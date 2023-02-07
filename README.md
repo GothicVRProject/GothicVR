@@ -32,6 +32,39 @@ File types and including data:
 ![Gothic-Unity-as-ZenGine-flow](./Documentation/Images/Gothic-Unity-as-ZenGine-flow.png)
 
 
+## lib/ZenLib
+
+**install**  
+```powershell
+choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+choco install mingw
+```
+
+**build**  
+```powershell
+cmake -G "MinGW Makefiles" `
+  -D ZENLIB_BUILD_EXAMPLES=On `
+  ..
+```
+
+**samples**  
+```powershell
+cd build/samples
+mkdir vdf-test
+
+# Will extract ZEN files out of VDFS
+./vdf_unpack.exe "C:\Program Files (x86)\Steam\steamapps\common\Gothic\Data\worlds.vdf" ./vdf-test
+```
+
+```powershell
+cd build/samples
+
+# Extracts VOB entries (e.g. Waypoints) from ZEN file (Like Spacer is doing)
+./zen_load.exe "C:\Program Files (x86)\Steam\steamapps\common\Gothic\Data\worlds.vdf" "WORLD"
+
+```
+
+
 ## FAQ
 
 **Q: What an awkward name...**  
