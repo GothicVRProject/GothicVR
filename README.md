@@ -42,9 +42,10 @@ choco install mingw
 
 **build**  
 ```powershell
-cmake -G "MinGW Makefiles" `
-  -D ZENLIB_BUILD_EXAMPLES=On `
-  ..
+mkdir build
+cd build
+cmake -G "MinGW Makefiles" -D ZENLIB_BUILD_EXAMPLES=On ..
+cmake --build .
 ```
 
 **samples**  
@@ -60,7 +61,7 @@ mkdir vdf-test
 cd build/samples
 
 # Extracts VOB entries (e.g. Waypoints) from ZEN file (Like Spacer is doing)
-./zen_load.exe "C:\Program Files (x86)\Steam\steamapps\common\Gothic\Data\worlds.vdf" "WORLD"
+./zen_load.exe "C:\Program Files (x86)\Steam\steamapps\common\Gothic\Data\worlds.vdf" "world.zen"
 
 ```
 
