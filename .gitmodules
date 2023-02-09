@@ -1,3 +1,4 @@
 [submodule "lib/ZenLib"]
 	path = lib/ZenLib
 	url = https://github.com/ataulien/ZenLib.git
+        ignore = dirty

@@ -66,6 +66,14 @@ cd build/samples
 ```
 
 
+## Howto load worldmesh
+* Check 
+  * ImportStaticMesh.cpp/BsZenLib::ImportAndCacheStaticMesh()
+  * ImportStaticMesh.cpp/BsZenLib::ImportAndCacheStaticMeshGeometry()
+  * zCProgMeshProto.h/ZenLoad::zCProgMeshProto()
+
+--> parser.readWorldMesh() --> during reading of .zen file it will parse mesh into this object.
+
 ## FAQ
 
 **Q: What an awkward name...**  
