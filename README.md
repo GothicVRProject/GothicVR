@@ -1,7 +1,7 @@
 # unZENity-VR
 This repository aims to leverage Unity as Open Source VR solution to work with Gothic 1/2, Mods, and Total Conversions.
 
-It's a PoC if the idea of _Importing everything from Gothic and act as the new engine (ZenGine --> Unity) behind the scenes can work.
+It's a PoC if the idea of _Importing everything_ from Gothic and act as the new engine (ZenGine --> Unity) behind the scenes can work.
 
 Heavily inspired and reusing code from:
 * [REGoth-bs](https://github.com/REGoth-project/REGoth-bs) ([Documentation](https://regoth-project.github.io/REGoth-bs/index.html))
