@@ -58,3 +58,10 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# Custom Ignores
+Assets/Logs/
+UserSettings/
+Assets/UberLogger.meta
+Assets/UberLogger/
+Assets/Pickle.meta
+Assets/Pickle/

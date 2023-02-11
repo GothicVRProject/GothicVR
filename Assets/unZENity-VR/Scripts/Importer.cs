@@ -1,7 +1,9 @@
+using Assimp;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 namespace UZVR
@@ -21,18 +23,11 @@ namespace UZVR
         {
             var srcPath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\_work\\DATA\\Worlds\\_work\\OLDCAMP.3DS";
             var destPath = Application.dataPath + "/OLDCAMP.3DS";
-            var relDestPath = "Assets/OLDCAMP.3DS";
             File.Copy(srcPath, destPath, true);
 
-            AssetDatabase.ImportAsset(relDestPath);
-
-            var obj = AssetDatabase.LoadAssetAtPath(relDestPath, typeof(Mesh));
-
             _Scene.GetRootGameObjects().Append(new GameObject("Foo"));
-            _Scene.GetRootGameObjects().Append(Object.Instantiate(obj));
-
-            int a = 2;
         }
+
 
         bool done;
         public void Update()
@@ -40,22 +35,23 @@ namespace UZVR
             if (done)
                 return;
 
-            var relDestPath = "Assets/OLDCAMP.3DS";
 
-            Mesh mesh = AssetDatabase.LoadAssetAtPath<Mesh>(relDestPath);
+            AssimpContext importer = new AssimpContext();
 
-            var gObject = new GameObject("Oldcamp");
 
-            var meshFilter = gObject.AddComponent<MeshFilter>();
-            meshFilter.mesh = mesh;
+            //var srcPath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\_work\\DATA\\Worlds\\_work\\OLDCAMP.3DS";
 
-            var meshRenderer = gObject.AddComponent<MeshRenderer>();
 
-            _Scene.GetRootGameObjects().Append(new GameObject("Foo2"));
-            _Scene.GetRootGameObjects().Append(gObject);
+            //var gObject = new GameObject("Oldcamp");
+            //gObject.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
 
-            done = true;
+            //var loader = gObject.AddComponent<Loader3DS>();
+            //loader.modelPath = srcPath;
 
+            //_Scene.GetRootGameObjects().Append(new GameObject("Foo2"));
+            //_Scene.GetRootGameObjects().Append(gObject);
+
+            //done = true;
         }
     }
 }
