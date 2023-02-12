@@ -32,6 +32,17 @@ File types and including data:
 ![Gothic-Unity-as-ZenGine-flow](./Documentation/Images/Gothic-Unity-as-ZenGine-flow.png)
 
 
+
+## What and how to use
+
+### World meshes
+1. (manually done) Extract VDF (e.g. worlds.vdf) into .zen (ZenLib)
+2. (todo) Convert .zen into .3ds (e.g. oldcamp.3ds) (which tool?)
+3. (done) Import oldcamp.3ds into Unity
+4. (manually done) Extract VDF (e.g. texture.vdf) into zen (ZenLib)
+5. (todo) Convert .tex textures into .tga (which tool?)
+6. (done) While creating mesh->materials we need to reference the TGA files in Unity
+
 ## lib/ZenLib
 
 **install**  

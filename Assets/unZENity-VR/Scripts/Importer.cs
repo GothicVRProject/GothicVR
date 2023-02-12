@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,12 +12,11 @@ namespace UZVR
     public class Importer : MonoBehaviour
     {
         private Scene _Scene;
-        private MeshFilter MeshTemplate = new MeshFilter();
 
 
         void Start()
         {
-            _Scene = SceneManager.GetSceneByName("Importer");
+            _Scene = SceneManager.GetSceneByName("SampleScene");
 
             _ImportMap();
         }
@@ -26,8 +26,6 @@ namespace UZVR
             var srcPath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\_work\\DATA\\Worlds\\_work\\OLDCAMP.3DS";
             var destPath = Application.dataPath + "/OLDCAMP.3DS";
             File.Copy(srcPath, destPath, true);
-
-            _Scene.GetRootGameObjects().Append(new GameObject("Foo"));
         }
 
 
@@ -42,6 +40,7 @@ namespace UZVR
 
             var root = new GameObject("Oldcamp");
             _Scene.GetRootGameObjects().Append(root);
+            root.transform.localPosition = new Vector3(10, 10, 10);
 
             root.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
 
@@ -59,6 +58,10 @@ namespace UZVR
             {
                 var meshObj = new GameObject(string.Format("zenGin0.{0,3:000}", i));
                 meshObj.transform.parent = root.transform;
+                meshObj.transform.localScale = Vector3.one;
+                meshObj.transform.localPosition = Vector3.zero;
+
+
                 var meshFilter = meshObj.AddComponent<MeshFilter>();
                 var meshRenderer = meshObj.AddComponent<MeshRenderer>();
 
@@ -125,8 +128,72 @@ namespace UZVR
         {
             var material = new Material(Shader.Find("Standard"));
             meshRenderer.material = material;
-
             material.name = importedMaterial.Name;
+
+            var diffuse = importedMaterial.TextureDiffuse;
+
+            using (var imageFile = File.OpenRead("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\___backup-modding\\GOTHIC MOD Development Kit\\VDFS-Tool\\_WORK\\DATA\\TEXTURES\\DESKTOP\\NOMIP\\INV_SLOT.TGA"))
+            {
+                var texture = _LoadTGA(imageFile);
+                material.mainTexture = texture;
+            }
+        }
+
+
+        // Credits: https://gist.github.com/mikezila/10557162
+        private Texture2D _LoadTGA(Stream TGAStream)
+        {
+
+            using (BinaryReader r = new BinaryReader(TGAStream))
+            {
+                // Skip some header info we don't care about.
+                // Even if we did care, we have to move the stream seek point to the beginning,
+                // as the previous method in the workflow left it at the end.
+                r.BaseStream.Seek(12, SeekOrigin.Begin);
+
+                short width = r.ReadInt16();
+                short height = r.ReadInt16();
+                int bitDepth = r.ReadByte();
+
+                // Skip a byte of header information we don't care about.
+                r.BaseStream.Seek(1, SeekOrigin.Current);
+
+                Texture2D tex = new Texture2D(width, height);
+                Color32[] pulledColors = new Color32[width * height];
+
+                if (bitDepth == 32)
+                {
+                    for (int i = 0; i < width * height; i++)
+                    {
+                        byte red = r.ReadByte();
+                        byte green = r.ReadByte();
+                        byte blue = r.ReadByte();
+                        byte alpha = r.ReadByte();
+
+                        pulledColors[i] = new Color32(blue, green, red, alpha);
+                    }
+                }
+                else if (bitDepth == 24)
+                {
+                    for (int i = 0; i < width * height; i++)
+                    {
+                        byte red = r.ReadByte();
+                        byte green = r.ReadByte();
+                        byte blue = r.ReadByte();
+
+                        pulledColors[i] = new Color32(blue, green, red, 1);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TGA texture had non 32/24 bit depth.");
+                }
+
+                tex.SetPixels32(pulledColors);
+                tex.Apply();
+                return tex;
+
+            }
         }
     }
 }
