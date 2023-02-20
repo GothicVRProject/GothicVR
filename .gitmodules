@@ -1,4 +1,12 @@
 [submodule "lib/ZenLib"]
 	path = lib/ZenLib
 	url = https://github.com/ataulien/ZenLib.git
-        ignore = dirty
+	ignore = dirty
+
+
+[submodule "Szmyk/VdfsSharp"]
+	path = Assets/Szmyk_VdfsSharp
+	url = https://github.com/Szmyk/VdfsSharp.git
+	ignore = dirty
+
+

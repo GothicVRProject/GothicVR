@@ -23,9 +23,6 @@ namespace UZVR
 
         private void _ImportMap()
         {
-            var srcPath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\_work\\DATA\\Worlds\\_work\\OLDCAMP.3DS";
-            var destPath = Application.dataPath + "/OLDCAMP.3DS";
-            File.Copy(srcPath, destPath, true);
         }
 
 

@@ -39,9 +39,12 @@ File types and including data:
 1. (manually done) Extract VDF (e.g. worlds.vdf) into .zen (ZenLib)
 2. (todo) Convert .zen into .3ds (e.g. oldcamp.3ds) (which tool?)
 3. (done) Import oldcamp.3ds into Unity
-4. (manually done) Extract VDF (e.g. texture.vdf) into zen (ZenLib)
+4. (manually done) Extract VDF (e.g. texture.vdf) into zen (ZenLib --> @see samples/vdf_unpack.cpp)
 5. (todo) Convert .tex textures into .tga (which tool?)
 6. (done) While creating mesh->materials we need to reference the TGA files in Unity
+
+Hints:
+* .tex -> Enthält eine Textur samt MipMap (Standard-Format: DXTC/S3TC)
 
 ## lib/ZenLib
 
