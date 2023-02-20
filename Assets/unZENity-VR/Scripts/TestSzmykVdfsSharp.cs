@@ -13,15 +13,16 @@ namespace UZVR
 
         void Start()
         {
-            string[] files = Directory.GetFiles(G1_DIR, "*.vdf", SearchOption.AllDirectories);
 
-            _ExtractVDFs(files);
+            //_ExtractVDFs();
+            _ExtractZens();
         }
 
-        private void _ExtractVDFs(string[] files)
+        private void _ExtractVDFs()
         {
-            Debug.Log(string.Format("Start importing vdf files from {0}", G1_DIR));
+            Debug.Log(string.Format("Start extracting vdf files from {0}", G1_DIR));
 
+            string[] files = Directory.GetFiles(G1_DIR, "*.vdf", SearchOption.AllDirectories);
             foreach (var file in files)
             {
                 var reader = new VdfsExtractor(file);
@@ -29,7 +30,16 @@ namespace UZVR
                 reader.ExtractFiles(UNITY_OUT_DIR, ExtractOption.Hierarchy);
             }
 
-            Debug.Log(string.Format("Import of {0} vdf files done.", files.Length));
+            Debug.Log(string.Format("Extracting of {0} vdf files done.", files.Length));
+        }
+
+        private void _ExtractZens()
+        {
+            Debug.Log(string.Format("Start extracting zen files from {0}", G1_DIR));
+
+            string[] files = Directory.GetFiles(UNITY_OUT_DIR, "*.zen", SearchOption.AllDirectories);
+
+            Debug.Log(string.Format("Extracting of {0} zen files done.", files.Length));
         }
 
     }
