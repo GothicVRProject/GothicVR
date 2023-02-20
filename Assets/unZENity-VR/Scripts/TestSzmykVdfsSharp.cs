@@ -9,6 +9,7 @@ namespace UZVR
     public class TestSzmykVdfsSharp : MonoBehaviour
     {
         private const string G1_DIR = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic";
+        private const string UNITY_OUT_DIR = "Assets/unZENity-VR/Extracted~";
 
         void Start()
         {
@@ -19,14 +20,16 @@ namespace UZVR
 
         private void _ExtractVDFs(string[] files)
         {
+            Debug.Log(string.Format("Start importing vdf files from {0}", G1_DIR));
+
             foreach (var file in files)
             {
                 var reader = new VdfsExtractor(file);
 
-                reader.ExtractFiles("Assets/unZENity-VR/Extracted~", ExtractOption.Hierarchy);
-                
-                int a = 2;
+                reader.ExtractFiles(UNITY_OUT_DIR, ExtractOption.Hierarchy);
             }
+
+            Debug.Log(string.Format("Import of {0} vdf files done.", files.Length));
         }
 
     }
