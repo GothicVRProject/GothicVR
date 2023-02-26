@@ -32,6 +32,15 @@ File types and including data:
 ![Gothic-Unity-as-ZenGine-flow](./Documentation/Images/Gothic-Unity-as-ZenGine-flow.png)
 
 
+## Gothic file formats and how to use
+
+### Mesh
+* Meshes are inside .vdf (worlds.vdf) --> .zen
+* Meshes can be in 3 variants: ASCII|BINARY|BIN_SAFE
+* Gothic meshes includes at least vertices
+* Need to check if we need to convert them to a 3ds/fbx file or just load directly from ZEN when game starts
+* C# parser is a reimplementation of [ataulien/ZenLib](https://github.com/ataulien/ZenLib/) and [lmichaelis/phoenix](https://github.com/lmichaelis/phoenix)
+
 
 ## What and how to use
 
@@ -92,3 +101,6 @@ cd build/samples
 
 **Q: What an awkward name...**  
 A: True! It's a combination of Gothic, Unity, Zen, VR, and a grain of insanity.
+
+**Q: Why did you reimplement parsing of Gothic files as ZenLib and phoenix already did it?**  
+A: Unfortunately we couldn't get ZenLib to compile as shared Library/DLL (compile error as dependencies weren't prepared for SHARED usage) and phoenix isn't exporting it's functions as extern "C" which is [required by mono](https://www.mono-project.com/docs/advanced/pinvoke/) (Unity crashes without error message when calling phoenix's functions via DLLImport).
