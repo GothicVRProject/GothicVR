@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace UZVR
@@ -10,7 +11,7 @@ namespace UZVR
     public class ZenParser
     {
         private string path;
-        private StreamReader reader;
+        private BinaryReader reader;
 
         private ZenFile zen;
 
@@ -22,19 +23,20 @@ namespace UZVR
 
         public void Parse()
         {
-            _ReadFile();
-            _ParseHeader();
+            using (FileStream fs = File.OpenRead(path))
+            using (BinaryReader rdr = new BinaryReader(fs, Encoding.ASCII))
+            {
+                reader = rdr;
+                _ParseHeader();
+                _ParseImplementationHeader();
+            }
 
             Debug.Log(zen);
         }
 
-        private void _ReadFile()
-        {
-            reader = File.OpenText(path);
-        }
-
         private void _ParseHeader()
         {
+            var foo = new BinaryReader(reader.BaseStream);
             reader.ReadLine(); // ZenGin Archive
             zen.header.version = int.Parse(reader.ReadLine().Replace("ver ", "")); // ver X
             reader.ReadLine(); // archiver type
@@ -46,6 +48,16 @@ namespace UZVR
 
             if (end != "END")
                 throw new Exception("Zen Header broken.");
+
+            if (zen.header.type != "BIN_SAFE")
+                throw new Exception("Only BINARY_SAFE as Zen type is implemented so far.");
+        }
+
+        private void _ParseImplementationHeader()
+        {
+            var version = reader.ReadUInt32();
+            var objectCount = reader.ReadUInt32();
+            var hashTableOffset = reader.ReadUInt32();
         }
     }
 }
