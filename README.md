@@ -8,6 +8,10 @@ Heavily inspired and reusing code from:
 * [OpenGothic](https://github.com/Try/OpenGothic)
 
 
+## How to contribute
+We're always looking for people with knowledge and/or spirit. Feel free to reach out to us via gothicVR(at)outlook.com or visit us at our Discord server [Gothic VR](https://discord.gg/3EzACMVx).
+
+
 ## Gothic folder and files to import
 
 Relevant Gothic folder and included files:
