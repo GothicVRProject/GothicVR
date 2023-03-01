@@ -6,9 +6,9 @@ namespace UZVR
 {
     public class DllImportTest : MonoBehaviour
     {
-        [DllImport("test_lib")]
+        [DllImport("phoenix-csharp-wrapper")]
         private static extern IntPtr getVDFHeader();
-        [DllImport("test_lib")]
+        [DllImport("phoenix-csharp-wrapper")]
         private static extern string getHeaderComment(IntPtr vdfHeader);
 
         void Start()
