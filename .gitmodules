@@ -1,0 +1,3 @@
+[submodule "Dependencies/phoenix-csharp-wrapper"]
+	path = Dependencies/phoenix-csharp-wrapper
+	url = https://github.com/GothicVRProject/phoenix-csharp-wrapper.git
