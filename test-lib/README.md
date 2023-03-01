@@ -14,3 +14,8 @@ choco install mingw
 cmake -G "MinGW Makefiles" -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
+
+
+## Resources
+
+* To check for exported DLL functions and dependencies being used: [Dependency Walker](https://www.dependencywalker.com/)
