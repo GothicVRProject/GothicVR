@@ -19,3 +19,4 @@ cmake --build build
 ## Resources
 
 * To check for exported DLL functions and dependencies being used: [Dependency Walker](https://www.dependencywalker.com/)
+* Howto export complex C++ objects via "wrapper": https://stackoverflow.com/questions/315051/using-a-class-defined-in-a-c-dll-in-c-sharp-code
