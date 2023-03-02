@@ -4,46 +4,105 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace UZVR
 {
     public class DllImportTest : MonoBehaviour
     {
-        private const string DLLNAME = "phoenix-csharp-wrapper";
-        private const string G1Dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\";
-
-
-        [DllImport(DLLNAME)] private static extern IntPtr createVDFContainer();
-        [DllImport(DLLNAME)] private static extern void addVDFToContainer(IntPtr vdfContainer, string vdfPath);
-        [DllImport(DLLNAME)] private static extern void disposeVDFContainer(IntPtr vdfContainer);
-
-        [DllImport(DLLNAME)] private static extern IntPtr loadWorld(IntPtr vdfContainer, string worldFileName, MyVector3[] vectors);
-        
-        
-        private IntPtr vdfContainer;
-        private void OnDestroy() { disposeVDFContainer(vdfContainer); }
-
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct MyVector3
-        {
-            float x;
-            float y;
-            float z;
-        }
-
         void Start()
         {
-            vdfContainer = createVDFContainer();
+            var vertices = new PhoenixBridge().GetWorldVertices();
 
-            var vdfPaths = Directory.GetFiles(G1Dir + "/Data", "*.vdf");
 
-            foreach (var vdfPath in vdfPaths)
-                addVDFToContainer(vdfContainer, vdfPath);
+            var root = new GameObject("World");
 
-            var vectors = new MyVector3[1];
+            var scene = SceneManager.GetSceneByName("SampleScene");
+            scene.GetRootGameObjects().Append(root);
+            var meshObj = new GameObject(string.Format("Mesh"));
+            meshObj.transform.parent = root.transform;
 
-            loadWorld(vdfContainer, "world.zen", vectors);
+            var meshFilter = meshObj.AddComponent<MeshFilter>();
+            var meshRenderer = meshObj.AddComponent<MeshRenderer>();
+
+            _PrepareMeshFilter(meshFilter, vertices);
+            _PrepareMeshRenderer(meshRenderer);
+        }
+
+        private void _PrepareMeshFilter(MeshFilter meshFilter, List<Vector3> vertices)
+        {
+            var mesh = new Mesh();
+            meshFilter.mesh = mesh;
+
+            mesh.vertices = vertices.ToArray();
+        }
+
+        private void _PrepareMeshRenderer(MeshRenderer meshRenderer)
+        {
+            var material = new Material(Shader.Find("Standard"));
+            meshRenderer.material = material;
+
+            using (var imageFile = File.OpenRead("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\___backup-modding\\GOTHIC MOD Development Kit\\VDFS-Tool\\_WORK\\DATA\\TEXTURES\\DESKTOP\\NOMIP\\INV_SLOT.TGA"))
+            {
+                var texture = _LoadTGA(imageFile);
+                material.mainTexture = texture;
+            }
+        }
+
+        // Credits: https://gist.github.com/mikezila/10557162
+        private Texture2D _LoadTGA(Stream TGAStream)
+        {
+
+            using (BinaryReader r = new BinaryReader(TGAStream))
+            {
+                // Skip some header info we don't care about.
+                // Even if we did care, we have to move the stream seek point to the beginning,
+                // as the previous method in the workflow left it at the end.
+                r.BaseStream.Seek(12, SeekOrigin.Begin);
+
+                short width = r.ReadInt16();
+                short height = r.ReadInt16();
+                int bitDepth = r.ReadByte();
+
+                // Skip a byte of header information we don't care about.
+                r.BaseStream.Seek(1, SeekOrigin.Current);
+
+                Texture2D tex = new Texture2D(width, height);
+                Color32[] pulledColors = new Color32[width * height];
+
+                if (bitDepth == 32)
+                {
+                    for (int i = 0; i < width * height; i++)
+                    {
+                        byte red = r.ReadByte();
+                        byte green = r.ReadByte();
+                        byte blue = r.ReadByte();
+                        byte alpha = r.ReadByte();
+
+                        pulledColors[i] = new Color32(blue, green, red, alpha);
+                    }
+                }
+                else if (bitDepth == 24)
+                {
+                    for (int i = 0; i < width * height; i++)
+                    {
+                        byte red = r.ReadByte();
+                        byte green = r.ReadByte();
+                        byte blue = r.ReadByte();
+
+                        pulledColors[i] = new Color32(blue, green, red, 1);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TGA texture had non 32/24 bit depth.");
+                }
+
+                tex.SetPixels32(pulledColors);
+                tex.Apply();
+                return tex;
+
+            }
         }
     }
 }
