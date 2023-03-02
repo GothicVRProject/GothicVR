@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -14,45 +15,35 @@ namespace UZVR
 
         [DllImport(DLLNAME)] private static extern IntPtr createVDFContainer();
         [DllImport(DLLNAME)] private static extern void addVDFToContainer(IntPtr vdfContainer, string vdfPath);
-        [DllImport(DLLNAME)] private static extern IntPtr getVDFEntry(IntPtr vdfContainer, string name);
         [DllImport(DLLNAME)] private static extern void disposeVDFContainer(IntPtr vdfContainer);
 
+        [DllImport(DLLNAME)] private static extern IntPtr loadWorld(IntPtr vdfContainer, string worldFileName, MyVector3[] vectors);
+        
+        
         private IntPtr vdfContainer;
+        private void OnDestroy() { disposeVDFContainer(vdfContainer); }
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct MyVector3
+        {
+            float x;
+            float y;
+            float z;
+        }
 
         void Start()
         {
             vdfContainer = createVDFContainer();
 
-            var vdfPaths = GetVDFPaths();
+            var vdfPaths = Directory.GetFiles(G1Dir + "/Data", "*.vdf");
 
             foreach (var vdfPath in vdfPaths)
-            {
-               HandleVDF(vdfPath);
-            }
+                addVDFToContainer(vdfContainer, vdfPath);
 
-            var found = findVDFByName("world.zen");
+            var vectors = new MyVector3[1];
 
-            disposeVDFContainer(vdfContainer);
-        }
-
-
-
-        private string[] GetVDFPaths()
-        {
-            return Directory.GetFiles(G1Dir + "/Data", "*.vdf");
-        }
-
-
-        private void HandleVDF(string vdfPath)
-        {
-            addVDFToContainer(vdfContainer, vdfPath);
-        }
-
-        private bool findVDFByName(string name)
-        {
-            IntPtr found = getVDFEntry(vdfContainer, name);
-
-            return found != IntPtr.Zero;
+            loadWorld(vdfContainer, "world.zen", vectors);
         }
     }
 }
