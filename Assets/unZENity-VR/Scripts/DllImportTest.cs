@@ -12,7 +12,7 @@ namespace UZVR
     {
         void Start()
         {
-            var vertices = new PhoenixBridge().GetWorldVertices();
+            var world = new PhoenixBridge().GetWorld();
 
 
             var root = new GameObject("World");
@@ -25,16 +25,17 @@ namespace UZVR
             var meshFilter = meshObj.AddComponent<MeshFilter>();
             var meshRenderer = meshObj.AddComponent<MeshRenderer>();
 
-            _PrepareMeshFilter(meshFilter, vertices);
+            _PrepareMeshFilter(meshFilter, world);
             _PrepareMeshRenderer(meshRenderer);
         }
 
-        private void _PrepareMeshFilter(MeshFilter meshFilter, List<Vector3> vertices)
+        private void _PrepareMeshFilter(MeshFilter meshFilter, World world)
         {
             var mesh = new Mesh();
             meshFilter.mesh = mesh;
 
-            mesh.vertices = vertices.ToArray();
+            mesh.vertices = world.vertices.ToArray();
+            mesh.triangles = world.triangles.ToArray();
         }
 
         private void _PrepareMeshRenderer(MeshRenderer meshRenderer)
