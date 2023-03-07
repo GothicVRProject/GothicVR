@@ -24,14 +24,13 @@ namespace UZVR
         [DllImport(DLLNAME)] private static extern void addVDFToContainer(IntPtr vdfContainer, string vdfPath);
 
         [DllImport(DLLNAME)] private static extern IntPtr loadWorldMesh(IntPtr vdfContainer, string worldFileName);
-
         [DllImport(DLLNAME)] private static extern int getWorldVerticesCount(IntPtr worldContainer);
-        [DllImport(DLLNAME)] private static extern void getMeshVertex(IntPtr mesh, int index, out float x, out float y, out float z);
+        [DllImport(DLLNAME)] private static extern void getWorldMeshVertex(IntPtr mesh, int index, out float x, out float y, out float z);
         [DllImport(DLLNAME)] private static extern int getWorldMeshVertexIndicesCount(IntPtr worldContainer);
         [DllImport(DLLNAME)] private static extern void getWorldMeshVertexIndex(IntPtr mesh, int index, out UInt32 value);
 
         [DllImport(DLLNAME)] private static extern void disposeVDFContainer(IntPtr vdfContainer);
-        [DllImport(DLLNAME)] private static extern void disposeMesh(IntPtr mesh);
+        [DllImport(DLLNAME)] private static extern void disposeWorldMesh(IntPtr mesh);
 
 
         private IntPtr vdfContainer;
@@ -57,7 +56,7 @@ namespace UZVR
             world.vertices = _GetWorldVertices(mesh);
             world.triangles = _GetWorldTriangles(mesh);
 
-            disposeMesh(mesh);
+            disposeWorldMesh(mesh);
 // FIXME kills Unity. NPE?
 //          disposeVDFContainer(vdfContainer);
 
@@ -71,7 +70,7 @@ namespace UZVR
 
             for (int i = 0; i < getWorldVerticesCount(mesh); i++)
             {
-                getMeshVertex(mesh, i, out float x, out float y, out float z);
+                getWorldMeshVertex(mesh, i, out float x, out float y, out float z);
                 vertices.Add(new(x, y, z));
             }
 
