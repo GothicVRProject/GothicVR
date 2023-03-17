@@ -12,11 +12,16 @@ Heavily inspired and reusing code from:
 We're always looking for people with knowledge and/or spirit. Feel free to reach out to us via gothicVR(at)outlook.com or visit us at our Discord server [Gothic VR](https://discord.gg/3EzACMVx).
 
 ## Workflow/Gameflow
-![data flow](./Documentation/Images/data-flow.drawio.png)
+
+![common interfaces between bridge and unity](./Documentation/Images/common-interfaces-bridge-unity.drawio.png)
 
 * unZENity-VR requests data from phoenix-csharp-bridge DLL.
 * The DLL uses it's compiled phoenix dependency to read Gothic assets.
 * The data is then returned to Unity to build Unity C# objects like Meshes.
+* Unity also registers functions on the DLL to react to Daedalus events.
+
+Below is an example workflow of how data is requested:
+![data flow](./Documentation/Images/data-flow.drawio.png)
 
 
 ## FAQ
