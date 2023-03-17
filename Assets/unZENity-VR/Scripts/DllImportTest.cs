@@ -26,27 +26,32 @@ namespace UZVR
             var meshFilter = meshObj.AddComponent<MeshFilter>();
             var meshRenderer = meshObj.AddComponent<MeshRenderer>();
 
-            _PrepareMeshRenderer(meshRenderer);
+            _PrepareMeshRenderer(meshRenderer, world);
             _PrepareMeshFilter(meshFilter, world);
 
             root.transform.localScale = Vector3.one / 100;
 
         }
 
-        private void _PrepareMeshRenderer(MeshRenderer meshRenderer)
+        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, World world)
         {
             var standardShader = Shader.Find("Standard");
 
-            meshRenderer.materials = new[] { new Material(standardShader), new Material(standardShader), new Material(standardShader) };
+            Material[] materials = new Material[world.materialCount];
 
-            meshRenderer.materials[0].color = Color.red;
-            meshRenderer.materials[1].color = Color.yellow;
-            meshRenderer.materials[2].color = Color.green;
+            meshRenderer.materials = materials;
+
+            //meshRenderer.materials[0].color = Color.red;
+            //meshRenderer.materials[1].color = Color.yellow;
+            //meshRenderer.materials[2].color = Color.green;
 
             //using (var imageFile = File.OpenRead("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\___backup-modding\\GOTHIC MOD Development Kit\\VDFS-Tool\\_WORK\\DATA\\TEXTURES\\DESKTOP\\NOMIP\\INV_SLOT.TGA"))
             //{
             //    var texture = _LoadTGA(imageFile);
-            //    material.mainTexture = texture;
+            //    foreach (var material in meshRenderer.materials)
+            //    {
+            //        material.mainTexture = texture;
+            //    }
             //}
         }
         private void _PrepareMeshFilter(MeshFilter meshFilter, World world)
@@ -55,14 +60,15 @@ namespace UZVR
             meshFilter.mesh = mesh;
 
             mesh.vertices = world.vertices.ToArray();
-            mesh.triangles = world.triangles.ToArray();
 
-            mesh.subMeshCount = 3;
-            int oneThird = world.triangles.Count / 3;
-            //meshFilter.mesh.SetSubMesh(1, new SubMeshDescriptor(0, world.triangles.Count));
-            meshFilter.mesh.SetSubMesh(0, new SubMeshDescriptor(oneThird * 0, oneThird * 1 - 1));
-            meshFilter.mesh.SetSubMesh(1, new SubMeshDescriptor(oneThird * 1, oneThird * 2 - 1));
-            meshFilter.mesh.SetSubMesh(2, new SubMeshDescriptor(oneThird * 2, oneThird * 3 - 1));
+            mesh.subMeshCount = world.materialCount;
+            mesh.vertices = world.vertices.ToArray();
+            //mesh.triangles = world.triangles.ToArray();
+
+            for (var materialIndex = 0; materialIndex < world.triangles.Count; materialIndex++)
+            {
+                mesh.SetTriangles(world.triangles[materialIndex], materialIndex);
+            }
         }
 
         // Credits: https://gist.github.com/mikezila/10557162

@@ -10,7 +10,8 @@ namespace UZVR
     public struct World
     {
         public List<Vector3> vertices;
-        public List<int> triangles;
+        public Dictionary<int, List<int>> triangles;
+        public int materialCount;
     }
 
 
@@ -26,8 +27,10 @@ namespace UZVR
         [DllImport(DLLNAME)] private static extern IntPtr loadWorldMesh(IntPtr vdfContainer, string worldFileName);
         [DllImport(DLLNAME)] private static extern int getWorldVerticesCount(IntPtr worldContainer);
         [DllImport(DLLNAME)] private static extern void getWorldMeshVertex(IntPtr mesh, int index, out float x, out float y, out float z);
-        [DllImport(DLLNAME)] private static extern int getWorldMeshVertexIndicesCount(IntPtr worldContainer);
-        [DllImport(DLLNAME)] private static extern void getWorldMeshVertexIndex(IntPtr mesh, int index, out UInt32 value);
+        [DllImport(DLLNAME)] private static extern int getWorldMeshTrianglesCount(IntPtr worldContainer);
+        [DllImport(DLLNAME)] private static extern void getWorldMeshTriangleIndex(IntPtr mesh, int index, out UInt32 valueA, out UInt32 valueB, out UInt32 valueC);
+        [DllImport(DLLNAME)] private static extern int getWorldMeshMaterialsCount(IntPtr mesh);
+        [DllImport(DLLNAME)] private static extern int getWorldMeshMaterialIndex(IntPtr mesh, int index);
 
         [DllImport(DLLNAME)] private static extern void disposeVDFContainer(IntPtr vdfContainer);
         [DllImport(DLLNAME)] private static extern void disposeWorldMesh(IntPtr mesh);
@@ -54,7 +57,8 @@ namespace UZVR
             var mesh = loadWorldMesh(vdfContainer, "world.zen");
 
             world.vertices = _GetWorldVertices(mesh);
-            world.triangles = _GetWorldTriangles(mesh);
+            world.materialCount = getWorldMeshMaterialsCount(mesh);
+            world.triangles = _GetWorldTriangles(mesh, world.materialCount);
 
             disposeWorldMesh(mesh);
 // FIXME kills Unity. NPE?
@@ -77,15 +81,26 @@ namespace UZVR
             return vertices;
         }
 
-        private List<int> _GetWorldTriangles(IntPtr mesh)
+        private Dictionary<int, List<int>> _GetWorldTriangles(IntPtr mesh, int materialCount)
         {
-            List<int> triangles = new();
+            Dictionary<int, List<int>> triangles = new();
 
+            // FIXME We can optimize by cleaning up empty materials.
+            // PERFORMANCE e.g. worlds.vdfs has 2263 materials, but only ~1300 of them have triangles attached to it.
 
-            for (int i = 0; i < getWorldMeshVertexIndicesCount(mesh); i++)
+            // Initialize array
+            for (var i=0; i < materialCount; i++)
             {
-                getWorldMeshVertexIndex(mesh, i, out UInt32 value);
-                triangles.Add((int)value);
+                triangles.Add(i, new());
+            }
+
+
+            for (int i = 0; i < getWorldMeshTrianglesCount(mesh); i++)
+            {
+                var materialIndex = getWorldMeshMaterialIndex(mesh, i);
+                getWorldMeshTriangleIndex(mesh, i, out UInt32 valueA, out UInt32 valueB, out UInt32 valueC);
+
+                triangles[materialIndex].AddRange(new []{ (int)valueA, (int)valueB, (int)valueC });
             }
 
             return triangles;
