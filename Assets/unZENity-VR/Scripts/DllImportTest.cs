@@ -37,7 +37,15 @@ namespace UZVR
         {
             var standardShader = Shader.Find("Standard");
 
-            Material[] materials = new Material[world.materialCount];
+            Material[] materials = new Material[world.materials.Count];
+
+
+            for (int i = 0; i < materials.Length; i++)
+            {
+                var m = new Material(standardShader);
+                m.color = world.materials[i].color;
+                materials[i] = m;
+            }
 
             meshRenderer.materials = materials;
 
@@ -61,7 +69,7 @@ namespace UZVR
 
             mesh.vertices = world.vertices.ToArray();
 
-            mesh.subMeshCount = world.materialCount;
+            mesh.subMeshCount = world.materials.Count;
             mesh.vertices = world.vertices.ToArray();
             //mesh.triangles = world.triangles.ToArray();
 

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace UZVR
@@ -10,8 +10,13 @@ namespace UZVR
     public struct World
     {
         public List<Vector3> vertices;
+        public List<PC_Material> materials;
         public Dictionary<int, List<int>> triangles;
-        public int materialCount;
+    }
+
+    public struct PC_Material
+    {
+        public Color color;
     }
 
 
@@ -29,7 +34,9 @@ namespace UZVR
         [DllImport(DLLNAME)] private static extern void getWorldMeshVertex(IntPtr mesh, int index, out float x, out float y, out float z);
         [DllImport(DLLNAME)] private static extern int getWorldMeshTrianglesCount(IntPtr worldContainer);
         [DllImport(DLLNAME)] private static extern void getWorldMeshTriangleIndex(IntPtr mesh, int index, out UInt32 valueA, out UInt32 valueB, out UInt32 valueC);
+
         [DllImport(DLLNAME)] private static extern int getWorldMeshMaterialsCount(IntPtr mesh);
+        [DllImport(DLLNAME)] private static extern void getWorldMeshMaterialColor(IntPtr mesh, int index, out byte r, out byte g, out byte b, out byte a);
         [DllImport(DLLNAME)] private static extern int getWorldMeshMaterialIndex(IntPtr mesh, int index);
 
         [DllImport(DLLNAME)] private static extern void disposeVDFContainer(IntPtr vdfContainer);
@@ -57,8 +64,8 @@ namespace UZVR
             var mesh = loadWorldMesh(vdfContainer, "world.zen");
 
             world.vertices = _GetWorldVertices(mesh);
-            world.materialCount = getWorldMeshMaterialsCount(mesh);
-            world.triangles = _GetWorldTriangles(mesh, world.materialCount);
+            world.materials = _GetWorldMaterials(mesh);
+            world.triangles = _GetWorldTriangles(mesh, world.materials.Count);
 
             disposeWorldMesh(mesh);
 // FIXME kills Unity. NPE?
@@ -80,6 +87,22 @@ namespace UZVR
 
             return vertices;
         }
+
+        private List<PC_Material> _GetWorldMaterials(IntPtr mesh)
+        {
+            var materials = new List<PC_Material>();
+
+            for (var i = 0; i < getWorldMeshMaterialsCount(mesh); i++)
+            {
+                getWorldMeshMaterialColor(mesh, i, out byte r, out byte g, out byte b, out byte a);
+                // We need to convert uint8 (byte) to float for Unity.
+                var m = new PC_Material() { color = new Color((float)r/255, (float)g /255, (float)b /255, (float)a /255) };
+                materials.Add(m);
+            }
+
+            return materials;
+        }
+
 
         private Dictionary<int, List<int>> _GetWorldTriangles(IntPtr mesh, int materialCount)
         {
