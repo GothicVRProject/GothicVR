@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using UnityEngine;
 
 namespace UZVR
@@ -12,11 +13,23 @@ namespace UZVR
         public List<Vector3> vertices;
         public List<PCBridge_Material> materials;
         public Dictionary<int, List<int>> triangles;
+
+        public List<PCBridge_Waypoint> waypoints;
     }
 
     public struct PCBridge_Material
     {
         public Color color;
+    }
+
+    public struct PCBridge_Waypoint
+    {
+        public string name;
+        public bool freePoint;
+        public Vector3 position;
+        public Vector3 direction;
+        public bool underWater;
+        public int waterDepth;
     }
 
 
@@ -39,7 +52,7 @@ namespace UZVR
 
         // Vertices; aka Vertexes ;-)
         [DllImport(DLLNAME)] private static extern int getWorldMeshVertexCount(IntPtr world);
-        [DllImport(DLLNAME)] private static extern void getWorldMeshVertex(IntPtr world, int index, out float x, out float y, out float z);
+        [DllImport(DLLNAME)] private static extern Vector3 getWorldMeshVertex(IntPtr world, int index);
 
         // Triangles
         [DllImport(DLLNAME)] private static extern int getWorldMeshTriangleCount(IntPtr world);
@@ -49,6 +62,10 @@ namespace UZVR
         [DllImport(DLLNAME)] private static extern int getWorldMeshMaterialCount(IntPtr world);
         [DllImport(DLLNAME)] private static extern void getWorldMeshMaterialColor(IntPtr world, int index, out byte r, out byte g, out byte b, out byte a);
         [DllImport(DLLNAME)] private static extern int getWorldMeshTriangleMaterialIndex(IntPtr world, int index);
+
+        // Waypoints
+        [DllImport(DLLNAME)] private static extern int getWorldWaypointCount(IntPtr world);
+        [DllImport(DLLNAME)] private static extern void getWorldWaypoint(IntPtr world, int index, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth, out string name);
 
 
         private IntPtr _vdfContainer;
@@ -70,6 +87,7 @@ namespace UZVR
             world.vertices = _GetWorldVertices(worldPtr);
             world.materials = _GetWorldMaterials(worldPtr);
             world.triangles = _GetWorldTriangles(worldPtr, world.materials.Count);
+            world.waypoints = _GetWorldWaypoints(worldPtr);
 
             disposeWorld(worldPtr);
 
@@ -98,8 +116,7 @@ namespace UZVR
 
             for (int i = 0; i < getWorldMeshVertexCount(worldPtr); i++)
             {
-                getWorldMeshVertex(worldPtr, i, out float x, out float y, out float z);
-                vertices.Add(new(x, y, z));
+                vertices.Add(getWorldMeshVertex(worldPtr, i));
             }
 
             return vertices;
@@ -148,6 +165,34 @@ namespace UZVR
             }
 
             return triangles;
+        }
+
+
+        private List<PCBridge_Waypoint> _GetWorldWaypoints(IntPtr worldPtr)
+        {
+            var waypointCount = getWorldWaypointCount(worldPtr);
+            var waypoints = new List<PCBridge_Waypoint>(waypointCount);
+
+            for(int i = 0; i < waypointCount; i++)
+            {
+                getWorldWaypoint(worldPtr, i, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth, out string name);
+
+                Debug.Log(name);
+
+                var waypoint = new PCBridge_Waypoint()
+                {
+                    name = name,
+                    position = position,
+                    direction = direction,
+                    freePoint = freePoint,
+                    underWater = underWater,
+                    waterDepth = waterDepth
+                };
+                
+                waypoints.Add(waypoint);
+            }
+
+            return waypoints;
         }
     }
 }
