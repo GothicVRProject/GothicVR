@@ -82,10 +82,7 @@ namespace UZVR
             for (int i = 0; i < getWorldVerticesCount(mesh); i++)
             {
                 getWorldMeshVertex(mesh, i, out float x, out float y, out float z);
-                // FIXME Vertices have 2 issues
-                // 1. HOTFIX the visible surface is flipped. We therefore switch z with x) https://answers.unity.com/questions/713367/meshes-upside-down-invisible.html
-                // 2. The mesh is mirrored. on the x/y axis. We need to check what to do...
-                vertices.Add(new(z, y, x));
+                vertices.Add(new(x, y, z));
             }
 
             return vertices;
@@ -126,7 +123,10 @@ namespace UZVR
                 var materialIndex = getWorldMeshMaterialIndex(mesh, i);
                 getWorldMeshTriangleIndex(mesh, i, out UInt32 valueA, out UInt32 valueB, out UInt32 valueC);
 
-                triangles[materialIndex].AddRange(new []{ (int)valueA, (int)valueB, (int)valueC });
+                // We need to flip valueA with valueC to:
+                // 1/ have the mesh elements shown (flipped surface) and
+                // 2/ world mirrored right way.
+                triangles[materialIndex].AddRange(new []{ (int)valueC, (int)valueB, (int)valueA });
             }
 
             return triangles;
