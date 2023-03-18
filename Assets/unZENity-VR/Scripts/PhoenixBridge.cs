@@ -43,35 +43,43 @@ namespace UZVR
         [DllImport(DLLNAME)] private static extern void disposeWorldMesh(IntPtr mesh);
 
 
-        private IntPtr vdfContainer;
+        private IntPtr _vdfContainer;
 
         ~PhoenixBridge()
         {
-            disposeVDFContainer(vdfContainer);
+            disposeVDFContainer(_vdfContainer);
         }
 
 
         public World GetWorld()
         {
+            _ParseVDFs();
+
             World world = new();
-            vdfContainer = createVDFContainer();
-
-            var vdfPaths = Directory.GetFiles(G1Dir + "/Data", "*.vdf");
-
-            foreach (var vdfPath in vdfPaths)
-                addVDFToContainer(vdfContainer, vdfPath);
-
-            var mesh = loadWorldMesh(vdfContainer, "world.zen");
+            var mesh = loadWorldMesh(_vdfContainer, "world.zen");
 
             world.vertices = _GetWorldVertices(mesh);
             world.materials = _GetWorldMaterials(mesh);
             world.triangles = _GetWorldTriangles(mesh, world.materials.Count);
 
             disposeWorldMesh(mesh);
-// FIXME kills Unity. NPE?
-//          disposeVDFContainer(vdfContainer);
 
             return world;
+        }
+
+        private void _ParseVDFs()
+        {
+            if (_vdfContainer != IntPtr.Zero)
+                return;
+
+            _vdfContainer = createVDFContainer();
+
+            var vdfPaths = Directory.GetFiles(G1Dir + "/Data", "*.vdf");
+
+            foreach (var vdfPath in vdfPaths)
+                addVDFToContainer(_vdfContainer, vdfPath);
+
+
         }
 
         private List<Vector3> _GetWorldVertices(IntPtr mesh)
