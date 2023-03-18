@@ -7,14 +7,14 @@ using UnityEngine;
 
 namespace UZVR
 {
-    public struct World
+    public struct PCBridge_World
     {
         public List<Vector3> vertices;
-        public List<PC_Material> materials;
+        public List<PCBridge_Material> materials;
         public Dictionary<int, List<int>> triangles;
     }
 
-    public struct PC_Material
+    public struct PCBridge_Material
     {
         public Color color;
     }
@@ -26,21 +26,29 @@ namespace UZVR
         private const string G1Dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\";
 
 
+        // Load
         [DllImport(DLLNAME)] private static extern IntPtr createVDFContainer();
         [DllImport(DLLNAME)] private static extern void addVDFToContainer(IntPtr vdfContainer, string vdfPath);
+        [DllImport(DLLNAME)] private static extern IntPtr loadWorld(IntPtr vdfContainer, string worldFileName);
 
-        [DllImport(DLLNAME)] private static extern IntPtr loadWorldMesh(IntPtr vdfContainer, string worldFileName);
-        [DllImport(DLLNAME)] private static extern int getWorldVerticesCount(IntPtr worldContainer);
-        [DllImport(DLLNAME)] private static extern void getWorldMeshVertex(IntPtr mesh, int index, out float x, out float y, out float z);
-        [DllImport(DLLNAME)] private static extern int getWorldMeshTrianglesCount(IntPtr worldContainer);
-        [DllImport(DLLNAME)] private static extern void getWorldMeshTriangleIndex(IntPtr mesh, int index, out UInt32 valueA, out UInt32 valueB, out UInt32 valueC);
-
-        [DllImport(DLLNAME)] private static extern int getWorldMeshMaterialsCount(IntPtr mesh);
-        [DllImport(DLLNAME)] private static extern void getWorldMeshMaterialColor(IntPtr mesh, int index, out byte r, out byte g, out byte b, out byte a);
-        [DllImport(DLLNAME)] private static extern int getWorldMeshMaterialIndex(IntPtr mesh, int index);
-
+        // Dispose
         [DllImport(DLLNAME)] private static extern void disposeVDFContainer(IntPtr vdfContainer);
-        [DllImport(DLLNAME)] private static extern void disposeWorldMesh(IntPtr mesh);
+        [DllImport(DLLNAME)] private static extern void disposeWorld(IntPtr mesh);
+
+
+
+        // Vertices; aka Vertexes ;-)
+        [DllImport(DLLNAME)] private static extern int getWorldMeshVertexCount(IntPtr world);
+        [DllImport(DLLNAME)] private static extern void getWorldMeshVertex(IntPtr world, int index, out float x, out float y, out float z);
+
+        // Triangles
+        [DllImport(DLLNAME)] private static extern int getWorldMeshTriangleCount(IntPtr world);
+        [DllImport(DLLNAME)] private static extern void getWorldMeshTriangle(IntPtr world, int index, out UInt32 valueA, out UInt32 valueB, out UInt32 valueC);
+
+        // Materials
+        [DllImport(DLLNAME)] private static extern int getWorldMeshMaterialCount(IntPtr world);
+        [DllImport(DLLNAME)] private static extern void getWorldMeshMaterialColor(IntPtr world, int index, out byte r, out byte g, out byte b, out byte a);
+        [DllImport(DLLNAME)] private static extern int getWorldMeshTriangleMaterialIndex(IntPtr world, int index);
 
 
         private IntPtr _vdfContainer;
@@ -51,18 +59,19 @@ namespace UZVR
         }
 
 
-        public World GetWorld()
+        public PCBridge_World GetWorld()
         {
             _ParseVDFs();
 
-            World world = new();
-            var mesh = loadWorldMesh(_vdfContainer, "world.zen");
+            var world = new PCBridge_World();
 
-            world.vertices = _GetWorldVertices(mesh);
-            world.materials = _GetWorldMaterials(mesh);
-            world.triangles = _GetWorldTriangles(mesh, world.materials.Count);
+            var worldPtr = loadWorld(_vdfContainer, "world.zen");
 
-            disposeWorldMesh(mesh);
+            world.vertices = _GetWorldVertices(worldPtr);
+            world.materials = _GetWorldMaterials(worldPtr);
+            world.triangles = _GetWorldTriangles(worldPtr, world.materials.Count);
+
+            disposeWorld(worldPtr);
 
             return world;
         }
@@ -82,29 +91,30 @@ namespace UZVR
 
         }
 
-        private List<Vector3> _GetWorldVertices(IntPtr mesh)
+        private List<Vector3> _GetWorldVertices(IntPtr worldPtr)
         {
             List<Vector3> vertices = new();
 
 
-            for (int i = 0; i < getWorldVerticesCount(mesh); i++)
+            for (int i = 0; i < getWorldMeshVertexCount(worldPtr); i++)
             {
-                getWorldMeshVertex(mesh, i, out float x, out float y, out float z);
+                getWorldMeshVertex(worldPtr, i, out float x, out float y, out float z);
                 vertices.Add(new(x, y, z));
             }
 
             return vertices;
         }
 
-        private List<PC_Material> _GetWorldMaterials(IntPtr mesh)
+        private List<PCBridge_Material> _GetWorldMaterials(IntPtr worldPtr)
         {
-            var materials = new List<PC_Material>();
+            int materialCount = getWorldMeshMaterialCount(worldPtr);
+            var materials = new List<PCBridge_Material>(materialCount);
 
-            for (var i = 0; i < getWorldMeshMaterialsCount(mesh); i++)
+            for (var i=0; i<materialCount; i++)
             {
-                getWorldMeshMaterialColor(mesh, i, out byte r, out byte g, out byte b, out byte a);
+                getWorldMeshMaterialColor(worldPtr, i, out byte r, out byte g, out byte b, out byte a);
                 // We need to convert uint8 (byte) to float for Unity.
-                var m = new PC_Material() { color = new Color((float)r/255, (float)g /255, (float)b /255, (float)a /255) };
+                var m = new PCBridge_Material() { color = new Color((float)r/255, (float)g /255, (float)b /255, (float)a /255) };
                 materials.Add(m);
             }
 
@@ -112,7 +122,7 @@ namespace UZVR
         }
 
 
-        private Dictionary<int, List<int>> _GetWorldTriangles(IntPtr mesh, int materialCount)
+        private Dictionary<int, List<int>> _GetWorldTriangles(IntPtr worldPtr, int materialCount)
         {
             Dictionary<int, List<int>> triangles = new();
 
@@ -126,10 +136,10 @@ namespace UZVR
             }
 
 
-            for (int i = 0; i < getWorldMeshTrianglesCount(mesh); i++)
+            for (int i = 0; i < getWorldMeshTriangleCount(worldPtr); i++)
             {
-                var materialIndex = getWorldMeshMaterialIndex(mesh, i);
-                getWorldMeshTriangleIndex(mesh, i, out UInt32 valueA, out UInt32 valueB, out UInt32 valueC);
+                var materialIndex = getWorldMeshTriangleMaterialIndex(worldPtr, i);
+                getWorldMeshTriangle(worldPtr, i, out UInt32 valueA, out UInt32 valueB, out UInt32 valueC);
 
                 // We need to flip valueA with valueC to:
                 // 1/ have the mesh elements shown (flipped surface) and

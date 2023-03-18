@@ -35,7 +35,7 @@ namespace UZVR
 
         }
 
-        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, World world)
+        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, PCBridge_World world)
         {
             var standardShader = Shader.Find("Standard");
 
@@ -64,7 +64,7 @@ namespace UZVR
             //    }
             //}
         }
-        private void _PrepareMeshFilter(MeshFilter meshFilter, World world)
+        private void _PrepareMeshFilter(MeshFilter meshFilter, PCBridge_World world)
         {
             var mesh = new Mesh();
             meshFilter.mesh = mesh;
