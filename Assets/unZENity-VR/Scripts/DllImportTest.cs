@@ -25,9 +25,11 @@ namespace UZVR
 
             var meshFilter = meshObj.AddComponent<MeshFilter>();
             var meshRenderer = meshObj.AddComponent<MeshRenderer>();
+            var meshCollider = meshObj.AddComponent<MeshCollider>();
 
             _PrepareMeshRenderer(meshRenderer, world);
             _PrepareMeshFilter(meshFilter, world);
+            meshCollider.sharedMesh = meshFilter.mesh;
 
             root.transform.localScale = Vector3.one / 100;
 
@@ -71,7 +73,6 @@ namespace UZVR
 
             mesh.subMeshCount = world.materials.Count;
             mesh.vertices = world.vertices.ToArray();
-            //mesh.triangles = world.triangles.ToArray();
 
             for (var materialIndex = 0; materialIndex < world.triangles.Count; materialIndex++)
             {
