@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using UnityEngine;
 
 namespace UZVR
@@ -65,7 +65,13 @@ namespace UZVR
 
         // Waypoints
         [DllImport(DLLNAME)] private static extern int getWorldWaypointCount(IntPtr world);
-        [DllImport(DLLNAME)] private static extern void getWorldWaypoint(IntPtr world, int index, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth, out string name);
+
+        // Fetch size of name string to allocate C# memory for the returned char*. Will only work this way.
+        // @see https://limbioliong.wordpress.com/2011/11/01/using-the-stringbuilder-in-unmanaged-api-calls/
+        [DllImport(DLLNAME)] private static extern int getWorldWaypointNameSize(IntPtr world, int index);
+
+        // U1 to have bool as 1-byte from C++; https://learn.microsoft.com/en-us/visualstudio/code-quality/ca1414?view=vs-2022&tabs=csharp
+        [DllImport(DLLNAME)] private static extern void getWorldWaypoint(IntPtr world, int index, StringBuilder name, out Vector3 position, out Vector3 direction, [MarshalAs(UnmanagedType.U1)] out bool freePoint, [MarshalAs(UnmanagedType.U1)] out bool underWater, out int waterDepth);
 
 
         private IntPtr _vdfContainer;
@@ -175,13 +181,15 @@ namespace UZVR
 
             for(int i = 0; i < waypointCount; i++)
             {
-                getWorldWaypoint(worldPtr, i, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth, out string name);
+                StringBuilder name = new(getWorldWaypointNameSize(worldPtr, i));
 
-                Debug.Log(name);
+                getWorldWaypoint(worldPtr, i, name, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth);
+
+                Debug.Log(name.ToString());
 
                 var waypoint = new PCBridge_Waypoint()
                 {
-                    name = name,
+                    name = name.ToString(),
                     position = position,
                     direction = direction,
                     freePoint = freePoint,
