@@ -22,7 +22,7 @@ namespace UZVR
             scene.GetRootGameObjects().Append(root);
 
             new MeshCreator().Create(root, world);
-            new WayNetCreator().Create(root, world);
+            new WaynetCreator().Create(root, world);
         }
     }
 }

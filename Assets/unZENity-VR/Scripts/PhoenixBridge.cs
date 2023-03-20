@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -15,6 +16,7 @@ namespace UZVR
         public Dictionary<int, List<int>> triangles;
 
         public List<PCBridge_Waypoint> waypoints;
+        public List<PCBridge_WaypointEdge> waypointEdges;
     }
 
     public struct PCBridge_Material
@@ -30,6 +32,11 @@ namespace UZVR
         public Vector3 direction;
         public bool underWater;
         public int waterDepth;
+    }
+
+    public struct PCBridge_WaypointEdge {
+        public uint a;
+        public uint b;
     }
 
 
@@ -63,15 +70,17 @@ namespace UZVR
         [DllImport(DLLNAME)] private static extern void getWorldMeshMaterialColor(IntPtr world, int index, out byte r, out byte g, out byte b, out byte a);
         [DllImport(DLLNAME)] private static extern int getWorldMeshTriangleMaterialIndex(IntPtr world, int index);
 
-        // Waypoints
-        [DllImport(DLLNAME)] private static extern int getWorldWaypointCount(IntPtr world);
+        // Waynet
+        [DllImport(DLLNAME)] private static extern int getWorldWaynetWaypointCount(IntPtr world);
 
         // Fetch size of name string to allocate C# memory for the returned char*. Will only work this way.
         // @see https://limbioliong.wordpress.com/2011/11/01/using-the-stringbuilder-in-unmanaged-api-calls/
-        [DllImport(DLLNAME)] private static extern int getWorldWaypointNameSize(IntPtr world, int index);
+        [DllImport(DLLNAME)] private static extern int getWorldWaynetWaypointNameSize(IntPtr world, int index);
 
         // U1 to have bool as 1-byte from C++; https://learn.microsoft.com/en-us/visualstudio/code-quality/ca1414?view=vs-2022&tabs=csharp
-        [DllImport(DLLNAME)] private static extern void getWorldWaypoint(IntPtr world, int index, StringBuilder name, out Vector3 position, out Vector3 direction, [MarshalAs(UnmanagedType.U1)] out bool freePoint, [MarshalAs(UnmanagedType.U1)] out bool underWater, out int waterDepth);
+        [DllImport(DLLNAME)] private static extern void getWorldWaynetWaypoint(IntPtr world, int index, StringBuilder name, out Vector3 position, out Vector3 direction, [MarshalAs(UnmanagedType.U1)] out bool freePoint, [MarshalAs(UnmanagedType.U1)] out bool underWater, out int waterDepth);
+        [DllImport(DLLNAME)] private static extern int getWorldWaynetEdgeCount(IntPtr world);
+        [DllImport(DLLNAME)] private static extern PCBridge_WaypointEdge getWorldWaynetEdge(IntPtr world, int index);
 
 
         private IntPtr _vdfContainer;
@@ -94,6 +103,7 @@ namespace UZVR
             world.materials = _GetWorldMaterials(worldPtr);
             world.triangles = _GetWorldTriangles(worldPtr, world.materials.Count);
             world.waypoints = _GetWorldWaypoints(worldPtr);
+            world.waypointEdges = _GetWorldWaypointEdges(worldPtr);
 
             disposeWorld(worldPtr);
 
@@ -176,16 +186,14 @@ namespace UZVR
 
         private List<PCBridge_Waypoint> _GetWorldWaypoints(IntPtr worldPtr)
         {
-            var waypointCount = getWorldWaypointCount(worldPtr);
+            var waypointCount = getWorldWaynetWaypointCount(worldPtr);
             var waypoints = new List<PCBridge_Waypoint>(waypointCount);
 
             for(int i = 0; i < waypointCount; i++)
             {
-                StringBuilder name = new(getWorldWaypointNameSize(worldPtr, i));
+                StringBuilder name = new(getWorldWaynetWaypointNameSize(worldPtr, i));
 
-                getWorldWaypoint(worldPtr, i, name, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth);
-
-                Debug.Log(name.ToString());
+                getWorldWaynetWaypoint(worldPtr, i, name, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth);
 
                 var waypoint = new PCBridge_Waypoint()
                 {
@@ -201,6 +209,21 @@ namespace UZVR
             }
 
             return waypoints;
+        }
+
+        private List<PCBridge_WaypointEdge> _GetWorldWaypointEdges(IntPtr worldPtr)
+        {
+            var edgeCount = getWorldWaynetEdgeCount(worldPtr);
+            var edges = new List<PCBridge_WaypointEdge>(edgeCount);
+
+            for (int i = 0; i < edgeCount; i++)
+            {
+                var edge = getWorldWaynetEdge(worldPtr, i);
+
+                edges.Add(edge);
+            }
+
+            return edges;
         }
     }
 }
