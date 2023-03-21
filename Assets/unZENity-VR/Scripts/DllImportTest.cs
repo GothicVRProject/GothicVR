@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 namespace UZVR
@@ -22,7 +17,7 @@ namespace UZVR
             scene.GetRootGameObjects().Append(root);
 
             new MeshCreator().Create(root, world);
-            new WaynetCreator().Create(root, world);
+            //new WaynetCreator().Create(root, world);
         }
     }
 }

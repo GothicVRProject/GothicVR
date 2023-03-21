@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace UZVR
 {
@@ -6,19 +9,92 @@ namespace UZVR
     {
         public void Create(GameObject root, PCBridge_World world)
         {
-            var meshObj = new GameObject(string.Format("Mesh"));
+            var meshObj = new GameObject("Mesh");
             meshObj.transform.parent = root.transform;
 
-            var meshFilter = meshObj.AddComponent<MeshFilter>();
-            var meshRenderer = meshObj.AddComponent<MeshRenderer>();
-            var meshCollider = meshObj.AddComponent<MeshCollider>();
+            for (var materialIndex=0; materialIndex < world.materials.Count; materialIndex++)
+            {
+                // Material isn't used in this map
+                if (world.triangles[materialIndex].Count == 0)
+                    continue;
 
-            _PrepareMeshRenderer(meshRenderer, world);
-            _PrepareMeshFilter(meshFilter, world);
-            meshCollider.sharedMesh = meshFilter.mesh;
+                var subMeshObj = new GameObject(string.Format("submesh-{0}", world.materials[materialIndex].name));
+                var meshFilter = subMeshObj.AddComponent<MeshFilter>();
+                var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
+                //var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
-            // Needs to be done at the end to affect all created objects.
-            meshObj.transform.localScale = Vector3.one / 100;
+                _PrepareMeshRenderer(meshRenderer, world, materialIndex);
+                _PrepareMeshFilter(meshFilter, world, materialIndex);
+                //meshCollider.sharedMesh = meshFilter.mesh;
+
+                subMeshObj.transform.localScale = Vector3.one / 100;
+                subMeshObj.transform.parent = meshObj.transform;
+            }
+        }
+
+        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, PCBridge_World world, int materialIndex)
+        {
+            var standardShader = Shader.Find("Standard");
+            var material = new Material(standardShader);
+
+            material.color = world.materials[materialIndex].color;
+            meshRenderer.material = material;
+        }
+
+        // TODO Put our solution into this post to help others: https://forum.unity.com/threads/remove-vertices-that-are-not-in-triangle-solved.342335/
+        /// <summary>
+        /// This method is quite complex. What we do is:
+        /// We use all the vertices from every mesh and check which ones are used in our submesh (aka are triangles using a vertex?)
+        /// We create a new Vertices list and Triangles list based on our changes.
+        /// Check the code for technical details.
+        /// 
+        /// Example:
+        ///     vertices  => 0=[...], 1=[...], 2=[...]
+        ///     triangles => 0=4, 1=5, 2=8, 3=1, 4=1
+        ///     
+        ///     distinctOrderedTriangles => 0=1, 1=4, 2=5, 3=8
+        ///     
+        ///     newVertexTriangleMapping => 1=0, 4=1, 5=2, 8=3
+        ///     
+        ///     newVertices  => 0=[...], 1=[...], 2=[...]
+        ///     newTriangles => 0=1, 1=0, 2=3, 3=0, 4=0 <-- values are replaced with new mapping
+        /// </summary>
+        private void _PrepareMeshFilter(MeshFilter meshFilter, PCBridge_World world, int materialIndex)
+        {
+            var vertices = world.vertices;
+            var triangles = world.triangles[materialIndex];
+
+            var mesh = new Mesh();
+            meshFilter.mesh = mesh;
+
+            // Distinct -> We only want to check vertex-indices once for adding to the new mapping
+            // Ordered -> We need to check from lowest used vertex-index to highest for the new mapping
+            List<int> distinctOrderedTriangles = triangles.Distinct().OrderBy(val => val).ToList();
+            Dictionary<int, int> newVertexTriangleMapping = new();
+            List<Vector3> newVertices = new();
+
+            // Loop through all the distinctOrderedTriangles
+            for (int i=0; i<distinctOrderedTriangles.Count; i++)
+            {
+                // curVertexIndex == currently lowest vertex index in this loop
+                int curVertexIndex = distinctOrderedTriangles[i];
+                Vector3 vertexAtIndex = vertices[curVertexIndex];
+
+                // Previously index of vertex is now the new index of loop's >i<.
+                // This Dictionary will be used to >replace< the original triangle values later.
+                // e.g. previous Vertex-index=5 (key) is now the Vertex-index=0 (value)
+                newVertexTriangleMapping.Add(curVertexIndex, i);
+
+                // Add the vertex which was found as new lowest entry
+                // e.g. Vertex-index=5 is now Vertex-index=0
+                newVertices.Add(vertexAtIndex);
+            }
+
+            // Now we replace the triangle values. aka the vertex-indices (value old) with new >mapping< from Dictionary.
+            var newTriangles = triangles.Select(originalVertexIndex => newVertexTriangleMapping[originalVertexIndex]);
+
+            mesh.vertices = newVertices.ToArray();
+            mesh.triangles = newTriangles.ToArray();
         }
 
         private void _PrepareMeshRenderer(MeshRenderer meshRenderer, PCBridge_World world)
@@ -54,8 +130,6 @@ namespace UZVR
         {
             var mesh = new Mesh();
             meshFilter.mesh = mesh;
-
-            mesh.vertices = world.vertices.ToArray();
 
             mesh.subMeshCount = world.materials.Count;
             mesh.vertices = world.vertices.ToArray();

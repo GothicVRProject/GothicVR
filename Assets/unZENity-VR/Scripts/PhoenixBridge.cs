@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 using UnityEngine;
 
 namespace UZVR
@@ -21,6 +19,7 @@ namespace UZVR
 
     public struct PCBridge_Material
     {
+        public string name;
         public Color color;
     }
 
@@ -67,7 +66,10 @@ namespace UZVR
 
         // Materials
         [DllImport(DLLNAME)] private static extern int getWorldMeshMaterialCount(IntPtr world);
+        [DllImport(DLLNAME)] private static extern int getWorldMeshMaterialNameSize(IntPtr world, int index);
+        [DllImport(DLLNAME)] private static extern void getWorldMeshMaterialName(IntPtr world, int index, StringBuilder name);
         [DllImport(DLLNAME)] private static extern void getWorldMeshMaterialColor(IntPtr world, int index, out byte r, out byte g, out byte b, out byte a);
+
         [DllImport(DLLNAME)] private static extern int getWorldMeshTriangleMaterialIndex(IntPtr world, int index);
 
         // Waynet
@@ -147,7 +149,14 @@ namespace UZVR
             {
                 getWorldMeshMaterialColor(worldPtr, i, out byte r, out byte g, out byte b, out byte a);
                 // We need to convert uint8 (byte) to float for Unity.
-                var m = new PCBridge_Material() { color = new Color((float)r/255, (float)g /255, (float)b /255, (float)a /255) };
+
+                StringBuilder name = new(getWorldMeshMaterialNameSize(worldPtr, i));
+                getWorldMeshMaterialName(worldPtr, i, name);
+
+                var m = new PCBridge_Material() {
+                    name = name.ToString(),
+                    color = new Color((float)r/255, (float)g /255, (float)b /255, (float)a /255)
+                };
                 materials.Add(m);
             }
 
@@ -172,7 +181,7 @@ namespace UZVR
             for (int i = 0; i < getWorldMeshTriangleCount(worldPtr); i++)
             {
                 var materialIndex = getWorldMeshTriangleMaterialIndex(worldPtr, i);
-                getWorldMeshTriangle(worldPtr, i, out UInt32 valueA, out UInt32 valueB, out UInt32 valueC);
+                getWorldMeshTriangle(worldPtr, i, out uint valueA, out uint valueB, out uint valueC);
 
                 // We need to flip valueA with valueC to:
                 // 1/ have the mesh elements shown (flipped surface) and
