@@ -30,11 +30,13 @@ namespace UZVR
         {
             var vm = new VmBridge("GOTHIC.DAT");
 
-            vm.registerCallback();
+            vm.CallFunction("STARTUP_WORLD"); // Works: STARTUP_ORCGRAVEYARD
 
-            vm.callCallback(1);
-            vm.callCallback(2);
-            vm.callCallback(3);
+            //vm.registerCallback();
+
+            //vm.callCallback(1);
+            //vm.callCallback(2);
+            //vm.callCallback(3);
 
         }
     }

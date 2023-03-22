@@ -42,7 +42,6 @@ namespace UZVR
             meshRenderer.material = material;
         }
 
-        // TODO Put our solution into this post to help others: https://forum.unity.com/threads/remove-vertices-that-are-not-in-triangle-solved.342335/
         /// <summary>
         /// This method is quite complex. What we do is:
         /// We use all the vertices from every mesh and check which ones are used in our submesh (aka are triangles using a vertex?)
