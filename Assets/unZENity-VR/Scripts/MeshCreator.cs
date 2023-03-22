@@ -22,11 +22,11 @@ namespace UZVR
                 var subMeshObj = new GameObject(string.Format("submesh-{0}", world.materials[materialIndex].name));
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
-                //var meshCollider = subMeshObj.AddComponent<MeshCollider>();
+                var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
                 _PrepareMeshRenderer(meshRenderer, world, materialIndex);
                 _PrepareMeshFilter(meshFilter, world, materialIndex);
-                //meshCollider.sharedMesh = meshFilter.mesh;
+                meshCollider.sharedMesh = meshFilter.mesh;
 
                 subMeshObj.transform.localScale = Vector3.one / 100;
                 subMeshObj.transform.parent = meshObj.transform;

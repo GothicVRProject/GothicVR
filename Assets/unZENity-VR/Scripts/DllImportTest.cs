@@ -30,14 +30,7 @@ namespace UZVR
         {
             var vm = new VmBridge("GOTHIC.DAT");
 
-            vm.CallFunction("STARTUP_WORLD"); // Works: STARTUP_ORCGRAVEYARD
-
-            //vm.registerCallback();
-
-            //vm.callCallback(1);
-            //vm.callCallback(2);
-            //vm.callCallback(3);
-
+            vm.CallFunction("STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
         }
     }
 }
