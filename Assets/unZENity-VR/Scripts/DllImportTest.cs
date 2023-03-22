@@ -1,6 +1,7 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UZVR.Phoenix;
 
 namespace UZVR
 {
@@ -8,8 +9,13 @@ namespace UZVR
     {
         void Start()
         {
-            var world = new PhoenixBridge().GetWorld();
+            //TestWorld();
+            TestVM();
+        }
 
+        private void TestWorld()
+        {
+            var world = new WorldBridge().GetWorld();
 
             var root = new GameObject("World");
 
@@ -18,6 +24,18 @@ namespace UZVR
 
             new MeshCreator().Create(root, world);
             //new WaynetCreator().Create(root, world);
+        }
+
+        private void TestVM()
+        {
+            var vm = new VmBridge("GOTHIC.DAT");
+
+            vm.registerCallback();
+
+            vm.callCallback(1);
+            vm.callCallback(2);
+            vm.callCallback(3);
+
         }
     }
 }

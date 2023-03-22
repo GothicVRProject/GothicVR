@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
 
-namespace UZVR
+namespace UZVR.Phoenix
 {
     public struct PCBridge_World
     {
@@ -39,7 +39,7 @@ namespace UZVR
     }
 
 
-    public class PhoenixBridge
+    public class WorldBridge
     {
         private const string DLLNAME = "phoenix-csharp-bridge";
         private const string G1Dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\";
@@ -87,7 +87,7 @@ namespace UZVR
 
         private IntPtr _vdfContainer;
 
-        ~PhoenixBridge()
+        ~WorldBridge()
         {
             disposeVDFContainer(_vdfContainer);
         }
