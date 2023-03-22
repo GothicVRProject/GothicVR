@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace AUZVR
+namespace UZVR
 {
     public static class DaedalusExternals
     {
