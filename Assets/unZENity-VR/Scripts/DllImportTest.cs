@@ -11,7 +11,7 @@ namespace UZVR
 
         void Start()
         {
-            VdfsBridge vdfsBridge = new VdfsBridge(G1Dir + "/Data");
+            var vdfsBridge = new VdfsBridge(G1Dir + "/Data");
 
             TestWorld(vdfsBridge);
             TestVM();

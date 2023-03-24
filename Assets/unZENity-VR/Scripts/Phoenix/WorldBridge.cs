@@ -33,7 +33,8 @@ namespace UZVR.Phoenix
         public int waterDepth;
     }
 
-    public class PCBridge_WaypointEdge {
+    // Reason to be a struct is to have auto-marshalling for PInvoke
+    public struct PCBridge_WaypointEdge {
         public uint a;
         public uint b;
     }
