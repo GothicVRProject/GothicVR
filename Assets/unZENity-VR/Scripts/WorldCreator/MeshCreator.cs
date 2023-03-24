@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UZVR.Phoenix;
 using UZVR.Phoenix.World;
 
-namespace UZVR
+namespace UZVR.WorldCreator
 {
     public class MeshCreator
     {

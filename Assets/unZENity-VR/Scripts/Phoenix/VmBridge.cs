@@ -50,9 +50,9 @@ namespace UZVR.Phoenix
 
         private void RegisterCallbacks()
         {
-            registerDefaultExternal(VmPtr, DaedalusExternals.NotImplementedCallback);
-            registerExternal(VmPtr, "Wld_InsertNpc", DaedalusExternals.Wld_InsertNpc);
-            registerTA_MIN(VmPtr, DaedalusExternals.TA_MIN);
+            registerDefaultExternal(VmPtr, NPCExternals.NotImplementedCallback);
+            registerExternal(VmPtr, "Wld_InsertNpc", NPCExternals.Wld_InsertNpc);
+            registerTA_MIN(VmPtr, NPCExternals.TA_MIN);
         }
 
         public void CallFunction(string functionName)

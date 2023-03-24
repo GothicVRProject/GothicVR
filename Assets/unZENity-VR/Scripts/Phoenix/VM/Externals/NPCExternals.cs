@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UZVR.Demo;
 using UZVR.Phoenix;
 using UZVR.Phoenix.VM;
-using UZVR.Phoenix.World;
-using static UnityEditor.Progress;
 
 namespace UZVR
 {
-    public static class DaedalusExternals
+    public static class NPCExternals
     {
         public static void NotImplementedCallback(string value)
         {
@@ -20,11 +19,11 @@ namespace UZVR
         }
 
         /// <summary>
-        /// Original gothic uses this function to spawn an NPC instance into the world.
+        /// Original Gothic uses this function to spawn an NPC instance into the world.
         /// 
         /// The startpoint to walk isn't neccessarily the spawnpoint mentioned here.
         /// It can also be the currently active routine point to walk to.
-        /// We therefore briefly execute the daily routine once to collect current location and use this as spawn location.
+        /// We therefore execute the daily routines to collect current location and use this as spawn location.
         /// </summary>
         public static void Wld_InsertNpc(int npcinstance, string spawnpoint)
         {

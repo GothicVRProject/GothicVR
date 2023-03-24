@@ -2,10 +2,11 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UZVR.Phoenix;
+using UZVR.WorldCreator;
 
 namespace UZVR
 {
-    public class DllImportTest : MonoBehaviour
+    public class PhoenixImporter : MonoBehaviour
     {
         private const string G1Dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic";
 
@@ -13,11 +14,11 @@ namespace UZVR
         {
             var vdfsBridge = new VdfsBridge(G1Dir + "/Data");
 
-            TestWorld(vdfsBridge);
-            TestVM();
+            LoadWorld(vdfsBridge);
+            LoadGothicVM();
         }
 
-        private void TestWorld(VdfsBridge vdfsBridge)
+        private void LoadWorld(VdfsBridge vdfsBridge)
         {
             var worldBridge = new WorldBridge(vdfsBridge, "world.zen");
 
@@ -32,7 +33,7 @@ namespace UZVR
             PhoenixBridge.WorldBridge = worldBridge;
         }
 
-        private void TestVM()
+        private void LoadGothicVM()
         {
             var vm = new VmBridge(G1Dir + "/_work/DATA/scripts/_compiled/GOTHIC.DAT");
 

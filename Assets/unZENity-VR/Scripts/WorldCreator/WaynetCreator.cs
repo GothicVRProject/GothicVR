@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UZVR.Phoenix.World;
 
-namespace UZVR
+namespace UZVR.WorldCreator
 {
     public class WaynetCreator
     {
