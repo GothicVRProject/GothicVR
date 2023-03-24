@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace UZVR.Phoenix
 {
-    public struct PCBridge_World
+    public class PCBridge_World
     {
         public List<Vector3> vertices;
         public List<PCBridge_Material> materials;
@@ -17,13 +17,13 @@ namespace UZVR.Phoenix
         public List<PCBridge_WaypointEdge> waypointEdges;
     }
 
-    public struct PCBridge_Material
+    public class PCBridge_Material
     {
         public string name;
         public Color color;
     }
 
-    public struct PCBridge_Waypoint
+    public class PCBridge_Waypoint
     {
         public string name;
         public bool freePoint;
@@ -33,7 +33,7 @@ namespace UZVR.Phoenix
         public int waterDepth;
     }
 
-    public struct PCBridge_WaypointEdge {
+    public class PCBridge_WaypointEdge {
         public uint a;
         public uint b;
     }
@@ -42,16 +42,16 @@ namespace UZVR.Phoenix
     public class WorldBridge
     {
         private const string DLLNAME = "phoenix-csharp-bridge";
-        private const string G1Dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\";
+
+        public IntPtr WorldPtr { get; private set; } = IntPtr.Zero;
+
+        public PCBridge_World World { get; private set; } = new PCBridge_World();
 
 
         // Load
-        [DllImport(DLLNAME)] private static extern IntPtr createVDFContainer();
-        [DllImport(DLLNAME)] private static extern void addVDFToContainer(IntPtr vdfContainer, string vdfPath);
         [DllImport(DLLNAME)] private static extern IntPtr loadWorld(IntPtr vdfContainer, string worldFileName);
 
         // Dispose
-        [DllImport(DLLNAME)] private static extern void disposeVDFContainer(IntPtr vdfContainer);
         [DllImport(DLLNAME)] private static extern void disposeWorld(IntPtr mesh);
 
 
@@ -85,73 +85,50 @@ namespace UZVR.Phoenix
         [DllImport(DLLNAME)] private static extern PCBridge_WaypointEdge getWorldWaynetEdge(IntPtr world, int index);
 
 
-        private IntPtr _vdfContainer;
+        public WorldBridge(VdfsBridge vdfs, string worldName)
+        {
+            WorldPtr = loadWorld(vdfs.VdfsPtr, worldName);
 
+            World.vertices = _GetWorldVertices();
+            World.materials = _GetWorldMaterials();
+            World.triangles = _GetWorldTriangles(World.materials.Count);
+            World.waypoints = _GetWorldWaypoints();
+            World.waypointEdges = _GetWorldWaypointEdges();
+        }
+
+        // TODO: Check when the class is disposed to free memory within DLL.
+        // If happening too late, then free it manually earlier.
         ~WorldBridge()
         {
-            disposeVDFContainer(_vdfContainer);
+            disposeWorld(WorldPtr);
+            WorldPtr = IntPtr.Zero;
         }
 
-
-        public PCBridge_World GetWorld()
-        {
-            _ParseVDFs();
-
-            var world = new PCBridge_World();
-
-            var worldPtr = loadWorld(_vdfContainer, "world.zen");
-
-            world.vertices = _GetWorldVertices(worldPtr);
-            world.materials = _GetWorldMaterials(worldPtr);
-            world.triangles = _GetWorldTriangles(worldPtr, world.materials.Count);
-            world.waypoints = _GetWorldWaypoints(worldPtr);
-            world.waypointEdges = _GetWorldWaypointEdges(worldPtr);
-
-            disposeWorld(worldPtr);
-
-            return world;
-        }
-
-        private void _ParseVDFs()
-        {
-            if (_vdfContainer != IntPtr.Zero)
-                return;
-
-            _vdfContainer = createVDFContainer();
-
-            var vdfPaths = Directory.GetFiles(G1Dir + "/Data", "*.vdf");
-
-            foreach (var vdfPath in vdfPaths)
-                addVDFToContainer(_vdfContainer, vdfPath);
-
-
-        }
-
-        private List<Vector3> _GetWorldVertices(IntPtr worldPtr)
+        private List<Vector3> _GetWorldVertices()
         {
             List<Vector3> vertices = new();
 
 
-            for (int i = 0; i < getWorldMeshVertexCount(worldPtr); i++)
+            for (int i = 0; i < getWorldMeshVertexCount(WorldPtr); i++)
             {
-                vertices.Add(getWorldMeshVertex(worldPtr, i));
+                vertices.Add(getWorldMeshVertex(WorldPtr, i));
             }
 
             return vertices;
         }
 
-        private List<PCBridge_Material> _GetWorldMaterials(IntPtr worldPtr)
+        private List<PCBridge_Material> _GetWorldMaterials()
         {
-            int materialCount = getWorldMeshMaterialCount(worldPtr);
+            int materialCount = getWorldMeshMaterialCount(WorldPtr);
             var materials = new List<PCBridge_Material>(materialCount);
 
             for (var i=0; i<materialCount; i++)
             {
-                getWorldMeshMaterialColor(worldPtr, i, out byte r, out byte g, out byte b, out byte a);
+                getWorldMeshMaterialColor(WorldPtr, i, out byte r, out byte g, out byte b, out byte a);
                 // We need to convert uint8 (byte) to float for Unity.
 
-                StringBuilder name = new(getWorldMeshMaterialNameSize(worldPtr, i));
-                getWorldMeshMaterialName(worldPtr, i, name);
+                StringBuilder name = new(getWorldMeshMaterialNameSize(WorldPtr, i));
+                getWorldMeshMaterialName(WorldPtr, i, name);
 
                 var m = new PCBridge_Material() {
                     name = name.ToString(),
@@ -164,7 +141,7 @@ namespace UZVR.Phoenix
         }
 
 
-        private Dictionary<int, List<int>> _GetWorldTriangles(IntPtr worldPtr, int materialCount)
+        private Dictionary<int, List<int>> _GetWorldTriangles(int materialCount)
         {
             Dictionary<int, List<int>> triangles = new();
 
@@ -178,10 +155,10 @@ namespace UZVR.Phoenix
             }
 
 
-            for (int i = 0; i < getWorldMeshTriangleCount(worldPtr); i++)
+            for (int i = 0; i < getWorldMeshTriangleCount(WorldPtr); i++)
             {
-                var materialIndex = getWorldMeshTriangleMaterialIndex(worldPtr, i);
-                getWorldMeshTriangle(worldPtr, i, out uint valueA, out uint valueB, out uint valueC);
+                var materialIndex = getWorldMeshTriangleMaterialIndex(WorldPtr, i);
+                getWorldMeshTriangle(WorldPtr, i, out uint valueA, out uint valueB, out uint valueC);
 
                 // We need to flip valueA with valueC to:
                 // 1/ have the mesh elements shown (flipped surface) and
@@ -193,16 +170,16 @@ namespace UZVR.Phoenix
         }
 
 
-        private List<PCBridge_Waypoint> _GetWorldWaypoints(IntPtr worldPtr)
+        private List<PCBridge_Waypoint> _GetWorldWaypoints()
         {
-            var waypointCount = getWorldWaynetWaypointCount(worldPtr);
+            var waypointCount = getWorldWaynetWaypointCount(WorldPtr);
             var waypoints = new List<PCBridge_Waypoint>(waypointCount);
 
             for(int i = 0; i < waypointCount; i++)
             {
-                StringBuilder name = new(getWorldWaynetWaypointNameSize(worldPtr, i));
+                StringBuilder name = new(getWorldWaynetWaypointNameSize(WorldPtr, i));
 
-                getWorldWaynetWaypoint(worldPtr, i, name, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth);
+                getWorldWaynetWaypoint(WorldPtr, i, name, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth);
 
                 var waypoint = new PCBridge_Waypoint()
                 {
@@ -220,14 +197,14 @@ namespace UZVR.Phoenix
             return waypoints;
         }
 
-        private List<PCBridge_WaypointEdge> _GetWorldWaypointEdges(IntPtr worldPtr)
+        private List<PCBridge_WaypointEdge> _GetWorldWaypointEdges()
         {
-            var edgeCount = getWorldWaynetEdgeCount(worldPtr);
+            var edgeCount = getWorldWaynetEdgeCount(WorldPtr);
             var edges = new List<PCBridge_WaypointEdge>(edgeCount);
 
             for (int i = 0; i < edgeCount; i++)
             {
-                var edge = getWorldWaynetEdge(worldPtr, i);
+                var edge = getWorldWaynetEdge(WorldPtr, i);
 
                 edges.Add(edge);
             }

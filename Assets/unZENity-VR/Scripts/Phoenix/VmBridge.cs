@@ -11,7 +11,7 @@ namespace UZVR.Phoenix
         private const string DLLNAME = "phoenix-csharp-bridge";
         private const string G1DatDir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\_work\\DATA\\scripts\\_compiled\\";
 
-        private IntPtr _vm;
+        public IntPtr VmPtr { get; private set; } = IntPtr.Zero;
 
 
         // Generic functions
@@ -38,42 +38,40 @@ namespace UZVR.Phoenix
 
 
 
-        public VmBridge(string datFilename)
+        public VmBridge(string datFilePath)
         {
-            CreateVm(datFilename);
+            CreateVm(datFilePath);
             RegisterCallbacks();
         }
 
-        private void CreateVm(string datFilename)
+        private void CreateVm(string datFilePath)
         {
-            var filePath = G1DatDir + datFilename;
+            if (!File.Exists(datFilePath))
+                throw new FileNotFoundException(datFilePath + " not found.");
 
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException(filePath + " not found.");
-
-            _vm = createVM(G1DatDir + datFilename);
+            VmPtr = createVM(datFilePath);
         }
 
         private void RegisterCallbacks()
         {
-            registerDefaultExternal(_vm, DaedalusExternals.NotImplementedCallback);
-            registerExternal(_vm, "Wld_InsertNpc", DaedalusExternals.Wld_InsertNpc);
-            registerTA_MIN(_vm, DaedalusExternals.TA_MIN);
+            registerDefaultExternal(VmPtr, DaedalusExternals.NotImplementedCallback);
+            registerExternal(VmPtr, "Wld_InsertNpc", DaedalusExternals.Wld_InsertNpc);
+            registerTA_MIN(VmPtr, DaedalusExternals.TA_MIN);
         }
 
         public void CallFunction(string functionName)
         {
-            vmCallFunctionByName(_vm, functionName);
+            vmCallFunctionByName(VmPtr, functionName);
         }
 
         public void CallFunction(int index, IntPtr npcInstance)
         {
-            vmCallFunctionByIndex(_vm, index, npcInstance);
+            vmCallFunctionByIndex(VmPtr, index, npcInstance);
         }
 
         public IntPtr InitNpcInstance(int instanceId)
         {
-            return initNpcInstance(_vm, instanceId);
+            return initNpcInstance(VmPtr, instanceId);
         }
 
         public uint GetNpcSymbolId(IntPtr npc)
@@ -97,7 +95,7 @@ namespace UZVR.Phoenix
 
         ~VmBridge()
         {
-            disposeVM(_vm);
+            disposeVM(VmPtr);
         }
     }
 

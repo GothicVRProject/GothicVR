@@ -7,30 +7,34 @@ namespace UZVR
 {
     public class DllImportTest : MonoBehaviour
     {
+        private const string G1Dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic";
+
         void Start()
         {
-            TestWorld();
+            VdfsBridge vdfsBridge = new VdfsBridge(G1Dir + "/Data");
+
+            TestWorld(vdfsBridge);
             TestVM();
         }
 
-        private void TestWorld()
+        private void TestWorld(VdfsBridge vdfsBridge)
         {
-            var world = new WorldBridge().GetWorld();
+            var worldBridge = new WorldBridge(vdfsBridge, "world.zen");
 
             var root = new GameObject("World");
 
             var scene = SceneManager.GetSceneByName("SampleScene");
             scene.GetRootGameObjects().Append(root);
 
-            new MeshCreator().Create(root, world);
-            //new WaynetCreator().Create(root, world);
+            new MeshCreator().Create(root, worldBridge.World);
+            new WaynetCreator().Create(root, worldBridge.World);
 
-            TestSingleton.world = world;
+            TestSingleton.world = worldBridge.World;
         }
 
         private void TestVM()
         {
-            var vm = new VmBridge("GOTHIC.DAT");
+            var vm = new VmBridge(G1Dir + "/_work/DATA/scripts/_compiled/GOTHIC.DAT");
 
             TestSingleton.vm = vm;
 
