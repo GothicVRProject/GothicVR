@@ -1,9 +1,9 @@
 ﻿using System;
-using UnityEngine;
-using System.Linq;
-using UZVR.Phoenix;
-using Unity.VisualScripting;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UZVR.Phoenix;
+using static UnityEditor.Progress;
 
 namespace UZVR
 {
@@ -39,6 +39,12 @@ namespace UZVR
             }
 
             var npc = TestSingleton.vm.InitNpcInstance(npcinstance);
+
+            string name = TestSingleton.vm.GetNpcName(npc);
+
+            var newNpc = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            newNpc.name = string.Format("{0}-{1}", name, spawnpoint);
+
             var npcRoutine = TestSingleton.vm.GetNpcRoutine(npc);
 
             TestSingleton.vm.CallFunction(npcRoutine, npc);
@@ -48,13 +54,10 @@ namespace UZVR
             if (TestSingleton.npcRoutines.TryGetValue(symbolId, out List<TestSingleton.Routine> routines))
             {
                 initialSpawnpoint = TestSingleton.world.waypoints
-                .FirstOrDefault(item => item.name.ToLower() == routines.First().waypoint.ToLower());
+                    .FirstOrDefault(item => item.name.ToLower() == routines.First().waypoint.ToLower());
+                var routineComp = newNpc.AddComponent<NpcRoutine>();
+                routineComp.routines = routines;
             }
-
-            string name = TestSingleton.vm.GetNpcName(npc);
-
-            var newNpc = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            newNpc.name = string.Format("{0}-{1}", name, spawnpoint);
 
             newNpc.transform.position = initialSpawnpoint.position;
             newNpc.transform.parent = npcContainer.transform;
@@ -62,12 +65,19 @@ namespace UZVR
 
         public static void TA_MIN(IntPtr npc, int start_h, int start_m, int stop_h, int stop_m, int action, string waypoint)
         {
+            Debug.Log(DateTime.MinValue);
+            Debug.Log(new DateTime(1, 1, 1, 0, 0, 0));
+
+            var stop_hFormatted = stop_h == 24 ? 0 : stop_h;
+
             TestSingleton.Routine routine = new()
             {
                 start_h = start_h,
                 start_m = start_m,
+                start = new(1,1,1, start_h, start_m, 0),
                 stop_h = stop_h,
                 stop_m = stop_m,
+                stop = new(1, 1, 1, stop_hFormatted, stop_m, 0),
                 action = action,
                 waypoint = waypoint
             };
