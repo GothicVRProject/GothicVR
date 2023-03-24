@@ -18,7 +18,7 @@ namespace UZVR
                 var wpobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
                 wpobject.name = waypoint.name;
-                wpobject.transform.position= waypoint.position / 100;
+                wpobject.transform.position= waypoint.position;
 
                 wpobject.transform.parent = waypointsObj.transform;
             }
@@ -30,8 +30,8 @@ namespace UZVR
             for (int i=0; i<world.waypointEdges.Count; i++)
             {
                 var edge = world.waypointEdges[i];
-                var startPos = world.waypoints[(int)edge.a].position / 100;
-                var endPos = world.waypoints[(int)edge.b].position / 100;
+                var startPos = world.waypoints[(int)edge.a].position;
+                var endPos = world.waypoints[(int)edge.b].position;
                 var lineObj = new GameObject();
 
                 lineObj.AddComponent<LineRenderer>();

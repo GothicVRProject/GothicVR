@@ -9,7 +9,7 @@ namespace UZVR
     {
         void Start()
         {
-            //TestWorld();
+            TestWorld();
             TestVM();
         }
 
@@ -24,11 +24,15 @@ namespace UZVR
 
             new MeshCreator().Create(root, world);
             //new WaynetCreator().Create(root, world);
+
+            TestSingleton.world = world;
         }
 
         private void TestVM()
         {
             var vm = new VmBridge("GOTHIC.DAT");
+
+            TestSingleton.vm = vm;
 
             vm.CallFunction("STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
         }

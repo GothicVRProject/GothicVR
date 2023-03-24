@@ -28,7 +28,7 @@ namespace UZVR
                 _PrepareMeshFilter(meshFilter, world, materialIndex);
                 meshCollider.sharedMesh = meshFilter.mesh;
 
-                subMeshObj.transform.localScale = Vector3.one / 100;
+                subMeshObj.transform.localScale = Vector3.one / 100; // Gothic mesh scales are too big by factor 100
                 subMeshObj.transform.parent = meshObj.transform;
             }
         }

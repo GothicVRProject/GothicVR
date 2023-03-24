@@ -207,7 +207,7 @@ namespace UZVR.Phoenix
                 var waypoint = new PCBridge_Waypoint()
                 {
                     name = name.ToString(),
-                    position = position,
+                    position = position / 100, // Gothic coordinates are too big by factor 100
                     direction = direction,
                     freePoint = freePoint,
                     underWater = underWater,
