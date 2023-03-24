@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UZVR;
 using UZVR.Phoenix;
-using UZVR.Phoenix.VM;
+using UZVR.Phoenix.Vm;
 
 namespace UZVR.Demo
 {

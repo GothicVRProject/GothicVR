@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using UZVR.Phoenix.Vm.Externals;
 
 namespace UZVR.Phoenix
 {
@@ -36,11 +37,12 @@ namespace UZVR.Phoenix
 
         public VmBridge(string datFilePath)
         {
-            CreateVm(datFilePath);
-            RegisterCallbacks();
+            _CreateVm(datFilePath);
+            _RegisterDefaultCallbacks();
+            _RegisterNPCCallbacks();
         }
 
-        private void CreateVm(string datFilePath)
+        private void _CreateVm(string datFilePath)
         {
             if (!File.Exists(datFilePath))
                 throw new FileNotFoundException(datFilePath + " not found.");
@@ -48,11 +50,15 @@ namespace UZVR.Phoenix
             VmPtr = createVM(datFilePath);
         }
 
-        private void RegisterCallbacks()
+        private void _RegisterDefaultCallbacks()
         {
-            registerDefaultExternal(VmPtr, NPCExternals.NotImplementedCallback);
-            registerExternal(VmPtr, "Wld_InsertNpc", NPCExternals.Wld_InsertNpc);
-            registerTA_MIN(VmPtr, NPCExternals.TA_MIN);
+            registerDefaultExternal(VmPtr, DefaultExternals.NotImplementedCallback);
+        }
+
+        private void _RegisterNPCCallbacks()
+        {
+            registerExternal(VmPtr, "Wld_InsertNpc", NpcExternals.Wld_InsertNpc);
+            registerTA_MIN(VmPtr, NpcExternals.TA_MIN);
         }
 
         public void CallFunction(string functionName)

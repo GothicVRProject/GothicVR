@@ -2,10 +2,11 @@
 using System.Linq;
 using UnityEngine;
 using UZVR.Phoenix.World;
+using UZVR.Util;
 
 namespace UZVR.WorldCreator
 {
-    public class MeshCreator
+    public class MeshCreator: SingletonBehaviour<MeshCreator>
     {
         public void Create(GameObject root, PBWorld world)
         {
@@ -96,49 +97,7 @@ namespace UZVR.WorldCreator
             mesh.triangles = newTriangles.ToArray();
         }
 
-        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, PBWorld world)
-        {
-            var standardShader = Shader.Find("Standard");
-
-            Material[] materials = new Material[world.materials.Count];
-
-
-            for (int i = 0; i < materials.Length; i++)
-            {
-                var m = new Material(standardShader);
-                m.color = world.materials[i].color;
-                materials[i] = m;
-            }
-
-            meshRenderer.materials = materials;
-
-            //meshRenderer.materials[0].color = Color.red;
-            //meshRenderer.materials[1].color = Color.yellow;
-            //meshRenderer.materials[2].color = Color.green;
-
-            //using (var imageFile = File.OpenRead("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\___backup-modding\\GOTHIC MOD Development Kit\\VDFS-Tool\\_WORK\\DATA\\TEXTURES\\DESKTOP\\NOMIP\\INV_SLOT.TGA"))
-            //{
-            //    var texture = _LoadTGA(imageFile);
-            //    foreach (var material in meshRenderer.materials)
-            //    {
-            //        material.mainTexture = texture;
-            //    }
-            //}
-        }
-        private void _PrepareMeshFilter(MeshFilter meshFilter, PBWorld world)
-        {
-            var mesh = new Mesh();
-            meshFilter.mesh = mesh;
-
-            mesh.subMeshCount = world.materials.Count;
-            mesh.vertices = world.vertices.ToArray();
-
-            for (var materialIndex = 0; materialIndex < world.triangles.Count; materialIndex++)
-            {
-                mesh.SetTriangles(world.triangles[materialIndex], materialIndex);
-            }
-        }
-
+       
         // Credits: https://gist.github.com/mikezila/10557162
         //private Texture2D _LoadTGA(Stream TGAStream)
         //{

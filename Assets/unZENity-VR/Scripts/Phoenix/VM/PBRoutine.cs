@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UZVR.Phoenix.VM
+namespace UZVR.Phoenix.Vm
 {
     public class PBRoutine
     {

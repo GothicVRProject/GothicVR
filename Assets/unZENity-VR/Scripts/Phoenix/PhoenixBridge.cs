@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using UZVR.Phoenix;
-using UZVR.Phoenix.VM;
+using UZVR.Phoenix.Vm;
 using UZVR.Phoenix.World;
 
 namespace UZVR.Phoenix

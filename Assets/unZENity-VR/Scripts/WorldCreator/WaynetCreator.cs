@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using UZVR.Phoenix.World;
+using UZVR.Util;
 
 namespace UZVR.WorldCreator
 {
-    public class WaynetCreator
+    public class WaynetCreator: SingletonBehaviour<WaynetCreator>
     {
         public void Create(GameObject root, PBWorld world)
         {
