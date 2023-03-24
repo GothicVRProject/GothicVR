@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UZVR.Phoenix;
+using UZVR.Phoenix.World;
 
 namespace UZVR
 {
     public class MeshCreator
     {
-        public void Create(GameObject root, PCBridge_World world)
+        public void Create(GameObject root, PBWorld world)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.transform.parent = root.transform;
@@ -33,7 +34,7 @@ namespace UZVR
             }
         }
 
-        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, PCBridge_World world, int materialIndex)
+        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, PBWorld world, int materialIndex)
         {
             var standardShader = Shader.Find("Standard");
             var material = new Material(standardShader);
@@ -59,7 +60,7 @@ namespace UZVR
         ///     newVertices  => 0=[...], 1=[...], 2=[...]
         ///     newTriangles => 0=1, 1=0, 2=3, 3=0, 4=0 <-- values are replaced with new mapping
         /// </summary>
-        private void _PrepareMeshFilter(MeshFilter meshFilter, PCBridge_World world, int materialIndex)
+        private void _PrepareMeshFilter(MeshFilter meshFilter, PBWorld world, int materialIndex)
         {
             var vertices = world.vertices;
             var triangles = world.triangles[materialIndex];
@@ -97,7 +98,7 @@ namespace UZVR
             mesh.triangles = newTriangles.ToArray();
         }
 
-        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, PCBridge_World world)
+        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, PBWorld world)
         {
             var standardShader = Shader.Find("Standard");
 
@@ -126,7 +127,7 @@ namespace UZVR
             //    }
             //}
         }
-        private void _PrepareMeshFilter(MeshFilter meshFilter, PCBridge_World world)
+        private void _PrepareMeshFilter(MeshFilter meshFilter, PBWorld world)
         {
             var mesh = new Mesh();
             meshFilter.mesh = mesh;

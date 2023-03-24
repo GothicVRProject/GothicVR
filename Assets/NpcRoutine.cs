@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UZVR;
+using UZVR.Phoenix;
+using UZVR.Phoenix.VM;
 
 public class NpcRoutine: MonoBehaviour
 {
     private static int SPEED = 10;
     private GameTime gameTime;
-    public List<TestSingleton.Routine> routines;
+    public List<PBRoutine> routines;
 
     void Start()
     {
@@ -19,17 +21,17 @@ public class NpcRoutine: MonoBehaviour
     {
         var routine = GetCurrentRoutine();
 
-        if (routine.Equals(default(TestSingleton.Routine)))
+        if (routine == null)
             return;
 
-        var waypoint = TestSingleton.world.waypoints
+        var waypoint = PhoenixBridge.World.waypoints
             .FirstOrDefault(item => item.name.ToLower() == routine.waypoint.ToLower());
 
         var startPosition = gameObject.transform.position;
         gameObject.transform.position = Vector3.MoveTowards(startPosition, waypoint.position, SPEED * Time.deltaTime);
     }
 
-    private TestSingleton.Routine GetCurrentRoutine()
+    private PBRoutine GetCurrentRoutine()
     {
         var curTime = gameTime.getCurrentDateTime();
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UZVR.Phoenix;
+using UZVR.Phoenix.VM;
+using UZVR.Phoenix.World;
 using static UnityEditor.Progress;
 
 namespace UZVR
@@ -28,32 +30,32 @@ namespace UZVR
         {
             var npcContainer = GameObject.Find("NPCs");
 
-            var initialSpawnpoint = TestSingleton.world.waypoints
+            var initialSpawnpoint = PhoenixBridge.World.waypoints
                 .FirstOrDefault(item => item.name.ToLower() == spawnpoint.ToLower());
 
             // Not very fast. Please consider using an index search via a Dictionary(string name, Waypoint waypoint);
-            if (initialSpawnpoint.Equals(default(PCBridge_Waypoint)))
+            if (initialSpawnpoint == null)
             {
                 Debug.LogWarning(string.Format("spawnpoint={0} couldn't be found.", spawnpoint));
                 return;
             }
 
-            var npc = TestSingleton.vm.InitNpcInstance(npcinstance);
+            var npc = PhoenixBridge.VMBridge.InitNpcInstance(npcinstance);
 
-            string name = TestSingleton.vm.GetNpcName(npc);
+            string name = PhoenixBridge.VMBridge.GetNpcName(npc);
 
             var newNpc = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             newNpc.name = string.Format("{0}-{1}", name, spawnpoint);
 
-            var npcRoutine = TestSingleton.vm.GetNpcRoutine(npc);
+            var npcRoutine = PhoenixBridge.VMBridge.GetNpcRoutine(npc);
 
-            TestSingleton.vm.CallFunction(npcRoutine, npc);
+            PhoenixBridge.VMBridge.CallFunction(npcRoutine, npc);
 
-            var symbolId = TestSingleton.vm.GetNpcSymbolId(npc);
+            var symbolId = PhoenixBridge.VMBridge.GetNpcSymbolId(npc);
 
-            if (TestSingleton.npcRoutines.TryGetValue(symbolId, out List<TestSingleton.Routine> routines))
+            if (PhoenixBridge.npcRoutines.TryGetValue(symbolId, out List<PBRoutine> routines))
             {
-                initialSpawnpoint = TestSingleton.world.waypoints
+                initialSpawnpoint = PhoenixBridge.World.waypoints
                     .FirstOrDefault(item => item.name.ToLower() == routines.First().waypoint.ToLower());
                 var routineComp = newNpc.AddComponent<NpcRoutine>();
                 routineComp.routines = routines;
@@ -70,7 +72,7 @@ namespace UZVR
 
             var stop_hFormatted = stop_h == 24 ? 0 : stop_h;
 
-            TestSingleton.Routine routine = new()
+            PBRoutine routine = new()
             {
                 start_h = start_h,
                 start_m = start_m,
@@ -82,12 +84,12 @@ namespace UZVR
                 waypoint = waypoint
             };
 
-            var symbolId = TestSingleton.vm.GetNpcSymbolId(npc);
+            var symbolId = PhoenixBridge.VMBridge.GetNpcSymbolId(npc);
 
             // Add element if key not yet exists.
-            TestSingleton.npcRoutines.TryAdd(symbolId, new());
+            PhoenixBridge.npcRoutines.TryAdd(symbolId, new());
 
-            TestSingleton.npcRoutines[symbolId].Add(routine);
+            PhoenixBridge.npcRoutines[symbolId].Add(routine);
         }
     }
 }

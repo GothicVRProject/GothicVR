@@ -4,51 +4,18 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
+using UZVR.Phoenix.World;
 
 namespace UZVR.Phoenix
 {
-    public class PCBridge_World
-    {
-        public List<Vector3> vertices;
-        public List<PCBridge_Material> materials;
-        public Dictionary<int, List<int>> triangles;
-
-        public List<PCBridge_Waypoint> waypoints;
-        public List<PCBridge_WaypointEdge> waypointEdges;
-    }
-
-    public class PCBridge_Material
-    {
-        public string name;
-        public Color color;
-    }
-
-    public class PCBridge_Waypoint
-    {
-        public string name;
-        public bool freePoint;
-        public Vector3 position;
-        public Vector3 direction;
-        public bool underWater;
-        public int waterDepth;
-    }
-
-    // Reason to be a struct is to have auto-marshalling for PInvoke
-    public struct PCBridge_WaypointEdge {
-        public uint a;
-        public uint b;
-    }
-
-
     public class WorldBridge
     {
-        private const string DLLNAME = "phoenix-csharp-bridge";
 
         public IntPtr WorldPtr { get; private set; } = IntPtr.Zero;
 
-        public PCBridge_World World { get; private set; } = new PCBridge_World();
+        public PBWorld World { get; private set; } = new();
 
-
+        private const string DLLNAME = PhoenixBridge.DLLNAME;
         // Load
         [DllImport(DLLNAME)] private static extern IntPtr loadWorld(IntPtr vdfContainer, string worldFileName);
 
@@ -83,7 +50,7 @@ namespace UZVR.Phoenix
         // U1 to have bool as 1-byte from C++; https://learn.microsoft.com/en-us/visualstudio/code-quality/ca1414?view=vs-2022&tabs=csharp
         [DllImport(DLLNAME)] private static extern void getWorldWaynetWaypoint(IntPtr world, int index, StringBuilder name, out Vector3 position, out Vector3 direction, [MarshalAs(UnmanagedType.U1)] out bool freePoint, [MarshalAs(UnmanagedType.U1)] out bool underWater, out int waterDepth);
         [DllImport(DLLNAME)] private static extern int getWorldWaynetEdgeCount(IntPtr world);
-        [DllImport(DLLNAME)] private static extern PCBridge_WaypointEdge getWorldWaynetEdge(IntPtr world, int index);
+        [DllImport(DLLNAME)] private static extern PBWaypointEdge getWorldWaynetEdge(IntPtr world, int index);
 
 
         public WorldBridge(VdfsBridge vdfs, string worldName)
@@ -118,10 +85,10 @@ namespace UZVR.Phoenix
             return vertices;
         }
 
-        private List<PCBridge_Material> _GetWorldMaterials()
+        private List<PBMaterial> _GetWorldMaterials()
         {
             int materialCount = getWorldMeshMaterialCount(WorldPtr);
-            var materials = new List<PCBridge_Material>(materialCount);
+            var materials = new List<PBMaterial>(materialCount);
 
             for (var i=0; i<materialCount; i++)
             {
@@ -131,7 +98,7 @@ namespace UZVR.Phoenix
                 StringBuilder name = new(getWorldMeshMaterialNameSize(WorldPtr, i));
                 getWorldMeshMaterialName(WorldPtr, i, name);
 
-                var m = new PCBridge_Material() {
+                var m = new PBMaterial() {
                     name = name.ToString(),
                     color = new Color((float)r/255, (float)g /255, (float)b /255, (float)a /255)
                 };
@@ -171,10 +138,10 @@ namespace UZVR.Phoenix
         }
 
 
-        private List<PCBridge_Waypoint> _GetWorldWaypoints()
+        private List<PBWaypoint> _GetWorldWaypoints()
         {
             var waypointCount = getWorldWaynetWaypointCount(WorldPtr);
-            var waypoints = new List<PCBridge_Waypoint>(waypointCount);
+            var waypoints = new List<PBWaypoint>(waypointCount);
 
             for(int i = 0; i < waypointCount; i++)
             {
@@ -182,7 +149,7 @@ namespace UZVR.Phoenix
 
                 getWorldWaynetWaypoint(WorldPtr, i, name, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth);
 
-                var waypoint = new PCBridge_Waypoint()
+                var waypoint = new PBWaypoint()
                 {
                     name = name.ToString(),
                     position = position / 100, // Gothic coordinates are too big by factor 100
@@ -198,10 +165,10 @@ namespace UZVR.Phoenix
             return waypoints;
         }
 
-        private List<PCBridge_WaypointEdge> _GetWorldWaypointEdges()
+        private List<PBWaypointEdge> _GetWorldWaypointEdges()
         {
             var edgeCount = getWorldWaynetEdgeCount(WorldPtr);
-            var edges = new List<PCBridge_WaypointEdge>(edgeCount);
+            var edges = new List<PBWaypointEdge>(edgeCount);
 
             for (int i = 0; i < edgeCount; i++)
             {

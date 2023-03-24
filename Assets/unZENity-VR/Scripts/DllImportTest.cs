@@ -29,14 +29,14 @@ namespace UZVR
             new MeshCreator().Create(root, worldBridge.World);
             new WaynetCreator().Create(root, worldBridge.World);
 
-            TestSingleton.world = worldBridge.World;
+            PhoenixBridge.WorldBridge = worldBridge;
         }
 
         private void TestVM()
         {
             var vm = new VmBridge(G1Dir + "/_work/DATA/scripts/_compiled/GOTHIC.DAT");
 
-            TestSingleton.vm = vm;
+            PhoenixBridge.VMBridge = vm;
 
             vm.CallFunction("STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
         }

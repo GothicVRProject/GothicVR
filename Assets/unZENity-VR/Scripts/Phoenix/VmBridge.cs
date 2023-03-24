@@ -2,18 +2,14 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
 
 namespace UZVR.Phoenix
 {
     public class VmBridge
     {
-        private const string DLLNAME = "phoenix-csharp-bridge";
-        private const string G1DatDir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic\\_work\\DATA\\scripts\\_compiled\\";
-
         public IntPtr VmPtr { get; private set; } = IntPtr.Zero;
 
-
+        private const string DLLNAME = PhoenixBridge.DLLNAME;
         // Generic functions
         [DllImport(DLLNAME)] private static extern IntPtr createVM(string datFilePath);
         [DllImport(DLLNAME)] private static extern void disposeVM(IntPtr vm);

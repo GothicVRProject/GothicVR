@@ -1,21 +1,18 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
 
 namespace UZVR.Phoenix
 {
     public class VdfsBridge
-    {
-        private const string DLLNAME = "phoenix-csharp-bridge";
-        
+    {      
         public IntPtr VdfsPtr
         {
             get;
             private set;
         }
 
+        private const string DLLNAME = PhoenixBridge.DLLNAME;
         [DllImport(DLLNAME)] private static extern IntPtr createVDFContainer();
         [DllImport(DLLNAME)] private static extern void addVDFToContainer(IntPtr vdfContainer, string vdfPath);
         [DllImport(DLLNAME)] private static extern void disposeVDFContainer(IntPtr vdfContainer);

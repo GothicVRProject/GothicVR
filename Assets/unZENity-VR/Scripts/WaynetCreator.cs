@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
-using UZVR.Phoenix;
+using UZVR.Phoenix.World;
 
 namespace UZVR
 {
     public class WaynetCreator
     {
-        public void Create(GameObject root, PCBridge_World world)
+        public void Create(GameObject root, PBWorld world)
         {
             var waynetObj = new GameObject(string.Format("Waynet"));
             waynetObj.transform.parent = root.transform;
