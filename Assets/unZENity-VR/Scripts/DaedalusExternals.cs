@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Linq;
 using UZVR.Phoenix;
 using Unity.VisualScripting;
+using System.Collections.Generic;
 
 namespace UZVR
 {
@@ -37,13 +38,23 @@ namespace UZVR
                 return;
             }
 
-            var npcInstance = TestSingleton.vm.InitNpcInstance(npcinstance);
-            var npcRoutine = TestSingleton.vm.GetNpcRoutine(npcInstance);
+            var npc = TestSingleton.vm.InitNpcInstance(npcinstance);
+            var npcRoutine = TestSingleton.vm.GetNpcRoutine(npc);
 
-            TestSingleton.vm.CallFunction(npcRoutine, npcInstance);            
+            TestSingleton.vm.CallFunction(npcRoutine, npc);
+
+            var symbolId = TestSingleton.vm.GetNpcSymbolId(npc);
+
+            if (TestSingleton.npcRoutines.TryGetValue(symbolId, out List<TestSingleton.Routine> routines))
+            {
+                initialSpawnpoint = TestSingleton.world.waypoints
+                .FirstOrDefault(item => item.name.ToLower() == routines.First().waypoint.ToLower());
+            }
+
+            string name = TestSingleton.vm.GetNpcName(npc);
 
             var newNpc = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            newNpc.name = string.Format("{0}-{1}", npcinstance, spawnpoint);
+            newNpc.name = string.Format("{0}-{1}", name, spawnpoint);
 
             newNpc.transform.position = initialSpawnpoint.position;
             newNpc.transform.parent = npcContainer.transform;
@@ -51,11 +62,22 @@ namespace UZVR
 
         public static void TA_MIN(IntPtr npc, int start_h, int start_m, int stop_h, int stop_m, int action, string waypoint)
         {
-            // TODO Store routine as array onto the actual NPC (e.g. dictionary inside Unity)
-            // TODO Use the current routine end point as Wld_InsertNpc's "real" spawn point.
-            // TODO the npcRef is always 0x0. Also on main.cc. Are we missing sym.set_instance(h); ? Why? Is it even used during call?
+            TestSingleton.Routine routine = new()
+            {
+                start_h = start_h,
+                start_m = start_m,
+                stop_h = stop_h,
+                stop_m = stop_m,
+                action = action,
+                waypoint = waypoint
+            };
 
-            int a = 2;
+            var symbolId = TestSingleton.vm.GetNpcSymbolId(npc);
+
+            // Add element if key not yet exists.
+            TestSingleton.npcRoutines.TryAdd(symbolId, new());
+
+            TestSingleton.npcRoutines[symbolId].Add(routine);
         }
     }
 }

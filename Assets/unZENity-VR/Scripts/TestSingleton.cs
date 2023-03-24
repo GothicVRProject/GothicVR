@@ -1,4 +1,5 @@
-﻿using UZVR.Phoenix;
+﻿using System.Collections.Generic;
+using UZVR.Phoenix;
 
 namespace UZVR
 {
@@ -9,8 +10,22 @@ namespace UZVR
     /// </summary>
     public static class TestSingleton
     {
+        public struct Routine
+        {
+            public int start_h;
+            public int start_m;
+            public int stop_h;
+            public int stop_m;
+            public int action;
+            public string waypoint;
+        }
+
+
         public static PCBridge_World world;
 
         public static VmBridge vm;
+
+
+        public static Dictionary<uint, List<Routine>> npcRoutines = new();
     }
 }

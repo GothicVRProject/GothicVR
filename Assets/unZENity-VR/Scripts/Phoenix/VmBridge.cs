@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
 
 namespace UZVR.Phoenix
@@ -31,6 +32,10 @@ namespace UZVR.Phoenix
         // NPC functions
         [DllImport(DLLNAME)] private static extern IntPtr initNpcInstance(IntPtr vm, int instanceId);
         [DllImport(DLLNAME)] private static extern int getNpcRoutine(IntPtr npc);
+        [DllImport(DLLNAME)] private static extern uint getNpcSymbolIndex(IntPtr npc);
+        [DllImport(DLLNAME)] private static extern int getNpcNameSize(IntPtr npc);
+        [DllImport(DLLNAME)] private static extern void getNpcName(IntPtr npc, StringBuilder name);
+
 
 
         public VmBridge(string datFilename)
@@ -71,9 +76,23 @@ namespace UZVR.Phoenix
             return initNpcInstance(_vm, instanceId);
         }
 
+        public uint GetNpcSymbolId(IntPtr npc)
+        {
+            return getNpcSymbolIndex(npc);
+        }
+
         public int GetNpcRoutine(IntPtr npc)
         {
             return getNpcRoutine(npc);
+        }
+
+        public string GetNpcName(IntPtr npc)
+        {
+            var size = getNpcNameSize(npc);
+            var name = new StringBuilder(size);
+            getNpcName(npc, name);
+
+            return name.ToString();
         }
 
         ~VmBridge()
