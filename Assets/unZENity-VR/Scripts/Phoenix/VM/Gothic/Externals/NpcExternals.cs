@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using UnityEngine.Events;
-using UZVR.Demo;
 
-namespace UZVR.Phoenix.Vm.Externals
+namespace UZVR.Phoenix.Vm.Gothic.Externals
 {
     public static class NpcExternals
     {

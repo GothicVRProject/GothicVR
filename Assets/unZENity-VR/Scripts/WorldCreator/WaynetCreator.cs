@@ -6,7 +6,7 @@ namespace UZVR.WorldCreator
 {
     public class WaynetCreator: SingletonBehaviour<WaynetCreator>
     {
-        public void Create(GameObject root, PBWorld world)
+        public void Create(GameObject root, BWorld world)
         {
             var waynetObj = new GameObject(string.Format("Waynet"));
             waynetObj.transform.parent = root.transform;

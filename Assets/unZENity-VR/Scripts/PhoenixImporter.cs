@@ -2,6 +2,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UZVR.Phoenix;
+using UZVR.Phoenix.Bridge;
+using UZVR.Phoenix.Bridge.Vm;
 using UZVR.Util;
 using UZVR.WorldCreator;
 
@@ -40,11 +42,12 @@ namespace UZVR
 
         private void LoadGothicVM()
         {
-            var vm = new VmBridge(G1Dir + "/_work/DATA/scripts/_compiled/GOTHIC.DAT");
+            var vmGothicBridge = new VmGothicBridge(G1Dir + "/_work/DATA/scripts/_compiled/GOTHIC.DAT");
 
-            PhoenixBridge.VMBridge = vm;
+            PhoenixBridge.VmGothicBridge = vmGothicBridge;
+            PhoenixBridge.VmGothicNpcBridge = new(vmGothicBridge);
 
-            vm.CallFunction("STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
+            vmGothicBridge.CallFunction("STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
         }
     }
 }

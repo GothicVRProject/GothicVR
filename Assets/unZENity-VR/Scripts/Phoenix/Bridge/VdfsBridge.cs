@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace UZVR.Phoenix
+namespace UZVR.Phoenix.Bridge
 {
     public class VdfsBridge
     {      
@@ -13,33 +13,33 @@ namespace UZVR.Phoenix
         }
 
         private const string DLLNAME = PhoenixBridge.DLLNAME;
-        [DllImport(DLLNAME)] private static extern IntPtr createVDFContainer();
-        [DllImport(DLLNAME)] private static extern void addVDFToContainer(IntPtr vdfContainer, string vdfPath);
-        [DllImport(DLLNAME)] private static extern void disposeVDFContainer(IntPtr vdfContainer);
+        [DllImport(DLLNAME)] private static extern IntPtr vdfCreateContainer();
+        [DllImport(DLLNAME)] private static extern void vdfAddToContainer(IntPtr vdfContainer, string vdfPath);
+        [DllImport(DLLNAME)] private static extern void vdfDisposeContainer(IntPtr vdfContainer);
 
 
         public VdfsBridge(string vdfsDir)
         {
-            VdfsPtr = createVDFContainer();
+            VdfsPtr = vdfCreateContainer();
 
             _ParseVDFs(vdfsDir);
         }
 
         private void _ParseVDFs(string vdfsDir)
         {
-            VdfsPtr = createVDFContainer();
+            VdfsPtr = vdfCreateContainer();
 
             var vdfPaths = Directory.GetFiles(vdfsDir, "*.vdf");
 
             foreach (var vdfPath in vdfPaths)
-                addVDFToContainer(VdfsPtr, vdfPath);
+                vdfAddToContainer(VdfsPtr, vdfPath);
         }
 
         // TODO: Check when the class is disposed to free memory within DLL.
         // If happening too late, then free it manually earlier.
         ~VdfsBridge()
         {
-            disposeVDFContainer(VdfsPtr);
+            vdfDisposeContainer(VdfsPtr);
             VdfsPtr = IntPtr.Zero;
         }
 

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace UZVR.Phoenix.Vm
+namespace UZVR.Phoenix.Vm.Gothic
 {
-    public class PBRoutine
+    public class BRoutine
     {
         public int start_h;
         public int start_m;

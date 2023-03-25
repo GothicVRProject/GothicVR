@@ -2,7 +2,7 @@
 
 namespace UZVR.Phoenix.World
 {
-    public class PBWaypoint
+    public class BWaypoint
     {
         public string name;
         public bool freePoint;

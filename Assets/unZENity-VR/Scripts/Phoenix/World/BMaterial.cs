@@ -2,7 +2,7 @@
 
 namespace UZVR.Phoenix.World
 {
-    public class PBMaterial
+    public class BMaterial
     {
         public string name;
         public Color color;

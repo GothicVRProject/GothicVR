@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UZVR.Demo;
-using UZVR.Phoenix;
-using UZVR.Phoenix.Vm;
-using UZVR.Phoenix.Vm.Externals;
+using UZVR.Phoenix.Bridge;
+using UZVR.Phoenix.Vm.Gothic;
+using UZVR.Phoenix.Vm.Gothic.Externals;
 using UZVR.Util;
 
 namespace UZVR.WorldCreator
@@ -25,27 +25,26 @@ namespace UZVR.WorldCreator
             var initialSpawnpoint = PhoenixBridge.World.waypoints
                 .FirstOrDefault(item => item.name.ToLower() == spawnpoint.ToLower());
 
-            // Not very fast. Please consider using an index search via a Dictionary(string name, Waypoint waypoint);
             if (initialSpawnpoint == null)
             {
                 Debug.LogWarning(string.Format("spawnpoint={0} couldn't be found.", spawnpoint));
                 return;
             }
 
-            var npc = PhoenixBridge.VMBridge.InitNpcInstance(npcInstance);
+            var npc = PhoenixBridge.VmGothicNpcBridge.InitNpcInstance(npcInstance);
 
-            string name = PhoenixBridge.VMBridge.GetNpcName(npc);
+            string name = PhoenixBridge.VmGothicNpcBridge.GetNpcName(npc);
 
             var newNpc = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             newNpc.name = string.Format("{0}-{1}", name, spawnpoint);
 
-            var npcRoutine = PhoenixBridge.VMBridge.GetNpcRoutine(npc);
+            var npcRoutine = PhoenixBridge.VmGothicNpcBridge.GetNpcRoutine(npc);
 
-            PhoenixBridge.VMBridge.CallFunction(npcRoutine, npc);
+            PhoenixBridge.VmGothicNpcBridge.CallFunction(npcRoutine, npc);
 
-            var symbolId = PhoenixBridge.VMBridge.GetNpcSymbolId(npc);
+            var symbolId = PhoenixBridge.VmGothicNpcBridge.GetNpcSymbolId(npc);
 
-            if (PhoenixBridge.npcRoutines.TryGetValue(symbolId, out List<PBRoutine> routines))
+            if (PhoenixBridge.npcRoutines.TryGetValue(symbolId, out List<BRoutine> routines))
             {
                 initialSpawnpoint = PhoenixBridge.World.waypoints
                     .FirstOrDefault(item => item.name.ToLower() == routines.First().waypoint.ToLower());
@@ -59,12 +58,10 @@ namespace UZVR.WorldCreator
 
         private static void TA_MIN(NpcExternals.TA_MINData data)
         {
-            Debug.Log(DateTime.MinValue);
-            Debug.Log(new DateTime(1, 1, 1, 0, 0, 0));
-
+            // If we put h=24, DateTime will throw an error instead of rolling.
             var stop_hFormatted = data.stop_h == 24 ? 0 : data.stop_h;
 
-            PBRoutine routine = new()
+            BRoutine routine = new()
             {
                 start_h = data.start_h,
                 start_m = data.start_m,
@@ -76,7 +73,7 @@ namespace UZVR.WorldCreator
                 waypoint = data.waypoint
             };
 
-            var symbolId = PhoenixBridge.VMBridge.GetNpcSymbolId(data.npc);
+            var symbolId = PhoenixBridge.VmGothicNpcBridge.GetNpcSymbolId(data.npc);
 
             // Add element if key not yet exists.
             PhoenixBridge.npcRoutines.TryAdd(symbolId, new());

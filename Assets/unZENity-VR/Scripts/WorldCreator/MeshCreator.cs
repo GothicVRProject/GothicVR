@@ -8,7 +8,7 @@ namespace UZVR.WorldCreator
 {
     public class MeshCreator: SingletonBehaviour<MeshCreator>
     {
-        public void Create(GameObject root, PBWorld world)
+        public void Create(GameObject root, BWorld world)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.transform.parent = root.transform;
@@ -33,7 +33,7 @@ namespace UZVR.WorldCreator
             }
         }
 
-        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, PBWorld world, int materialIndex)
+        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, BWorld world, int materialIndex)
         {
             var standardShader = Shader.Find("Standard");
             var material = new Material(standardShader);
@@ -59,7 +59,7 @@ namespace UZVR.WorldCreator
         ///     newVertices  => 0=[...], 1=[...], 2=[...]
         ///     newTriangles => 0=1, 1=0, 2=3, 3=0, 4=0 <-- values are replaced with new mapping
         /// </summary>
-        private void _PrepareMeshFilter(MeshFilter meshFilter, PBWorld world, int materialIndex)
+        private void _PrepareMeshFilter(MeshFilter meshFilter, BWorld world, int materialIndex)
         {
             var vertices = world.vertices;
             var triangles = world.triangles[materialIndex];

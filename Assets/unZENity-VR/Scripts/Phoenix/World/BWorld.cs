@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace UZVR.Phoenix.World
 {
-    public class PBWorld
+    public class BWorld
     {
         public List<Vector3> vertices;
-        public List<PBMaterial> materials;
+        public List<BMaterial> materials;
         public Dictionary<int, List<int>> triangles;
 
-        public List<PBWaypoint> waypoints;
-        public List<PBWaypointEdge> waypointEdges;
+        public List<BWaypoint> waypoints;
+        public List<BWaypointEdge> waypointEdges;
     }
 }
