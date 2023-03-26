@@ -1,21 +1,5 @@
 {
   "dependencies": {
-    "com.frozenstorminteractive.assimp": {
-      "version": "4.1.0-pre.2",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://upm.frozenstorminteractive.com"
-    },
-    "com.frozenstorminteractive.assimp.windows": {
-      "version": "4.1.0-pre.2",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.frozenstorminteractive.assimp": "4.1.0-pre.2"
-      },
-      "url": "https://upm.frozenstorminteractive.com"
-    },
     "com.unity.collab-proxy": {
       "version": "1.17.7",
       "depth": 0,
