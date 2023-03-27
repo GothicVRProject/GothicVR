@@ -1,25 +1,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UZVR.Phoenix;
+using UZVR.Demo;
 using UZVR.Phoenix.Bridge;
 using UZVR.Phoenix.Vm.Gothic;
+using UZVR.Util;
 
-namespace UZVR.Demo
+namespace UZVR.Npc
 {
-    public class NpcRoutine : MonoBehaviour
+    public class Routine : MonoBehaviour
     {
-        private static int SPEED = 10;
+        private static readonly int SPEED = 10;
         private GameTime gameTime;
         public List<BRoutine> routines;
 
         void Start()
         {
-            gameTime = FindObjectOfType<GameTime>();
+            gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
         }
 
         void Update()
         {
+            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
+                return;
+
             var routine = GetCurrentRoutine();
 
             if (routine == null)

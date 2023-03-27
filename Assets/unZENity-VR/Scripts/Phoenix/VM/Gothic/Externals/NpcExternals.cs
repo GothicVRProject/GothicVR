@@ -16,7 +16,9 @@ namespace UZVR.Phoenix.Vm.Gothic.Externals
             public string waypoint;
         }
 
+        // FIXME - Throw Debug.Log if no listener is added.
         public static UnityEvent<int, string> PhoenixWld_InsertNpc = new();
+        // FIXME - Throw Debug.Log if no listener is added.
         public static UnityEvent<TA_MINData> PhoenixTA_MIN = new();
 
         /// <summary>
@@ -26,9 +28,9 @@ namespace UZVR.Phoenix.Vm.Gothic.Externals
         /// It can also be the currently active routine point to walk to.
         /// We therefore execute the daily routines to collect current location and use this as spawn location.
         /// </summary>
-        public static void Wld_InsertNpc(int npcinstance, string spawnpoint)
+        public static void Wld_InsertNpc(int npcInstance, string spawnpoint)
         {
-            PhoenixWld_InsertNpc.Invoke(npcinstance, spawnpoint);
+            PhoenixWld_InsertNpc.Invoke(npcInstance, spawnpoint);
         }
 
         public static void TA_MIN(IntPtr npc, int start_h, int start_m, int stop_h, int stop_m, int action, string waypoint)

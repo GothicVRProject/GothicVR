@@ -1,10 +1,11 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UZVR.Util;
 
 namespace UZVR.Demo
 {
-    public class GameTime : MonoBehaviour
+    public class GameTime : SingletonBehaviour<GameTime>
     {
         private static DateTime MIN_TIME = new(1, 1, 1, 0, 0, 0);
         private static DateTime MAX_TIME = new(1, 1, 1, 23, 59, 59);
@@ -12,6 +13,9 @@ namespace UZVR.Demo
 
         void Start()
         {
+            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableDayTime)
+                return;
+
             StartCoroutine(TimeTick());
         }
 

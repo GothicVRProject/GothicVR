@@ -14,7 +14,8 @@ namespace UZVR.Phoenix.Bridge.Vm.Gothic
         private readonly VmBridge _vmBridge;
 
         // Basic
-        [DllImport(DLLNAME)] private static extern IntPtr vmGothicNpcinitInstance(IntPtr vm, int instanceId);
+        [DllImport(DLLNAME)] private static extern IntPtr vmGothicNpcInitInstance(IntPtr vm, int instanceId);
+        [DllImport(DLLNAME)] private static extern IntPtr vmGothicNpcInitInstanceByName(IntPtr vm, string instanceName);
         [DllImport(DLLNAME)] private static extern uint vmGothicNpcGetSymbolIndex(IntPtr npcPtr);
         [DllImport(DLLNAME)] private static extern void vmGothicNpcCallFunctionByIndex(IntPtr vm, int index, IntPtr npcPtr);
 
@@ -46,7 +47,12 @@ namespace UZVR.Phoenix.Bridge.Vm.Gothic
 
         public IntPtr InitNpcInstance(int instanceId)
         {
-            return vmGothicNpcinitInstance(_vmBridge.VmPtr, instanceId);
+            return vmGothicNpcInitInstance(_vmBridge.VmPtr, instanceId);
+        }
+
+        public IntPtr InitNpcInstance(string instanceName)
+        {
+            return vmGothicNpcInitInstanceByName(_vmBridge.VmPtr, instanceName);
         }
 
         public uint GetNpcSymbolId(IntPtr npc)

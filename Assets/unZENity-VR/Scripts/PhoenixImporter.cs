@@ -1,7 +1,6 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UZVR.Phoenix;
 using UZVR.Phoenix.Bridge;
 using UZVR.Phoenix.Bridge.Vm;
 using UZVR.Util;

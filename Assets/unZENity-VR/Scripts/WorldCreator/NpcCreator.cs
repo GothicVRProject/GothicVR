@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UZVR.Demo;
+using UZVR.Npc;
 using UZVR.Phoenix.Bridge;
 using UZVR.Phoenix.Vm.Gothic;
 using UZVR.Phoenix.Vm.Gothic.Externals;
@@ -35,7 +37,7 @@ namespace UZVR.WorldCreator
 
             string name = PhoenixBridge.VmGothicNpcBridge.GetNpcName(npc);
 
-            var newNpc = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
             newNpc.name = string.Format("{0}-{1}", name, spawnpoint);
 
             var npcRoutine = PhoenixBridge.VmGothicNpcBridge.GetNpcRoutine(npc);
@@ -43,13 +45,13 @@ namespace UZVR.WorldCreator
             PhoenixBridge.VmGothicNpcBridge.CallFunction(npcRoutine, npc);
 
             var symbolId = PhoenixBridge.VmGothicNpcBridge.GetNpcSymbolId(npc);
+            newNpc.GetComponent<Properties>().DaedalusSymbolId = symbolId;
 
             if (PhoenixBridge.npcRoutines.TryGetValue(symbolId, out List<BRoutine> routines))
             {
                 initialSpawnpoint = PhoenixBridge.World.waypoints
                     .FirstOrDefault(item => item.name.ToLower() == routines.First().waypoint.ToLower());
-                var routineComp = newNpc.AddComponent<NpcRoutine>();
-                routineComp.routines = routines;
+                newNpc.GetComponent<Routine>().routines = routines;
             }
 
             newNpc.transform.position = initialSpawnpoint.position;
