@@ -77,17 +77,19 @@ namespace UZVR.Phoenix.Bridge.Vm.Gothic
 
 #region Externals
 
-        delegate void REGISTER_TA_MIN(IntPtr npcRef, int start_h, int start_m, int stop_h, int stop_m, int action, string waypoint);
-        delegate void NO_RETURN_INT_STRING_PARAM_CALLBACK(int npcinstance, string spawnpoint);
+        delegate void WLD_INSERT_NPC_CALLBACK(int npcinstance, string spawnpoint);
+        delegate void TA_MIN_CALLBACK(IntPtr npcRef, int start_h, int start_m, int stop_h, int stop_m, int action, string waypoint);
+        delegate void AI_OUTPUT_CALLBACK(IntPtr self, IntPtr target, string outputname);
 
-        [DllImport(DLLNAME)] private static extern void vmGothicRegisterWld_InsertNpc(IntPtr vm, string functionName, NO_RETURN_INT_STRING_PARAM_CALLBACK callback);
-        [DllImport(DLLNAME)] private static extern void vmGothicNpcRegisterTA_MIN(IntPtr vm, REGISTER_TA_MIN callback);
-
+        [DllImport(DLLNAME)] private static extern void vmGothicRegisterWld_InsertNpc(IntPtr vm, string functionName, WLD_INSERT_NPC_CALLBACK callback);
+        [DllImport(DLLNAME)] private static extern void vmGothicNpcRegisterTA_MIN(IntPtr vm, TA_MIN_CALLBACK callback);
+        [DllImport(DLLNAME)] private static extern void vmGothicNpcRegisterAI_Output(IntPtr vm, AI_OUTPUT_CALLBACK callback);
 
         private void RegisterNpcCallbacks()
         {
             vmGothicRegisterWld_InsertNpc(_vmBridge.VmPtr, "Wld_InsertNpc", NpcExternals.Wld_InsertNpc);
             vmGothicNpcRegisterTA_MIN(_vmBridge.VmPtr, NpcExternals.TA_MIN);
+            vmGothicNpcRegisterAI_Output(_vmBridge.VmPtr, NpcExternals.AI_Output);
         }
 
 #endregion

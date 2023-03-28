@@ -48,5 +48,11 @@ namespace UZVR.Phoenix.Vm.Gothic.Externals
                 }
             );
         }
+
+        public static void AI_Output(IntPtr self, IntPtr target, string outputname)
+        {
+            // NotYetImplemented
+            int a = 2;
+        }
     }
 }
