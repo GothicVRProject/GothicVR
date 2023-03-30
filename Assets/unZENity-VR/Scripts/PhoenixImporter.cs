@@ -17,7 +17,7 @@ namespace UZVR
         {
             // Load after Start() so that other MonoBehaviours can subscribe to DaedalusVM events.
             if (_loaded) return;
-            _loaded = true;
+                _loaded = true;
 
             var vdfsBridge = new VdfsBridge(G1Dir + "/Data");
 

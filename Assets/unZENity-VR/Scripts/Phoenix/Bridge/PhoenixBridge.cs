@@ -8,7 +8,7 @@ namespace UZVR.Phoenix.Bridge
 {
     public static class PhoenixBridge
     {
-        public const string DLLNAME = "phoenix-csharp-bridge";
+        public const string DLLNAME = "libphoenix-csharp-bridge";
 
         /// <summary>
         /// No need to get WorldBridge as everything is loaded right from the start and stored inside World.
