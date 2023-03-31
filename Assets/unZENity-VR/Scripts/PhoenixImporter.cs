@@ -28,6 +28,8 @@ namespace UZVR
         private void LoadWorld(VdfsBridge vdfsBridge)
         {
             var worldBridge = new WorldBridge(vdfsBridge, "world.zen");
+
+            PhoenixBridge.VdfsPtr = vdfsBridge.VdfsPtr;
             PhoenixBridge.WorldBridge = worldBridge;
 
             var root = new GameObject("World");

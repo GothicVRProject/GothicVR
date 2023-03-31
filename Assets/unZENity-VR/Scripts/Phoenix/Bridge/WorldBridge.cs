@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 using UZVR.Phoenix.World;
 
@@ -25,7 +27,7 @@ namespace UZVR.Phoenix.Bridge
 
         // Vertices; aka Vertexes ;-)
         [DllImport(DLLNAME)] private static extern int worldGetMeshVertexCount(IntPtr world);
-        [DllImport(DLLNAME)] private static extern Vector3 worldGetMeshVertex(IntPtr world, int index);
+        [DllImport(DLLNAME)] private static extern void worldGetMeshVertex(IntPtr world, int index, out Vector3 vertex, out Vector2 texture, out Vector3 normal);
 
         // Triangles
         [DllImport(DLLNAME)] private static extern int worldGetMeshTriangleCount(IntPtr world);
@@ -35,6 +37,7 @@ namespace UZVR.Phoenix.Bridge
         [DllImport(DLLNAME)] private static extern int worldGetMeshMaterialCount(IntPtr world);
         [DllImport(DLLNAME)] private static extern int worldGetMeshMaterialNameSize(IntPtr world, int index);
         [DllImport(DLLNAME)] private static extern void worldGetMeshMaterialName(IntPtr world, int index, StringBuilder name);
+        [DllImport(DLLNAME)] private static extern void worldMeshMaterialGetTextureName(IntPtr world, int index, StringBuilder texture);
         [DllImport(DLLNAME)] private static extern void worldGetMeshMaterialColor(IntPtr world, int index, out byte r, out byte g, out byte b, out byte a);
 
         [DllImport(DLLNAME)] private static extern int worldGetMeshTriangleMaterialIndex(IntPtr world, int index);
@@ -56,7 +59,7 @@ namespace UZVR.Phoenix.Bridge
         {
             WorldPtr = worldLoad(vdfs.VdfsPtr, worldName);
 
-            World.vertices = _GetWorldVertices();
+            SetWorldVertices(World);
             World.materials = _GetWorldMaterials();
             World.triangles = _GetWorldTriangles(World.materials.Count);
             World.waypoints = _GetWorldWaypoints();
@@ -71,17 +74,24 @@ namespace UZVR.Phoenix.Bridge
             WorldPtr = IntPtr.Zero;
         }
 
-        private List<Vector3> _GetWorldVertices()
+        private void SetWorldVertices(BWorld world)
         {
             List<Vector3> vertices = new();
-
+            List<Vector2> textures = new();
+            List<Vector3> normals = new();
 
             for (int i = 0; i < worldGetMeshVertexCount(WorldPtr); i++)
             {
-                vertices.Add(worldGetMeshVertex(WorldPtr, i));
+                worldGetMeshVertex(WorldPtr, i, out Vector3 vertex, out Vector2 textureVector, out Vector3 normal);
+
+                vertices.Add(vertex);
+                textures.Add(textureVector);
+                normals.Add(normal);
             }
 
-            return vertices;
+            world.vertices = vertices;
+            world.textures = textures;
+            world.normals = normals;
         }
 
         private List<BMaterial> _GetWorldMaterials()
@@ -91,14 +101,18 @@ namespace UZVR.Phoenix.Bridge
 
             for (var i=0; i<materialCount; i++)
             {
-                worldGetMeshMaterialColor(WorldPtr, i, out byte r, out byte g, out byte b, out byte a);
-                // We need to convert uint8 (byte) to float for Unity.
-
                 StringBuilder name = new(worldGetMeshMaterialNameSize(WorldPtr, i));
                 worldGetMeshMaterialName(WorldPtr, i, name);
 
+                StringBuilder textureName = new(255);
+                worldMeshMaterialGetTextureName(WorldPtr, i, textureName);
+
+                worldGetMeshMaterialColor(WorldPtr, i, out byte r, out byte g, out byte b, out byte a);
+
                 var m = new BMaterial() {
                     name = name.ToString(),
+                    textureName = textureName.ToString(),
+                    // We need to convert uint8 (byte) to float for Unity.
                     color = new Color((float)r/255, (float)g /255, (float)b /255, (float)a /255)
                 };
                 materials.Add(m);

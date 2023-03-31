@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Palmmedia.ReportGenerator.Core;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
+using UZVR.Phoenix.Bridge;
 using UZVR.Phoenix.World;
 using UZVR.Util;
+using UZVR.World;
 
 namespace UZVR.WorldCreator
 {
@@ -24,8 +28,8 @@ namespace UZVR.WorldCreator
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
                 var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
-                _PrepareMeshRenderer(meshRenderer, world, materialIndex);
-                _PrepareMeshFilter(meshFilter, world, materialIndex);
+                PrepareMeshRenderer(meshRenderer, world, materialIndex);
+                PrepareMeshFilter(meshFilter, world, materialIndex);
                 meshCollider.sharedMesh = meshFilter.mesh;
 
                 subMeshObj.transform.localScale = Vector3.one / 100; // Gothic mesh scales are too big by factor 100
@@ -33,13 +37,27 @@ namespace UZVR.WorldCreator
             }
         }
 
-        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, BWorld world, int materialIndex)
+        private void PrepareMeshRenderer(MeshRenderer meshRenderer, BWorld world, int materialIndex)
         {
             var standardShader = Shader.Find("Standard");
             var material = new Material(standardShader);
+            var bMaterial = world.materials[materialIndex];
 
-            material.color = world.materials[materialIndex].color;
+            //material.color = Color.red; // bMaterial.color;
             meshRenderer.material = material;
+
+            var bTexture = TextureBridge.LoadTexture(PhoenixBridge.VdfsPtr, bMaterial.textureName);
+
+            if (bTexture == null)
+                return;
+
+            var texture = new Texture2D((int)bTexture.width, (int)bTexture.height, TextureFormat.RGBA32, false);
+            texture.name = bMaterial.textureName;
+            texture.LoadRawTextureData(bTexture.data.ToArray());
+
+            texture.Apply();
+
+            material.mainTexture = texture;
         }
 
         /// <summary>
@@ -59,9 +77,11 @@ namespace UZVR.WorldCreator
         ///     newVertices  => 0=[...], 1=[...], 2=[...]
         ///     newTriangles => 0=1, 1=0, 2=3, 3=0, 4=0 <-- values are replaced with new mapping
         /// </summary>
-        private void _PrepareMeshFilter(MeshFilter meshFilter, BWorld world, int materialIndex)
+        private void PrepareMeshFilter(MeshFilter meshFilter, BWorld world, int materialIndex)
         {
             var vertices = world.vertices;
+            var textures = world.textures;
+            var normals = world.normals;
             var triangles = world.triangles[materialIndex];
 
             var mesh = new Mesh();
@@ -72,6 +92,8 @@ namespace UZVR.WorldCreator
             List<int> distinctOrderedTriangles = triangles.Distinct().OrderBy(val => val).ToList();
             Dictionary<int, int> newVertexTriangleMapping = new();
             List<Vector3> newVertices = new();
+            List<Vector2> newTextures = new();
+            List<Vector3> newNormals = new();
 
             // Loop through all the distinctOrderedTriangles
             for (int i=0; i<distinctOrderedTriangles.Count; i++)
@@ -79,6 +101,8 @@ namespace UZVR.WorldCreator
                 // curVertexIndex == currently lowest vertex index in this loop
                 int curVertexIndex = distinctOrderedTriangles[i];
                 Vector3 vertexAtIndex = vertices[curVertexIndex];
+                Vector2 textureAtIndex = textures[curVertexIndex];
+                Vector3 normalAtIndex = normals[curVertexIndex];
 
                 // Previously index of vertex is now the new index of loop's >i<.
                 // This Dictionary will be used to >replace< the original triangle values later.
@@ -88,6 +112,8 @@ namespace UZVR.WorldCreator
                 // Add the vertex which was found as new lowest entry
                 // e.g. Vertex-index=5 is now Vertex-index=0
                 newVertices.Add(vertexAtIndex);
+                newTextures.Add(textureAtIndex);
+                newNormals.Add(normalAtIndex);
             }
 
             // Now we replace the triangle values. aka the vertex-indices (value old) with new >mapping< from Dictionary.
@@ -95,6 +121,8 @@ namespace UZVR.WorldCreator
 
             mesh.vertices = newVertices.ToArray();
             mesh.triangles = newTriangles.ToArray();
+            mesh.uv = newTextures.ToArray();
+            mesh.normals = newNormals.ToArray();
         }
 
        

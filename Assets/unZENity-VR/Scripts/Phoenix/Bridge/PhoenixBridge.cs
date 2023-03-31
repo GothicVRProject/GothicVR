@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UZVR.Phoenix.Bridge.Vm;
 using UZVR.Phoenix.Bridge.Vm.Gothic;
 using UZVR.Phoenix.Vm.Gothic;
@@ -9,6 +10,8 @@ namespace UZVR.Phoenix.Bridge
     public static class PhoenixBridge
     {
         public const string DLLNAME = "libphoenix-csharp-bridge";
+
+        public static IntPtr VdfsPtr;
 
         /// <summary>
         /// No need to get WorldBridge as everything is loaded right from the start and stored inside World.
