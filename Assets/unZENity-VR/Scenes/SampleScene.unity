@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.4366756, g: 0.48427194, b: 0.5645252, a: 1}
+  m_IndirectSpecularColor: {r: 0.4366757, g: 0.48427194, b: 0.5645252, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -273,9 +273,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   CreateWaypoints: 0
-  CreateWaypointEdges: 0
-  EnableDayTime: 0
-  EnableNpcRoutines: 0
+  CreateWaypointEdges: 1
+  EnableDayTime: 1
+  EnableNpcRoutines: 1
 --- !u!1 &703127196
 GameObject:
   m_ObjectHideFlags: 0
