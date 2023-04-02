@@ -1,5 +1,7 @@
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using UZVR.Demo;
@@ -16,13 +18,18 @@ namespace UZVR.Npc
         private GameTime gameTime;
         public List<BRoutine> routines;
 
-        private BRoutine routine;
+        private BRoutine curRoutine;
         private System.DateTime curTime;
-        private BWaypoint waypoint;
+        private System.DateTime timeToStartNextWalk;
+        private Vector3 curPos;
+        private BWaypoint curWaypoint;
 
         void Start()
         {
+            curPos = GetCurrentPosition();
             gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
+            timeToStartNextWalk = curRoutine.stop;
+            curWaypoint = getNextWaypoint();
         }
 
         void Update()
@@ -31,33 +38,51 @@ namespace UZVR.Npc
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
                 return;
 
-            routine = GetCurrentRoutine();
+            curTime = GetCurrentTime();
+            curRoutine = GetCurrentRoutine();
 
             //Does the NPC have a Routine?
-            if (routine == null)
+            if (curRoutine == null)
                 return;
-
-            waypoint = getNextWaypoint();
-
-            moveToWaypoint();
+            
+            if (IsTimeToGetNextWaypoint())
+                curWaypoint = getNextWaypoint();
+            
+            if (IsNotAtCurWaypoint())
+            {
+                curPos = GetCurrentPosition();
+                moveToWaypoint();
+            }
         }
-
-        private void moveToWaypoint()
+        
+        private System.DateTime GetCurrentTime()
         {
-            Vector3 startPosition = gameObject.transform.position;
-            gameObject.transform.position = Vector3.MoveTowards(startPosition, waypoint.position, SPEED * Time.deltaTime);
+            return gameTime.getCurrentDateTime();
         }
-
-
         private BRoutine GetCurrentRoutine()
         {
-            curTime = gameTime.getCurrentDateTime();
-
             return routines.FirstOrDefault(item => (item.start <= curTime && curTime < item.stop));
+        }
+        private bool IsTimeToGetNextWaypoint()
+        {
+            timeToStartNextWalk = curRoutine.stop;
+            return curTime < timeToStartNextWalk;
         }
         private BWaypoint getNextWaypoint()
         {
-            return PhoenixBridge.World.waypoints.FirstOrDefault(item => item.name.ToLower() == routine.waypoint.ToLower());
+            return PhoenixBridge.World.waypoints.FirstOrDefault(item => item.name.ToLower() == curRoutine.waypoint.ToLower());
+        }
+        private bool IsNotAtCurWaypoint()
+        {
+            return curPos != curWaypoint.position;
+        }
+        private Vector3 GetCurrentPosition()
+        {
+            return gameObject.transform.position;
+        }
+        private void moveToWaypoint()
+        {
+            gameObject.transform.position = Vector3.MoveTowards(curPos, curWaypoint.position, SPEED * Time.deltaTime);
         }
     }
 }
