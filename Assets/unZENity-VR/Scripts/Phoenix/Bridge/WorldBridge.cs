@@ -82,10 +82,10 @@ namespace UZVR.Phoenix.Bridge
 
             for (int i = 0; i < worldGetMeshVertexCount(WorldPtr); i++)
             {
-                worldGetMeshVertex(WorldPtr, i, out Vector3 vertex, out Vector2 textureVector, out Vector3 normal);
+                worldGetMeshVertex(WorldPtr, i, out Vector3 vertex, out Vector2 texture, out Vector3 normal);
 
-                vertices.Add(vertex);
                 textures.Add(textureVector);
+                vertices.Add(vertex / 100); // Gothic coordinates are too big by factor 100
                 normals.Add(normal);
             }
 
@@ -129,12 +129,11 @@ namespace UZVR.Phoenix.Bridge
             // FIXME We can optimize by cleaning up empty materials.
             // PERFORMANCE e.g. worlds.vdfs has 2263 materials, but only ~1300 of them have triangles attached to it.
 
-            // Initialize array
+            // Initialize arrays
             for (var i=0; i < materialCount; i++)
             {
                 triangles.Add(i, new());
             }
-
 
             for (int i = 0; i < worldGetMeshTriangleCount(WorldPtr); i++)
             {

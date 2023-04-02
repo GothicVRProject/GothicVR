@@ -54,7 +54,6 @@ namespace UZVR.WorldCreator
                 lineObj.AddComponent<LineRenderer>();
                 LineRenderer lr = lineObj.GetComponent<LineRenderer>();
                 lr.material = new Material(Shader.Find("Standard"));
-                //                lr.SetColors(color, color);
                 lr.startWidth = 0.1f;
                 lr.endWidth = 0.1f;
                 lr.SetPosition(0, startPos);

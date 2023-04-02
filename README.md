@@ -24,6 +24,10 @@ Below is an example workflow of how data is requested:
 ![data flow](./Documentation/Images/data-flow.drawio.png)
 
 
+## Dependencies
+* unZENity-VR is relying on libphoenix-csharp-bridge (a shared library (.dll/.a/.so): https://github.com/GothicVRProject/phoenix-csharp-bridge.
+
+
 ## FAQ
 
 **Q: Why do you use an external framework to parse Gothic assets?**  

@@ -1,12 +1,9 @@
-﻿using Palmmedia.ReportGenerator.Core;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UZVR.Phoenix.Bridge;
 using UZVR.Phoenix.World;
 using UZVR.Util;
-using UZVR.World;
 
 namespace UZVR.WorldCreator
 {
@@ -19,7 +16,7 @@ namespace UZVR.WorldCreator
 
             for (var materialIndex=0; materialIndex < world.materials.Count; materialIndex++)
             {
-                // Material isn't used in this map
+                // Material isn't used in this world
                 if (world.triangles[materialIndex].Count == 0)
                     continue;
 
@@ -32,7 +29,6 @@ namespace UZVR.WorldCreator
                 PrepareMeshFilter(meshFilter, world, materialIndex);
                 meshCollider.sharedMesh = meshFilter.mesh;
 
-                subMeshObj.transform.localScale = Vector3.one / 100; // Gothic mesh scales are too big by factor 100
                 subMeshObj.transform.parent = meshObj.transform;
             }
         }
@@ -96,7 +92,7 @@ namespace UZVR.WorldCreator
             List<Vector3> newNormals = new();
 
             // Loop through all the distinctOrderedTriangles
-            for (int i=0; i<distinctOrderedTriangles.Count; i++)
+            for (int i = 0; i < distinctOrderedTriangles.Count; i++)
             {
                 // curVertexIndex == currently lowest vertex index in this loop
                 int curVertexIndex = distinctOrderedTriangles[i];
@@ -119,67 +115,10 @@ namespace UZVR.WorldCreator
             // Now we replace the triangle values. aka the vertex-indices (value old) with new >mapping< from Dictionary.
             var newTriangles = triangles.Select(originalVertexIndex => newVertexTriangleMapping[originalVertexIndex]);
 
-            mesh.vertices = newVertices.ToArray();
-            mesh.triangles = newTriangles.ToArray();
-            mesh.uv = newTextures.ToArray();
-            mesh.normals = newNormals.ToArray();
+            mesh.SetVertices(newVertices);
+            mesh.SetTriangles(newTriangles.ToArray(), 0);
+            mesh.SetUVs(0, newTextures);
+            mesh.SetNormals(newNormals);
         }
-
-       
-        // Credits: https://gist.github.com/mikezila/10557162
-        //private Texture2D _LoadTGA(Stream TGAStream)
-        //{
-
-        //    using (BinaryReader r = new BinaryReader(TGAStream))
-        //    {
-        //        // Skip some header info we don't care about.
-        //        // Even if we did care, we have to move the stream seek point to the beginning,
-        //        // as the previous method in the workflow left it at the end.
-        //        r.BaseStream.Seek(12, SeekOrigin.Begin);
-
-        //        short width = r.ReadInt16();
-        //        short height = r.ReadInt16();
-        //        int bitDepth = r.ReadByte();
-
-        //        // Skip a byte of header information we don't care about.
-        //        r.BaseStream.Seek(1, SeekOrigin.Current);
-
-        //        Texture2D tex = new Texture2D(width, height);
-        //        Color32[] pulledColors = new Color32[width * height];
-
-        //        if (bitDepth == 32)
-        //        {
-        //            for (int i = 0; i < width * height; i++)
-        //            {
-        //                byte red = r.ReadByte();
-        //                byte green = r.ReadByte();
-        //                byte blue = r.ReadByte();
-        //                byte alpha = r.ReadByte();
-
-        //                pulledColors[i] = new Color32(blue, green, red, alpha);
-        //            }
-        //        }
-        //        else if (bitDepth == 24)
-        //        {
-        //            for (int i = 0; i < width * height; i++)
-        //            {
-        //                byte red = r.ReadByte();
-        //                byte green = r.ReadByte();
-        //                byte blue = r.ReadByte();
-
-        //                pulledColors[i] = new Color32(blue, green, red, 1);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            throw new Exception("TGA texture had non 32/24 bit depth.");
-        //        }
-
-        //        tex.SetPixels32(pulledColors);
-        //        tex.Apply();
-        //        return tex;
-
-        //    }
-        //}
     }
 }
