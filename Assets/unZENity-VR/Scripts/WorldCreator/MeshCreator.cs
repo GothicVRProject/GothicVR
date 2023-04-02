@@ -47,7 +47,7 @@ namespace UZVR.WorldCreator
             if (bTexture == null)
                 return;
 
-            var texture = new Texture2D((int)bTexture.width, (int)bTexture.height, TextureFormat.RGBA32, false);
+            var texture = new Texture2D((int)bTexture.width, (int)bTexture.height, bTexture.GetUnityTextureFormat(), false);
             texture.name = bMaterial.textureName;
             texture.LoadRawTextureData(bTexture.data.ToArray());
 

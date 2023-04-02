@@ -84,7 +84,7 @@ namespace UZVR.Phoenix.Bridge
             {
                 worldGetMeshVertex(WorldPtr, i, out Vector3 vertex, out Vector2 texture, out Vector3 normal);
 
-                textures.Add(textureVector);
+                textures.Add(texture);
                 vertices.Add(vertex / 100); // Gothic coordinates are too big by factor 100
                 normals.Add(normal);
             }
