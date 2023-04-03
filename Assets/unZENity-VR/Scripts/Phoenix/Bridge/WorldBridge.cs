@@ -27,7 +27,7 @@ namespace UZVR.Phoenix.Bridge
 
         // Vertices; aka Vertexes ;-)
         [DllImport(DLLNAME)] private static extern int worldGetMeshVertexCount(IntPtr world);
-        [DllImport(DLLNAME)] private static extern void worldGetMeshVertex(IntPtr world, int index, out Vector3 vertex, out Vector2 texture, out Vector3 normal);
+        [DllImport(DLLNAME)] private static extern Vector3 worldGetMeshVertex(IntPtr world, int index);
 
         // Triangles
         [DllImport(DLLNAME)] private static extern int worldGetMeshTriangleCount(IntPtr world);
@@ -39,8 +39,14 @@ namespace UZVR.Phoenix.Bridge
         [DllImport(DLLNAME)] private static extern void worldGetMeshMaterialName(IntPtr world, int index, StringBuilder name);
         [DllImport(DLLNAME)] private static extern void worldMeshMaterialGetTextureName(IntPtr world, int index, StringBuilder texture);
         [DllImport(DLLNAME)] private static extern void worldGetMeshMaterialColor(IntPtr world, int index, out byte r, out byte g, out byte b, out byte a);
-
         [DllImport(DLLNAME)] private static extern int worldGetMeshTriangleMaterialIndex(IntPtr world, int index);
+
+        // Features
+        [DllImport(DLLNAME)] private static extern ulong worldMeshFeatureIndicesCount(IntPtr world);
+        [DllImport(DLLNAME)] private static extern uint worldMeshFeatureIndexGet(IntPtr world, ulong index);
+        [DllImport(DLLNAME)] private static extern ulong worldMeshFeaturesCount(IntPtr world);
+        [DllImport(DLLNAME)] private static extern Vector2 worldMeshFeatureTextureGet(IntPtr world, ulong index);
+        [DllImport(DLLNAME)] private static extern Vector3 worldMeshFeatureNormalGet(IntPtr world, ulong index);
 
         // Waynet
         [DllImport(DLLNAME)] private static extern int worldGetWaynetWaypointCount(IntPtr world);
@@ -62,6 +68,10 @@ namespace UZVR.Phoenix.Bridge
             SetWorldVertices(World);
             World.materials = _GetWorldMaterials();
             World.triangles = _GetWorldTriangles(World.materials.Count);
+
+            World.featureIndices = GetWorldFeatureIndices();
+            World.features = GetWorldFeatures();
+
             World.waypoints = _GetWorldWaypoints();
             World.waypointEdges = _GetWorldWaypointEdges();
         }
@@ -77,21 +87,15 @@ namespace UZVR.Phoenix.Bridge
         private void SetWorldVertices(BWorld world)
         {
             List<Vector3> vertices = new();
-            List<Vector2> textures = new();
-            List<Vector3> normals = new();
 
             for (int i = 0; i < worldGetMeshVertexCount(WorldPtr); i++)
             {
-                worldGetMeshVertex(WorldPtr, i, out Vector3 vertex, out Vector2 texture, out Vector3 normal);
+                var vertex = worldGetMeshVertex(WorldPtr, i);
 
-                textures.Add(texture);
                 vertices.Add(vertex / 100); // Gothic coordinates are too big by factor 100
-                normals.Add(normal);
             }
 
             world.vertices = vertices;
-            world.textures = textures;
-            world.normals = normals;
         }
 
         private List<BMaterial> _GetWorldMaterials()
@@ -149,8 +153,36 @@ namespace UZVR.Phoenix.Bridge
             return triangles;
         }
 
+        private List<uint> GetWorldFeatureIndices()
+        {
+            List<uint> featureIndices = new();
 
-        private List<BWaypoint> _GetWorldWaypoints()
+            for (ulong i = 0; i < worldMeshFeatureIndicesCount(WorldPtr); i++)
+            {
+                featureIndices.Add(worldMeshFeatureIndexGet(WorldPtr, i));
+            }
+
+            return featureIndices;
+        }
+
+        private List<BWorld.BFeature> GetWorldFeatures()
+        {
+            List<BWorld.BFeature> features = new();
+
+            for (ulong i = 0; i < worldMeshFeaturesCount(WorldPtr); i++)
+            {
+                features.Add(new()
+                {
+                    texture = worldMeshFeatureTextureGet(WorldPtr, i),
+                    normal = worldMeshFeatureNormalGet(WorldPtr, i)
+                });
+            }
+
+            return features;
+        }
+
+
+    private List<BWaypoint> _GetWorldWaypoints()
         {
             var waypointCount = worldGetWaynetWaypointCount(WorldPtr);
             var waypoints = new List<BWaypoint>(waypointCount);

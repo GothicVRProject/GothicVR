@@ -18,13 +18,12 @@ namespace UZVR.Phoenix.Bridge
 
         public static BTexture LoadTexture(IntPtr vdfContainer, string name)
         {
+            // FIXME - Need to introduce texture cache as e.g. OWODWAT_A0.TGA is loaded already ~5 times...
             var texture = textureLoad(vdfContainer, name, out BTexture.BFormat format, out int mipmapCount);
-
             if (texture == IntPtr.Zero)
                 return null;
 
-            BTexture bTexture = null;
-
+            BTexture bTexture;
             switch (format)
             {
                 case BFormat.tex_dxt1:

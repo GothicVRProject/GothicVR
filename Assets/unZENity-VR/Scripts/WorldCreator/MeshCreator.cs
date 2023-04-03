@@ -76,8 +76,9 @@ namespace UZVR.WorldCreator
         private void PrepareMeshFilter(MeshFilter meshFilter, BWorld world, int materialIndex)
         {
             var vertices = world.vertices;
-            var textures = world.textures;
-            var normals = world.normals;
+            var featureIndices = world.featureIndices;
+            var textures = world.features.Select(i => i.texture).ToList();
+            var normals = world.features.Select(i => i.normal).ToList();
             var triangles = world.triangles[materialIndex];
 
             var mesh = new Mesh();
@@ -97,8 +98,9 @@ namespace UZVR.WorldCreator
                 // curVertexIndex == currently lowest vertex index in this loop
                 int curVertexIndex = distinctOrderedTriangles[i];
                 Vector3 vertexAtIndex = vertices[curVertexIndex];
-                Vector2 textureAtIndex = textures[curVertexIndex];
-                Vector3 normalAtIndex = normals[curVertexIndex];
+                int curFeatureIndex = (int)featureIndices[curVertexIndex];
+                Vector2 textureAtIndex = textures[(int)featureIndices[curVertexIndex]];
+                Vector3 normalAtIndex = normals[(int)featureIndices[curVertexIndex]];
 
                 // Previously index of vertex is now the new index of loop's >i<.
                 // This Dictionary will be used to >replace< the original triangle values later.
