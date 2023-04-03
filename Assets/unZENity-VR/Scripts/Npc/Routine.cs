@@ -14,7 +14,7 @@ namespace UZVR.Npc
 {
     public class Routine : MonoBehaviour
     {
-        private static readonly int SPEED = 10;
+        private static readonly int SPEED = 50;
         private GameTime gameTime;
         public List<BRoutine> routines;
 
@@ -70,7 +70,8 @@ namespace UZVR.Npc
         }
         private BWaypoint getNextWaypoint()
         {
-            return PhoenixBridge.World.waypoints.FirstOrDefault(item => item.name.ToLower() == curRoutine.waypoint.ToLower());
+            //return PhoenixBridge.World.waypointsList.FirstOrDefault(item => item.name.ToLower() == curRoutine.waypoint.ToLower());
+            return PhoenixBridge.World.waypointsDict[curRoutine.waypoint.ToLower()];
         }
         private bool IsNotAtCurWaypoint()
         {

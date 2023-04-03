@@ -59,7 +59,9 @@ namespace UZVR.Phoenix.Bridge
             World.vertices = _GetWorldVertices();
             World.materials = _GetWorldMaterials();
             World.triangles = _GetWorldTriangles(World.materials.Count);
-            World.waypoints = _GetWorldWaypoints();
+            Tuple<List<BWaypoint>, Dictionary<string, BWaypoint>> waypointsTuple = _CreateWorldWaypoints();
+            World.waypointsList = _GetWorldWaypointsList(waypointsTuple);
+            World.waypointsDict = _GetWorldWaypointsDict(waypointsTuple);
             World.waypointEdges = _GetWorldWaypointEdges();
         }
 
@@ -136,13 +138,14 @@ namespace UZVR.Phoenix.Bridge
             return triangles;
         }
 
-
-        private List<BWaypoint> _GetWorldWaypoints()
+        private Tuple<List<BWaypoint>, Dictionary<string, BWaypoint>> _CreateWorldWaypoints()
         {
             var waypointCount = worldGetWaynetWaypointCount(WorldPtr);
             var waypoints = new List<BWaypoint>(waypointCount);
+            //Dictionary<string, Vector3> WaypointDict = new Dictionary<string, Vector3>();
+            Dictionary<string, BWaypoint> BWaypointDict = new Dictionary<string, BWaypoint>();
 
-            for(int i = 0; i < waypointCount; i++)
+            for (int i = 0; i < waypointCount; i++)
             {
                 StringBuilder name = new(worldGetWaynetWaypointNameSize(WorldPtr, i));
 
@@ -150,18 +153,26 @@ namespace UZVR.Phoenix.Bridge
 
                 var waypoint = new BWaypoint()
                 {
-                    name = name.ToString(),
+                    name = name.ToString().ToLower(),
                     position = position / 100, // Gothic coordinates are too big by factor 100
                     direction = direction,
                     freePoint = freePoint,
                     underWater = underWater,
                     waterDepth = waterDepth
                 };
-                
+                BWaypointDict.Add(name.ToString().ToLower(), waypoint);
                 waypoints.Add(waypoint);
             }
 
-            return waypoints;
+            return Tuple.Create(waypoints, BWaypointDict);
+        }
+        private List<BWaypoint> _GetWorldWaypointsList(Tuple<List<BWaypoint>, Dictionary<string, BWaypoint>> waypointsTuple)
+        {
+            return waypointsTuple.Item1;
+        }
+        private Dictionary<string, BWaypoint> _GetWorldWaypointsDict(Tuple<List<BWaypoint>, Dictionary<string, BWaypoint>> waypointsTuple)
+        {
+            return waypointsTuple.Item2;
         }
 
         private List<BWaypointEdge> _GetWorldWaypointEdges()

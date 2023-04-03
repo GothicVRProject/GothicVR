@@ -25,7 +25,7 @@ namespace UZVR.WorldCreator
             var npcContainer = GameObject.Find("NPCs");
 
             var initialSpawnpoint = 
-                PhoenixBridge.World.waypoints.FirstOrDefault(item => item.name.ToLower() == spawnpoint.ToLower());
+                PhoenixBridge.World.waypointsList.FirstOrDefault(item => item.name.ToLower() == spawnpoint.ToLower());
 
             if (initialSpawnpoint == null)
             {
@@ -50,7 +50,7 @@ namespace UZVR.WorldCreator
             if (PhoenixBridge.npcRoutines.TryGetValue(symbolId, out List<BRoutine> routines))
             {
                 initialSpawnpoint = 
-                    PhoenixBridge.World.waypoints.FirstOrDefault(routine => routine.name.ToLower() == routines.First().waypoint.ToLower());
+                    PhoenixBridge.World.waypointsList.FirstOrDefault(routine => routine.name.ToLower() == routines.First().waypoint.ToLower());
                 newNpc.GetComponent<Routine>().routines = routines;
             }
 

@@ -25,7 +25,7 @@ namespace UZVR.WorldCreator
             var waypointsObj = new GameObject(string.Format("Waypoints"));
             waypointsObj.transform.parent = parent.transform;
 
-            foreach (var waypoint in world.waypoints)
+            foreach (var waypoint in world.waypointsList)
             {
                 var wpobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
@@ -47,8 +47,8 @@ namespace UZVR.WorldCreator
             for (int i = 0; i < world.waypointEdges.Count; i++)
             {
                 var edge = world.waypointEdges[i];
-                var startPos = world.waypoints[(int)edge.a].position;
-                var endPos = world.waypoints[(int)edge.b].position;
+                var startPos = world.waypointsList[(int)edge.a].position;
+                var endPos = world.waypointsList[(int)edge.b].position;
                 var lineObj = new GameObject();
 
                 lineObj.AddComponent<LineRenderer>();
