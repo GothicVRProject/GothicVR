@@ -142,7 +142,6 @@ namespace UZVR.Phoenix.Bridge
         {
             var waypointCount = worldGetWaynetWaypointCount(WorldPtr);
             var waypoints = new List<BWaypoint>(waypointCount);
-            //Dictionary<string, Vector3> WaypointDict = new Dictionary<string, Vector3>();
             Dictionary<string, BWaypoint> BWaypointDict = new Dictionary<string, BWaypoint>();
 
             for (int i = 0; i < waypointCount; i++)

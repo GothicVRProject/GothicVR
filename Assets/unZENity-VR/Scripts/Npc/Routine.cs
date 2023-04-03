@@ -70,7 +70,6 @@ namespace UZVR.Npc
         }
         private BWaypoint getNextWaypoint()
         {
-            //return PhoenixBridge.World.waypointsList.FirstOrDefault(item => item.name.ToLower() == curRoutine.waypoint.ToLower());
             return PhoenixBridge.World.waypointsDict[curRoutine.waypoint.ToLower()];
         }
         private bool IsNotAtCurWaypoint()
