@@ -13,7 +13,7 @@ namespace UZVR.Phoenix.World
 
         public List<Vector3> vertices;
         public List<BMaterial> materials;
-        public Dictionary<int, List<int>> triangles;
+        public Dictionary<int, List<uint>> triangles;
 
         public List<uint> featureIndices;
         public List<BFeature> features;

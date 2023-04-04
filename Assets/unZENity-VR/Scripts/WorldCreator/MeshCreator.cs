@@ -86,7 +86,7 @@ namespace UZVR.WorldCreator
 
             // Distinct -> We only want to check vertex-indices once for adding to the new mapping
             // Ordered -> We need to check from lowest used vertex-index to highest for the new mapping
-            List<int> distinctOrderedTriangles = triangles.Distinct().OrderBy(val => val).ToList();
+            List<uint> distinctOrderedTriangles = triangles.Distinct().OrderBy(val => val).ToList();
             Dictionary<int, int> newVertexTriangleMapping = new();
             List<Vector3> newVertices = new();
             List<Vector2> newTextures = new();
@@ -96,16 +96,16 @@ namespace UZVR.WorldCreator
             for (int i = 0; i < distinctOrderedTriangles.Count; i++)
             {
                 // curVertexIndex == currently lowest vertex index in this loop
-                int curVertexIndex = distinctOrderedTriangles[i];
-                Vector3 vertexAtIndex = vertices[curVertexIndex];
-                int curFeatureIndex = (int)featureIndices[curVertexIndex];
-                Vector2 textureAtIndex = textures[(int)featureIndices[curVertexIndex]];
-                Vector3 normalAtIndex = normals[(int)featureIndices[curVertexIndex]];
+                int curVertexIndex = (int)distinctOrderedTriangles[i];
+                Vector3 vertexAtIndex = vertices[(int)curVertexIndex];
+                uint curFeatureIndex = featureIndices[(int)curVertexIndex];
+                Vector2 textureAtIndex = textures[(int)featureIndices[(int)curVertexIndex]];
+                Vector3 normalAtIndex = normals[(int)featureIndices[(int)curVertexIndex]];
 
                 // Previously index of vertex is now the new index of loop's >i<.
                 // This Dictionary will be used to >replace< the original triangle values later.
                 // e.g. previous Vertex-index=5 (key) is now the Vertex-index=0 (value)
-                newVertexTriangleMapping.Add(curVertexIndex, i);
+                newVertexTriangleMapping.Add((int)curVertexIndex, i);
 
                 // Add the vertex which was found as new lowest entry
                 // e.g. Vertex-index=5 is now Vertex-index=0
@@ -115,10 +115,21 @@ namespace UZVR.WorldCreator
             }
 
             // Now we replace the triangle values. aka the vertex-indices (value old) with new >mapping< from Dictionary.
-            var newTriangles = triangles.Select(originalVertexIndex => newVertexTriangleMapping[originalVertexIndex]);
+            var newTriangles = triangles.Select(originalVertexIndex => newVertexTriangleMapping[(int)originalVertexIndex]).ToArray();
+            var newFlippedTriangles = new List<int>(newTriangles.Count());
+
+            // We need to flip valueA with valueC to:
+            // 1/ have the mesh elements shown (flipped surface) and
+            // 2/ world mirrored right way.
+            for (var i = 0; i < newTriangles.Count(); i+=3)
+            {
+                newFlippedTriangles.Add(newTriangles[i+2]);
+                newFlippedTriangles.Add(newTriangles[i+1]);
+                newFlippedTriangles.Add(newTriangles[i]);
+            }
 
             mesh.SetVertices(newVertices);
-            mesh.SetTriangles(newTriangles.ToArray(), 0);
+            mesh.SetTriangles(newFlippedTriangles, 0);
             mesh.SetUVs(0, newTextures);
             mesh.SetNormals(newNormals);
         }

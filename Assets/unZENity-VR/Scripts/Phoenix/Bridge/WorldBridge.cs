@@ -30,8 +30,8 @@ namespace UZVR.Phoenix.Bridge
         [DllImport(DLLNAME)] private static extern Vector3 worldGetMeshVertex(IntPtr world, int index);
 
         // Triangles
-        [DllImport(DLLNAME)] private static extern int worldGetMeshTriangleCount(IntPtr world);
-        [DllImport(DLLNAME)] private static extern void worldGetMeshTriangle(IntPtr world, int index, out UInt32 valueA, out UInt32 valueB, out UInt32 valueC);
+        [DllImport(DLLNAME)] private static extern ulong worldMeshVertexIndicesCount(IntPtr world);
+        [DllImport(DLLNAME)] private static extern uint worldMeshVertexIndexGet(IntPtr world, ulong index);
 
         // Materials
         [DllImport(DLLNAME)] private static extern int worldGetMeshMaterialCount(IntPtr world);
@@ -39,7 +39,7 @@ namespace UZVR.Phoenix.Bridge
         [DllImport(DLLNAME)] private static extern void worldGetMeshMaterialName(IntPtr world, int index, StringBuilder name);
         [DllImport(DLLNAME)] private static extern void worldMeshMaterialGetTextureName(IntPtr world, int index, StringBuilder texture);
         [DllImport(DLLNAME)] private static extern void worldGetMeshMaterialColor(IntPtr world, int index, out byte r, out byte g, out byte b, out byte a);
-        [DllImport(DLLNAME)] private static extern int worldGetMeshTriangleMaterialIndex(IntPtr world, int index);
+        [DllImport(DLLNAME)] private static extern int worldGetMeshTriangleMaterialIndex(IntPtr world, ulong index);
 
         // Features
         [DllImport(DLLNAME)] private static extern ulong worldMeshFeatureIndicesCount(IntPtr world);
@@ -67,7 +67,7 @@ namespace UZVR.Phoenix.Bridge
 
             SetWorldVertices(World);
             World.materials = _GetWorldMaterials();
-            World.triangles = _GetWorldTriangles(World.materials.Count);
+            World.triangles = GetWorldTriangles(World.materials.Count);
 
             World.featureIndices = GetWorldFeatureIndices();
             World.features = GetWorldFeatures();
@@ -126,9 +126,9 @@ namespace UZVR.Phoenix.Bridge
         }
 
 
-        private Dictionary<int, List<int>> _GetWorldTriangles(int materialCount)
+        private Dictionary<int, List<uint>> GetWorldTriangles(int materialCount)
         {
-            Dictionary<int, List<int>> triangles = new();
+            Dictionary<int, List<uint>> triangles = new();
 
             // FIXME We can optimize by cleaning up empty materials.
             // PERFORMANCE e.g. worlds.vdfs has 2263 materials, but only ~1300 of them have triangles attached to it.
@@ -139,15 +139,22 @@ namespace UZVR.Phoenix.Bridge
                 triangles.Add(i, new());
             }
 
-            for (int i = 0; i < worldGetMeshTriangleCount(WorldPtr); i++)
+            var size = worldMeshVertexIndicesCount(WorldPtr);
+
+            for (int i = 0; i < (int)worldMeshVertexIndicesCount(WorldPtr); i+=3)
             {
-                var materialIndex = worldGetMeshTriangleMaterialIndex(WorldPtr, i);
-                worldGetMeshTriangle(WorldPtr, i, out uint valueA, out uint valueB, out uint valueC);
+                // only 1/3 is the count of materials. Aka every 1st of 3 triangle indices to check for its value.
+                var materialIndex = worldGetMeshTriangleMaterialIndex(WorldPtr, (ulong)i / 3);
+                triangles[materialIndex].AddRange(new[]
+                {
+                    worldMeshVertexIndexGet(WorldPtr, (ulong) i),
+                    worldMeshVertexIndexGet(WorldPtr, (ulong) i+1),
+                    worldMeshVertexIndexGet(WorldPtr, (ulong) i+2)
+                });
 
                 // We need to flip valueA with valueC to:
                 // 1/ have the mesh elements shown (flipped surface) and
                 // 2/ world mirrored right way.
-                triangles[materialIndex].AddRange(new []{ (int)valueC, (int)valueB, (int)valueA });
             }
 
             return triangles;
