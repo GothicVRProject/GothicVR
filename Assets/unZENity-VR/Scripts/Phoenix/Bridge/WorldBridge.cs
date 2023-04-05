@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UZVR.Phoenix.World;
+using static UZVR.Phoenix.World.BWorld;
 
 namespace UZVR.Phoenix.Bridge
 {
@@ -67,14 +69,227 @@ namespace UZVR.Phoenix.Bridge
 
             SetWorldVertices(World);
             World.materials = _GetWorldMaterials();
-            World.triangles = GetWorldTriangles(World.materials.Count);
+            SetWorldTriangles(World, World.materials.Count);
 
             World.featureIndices = GetWorldFeatureIndices();
-            World.features = GetWorldFeatures();
+            SetWorldFeatures(World);
 
             World.waypoints = _GetWorldWaypoints();
             World.waypointEdges = _GetWorldWaypointEdges();
         }
+
+
+
+
+
+        public static BWorld LoadWorld(IntPtr vdfsPtr, string worldName)
+        {
+            IntPtr worldPtr = worldLoad(vdfsPtr, worldName);
+
+            BWorld world = new()
+            {
+                vertexIndices = LoadVertexIndices(worldPtr),
+                materialIndices = LoadMaterialIndices(worldPtr),
+                featureIndices = LoadFeatureIndices(worldPtr),
+
+                vertices = LoadVertices(worldPtr),
+                materials = LoadMaterials(worldPtr),
+                featureTextures = LoadFeatureTextures(worldPtr),
+                featureNormals = LoadFeatureNormals(worldPtr)                
+            };
+
+            worldDispose(worldPtr);
+
+            return world;
+        }
+
+        public static Dictionary<int, BSubMesh> CreateSubmeshesForUnity(BWorld world)
+        {
+            Dictionary<int, BSubMesh> subMeshes = new(world.materials.Count);
+            var vertices = world.vertices;
+            var vertexIndices = world.vertexIndices;
+            var featureIndices = world.featureIndices;
+            var featureTextures = world.featureTextures;
+            var featureNormals = world.featureNormals;
+
+            // Store temporarily if a specific vertex is already in the material. Reference new vertex_indices to it then.
+            // dict<materialId, dict<originalVertexId, newVertexIdInList>
+            Dictionary<int, Dictionary<uint, int>> tempVerticesMapping = new();
+
+            for (int loopVertexIndexId = 0; loopVertexIndexId < vertexIndices.Count; loopVertexIndexId++)
+            {
+                // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
+                var materialIndex = world.materialIndices[loopVertexIndexId / 3];
+
+                // The materialIndex was never used before.
+                if (!subMeshes.ContainsKey(materialIndex))
+                {
+                    var newSubMesh = new BSubMesh()
+                    {
+                        materialIndex = materialIndex,
+                        material = world.materials[materialIndex]
+                    };
+
+                    subMeshes.Add(materialIndex, newSubMesh);
+                    tempVerticesMapping.Add(materialIndex, new());
+                }
+
+                var currentSubMesh = subMeshes[materialIndex];
+                var curTempVerticesMapping = tempVerticesMapping[materialIndex];
+
+                var origVertexIndex = vertexIndices[loopVertexIndexId];
+                if (!curTempVerticesMapping.ContainsKey(origVertexIndex))
+                {
+                    // Gothic meshes are too big for Unity by factor 100.
+                    currentSubMesh.vertices.Add(vertices[(int)origVertexIndex] / 100);
+                    
+                    // Temporarily store vertexIndex as it can be referenced by other
+                    // vertexIndices (aka triangles) within the same SubMesh.
+                    curTempVerticesMapping.Add(origVertexIndex, curTempVerticesMapping.Count);
+
+                    currentSubMesh.debugTextureIndices.Add((int)featureIndices[loopVertexIndexId]);
+
+                    var featureIndex = (int)featureIndices[loopVertexIndexId];
+                    currentSubMesh.uvs.Add(featureTextures[featureIndex]);
+                    currentSubMesh.normals.Add(featureNormals[featureIndex]);
+                }
+
+                var newVertexIndex = curTempVerticesMapping[origVertexIndex];
+
+                currentSubMesh.triangles.Add(newVertexIndex);
+
+                // We need to flip valueA with valueC to have the mesh elements
+                // shown upside down (original data shows flipped surface in Unity)
+                var triangleCount = currentSubMesh.triangles.Count;
+                if (triangleCount > 0 && triangleCount % 3 == 0)
+                {
+                    // Flip n-1 with n-3
+                    (currentSubMesh.triangles[triangleCount - 1], currentSubMesh.triangles[triangleCount - 3]) =
+                        (currentSubMesh.triangles[triangleCount - 3], currentSubMesh.triangles[triangleCount - 1]);
+                }
+            }
+
+            return subMeshes;
+        }
+
+        private static List<uint> LoadVertexIndices(IntPtr worldPtr)
+        {
+            var size = worldMeshVertexIndicesCount(worldPtr);
+            List<uint> vertexIndices = new((int)size);
+
+            for (ulong i = 0; i < size; i++)
+            {
+                vertexIndices.Add(
+                    worldMeshVertexIndexGet(worldPtr, i)
+                );
+            }
+
+            return vertexIndices;
+        }
+
+        private static List<int> LoadMaterialIndices(IntPtr worldPtr)
+        {
+            // Every 3 vertices (==1 triangle) have 1 material. It means 1/3 of vertexIndices count.
+            var size = worldMeshVertexIndicesCount(worldPtr) / 3ul;
+            List<int> materialIndices = new((int)size);
+
+            for (ulong i = 0; i < size; i++)
+            {
+                var materialIndex = worldGetMeshTriangleMaterialIndex(worldPtr, i);
+                materialIndices.Add(materialIndex);
+            }
+
+            return materialIndices;
+        }
+
+        private static List<uint> LoadFeatureIndices(IntPtr worldPtr)
+        {
+            var size = worldMeshFeatureIndicesCount(worldPtr);
+            List<uint> featureIndices = new((int)size);
+
+            for (ulong i = 0; i < size; i++)
+            {
+                featureIndices.Add(worldMeshFeatureIndexGet(worldPtr, i));
+            }
+
+            return featureIndices;
+        }
+
+
+        private static List<Vector3> LoadVertices(IntPtr worldPtr)
+        {
+            var size = worldGetMeshVertexCount(worldPtr);
+            List<Vector3> vertices = new();
+
+            for (int i = 0; i < size; i++)
+            {
+                vertices.Add(
+                    worldGetMeshVertex(worldPtr, i)
+                );
+            }
+
+            return vertices;
+        }
+
+        private static List<BMaterial> LoadMaterials(IntPtr worldPtr)
+        {
+            int materialCount = worldGetMeshMaterialCount(worldPtr);
+            var materials = new List<BMaterial>(materialCount);
+
+            for (var i = 0; i < materialCount; i++)
+            {
+                StringBuilder name = new(worldGetMeshMaterialNameSize(worldPtr, i));
+                worldGetMeshMaterialName(worldPtr, i, name);
+
+                StringBuilder textureName = new(255);
+                worldMeshMaterialGetTextureName(worldPtr, i, textureName);
+
+                worldGetMeshMaterialColor(worldPtr, i, out byte r, out byte g, out byte b, out byte a);
+
+                var m = new BMaterial()
+                {
+                    name = name.ToString(),
+                    textureName = textureName.ToString(),
+                    // We need to convert uint8 (byte) to float for Unity.
+                    color = new Color((float)r / 255, (float)g / 255, (float)b / 255, (float)a / 255)
+                };
+                materials.Add(m);
+            }
+
+            return materials;
+        }
+
+        private static List<Vector2> LoadFeatureTextures(IntPtr worldPtr)
+        {
+            var featureCount = worldMeshFeaturesCount(worldPtr);
+
+            List<Vector2> featureTextures = new((int)featureCount);
+
+            for (ulong i = 0; i < worldMeshFeaturesCount(worldPtr); i++)
+            {
+                featureTextures.Add(worldMeshFeatureTextureGet(worldPtr, i));
+            }
+
+            return featureTextures;
+        }
+
+        private static List<Vector3> LoadFeatureNormals(IntPtr worldPtr)
+        {
+            var featureCount = worldMeshFeaturesCount(worldPtr);
+
+            List<Vector3> featureNormals = new((int)featureCount);
+
+            for (ulong i = 0; i < worldMeshFeaturesCount(worldPtr); i++)
+            {
+                featureNormals.Add(
+                    worldMeshFeatureNormalGet(worldPtr, i)
+                );
+            }
+
+            return featureNormals;
+        }
+
+
 
         // TODO: Check when the class is disposed to free memory within DLL.
         // If happening too late, then free it manually earlier.
@@ -83,6 +298,8 @@ namespace UZVR.Phoenix.Bridge
             worldDispose(WorldPtr);
             WorldPtr = IntPtr.Zero;
         }
+
+
 
         private void SetWorldVertices(BWorld world)
         {
@@ -126,9 +343,11 @@ namespace UZVR.Phoenix.Bridge
         }
 
 
-        private Dictionary<int, List<uint>> GetWorldTriangles(int materialCount)
+        private void SetWorldTriangles(BWorld world, int materialCount)
         {
-            Dictionary<int, List<uint>> triangles = new();
+            Dictionary<int, List<uint>> materializedTriangles = new();
+            List<uint> triangles = new();
+            List<int> materialIndices = new();
 
             // FIXME We can optimize by cleaning up empty materials.
             // PERFORMANCE e.g. worlds.vdfs has 2263 materials, but only ~1300 of them have triangles attached to it.
@@ -136,28 +355,27 @@ namespace UZVR.Phoenix.Bridge
             // Initialize arrays
             for (var i=0; i < materialCount; i++)
             {
-                triangles.Add(i, new());
+                materializedTriangles.Add(i, new());
             }
-
-            var size = worldMeshVertexIndicesCount(WorldPtr);
 
             for (int i = 0; i < (int)worldMeshVertexIndicesCount(WorldPtr); i+=3)
             {
+                var vertexIndex1 = worldMeshVertexIndexGet(WorldPtr, (ulong)i);
+                var vertexIndex2 = worldMeshVertexIndexGet(WorldPtr, (ulong)i + 1);
+                var vertexIndex3 = worldMeshVertexIndexGet(WorldPtr, (ulong)i + 2);
+
                 // only 1/3 is the count of materials. Aka every 1st of 3 triangle indices to check for its value.
                 var materialIndex = worldGetMeshTriangleMaterialIndex(WorldPtr, (ulong)i / 3);
-                triangles[materialIndex].AddRange(new[]
-                {
-                    worldMeshVertexIndexGet(WorldPtr, (ulong) i),
-                    worldMeshVertexIndexGet(WorldPtr, (ulong) i+1),
-                    worldMeshVertexIndexGet(WorldPtr, (ulong) i+2)
-                });
+                materialIndices.Add(materialIndex);
 
-                // We need to flip valueA with valueC to:
-                // 1/ have the mesh elements shown (flipped surface) and
-                // 2/ world mirrored right way.
+                materializedTriangles[materialIndex].AddRange(new[] { vertexIndex1, vertexIndex2, vertexIndex3 });
+                triangles.AddRange(new[] { vertexIndex1, vertexIndex2, vertexIndex3 });
             }
 
-            return triangles;
+            world.materialIndices = materialIndices;
+
+            world.materializedTriangles = materializedTriangles;
+            world.vertexIndices = triangles;
         }
 
         private List<uint> GetWorldFeatureIndices()
@@ -172,20 +390,18 @@ namespace UZVR.Phoenix.Bridge
             return featureIndices;
         }
 
-        private List<BWorld.BFeature> GetWorldFeatures()
+        private void SetWorldFeatures(BWorld world)
         {
-            List<BWorld.BFeature> features = new();
+            var featureCount = worldMeshFeaturesCount(WorldPtr);
+
+            world.featureTextures = new((int)featureCount);
+            world.featureNormals = new((int)featureCount);
 
             for (ulong i = 0; i < worldMeshFeaturesCount(WorldPtr); i++)
             {
-                features.Add(new()
-                {
-                    texture = worldMeshFeatureTextureGet(WorldPtr, i),
-                    normal = worldMeshFeatureNormalGet(WorldPtr, i)
-                });
+                world.featureTextures.Add(worldMeshFeatureTextureGet(WorldPtr, i));
+                world.featureNormals.Add(worldMeshFeatureNormalGet(WorldPtr, i));
             }
-
-            return features;
         }
 
 

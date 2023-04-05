@@ -29,6 +29,13 @@ namespace UZVR
         {
             var worldBridge = new WorldBridge(vdfsBridge, "world.zen");
 
+
+            var newWorldLoaded = WorldBridge.LoadWorld(vdfsBridge.VdfsPtr, "world.zen");
+
+            var subMeshes = WorldBridge.CreateSubmeshesForUnity(newWorldLoaded);
+            newWorldLoaded.subMeshes = subMeshes;
+
+
             PhoenixBridge.VdfsPtr = vdfsBridge.VdfsPtr;
             PhoenixBridge.WorldBridge = worldBridge;
 
@@ -37,7 +44,9 @@ namespace UZVR
             var scene = SceneManager.GetSceneByName("SampleScene");
             scene.GetRootGameObjects().Append(root);
 
-            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(root, worldBridge.World);
+//            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(root, worldBridge.World);
+            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(root, newWorldLoaded);
+
             SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(root, worldBridge.World);
         }
 

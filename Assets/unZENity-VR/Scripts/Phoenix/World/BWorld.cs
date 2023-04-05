@@ -5,20 +5,36 @@ namespace UZVR.Phoenix.World
 {
     public class BWorld
     {
-        public class BFeature
-        {
-            public Vector2 texture; // uv
-            public Vector3 normal;
-        }
+        public List<uint> vertexIndices; // index to vertices. 3 indices form one triangle.
+        public List<int> materialIndices; // each key (index) of a vertex_index has a material index in here.
+        public List<uint> featureIndices; // Each vertex_index has a feature index.
 
         public List<Vector3> vertices;
         public List<BMaterial> materials;
-        public Dictionary<int, List<uint>> triangles;
+        public List<Vector2> featureTextures; // Used as uv within Unity
+        public List<Vector3> featureNormals;
 
-        public List<uint> featureIndices;
-        public List<BFeature> features;
+        // transformed object within Unity.
+        public Dictionary<int, List<uint>> materializedTriangles;
+
+        public Dictionary<int, BSubMesh> subMeshes;
+
+        public class BSubMesh
+        {
+            public int materialIndex;
+            public BMaterial material;
+
+            public List<Vector3> vertices = new();
+            public List<int> triangles = new();
+            public List<Vector2> uvs = new() ;
+            public List<Vector3> normals = new();
+
+            public List<int> debugTextureIndices = new();
+        }
+
 
         public List<BWaypoint> waypoints;
         public List<BWaypointEdge> waypointEdges;
+
     }
 }

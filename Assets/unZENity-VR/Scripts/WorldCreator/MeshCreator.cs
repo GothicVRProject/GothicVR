@@ -4,6 +4,7 @@ using UnityEngine;
 using UZVR.Phoenix.Bridge;
 using UZVR.Phoenix.World;
 using UZVR.Util;
+using static UZVR.Phoenix.World.BWorld;
 
 namespace UZVR.WorldCreator
 {
@@ -14,24 +15,115 @@ namespace UZVR.WorldCreator
             var meshObj = new GameObject("Mesh");
             meshObj.transform.parent = root.transform;
 
-            for (var materialIndex=0; materialIndex < world.materials.Count; materialIndex++)
-            {
-                // Material isn't used in this world
-                if (world.triangles[materialIndex].Count == 0)
-                    continue;
 
-                var subMeshObj = new GameObject(string.Format("submesh-{0}", world.materials[materialIndex].name));
+            // DEBUG - values are there in the right order...
+            var vValue = world.featureTextures.First(i => i == new Vector2(1.91805f, 1.07236f));
+            var vIndex = world.featureTextures[281449];
+
+            // DEBUG Textures
+            {
+                var debug = new GameObject("DEBUG");
+                var meshFilter = debug.AddComponent<MeshFilter>();
+                var meshRenderer = debug.AddComponent<MeshRenderer>();
+
+                var standardShader = Shader.Find("Standard");
+                var material = new Material(standardShader);
+                var bTexture = TextureBridge.LoadTexture(PhoenixBridge.VdfsPtr, "OWODWAT_A0.TGA");
+
+                meshRenderer.material = material;
+
+                var texture = new Texture2D((int)bTexture.width, (int)bTexture.height, bTexture.GetUnityTextureFormat(), false);
+                texture.name = "OWODWAT_A0.TGA";
+                texture.LoadRawTextureData(bTexture.data.ToArray());
+
+                texture.Apply();
+
+                material.mainTexture = texture;
+                debug.transform.parent = meshObj.transform;
+
+
+                var mesh = new Mesh();
+                meshFilter.mesh = mesh;
+                mesh.SetVertices(new Vector3[]
+                {
+                    new(76.33f, -2.28f, -10.25f),
+                    new(67.82f, 18.91f, -10.25f),
+                    new(61.26f, -8.07f, -10.25f),
+                    new(52.76f, 13.12f, -10.25f),
+                    //new(76.33f, -2.28f, -10.25f),
+                    //new(61.26f, -8.07f, -10.25f),
+                    //new(67.82f, 18.91f, -10.25f),
+                    //new(52.76f, 13.12f, -10.25f)
+                });
+                mesh.SetTriangles(new int[]
+                {
+                    0, 1, 2, 3, 2, 1, //4, 5, 6, 7, 6, 5
+                }, 0);
+                mesh.SetUVs(0, new Vector2[]
+                {
+                    new(2.31f, -11.92f),
+                    new(5.90f, -10.48f),
+                    new(1.33f, -9.37f) ,
+                    new(4.92f, -7.93f) ,
+
+                    //new(2.31f, 13.92f) ,
+                    //new(1.33f, 11.37f) ,
+                    //new(5.90f, 12.48f) ,
+                    //new(4.92f, 9.93f)  ,
+                });
+//                mesh.SetNormals(newNormals);
+            }
+
+
+
+            foreach (var subMesh in world.subMeshes.Values)
+            {
+                var subMeshObj = new GameObject(string.Format("submesh-{0}", subMesh.material.name));
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
                 var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
-                PrepareMeshRenderer(meshRenderer, world, materialIndex);
-                PrepareMeshFilter(meshFilter, world, materialIndex);
+                PrepareMeshRenderer2(meshRenderer, subMesh);
+                PrepareMeshFilter2(meshFilter, subMesh);
                 meshCollider.sharedMesh = meshFilter.mesh;
 
                 subMeshObj.transform.parent = meshObj.transform;
             }
         }
+
+        private void PrepareMeshRenderer2(MeshRenderer meshRenderer, BSubMesh subMesh)
+        {
+            var standardShader = Shader.Find("Standard");
+            var material = new Material(standardShader);
+            var bMaterial = subMesh.material;
+
+            //material.color = Color.red; // bMaterial.color;
+            meshRenderer.material = material;
+
+            var bTexture = TextureBridge.LoadTexture(PhoenixBridge.VdfsPtr, bMaterial.textureName);
+
+            if (bTexture == null)
+                return;
+
+            var texture = new Texture2D((int)bTexture.width, (int)bTexture.height, bTexture.GetUnityTextureFormat(), false);
+            texture.name = bMaterial.textureName;
+            texture.LoadRawTextureData(bTexture.data.ToArray());
+
+            texture.Apply();
+
+            material.mainTexture = texture;
+        }
+
+        private void PrepareMeshFilter2(MeshFilter meshFilter, BSubMesh subMesh)
+        {
+            var mesh = new Mesh();
+            meshFilter.mesh = mesh;
+
+            mesh.SetVertices(subMesh.vertices);
+            mesh.SetTriangles(subMesh.triangles, 0);
+            mesh.SetUVs(0, subMesh.uvs);
+        }
+
 
         private void PrepareMeshRenderer(MeshRenderer meshRenderer, BWorld world, int materialIndex)
         {
@@ -56,6 +148,7 @@ namespace UZVR.WorldCreator
             material.mainTexture = texture;
         }
 
+
         /// <summary>
         /// This method is quite complex. What we do is:
         /// We use all the vertices from every mesh and check which ones are used in our submesh (aka are triangles using a vertex?)
@@ -77,16 +170,17 @@ namespace UZVR.WorldCreator
         {
             var vertices = world.vertices;
             var featureIndices = world.featureIndices;
-            var textures = world.features.Select(i => i.texture).ToList();
-            var normals = world.features.Select(i => i.normal).ToList();
-            var triangles = world.triangles[materialIndex];
+            var textures = world.featureTextures;
+            var normals = world.featureNormals;
+            var matTriangles = world.materializedTriangles[materialIndex];
+            var triangles = world.vertexIndices;
 
             var mesh = new Mesh();
             meshFilter.mesh = mesh;
 
             // Distinct -> We only want to check vertex-indices once for adding to the new mapping
             // Ordered -> We need to check from lowest used vertex-index to highest for the new mapping
-            List<uint> distinctOrderedTriangles = triangles.Distinct().OrderBy(val => val).ToList();
+            List<uint> distinctOrderedTriangles = matTriangles.Distinct().OrderBy(val => val).ToList();
             Dictionary<int, int> newVertexTriangleMapping = new();
             List<Vector3> newVertices = new();
             List<Vector2> newTextures = new();
@@ -98,9 +192,9 @@ namespace UZVR.WorldCreator
                 // curVertexIndex == currently lowest vertex index in this loop
                 int curVertexIndex = (int)distinctOrderedTriangles[i];
                 Vector3 vertexAtIndex = vertices[(int)curVertexIndex];
-                uint curFeatureIndex = featureIndices[(int)curVertexIndex];
-                Vector2 textureAtIndex = textures[(int)featureIndices[(int)curVertexIndex]];
-                Vector3 normalAtIndex = normals[(int)featureIndices[(int)curVertexIndex]];
+                uint curFeatureIndex = featureIndices[(int)curVertexIndex * 3];
+                Vector2 textureAtIndex = textures[(int)curFeatureIndex];
+                Vector3 normalAtIndex = normals[(int)curFeatureIndex];
 
                 // Previously index of vertex is now the new index of loop's >i<.
                 // This Dictionary will be used to >replace< the original triangle values later.
@@ -115,7 +209,7 @@ namespace UZVR.WorldCreator
             }
 
             // Now we replace the triangle values. aka the vertex-indices (value old) with new >mapping< from Dictionary.
-            var newTriangles = triangles.Select(originalVertexIndex => newVertexTriangleMapping[(int)originalVertexIndex]).ToArray();
+            var newTriangles = matTriangles.Select(originalVertexIndex => newVertexTriangleMapping[(int)originalVertexIndex]).ToArray();
             var newFlippedTriangles = new List<int>(newTriangles.Count());
 
             // We need to flip valueA with valueC to:
@@ -130,8 +224,8 @@ namespace UZVR.WorldCreator
 
             mesh.SetVertices(newVertices);
             mesh.SetTriangles(newFlippedTriangles, 0);
-            mesh.SetUVs(0, newTextures);
-            mesh.SetNormals(newNormals);
+            //mesh.SetUVs(0, newTextures);
+            //mesh.SetNormals(newNormals);
         }
     }
 }
