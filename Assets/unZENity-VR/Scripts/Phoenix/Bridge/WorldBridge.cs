@@ -112,11 +112,9 @@ namespace UZVR.Phoenix.Bridge
             var featureTextures = world.featureTextures;
             var featureNormals = world.featureNormals;
 
-            // Store temporarily if a specific vertex is already in the material. Reference new vertex_indices to it then.
-            // dict<materialId, dict<originalVertexId, newVertexIdInList>
-            Dictionary<int, Dictionary<uint, int>> tempVerticesMapping = new();
-
-            for (int loopVertexIndexId = 0; loopVertexIndexId < vertexIndices.Count; loopVertexIndexId++)
+            // We need to put vertex_indices (aka triangles) in reversed order
+            // to make Unity draw mesh elements right (instead of upside down)
+            for (int loopVertexIndexId = vertexIndices.Count-1; loopVertexIndexId >= 0; loopVertexIndexId--)
             {
                 // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
                 var materialIndex = world.materialIndices[loopVertexIndexId / 3];
@@ -131,42 +129,21 @@ namespace UZVR.Phoenix.Bridge
                     };
 
                     subMeshes.Add(materialIndex, newSubMesh);
-                    tempVerticesMapping.Add(materialIndex, new());
                 }
 
                 var currentSubMesh = subMeshes[materialIndex];
-                var curTempVerticesMapping = tempVerticesMapping[materialIndex];
-
                 var origVertexIndex = vertexIndices[loopVertexIndexId];
-                if (!curTempVerticesMapping.ContainsKey(origVertexIndex))
-                {
-                    // Gothic meshes are too big for Unity by factor 100.
-                    currentSubMesh.vertices.Add(vertices[(int)origVertexIndex] / 100);
+
+                // Gothic meshes are too big for Unity by factor 100.
+                currentSubMesh.vertices.Add(vertices[(int)origVertexIndex] / 100);
                     
-                    // Temporarily store vertexIndex as it can be referenced by other
-                    // vertexIndices (aka triangles) within the same SubMesh.
-                    curTempVerticesMapping.Add(origVertexIndex, curTempVerticesMapping.Count);
+                currentSubMesh.debugTextureIndices.Add((int)featureIndices[loopVertexIndexId]);
 
-                    currentSubMesh.debugTextureIndices.Add((int)featureIndices[loopVertexIndexId]);
+                var featureIndex = (int)featureIndices[loopVertexIndexId];
+                currentSubMesh.uvs.Add(featureTextures[featureIndex]);
+                currentSubMesh.normals.Add(featureNormals[featureIndex]);
 
-                    var featureIndex = (int)featureIndices[loopVertexIndexId];
-                    currentSubMesh.uvs.Add(featureTextures[featureIndex]);
-                    currentSubMesh.normals.Add(featureNormals[featureIndex]);
-                }
-
-                var newVertexIndex = curTempVerticesMapping[origVertexIndex];
-
-                currentSubMesh.triangles.Add(newVertexIndex);
-
-                // We need to flip valueA with valueC to have the mesh elements
-                // shown upside down (original data shows flipped surface in Unity)
-                var triangleCount = currentSubMesh.triangles.Count;
-                if (triangleCount > 0 && triangleCount % 3 == 0)
-                {
-                    // Flip n-1 with n-3
-                    (currentSubMesh.triangles[triangleCount - 1], currentSubMesh.triangles[triangleCount - 3]) =
-                        (currentSubMesh.triangles[triangleCount - 3], currentSubMesh.triangles[triangleCount - 1]);
-                }
+                currentSubMesh.triangles.Add(currentSubMesh.vertices.Count - 1);
             }
 
             return subMeshes;
