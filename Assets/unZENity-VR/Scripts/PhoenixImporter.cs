@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UZVR.Phoenix.Bridge;
 using UZVR.Phoenix.Bridge.Vm;
+using UZVR.Phoenix.World;
 using UZVR.Util;
 using UZVR.WorldCreator;
 
@@ -27,16 +28,25 @@ namespace UZVR
 
         private void LoadWorld(VdfsBridge vdfsBridge)
         {
-            var worldBridge = new WorldBridge(vdfsBridge, "world.zen");
-            PhoenixBridge.WorldBridge = worldBridge;
+            var world = WorldBridge.LoadWorld(vdfsBridge.VdfsPtr, "world.zen");
+
+            var subMeshes = WorldBridge.CreateSubmeshesForUnity(world);
+            world.subMeshes = subMeshes;
+
+
+            PhoenixBridge.VdfsPtr = vdfsBridge.VdfsPtr;
+            PhoenixBridge.World = world;
+
 
             var root = new GameObject("World");
 
             var scene = SceneManager.GetSceneByName("SampleScene");
             scene.GetRootGameObjects().Append(root);
 
-            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(root, worldBridge.World);
-            SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(root, worldBridge.World);
+//            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(root, worldBridge.World);
+            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(root, world);
+
+            SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(root, world);
         }
 
         private void LoadGothicVM()

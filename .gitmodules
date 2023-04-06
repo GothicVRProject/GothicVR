@@ -1,3 +1,0 @@
-[submodule "Dependencies/phoenix-csharp-bridge"]
-	path = Dependencies/phoenix-csharp-bridge
-	url = https://github.com/GothicVRProject/phoenix-csharp-bridge.git

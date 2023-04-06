@@ -1,157 +1,78 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UZVR.Phoenix.Bridge;
 using UZVR.Phoenix.World;
 using UZVR.Util;
+using static UZVR.Phoenix.World.BWorld;
 
 namespace UZVR.WorldCreator
 {
     public class MeshCreator: SingletonBehaviour<MeshCreator>
     {
+        // Cache helped speed up loading of G1 world textures from 870ms to 230 (~75% speedup)
+        private Dictionary<string, Texture2D> cachedTextures = new();
+
         public void Create(GameObject root, BWorld world)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.transform.parent = root.transform;
 
-            for (var materialIndex=0; materialIndex < world.materials.Count; materialIndex++)
+            foreach (var subMesh in world.subMeshes.Values)
             {
-                // Material isn't used in this map
-                if (world.triangles[materialIndex].Count == 0)
-                    continue;
-
-                var subMeshObj = new GameObject(string.Format("submesh-{0}", world.materials[materialIndex].name));
+                var subMeshObj = new GameObject(string.Format("submesh-{0}", subMesh.material.name));
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
                 var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
-                _PrepareMeshRenderer(meshRenderer, world, materialIndex);
-                _PrepareMeshFilter(meshFilter, world, materialIndex);
+                PrepareMeshRenderer(meshRenderer, subMesh);
+                PrepareMeshFilter(meshFilter, subMesh);
                 meshCollider.sharedMesh = meshFilter.mesh;
 
-                subMeshObj.transform.localScale = Vector3.one / 100; // Gothic mesh scales are too big by factor 100
                 subMeshObj.transform.parent = meshObj.transform;
             }
+
+            // Currently we don't need to store cachedTextures once the world is loaded.
+            cachedTextures.Clear();
         }
 
-        private void _PrepareMeshRenderer(MeshRenderer meshRenderer, BWorld world, int materialIndex)
+        private void PrepareMeshRenderer(MeshRenderer meshRenderer, BSubMesh subMesh)
         {
             var standardShader = Shader.Find("Standard");
             var material = new Material(standardShader);
+            var bMaterial = subMesh.material;
 
-            material.color = world.materials[materialIndex].color;
             meshRenderer.material = material;
+
+            // Load texture for the first time.
+            if (!cachedTextures.TryGetValue(bMaterial.textureName, out Texture2D cachedTexture))
+            {
+                var bTexture = TextureBridge.LoadTexture(PhoenixBridge.VdfsPtr, bMaterial.textureName);
+
+                if (bTexture == null)
+                    return;
+
+                var texture = new Texture2D((int)bTexture.width, (int)bTexture.height, bTexture.GetUnityTextureFormat(), false);
+
+                texture.name = bMaterial.textureName;
+                texture.LoadRawTextureData(bTexture.data.ToArray());
+
+                texture.Apply();
+
+                cachedTextures.Add(bMaterial.textureName, texture);
+                cachedTexture = texture;
+            }
+
+            material.mainTexture = cachedTexture;
         }
 
-        /// <summary>
-        /// This method is quite complex. What we do is:
-        /// We use all the vertices from every mesh and check which ones are used in our submesh (aka are triangles using a vertex?)
-        /// We create a new Vertices list and Triangles list based on our changes.
-        /// Check the code for technical details.
-        /// 
-        /// Example:
-        ///     vertices  => 0=[...], 1=[...], 2=[...]
-        ///     triangles => 0=4, 1=5, 2=8, 3=1, 4=1
-        ///     
-        ///     distinctOrderedTriangles => 0=1, 1=4, 2=5, 3=8
-        ///     
-        ///     newVertexTriangleMapping => 1=0, 4=1, 5=2, 8=3
-        ///     
-        ///     newVertices  => 0=[...], 1=[...], 2=[...]
-        ///     newTriangles => 0=1, 1=0, 2=3, 3=0, 4=0 <-- values are replaced with new mapping
-        /// </summary>
-        private void _PrepareMeshFilter(MeshFilter meshFilter, BWorld world, int materialIndex)
+        private void PrepareMeshFilter(MeshFilter meshFilter, BSubMesh subMesh)
         {
-            var vertices = world.vertices;
-            var triangles = world.triangles[materialIndex];
-
             var mesh = new Mesh();
             meshFilter.mesh = mesh;
 
-            // Distinct -> We only want to check vertex-indices once for adding to the new mapping
-            // Ordered -> We need to check from lowest used vertex-index to highest for the new mapping
-            List<int> distinctOrderedTriangles = triangles.Distinct().OrderBy(val => val).ToList();
-            Dictionary<int, int> newVertexTriangleMapping = new();
-            List<Vector3> newVertices = new();
-
-            // Loop through all the distinctOrderedTriangles
-            for (int i=0; i<distinctOrderedTriangles.Count; i++)
-            {
-                // curVertexIndex == currently lowest vertex index in this loop
-                int curVertexIndex = distinctOrderedTriangles[i];
-                Vector3 vertexAtIndex = vertices[curVertexIndex];
-
-                // Previously index of vertex is now the new index of loop's >i<.
-                // This Dictionary will be used to >replace< the original triangle values later.
-                // e.g. previous Vertex-index=5 (key) is now the Vertex-index=0 (value)
-                newVertexTriangleMapping.Add(curVertexIndex, i);
-
-                // Add the vertex which was found as new lowest entry
-                // e.g. Vertex-index=5 is now Vertex-index=0
-                newVertices.Add(vertexAtIndex);
-            }
-
-            // Now we replace the triangle values. aka the vertex-indices (value old) with new >mapping< from Dictionary.
-            var newTriangles = triangles.Select(originalVertexIndex => newVertexTriangleMapping[originalVertexIndex]);
-
-            mesh.vertices = newVertices.ToArray();
-            mesh.triangles = newTriangles.ToArray();
+            mesh.SetVertices(subMesh.vertices);
+            mesh.SetTriangles(subMesh.triangles, 0);
+            mesh.SetUVs(0, subMesh.uvs);
         }
-
-       
-        // Credits: https://gist.github.com/mikezila/10557162
-        //private Texture2D _LoadTGA(Stream TGAStream)
-        //{
-
-        //    using (BinaryReader r = new BinaryReader(TGAStream))
-        //    {
-        //        // Skip some header info we don't care about.
-        //        // Even if we did care, we have to move the stream seek point to the beginning,
-        //        // as the previous method in the workflow left it at the end.
-        //        r.BaseStream.Seek(12, SeekOrigin.Begin);
-
-        //        short width = r.ReadInt16();
-        //        short height = r.ReadInt16();
-        //        int bitDepth = r.ReadByte();
-
-        //        // Skip a byte of header information we don't care about.
-        //        r.BaseStream.Seek(1, SeekOrigin.Current);
-
-        //        Texture2D tex = new Texture2D(width, height);
-        //        Color32[] pulledColors = new Color32[width * height];
-
-        //        if (bitDepth == 32)
-        //        {
-        //            for (int i = 0; i < width * height; i++)
-        //            {
-        //                byte red = r.ReadByte();
-        //                byte green = r.ReadByte();
-        //                byte blue = r.ReadByte();
-        //                byte alpha = r.ReadByte();
-
-        //                pulledColors[i] = new Color32(blue, green, red, alpha);
-        //            }
-        //        }
-        //        else if (bitDepth == 24)
-        //        {
-        //            for (int i = 0; i < width * height; i++)
-        //            {
-        //                byte red = r.ReadByte();
-        //                byte green = r.ReadByte();
-        //                byte blue = r.ReadByte();
-
-        //                pulledColors[i] = new Color32(blue, green, red, 1);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            throw new Exception("TGA texture had non 32/24 bit depth.");
-        //        }
-
-        //        tex.SetPixels32(pulledColors);
-        //        tex.Apply();
-        //        return tex;
-
-        //    }
-        //}
     }
 }

@@ -1,0 +1,1 @@
+unZENity-VR is relying on libphoenix-csharp-bridge.dll (*.a for some Windows builds and *.so for linux). Please make sure to have latest working version of the library from https://github.com/GothicVRProject/phoenix-csharp-bridge placed in here.

@@ -13,7 +13,7 @@ namespace UZVR.Phoenix.Vm.Gothic.Externals
             //throw new NotImplementedException("External >" + value + "< not registered but required by DaedalusVM.");
 
             // DEBUG During development
-            Debug.LogError("External >" + value + "< not registered but required by DaedalusVM.");
+            // Debug.LogError("External >" + value + "< not registered but required by DaedalusVM.");
 
             PhoenixNotImplementedCallback.Invoke();
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UZVR.Phoenix.Bridge.Vm;
 using UZVR.Phoenix.Bridge.Vm.Gothic;
 using UZVR.Phoenix.Vm.Gothic;
@@ -10,15 +11,9 @@ namespace UZVR.Phoenix.Bridge
     {
         public const string DLLNAME = "libphoenix-csharp-bridge";
 
-        /// <summary>
-        /// No need to get WorldBridge as everything is loaded right from the start and stored inside World.
-        /// Therefore we support this shortcut only.
-        /// </summary>
-        public static WorldBridge WorldBridge { private get; set; }
-        public static BWorld World {
-            get { return WorldBridge.World; }
-            private set { }
-        }
+        public static IntPtr VdfsPtr;
+
+        public static BWorld World;
 
 
         /// Gothic VM consists of a lot of elements. We therefore split it into areas like NPC, Items, ... and store it for use.
