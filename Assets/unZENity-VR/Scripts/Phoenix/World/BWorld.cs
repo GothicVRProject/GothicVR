@@ -14,9 +14,6 @@ namespace UZVR.Phoenix.World
         public List<Vector2> featureTextures; // Used as uv within Unity
         public List<Vector3> featureNormals;
 
-        // transformed object within Unity.
-        public Dictionary<int, List<uint>> materializedTriangles;
-
         public Dictionary<int, BSubMesh> subMeshes;
 
         public class BSubMesh
@@ -28,10 +25,7 @@ namespace UZVR.Phoenix.World
             public List<int> triangles = new();
             public List<Vector2> uvs = new() ;
             public List<Vector3> normals = new();
-
-            public List<int> debugTextureIndices = new();
         }
-
 
         public List<BWaypoint> waypoints;
         public List<BWaypointEdge> waypointEdges;

@@ -13,15 +13,7 @@ namespace UZVR.Phoenix.Bridge
 
         public static IntPtr VdfsPtr;
 
-        /// <summary>
-        /// No need to get WorldBridge as everything is loaded right from the start and stored inside World.
-        /// Therefore we support this shortcut only.
-        /// </summary>
-        public static WorldBridge WorldBridge { private get; set; }
-        public static BWorld World {
-            get { return WorldBridge.World; }
-            private set { }
-        }
+        public static BWorld World;
 
 
         /// Gothic VM consists of a lot of elements. We therefore split it into areas like NPC, Items, ... and store it for use.

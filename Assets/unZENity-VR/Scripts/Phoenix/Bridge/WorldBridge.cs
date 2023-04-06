@@ -11,13 +11,8 @@ using static UZVR.Phoenix.World.BWorld;
 
 namespace UZVR.Phoenix.Bridge
 {
-    public class WorldBridge
+    public static class WorldBridge
     {
-
-        public IntPtr WorldPtr { get; private set; } = IntPtr.Zero;
-
-        public BWorld World { get; private set; } = new();
-
         private const string DLLNAME = PhoenixBridge.DLLNAME;
         // Load
         [DllImport(DLLNAME)] private static extern IntPtr worldLoad(IntPtr vdfContainer, string worldFileName);
@@ -63,25 +58,6 @@ namespace UZVR.Phoenix.Bridge
         [DllImport(DLLNAME)] private static extern void worldGetWaynetEdge(IntPtr world, int index, out uint a, out uint b);
 
 
-        public WorldBridge(VdfsBridge vdfs, string worldName)
-        {
-            WorldPtr = worldLoad(vdfs.VdfsPtr, worldName);
-
-            SetWorldVertices(World);
-            World.materials = _GetWorldMaterials();
-            SetWorldTriangles(World, World.materials.Count);
-
-            World.featureIndices = GetWorldFeatureIndices();
-            SetWorldFeatures(World);
-
-            World.waypoints = _GetWorldWaypoints();
-            World.waypointEdges = _GetWorldWaypointEdges();
-        }
-
-
-
-
-
         public static BWorld LoadWorld(IntPtr vdfsPtr, string worldName)
         {
             IntPtr worldPtr = worldLoad(vdfsPtr, worldName);
@@ -95,7 +71,10 @@ namespace UZVR.Phoenix.Bridge
                 vertices = LoadVertices(worldPtr),
                 materials = LoadMaterials(worldPtr),
                 featureTextures = LoadFeatureTextures(worldPtr),
-                featureNormals = LoadFeatureNormals(worldPtr)                
+                featureNormals = LoadFeatureNormals(worldPtr),
+
+                waypoints = LoadWorldWaypoints(worldPtr),
+                waypointEdges = LoadWorldWaypointEdges(worldPtr)
             };
 
             worldDispose(worldPtr);
@@ -137,8 +116,6 @@ namespace UZVR.Phoenix.Bridge
                 // Gothic meshes are too big for Unity by factor 100.
                 currentSubMesh.vertices.Add(vertices[(int)origVertexIndex] / 100);
                     
-                currentSubMesh.debugTextureIndices.Add((int)featureIndices[loopVertexIndexId]);
-
                 var featureIndex = (int)featureIndices[loopVertexIndexId];
                 currentSubMesh.uvs.Add(featureTextures[featureIndex]);
                 currentSubMesh.normals.Add(featureNormals[featureIndex]);
@@ -266,132 +243,16 @@ namespace UZVR.Phoenix.Bridge
             return featureNormals;
         }
 
-
-
-        // TODO: Check when the class is disposed to free memory within DLL.
-        // If happening too late, then free it manually earlier.
-        ~WorldBridge()
+    private static List<BWaypoint> LoadWorldWaypoints(IntPtr worldPtr)
         {
-            worldDispose(WorldPtr);
-            WorldPtr = IntPtr.Zero;
-        }
-
-
-
-        private void SetWorldVertices(BWorld world)
-        {
-            List<Vector3> vertices = new();
-
-            for (int i = 0; i < worldGetMeshVertexCount(WorldPtr); i++)
-            {
-                var vertex = worldGetMeshVertex(WorldPtr, i);
-
-                vertices.Add(vertex / 100); // Gothic coordinates are too big by factor 100
-            }
-
-            world.vertices = vertices;
-        }
-
-        private List<BMaterial> _GetWorldMaterials()
-        {
-            int materialCount = worldGetMeshMaterialCount(WorldPtr);
-            var materials = new List<BMaterial>(materialCount);
-
-            for (var i=0; i<materialCount; i++)
-            {
-                StringBuilder name = new(worldGetMeshMaterialNameSize(WorldPtr, i));
-                worldGetMeshMaterialName(WorldPtr, i, name);
-
-                StringBuilder textureName = new(255);
-                worldMeshMaterialGetTextureName(WorldPtr, i, textureName);
-
-                worldGetMeshMaterialColor(WorldPtr, i, out byte r, out byte g, out byte b, out byte a);
-
-                var m = new BMaterial() {
-                    name = name.ToString(),
-                    textureName = textureName.ToString(),
-                    // We need to convert uint8 (byte) to float for Unity.
-                    color = new Color((float)r/255, (float)g /255, (float)b /255, (float)a /255)
-                };
-                materials.Add(m);
-            }
-
-            return materials;
-        }
-
-
-        private void SetWorldTriangles(BWorld world, int materialCount)
-        {
-            Dictionary<int, List<uint>> materializedTriangles = new();
-            List<uint> triangles = new();
-            List<int> materialIndices = new();
-
-            // FIXME We can optimize by cleaning up empty materials.
-            // PERFORMANCE e.g. worlds.vdfs has 2263 materials, but only ~1300 of them have triangles attached to it.
-
-            // Initialize arrays
-            for (var i=0; i < materialCount; i++)
-            {
-                materializedTriangles.Add(i, new());
-            }
-
-            for (int i = 0; i < (int)worldMeshVertexIndicesCount(WorldPtr); i+=3)
-            {
-                var vertexIndex1 = worldMeshVertexIndexGet(WorldPtr, (ulong)i);
-                var vertexIndex2 = worldMeshVertexIndexGet(WorldPtr, (ulong)i + 1);
-                var vertexIndex3 = worldMeshVertexIndexGet(WorldPtr, (ulong)i + 2);
-
-                // only 1/3 is the count of materials. Aka every 1st of 3 triangle indices to check for its value.
-                var materialIndex = worldGetMeshTriangleMaterialIndex(WorldPtr, (ulong)i / 3);
-                materialIndices.Add(materialIndex);
-
-                materializedTriangles[materialIndex].AddRange(new[] { vertexIndex1, vertexIndex2, vertexIndex3 });
-                triangles.AddRange(new[] { vertexIndex1, vertexIndex2, vertexIndex3 });
-            }
-
-            world.materialIndices = materialIndices;
-
-            world.materializedTriangles = materializedTriangles;
-            world.vertexIndices = triangles;
-        }
-
-        private List<uint> GetWorldFeatureIndices()
-        {
-            List<uint> featureIndices = new();
-
-            for (ulong i = 0; i < worldMeshFeatureIndicesCount(WorldPtr); i++)
-            {
-                featureIndices.Add(worldMeshFeatureIndexGet(WorldPtr, i));
-            }
-
-            return featureIndices;
-        }
-
-        private void SetWorldFeatures(BWorld world)
-        {
-            var featureCount = worldMeshFeaturesCount(WorldPtr);
-
-            world.featureTextures = new((int)featureCount);
-            world.featureNormals = new((int)featureCount);
-
-            for (ulong i = 0; i < worldMeshFeaturesCount(WorldPtr); i++)
-            {
-                world.featureTextures.Add(worldMeshFeatureTextureGet(WorldPtr, i));
-                world.featureNormals.Add(worldMeshFeatureNormalGet(WorldPtr, i));
-            }
-        }
-
-
-    private List<BWaypoint> _GetWorldWaypoints()
-        {
-            var waypointCount = worldGetWaynetWaypointCount(WorldPtr);
+            var waypointCount = worldGetWaynetWaypointCount(worldPtr);
             var waypoints = new List<BWaypoint>(waypointCount);
 
             for(int i = 0; i < waypointCount; i++)
             {
-                StringBuilder name = new(worldGetWaynetWaypointNameSize(WorldPtr, i));
+                StringBuilder name = new(worldGetWaynetWaypointNameSize(worldPtr, i));
 
-                worldGetWaynetWaypoint(WorldPtr, i, name, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth);
+                worldGetWaynetWaypoint(worldPtr, i, name, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth);
 
                 var waypoint = new BWaypoint()
                 {
@@ -409,14 +270,14 @@ namespace UZVR.Phoenix.Bridge
             return waypoints;
         }
 
-        private List<BWaypointEdge> _GetWorldWaypointEdges()
+        private static List<BWaypointEdge> LoadWorldWaypointEdges(IntPtr worldPtr)
         {
-            var edgeCount = worldGetWaynetEdgeCount(WorldPtr);
+            var edgeCount = worldGetWaynetEdgeCount(worldPtr);
             var edges = new List<BWaypointEdge>(edgeCount);
 
             for (int i = 0; i < edgeCount; i++)
             {
-                worldGetWaynetEdge(WorldPtr, i, out uint a, out uint b);
+                worldGetWaynetEdge(worldPtr, i, out uint a, out uint b);
 
                 var edge = new BWaypointEdge()
                 {
