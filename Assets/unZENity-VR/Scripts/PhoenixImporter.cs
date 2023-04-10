@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -20,21 +22,26 @@ namespace UZVR
             if (_loaded) return;
                 _loaded = true;
 
-            var vdfsBridge = new VdfsBridge(G1Dir + "/Data");
+            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "Data"));
+            var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
 
-            LoadWorld(vdfsBridge);
+            LoadWorld(vdfPtr);
+
+            // HINT: In future we need it for loading more data during runtime. For now we can remove it.
+            VdfsBridge.DestroyVdfs(vdfPtr);
+
             LoadGothicVM();
         }
 
-        private void LoadWorld(VdfsBridge vdfsBridge)
+        private void LoadWorld(IntPtr vdfPtr)
         {
-            var world = WorldBridge.LoadWorld(vdfsBridge.VdfsPtr, "world.zen");
+            var world = WorldBridge.LoadWorld(vdfPtr, "world.zen");
 
             var subMeshes = WorldBridge.CreateSubmeshesForUnity(world);
             world.subMeshes = subMeshes;
 
 
-            PhoenixBridge.VdfsPtr = vdfsBridge.VdfsPtr;
+            PhoenixBridge.VdfsPtr = vdfPtr;
             PhoenixBridge.World = world;
 
 

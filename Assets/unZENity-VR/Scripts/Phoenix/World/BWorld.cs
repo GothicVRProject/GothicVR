@@ -5,9 +5,9 @@ namespace UZVR.Phoenix.World
 {
     public class BWorld
     {
-        public List<uint> vertexIndices; // index to vertices. 3 indices form one triangle.
-        public List<int> materialIndices; // each key (index) of a vertex_index has a material index in here.
-        public List<uint> featureIndices; // Each vertex_index has a feature index.
+        public int[] vertexIndices; // index to vertices. 3 indices form one triangle.
+        public int[] materialIndices; // each key (index) of a vertex_index has a material index in here.
+        public int[] featureIndices; // Each vertex_index has a feature index.
 
         public List<Vector3> vertices;
         public List<BMaterial> materials;

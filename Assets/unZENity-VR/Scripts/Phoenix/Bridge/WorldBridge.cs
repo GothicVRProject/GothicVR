@@ -1,3 +1,4 @@
+using PxCs;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -60,24 +61,25 @@ namespace UZVR.Phoenix.Bridge
 
         public static BWorld LoadWorld(IntPtr vdfsPtr, string worldName)
         {
-            IntPtr worldPtr = worldLoad(vdfsPtr, worldName);
+            var worldPtr = PxWorld.pxWorldLoadFromVdf(vdfsPtr, worldName);
+            var worldMeshPtr = PxWorld.pxWorldGetMesh(worldPtr);
 
             BWorld world = new()
             {
-                vertexIndices = LoadVertexIndices(worldPtr),
-                materialIndices = LoadMaterialIndices(worldPtr),
-                featureIndices = LoadFeatureIndices(worldPtr),
+                vertexIndices = PxMesh.GetPolygonVertexIndices(worldMeshPtr),
+                materialIndices = PxMesh.GetPolygonMaterialIndices(worldMeshPtr),
+                featureIndices = PxMesh.GetPolygonFeatureIndices(worldMeshPtr),
 
-                vertices = LoadVertices(worldPtr),
-                materials = LoadMaterials(worldPtr),
-                featureTextures = LoadFeatureTextures(worldPtr),
-                featureNormals = LoadFeatureNormals(worldPtr),
+                vertices = LoadVertices(worldMeshPtr),
+                materials = LoadMaterials(worldMeshPtr),
+                featureTextures = LoadFeatureTextures(worldMeshPtr),
+                featureNormals = LoadFeatureNormals(worldMeshPtr),
 
-                waypoints = LoadWorldWaypoints(worldPtr),
-                waypointEdges = LoadWorldWaypointEdges(worldPtr)
+                waypoints = LoadWorldWaypoints(worldMeshPtr),
+                waypointEdges = LoadWorldWaypointEdges(worldMeshPtr)
             };
 
-            worldDispose(worldPtr);
+            PxWorld.pxWorldDestroy(worldPtr);
 
             return world;
         }
@@ -125,50 +127,6 @@ namespace UZVR.Phoenix.Bridge
 
             return subMeshes;
         }
-
-        private static List<uint> LoadVertexIndices(IntPtr worldPtr)
-        {
-            var size = worldMeshVertexIndicesCount(worldPtr);
-            List<uint> vertexIndices = new((int)size);
-
-            for (ulong i = 0; i < size; i++)
-            {
-                vertexIndices.Add(
-                    worldMeshVertexIndexGet(worldPtr, i)
-                );
-            }
-
-            return vertexIndices;
-        }
-
-        private static List<int> LoadMaterialIndices(IntPtr worldPtr)
-        {
-            // Every 3 vertices (==1 triangle) have 1 material. It means 1/3 of vertexIndices count.
-            var size = worldMeshVertexIndicesCount(worldPtr) / 3ul;
-            List<int> materialIndices = new((int)size);
-
-            for (ulong i = 0; i < size; i++)
-            {
-                var materialIndex = worldGetMeshTriangleMaterialIndex(worldPtr, i);
-                materialIndices.Add(materialIndex);
-            }
-
-            return materialIndices;
-        }
-
-        private static List<uint> LoadFeatureIndices(IntPtr worldPtr)
-        {
-            var size = worldMeshFeatureIndicesCount(worldPtr);
-            List<uint> featureIndices = new((int)size);
-
-            for (ulong i = 0; i < size; i++)
-            {
-                featureIndices.Add(worldMeshFeatureIndexGet(worldPtr, i));
-            }
-
-            return featureIndices;
-        }
-
 
         private static List<Vector3> LoadVertices(IntPtr worldPtr)
         {
