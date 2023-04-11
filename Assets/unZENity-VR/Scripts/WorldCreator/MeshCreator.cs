@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using PxCs;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UZVR.Phoenix.Bridge;
 using UZVR.Phoenix.World;
@@ -46,15 +48,28 @@ namespace UZVR.WorldCreator
             // Load texture for the first time.
             if (!cachedTextures.TryGetValue(bMaterial.texture, out Texture2D cachedTexture))
             {
-                var bTexture = TextureBridge.LoadTexture(PhoenixBridge.VdfsPtr, bMaterial.texture);
+                var pxTexture = PxTexture.GetTextureFromVdf(PhoenixBridge.VdfsPtr, bMaterial.texture);
 
-                if (bTexture == null)
+                // No texture found
+                if (pxTexture == null)
+                {
+                    Debug.LogWarning($"Texture {bMaterial.texture} couldn't be found.");
                     return;
+                }
 
-                var texture = new Texture2D((int)bTexture.width, (int)bTexture.height, bTexture.GetUnityTextureFormat(), false);
+                var format = pxTexture.GetUnityTextureFormat();
+                if (format == 0)
+                {
+                    Debug.LogWarning("Format is not supported or not yet tested to work with Unity:" +
+                        Enum.GetName(typeof(PxTexture.Format), format)
+                    );
+                    return;
+                }
+
+                var texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, false);
 
                 texture.name = bMaterial.texture;
-                texture.LoadRawTextureData(bTexture.data.ToArray());
+                texture.LoadRawTextureData(pxTexture.mipmaps[0].mipmap);
 
                 texture.Apply();
 
