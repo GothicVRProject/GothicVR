@@ -5,13 +5,7 @@ using System.IO;
 namespace UZVR.Phoenix.Bridge
 {
     public static class VdfsBridge
-    {      
-        public IntPtr VdfsPtr
-        {
-            get;
-            private set;
-        }
-
+    {
         public static IntPtr LoadVdfsInDirectory(string vdfsDir)
         {
             var vdfsPtr = PxVdf.pxVdfNew("main");

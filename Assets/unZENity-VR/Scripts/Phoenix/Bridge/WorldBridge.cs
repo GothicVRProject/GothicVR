@@ -1,11 +1,9 @@
+using Assets.unZENity_VR.Scripts.Phoenix.Util;
 using PxCs;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UZVR.Phoenix.World;
 using static UZVR.Phoenix.World.BWorld;
@@ -70,13 +68,12 @@ namespace UZVR.Phoenix.Bridge
                 materialIndices = PxMesh.GetPolygonMaterialIndices(worldMeshPtr),
                 featureIndices = PxMesh.GetPolygonFeatureIndices(worldMeshPtr),
 
-                vertices = LoadVertices(worldMeshPtr),
-                materials = LoadMaterials(worldMeshPtr),
-                featureTextures = LoadFeatureTextures(worldMeshPtr),
-                featureNormals = LoadFeatureNormals(worldMeshPtr),
+                vertices = PxMesh.GetVertices(worldMeshPtr),
+                features = PxMesh.GetFeatures(worldMeshPtr),
+                materials = PxMesh.GetMaterials(worldMeshPtr),
 
-                waypoints = LoadWorldWaypoints(worldMeshPtr),
-                waypointEdges = LoadWorldWaypointEdges(worldMeshPtr)
+                waypoints = PxWorld.GetWayPoints(worldPtr),
+                waypointEdges = PxWorld.GetWayEdges(worldPtr)
             };
 
             PxWorld.pxWorldDestroy(worldPtr);
@@ -86,16 +83,15 @@ namespace UZVR.Phoenix.Bridge
 
         public static Dictionary<int, BSubMesh> CreateSubmeshesForUnity(BWorld world)
         {
-            Dictionary<int, BSubMesh> subMeshes = new(world.materials.Count);
+            Dictionary<int, BSubMesh> subMeshes = new(world.materials.Length);
             var vertices = world.vertices;
             var vertexIndices = world.vertexIndices;
             var featureIndices = world.featureIndices;
-            var featureTextures = world.featureTextures;
-            var featureNormals = world.featureNormals;
+            var features = world.features;
 
             // We need to put vertex_indices (aka triangles) in reversed order
             // to make Unity draw mesh elements right (instead of upside down)
-            for (int loopVertexIndexId = vertexIndices.Count-1; loopVertexIndexId >= 0; loopVertexIndexId--)
+            for (var loopVertexIndexId = vertexIndices.LongLength - 1; loopVertexIndexId >= 0; loopVertexIndexId--)
             {
                 // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
                 var materialIndex = world.materialIndices[loopVertexIndexId / 3];
@@ -116,137 +112,16 @@ namespace UZVR.Phoenix.Bridge
                 var origVertexIndex = vertexIndices[loopVertexIndexId];
 
                 // Gothic meshes are too big for Unity by factor 100.
-                currentSubMesh.vertices.Add(vertices[(int)origVertexIndex] / 100);
+                currentSubMesh.vertices.Add(vertices[(int)origVertexIndex].ToUnityVector() / 100);
                     
                 var featureIndex = (int)featureIndices[loopVertexIndexId];
-                currentSubMesh.uvs.Add(featureTextures[featureIndex]);
-                currentSubMesh.normals.Add(featureNormals[featureIndex]);
+                currentSubMesh.uvs.Add(features[featureIndex].texture.ToUnityVector());
+                currentSubMesh.normals.Add(features[featureIndex].normal.ToUnityVector());
 
                 currentSubMesh.triangles.Add(currentSubMesh.vertices.Count - 1);
             }
 
             return subMeshes;
-        }
-
-        private static List<Vector3> LoadVertices(IntPtr worldPtr)
-        {
-            var size = worldGetMeshVertexCount(worldPtr);
-            List<Vector3> vertices = new();
-
-            for (int i = 0; i < size; i++)
-            {
-                vertices.Add(
-                    worldGetMeshVertex(worldPtr, i)
-                );
-            }
-
-            return vertices;
-        }
-
-        private static List<BMaterial> LoadMaterials(IntPtr worldPtr)
-        {
-            int materialCount = worldGetMeshMaterialCount(worldPtr);
-            var materials = new List<BMaterial>(materialCount);
-
-            for (var i = 0; i < materialCount; i++)
-            {
-                StringBuilder name = new(worldGetMeshMaterialNameSize(worldPtr, i));
-                worldGetMeshMaterialName(worldPtr, i, name);
-
-                StringBuilder textureName = new(255);
-                worldMeshMaterialGetTextureName(worldPtr, i, textureName);
-
-                worldGetMeshMaterialColor(worldPtr, i, out byte r, out byte g, out byte b, out byte a);
-
-                var m = new BMaterial()
-                {
-                    name = name.ToString(),
-                    textureName = textureName.ToString(),
-                    // We need to convert uint8 (byte) to float for Unity.
-                    color = new Color((float)r / 255, (float)g / 255, (float)b / 255, (float)a / 255)
-                };
-                materials.Add(m);
-            }
-
-            return materials;
-        }
-
-        private static List<Vector2> LoadFeatureTextures(IntPtr worldPtr)
-        {
-            var featureCount = worldMeshFeaturesCount(worldPtr);
-
-            List<Vector2> featureTextures = new((int)featureCount);
-
-            for (ulong i = 0; i < worldMeshFeaturesCount(worldPtr); i++)
-            {
-                featureTextures.Add(worldMeshFeatureTextureGet(worldPtr, i));
-            }
-
-            return featureTextures;
-        }
-
-        private static List<Vector3> LoadFeatureNormals(IntPtr worldPtr)
-        {
-            var featureCount = worldMeshFeaturesCount(worldPtr);
-
-            List<Vector3> featureNormals = new((int)featureCount);
-
-            for (ulong i = 0; i < worldMeshFeaturesCount(worldPtr); i++)
-            {
-                featureNormals.Add(
-                    worldMeshFeatureNormalGet(worldPtr, i)
-                );
-            }
-
-            return featureNormals;
-        }
-
-    private static List<BWaypoint> LoadWorldWaypoints(IntPtr worldPtr)
-        {
-            var waypointCount = worldGetWaynetWaypointCount(worldPtr);
-            var waypoints = new List<BWaypoint>(waypointCount);
-
-            for(int i = 0; i < waypointCount; i++)
-            {
-                StringBuilder name = new(worldGetWaynetWaypointNameSize(worldPtr, i));
-
-                worldGetWaynetWaypoint(worldPtr, i, name, out Vector3 position, out Vector3 direction, out bool freePoint, out bool underWater, out int waterDepth);
-
-                var waypoint = new BWaypoint()
-                {
-                    name = name.ToString(),
-                    position = position / 100, // Gothic coordinates are too big by factor 100
-                    direction = direction,
-                    freePoint = freePoint,
-                    underWater = underWater,
-                    waterDepth = waterDepth
-                };
-                
-                waypoints.Add(waypoint);
-            }
-
-            return waypoints;
-        }
-
-        private static List<BWaypointEdge> LoadWorldWaypointEdges(IntPtr worldPtr)
-        {
-            var edgeCount = worldGetWaynetEdgeCount(worldPtr);
-            var edges = new List<BWaypointEdge>(edgeCount);
-
-            for (int i = 0; i < edgeCount; i++)
-            {
-                worldGetWaynetEdge(worldPtr, i, out uint a, out uint b);
-
-                var edge = new BWaypointEdge()
-                {
-                    a = a,
-                    b = b
-                };
-
-                edges.Add(edge);
-            }
-
-            return edges;
         }
     }
 }

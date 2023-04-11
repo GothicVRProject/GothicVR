@@ -44,21 +44,21 @@ namespace UZVR.WorldCreator
             meshRenderer.material = material;
 
             // Load texture for the first time.
-            if (!cachedTextures.TryGetValue(bMaterial.textureName, out Texture2D cachedTexture))
+            if (!cachedTextures.TryGetValue(bMaterial.texture, out Texture2D cachedTexture))
             {
-                var bTexture = TextureBridge.LoadTexture(PhoenixBridge.VdfsPtr, bMaterial.textureName);
+                var bTexture = TextureBridge.LoadTexture(PhoenixBridge.VdfsPtr, bMaterial.texture);
 
                 if (bTexture == null)
                     return;
 
                 var texture = new Texture2D((int)bTexture.width, (int)bTexture.height, bTexture.GetUnityTextureFormat(), false);
 
-                texture.name = bMaterial.textureName;
+                texture.name = bMaterial.texture;
                 texture.LoadRawTextureData(bTexture.data.ToArray());
 
                 texture.Apply();
 
-                cachedTextures.Add(bMaterial.textureName, texture);
+                cachedTextures.Add(bMaterial.texture, texture);
                 cachedTexture = texture;
             }
 

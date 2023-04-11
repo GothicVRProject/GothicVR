@@ -1,3 +1,4 @@
+using Assets.unZENity_VR.Scripts.Phoenix.Util;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -33,7 +34,7 @@ namespace UZVR.Npc
                 .FirstOrDefault(item => item.name.ToLower() == routine.waypoint.ToLower());
 
             var startPosition = gameObject.transform.position;
-            gameObject.transform.position = Vector3.MoveTowards(startPosition, waypoint.position, SPEED * Time.deltaTime);
+            gameObject.transform.position = Vector3.MoveTowards(startPosition, waypoint.position.ToUnityVector(), SPEED * Time.deltaTime);
         }
 
         private BRoutine GetCurrentRoutine()

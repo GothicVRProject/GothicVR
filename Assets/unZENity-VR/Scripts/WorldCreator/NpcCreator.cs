@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.unZENity_VR.Scripts.Phoenix.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
@@ -54,7 +55,7 @@ namespace UZVR.WorldCreator
                 newNpc.GetComponent<Routine>().routines = routines;
             }
 
-            newNpc.transform.position = initialSpawnpoint.position;
+            newNpc.transform.position = initialSpawnpoint.position.ToUnityVector();
             newNpc.transform.parent = npcContainer.transform;
         }
 

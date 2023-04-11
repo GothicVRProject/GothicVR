@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PxCs.Data;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace UZVR.Phoenix.World
@@ -9,17 +10,16 @@ namespace UZVR.Phoenix.World
         public int[] materialIndices; // each key (index) of a vertex_index has a material index in here.
         public int[] featureIndices; // Each vertex_index has a feature index.
 
-        public List<Vector3> vertices;
-        public List<BMaterial> materials;
-        public List<Vector2> featureTextures; // Used as uv within Unity
-        public List<Vector3> featureNormals;
+        public System.Numerics.Vector3[] vertices;
+        public PxFeatureData[] features;
+        public PxMaterialData[] materials;
 
         public Dictionary<int, BSubMesh> subMeshes;
 
         public class BSubMesh
         {
             public int materialIndex;
-            public BMaterial material;
+            public PxMaterialData material;
 
             public List<Vector3> vertices = new();
             public List<int> triangles = new();
@@ -27,8 +27,8 @@ namespace UZVR.Phoenix.World
             public List<Vector3> normals = new();
         }
 
-        public List<BWaypoint> waypoints;
-        public List<BWaypointEdge> waypointEdges;
+        public PxWayPointData[] waypoints;
+        public PxWayEdgeData[] waypointEdges;
 
     }
 }
