@@ -1,3 +1,4 @@
+using PxCs;
 using System;
 using System.IO;
 using System.Linq;
@@ -5,7 +6,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UZVR.Phoenix.Bridge;
 using UZVR.Phoenix.Bridge.Vm;
-using UZVR.Phoenix.World;
 using UZVR.Util;
 using UZVR.WorldCreator;
 
@@ -26,10 +26,6 @@ namespace UZVR
             var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
 
             LoadWorld(vdfPtr);
-
-            // HINT: In future we need it for loading more data during runtime. For now we can remove it.
-            VdfsBridge.DestroyVdfs(vdfPtr);
-
             LoadGothicVM();
         }
 
@@ -50,20 +46,39 @@ namespace UZVR
             var scene = SceneManager.GetSceneByName("SampleScene");
             scene.GetRootGameObjects().Append(root);
 
-//            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(root, worldBridge.World);
             SingletonBehaviour<MeshCreator>.GetOrCreate().Create(root, world);
-
             SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(root, world);
         }
 
         private void LoadGothicVM()
         {
-            var vmGothicBridge = new VmGothicBridge(G1Dir + "/_work/DATA/scripts/_compiled/GOTHIC.DAT");
+            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
+            var vmPtr = VmGothicBridge.LoadVm(fullPath);
 
-            PhoenixBridge.VmGothicBridge = vmGothicBridge;
-            PhoenixBridge.VmGothicNpcBridge = new(vmGothicBridge);
+            VmGothicBridge.RegisterExternals(vmPtr);
 
-            vmGothicBridge.CallFunction("STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
+            PhoenixBridge.VmGothicPtr = vmPtr;
+
+            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
+        }
+
+
+        // FIXME: This destructor is called multiple times when starting Unity game (Also during start of game)
+        // FIXME: We need to check why and improve!
+        // Destroy memory on phoenix DLL when game closes.
+        ~PhoenixImporter()
+        {
+            if (PhoenixBridge.VdfsPtr != IntPtr.Zero)
+            {
+                PxVdf.pxVdfDestroy(PhoenixBridge.VdfsPtr);
+                PhoenixBridge.VdfsPtr = IntPtr.Zero;
+            }
+
+            if (PhoenixBridge.VmGothicPtr != IntPtr.Zero)
+            {
+                PxVm.pxVmDestroy(PhoenixBridge.VmGothicPtr);
+                PhoenixBridge.VmGothicPtr = IntPtr.Zero;
+            }
         }
     }
 }

@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using PxCs;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UZVR.Npc;
 using UZVR.Phoenix.Bridge;
+using UZVR.Phoenix.Bridge.Vm;
 using UZVR.Phoenix.Vm.Gothic;
-using UZVR.Phoenix.Vm.Gothic.Externals;
 using UZVR.Util;
 
 namespace UZVR.WorldCreator
@@ -13,10 +14,17 @@ namespace UZVR.WorldCreator
     {
         void Start()
         {
-            NpcExternals.PhoenixWld_InsertNpc.AddListener(Wld_InsertNpc);
-            NpcExternals.PhoenixTA_MIN.AddListener(TA_MIN);
+            VmGothicBridge.PhoenixWld_InsertNpc.AddListener(Wld_InsertNpc);
+            VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
         }
 
+        /// <summary>
+        /// Original Gothic uses this function to spawn an NPC instance into the world.
+        /// 
+        /// The startpoint to walk isn't neccessarily the spawnpoint mentioned here.
+        /// It can also be the currently active routine point to walk to.
+        /// We therefore execute the daily routines to collect current location and use this as spawn location.
+        /// </summary>
         public static void Wld_InsertNpc(int npcInstance, string spawnpoint)
         {
             var npcContainer = GameObject.Find("NPCs");
@@ -30,21 +38,18 @@ namespace UZVR.WorldCreator
                 return;
             }
 
-            var npc = PhoenixBridge.VmGothicNpcBridge.InitNpcInstance(npcInstance);
-
-            string name = PhoenixBridge.VmGothicNpcBridge.GetNpcName(npc);
+            // FIXME - We need to initialize NPCs via ID not name
+            var pxNpc = PxVm.InitializeNpc(PhoenixBridge.VmGothicPtr, (uint)npcInstance);
 
             var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
-            newNpc.name = string.Format("{0}-{1}", name, spawnpoint);
+            newNpc.name = string.Format("{0}-{1}", "some NPC - FIXME fetch name", spawnpoint);
+            var npcRoutine = pxNpc.routine;
 
-            var npcRoutine = PhoenixBridge.VmGothicNpcBridge.GetNpcRoutine(npc);
+            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, (uint)npcRoutine);
 
-            PhoenixBridge.VmGothicNpcBridge.CallFunction(npcRoutine, npc);
+            newNpc.GetComponent<Properties>().npc = pxNpc;
 
-            var symbolId = PhoenixBridge.VmGothicNpcBridge.GetNpcSymbolId(npc);
-            newNpc.GetComponent<Properties>().DaedalusSymbolId = symbolId;
-
-            if (PhoenixBridge.npcRoutines.TryGetValue(symbolId, out List<BRoutine> routines))
+            if (PhoenixBridge.npcRoutines.TryGetValue(pxNpc.npcPtr, out List<BRoutine> routines))
             {
                 initialSpawnpoint = PhoenixBridge.World.waypoints
                     .FirstOrDefault(item => item.name.ToLower() == routines.First().waypoint.ToLower());
@@ -55,7 +60,7 @@ namespace UZVR.WorldCreator
             newNpc.transform.parent = npcContainer.transform;
         }
 
-        private static void TA_MIN(NpcExternals.TA_MINData data)
+        private static void TA_MIN(VmGothicBridge.TA_MINData data)
         {
             // If we put h=24, DateTime will throw an error instead of rolling.
             var stop_hFormatted = data.stop_h == 24 ? 0 : data.stop_h;
@@ -72,13 +77,9 @@ namespace UZVR.WorldCreator
                 waypoint = data.waypoint
             };
 
-            var symbolId = PhoenixBridge.VmGothicNpcBridge.GetNpcSymbolId(data.npc);
-
             // Add element if key not yet exists.
-            PhoenixBridge.npcRoutines.TryAdd(symbolId, new());
-
-            PhoenixBridge.npcRoutines[symbolId].Add(routine);
-
+            PhoenixBridge.npcRoutines.TryAdd(data.npc, new());
+            PhoenixBridge.npcRoutines[data.npc].Add(routine);
         }
     }
 }

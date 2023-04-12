@@ -22,11 +22,6 @@ namespace UZVR.Phoenix.Bridge
 
             return vdfsPtr;
         }
-
-        public static void DestroyVdfs(IntPtr vdfsPtr)
-        {
-            PxVdf.pxVdfDestroy(vdfsPtr);
-        }
     }
 
 }
