@@ -102,8 +102,8 @@ jobs:
       
       - name: Create Target Directory & copy Build
         run: |
-          mkdir -p /Build/PullRequests/${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
-          mv ${{ matrix.targetPlatform }}/ /Build/PullRequests/${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
+          mkdir -p /builds/PullRequests/PR: ${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
+          mv ${{ matrix.targetDevice }}/ /Build/PullRequests/PR: ${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
       # Output
       #- uses: actions/upload-artifact@v2
       #  with:
