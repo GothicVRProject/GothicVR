@@ -95,18 +95,12 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          #customImage: ${{ matrix.customImage }}
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
           buildMethod: UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
       
       - name: Create Target Directory & copy Build
         run: |
-          mkdir -p /builds/PullRequests/PR: ${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
-          mv ${{ matrix.targetDevice }}/ /Build/PullRequests/PR: ${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
-      # Output
-      #- uses: actions/upload-artifact@v2
-      #  with:
-      #    name: Build-${{ matrix.targetPlatform }}
-      #    path: ${{ matrix.targetPlatform }}/
-      #    if-no-files-found: error
+          mkdir -p /builds/PullRequests/PR:${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
+          mv build/${{ matrix.targetDevice }}/ /Build/PullRequests/PR:${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
+
