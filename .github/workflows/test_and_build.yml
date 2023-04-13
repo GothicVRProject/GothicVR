@@ -61,6 +61,7 @@ jobs:
 
   buildForAllPlatforms:
     name: Build GothicVR for ${{ matrix.targetPlatform }}
+    needs: Unit_Tests
     strategy:
       fail-fast: false
       matrix:
