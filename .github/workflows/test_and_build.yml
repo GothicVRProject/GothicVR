@@ -107,7 +107,7 @@ jobs:
       - name: Create Target Directory & copy Build
         run: |
           mkdir -p ${{ env.TARGET_DIR }}/{{ matrix.targetDevice }}
-          mv /path/to/build ${{ env.TARGET_DIR }}/{{ matrix.targetDevice }}
+          mv ${{ matrix.targetPlatform }}/ ${{ env.TARGET_DIR }}/{{ matrix.targetDevice }}
       # Output
       #- uses: actions/upload-artifact@v2
       #  with:
