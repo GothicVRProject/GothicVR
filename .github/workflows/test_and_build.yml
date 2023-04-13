@@ -5,9 +5,10 @@ on:
     branches:
       - main
     types: [opened, edited]
+    
   push:
     branches:
-      - '*'
+      - 18-create-build-pipeline
 
 jobs:
 
@@ -17,7 +18,6 @@ jobs:
   Unit_Tests:
     name: Test in ${{ matrix.testMode }}
     runs-on: self-hosted
-    if: contains(github.event.head_commit.message, '#build') && github.repository_owner == github.actor
     strategy:
       fail-fast: false
       matrix:
@@ -56,13 +56,12 @@ jobs:
           path: ${{ steps.tests.outputs.coveragePath }}
 
   #########
-  # BUILD # 
+  # BUILD #
   #########
 
   buildForAllPlatforms:
     name: Build GothicVR for ${{ matrix.targetPlatform }}
     needs: Unit_Tests
-    if: contains(github.event.head_commit.message, '#build') && github.repository_owner == github.actor
     strategy:
       fail-fast: false
       matrix:
