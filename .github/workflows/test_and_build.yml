@@ -63,6 +63,10 @@ jobs:
     name: Build GothicVR for ${{ matrix.targetDevice }}
     needs: Unit_Tests
     runs-on: self-hosted
+    env:
+      BUILD_DIR: /Build/PullRequests
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      TARGET_DIR: ${{ env.BUILD_DIR }}/${{ env.PR_NUMBER }} 
     strategy:
       fail-fast: false
       matrix:
@@ -72,11 +76,7 @@ jobs:
           - targetPlatform: Android
             targetDevice: Pico 4
           - targetPlatform: Android
-            targetDevice: Quest2
-    env:
-      BUILD_DIR: /Build/PullRequests
-      PR_NUMBER: ${{ github.event.pull_request.number }}
-      TARGET_DIR: ${{ env.BUILD_DIR }}/${{ env.PR_NUMBER }}  
+            targetDevice: Quest2 
     steps:
       # Checkout
       - name: Checkout repository
