@@ -1,5 +1,6 @@
-﻿using UZVR.Phoenix.Bridge;
-using UZVR.Phoenix.Bridge.Vm.Gothic;
+﻿using PxCs;
+using System;
+using UZVR.Phoenix.Bridge;
 using UZVR.Util;
 
 namespace UZVR.Npc.Hero
@@ -9,10 +10,8 @@ namespace UZVR.Npc.Hero
 
         private void Start()
         {
-            var userPtr = PhoenixBridge.VmGothicNpcBridge.InitNpcInstance("hero");
-            var symbolId = PhoenixBridge.VmGothicNpcBridge.GetNpcSymbolId(userPtr);
-
-            GetComponent<Properties>().DaedalusSymbolId = symbolId;
+            var hero = PxVm.InitializeNpc(PhoenixBridge.VmGothicPtr, "hero");
+            GetComponent<Properties>().npc = hero;
         }
     }
 }

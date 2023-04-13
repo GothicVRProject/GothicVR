@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UZVR.Phoenix.Bridge.Vm.Gothic;
 
 namespace UZVR.Npc
 {
@@ -12,9 +11,7 @@ namespace UZVR.Npc
 
             Debug.Log("Player collission");
 
-            var dialogs = DialogBridge.GetSortedDialogsForNpc(Properties.DaedalusSymbolId);
-
-            // Call dialog
+            // TODO Call dialog
         }
     }
 }
