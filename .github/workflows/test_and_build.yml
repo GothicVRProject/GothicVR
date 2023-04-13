@@ -73,7 +73,6 @@ jobs:
             targetDevice: Pico 4
           - targetPlatform: Android
             targetDevice: Quest2
-    runs-on: ${{ matrix.runnerTag }}
     steps:
       # Checkout
       - name: Checkout repository
