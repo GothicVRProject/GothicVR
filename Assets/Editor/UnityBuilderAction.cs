@@ -11,8 +11,9 @@ namespace UnityBuildTools {
         static string[] SCENES = FindEnabledEditorScenes();
     
         static readonly string APP_NAME = "unZENity-VR";
-        static readonly string TARGET_DIR = "build";
-    
+        static readonly string TARGET_DIR = "/build";
+
+
         [MenuItem("unZENity/CI/Build Quest2")]
         static void PerformQuestBuild()
         {
