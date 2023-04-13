@@ -38,7 +38,6 @@ namespace UZVR.WorldCreator
                 return;
             }
 
-            // FIXME - We need to initialize NPCs via ID not name
             var pxNpc = PxVm.InitializeNpc(PhoenixBridge.VmGothicPtr, (uint)npcInstance);
 
             var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));

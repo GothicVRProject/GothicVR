@@ -16,7 +16,33 @@ namespace UZVR
         private const string G1Dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic";
 
         private bool _loaded = false;
-        void Update()
+
+        private void Start()
+        {
+            VmGothicBridge.DefaultExternalCallback.AddListener(MissingVmExternalCall);
+            PxLogging.pxLoggerSet(PxLoggerCallback);
+        }
+
+        public static void MissingVmExternalCall(IntPtr vmPtr, string missingCallbackName)
+        {
+            Debug.LogWarning($"Method >{missingCallbackName}< not yet implemented in DaedalusVM.");
+        }
+
+        public static void PxLoggerCallback(PxLogging.Level level, string message)
+        {
+            switch(level)
+            {
+                case PxLogging.Level.warn:
+                    Debug.LogWarning(message);
+                    break;
+                case PxLogging.Level.error:
+                    Debug.LogError(message);
+                    break;
+            }
+        }
+
+
+        private void Update()
         {
             // Load after Start() so that other MonoBehaviours can subscribe to DaedalusVM events.
             if (_loaded) return;

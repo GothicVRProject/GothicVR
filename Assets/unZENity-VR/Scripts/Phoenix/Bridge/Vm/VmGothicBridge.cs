@@ -53,7 +53,7 @@ namespace UZVR.Phoenix.Bridge.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "TA_MIN", TA_MIN);
         }
 
-        public static UnityEvent<string> DefaultExternalCallback = new();
+        public static UnityEvent<IntPtr, string> DefaultExternalCallback = new();
         public static UnityEvent<int, string> PhoenixWld_InsertNpc = new();
         public static UnityEvent<TA_MINData> PhoenixTA_MIN = new();
 
@@ -66,7 +66,7 @@ namespace UZVR.Phoenix.Bridge.Vm
             // DEBUG During development
             // Debug.LogError("External >" + value + "< not registered but required by DaedalusVM.");
 
-            DefaultExternalCallback.Invoke(missingCallbackName);
+            DefaultExternalCallback.Invoke(vmPtr, missingCallbackName);
         }
 
         public static void Wld_InsertNpc(IntPtr vmPtr)

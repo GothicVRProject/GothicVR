@@ -63,10 +63,9 @@ namespace UZVR.Phoenix.Bridge
                 var currentSubMesh = subMeshes[materialIndex];
                 var origVertexIndex = vertexIndices[loopVertexIndexId];
 
-                // Gothic meshes are too big for Unity by factor 100.
-                currentSubMesh.vertices.Add(vertices[(int)origVertexIndex].ToUnityVector() / 100);
-                    
-                var featureIndex = (int)featureIndices[loopVertexIndexId];
+                currentSubMesh.vertices.Add(vertices[origVertexIndex].ToUnityVector());
+
+                var featureIndex = featureIndices[loopVertexIndexId];
                 currentSubMesh.uvs.Add(features[featureIndex].texture.ToUnityVector());
                 currentSubMesh.normals.Add(features[featureIndex].normal.ToUnityVector());
 
