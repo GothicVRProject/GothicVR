@@ -56,7 +56,7 @@ jobs:
           path: ${{ steps.tests.outputs.coveragePath }}
 
   #########
-  # BUILD #
+  # BUILD # 
   #########
 
   buildForAllPlatforms:
