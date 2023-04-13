@@ -60,21 +60,19 @@ jobs:
   #########
 
   buildForAllPlatforms:
-    name: Build GothicVR for ${{ matrix.targetPlatform }}
+    name: Build GothicVR for ${{ matrix.targetDevice }}
     needs: Unit_Tests
+    runs-on: self-hosted
     strategy:
       fail-fast: false
       matrix:
         include:
-          - runnerTag: self-hosted
-            targetPlatform: StandaloneWindows64
-            #customImage: Null
-          - runnerTag: self-hosted
-            targetPlatform: Android
-            targetDevice:
-              - pico4
-              - quest2
-            #customImage: 'thogsit/unitycifix:ubuntu-2022.2.1f1-android-1.0.1'
+          - targetPlatform: StandaloneWindows64
+            targetDevice: Windows64
+          - targetPlatform: Android
+            targetDevice: Pico 4
+          - targetPlatform: Android
+            targetDevice: Quest2
     runs-on: ${{ matrix.runnerTag }}
     steps:
       # Checkout
@@ -101,7 +99,7 @@ jobs:
           #customImage: ${{ matrix.customImage }}
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
-          buildMethod: UnityBuildTools.UnityBuilderAction.PerformBuild${{ matrix.targetPlatform }}
+          buildMethod: UnityBuildTools.UnityBuilderAction.PerformBuild${{ matrix.targetDevice }}
 
       # Output
       #- uses: actions/upload-artifact@v2
