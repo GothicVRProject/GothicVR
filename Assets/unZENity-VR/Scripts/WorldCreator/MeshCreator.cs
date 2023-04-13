@@ -52,7 +52,12 @@ namespace UZVR.WorldCreator
             // Load texture for the first time.
             if (!cachedTextures.TryGetValue(bMaterial.texture, out Texture2D cachedTexture))
             {
-                var pxTexture = PxTexture.GetTextureFromVdf(PhoenixBridge.VdfsPtr, bMaterial.texture);
+                var x = (PxTexture.Format.tex_dxt5 | PxTexture.Format.tex_dxt1);
+                // FIXME - There might be more textures to load compressed. Please check for sake of performance!
+                var pxTexture = PxTexture.GetTextureFromVdf(
+                    PhoenixBridge.VdfsPtr,
+                    bMaterial.texture,
+                    PxTexture.Format.tex_dxt1, PxTexture.Format.tex_dxt5);
 
                 // No texture found
                 if (pxTexture == null)
@@ -61,12 +66,10 @@ namespace UZVR.WorldCreator
                     return;
                 }
 
-                var format = pxTexture.GetUnityTextureFormat();
+                var format = pxTexture.format.AsUnityTextureFormat();
                 if (format == 0)
                 {
-                    Debug.LogWarning("Format is not supported or not yet tested to work with Unity:" +
-                        Enum.GetName(typeof(PxTexture.Format), format)
-                    );
+                    Debug.LogWarning($"Format >{pxTexture.format}< is not supported or not yet tested to work with Unity:");
                     return;
                 }
 

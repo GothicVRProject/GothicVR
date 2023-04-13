@@ -6,14 +6,16 @@ namespace UZVR.Util
 {
     public static class PxTextureDataExtension
     {
-        public static TextureFormat GetUnityTextureFormat(this PxTextureData obj)
+        public static TextureFormat AsUnityTextureFormat(this PxTexture.Format format)
         {
-            switch (obj.format)
+            switch (format)
             {
                 case PxTexture.Format.tex_dxt1:
                     return TextureFormat.DXT1;
                 case PxTexture.Format.tex_dxt5:
                     return TextureFormat.DXT5;
+                case PxTexture.Format.tex_B8G8R8A8:
+                    return TextureFormat.Alpha8;
                 default:
                     return 0;
                     //throw new NotSupportedException(
