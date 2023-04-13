@@ -70,9 +70,9 @@ jobs:
           - targetPlatform: StandaloneWindows64
             targetDevice: Windows64
           - targetPlatform: Android
-            targetDevice: Pico 4
+            targetDevice: Pico
           - targetPlatform: Android
-            targetDevice: Quest2 
+            targetDevice: Quest
     steps:
       # Checkout
       - name: Checkout repository
@@ -98,7 +98,7 @@ jobs:
           #customImage: ${{ matrix.customImage }}
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
-          buildMethod: UnityBuildTools.UnityBuilderAction.PerformBuild${{ matrix.targetDevice }}
+          buildMethod: UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
       
       - name: Create Target Directory & copy Build
         run: |
