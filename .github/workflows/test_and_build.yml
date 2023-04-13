@@ -102,5 +102,6 @@ jobs:
       - name: Create Target Directory & copy Build
         run: |
           mkdir -p /builds/PullRequests/PR:${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
-          mv -r build/${{ matrix.targetDevice }} /builds/PullRequests/PR:${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}/
+        #  mv -r build/${{ matrix.targetDevice }} /builds/PullRequests/PR:${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}/
+        rsync -arctuxz --remove-source-files build/${{ matrix.targetDevice }} /builds/PullRequests/PR:${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}/
 

@@ -32,7 +32,7 @@ namespace UnityBuildTools {
 		}
 
 		[MenuItem("unZENity/CI/Build PCVR")]
-		static void PerformPCVRBuild()
+		static void PerformWindows64Build()
 		{
 			string target_path = TARGET_DIR + "/Windows64/" + APP_NAME + ".exe";
 			GenericBuild(SCENES, target_path, BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64, BuildOptions.None);
