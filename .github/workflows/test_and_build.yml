@@ -81,11 +81,11 @@ jobs:
           lfs: true
 
       # Cache
-      - uses: actions/cache@v2
-        with:
-          path: Library
-          key: Library-${{ matrix.targetPlatform }}
-          restore-keys: Library-
+      #- uses: actions/cache@v2
+      #  with:
+      #    path: Library
+      #    key: Library-${{ matrix.targetPlatform }}
+      #    restore-keys: Library-
 
       # Build
       - name: Build project
