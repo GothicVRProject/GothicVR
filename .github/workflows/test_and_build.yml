@@ -73,6 +73,10 @@ jobs:
             targetDevice: Pico 4
           - targetPlatform: Android
             targetDevice: Quest2
+    env:
+      BUILD_DIR: /Build/PullRequests
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      TARGET_DIR: ${{ env.BUILD_DIR }}/${{ env.PR_NUMBER }}  
     steps:
       # Checkout
       - name: Checkout repository
@@ -99,7 +103,11 @@ jobs:
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
           buildMethod: UnityBuildTools.UnityBuilderAction.PerformBuild${{ matrix.targetDevice }}
-
+      
+      - name: Create Target Directory & copy Build
+        run: |
+          mkdir -p ${{ env.TARGET_DIR }}/{{ matrix.targetDevice }}
+          mv /path/to/build ${{ env.TARGET_DIR }}/{{ matrix.targetDevice }}
       # Output
       #- uses: actions/upload-artifact@v2
       #  with:
