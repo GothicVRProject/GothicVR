@@ -28,6 +28,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           lfs: true
+          submodules: false
       - uses: actions/cache@v2
         with:
           path: ${{ matrix.projectPath }}/Library
@@ -79,6 +80,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           lfs: true
+          submodules: false
 
       # Cache
       - uses: actions/cache@v2
