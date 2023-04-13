@@ -45,6 +45,10 @@ namespace UZVR.WorldCreator
 
             meshRenderer.material = material;
 
+            // No texture to add.
+            if (bMaterial.texture == "")
+                return;
+
             // Load texture for the first time.
             if (!cachedTextures.TryGetValue(bMaterial.texture, out Texture2D cachedTexture))
             {
