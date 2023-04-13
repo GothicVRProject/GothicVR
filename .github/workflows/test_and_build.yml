@@ -102,5 +102,5 @@ jobs:
       - name: Create Target Directory & copy Build
         run: |
           mkdir -p /builds/PullRequests/PR:${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
-          mv build/${{ matrix.targetDevice }}/ /Build/PullRequests/PR:${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
+          mv /build/${{ matrix.targetDevice }}/* /Build/PullRequests/PR:${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}/
 
