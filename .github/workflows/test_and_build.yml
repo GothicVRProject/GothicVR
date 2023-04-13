@@ -71,6 +71,9 @@ jobs:
             #customImage: Null
           - runnerTag: self-hosted
             targetPlatform: Android
+            targetDevice:
+              - pico4
+              - quest2
             #customImage: 'thogsit/unitycifix:ubuntu-2022.2.1f1-android-1.0.1'
     runs-on: ${{ matrix.runnerTag }}
     steps:
@@ -86,15 +89,6 @@ jobs:
           path: Library
           key: Library-${{ matrix.targetPlatform }}
           restore-keys: Library-
-
-      # Test (Currently disabled due to resource saving)
-      #- name: Run tests
-      #  uses: game-ci/unity-test-runner@v2
-      #  env:
-      #    UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-      #  with:
-      #    githubToken: ${{ secrets.GITHUB_TOKEN }}
-      #    customImage: 'thogsit/unitycifix:ubuntu-2022.2.1f1-android-1.0.1'
 
       # Build
       - name: Build project
