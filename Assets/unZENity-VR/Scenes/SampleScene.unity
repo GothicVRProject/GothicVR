@@ -289,6 +289,7 @@ MonoBehaviour:
   CreateWaypoints: 1
   CreateWaypointEdges: 1
   EnableDayTime: 1
+  SunMovementPerformanceValue: 1
   EnableNpcRoutines: 1
 --- !u!1 &703127196
 GameObject:

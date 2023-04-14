@@ -6,6 +6,7 @@ using UZVR.Phoenix.Data.Vm.Gothic;
 using UZVR.Phoenix.Interface;
 using UZVR.Phoenix.Util;
 using UZVR.Util;
+using UZVR.World;
 
 namespace UZVR.Npc
 {
@@ -39,7 +40,7 @@ namespace UZVR.Npc
 
         private RoutineData GetCurrentRoutine()
         {
-            var curTime = gameTime.getCurrentDateTime();
+            var curTime = gameTime.GetCurrentDateTime();
 
             var routine = routines.FirstOrDefault(item => (item.start <= curTime && curTime < item.stop));
 
