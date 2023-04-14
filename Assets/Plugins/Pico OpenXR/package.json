@@ -1,0 +1,17 @@
+{
+  "name": "com.unity.xr.openxr.picoxr",
+  "displayName": "OpenXR PICO Plugin",
+  "version": "1.0.0",
+  "unity": "2020.3",
+  "description": "Provides display and input support for PICO devices.",
+  "keywords": [
+    "picoxr",
+    "openxr",
+    "xr",
+    "reality",
+    "xreditorsubsystem"
+  ],
+  "dependencies": {
+    "com.unity.xr.openxr": "1.3.0"
+  }
+}
