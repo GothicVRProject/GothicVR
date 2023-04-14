@@ -29,6 +29,17 @@ unZENity-VR is using the following projects:
 * [phoenix-csharp-interface](https://github.com/GothicKit/phoenix-csharp-interface) (C# endpoint for C interface)
 
 
+# Usage
+
+# Gamers
+*  PCVR - To set folder for Gothic 1 set its location at ./StreamingAssets/GameSettings.json
+*  Quest2/PicoVR - copy the game files inside of Android/data/com.DefaultCompany.unZENity-VR/files
+
+## Developers
+* To set folder for Gothic 1 set its location inside Unity development space at ./Assets/StreamingAssets/GameSettings.dev.json (you need to create this file as it's added to .gitignore)
+
+
+
 ## FAQ
 
 **Q: Why do you use an external framework to parse Gothic assets?**  
