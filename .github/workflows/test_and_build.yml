@@ -30,6 +30,7 @@ jobs:
           lfs: true
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+          clean: true
       - uses: actions/cache@v2
         with:
           path: ${{ matrix.projectPath }}/Library
@@ -83,6 +84,7 @@ jobs:
           lfs: true
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+          clean: true
 
       # Cache
       - uses: actions/cache@v2
