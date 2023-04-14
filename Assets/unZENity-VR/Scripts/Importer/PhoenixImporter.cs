@@ -29,7 +29,7 @@ namespace UZVR.Importer
             if (_loaded) return;
             _loaded = true;
 
-            var G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.G1_path;
+            var G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicIPath;
 
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "Data"));
             var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);

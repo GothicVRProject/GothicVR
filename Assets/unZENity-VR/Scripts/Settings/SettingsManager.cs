@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using UnityEditor;
 using UnityEngine;
 using UZVR.Util;
 
@@ -33,7 +32,7 @@ namespace UZVR.Settings
             if (File.Exists(settingsDevFilePath))
             {
                 var devJson = File.ReadAllText(settingsDevFilePath);
-                EditorJsonUtility.FromJsonOverwrite(devJson, GameSettings);
+                JsonUtility.FromJsonOverwrite(devJson, GameSettings);
             }
         }
     }
