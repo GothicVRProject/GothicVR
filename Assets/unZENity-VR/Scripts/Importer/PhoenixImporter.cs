@@ -29,10 +29,11 @@ namespace UZVR.Importer
             if (_loaded) return;
             _loaded = true;
 
-            if(Application.platform == RuntimePlatform.Android) {
-                var G1Dir=Application.persistentDataPath;
-            }
-            else var G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicIPath;
+            var G1Dir = "";
+            if (Application.platform == RuntimePlatform.Android)
+                G1Dir=Application.persistentDataPath;
+            else
+                G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicIPath;
 
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "Data"));
             var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
