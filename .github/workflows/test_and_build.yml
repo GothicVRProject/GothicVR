@@ -99,13 +99,13 @@ jobs:
           allowDirtyBuild: true
           buildMethod: UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: Build-${{ matrix.targetDevice }}
-          path: build/${{ matrix.targetDevice }}
+      #- uses: actions/upload-artifact@v2
+      #  with:
+      #    name: Build-${{ matrix.targetDevice }}
+      #    path: /tmp/build/${{ matrix.targetDevice }}
 
-      #- name: Create Target Directory & copy Build
-      #  run: |
-      #    mkdir -p /builds/PullRequests/PR:${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
-      #    rsync -arctuxz --remove-source-files build/${{ matrix.targetDevice }} /builds/PullRequests/PR:${{ github.event.pull_request.number }}:${{ github.event.pull_request.head.ref }}/${{ matrix.targetDevice }}/
+      - name: Create Target Directory & copy Build
+        run: |
+          mkdir -p /builds/PullRequests/PR:${{ github.event.pull_request.number }}/${{ matrix.targetDevice }}
+          rsync -arctuxz --remove-source-files /tmp/build/${{ matrix.targetDevice }} /builds/PullRequests/PR:${{ github.event.pull_request.number }}:${{ github.event.pull_request.head.ref }}/${{ matrix.targetDevice }}/
 
