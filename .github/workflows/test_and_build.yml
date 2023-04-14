@@ -96,14 +96,13 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
-          buildsPath: /tmp/build
           allowDirtyBuild: true
           buildMethod: UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
 
       - uses: actions/upload-artifact@v2
         with:
           name: Build-${{ matrix.targetDevice }}
-          path: /tmp/build/${{ matrix.targetDevice }}
+          path: build/${{ matrix.targetDevice }}
           expire-in: 2 days
 
       #- name: Create Target Directory & copy Build
