@@ -1,0 +1,16 @@
+name: Delete build directory
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  delete-build-directory:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Delete build directory
+        run: |
+          rm -rf builds/${{ github.event.pull_request.head.ref }}
