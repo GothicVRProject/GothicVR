@@ -2,7 +2,7 @@ using PxCs;
 using System;
 using System.IO;
 
-namespace UZVR.Phoenix.Bridge
+namespace UZVR.Phoenix.Interface
 {
     public static class VdfsBridge
     {

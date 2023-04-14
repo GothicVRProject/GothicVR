@@ -1,8 +1,7 @@
 ﻿using PxCs;
-using PxCs.Data;
 using UnityEngine;
 
-namespace UZVR.Util
+namespace UZVR.Phoenix.Util
 {
     public static class PxTextureDataExtension
     {

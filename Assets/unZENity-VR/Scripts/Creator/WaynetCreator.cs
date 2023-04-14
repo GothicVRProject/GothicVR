@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using UZVR.Demo;
-using UZVR.Phoenix.World;
+using UZVR.Phoenix.Data;
+using UZVR.Phoenix.Util;
 using UZVR.Util;
 
-namespace UZVR.WorldCreator
+namespace UZVR.Creator
 {
     public class WaynetCreator: SingletonBehaviour<WaynetCreator>
     {
-        public void Create(GameObject root, BWorld world)
+        public void Create(GameObject root, WorldData world)
         {
             var waynetObj = new GameObject(string.Format("Waynet"));
             waynetObj.transform.parent = root.transform;
@@ -17,7 +18,7 @@ namespace UZVR.WorldCreator
             CreateWaypointEdges(waynetObj, world);
         }
 
-        private void CreateWaypoints(GameObject parent, BWorld world)
+        private void CreateWaypoints(GameObject parent, WorldData world)
         {
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateWaypoints)
                 return;
@@ -36,7 +37,7 @@ namespace UZVR.WorldCreator
             }
         }
 
-        private void CreateWaypointEdges(GameObject parent, BWorld world)
+        private void CreateWaypointEdges(GameObject parent, WorldData world)
         {
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateWaypointEdges)
                 return;

@@ -1,15 +1,15 @@
 using PxCs;
 using System;
 using System.Collections.Generic;
-using UZVR.Phoenix.World;
-using UZVR.Util;
-using static UZVR.Phoenix.World.BWorld;
+using UZVR.Phoenix.Data;
+using UZVR.Phoenix.Util;
+using static UZVR.Phoenix.Data.WorldData;
 
-namespace UZVR.Phoenix.Bridge
+namespace UZVR.Phoenix.Interface
 {
     public static class WorldBridge
     {
-        public static BWorld LoadWorld(IntPtr vdfsPtr, string worldName)
+        public static WorldData LoadWorld(IntPtr vdfsPtr, string worldName)
         {
             var worldPtr = PxWorld.pxWorldLoadFromVdf(vdfsPtr, worldName);
             if (worldPtr == IntPtr.Zero)
@@ -19,7 +19,7 @@ namespace UZVR.Phoenix.Bridge
             if (worldMeshPtr == IntPtr.Zero)
                 throw new ArgumentException($"No mesh in world >{worldName}< found.");
 
-            BWorld world = new()
+            WorldData world = new()
             {
                 vertexIndices = PxMesh.GetPolygonVertexIndices(worldMeshPtr),
                 materialIndices = PxMesh.GetPolygonMaterialIndices(worldMeshPtr),
@@ -38,9 +38,9 @@ namespace UZVR.Phoenix.Bridge
             return world;
         }
 
-        public static Dictionary<int, BSubMesh> CreateSubmeshesForUnity(BWorld world)
+        public static Dictionary<int, SubMeshData> CreateSubmeshesForUnity(WorldData world)
         {
-            Dictionary<int, BSubMesh> subMeshes = new(world.materials.Length);
+            Dictionary<int, SubMeshData> subMeshes = new(world.materials.Length);
             var vertices = world.vertices;
             var vertexIndices = world.vertexIndices;
             var featureIndices = world.featureIndices;
@@ -56,7 +56,7 @@ namespace UZVR.Phoenix.Bridge
                 // The materialIndex was never used before.
                 if (!subMeshes.ContainsKey(materialIndex))
                 {
-                    var newSubMesh = new BSubMesh()
+                    var newSubMesh = new SubMeshData()
                     {
                         materialIndex = materialIndex,
                         material = world.materials[materialIndex]

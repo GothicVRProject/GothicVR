@@ -1,20 +1,19 @@
 ﻿using PxCs;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UZVR.Phoenix.Bridge;
-using UZVR.Phoenix.World;
+using UZVR.Phoenix.Data;
+using UZVR.Phoenix.Interface;
+using UZVR.Phoenix.Util;
 using UZVR.Util;
-using static UZVR.Phoenix.World.BWorld;
 
-namespace UZVR.WorldCreator
+namespace UZVR.Creator
 {
     public class MeshCreator: SingletonBehaviour<MeshCreator>
     {
         // Cache helped speed up loading of G1 world textures from 870ms to 230 (~75% speedup)
         private Dictionary<string, Texture2D> cachedTextures = new();
 
-        public void Create(GameObject root, BWorld world)
+        public void Create(GameObject root, WorldData world)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.transform.parent = root.transform;
@@ -37,7 +36,7 @@ namespace UZVR.WorldCreator
             cachedTextures.Clear();
         }
 
-        private void PrepareMeshRenderer(MeshRenderer meshRenderer, BSubMesh subMesh)
+        private void PrepareMeshRenderer(MeshRenderer meshRenderer, WorldData.SubMeshData subMesh)
         {
             var standardShader = Shader.Find("Standard");
             var material = new Material(standardShader);
@@ -52,7 +51,6 @@ namespace UZVR.WorldCreator
             // Load texture for the first time.
             if (!cachedTextures.TryGetValue(bMaterial.texture, out Texture2D cachedTexture))
             {
-                var x = (PxTexture.Format.tex_dxt5 | PxTexture.Format.tex_dxt1);
                 // FIXME - There might be more textures to load compressed. Please check for sake of performance!
                 var pxTexture = PxTexture.GetTextureFromVdf(
                     PhoenixBridge.VdfsPtr,
@@ -87,7 +85,7 @@ namespace UZVR.WorldCreator
             material.mainTexture = cachedTexture;
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, BSubMesh subMesh)
+        private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
         {
             var mesh = new Mesh();
             meshFilter.mesh = mesh;

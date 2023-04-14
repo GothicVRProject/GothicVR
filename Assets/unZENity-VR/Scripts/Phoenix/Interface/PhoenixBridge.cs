@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using UZVR.Phoenix.Vm.Gothic;
-using UZVR.Phoenix.World;
+using UZVR.Phoenix.Data;
+using UZVR.Phoenix.Data.Vm.Gothic;
 
-namespace UZVR.Phoenix.Bridge
+namespace UZVR.Phoenix.Interface
 {
     public static class PhoenixBridge
     {
-        public const string DLLNAME = "libphoenix-csharp-bridge";
-
         public static IntPtr VdfsPtr;
         public static IntPtr VmGothicPtr;
 
-        public static BWorld World;
+        public static WorldData World;
 
         // FIXME Find a better place for the NPC routines. E.g. on the NPCs itself? But we e.g. need to have a static NPCObject List to do so.
-        public static Dictionary<IntPtr, List<BRoutine>> npcRoutines = new();
+        public static Dictionary<IntPtr, List<RoutineData>> npcRoutines = new();
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace UZVR.Util
+namespace UZVR.Phoenix.Util
 {
     public static class NumericsExtension
     {

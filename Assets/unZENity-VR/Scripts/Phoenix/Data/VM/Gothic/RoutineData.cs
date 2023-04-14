@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace UZVR.Phoenix.Vm.Gothic
+namespace UZVR.Phoenix.Data.Vm.Gothic
 {
-    public class BRoutine
+    public class RoutineData
     {
         public int start_h;
         public int start_m;

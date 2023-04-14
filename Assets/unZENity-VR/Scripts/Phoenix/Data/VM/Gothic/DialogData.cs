@@ -1,6 +1,6 @@
-﻿namespace UZVR.Phoenix.Vm.Gothic
+﻿namespace UZVR.Phoenix.Data.Vm.Gothic
 {
-    public class BDialog
+    public class DialogData
     {
         public string description;
         public int npc;

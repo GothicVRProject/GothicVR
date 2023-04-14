@@ -1,6 +1,6 @@
 ﻿using PxCs;
 using System;
-using UZVR.Phoenix.Bridge;
+using UZVR.Phoenix.Interface;
 using UZVR.Util;
 
 namespace UZVR.Npc.Hero

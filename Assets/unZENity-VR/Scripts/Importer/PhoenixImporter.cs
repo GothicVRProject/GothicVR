@@ -4,24 +4,38 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UZVR.Phoenix.Bridge;
-using UZVR.Phoenix.Bridge.Vm;
+using UZVR.Phoenix.Interface;
+using UZVR.Phoenix.Interface.Vm;
 using UZVR.Util;
-using UZVR.WorldCreator;
+using UZVR.Creator;
 
-namespace UZVR
+namespace UZVR.Importer
 {
     public class PhoenixImporter : SingletonBehaviour<PhoenixImporter>
     {
         private const string G1Dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic";
-
         private bool _loaded = false;
+
 
         private void Start()
         {
             VmGothicBridge.DefaultExternalCallback.AddListener(MissingVmExternalCall);
             PxLogging.pxLoggerSet(PxLoggerCallback);
         }
+
+        private void Update()
+        {
+            // Load after Start() so that other MonoBehaviours can subscribe to DaedalusVM events.
+            if (_loaded) return;
+            _loaded = true;
+
+            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "Data"));
+            var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
+
+            LoadWorld(vdfPtr);
+            LoadGothicVM();
+        }
+
 
         public static void MissingVmExternalCall(IntPtr vmPtr, string missingCallbackName)
         {
@@ -39,20 +53,6 @@ namespace UZVR
                     Debug.LogError(message);
                     break;
             }
-        }
-
-
-        private void Update()
-        {
-            // Load after Start() so that other MonoBehaviours can subscribe to DaedalusVM events.
-            if (_loaded) return;
-                _loaded = true;
-
-            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "Data"));
-            var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
-
-            LoadWorld(vdfPtr);
-            LoadGothicVM();
         }
 
         private void LoadWorld(IntPtr vdfPtr)

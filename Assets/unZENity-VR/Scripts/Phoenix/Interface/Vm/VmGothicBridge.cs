@@ -2,7 +2,7 @@
 using System;
 using UnityEngine.Events;
 
-namespace UZVR.Phoenix.Bridge.Vm
+namespace UZVR.Phoenix.Interface.Vm
 {
     /// <summary>
     /// Contains basic methods only available in Gothic Daedalus module.
@@ -13,7 +13,7 @@ namespace UZVR.Phoenix.Bridge.Vm
         {
             var bufferPtr = LoadBuffer(fullDatFilePath);
             var vmPtr = PxVm.pxVmLoad(bufferPtr);
-            PxBuffer.pxBufferDestroy(bufferPtr); // No need any longer
+            PxBuffer.pxBufferDestroy(bufferPtr); // Data isn't needed any longer.
 
             return vmPtr;
         }

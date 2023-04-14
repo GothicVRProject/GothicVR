@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UZVR.Demo;
-using UZVR.Phoenix.Bridge;
-using UZVR.Phoenix.Vm.Gothic;
+using UZVR.Phoenix.Data.Vm.Gothic;
+using UZVR.Phoenix.Interface;
+using UZVR.Phoenix.Util;
 using UZVR.Util;
 
 namespace UZVR.Npc
@@ -12,7 +13,7 @@ namespace UZVR.Npc
     {
         private static readonly int SPEED = 10;
         private GameTime gameTime;
-        public List<BRoutine> routines = new();
+        public List<RoutineData> routines = new();
 
         void Start()
         {
@@ -36,7 +37,7 @@ namespace UZVR.Npc
             gameObject.transform.position = Vector3.MoveTowards(startPosition, waypoint.position.ToUnityVector(), SPEED * Time.deltaTime);
         }
 
-        private BRoutine GetCurrentRoutine()
+        private RoutineData GetCurrentRoutine()
         {
             var curTime = gameTime.getCurrentDateTime();
 

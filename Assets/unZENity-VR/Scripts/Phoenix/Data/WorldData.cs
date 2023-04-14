@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UZVR.Phoenix.World
+namespace UZVR.Phoenix.Data
 {
-    public class BWorld
+    /// <summary>
+    /// Parsed Phoenix World data is arranged in a way to easily be usable by Unity objects.
+    /// E.g. by providing submeshes.
+    /// </summary>
+    public class WorldData
     {
         public int[] vertexIndices; // index to vertices. 3 indices form one triangle.
         public int[] materialIndices; // each key (index) of a vertex_index has a material index in here.
@@ -14,9 +18,9 @@ namespace UZVR.Phoenix.World
         public PxFeatureData[] features;
         public PxMaterialData[] materials;
 
-        public Dictionary<int, BSubMesh> subMeshes;
+        public Dictionary<int, SubMeshData> subMeshes;
 
-        public class BSubMesh
+        public class SubMeshData
         {
             public int materialIndex;
             public PxMaterialData material;

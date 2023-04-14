@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UZVR.Npc;
-using UZVR.Phoenix.Bridge;
-using UZVR.Phoenix.Bridge.Vm;
-using UZVR.Phoenix.Vm.Gothic;
+using UZVR.Phoenix.Data.Vm.Gothic;
+using UZVR.Phoenix.Interface;
+using UZVR.Phoenix.Interface.Vm;
+using UZVR.Phoenix.Util;
 using UZVR.Util;
 
-namespace UZVR.WorldCreator
+namespace UZVR.Creator
 {
     public class NpcCreator : SingletonBehaviour<NpcCreator>
     {
@@ -48,7 +49,7 @@ namespace UZVR.WorldCreator
 
             newNpc.GetComponent<Properties>().npc = pxNpc;
 
-            if (PhoenixBridge.npcRoutines.TryGetValue(pxNpc.npcPtr, out List<BRoutine> routines))
+            if (PhoenixBridge.npcRoutines.TryGetValue(pxNpc.npcPtr, out List<RoutineData> routines))
             {
                 initialSpawnpoint = PhoenixBridge.World.waypoints
                     .FirstOrDefault(item => item.name.ToLower() == routines.First().waypoint.ToLower());
@@ -64,7 +65,7 @@ namespace UZVR.WorldCreator
             // If we put h=24, DateTime will throw an error instead of rolling.
             var stop_hFormatted = data.stop_h == 24 ? 0 : data.stop_h;
 
-            BRoutine routine = new()
+            RoutineData routine = new()
             {
                 start_h = data.start_h,
                 start_m = data.start_m,
