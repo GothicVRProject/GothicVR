@@ -29,6 +29,16 @@ unZENity-VR is using the following projects:
 * [https://github.com/GothicKit/phoenix-csharp-interface](phoenix-csharp-interface) (C# endpoint for C interface)
 
 
+# Usage
+
+# Gamers
+* To set folder for Gothic 1 set its location at ./StreamingAssets/GameSettings.json
+
+## Developers
+* To set folder for Gothic 1 set its location inside Unity development space at ./Assets/StreamingAssets/GameSettings.dev.json (you need to create this file as it's added to .gitignore)
+
+
+
 ## FAQ
 
 **Q: Why do you use an external framework to parse Gothic assets?**  
