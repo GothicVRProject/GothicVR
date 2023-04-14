@@ -71,10 +71,14 @@ namespace UZVR.Creator
                     return;
                 }
 
-                var texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, false);
+                var texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, (int)pxTexture.mipmapCount, false);
 
                 texture.name = bMaterial.texture;
-                texture.LoadRawTextureData(pxTexture.mipmaps[0].mipmap);
+
+                for (var i = 0u; i < pxTexture.mipmapCount; i++)
+                {
+                    texture.SetPixelData(pxTexture.mipmaps[i].mipmap, (int)i);
+                }
 
                 texture.Apply();
 
