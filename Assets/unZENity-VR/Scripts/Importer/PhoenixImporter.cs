@@ -29,7 +29,7 @@ namespace UZVR.Importer
             if (_loaded) return;
             _loaded = true;
 
-            var G1Dir;
+            string G1Dir;
             if (Application.platform == RuntimePlatform.Android)
                 G1Dir=Application.persistentDataPath;
             else
