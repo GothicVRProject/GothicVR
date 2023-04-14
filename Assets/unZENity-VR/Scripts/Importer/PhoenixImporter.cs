@@ -8,12 +8,12 @@ using UZVR.Phoenix.Interface;
 using UZVR.Phoenix.Interface.Vm;
 using UZVR.Util;
 using UZVR.Creator;
+using UZVR.Settings;
 
 namespace UZVR.Importer
 {
     public class PhoenixImporter : SingletonBehaviour<PhoenixImporter>
     {
-        private const string G1Dir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic";
         private bool _loaded = false;
 
 
@@ -29,11 +29,13 @@ namespace UZVR.Importer
             if (_loaded) return;
             _loaded = true;
 
+            var G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.G1_path;
+
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "Data"));
             var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
 
             LoadWorld(vdfPtr);
-            LoadGothicVM();
+            LoadGothicVM(G1Dir);
         }
 
 
@@ -76,7 +78,7 @@ namespace UZVR.Importer
             SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(root, world);
         }
 
-        private void LoadGothicVM()
+        private void LoadGothicVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
             var vmPtr = VmGothicBridge.LoadVm(fullPath);
