@@ -24,7 +24,7 @@ We're always looking for people with knowledge and/or spirit. Feel free to reach
 
 ## Dependencies
 unZENity-VR is using the following projects:
-* [phoenix]([phoenix](https://github.com/GothicKit/phoenix)) (Gothic asset parser)
+* [phoenix](https://github.com/GothicKit/phoenix) (Gothic asset parser)
 * [phoenix-shared-interface](https://github.com/GothicKit/phoenix-shared-interface) (C++ -> C interface)
 * [phoenix-csharp-interface](https://github.com/GothicKit/phoenix-csharp-interface) (C# endpoint for C interface)
 
