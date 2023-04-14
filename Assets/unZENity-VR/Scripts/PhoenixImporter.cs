@@ -57,7 +57,7 @@ namespace UZVR
 
         private void LoadWorld(IntPtr vdfPtr)
         {
-            var world = WorldBridge.LoadWorld(vdfPtr, "world.zen");
+            var world = WorldBridge.LoadWorld(vdfPtr, "world.zen"); // world.zen -> G1, newworld.zen/oldworld.zen/addonworld.zen -> G2
 
             var subMeshes = WorldBridge.CreateSubmeshesForUnity(world);
             world.subMeshes = subMeshes;

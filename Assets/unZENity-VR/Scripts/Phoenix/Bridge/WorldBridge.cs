@@ -12,7 +12,12 @@ namespace UZVR.Phoenix.Bridge
         public static BWorld LoadWorld(IntPtr vdfsPtr, string worldName)
         {
             var worldPtr = PxWorld.pxWorldLoadFromVdf(vdfsPtr, worldName);
+            if (worldPtr == IntPtr.Zero)
+                throw new ArgumentException($"World >{worldName}< couldn't be found.");
+
             var worldMeshPtr = PxWorld.pxWorldGetMesh(worldPtr);
+            if (worldMeshPtr == IntPtr.Zero)
+                throw new ArgumentException($"No mesh in world >{worldName}< found.");
 
             BWorld world = new()
             {
