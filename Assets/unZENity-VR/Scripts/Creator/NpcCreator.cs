@@ -45,7 +45,7 @@ namespace UZVR.Creator
             newNpc.name = string.Format("{0}-{1}", "some NPC - FIXME fetch name", spawnpoint);
             var npcRoutine = pxNpc.routine;
 
-            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, (uint)npcRoutine);
+            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, (uint)npcRoutine, pxNpc.npcPtr);
 
             newNpc.GetComponent<Properties>().npc = pxNpc;
 
