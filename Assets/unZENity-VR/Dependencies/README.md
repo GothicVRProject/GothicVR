@@ -1,1 +1,4 @@
-unZENity-VR is relying on libphoenix-csharp-bridge.dll (*.a for some Windows builds and *.so for linux). Please make sure to have latest working version of the library from https://github.com/GothicVRProject/phoenix-csharp-bridge placed in here.
+This project relies on two dll/so
+
+* PxCs.dll (Managed .NET library; can be used on linux systems as well; extern bridge between libhoenix-shared and Unity)
+* libphoenix-shared.dll (Unmanaged C library; actual Gothic asset parser logic; *.a for some Windows builds and *.so for linux).

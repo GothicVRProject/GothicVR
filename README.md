@@ -13,19 +13,20 @@ We're always looking for people with knowledge and/or spirit. Feel free to reach
 
 ## Workflow/Gameflow
 
-![common interfaces between bridge and unity](./Documentation/Images/common-interfaces-bridge-unity.drawio.png)
-
-* unZENity-VR requests data from phoenix-csharp-bridge DLL.
-* The DLL uses it's compiled phoenix dependency to read Gothic assets.
-* The data is then returned to Unity to build Unity C# objects like Meshes.
-* Unity also registers functions on the DLL to react to Daedalus events.
-
-Below is an example workflow of how data is requested:
 ![data flow](./Documentation/Images/data-flow.drawio.png)
 
 
+1. unZENity-VR requests data from PxCs.dll (.net standard 2.1 shared library which is cross-OS compatibel)
+1. The dll itself forwards request to libphoenix-shared.dll/.so as it includes the original phoenix parser library.
+1. phoenix-shared-interface loads the file system data.
+1. The data is then returned to Unity to build Unity C# objects like Meshes.
+
+
 ## Dependencies
-* unZENity-VR is relying on libphoenix-csharp-bridge (a shared library (.dll/.a/.so): https://github.com/GothicVRProject/phoenix-csharp-bridge.
+unZENity-VR is using the following projects:
+* [https://github.com/GothicKit/phoenix](phoenix) (Gothic asset parser)
+* [https://github.com/GothicKit/phoenix-shared-interface](phoenix-shared-interface) (C++ -> C interface)
+* [https://github.com/GothicKit/phoenix-csharp-interface](phoenix-csharp-interface) (C# endpoint for C interface)
 
 
 ## FAQ
