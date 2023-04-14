@@ -24,7 +24,7 @@ namespace UZVR.Util
         public static T GetOrCreate()
         {
             if (!Created)
-                _instance = GameObject.FindObjectOfType<T>();
+                _instance = FindObjectOfType<T>();
 
             if (!Created)
             {
@@ -61,7 +61,7 @@ namespace UZVR.Util
             else
             {
                 if (dontDestroyOnLoad)
-                    GameObject.DontDestroyOnLoad(gameObject);
+                    DontDestroyOnLoad(gameObject);
 
                 _instance = (T)this;
             }
