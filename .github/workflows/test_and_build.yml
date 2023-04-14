@@ -6,9 +6,9 @@ on:
       - main
     types: [opened, edited]
     
-  push:
-    branches:
-      - 18-create-build-pipeline
+  #push:
+  #  branches:
+  #    - 18-create-build-pipeline
 
 jobs:
 
@@ -100,13 +100,14 @@ jobs:
           allowDirtyBuild: true
           buildMethod: UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
 
-      #- uses: actions/upload-artifact@v2
-      #  with:
-      #    name: Build-${{ matrix.targetDevice }}
-      #    path: /tmp/build/${{ matrix.targetDevice }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Build-${{ matrix.targetDevice }}
+          path: /tmp/build/${{ matrix.targetDevice }}
+          expire-in: 2 days
 
-      - name: Create Target Directory & copy Build
-        run: |
-          mkdir -p /builds/PullRequests/${{ github.event.pull_request.number }}:${{ github.event.pull_request.head.ref }}/${{ matrix.targetDevice }}
-          rsync -arctuxz --remove-source-files /tmp/build/${{ matrix.targetDevice }} /builds/PullRequests/${{ github.event.pull_request.number }}:${{ github.event.pull_request.head.ref }}/${{ matrix.targetDevice }}/
+      #- name: Create Target Directory & copy Build
+      #  run: |
+      #    mkdir -p /builds/PullRequests/${{ github.event.pull_request.number }}:${{ github.event.pull_request.head.ref }}/${{ matrix.targetDevice }}
+      #    rsync -arctuxz --remove-source-files /tmp/build/${{ matrix.targetDevice }} /builds/PullRequests/${{ github.event.pull_request.number }}:${{ github.event.pull_request.head.ref }}/${{ matrix.targetDevice }}/
 
