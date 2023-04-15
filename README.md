@@ -36,7 +36,8 @@ unZENity-VR is using the following projects:
 *  Quest2/PicoVR - copy the game files inside of Android/data/com.DefaultCompany.unZENity-VR/files
 
 ## Developers
-* To set folder for Gothic 1 set its location inside Unity development space at ./Assets/StreamingAssets/GameSettings.dev.json (you need to create this file as it's added to .gitignore)
+* To ```git clone``` the project right, you need to have ```git lfs``` installed. (Otherwise shared libraries inside _/Assets/unZENity-VR/Dependencies_ will be empty and throw exceptions during Unity runs)
+* To set folder for Gothic 1 set its location inside Unity development space at _./Assets/StreamingAssets/GameSettings.dev.json_ (you need to create this file as it's added to .gitignore)
 
 
 
