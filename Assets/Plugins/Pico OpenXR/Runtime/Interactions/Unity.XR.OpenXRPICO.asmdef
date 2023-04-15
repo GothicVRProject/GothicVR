@@ -1,0 +1,28 @@
+{
+    "name": "Unity.XR.OpenXRPico",
+    "rootNamespace": "",
+    "references": [
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:4847341ff46394e83bb78fbd0652937e"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "",
+            "define": ""
+        },
+        {
+            "name": "com.unity.modules.unityanalytics",
+            "expression": "1.0.0",
+            "define": "UNITY_ANALYTICS"
+        }
+    ],
+    "noEngineReferences": false
+}
