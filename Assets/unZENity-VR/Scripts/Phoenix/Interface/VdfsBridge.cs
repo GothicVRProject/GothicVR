@@ -10,7 +10,7 @@ namespace UZVR.Phoenix.Interface
         {
             var vdfsPtr = PxVdf.pxVdfNew("main");
 
-            var vdfPaths = Directory.GetFiles(vdfsDir, "*.vdf");
+            var vdfPaths = Directory.GetFiles(vdfsDir, "*.VDF");
 
             foreach (var vdfPath in vdfPaths)
             {
