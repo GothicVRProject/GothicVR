@@ -21,19 +21,49 @@ namespace UZVR.Settings
 
         private void LoadGameSettings()
         {
-            var settingsFilePath = $"{Application.streamingAssetsPath}/{SETTINGS_FILE_NAME}";
+            var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
             if (!File.Exists(settingsFilePath))
-                throw new ArgumentException("No >GameSettings.json< file exists. Can't load engine.");
+                throw new ArgumentException($"No >GameSettings.json< file exists at >{settingsFilePath}<. Can't load Gothic1.");
 
             var settingsJson = File.ReadAllText(settingsFilePath);
             GameSettings = JsonUtility.FromJson<GameSettings>(settingsJson);
 
-            var settingsDevFilePath = $"{Application.streamingAssetsPath}/{SETTINGS_FILE_NAME_DEV}";
+            var settingsDevFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME_DEV}";
             if (File.Exists(settingsDevFilePath))
             {
                 var devJson = File.ReadAllText(settingsDevFilePath);
                 JsonUtility.FromJsonOverwrite(devJson, GameSettings);
             }
+
+            CheckIfGothicIDirectoryExists();
         }
+
+        /// <summary>
+        /// Return path of settings file based on target architecture.
+        /// As there is no "folder" for an Android build (as it's a packaged .apk file), we need to check within user directory.
+        /// </summary>
+        /// <returns></returns>
+        private string GetRootPath()
+        {
+            if (Application.platform == RuntimePlatform.Android)
+                // https://docs.unity3d.com/ScriptReference/Application-persistentDataPath.html
+                // Will be: /storage/emulated/<userid>/Android/data/<packagename>/files
+                return Application.persistentDataPath;
+            else
+                // https://docs.unity3d.com/ScriptReference/Application-streamingAssetsPath.html
+                // Will be:
+                // 1. Editor: Assets\StreamingAssets\
+                // 2. Standalone: Build\GothicVR_Data\StreamingAssets\
+                return Application.streamingAssetsPath;
+        }
+
+        private void CheckIfGothicIDirectoryExists()
+        {
+            if (!Directory.Exists(GameSettings.GothicIPath))
+                throw new ArgumentException(
+                    $"GothicI installation path wasn't found at >{GameSettings.GothicIPath}<." +
+                    $"Please put in the right absolute path to your local installation.");
+        }
+
     }
 }

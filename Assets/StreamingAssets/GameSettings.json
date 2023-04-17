@@ -1,4 +1,3 @@
 ﻿{
-  "GothicIPath": "TBD - For devs: please set inside GameSettings.dev.json",
-  "GothicIIPath": "TBD - For devs: please set inside GameSettings.dev.json"
+  "GothicIPath": "Path not set! (For gamers: Please put in full path to your GothicI installation. For devs: please set this value inside GameSettings.dev.json)"
 }
