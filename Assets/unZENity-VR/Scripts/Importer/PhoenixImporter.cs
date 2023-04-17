@@ -9,6 +9,7 @@ using UZVR.Phoenix.Interface.Vm;
 using UZVR.Util;
 using UZVR.Creator;
 using UZVR.Settings;
+using TMPro;
 
 namespace UZVR.Importer
 {
@@ -40,6 +41,7 @@ namespace UZVR.Importer
 
             LoadWorld(vdfPtr);
             LoadGothicVM(G1Dir);
+            LoadFonts(vdfPtr);
         }
 
 
@@ -92,6 +94,24 @@ namespace UZVR.Importer
             PhoenixBridge.VmGothicPtr = vmPtr;
 
             PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
+        }
+
+
+        private void LoadFonts(IntPtr vdfPtr)
+        {
+            var defaultFont = FontBridge.LoadFont(vdfPtr, "FONT_DEFAULT.FNT");
+
+            PhoenixBridge.DefaultFont = defaultFont;
+
+            // DEBUG
+            var obj = GameObject.Find("HelloWorld");
+            var textMesh = obj.GetComponent<TMP_Text>();
+
+            textMesh.fontSize = 12;
+
+            textMesh.text = "Is it Gothic font?";
+
+            textMesh.font = defaultFont;
         }
 
 
