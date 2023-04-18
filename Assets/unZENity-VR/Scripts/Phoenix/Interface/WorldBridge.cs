@@ -29,6 +29,8 @@ namespace UZVR.Phoenix.Interface
                 features = PxMesh.GetFeatures(worldMeshPtr),
                 materials = PxMesh.GetMaterials(worldMeshPtr),
 
+                vobs = PxWorld.GetVobs(worldPtr),
+
                 waypoints = PxWorld.GetWayPoints(worldPtr),
                 waypointEdges = PxWorld.GetWayEdges(worldPtr)
             };

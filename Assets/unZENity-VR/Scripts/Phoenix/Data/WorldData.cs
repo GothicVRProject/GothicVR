@@ -31,6 +31,8 @@ namespace UZVR.Phoenix.Data
             public List<Vector3> normals = new();
         }
 
+        public PxVobData[] vobs;
+
         public PxWayPointData[] waypoints;
         public PxWayEdgeData[] waypointEdges;
 

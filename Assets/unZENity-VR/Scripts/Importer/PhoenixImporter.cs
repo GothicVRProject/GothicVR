@@ -79,6 +79,7 @@ namespace UZVR.Importer
             scene.GetRootGameObjects().Append(root);
 
             SingletonBehaviour<MeshCreator>.GetOrCreate().Create(root, world);
+            SingletonBehaviour<VobCreator>.GetOrCreate().Create(root, world);
             SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(root, world);
         }
 
