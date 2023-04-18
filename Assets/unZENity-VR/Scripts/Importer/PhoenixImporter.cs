@@ -10,6 +10,7 @@ using UZVR.Util;
 using UZVR.Creator;
 using UZVR.Settings;
 using TMPro;
+using UnityEngine.TextCore.LowLevel;
 
 namespace UZVR.Importer
 {
@@ -37,7 +38,7 @@ namespace UZVR.Importer
 
             LoadWorld(vdfPtr);
             LoadGothicVM(G1Dir);
-            LoadFonts(vdfPtr);
+            LoadFonts();
         }
 
 
@@ -93,21 +94,41 @@ namespace UZVR.Importer
         }
 
 
-        private void LoadFonts(IntPtr vdfPtr)
+        /// <summary>
+        /// If there are Gothic ttf fonts stored on the current system, we will use them.
+        /// If not, we will stick with a default font.
+        /// </summary>
+        private void LoadFonts()
         {
-            var defaultFont = FontBridge.LoadFont(vdfPtr, "FONT_DEFAULT.FNT");
+            var menuFontPath = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicMenuFontPath;
+            var subtitleFontPath = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicSubtitleFontPath;
 
-            PhoenixBridge.DefaultFont = defaultFont;
+            // FIXME: These values are debug values. They need to be adjusted for optimized results.
+            int faceIndex = 0;
+            int samplingPointSize = 100;
+            int atlasPadding = 0;
+            GlyphRenderMode renderMode = GlyphRenderMode.COLOR;
+            int atlasWidth = 100;
+            int atlasHeight = 100;
 
-            // DEBUG
+
+            if (File.Exists(menuFontPath))
+                PhoenixBridge.GothicMenuFont = TMP_FontAsset.CreateFontAsset(menuFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
+
+            if (File.Exists(subtitleFontPath))
+                PhoenixBridge.GothicMenuFont = TMP_FontAsset.CreateFontAsset(subtitleFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
+
+            // DEBUG - Example to show how the font is being picked.
             var obj = GameObject.Find("HelloWorld");
             var textMesh = obj.GetComponent<TMP_Text>();
 
-            textMesh.fontSize = 12;
+            textMesh.fontSize = 50;
+            textMesh.autoSizeTextContainer = true;
 
             textMesh.text = "Is it Gothic font?";
 
-            textMesh.font = defaultFont;
+            if (PhoenixBridge.GothicMenuFont)
+                textMesh.font = PhoenixBridge.GothicMenuFont;
         }
 
 
