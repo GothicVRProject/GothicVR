@@ -5,7 +5,7 @@ using UZVR.Util;
 
 namespace UZVR.Settings
 {
-    public class SettingsManager: SingletonBehaviour<SettingsManager>
+    public class SettingsManager : SingletonBehaviour<SettingsManager>
     {
         public GameSettings GameSettings { get; private set; }
 
@@ -23,10 +23,17 @@ namespace UZVR.Settings
         {
             var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
             if (!File.Exists(settingsFilePath))
-                throw new ArgumentException($"No >GameSettings.json< file exists at >{settingsFilePath}<. Can't load Gothic1.");
+                if (Application.platform == RuntimePlatform.Android)
+                    CopyGameSettingsForAndroidBuild();
+                else
+                    throw new ArgumentException($"No >GameSettings.json< file exists at >{settingsFilePath}<. Can't load Gothic1.");
 
             var settingsJson = File.ReadAllText(settingsFilePath);
             GameSettings = JsonUtility.FromJson<GameSettings>(settingsJson);
+
+            // We ignore the "GothicIPath" field which is found in GameSettings for Android
+            if (Application.platform == RuntimePlatform.Android)
+                GameSettings.GothicIPath = GetRootPath();
 
             var settingsDevFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME_DEV}";
             if (File.Exists(settingsDevFilePath))
@@ -65,5 +72,28 @@ namespace UZVR.Settings
                     $"Please put in the right absolute path to your local installation.");
         }
 
+        /// <summary>
+        /// Import the settings file from streamingAssetPath to persistentDataPath.
+        /// Since the settings file is in streamingAssetPath, we need to use UnityWebRequest to move it so we can have access to it
+        /// as detailed here https://docs.unity3d.com/ScriptReference/Application-streamingAssetsPath.html
+        /// </summary>
+        private void CopyGameSettingsForAndroidBuild()
+        {
+            string GameSettingsPath = System.IO.Path.Combine(Application.streamingAssetsPath, $"{SETTINGS_FILE_NAME}");
+            string result = "";
+            if (GameSettingsPath.Contains("://") || GameSettingsPath.Contains(":///"))
+            {
+                UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(GameSettingsPath);
+                www.SendWebRequest();
+                // Wait until async download is done
+                while (!www.isDone) { }
+                result = www.downloadHandler.text;
+            }
+            else
+                result = System.IO.File.ReadAllText(GameSettingsPath);
+
+            string FinalPath = System.IO.Path.Combine(Application.persistentDataPath, $"{SETTINGS_FILE_NAME}");
+            File.WriteAllText(FinalPath, result);
+        }
     }
 }
