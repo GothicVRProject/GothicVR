@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.IO;
 using UnityEngine;
 using UZVR.Util;
 
 namespace UZVR.Settings
 {
-    public class SettingsManager: SingletonBehaviour<SettingsManager>
+    public class SettingsManager : SingletonBehaviour<SettingsManager>
     {
         public GameSettings GameSettings { get; private set; }
 
@@ -26,10 +26,14 @@ namespace UZVR.Settings
                 if (Application.platform == RuntimePlatform.Android)
                     Importer();
                 else
-                throw new ArgumentException($"No >GameSettings.json< file exists at >{settingsFilePath}<. Can't load Gothic1.");
+                    throw new ArgumentException($"No >GameSettings.json< file exists at >{settingsFilePath}<. Can't load Gothic1.");
 
             var settingsJson = File.ReadAllText(settingsFilePath);
             GameSettings = JsonUtility.FromJson<GameSettings>(settingsJson);
+
+            // We ignore the "GothicIPath" field which is found in GameSettings for Android
+            if (Application.platform == RuntimePlatform.Android)
+                GameSettings.GothicIPath = GetRootPath();
 
             var settingsDevFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME_DEV}";
             if (File.Exists(settingsDevFilePath))
@@ -38,7 +42,7 @@ namespace UZVR.Settings
                 JsonUtility.FromJsonOverwrite(devJson, GameSettings);
             }
 
-            CheckIfGothicIDirectoryExists();
+                CheckIfGothicIDirectoryExists();
         }
 
         /// <summary>
