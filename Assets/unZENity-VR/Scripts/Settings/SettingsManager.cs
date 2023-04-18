@@ -23,6 +23,9 @@ namespace UZVR.Settings
         {
             var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
             if (!File.Exists(settingsFilePath))
+                if (Application.platform == RuntimePlatform.Android)
+                    Importer();
+                else
                 throw new ArgumentException($"No >GameSettings.json< file exists at >{settingsFilePath}<. Can't load Gothic1.");
 
             var settingsJson = File.ReadAllText(settingsFilePath);
