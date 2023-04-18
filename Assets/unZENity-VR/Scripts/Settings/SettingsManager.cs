@@ -24,7 +24,7 @@ namespace UZVR.Settings
             var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
             if (!File.Exists(settingsFilePath))
                 if (Application.platform == RuntimePlatform.Android)
-                    Importer();
+                    CopyGameSettingsForAndroidBuild();
                 else
                     throw new ArgumentException($"No >GameSettings.json< file exists at >{settingsFilePath}<. Can't load Gothic1.");
 
@@ -42,7 +42,7 @@ namespace UZVR.Settings
                 JsonUtility.FromJsonOverwrite(devJson, GameSettings);
             }
 
-                CheckIfGothicIDirectoryExists();
+            CheckIfGothicIDirectoryExists();
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace UZVR.Settings
         /// Since the settings file is in streamingAssetPath, we need to use UnityWebRequest to move it so we can have access to it
         /// as detailed here https://docs.unity3d.com/ScriptReference/Application-streamingAssetsPath.html
         /// </summary>
-        private void Importer()
+        private void CopyGameSettingsForAndroidBuild()
         {
             string GameSettingsPath = System.IO.Path.Combine(Application.streamingAssetsPath, $"{SETTINGS_FILE_NAME}");
             string result = "";
