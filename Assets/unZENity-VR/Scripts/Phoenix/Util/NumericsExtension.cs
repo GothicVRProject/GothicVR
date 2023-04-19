@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 
 namespace UZVR.Phoenix.Util
 {
@@ -33,5 +34,24 @@ namespace UZVR.Phoenix.Util
                 return vector;
         }
 
+
+        public static UnityEngine.Vector3[] ToUnityArray(this Vector3[] array)
+        {
+            return Array.ConvertAll(array, item => new UnityEngine.Vector3()
+            {
+                x = item.X,
+                y = item.Y,
+                z = item.Z
+            });
+        }
+
+        public static UnityEngine.Vector2[] ToUnityArray(this Vector2[] array)
+        {
+            return Array.ConvertAll(array, item => new UnityEngine.Vector2()
+            {
+                x = item.X,
+                y = item.Y
+            });
+        }
     }
 }

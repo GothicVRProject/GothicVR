@@ -1,4 +1,5 @@
 ﻿using PxCs;
+using PxCs.Extensions;
 using System;
 using UnityEngine.Events;
 
@@ -71,7 +72,7 @@ namespace UZVR.Phoenix.Interface.Vm
 
         public static void Wld_InsertNpc(IntPtr vmPtr)
         {
-            var spawnpoint = PxVm.pxVmStackPopString(vmPtr);
+            var spawnpoint = PxVm.VmStackPopString(vmPtr);
             var npcInstance = PxVm.pxVmStackPopInt(vmPtr);
 
             PhoenixWld_InsertNpc.Invoke(npcInstance, spawnpoint);
@@ -79,7 +80,7 @@ namespace UZVR.Phoenix.Interface.Vm
 
         public static void TA_MIN(IntPtr vmPtr)
         {
-            var waypoint = PxVm.pxVmStackPopString(vmPtr);
+            var waypoint = PxVm.VmStackPopString(vmPtr);
             var action = PxVm.pxVmStackPopInt(vmPtr);
             var stop_m = PxVm.pxVmStackPopInt(vmPtr);
             var stop_h = PxVm.pxVmStackPopInt(vmPtr);
