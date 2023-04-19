@@ -19,20 +19,32 @@ namespace UZVR.Phoenix.Interface
             if (worldMeshPtr == IntPtr.Zero)
                 throw new ArgumentException($"No mesh in world >{worldName}< found.");
 
+            var vertexIndices = PxMesh.GetPolygonVertexIndices(worldMeshPtr);
+            var materialIndices = PxMesh.GetPolygonMaterialIndices(worldMeshPtr);
+            var featureIndices = PxMesh.GetPolygonFeatureIndices(worldMeshPtr);
+
+            var vertices = PxMesh.GetVertices(worldMeshPtr);
+            var features = PxMesh.GetFeatures(worldMeshPtr);
+            var materials = PxMesh.GetMaterials(worldMeshPtr);
+
+            var waypoints = PxWorld.GetWayPoints(worldPtr);
+            var waypointEdges = PxWorld.GetWayEdges(worldPtr);
+
             WorldData world = new()
             {
-                vertexIndices = PxMesh.GetPolygonVertexIndices(worldMeshPtr),
-                materialIndices = PxMesh.GetPolygonMaterialIndices(worldMeshPtr),
-                featureIndices = PxMesh.GetPolygonFeatureIndices(worldMeshPtr),
+                vertexIndices = vertexIndices,
+                materialIndices = materialIndices,
+                featureIndices = featureIndices,
 
-                vertices = PxMesh.GetVertices(worldMeshPtr),
-                features = PxMesh.GetFeatures(worldMeshPtr),
-                materials = PxMesh.GetMaterials(worldMeshPtr),
+                vertices = vertices,
+                features = features,
+                materials = materials,
+
 
                 vobs = PxWorld.GetVobs(worldPtr),
 
-                waypoints = PxWorld.GetWayPoints(worldPtr),
-                waypointEdges = PxWorld.GetWayEdges(worldPtr)
+                waypoints = waypoints,
+                waypointEdges = waypointEdges
             };
 
             PxWorld.pxWorldDestroy(worldPtr);

@@ -9,6 +9,7 @@ using UZVR.Phoenix.Interface.Vm;
 using UZVR.Util;
 using UZVR.Creator;
 using UZVR.Settings;
+using AOT;
 
 namespace UZVR.Importer
 {
@@ -29,11 +30,7 @@ namespace UZVR.Importer
             if (_loaded) return;
             _loaded = true;
 
-            string G1Dir;
-            if (Application.platform == RuntimePlatform.Android)
-                G1Dir=Application.persistentDataPath;
-            else
-                G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicIPath;
+            var G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicIPath;
 
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "Data"));
             var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
@@ -48,6 +45,7 @@ namespace UZVR.Importer
             Debug.LogWarning($"Method >{missingCallbackName}< not yet implemented in DaedalusVM.");
         }
 
+        [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]
         public static void PxLoggerCallback(PxLogging.Level level, string message)
         {
             switch(level)

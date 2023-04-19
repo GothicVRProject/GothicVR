@@ -302,7 +302,8 @@ MonoBehaviour:
   dontDestroyOnLoad: 0
   CreateWaypoints: 1
   CreateWaypointEdges: 1
-  EnableDayTime: 0
+  EnableDayTime: 1
+  SunMovementPerformanceValue: 2
   EnableNpcRoutines: 0
 --- !u!1 &703127196
 GameObject:
