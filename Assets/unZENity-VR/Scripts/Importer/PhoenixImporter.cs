@@ -9,6 +9,7 @@ using UZVR.Phoenix.Interface.Vm;
 using UZVR.Util;
 using UZVR.Creator;
 using UZVR.Settings;
+using AOT;
 
 namespace UZVR.Importer
 {
@@ -44,6 +45,7 @@ namespace UZVR.Importer
             Debug.LogWarning($"Method >{missingCallbackName}< not yet implemented in DaedalusVM.");
         }
 
+        [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]
         public static void PxLoggerCallback(PxLogging.Level level, string message)
         {
             switch(level)
