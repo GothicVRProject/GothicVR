@@ -14,6 +14,10 @@ namespace UZVR.Creator
 {
     public class VobCreator: SingletonBehaviour<VobCreator>
     {
+        // Needs to be changed to the real value. (But for now: Without it potions are big as houses. :-) )
+        private const int DEBUG_ITEM_SCALE = 45;
+
+
         // Cache helped speed up loading of G1 world textures from 870ms to 230 (~75% speedup)
         private Dictionary<string, Texture2D> cachedTextures = new();
 
@@ -26,7 +30,7 @@ namespace UZVR.Creator
 
             foreach (var vob in itemVobs)
             {
-                // FIXME: Add caching of MRM as object will be most likely be created multiple times inside scene.
+                // FIXME: Add caching of MRM as object will be created multiple times inside a scene.
                 var mrm = PxMRM.GetMRMFromVdf(PhoenixBridge.VdfsPtr, $"{vob.vobName}.MRM");
 
                 if (mrm == null)
@@ -44,7 +48,7 @@ namespace UZVR.Creator
                 {
                     PrepareMeshRenderer(meshRenderer, mrm);
                     PrepareMeshFilter(meshFilter, mrm);
-                    //                meshCollider.sharedMesh = meshFilter.mesh;
+                    meshCollider.sharedMesh = meshFilter.mesh;
                 }
                 catch (ArgumentOutOfRangeException e)
                 {
@@ -53,6 +57,8 @@ namespace UZVR.Creator
                     continue;
                 }
 
+                meshObj.transform.position = vob.position.ToUnityVector();
+                meshObj.transform.localScale /= DEBUG_ITEM_SCALE;
                 meshObj.transform.parent = vobRootObj.transform;
             }
 
@@ -119,10 +125,14 @@ namespace UZVR.Creator
                     return;
                 }
 
-                var texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, false);
+                var texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, (int)pxTexture.mipmapCount, false);
 
                 texture.name = materialData.texture;
-                texture.LoadRawTextureData(pxTexture.mipmaps[0].mipmap);
+
+                for (var i = 0u; i < pxTexture.mipmapCount; i++)
+                {
+                    texture.SetPixelData(pxTexture.mipmaps[i].mipmap, (int)i);
+                }
 
                 texture.Apply();
 
@@ -141,12 +151,19 @@ namespace UZVR.Creator
             if (mrmData.subMeshes.Length != 1)
                 throw new ArgumentOutOfRangeException("Currently it's only supported to have exact 1 subMesh for VobMRMs.");
 
-            mesh.SetVertices(mrmData.positions.ToUnityArray());
-            mesh.SetTriangles(mrmData.subMeshes.First().triangles.ToUnityTriangles(), 0);
+            var triangles = mrmData.subMeshes.First().triangles;
+            var wedges = mrmData.subMeshes.First().wedges;
 
-//            mesh.SetTriangles(mrmData.triangles, 0);
-//            mesh.SetTriangles(mrmData.triangles, 0);
-//            mesh.SetUVs(0, mrmData.uvs);
+
+            // We need to flip [a,b,c] => [c,b,a]. Otherwise mesh is drawn wrong side.
+            var preparedVertices = mrmData.positions.ToUnityArray();
+            var preparedTriangles = triangles.SelectMany(i => new int[]{wedges[i.c].index, wedges[i.b].index, wedges[i.a].index}).ToArray();
+            var preparedUVs = triangles.SelectMany(i => new Vector2[] { wedges[i.c].texture.ToUnityVector(), wedges[i.b].texture.ToUnityVector(), wedges[i.a].texture.ToUnityVector() }).ToArray();
+            
+            mesh.SetVertices(preparedVertices);
+            mesh.SetTriangles(preparedTriangles, 0);
+            // FIXME - We need to check how uv==vertices count was set within world meshes (I think we needed to create a new vertex for every triangle. No reuse!).
+            mesh.SetUVs(0, preparedUVs);
         }
     }
 }
