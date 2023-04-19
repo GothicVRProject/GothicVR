@@ -5,6 +5,7 @@ namespace UZVR.Demo
     public class DebugSettings: SingletonBehaviour<DebugSettings>
     {
         public bool CreateWaypoints;
+        public bool CreateVobs;
         public bool CreateWaypointEdges;
 
         public bool EnableDayTime;

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using UnityEngine;
+using UZVR.Demo;
 using UZVR.Phoenix.Data;
 using UZVR.Phoenix.Interface;
 using UZVR.Phoenix.Util;
@@ -24,6 +25,9 @@ namespace UZVR.Creator
 
         public void Create(GameObject root, WorldData world)
         {
+            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
+                return;
+
             var itemVobs = GetFlattenedVobsByType(world.vobs, PxWorld.PxVobType.PxVob_oCItem);
             var vobRootObj = new GameObject("Vobs");
             vobRootObj.transform.parent = root.transform;
