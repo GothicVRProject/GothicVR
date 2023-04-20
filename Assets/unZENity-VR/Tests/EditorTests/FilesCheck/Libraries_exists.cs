@@ -11,7 +11,7 @@ public class Libraries_exists
     [Test]
     public void Libraries_existsSimplePasses()
     {
-        string filePath = "Assets/Tests/EditorTests/FilesCheck/dll-List.txt";
+        string filePath = "Assets/unZENity-VR/Tests/EditorTests/FilesCheck/dll-List.txt";
         Assert.IsTrue(File.Exists(filePath), "File " + filePath + " not found.");
 
         string[] dllFiles = File.ReadAllLines(filePath);
