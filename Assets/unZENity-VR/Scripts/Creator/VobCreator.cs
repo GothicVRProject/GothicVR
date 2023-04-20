@@ -55,6 +55,25 @@ namespace UZVR.Creator
                     continue;
                 }
 
+
+                // Rotations from Gothic are a 3x3 matrix.
+                // According to this blog post, we can leverage it to be used the right way automatically:
+                // @see https://forum.unity.com/threads/convert-3x3-rotation-matrix-to-euler-angles.1086392/#post-7002275
+                // Hint 1: The matrix is transposed, i.e. we needed to change e.g. m01=[0,1] to m01=[1,0]
+                // Hint 2: m33 needs to be 1
+                var rotationMatrix = vob.rotation.matrix;
+                var matrix4x4 = new Matrix4x4();
+                matrix4x4.m00 = rotationMatrix[0, 0];
+                matrix4x4.m01 = rotationMatrix[1, 0];
+                matrix4x4.m02 = rotationMatrix[2, 0];
+                matrix4x4.m10 = rotationMatrix[0, 1];
+                matrix4x4.m11 = rotationMatrix[1, 1];
+                matrix4x4.m12 = rotationMatrix[2, 1];
+                matrix4x4.m20 = rotationMatrix[0, 2];
+                matrix4x4.m21 = rotationMatrix[1, 2];
+                matrix4x4.m22 = rotationMatrix[2, 2];
+                matrix4x4.m33 = 1;
+                meshObj.transform.rotation = matrix4x4.rotation;
                 meshObj.transform.position = vob.position.ToUnityVector();
                 meshObj.transform.parent = vobRootObj.transform;
             }
