@@ -17,7 +17,6 @@ namespace UZVR.Creator
         // Cache helped speed up loading of G1 world textures from 870ms to 230 (~75% speedup)
         private Dictionary<string, Texture2D> cachedTextures = new();
 
-
         public void Create(GameObject root, WorldData world)
         {
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
@@ -26,8 +25,6 @@ namespace UZVR.Creator
             var itemVobs = GetFlattenedVobsByType(world.vobs, PxWorld.PxVobType.PxVob_oCItem);
             var vobRootObj = new GameObject("Vobs");
             vobRootObj.transform.parent = root.transform;
-
-//            var DEBUG_ELEMENTS = itemVobs.Take(5);
 
             foreach (var vob in itemVobs)
             {
@@ -168,7 +165,7 @@ namespace UZVR.Creator
              *  
              *  If we now take first triangle and prepare it for Unity, we would get the following:
              *  vertices = 0[x0,...], 2[x2,...], 1[x1,...] --> as triangles point to a wedge and wedge index points to the position-index itself.
-             *  triangles = 0, 2, 3 --> 3 would normally be 2, but! we can never reuse positions. We always need to create new ones. (Reason: uvs demand the same size as vertices.)
+             *  triangles = 0, 2, 3 --> (indices for position items); ATTENTION: index 3 would normally be index 2, but! we can never reuse positions. We always need to create new ones. (Reason: uvs demand the same size as vertices.)
              *  uvs = [wedge[0].texture], [wedge[2].texture], [wedge[1].texture]
              */
 
