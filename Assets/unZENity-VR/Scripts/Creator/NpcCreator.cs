@@ -1,4 +1,4 @@
-﻿using PxCs;
+using PxCs;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -42,7 +42,7 @@ namespace UZVR.Creator
             var pxNpc = PxVm.InitializeNpc(PhoenixBridge.VmGothicPtr, (uint)npcInstance);
 
             var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
-            newNpc.name = string.Format("{0}-{1}", "some NPC - FIXME fetch name", spawnpoint);
+            newNpc.name = string.Format("{0}-{1}", string.Concat(pxNpc.names), spawnpoint);
             var npcRoutine = pxNpc.routine;
 
             PxVm.CallFunction(PhoenixBridge.VmGothicPtr, (uint)npcRoutine, pxNpc.npcPtr);

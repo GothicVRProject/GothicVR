@@ -1,0 +1,6 @@
+<linker>
+	<!-- On arm64 (Pico 4) we got Codepage error that Windows-1252 isn't installed. But if we set these two entries, it works! -->
+	<!-- Hint: For Windows build we still need to store the I18N.West.dll into ./Dependencies folder (Seems like link.xml is only been used for arm64) -->
+	<assembly fullname="I18N" preserve="all" />
+	<assembly fullname="I18N.West" preserve="all" />
+</linker>

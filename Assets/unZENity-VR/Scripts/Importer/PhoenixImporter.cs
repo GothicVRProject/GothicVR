@@ -11,6 +11,7 @@ using UZVR.Creator;
 using UZVR.Settings;
 using TMPro;
 using UnityEngine.TextCore.LowLevel;
+using AOT;
 
 namespace UZVR.Importer
 {
@@ -47,6 +48,7 @@ namespace UZVR.Importer
             Debug.LogWarning($"Method >{missingCallbackName}< not yet implemented in DaedalusVM.");
         }
 
+        [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]
         public static void PxLoggerCallback(PxLogging.Level level, string message)
         {
             switch(level)
