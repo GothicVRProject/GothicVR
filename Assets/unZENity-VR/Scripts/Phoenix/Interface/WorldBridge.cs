@@ -82,6 +82,7 @@ namespace UZVR.Phoenix.Interface
                 var currentSubMesh = subMeshes[materialIndex];
                 var origVertexIndex = vertexIndices[loopVertexIndexId];
 
+                // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
                 currentSubMesh.vertices.Add(vertices[origVertexIndex].ToUnityVector());
 
                 var featureIndex = featureIndices[loopVertexIndexId];

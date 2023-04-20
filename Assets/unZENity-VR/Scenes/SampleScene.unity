@@ -301,6 +301,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   CreateWaypoints: 1
+  CreateVobs: 1
   CreateWaypointEdges: 1
   EnableDayTime: 1
   SunMovementPerformanceValue: 2

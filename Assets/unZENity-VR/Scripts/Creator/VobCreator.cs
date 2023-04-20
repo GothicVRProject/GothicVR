@@ -3,7 +3,6 @@ using PxCs.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using UnityEngine;
 using UZVR.Demo;
 using UZVR.Phoenix.Data;
@@ -15,10 +14,6 @@ namespace UZVR.Creator
 {
     public class VobCreator: SingletonBehaviour<VobCreator>
     {
-        // Needs to be changed to the real value. (But for now: Without it potions are big as houses. :-) )
-        private const int DEBUG_ITEM_SCALE = 45;
-
-
         // Cache helped speed up loading of G1 world textures from 870ms to 230 (~75% speedup)
         private Dictionary<string, Texture2D> cachedTextures = new();
 
@@ -31,6 +26,8 @@ namespace UZVR.Creator
             var itemVobs = GetFlattenedVobsByType(world.vobs, PxWorld.PxVobType.PxVob_oCItem);
             var vobRootObj = new GameObject("Vobs");
             vobRootObj.transform.parent = root.transform;
+
+//            var DEBUG_ELEMENTS = itemVobs.Take(5);
 
             foreach (var vob in itemVobs)
             {
@@ -62,7 +59,6 @@ namespace UZVR.Creator
                 }
 
                 meshObj.transform.position = vob.position.ToUnityVector();
-                meshObj.transform.localScale /= DEBUG_ITEM_SCALE;
                 meshObj.transform.parent = vobRootObj.transform;
             }
 
@@ -73,9 +69,6 @@ namespace UZVR.Creator
         /// <summary>
         /// Convenient method to return specific vob elements in recursive list of PxVobData.childVobs...
         /// </summary>
-        /// <param name="vobsToFilter"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
         private List<PxVobData> GetFlattenedVobsByType(PxVobData[] vobsToFilter, PxWorld.PxVobType type)
         {
             var returnVobs = new List<PxVobData>();
@@ -155,18 +148,61 @@ namespace UZVR.Creator
             if (mrmData.subMeshes.Length != 1)
                 throw new ArgumentOutOfRangeException("Currently it's only supported to have exact 1 subMesh for VobMRMs.");
 
+            var vertices = mrmData.positions;
             var triangles = mrmData.subMeshes.First().triangles;
             var wedges = mrmData.subMeshes.First().wedges;
 
 
-            // We need to flip [a,b,c] => [c,b,a]. Otherwise mesh is drawn wrong side.
-            var preparedVertices = mrmData.positions.ToUnityArray();
-            var preparedTriangles = triangles.SelectMany(i => new int[]{wedges[i.c].index, wedges[i.b].index, wedges[i.a].index}).ToArray();
-            var preparedUVs = triangles.SelectMany(i => new Vector2[] { wedges[i.c].texture.ToUnityVector(), wedges[i.b].texture.ToUnityVector(), wedges[i.a].texture.ToUnityVector() }).ToArray();
-            
+            /**
+             * Ok, brace yourself:
+             * There are three parameters of interest when it comes to creating meshes for items (etc.).
+             * 1. positions - Unity: vertices (=Vector3)
+             * 2. triangles - contains 3 indices to wedges.
+             * 3. wedges - contains indices (Unity: triangles) to the positions (Unity: vertices) and textures (Unity: uvs (=Vector2)).
+             * 
+             * Data example:
+             *  positions: 0=>[x1,x2,x3], 0=>[x2,y2,z2], 0=>[x3,y3,z3]
+             *  submesh:
+             *    triangles: [0, 2, 1], [1, 2, 3]
+             *    wedges: 0=>[index=0, texture=...], 1=>[index=2, texture=...], 2=>[index=2, texture=...]
+             *  
+             *  If we now take first triangle and prepare it for Unity, we would get the following:
+             *  vertices = 0[x0,...], 2[x2,...], 1[x1,...] --> as triangles point to a wedge and wedge index points to the position-index itself.
+             *  triangles = 0, 2, 3 --> 3 would normally be 2, but! we can never reuse positions. We always need to create new ones. (Reason: uvs demand the same size as vertices.)
+             *  uvs = [wedge[0].texture], [wedge[2].texture], [wedge[1].texture]
+             */
+
+            // Size is predictable:
+            // 1. vertices.count == triangleIndices.size == uv.size
+            // 2. triangles from Phoenix are 3 indices. Therefore final Unity size is *3
+            var preparedVertices = new Vector3[triangles.Length * 3];
+            var preparedTriangles = new int[triangles.Length * 3];
+            var preparedUVs = new Vector2[triangles.Length * 3];
+
+            for (var i = 0; i < triangles.Length; i++)
+            {
+                // One triangle is made of 3 elements for Unity. We therefore need to prepare 3 elements within one loop.
+                var preparedIndex = i * 3;
+
+                var index1 = wedges[triangles[i].c];
+                var index2 = wedges[triangles[i].b];
+                var index3 = wedges[triangles[i].a];
+
+                preparedVertices[preparedIndex] = vertices[index1.index].ToUnityVector();
+                preparedVertices[preparedIndex + 1] = vertices[index2.index].ToUnityVector();
+                preparedVertices[preparedIndex + 2] = vertices[index3.index].ToUnityVector();
+
+                preparedTriangles[preparedIndex] = preparedIndex;
+                preparedTriangles[preparedIndex + 1] = preparedIndex +1;
+                preparedTriangles[preparedIndex + 2] = preparedIndex +2;
+
+                preparedUVs[preparedIndex] = index1.texture.ToUnityVector();
+                preparedUVs[preparedIndex + 1] = index2.texture.ToUnityVector();
+                preparedUVs[preparedIndex + 2] = index3.texture.ToUnityVector();
+            }
+
             mesh.SetVertices(preparedVertices);
             mesh.SetTriangles(preparedTriangles, 0);
-            // FIXME - We need to check how uv==vertices count was set within world meshes (I think we needed to create a new vertex for every triangle. No reuse!).
             mesh.SetUVs(0, preparedUVs);
         }
     }
