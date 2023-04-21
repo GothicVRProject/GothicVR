@@ -2,7 +2,7 @@
 
 ![Platforms](https://img.shields.io/static/v1?label=Platforms&message=PCVR%20|%20Ques2%20|%20Pico4&color=green)
 ![License](https://img.shields.io/github/license/GothicVRProject/GothicVR?label=License&color=important)
-[![Build](https://img.shields.io/github/actions/workflow/status/GothicVRProject/GothicVR/build.yml?label=Build&branch=main)](https://img.shields.io/github/actions/workflow/status/GothicKit/phoenix-shared-interface/build.yml)
+![Build](https://img.shields.io/github/actions/workflow/status/GothicVRProject/GothicVR/build.yml?label=Build&branch=main)
 
 Fan project recreating the classic Gothic experience in VR.
 
