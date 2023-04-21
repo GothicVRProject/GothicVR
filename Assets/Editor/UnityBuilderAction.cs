@@ -10,11 +10,11 @@ namespace UnityBuildTools {
     {
         static string[] SCENES = FindEnabledEditorScenes();
     
-        static readonly string APP_NAME = "unZENity-VR";
+        static readonly string APP_NAME = "GothicVR";
         static readonly string TARGET_DIR = "build";
 
 
-        [MenuItem("unZENity/CI/Build Quest2")]
+        [MenuItem("GothicVR/CI/Build Quest2")]
         static void PerformQuestBuild()
         {
             string target_path = TARGET_DIR + "/Quest/" + APP_NAME + ".apk";
@@ -23,7 +23,7 @@ namespace UnityBuildTools {
 			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
         }
 
-		[MenuItem("unZENity/CI/Build Pico4")]
+		[MenuItem("GothicVR/CI/Build Pico4")]
 		static void PerformPicoBuild()
 		{
 			string target_path = TARGET_DIR + "/Pico/" + APP_NAME + ".apk";
@@ -31,7 +31,7 @@ namespace UnityBuildTools {
 			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
 		}
 
-		[MenuItem("unZENity/CI/Build PCVR")]
+		[MenuItem("GothicVR/CI/Build PCVR")]
 		static void PerformWindows64Build()
 		{
 			string target_path = TARGET_DIR + "/Windows64/" + APP_NAME + ".exe";
