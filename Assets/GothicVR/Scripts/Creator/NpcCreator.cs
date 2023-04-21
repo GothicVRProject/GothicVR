@@ -17,6 +17,9 @@ namespace GVR.Creator
         {
             VmGothicBridge.PhoenixWld_InsertNpc.AddListener(Wld_InsertNpc);
             VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
+            VmGothicBridge.PhoenixMdl_SetVisual.AddListener(Mdl_SetVisual);
+            VmGothicBridge.PhoenixMdl_ApplyOverlayMds.AddListener(Mdl_ApplyOverlayMds);
+            VmGothicBridge.PhoenixMdl_SetVisualBody.AddListener(Mdl_SetVisualBody);
         }
 
         /// <summary>
@@ -80,6 +83,22 @@ namespace GVR.Creator
             // Add element if key not yet exists.
             PhoenixBridge.npcRoutines.TryAdd(data.npc, new());
             PhoenixBridge.npcRoutines[data.npc].Add(routine);
+        }
+
+
+        private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
+        {
+            // TBD
+        }
+
+        private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
+        {
+
+        }
+
+        private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
+        {
+            // TBD
         }
     }
 }
