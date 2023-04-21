@@ -29,14 +29,14 @@ We're always looking for people with knowledge and/or spirit. Feel free to reach
 ![data flow](./Documentation/Images/data-flow.drawio.png)
 
 
-1. unZENity-VR requests data from PxCs.dll (.net standard 2.1 shared library which is cross-OS compatibel)
+1. GothicVR requests data from PxCs.dll (.net standard 2.1 shared library which is cross-OS compatibel)
 1. The dll itself forwards request to libphoenix-shared.dll/.so as it includes the original phoenix parser library.
 1. phoenix-shared-interface loads the file system data.
 1. The data is then returned to Unity to build Unity C# objects like Meshes.
 
 
 ## Dependencies
-unZENity-VR is using the following projects:
+GothicVR is using the following projects:
 * [phoenix](https://github.com/GothicKit/phoenix) (Gothic asset parser)
 * [phoenix-shared-interface](https://github.com/GothicKit/phoenix-shared-interface) (C++ -> C interface)
 * [phoenix-csharp-interface](https://github.com/GothicKit/phoenix-csharp-interface) (C# endpoint for C interface)
