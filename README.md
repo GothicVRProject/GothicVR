@@ -8,8 +8,9 @@ Fan project recreating the classic Gothic experience in VR.
 
 
 # Usage
-For instructions on playing the game or adding contributions, please check out Wiki: https://github.com/GothicVRProject/GothicVR/wiki  
-(🤫 Shortcut for [Gamers](https://github.com/GothicVRProject/GothicVR/wiki/01-_-Gamer). Thank me later. 😉) 
+For instructions on playing the game or adding contributions, please check out Wiki: https://github.com/GothicVRProject/GothicVR/wiki
+
+(🤫 Shortcut for Gamer documentation: [here](https://github.com/GothicVRProject/GothicVR/wiki/01-_-Gamer). Thank me later. 😉) 
 
 
 ## Our Tenets (until you know better ones)
@@ -50,7 +51,7 @@ Big shoutout towards
 ## FAQ
 
 **Q: Why do you use an external framework to parse Gothic assets?**  
-A: phoenix is a full Gothic asset parser and already used by OpenGothic which is feature complete to work with Gothic1, Gothic2, and Gothic2 the Night of the Raven. Why reinventing the wheel? ¯\_(ツ)_/¯
+A: phoenix is a full Gothic asset parser and already used by OpenGothic. It is feature complete and works with Gothic1, Gothic2, and Gothic2 the Night of the Raven assets. Why reinventing the wheel? ¯\_(ツ)_/¯
 
-**Q: Why do you use integrate phoenix as shared library (DLL)?**  
+**Q: Why do you integrate phoenix as shared library (DLL) instead of using its code directly?**  
 A: As phoenix is written in C++, we need a way to communicate with C#. The way to go is shared libraries as they can be used within C# via _DllImport_.
