@@ -4,6 +4,7 @@ namespace UZVR.Demo
 {
     public class DebugSettings: SingletonBehaviour<DebugSettings>
     {
+        public bool CreateVobs;
         public bool CreateWaypoints;
         public bool CreateWaypointEdges;
 
