@@ -88,7 +88,10 @@ namespace GVR.Creator
 
         private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
         {
-            // TBD
+            // Example: visualname = HUMANS.MDS
+            // FIXME - add cache to ModelScript (E.g. HUMANS.MDS are called multiple times)
+
+            var modelScript = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, data.visual);
         }
 
         private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
