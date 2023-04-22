@@ -7,7 +7,7 @@
 Fan project recreating the classic Gothic experience in VR.
 
 
-# Usage
+## Usage
 For instructions on playing the game or adding contributions, please check out Wiki: https://github.com/GothicVRProject/GothicVR/wiki
 
 (🤫 Shortcut for Gamer documentation: [here](https://github.com/GothicVRProject/GothicVR/wiki/01-_-Gamer). Thank me later. 😉) 
