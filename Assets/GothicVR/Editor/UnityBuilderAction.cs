@@ -10,7 +10,7 @@ using UnityEngine.XR.Management;
 using Unity.VisualScripting;
 
 
-namespace UnityBuildTools
+namespace GVR.Editor.UnityBuildTools
 {
 
 	public class UnityBuilderAction
