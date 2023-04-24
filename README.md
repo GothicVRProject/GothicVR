@@ -10,7 +10,7 @@ Fan project recreating the classic Gothic experience in VR.
 ## Usage
 For instructions on playing the game or adding contributions, please check our [docs](docs).
 
-(🤫 Shortcut for Gamer documentation: [here](docs/setup/gamers.md). Thank me later. 😉) 
+(🤫 Shortcut for Gamer documentation: [here](docs/setup/gamer.md). Thank me later. 😉) 
 
 
 ## Our Tenets (until you know better ones)
