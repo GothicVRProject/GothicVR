@@ -47,7 +47,7 @@ To copy your game files onto your device you can use `adb`. To access your heads
 >
 > To connect your headset, use a USB Type-C cable.
 
-Firstly, check if you're headset can be reached from your PC with `adb devices`. This should list at least one device; if it shows more than one, make sure to specify your headset in the following commands with `adb -s <ID> ...`.
+Firstly, check if your headset can be reached from your PC with `adb devices`. This should list at least one device; if it shows more than one, make sure to specify your headset in the following commands with `adb -s <ID> ...`.
 
 If your headset is correctly connected, use `adb push <Path to your Gothic dir>/* /storage/emulated/0/Android/data/com.GothicVRProject.GothicVR/files/`.
 
