@@ -11,6 +11,9 @@ using UnityEngine.XR.OpenXR.Features.PICOSupport;
 using UnityEngine.XR.OpenXR.Features.Interactions;
 using UnityEngine.XR.Management;
 
+using UnityEditor.XR.OpenXR.Features;
+
+
 namespace UnityBuildTools {
 
     public class UnityBuilderAction
@@ -86,10 +89,18 @@ namespace UnityBuildTools {
         }
 
         private static void SetPicoSettings(){
-            foreach(var fet in OpenXRSettings.Instance.GetFeatures()) { Debug.Log(fet); }
-            
-            OpenXRSettings.Instance.GetFeature<PICOTouchControllerProfile>().enabled = true;
-            OpenXRSettings.Instance.GetFeature<PICOFeature>().enabled = true;
+
+            OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOTouchControllerProfile>().enabled = true;
+            OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOFeature>().enabled = true;
+
+            //deactivate Meta
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled = false;
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = false;
+
+			foreach (var item in OpenXRSettings.ActiveBuildTargetInstance.GetFeatures()) 
+            {
+				Debug.Log(item.name);
+			}
 
             Debug.Log("OpenXR settings set for: Pico");
 
@@ -99,11 +110,15 @@ namespace UnityBuildTools {
 
         private static void SetQuestSettings(){
             foreach(var fet in OpenXRSettings.Instance.GetFeatures()) { Debug.Log(fet); }
-            
-            OpenXRSettings.Instance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = true;
-            //OpenXRSettings.Instance.GetFeature<MetaQuestFeature>().enabled = true;
 
-            Debug.Log("OpenXR settings set for: Quest");
+            OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = true;
+            OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled = true;
+
+			//deactivate Pico
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOFeature>().enabled = false;
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOTouchControllerProfile>().enabled = false;
+
+			Debug.Log("OpenXR settings set for: Quest");
             XRGeneralSettings.Instance.Manager.InitializeLoaderSync();
         
         }
