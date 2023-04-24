@@ -1,22 +1,19 @@
-using System;
 using UnityEditor;
 using System.Collections.Generic;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
-using UnityEngine.XR;
 using UnityEngine.XR.OpenXR;
-using UnityEngine.XR.OpenXR.Features;
 using UnityEngine.XR.OpenXR.Features.MetaQuestSupport;
 using UnityEngine.XR.OpenXR.Features.PICOSupport;
 using UnityEngine.XR.OpenXR.Features.Interactions;
 using UnityEngine.XR.Management;
+using Unity.VisualScripting;
 
-using UnityEditor.XR.OpenXR.Features;
 
+namespace UnityBuildTools
+{
 
-namespace UnityBuildTools {
-
-    public class UnityBuilderAction
+	public class UnityBuilderAction
     {
         static string[] SCENES = FindEnabledEditorScenes();
     
@@ -28,18 +25,16 @@ namespace UnityBuildTools {
         static void PerformQuestBuild()
         {
             string target_path = TARGET_DIR + "/Quest/" + APP_NAME + ".apk";
-            SetAndroidSettings();
             SetQuestSettings();
-			//GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
+			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
         }
 
 		[MenuItem("GothicVR/Build/Build Pico4")]
 		static void PerformPicoBuild()
 		{
 			string target_path = TARGET_DIR + "/Pico/" + APP_NAME + ".apk";
-            SetAndroidSettings();
             SetPicoSettings();
-			//GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
+			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
 		}
 
 		[MenuItem("GothicVR/Build/Build PCVR")]
@@ -55,9 +50,6 @@ namespace UnityBuildTools {
             // Set the target platform for the build
             EditorUserBuildSettings.SwitchActiveBuildTarget(build_target_group, build_target);
     
-            
-            
-    
             // Set BuildPlayerOptions
             BuildPlayerOptions options = new BuildPlayerOptions();
             options.scenes = scenes;
@@ -69,12 +61,6 @@ namespace UnityBuildTools {
             // Build the project
             BuildReport report = BuildPipeline.BuildPlayer(options);
         }
-
-        private static void SetAndroidSettings()
-        {
-			// Set the target device for the build
-			PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
-		}
     
         private static string[] FindEnabledEditorScenes()
         {
@@ -90,10 +76,13 @@ namespace UnityBuildTools {
 
         private static void SetPicoSettings(){
 
-            OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOTouchControllerProfile>().enabled = true;
+			PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
+
+            //Enable Pico
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOTouchControllerProfile>().enabled = true;
             OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOFeature>().enabled = true;
 
-            //deactivate Meta
+            //Disable Meta
 			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled = false;
 			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = false;
 
@@ -101,25 +90,24 @@ namespace UnityBuildTools {
             {
 				Debug.Log(item.name);
 			}
-
-            Debug.Log("OpenXR settings set for: Pico");
-
-        
+            Debug.Log("OpenXR settings set for: Pico");  
+            
         }
 
 
         private static void SetQuestSettings(){
-            foreach(var fet in OpenXRSettings.Instance.GetFeatures()) { Debug.Log(fet); }
 
-            OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = true;
+			PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
+
+			//Enable Meta
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = true;
             OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled = true;
 
-			//deactivate Pico
+			//Disable Pico
 			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOFeature>().enabled = false;
 			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOTouchControllerProfile>().enabled = false;
 
 			Debug.Log("OpenXR settings set for: Quest");
-            XRGeneralSettings.Instance.Manager.InitializeLoaderSync();
         
         }
 
