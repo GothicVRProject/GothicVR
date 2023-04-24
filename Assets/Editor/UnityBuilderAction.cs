@@ -3,6 +3,13 @@ using UnityEditor;
 using System.Collections.Generic;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using UnityEngine.XR;
+using UnityEngine.XR.OpenXR;
+using UnityEngine.XR.OpenXR.Features;
+using UnityEngine.XR.OpenXR.Features.MetaQuestSupport;
+using UnityEngine.XR.OpenXR.Features.PICOSupport;
+using UnityEngine.XR.OpenXR.Features.Interactions;
+using UnityEngine.XR.Management;
 
 namespace UnityBuildTools {
 
@@ -19,8 +26,8 @@ namespace UnityBuildTools {
         {
             string target_path = TARGET_DIR + "/Quest/" + APP_NAME + ".apk";
             SetAndroidSettings();
-
-			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
+            SetQuestSettings();
+			//GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
         }
 
 		[MenuItem("GothicVR/CI/Build Pico4")]
@@ -28,7 +35,8 @@ namespace UnityBuildTools {
 		{
 			string target_path = TARGET_DIR + "/Pico/" + APP_NAME + ".apk";
             SetAndroidSettings();
-			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
+            SetPicoSettings();
+			//GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
 		}
 
 		[MenuItem("GothicVR/CI/Build PCVR")]
@@ -76,6 +84,31 @@ namespace UnityBuildTools {
             
 	    return EditorScenes.ToArray();
         }
+
+        private static void SetPicoSettings(){
+            foreach(var fet in OpenXRSettings.Instance.GetFeatures()) { Debug.Log(fet); }
+            
+            OpenXRSettings.Instance.GetFeature<PICOTouchControllerProfile>().enabled = true;
+            OpenXRSettings.Instance.GetFeature<PICOFeature>().enabled = true;
+
+            Debug.Log("OpenXR settings set for: Pico");
+
+        
+        }
+
+
+        private static void SetQuestSettings(){
+            foreach(var fet in OpenXRSettings.Instance.GetFeatures()) { Debug.Log(fet); }
+            
+            OpenXRSettings.Instance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = true;
+            //OpenXRSettings.Instance.GetFeature<MetaQuestFeature>().enabled = true;
+
+            Debug.Log("OpenXR settings set for: Quest");
+            XRGeneralSettings.Instance.Manager.InitializeLoaderSync();
+        
+        }
+
+        
     }
 }
 
