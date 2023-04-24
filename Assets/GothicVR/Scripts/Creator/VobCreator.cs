@@ -9,6 +9,7 @@ using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
+using PxCs.Data.Mesh;
 
 namespace GVR.Creator
 {
@@ -29,7 +30,7 @@ namespace GVR.Creator
             foreach (var vob in itemVobs)
             {
                 // FIXME: Add caching of MRM as object will be created multiple times inside a scene.
-                var mrm = PxMRM.GetMRMFromVdf(PhoenixBridge.VdfsPtr, $"{vob.vobName}.MRM");
+                var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, $"{vob.vobName}.MRM");
 
                 if (mrm == null)
                 {
@@ -61,7 +62,7 @@ namespace GVR.Creator
                 // @see https://forum.unity.com/threads/convert-3x3-rotation-matrix-to-euler-angles.1086392/#post-7002275
                 // Hint 1: The matrix is transposed, i.e. we needed to change e.g. m01=[0,1] to m01=[1,0]
                 // Hint 2: m33 needs to be 1
-                var rotationMatrix = vob.rotation;
+                var rotationMatrix = vob.rotation.Value;
                 var matrix4x4 = new Matrix4x4();
                 matrix4x4.m00 = rotationMatrix.m00;
                 matrix4x4.m01 = rotationMatrix.m10;
@@ -100,7 +101,7 @@ namespace GVR.Creator
             return returnVobs;
         }
 
-        private void PrepareMeshRenderer(MeshRenderer meshRenderer, PxMRMData mrmData)
+        private void PrepareMeshRenderer(MeshRenderer meshRenderer, PxMultiResolutionMeshData mrmData)
         {
             //if (mrmData.materials.Length != 1)
             //    throw new ArgumentOutOfRangeException("Currently it's only supported to have exact 1 material for VobMRMs.");
@@ -165,7 +166,7 @@ namespace GVR.Creator
             meshRenderer.SetMaterials(finalMaterials);
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxMRMData mrmData)
+        private void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
         {
             /**
              * Ok, brace yourself:
