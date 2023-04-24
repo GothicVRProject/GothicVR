@@ -8,6 +8,9 @@ using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
+using PxCs.Data.Mesh;
+using Unity.VisualScripting.Dependencies.Sqlite;
+using System;
 
 namespace GVR.Creator
 {
@@ -92,6 +95,11 @@ namespace GVR.Creator
             // FIXME - add cache to ModelScript (E.g. HUMANS.MDS are called multiple times)
 
             var modelScript = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, data.visual);
+            var skeletonName = modelScript.skeleton.name.Replace(".ASC", ".MDM");
+
+            var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, skeletonName);
+
+            CreateNpcMesh(mrm);
         }
 
         private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
@@ -102,6 +110,19 @@ namespace GVR.Creator
         private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
         {
             // TBD
+        }
+
+
+        // FIXME - Logic is copy&pasted from VobCreator.cs - We need to create a proper class where we can reuse functionality
+        // FIXME - instead of duplicating it!
+
+        private static void CreateNpcMesh(PxMultiResolutionMeshData mrm)
+        {
+            if (mrm.subMeshes.Length != 1)
+                throw new ArgumentOutOfRangeException("Only 1 submesh is implemented for NPC creation as of now.");
+
+            SingletonBehaviour<MultiResolutionMeshCreator>.GetOrCreate().Create(mrm, null, "foobar", Vector3.zero, new PxCs.Data.Misc.PxMatrix3x3Data());
+
         }
     }
 }
