@@ -6,9 +6,9 @@ on:
       - main
     types: [opened, reopened, synchronize]
     
-  #push:
-  #  branches:
-  #    - 18-create-build-pipeline
+  push:
+    branches:
+      - main
 
 jobs:
 
