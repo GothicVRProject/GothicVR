@@ -24,7 +24,7 @@ namespace UnityBuildTools {
         static readonly string TARGET_DIR = "build";
 
 
-        [MenuItem("GothicVR/CI/Build Quest2")]
+        [MenuItem("GothicVR/Build/Build Quest2")]
         static void PerformQuestBuild()
         {
             string target_path = TARGET_DIR + "/Quest/" + APP_NAME + ".apk";
@@ -33,7 +33,7 @@ namespace UnityBuildTools {
 			//GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
         }
 
-		[MenuItem("GothicVR/CI/Build Pico4")]
+		[MenuItem("GothicVR/Build/Build Pico4")]
 		static void PerformPicoBuild()
 		{
 			string target_path = TARGET_DIR + "/Pico/" + APP_NAME + ".apk";
@@ -42,7 +42,7 @@ namespace UnityBuildTools {
 			//GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
 		}
 
-		[MenuItem("GothicVR/CI/Build PCVR")]
+		[MenuItem("GothicVR/Build/Build PCVR")]
 		static void PerformWindows64Build()
 		{
 			string target_path = TARGET_DIR + "/Windows64/" + APP_NAME + ".exe";
