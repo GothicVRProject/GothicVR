@@ -2,7 +2,7 @@
 
 This section contains any relevant info to get your installation of GothicVR up and running.
 
-## Step 1 - Providing the Game Assets
+## Installing the Game Assets
 
 To comply with the Gothic Modding License, the project does not contain any of the original Gothic game assets. Because of that, you have to provide the Gothic game data yourself.
 
