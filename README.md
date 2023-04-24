@@ -8,9 +8,9 @@ Fan project recreating the classic Gothic experience in VR.
 
 
 ## Usage
-For instructions on playing the game or adding contributions, please check our Wiki: https://github.com/GothicVRProject/GothicVR/wiki
+For instructions on playing the game or adding contributions, please check our [docs](docs).
 
-(🤫 Shortcut for Gamer documentation: [here](https://github.com/GothicVRProject/GothicVR/wiki/01-_-Gamer). Thank me later. 😉) 
+(🤫 Shortcut for Gamer documentation: [here](docs/setup/gamers.md). Thank me later. 😉) 
 
 
 ## Our Tenets (until you know better ones)
@@ -26,13 +26,13 @@ We're always looking for people with knowledge and/or spirit. Feel free to reach
 
 ## Workflow/Gameflow
 
-![data flow](./Documentation/Images/data-flow.drawio.png)
+![data flow](docs/assets/diagrams/data-flow.png)
 
 
 1. GothicVR requests data from PxCs.dll (.net standard 2.1 shared library which is cross-OS compatibel)
-1. The dll itself forwards request to libphoenix-shared.dll/.so as it includes the original phoenix parser library.
-1. phoenix-shared-interface loads the file system data.
-1. The data is then returned to Unity to build Unity C# objects like Meshes.
+2. The dll itself forwards request to libphoenix-shared.dll/.so as it includes the original phoenix parser library.
+3. phoenix-shared-interface loads the file system data.
+4. The data is then returned to Unity to build Unity C# objects like Meshes.
 
 
 ## Dependencies
