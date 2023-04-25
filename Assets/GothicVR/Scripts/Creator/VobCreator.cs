@@ -1,15 +1,12 @@
-﻿using PxCs;
-using PxCs.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using GVR.Demo;
+﻿using GVR.Demo;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
-using PxCs.Data.Mesh;
+using PxCs.Data;
+using PxCs.Interface;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace GVR.Creator
 {

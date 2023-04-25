@@ -1,14 +1,13 @@
-using PxCs;
-using System.Collections.Generic;
-using UnityEngine;
-using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Mesh;
-using System.Linq;
-using PxCs.Data.Misc;
+using PxCs.Data.Struct;
+using PxCs.Interface;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace GVR.Creator
 {
@@ -17,7 +16,7 @@ namespace GVR.Creator
         // Cache helped speed up loading of G1 world textures from 870ms to 230 (~75% speedup)
         private Dictionary<string, Texture2D> cachedTextures = new();
 
-        public void Create(PxMultiResolutionMeshData mrm, GameObject? parent, string objectName, Vector3 position, PxMatrix3x3Data rotation)
+        public GameObject Create(PxMultiResolutionMeshData mrm, GameObject? parent, string objectName, Vector3 position, PxMatrix3x3Data rotation)
         {
             var meshObj = new GameObject(objectName);
 
@@ -57,6 +56,8 @@ namespace GVR.Creator
 
             if (null != parent)
                 meshObj.transform.parent = parent.transform;
+
+            return meshObj;
         }
 
         private void PrepareMeshRenderer(MeshRenderer meshRenderer, PxMultiResolutionMeshData mrmData)

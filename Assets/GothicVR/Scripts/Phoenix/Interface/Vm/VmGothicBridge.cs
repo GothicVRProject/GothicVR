@@ -1,5 +1,4 @@
-﻿using PxCs;
-using PxCs.Extensions;
+﻿using PxCs.Interface;
 using System;
 using UnityEngine.Events;
 

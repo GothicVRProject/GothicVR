@@ -1,7 +1,3 @@
-using PxCs;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using GVR.Npc;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
@@ -9,8 +5,12 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Mesh;
-using Unity.VisualScripting.Dependencies.Sqlite;
-using System;
+using PxCs.Data.Struct;
+using PxCs.Interface;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.Playables;
 
 namespace GVR.Creator
 {
@@ -94,12 +94,51 @@ namespace GVR.Creator
             // Example: visualname = HUMANS.MDS
             // FIXME - add cache to ModelScript (E.g. HUMANS.MDS are called multiple times)
 
-            var modelScript = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, data.visual);
+            var modelScript = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, data.visual); // Declaration of animations in a model.
             var skeletonName = modelScript.skeleton.name.Replace(".ASC", ".MDM");
 
-            var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, skeletonName);
+            //var anim = PxAnimation.LoadFromVdf(PhoenixBridge.VdfsPtr, )
+            object mdl = null; // Model.h --> if null
+            object mdh = null; // --> if null
+            var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // --> if null
 
-            CreateNpcMesh(mrm);
+            var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // Keyframes of animation.
+
+            /*
+             * Walk animation load:
+             * 1. load ModelScript (with array Animations[].name) (check)
+             * 2. Use this name, add MAN and load it as PxAnimationData
+             * 3. Use the PxAnimationData.samples for animation
+             * 4. PxAnimationData.nodeIndices --> Example: a skeleton with 10 bones (nodes) and 20 frames has 
+             *    10 node_indices and 10*20samples (i.e. 10 samples == 10 frames for bone/node1, 11...20 samples == 10 frames for node 2)
+             * 5. PxModelHierarchy (mdh) == skeleton/bones. 
+             * 
+             * Check checksums!
+             */
+
+            var gameObject = CreateNpcMesh(mrm);
+
+            // https://forum.unity.com/threads/whats-the-difference-between-animation-and-animator.288962/
+            // https://answers.unity.com/questions/1319072/how-to-change-animation-clips-of-an-animator-state.html
+            // https://answers.unity.com/questions/911169/procudurally-generate-animationclip-at-runtime.html
+            // Playable API: https://blog.unity.com/engine-platform/extending-timeline-practical-guide
+            // https://docs.unity3d.com/Manual/Playables.html?_ga=2.213931281.7656710.1587191155-1588388095.1584548241
+            // Playables API Demo: https://catlikecoding.com/unity/tutorials/tower-defense/animation/
+            // Demo 2: https://delphic.me.uk/blog/seekers_animation_system
+            // Demo 2 - source code: https://gist.github.com/delphic/42e7ade45edb60df418954ef09287337
+
+            // Playable API open source project: https://forum.unity.com/threads/uplayableanimation-playableapi-animation-system.1353557/
+            // github: https://github.com/EricHu33/uPlayableAnimation
+
+            AddAnimation(gameObject);
+
+
+            var animator = gameObject.AddComponent<Animator>();
+
+
+            var clip1 = new AnimationClip();
+
+            AnimationPlayableUtilities.PlayClip(animator, clip1, out PlayableGraph playableGraph);
         }
 
         private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
@@ -116,13 +155,89 @@ namespace GVR.Creator
         // FIXME - Logic is copy&pasted from VobCreator.cs - We need to create a proper class where we can reuse functionality
         // FIXME - instead of duplicating it!
 
-        private static void CreateNpcMesh(PxMultiResolutionMeshData mrm)
+        private static GameObject CreateNpcMesh(PxMultiResolutionMeshData mrm)
         {
-            if (mrm.subMeshes.Length != 1)
-                throw new ArgumentOutOfRangeException("Only 1 submesh is implemented for NPC creation as of now.");
+            return SingletonBehaviour<MultiResolutionMeshCreator>.GetOrCreate().Create(mrm, null, "foobar", Vector3.zero, new PxMatrix3x3Data());
+        }
 
-            SingletonBehaviour<MultiResolutionMeshCreator>.GetOrCreate().Create(mrm, null, "foobar", Vector3.zero, new PxCs.Data.Misc.PxMatrix3x3Data());
+        private static void AddAnimation(GameObject gameObject)
+        {
 
+            var anim = gameObject.AddComponent<Animation>();
+            var rend = gameObject.AddComponent<SkinnedMeshRenderer>();
+            var mesh = gameObject.GetComponent<MeshCollider>().sharedMesh;
+            // Build basic mesh
+            //Mesh mesh = new Mesh();
+            //mesh.vertices = new Vector3[] { new Vector3(-1, 0, 0), new Vector3(1, 0, 0), new Vector3(-1, 5, 0), new Vector3(1, 5, 0) };
+            //mesh.uv = new Vector2[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1) };
+            //mesh.triangles = new int[] { 2, 3, 1, 2, 1, 0 };
+            //mesh.RecalculateNormals();
+            //rend.material = new Material(Shader.Find("Diffuse"));
+
+            // assign bone weights to mesh
+            BoneWeight[] weights = new BoneWeight[mesh.vertices.Length];
+
+            for (int i = 0; i < weights.Length; i++)
+            {
+                if (i < weights.Length / 2)
+                {
+                    weights[0].boneIndex0 = 0;
+                    weights[0].weight0 = 1;
+                }
+                else
+                {
+                    weights[0].boneIndex0 = 1;
+                    weights[0].weight0 = 1;
+                }
+            }
+            mesh.boneWeights = weights;
+
+            // Create Bone Transforms and Bind poses
+            // One bone at the bottom and one at the top
+
+            Transform[] bones = new Transform[2];
+            Matrix4x4[] bindPoses = new Matrix4x4[2];
+            bones[0] = gameObject.transform;// new GameObject("Lower").transform;
+            //bones[0].parent = gameObject.transform;
+            // Set the position relative to the parent
+            bones[0].localRotation = Quaternion.identity;
+            bones[0].localPosition = Vector3.zero;
+            // The bind pose is bone's inverse transformation matrix
+            // In this case the matrix we also make this matrix relative to the root
+            // So that we can move the root game object around freely
+            bindPoses[0] = bones[0].worldToLocalMatrix * gameObject.transform.localToWorldMatrix;
+
+            bones[1] = new GameObject("Upper").transform;
+            bones[1].parent = gameObject.transform;
+            // Set the position relative to the parent
+            bones[1].localRotation = Quaternion.identity;
+            bones[1].localPosition = new Vector3(0, 5, 0);
+            // The bind pose is bone's inverse transformation matrix
+            // In this case the matrix we also make this matrix relative to the root
+            // So that we can move the root game object around freely
+            bindPoses[1] = bones[1].worldToLocalMatrix * gameObject.transform.localToWorldMatrix;
+
+            // bindPoses was created earlier and was updated with the required matrix.
+            // The bindPoses array will now be assigned to the bindposes in the Mesh.
+            mesh.bindposes = bindPoses;
+
+            // Assign bones and bind poses
+            rend.bones = bones;
+            rend.sharedMesh = mesh;
+
+            // Assign a simple waving animation to the bottom bone
+            AnimationCurve curve = new AnimationCurve();
+            curve.keys = new Keyframe[] { new Keyframe(0, 0, 0, 0), new Keyframe(1, 3, 0, 0), new Keyframe(2, 0.0F, 0, 0) };
+
+            // Create the clip with the curve
+            AnimationClip clip = new AnimationClip();
+            clip.legacy = true;
+            clip.SetCurve("Lower", typeof(Transform), "m_LocalPosition.z", curve);
+
+            // Add and play the clip
+            clip.wrapMode = WrapMode.Loop;
+            anim.AddClip(clip, "test");
+            anim.Play("test");
         }
     }
 }

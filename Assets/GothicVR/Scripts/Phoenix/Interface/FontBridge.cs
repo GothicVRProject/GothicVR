@@ -1,9 +1,8 @@
-using PxCs;
+using GVR.Phoenix.Util;
+using PxCs.Interface;
 using System;
 using TMPro;
 using UnityEngine;
-using UnityEngine.TextCore;
-using GVR.Phoenix.Util;
 
 namespace GVR.Phoenix.Interface
 {
