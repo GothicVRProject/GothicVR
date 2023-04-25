@@ -6,9 +6,9 @@ on:
       - main
     types: [opened, reopened, synchronize]
     
-  #push:
-  #  branches:
-  #    - 18-create-build-pipeline
+  push:
+    branches:
+      - main
 
 jobs:
 
@@ -101,7 +101,7 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
-          buildMethod: UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
+          buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
 
       - uses: actions/upload-artifact@v2
         with:
