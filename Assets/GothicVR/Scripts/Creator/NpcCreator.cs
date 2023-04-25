@@ -4,6 +4,7 @@ using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
+using PxCs.Data.Animation;
 using PxCs.Data.Mesh;
 using PxCs.Data.Struct;
 using PxCs.Interface;
@@ -89,6 +90,10 @@ namespace GVR.Creator
         }
 
 
+        // FIXME - Performance increased from 20sec load down to 5sec load.
+        // FIXME - Need to be replaced with proper caching later.
+        private static PxAnimationData[] tempHumanAnimations = null;
+
         private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
         {
             // Example: visualname = HUMANS.MDS
@@ -98,6 +103,19 @@ namespace GVR.Creator
             var skeletonName = modelScript.skeleton.name.Replace(".ASC", ".MDM");
 
             //var anim = PxAnimation.LoadFromVdf(PhoenixBridge.VdfsPtr, )
+
+            if (null == tempHumanAnimations)
+            {
+                tempHumanAnimations = new PxAnimationData[modelScript.animations.Length];
+                for (int i = 0; i < tempHumanAnimations.Length; i++)
+                {
+                    var animName = data.visual.Replace(".MDS", $"-{modelScript.animations[i].name}.MAN");
+
+                    //// FIXME - cache
+                    tempHumanAnimations[i] = PxAnimation.LoadFromVdf(PhoenixBridge.VdfsPtr, animName);
+                }
+            }
+
             object mdl = null; // Model.h --> if null
             object mdh = null; // --> if null
             var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // --> if null
@@ -106,8 +124,8 @@ namespace GVR.Creator
 
             /*
              * Walk animation load:
-             * 1. load ModelScript (with array Animations[].name) (check)
-             * 2. Use this name, add MAN and load it as PxAnimationData
+             * 1. load ModelScript (with array Animations[].name) (done)
+             * 2. Use this name, add MAN and load it as PxAnimationData (done)
              * 3. Use the PxAnimationData.samples for animation
              * 4. PxAnimationData.nodeIndices --> Example: a skeleton with 10 bones (nodes) and 20 frames has 
              *    10 node_indices and 10*20samples (i.e. 10 samples == 10 frames for bone/node1, 11...20 samples == 10 frames for node 2)
