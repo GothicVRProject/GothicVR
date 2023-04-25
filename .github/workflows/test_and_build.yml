@@ -7,12 +7,14 @@ on:
     types: [opened, reopened, synchronize]
     paths-ignore:
       - 'docs/**'
+      - "README.md"
     
   push:
     branches:
       - main
     paths-ignore:
       - 'docs/**'
+      - "README.md"
 
 jobs:
 
