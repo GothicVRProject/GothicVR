@@ -6,14 +6,14 @@ on:
       - main
     types: [opened, reopened, synchronize]
     paths-ignore:
-      - 'docs/**'
+      - '^(docs|Docs|DOCS)/.*'
       - "README.md"
     
   push:
     branches:
       - main
     paths-ignore:
-      - 'docs/**'
+      - '^(docs|Docs|DOCS)/.*'
       - "README.md"
 
 jobs:
