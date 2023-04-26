@@ -36,8 +36,8 @@ namespace GVR.Creator
                 }
 
                 
-                SingletonBehaviour<MultiResolutionMeshCreator>.GetOrCreate()
-                    .Create(mrm, root, $"vob-{vob.vobName}", vob.position.ToUnityVector(), vob.rotation.Value);
+                SingletonBehaviour<MeshCreator>.GetOrCreate()
+                    .Create(mrm, $"vob-{vob.vobName}", vob.position.ToUnityVector(), vob.rotation.Value, root);
             }
 
             // Currently we don't need to store cachedTextures once the world is loaded.

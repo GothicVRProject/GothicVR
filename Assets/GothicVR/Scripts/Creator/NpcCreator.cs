@@ -6,10 +6,12 @@ using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Animation;
 using PxCs.Data.Mesh;
+using PxCs.Data.Model;
 using PxCs.Data.Struct;
 using PxCs.Interface;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -100,9 +102,6 @@ namespace GVR.Creator
             // FIXME - add cache to ModelScript (E.g. HUMANS.MDS are called multiple times)
 
             var modelScript = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, data.visual); // Declaration of animations in a model.
-            var skeletonName = modelScript.skeleton.name.Replace(".ASC", ".MDM");
-
-            //var anim = PxAnimation.LoadFromVdf(PhoenixBridge.VdfsPtr, )
 
             if (null == tempHumanAnimations)
             {
@@ -111,16 +110,38 @@ namespace GVR.Creator
                 {
                     var animName = data.visual.Replace(".MDS", $"-{modelScript.animations[i].name}.MAN");
 
-                    //// FIXME - cache
+                    //// FIXME - cache the right way. (Not in a hidden static temp variable)
                     tempHumanAnimations[i] = PxAnimation.LoadFromVdf(PhoenixBridge.VdfsPtr, animName);
                 }
             }
 
-            object mdl = null; // Model.h --> if null
-            object mdh = null; // --> if null
-            var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // --> if null
+            if (modelScript.skeleton.disableMesh)
+            {
+                var mdhName = data.visual.Replace(".MDS", ".MDH");
 
-            var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // Keyframes of animation.
+                var mdh = PxModelHierarchy.LoadFromVdf(PhoenixBridge.VdfsPtr, mdhName);
+
+                
+
+
+                //PxModelHierarchyData mdh = null;
+
+            }
+            else
+            {
+                var skeletonName = modelScript.skeleton.name.Replace(".ASC", ".MDM");
+                var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // --> if null
+
+                var gameObject = CreateNpcMesh(mdm);
+            }
+
+            //var anim = PxAnimation.LoadFromVdf(PhoenixBridge.VdfsPtr, )
+
+
+
+            //            object mdl = PxModel.LoadModelFromVdf(PhoenixBridge.VdfsPtr, mdlName); // Model.h --> if null
+
+            //var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // Keyframes of animation.
 
             /*
              * Walk animation load:
@@ -134,7 +155,6 @@ namespace GVR.Creator
              * Check checksums!
              */
 
-            var gameObject = CreateNpcMesh(mrm);
 
             // https://forum.unity.com/threads/whats-the-difference-between-animation-and-animator.288962/
             // https://answers.unity.com/questions/1319072/how-to-change-animation-clips-of-an-animator-state.html
@@ -148,15 +168,15 @@ namespace GVR.Creator
             // Playable API open source project: https://forum.unity.com/threads/uplayableanimation-playableapi-animation-system.1353557/
             // github: https://github.com/EricHu33/uPlayableAnimation
 
-            AddAnimation(gameObject);
+            //AddAnimation(gameObject);
 
 
-            var animator = gameObject.AddComponent<Animator>();
+            //var animator = gameObject.AddComponent<Animator>();
 
 
-            var clip1 = new AnimationClip();
+            //var clip1 = new AnimationClip();
 
-            AnimationPlayableUtilities.PlayClip(animator, clip1, out PlayableGraph playableGraph);
+            //AnimationPlayableUtilities.PlayClip(animator, clip1, out PlayableGraph playableGraph);
         }
 
         private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
@@ -173,12 +193,22 @@ namespace GVR.Creator
         // FIXME - Logic is copy&pasted from VobCreator.cs - We need to create a proper class where we can reuse functionality
         // FIXME - instead of duplicating it!
 
-        private static GameObject CreateNpcMesh(PxMultiResolutionMeshData mrm)
+        private static GameObject CreateNpcMesh(PxModelMeshData mdm)
         {
-            return SingletonBehaviour<MultiResolutionMeshCreator>.GetOrCreate().Create(mrm, null, "foobar", Vector3.zero, new PxMatrix3x3Data());
+            return SingletonBehaviour<MeshCreator>.GetOrCreate().Create(mdm, "foobar", null);
         }
 
         private static void AddAnimation(GameObject gameObject)
+        {
+            /*
+             * What we need:
+             * 1. Bones
+             * 2. Animations
+             */
+        }
+
+
+        private static void AddAnimationDemo(GameObject gameObject)
         {
 
             var anim = gameObject.AddComponent<Animation>();
