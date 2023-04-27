@@ -216,6 +216,8 @@ namespace GVR.Creator
             var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, $"{data.body}.MDM");
 
             var root = CreateNpcMesh(mdm, name).transform.GetChild(0).gameObject;
+
+            var debugMesh = root.GetComponent<SkinnedMeshRenderer>().sharedMesh;
             CreateBonesData(root);
             CreateAnimations(root);
 
@@ -251,17 +253,17 @@ namespace GVR.Creator
                 bindPoses[i] = node.transform.ToUnityMatrix() * go.transform.worldToLocalMatrix; // is this right?
             }
 
-            BoneWeight[] boneWeights = new BoneWeight[root.GetComponent<SkinnedMeshRenderer>().sharedMesh.vertices.Length];
+            //BoneWeight[] boneWeights = new BoneWeight[root.GetComponent<SkinnedMeshRenderer>().sharedMesh.vertices.Length];
 
-            for (var i = 0; i < boneWeights.Length; i++)
-            {
-                boneWeights[i] = new BoneWeight()
-                {
-                    boneIndex0 = 0,
-                    weight0 = 1
-                };
-            }
-            root.GetComponent<SkinnedMeshRenderer>().sharedMesh.boneWeights = boneWeights;
+            //for (var i = 0; i < boneWeights.Length; i++)
+            //{
+            //    boneWeights[i] = new BoneWeight()
+            //    {
+            //        boneIndex0 = 2,
+            //        weight0 = 1f
+            //    };
+            //}
+            //root.GetComponent<SkinnedMeshRenderer>().sharedMesh.boneWeights = boneWeights;
 
             var renderer = root.GetComponent<SkinnedMeshRenderer>();
             renderer.sharedMesh.bindposes = bindPoses;
@@ -279,7 +281,7 @@ namespace GVR.Creator
             AnimationClip clip = new AnimationClip();
             AnimationCurve curve = new AnimationCurve();
             curve.keys = new Keyframe[] { new Keyframe(0f, 0f, 0f, 0f), new Keyframe(1f, 3f, 0f, 0f), new Keyframe(2f, 0f, 0f, 0f) };
-            clip.SetCurve("BIP01", typeof(Transform), "m_LocalPosition.z", curve);
+            clip.SetCurve("BIP01 SPINE", typeof(Transform), "m_LocalPosition.z", curve);
             clip.wrapMode = WrapMode.Loop;
 
             var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
