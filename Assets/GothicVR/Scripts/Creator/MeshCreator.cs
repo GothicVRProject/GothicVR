@@ -84,7 +84,7 @@ namespace GVR.Creator
             return meshObj;
         }
 
-        public GameObject Create(PxModelMeshData mdm, string objectName, GameObject parent = null)
+        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, GameObject parent = null)
         {
             var meshRootObject = new GameObject(objectName);
 
@@ -101,6 +101,8 @@ namespace GVR.Creator
                     PrepareMeshFilter(meshFilter, mesh);
                     meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
                     meshCollider.sharedMesh = meshFilter.mesh;
+
+                    CreateBonesData(subMesh, meshRenderer, mdh);
 
                     //meshRenderer.rootBone = meshRootObject.transform;
 
@@ -410,6 +412,26 @@ namespace GVR.Creator
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
+        }
+
+
+        private static void CreateBonesData(GameObject root, SkinnedMeshRenderer renderer, PxModelHierarchyData mdh)
+        {
+            Transform[] bones = new Transform[mdh.nodes.Length];
+            Matrix4x4[] bindPoses = new Matrix4x4[mdh.nodes.Length];
+
+            for (var i = 0; i < mdh.nodes.Length; i++)
+            {
+                var node = mdh.nodes[i];
+                var go = new GameObject(node.name);
+                go.SetParent(root);
+
+                bones[i] = go.transform;
+                bindPoses[i] = node.transform.ToUnityMatrix() * go.transform.worldToLocalMatrix; // is this right?
+            }
+
+            renderer.sharedMesh.bindposes = bindPoses;
+            renderer.bones = bones;
         }
     }
 }

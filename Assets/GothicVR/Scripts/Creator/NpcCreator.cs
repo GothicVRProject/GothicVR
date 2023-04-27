@@ -200,9 +200,9 @@ namespace GVR.Creator
             var mds = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, data.overlayname);
         }
 
+
         private static PxModelHierarchyData velayaMdh;
         private static PxModelScriptData velayaMds;
-
 
 
         private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
@@ -215,10 +215,9 @@ namespace GVR.Creator
 
             var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, $"{data.body}.MDM");
 
-            var root = CreateNpcMesh(mdm, name).transform.GetChild(0).gameObject;
+            var root = CreateNpcMesh(name, mdm, velayaMdh).transform.GetChild(0).gameObject;
 
             var debugMesh = root.GetComponent<SkinnedMeshRenderer>().sharedMesh;
-            CreateBonesData(root);
             CreateAnimations(root);
 
 
@@ -237,39 +236,6 @@ namespace GVR.Creator
             //animation.Play("test");
 
         }
-
-        private static void CreateBonesData(GameObject root)
-        {
-            Transform[] bones = new Transform[velayaMdh.nodes.Length];
-            Matrix4x4[] bindPoses = new Matrix4x4[velayaMdh.nodes.Length];
-
-            for (var i = 0; i < velayaMdh.nodes.Length; i++)
-            {
-                var node = velayaMdh.nodes[i];
-                var go = new GameObject(node.name);
-                go.SetParent(root);
-
-                bones[i] = go.transform;
-                bindPoses[i] = node.transform.ToUnityMatrix() * go.transform.worldToLocalMatrix; // is this right?
-            }
-
-            //BoneWeight[] boneWeights = new BoneWeight[root.GetComponent<SkinnedMeshRenderer>().sharedMesh.vertices.Length];
-
-            //for (var i = 0; i < boneWeights.Length; i++)
-            //{
-            //    boneWeights[i] = new BoneWeight()
-            //    {
-            //        boneIndex0 = 2,
-            //        weight0 = 1f
-            //    };
-            //}
-            //root.GetComponent<SkinnedMeshRenderer>().sharedMesh.boneWeights = boneWeights;
-
-            var renderer = root.GetComponent<SkinnedMeshRenderer>();
-            renderer.sharedMesh.bindposes = bindPoses;
-            renderer.bones = bones;
-        }
-
 
         private static void CreateAnimations(GameObject root)
         {
@@ -296,9 +262,9 @@ namespace GVR.Creator
         // FIXME - Logic is copy&pasted from VobCreator.cs - We need to create a proper class where we can reuse functionality
         // FIXME - instead of duplicating it!
 
-        private static GameObject CreateNpcMesh(PxModelMeshData mdm, string name)
+        private static GameObject CreateNpcMesh(string name, PxModelMeshData mdm, PxModelHierarchyData mdh)
         {
-            return SingletonBehaviour<MeshCreator>.GetOrCreate().Create(mdm, name, null);
+            return SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, null);
         }
 
         private static void AddAnimations(GameObject gameObject, PxModelHierarchyData mdh, PxModelMeshData mdm)
