@@ -238,8 +238,6 @@ namespace GVR.Creator
 
         private static void CreateBonesData(GameObject root)
         {
-            return;
-
             Transform[] bones = new Transform[velayaMdh.nodes.Length];
             Matrix4x4[] bindPoses = new Matrix4x4[velayaMdh.nodes.Length];
 
