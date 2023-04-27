@@ -46,8 +46,9 @@ namespace GVR.Creator
             meshObj.SetParent(parent);
 
             var meshFilter = meshObj.AddComponent<MeshFilter>();
-            var meshRenderer = meshObj.AddComponent<MeshRenderer>();
+            var meshRenderer = meshObj.AddComponent<SkinnedMeshRenderer>();
             var meshCollider = meshObj.AddComponent<MeshCollider>();
+            meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
 
             try
             {
@@ -93,12 +94,15 @@ namespace GVR.Creator
                 {
                     var subMesh = new GameObject(mesh.mesh.materials.First().name);
                     var meshFilter = subMesh.AddComponent<MeshFilter>();
-                    var meshRenderer = subMesh.AddComponent<MeshRenderer>();
+                    var meshRenderer = subMesh.AddComponent<SkinnedMeshRenderer>();
                     var meshCollider = subMesh.AddComponent<MeshCollider>();
 
                     PrepareMeshRenderer(meshRenderer, mesh.mesh);
                     PrepareMeshFilter(meshFilter, mesh.mesh);
+                    meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
                     meshCollider.sharedMesh = meshFilter.mesh;
+
+                    meshRenderer.rootBone = meshRootObject.transform;
 
                     subMesh.SetParent(meshRootObject);
                 }
@@ -179,7 +183,7 @@ namespace GVR.Creator
             mesh.SetUVs(0, subMesh.uvs);
         }
 
-        private void PrepareMeshRenderer(MeshRenderer meshRenderer, PxMultiResolutionMeshData mrmData)
+        private void PrepareMeshRenderer(SkinnedMeshRenderer meshRenderer, PxMultiResolutionMeshData mrmData)
         {
             var finalMaterials = new List<Material>(mrmData.subMeshes.Length);
 

@@ -5,14 +5,16 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Animation;
-using PxCs.Data.Mesh;
 using PxCs.Data.Model;
-using PxCs.Data.Struct;
+using PxCs.Extensions;
 using PxCs.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting.Dependencies.Sqlite;
+using System.Security.Cryptography;
+using Unity.XR.CoreUtils;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 namespace GVR.Creator
@@ -98,50 +100,57 @@ namespace GVR.Creator
 
         private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
         {
+            var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
+
+            if (name != "Velaya")
+                return;
+
+
             // Example: visualname = HUMANS.MDS
             // FIXME - add cache to ModelScript (E.g. HUMANS.MDS are called multiple times)
+            var mds = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, data.visual); // Declaration of animations in a model.
 
-            var modelScript = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, data.visual); // Declaration of animations in a model.
+            velayaMds = mds;
+
 
             if (null == tempHumanAnimations)
             {
-                tempHumanAnimations = new PxAnimationData[modelScript.animations.Length];
+                tempHumanAnimations = new PxAnimationData[mds.animations.Length];
                 for (int i = 0; i < tempHumanAnimations.Length; i++)
                 {
-                    var animName = data.visual.Replace(".MDS", $"-{modelScript.animations[i].name}.MAN");
+                    var animName = data.visual.Replace(".MDS", $"-{mds.animations[i].name}.MAN");
 
                     //// FIXME - cache the right way. (Not in a hidden static temp variable)
                     tempHumanAnimations[i] = PxAnimation.LoadFromVdf(PhoenixBridge.VdfsPtr, animName);
                 }
             }
 
-            if (modelScript.skeleton.disableMesh)
+
+            if (mds.skeleton.disableMesh)
             {
                 var mdhName = data.visual.Replace(".MDS", ".MDH");
 
                 var mdh = PxModelHierarchy.LoadFromVdf(PhoenixBridge.VdfsPtr, mdhName);
+                velayaMdh = mdh;
 
-                
 
+                //var skeletonName = mds.skeleton.name.Replace(".ASC", ".MDM");
+                //var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // --> if null
 
-                //PxModelHierarchyData mdh = null;
+                //var gameObject = CreateNpcMesh(mdm, name);
+
+                //AddAnimations(gameObject, mdh, mdm);
 
             }
             else
             {
-                var skeletonName = modelScript.skeleton.name.Replace(".ASC", ".MDM");
+                var skeletonName = mds.skeleton.name.Replace(".ASC", ".MDM");
                 var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // --> if null
 
-                var gameObject = CreateNpcMesh(mdm);
+                //var gameObject = CreateNpcMesh(mdm, name);
             }
 
-            //var anim = PxAnimation.LoadFromVdf(PhoenixBridge.VdfsPtr, )
-
-
-
-            //            object mdl = PxModel.LoadModelFromVdf(PhoenixBridge.VdfsPtr, mdlName); // Model.h --> if null
-
-            //var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // Keyframes of animation.
+            return;
 
             /*
              * Walk animation load:
@@ -181,36 +190,165 @@ namespace GVR.Creator
 
         private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
         {
+            // TBD
 
+            var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
+
+            if (name != "Velaya")
+                return;
+
+            var mds = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, data.overlayname);
         }
+
+        private static PxModelHierarchyData velayaMdh;
+        private static PxModelScriptData velayaMds;
+
+
 
         private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
         {
             // TBD
+            var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
+
+            if (name != "Velaya")
+                return;
+
+            var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, $"{data.body}.MDM");
+
+            var root = CreateNpcMesh(mdm, name).transform.GetChild(0).gameObject;
+            CreateBonesData(root);
+            CreateAnimations(root);
+
+
+            //var tempAnimation = tempHumanAnimations[1];
+
+
+
+            //Animation animation = root.AddComponent<Animation>();
+            //AnimationCurve curve = new AnimationCurve();
+            //curve.keys = new Keyframe[] { new Keyframe(0f, 0f, 0f, 0f), new Keyframe(1f, 3f, 0f, 0f), new Keyframe(2f, 0f, 0f, 0f) };
+            //AnimationClip clip = new AnimationClip();
+            //clip.legacy = true;
+            //clip.SetCurve("BIP01", typeof(Transform), "m_LocalPosition.z", curve);
+            //clip.wrapMode = WrapMode.Loop;
+            //animation.AddClip(clip, "test");
+            //animation.Play("test");
+
         }
 
+        private static void CreateBonesData(GameObject root)
+        {
+            return;
+
+            Transform[] bones = new Transform[velayaMdh.nodes.Length];
+            Matrix4x4[] bindPoses = new Matrix4x4[velayaMdh.nodes.Length];
+
+            for (var i = 0; i < velayaMdh.nodes.Length; i++)
+            {
+                var node = velayaMdh.nodes[i];
+                var go = new GameObject(node.name);
+                go.SetParent(root);
+
+                bones[i] = go.transform;
+                bindPoses[i] = node.transform.ToUnityMatrix() * go.transform.worldToLocalMatrix; // is this right?
+            }
+
+            BoneWeight[] boneWeights = new BoneWeight[root.GetComponent<SkinnedMeshRenderer>().sharedMesh.vertices.Length];
+
+            for (var i = 0; i < boneWeights.Length; i++)
+            {
+                boneWeights[i] = new BoneWeight()
+                {
+                    boneIndex0 = 0,
+                    weight0 = 1
+                };
+            }
+            root.GetComponent<SkinnedMeshRenderer>().sharedMesh.boneWeights = boneWeights;
+
+            var renderer = root.GetComponent<SkinnedMeshRenderer>();
+            renderer.sharedMesh.bindposes = bindPoses;
+            renderer.bones = bones;
+        }
+
+
+        private static void CreateAnimations(GameObject root)
+        {
+            var animator = root.AddComponent<Animator>();
+
+            var playableGraph = PlayableGraph.Create("foobar");
+            playableGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+
+            AnimationClip clip = new AnimationClip();
+            AnimationCurve curve = new AnimationCurve();
+            curve.keys = new Keyframe[] { new Keyframe(0f, 0f, 0f, 0f), new Keyframe(1f, 3f, 0f, 0f), new Keyframe(2f, 0f, 0f, 0f) };
+            clip.SetCurve("BIP01", typeof(Transform), "m_LocalPosition.z", curve);
+            clip.wrapMode = WrapMode.Loop;
+
+            var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
+            var playableOutput = AnimationPlayableOutput.Create(playableGraph, "Animation", animator);
+            playableOutput.SetSourcePlayable(clipPlayable);
+
+            GraphVisualizerClient.Show(playableGraph);
+            
+            playableGraph.Play();
+        }
 
         // FIXME - Logic is copy&pasted from VobCreator.cs - We need to create a proper class where we can reuse functionality
         // FIXME - instead of duplicating it!
 
-        private static GameObject CreateNpcMesh(PxModelMeshData mdm)
+        private static GameObject CreateNpcMesh(PxModelMeshData mdm, string name)
         {
-            return SingletonBehaviour<MeshCreator>.GetOrCreate().Create(mdm, "foobar", null);
+            return SingletonBehaviour<MeshCreator>.GetOrCreate().Create(mdm, name, null);
         }
 
-        private static void AddAnimation(GameObject gameObject)
+        private static void AddAnimations(GameObject gameObject, PxModelHierarchyData mdh, PxModelMeshData mdm)
         {
+            if (mdm.meshes.Length != 1)
+                throw new ArgumentOutOfRangeException("Only one material is supported for bones/animations as of now.");
+
+
+
+            // Next: mdh.nodes == bones. Every bone need to be a separate GameObject below current one. (e.g. "Bip01 Head")
+
+
+            //gameObject.AddComponent<SkinnedMeshRenderer>();
+
             /*
              * What we need:
              * 1. Bones
              * 2. Animations
              */
+            // NEXT - Add bones (mdh...transform as bones!
+            // NEXT - link node_indices (Aka animation information) to bones and start play!
+
+
+            //var renderer = new SkinnedMeshRenderer();
+            //Transform[] bones = new Transform[mdh.nodes.Length];
+
+            //for (int i = 0; i < mdh.nodes.Length; i++)
+            //{
+            //    var transform = mdh.nodes[i].transform.ToUnityMatrix();
+
+            //    bones[i] = new Transform()
+            //    {
+            //        name = mdh.nodes[i].name,
+            //        position = transform.GetPosition(),
+            //        rotation = transform.rotation,
+            //        localScale = Vector3.one
+            //    };
+            //}
+            //humanDescription.skeleton = skeletonBones;
+
+            //var avatar = AvatarBuilder.BuildHumanAvatar(gameObject, humanDescription);
+
+            //var animator = gameObject.AddComponent<Animator>();
+            //animator.avatar = avatar;
+
         }
 
 
         private static void AddAnimationDemo(GameObject gameObject)
         {
-
             var anim = gameObject.AddComponent<Animation>();
             var rend = gameObject.AddComponent<SkinnedMeshRenderer>();
             var mesh = gameObject.GetComponent<MeshCollider>().sharedMesh;
