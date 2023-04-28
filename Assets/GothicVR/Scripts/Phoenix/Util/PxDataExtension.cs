@@ -22,18 +22,18 @@ namespace GVR.Phoenix.Util
                 return data;
 
 
-            data.boneIndex0 = weights[1].nodeIndex;
-            data.weight0 = weights[1].weight;
+            data.boneIndex1 = weights[1].nodeIndex;
+            data.weight1 = weights[1].weight;
             if (weights.Length == 2)
                 return data;
 
-            data.boneIndex0 = weights[2].nodeIndex;
-            data.weight0 = weights[2].weight;
+            data.boneIndex2 = weights[2].nodeIndex;
+            data.weight2 = weights[2].weight;
             if (weights.Length == 3)
                 return data;
 
-            data.boneIndex0 = weights[3].nodeIndex;
-            data.weight0 = weights[3].weight;
+            data.boneIndex3 = weights[3].nodeIndex;
+            data.weight3 = weights[3].weight;
             return data;
         }
     }
