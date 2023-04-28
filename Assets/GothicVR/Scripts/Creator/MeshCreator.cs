@@ -9,6 +9,7 @@ using PxCs.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace GVR.Creator
@@ -351,6 +352,9 @@ namespace GVR.Creator
             var mesh = new Mesh();
             var pxMesh = soft.mesh;
             var weights = soft.weights;
+
+            var DebugWeightIndices = weights.SelectMany(i => i).Select(i => i.nodeIndex).GroupBy(i => i).ToArray();
+
             meshFilter.mesh = mesh;
             mesh.subMeshCount = soft.mesh.subMeshes.Length;
 
@@ -426,11 +430,22 @@ namespace GVR.Creator
                 var nodeMatrix = node.transform.ToUnityMatrix();
                 var go = new GameObject(node.name);
                 go.SetParent(root);
-                go.transform.rotation = nodeMatrix.rotation;
-                go.transform.localPosition = nodeMatrix.GetPosition() / 100; // Unity positions are too big by factor 100.
+
+                // FIXME - used?
+                //go.transform.rotation = nodeMatrix.rotation;
+                //go.transform.localPosition = nodeMatrix.GetPosition(); // FIXME - needed? -> Unity positions are too big by factor 100.
+
+                go.transform.localRotation = Quaternion.identity;
+                go.transform.localPosition = Vector3.zero;
+
+                Debug.Log("rotation " + nodeMatrix.rotation);
+                Debug.Log("position " + nodeMatrix.GetPosition());
 
                 bones[i] = go.transform;
-                bindPoses[i] = go.transform.worldToLocalMatrix * go.transform.localToWorldMatrix; // is this right?
+
+                // FIXME - is this right or the other one?
+                //bindPoses[i] = go.transform.worldToLocalMatrix;//.worldToLocalMatrix * go.transform.localToWorldMatrix;
+                bindPoses[i] = bones[i].worldToLocalMatrix * root.transform.localToWorldMatrix;
             }
 
             renderer.sharedMesh.bindposes = bindPoses;

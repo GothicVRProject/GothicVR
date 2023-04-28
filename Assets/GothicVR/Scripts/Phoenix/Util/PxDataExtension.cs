@@ -9,10 +9,9 @@ namespace GVR.Phoenix.Util
         public static BoneWeight ToBoneWeight(this PxWeightEntryData[] weights)
         {
             if (weights == null)
-                throw new ArgumentNullException("Weights is null.");
+                throw new ArgumentNullException("Weights are null.");
             if (weights.Length == 0 || weights.Length > 4)
                 throw new ArgumentOutOfRangeException($"Only 1...4 weights are currently supported but >{weights.Length}< provided.");
-
 
             var data = new BoneWeight();
 
@@ -20,7 +19,6 @@ namespace GVR.Phoenix.Util
             data.weight0 = weights[0].weight;
             if (weights.Length == 1)
                 return data;
-
 
             data.boneIndex1 = weights[1].nodeIndex;
             data.weight1 = weights[1].weight;

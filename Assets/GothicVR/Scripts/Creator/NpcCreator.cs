@@ -217,6 +217,9 @@ namespace GVR.Creator
 
             var root = CreateNpcMesh(name, mdm, velayaMdh).transform.GetChild(0).gameObject;
 
+            // DEBUG - change location for better visibility
+            root.transform.position += root.transform.position + new Vector3(1, 5, 1);
+
             var debugMesh = root.GetComponent<SkinnedMeshRenderer>().sharedMesh;
             CreateAnimations(root);
 
@@ -247,7 +250,7 @@ namespace GVR.Creator
             AnimationClip clip = new AnimationClip();
             AnimationCurve curve = new AnimationCurve();
             curve.keys = new Keyframe[] { new Keyframe(0f, 0f, 0f, 0f), new Keyframe(1f, 3f, 0f, 0f), new Keyframe(2f, 0f, 0f, 0f) };
-            clip.SetCurve("BIP01 SPINE", typeof(Transform), "m_LocalPosition.z", curve);
+            clip.SetCurve("BIP01 L UPPERARM", typeof(Transform), "m_LocalPosition.z", curve);
             clip.wrapMode = WrapMode.Loop;
 
             var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
