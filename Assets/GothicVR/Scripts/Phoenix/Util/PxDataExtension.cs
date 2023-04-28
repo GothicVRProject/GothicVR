@@ -1,6 +1,5 @@
 using PxCs.Data.Mesh;
 using System;
-using System.Numerics;
 using UnityEngine;
 
 namespace GVR.Phoenix.Util

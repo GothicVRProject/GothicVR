@@ -423,11 +423,14 @@ namespace GVR.Creator
             for (var i = 0; i < mdh.nodes.Length; i++)
             {
                 var node = mdh.nodes[i];
+                var nodeMatrix = node.transform.ToUnityMatrix();
                 var go = new GameObject(node.name);
                 go.SetParent(root);
+                go.transform.rotation = nodeMatrix.rotation;
+                go.transform.localPosition = nodeMatrix.GetPosition() / 100; // Unity positions are too big by factor 100.
 
                 bones[i] = go.transform;
-                bindPoses[i] = node.transform.ToUnityMatrix() * go.transform.worldToLocalMatrix; // is this right?
+                bindPoses[i] = go.transform.worldToLocalMatrix * go.transform.localToWorldMatrix; // is this right?
             }
 
             renderer.sharedMesh.bindposes = bindPoses;
