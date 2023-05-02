@@ -12,6 +12,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.UIElements;
 
 namespace GVR.Creator
 {
@@ -42,7 +43,7 @@ namespace GVR.Creator
             return meshObj;
         }
 
-        public GameObject Create(PxMultiResolutionMeshData mrm, string objectName, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null)
+        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null)
         {
             var meshObj = new GameObject(objectName);
             meshObj.SetParent(parent);
@@ -50,6 +51,8 @@ namespace GVR.Creator
             var meshFilter = meshObj.AddComponent<MeshFilter>();
             var meshRenderer = meshObj.AddComponent<MeshRenderer>();
             var meshCollider = meshObj.AddComponent<MeshCollider>();
+
+            SetPosAndRot(meshObj, position, rotation);
 
             try
             {
@@ -63,31 +66,13 @@ namespace GVR.Creator
                 Destroy(meshObj);
             }
 
-            // Rotations from Gothic are a 3x3 matrix.
-            // According to this blog post, we can leverage it to be used the right way automatically:
-            // @see https://forum.unity.com/threads/convert-3x3-rotation-matrix-to-euler-angles.1086392/#post-7002275
-            // Hint 1: The matrix is transposed, i.e. we needed to change e.g. m01=[0,1] to m01=[1,0]
-            // Hint 2: m33 needs to be 1
-            var matrix4x4 = new Matrix4x4();
-            matrix4x4.m00 = rotation.m00;
-            matrix4x4.m01 = rotation.m10;
-            matrix4x4.m02 = rotation.m20;
-            matrix4x4.m10 = rotation.m01;
-            matrix4x4.m11 = rotation.m11;
-            matrix4x4.m12 = rotation.m21;
-            matrix4x4.m20 = rotation.m02;
-            matrix4x4.m21 = rotation.m12;
-            matrix4x4.m22 = rotation.m22;
-            matrix4x4.m33 = 1;
-            meshObj.transform.rotation = matrix4x4.rotation;
-            meshObj.transform.position = position;
-
             return meshObj;
         }
 
-        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, GameObject parent = null)
+        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position = default, PxMatrix3x3Data rotation = default, GameObject parent = null)
         {
             var meshRootObject = new GameObject(objectName);
+            SetPosAndRot(meshRootObject, position, rotation);
 
             try
             {
@@ -122,6 +107,31 @@ namespace GVR.Creator
             return meshRootObject;
         }
 
+
+        private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
+        {
+            if (position.Equals(default) && rotation.Equals(default))
+                return;
+
+            // Rotations from Gothic are a 3x3 matrix.
+            // According to this blog post, we can leverage it to be used the right way automatically:
+            // @see https://forum.unity.com/threads/convert-3x3-rotation-matrix-to-euler-angles.1086392/#post-7002275
+            // Hint 1: The matrix is transposed, i.e. we needed to change e.g. m01=[0,1] to m01=[1,0]
+            // Hint 2: m33 needs to be 1
+            var matrix4x4 = new Matrix4x4();
+            matrix4x4.m00 = rotation.m00;
+            matrix4x4.m01 = rotation.m10;
+            matrix4x4.m02 = rotation.m20;
+            matrix4x4.m10 = rotation.m01;
+            matrix4x4.m11 = rotation.m11;
+            matrix4x4.m12 = rotation.m21;
+            matrix4x4.m20 = rotation.m02;
+            matrix4x4.m21 = rotation.m12;
+            matrix4x4.m22 = rotation.m22;
+            matrix4x4.m33 = 1;
+            obj.transform.rotation = matrix4x4.rotation;
+            obj.transform.position = position;
+        }
 
         private void PrepareMeshRenderer(Renderer renderer, WorldData.SubMeshData subMesh)
         {

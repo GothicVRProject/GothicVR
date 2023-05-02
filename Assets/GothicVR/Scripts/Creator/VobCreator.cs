@@ -6,6 +6,7 @@ using GVR.Util;
 using PxCs.Data;
 using PxCs.Interface;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace GVR.Creator
@@ -21,7 +22,8 @@ namespace GVR.Creator
                 return;
 
             CreateItems(root, world);
-            
+            CreateContainers(root, world);
+
 
             // Currently we don't need to store cachedTextures once the world is loaded.
             cachedTextures.Clear();
@@ -49,7 +51,7 @@ namespace GVR.Creator
         private void CreateItems(GameObject root, WorldData world)
         {
             var itemVobs = GetFlattenedVobsByType(world.vobs, PxWorld.PxVobType.PxVob_oCItem);
-            var vobRootObj = new GameObject("Vobs");
+            var vobRootObj = new GameObject("Vob-Items");
             vobRootObj.transform.parent = root.transform;
 
             foreach (var vob in itemVobs)
@@ -64,7 +66,35 @@ namespace GVR.Creator
                 }
 
                 SingletonBehaviour<MeshCreator>.GetOrCreate()
-                    .Create(mrm, $"vob-{vob.vobName}", vob.position.ToUnityVector(), vob.rotation.Value, root);
+                    .Create(vob.vobName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
+            }
+        }
+
+        private void CreateContainers(GameObject root, WorldData world)
+        {
+            var itemVobs = GetFlattenedVobsByType(world.vobs, PxWorld.PxVobType.PxVob_oCMobContainer);
+            var vobRootObj = new GameObject("Vob-Containers");
+            vobRootObj.transform.parent = root.transform;
+
+            foreach (var vob in itemVobs)
+            {
+                var mdsName = vob.visualName;
+                var mdhName = mdsName.Replace(".MDS", ".MDH", System.StringComparison.OrdinalIgnoreCase);
+
+                var mds = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, mdsName);
+                var mdh = PxModelHierarchy.LoadFromVdf(PhoenixBridge.VdfsPtr, mdhName);
+
+                var mdmName = mds.skeleton.name.Replace(".ASC", ".MDM", System.StringComparison.OrdinalIgnoreCase);
+                var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, mdmName);
+
+                if (mdm == null)
+                {
+                    Debug.LogWarning($">{mdmName}< not found.");
+                    continue;
+                }
+
+                SingletonBehaviour<MeshCreator>.GetOrCreate()
+                    .Create(vob.vobName, mdm, mdh, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
             }
         }
     }

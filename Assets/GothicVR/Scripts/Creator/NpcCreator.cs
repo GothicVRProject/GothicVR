@@ -353,7 +353,7 @@ namespace GVR.Creator
 
         private static GameObject CreateNpcMesh(string name, PxModelMeshData mdm, PxModelHierarchyData mdh)
         {
-            return SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, null);
+            return SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, default, default, null);
         }
 
         private static void AddAnimations(GameObject gameObject, PxModelHierarchyData mdh, PxModelMeshData mdm)
