@@ -168,6 +168,7 @@ GameObject:
   - component: {fileID: 124285704}
   - component: {fileID: 124285698}
   - component: {fileID: 124285702}
+  - component: {fileID: 124285705}
   m_Layer: 0
   m_Name: Importer
   m_TagString: Untagged
@@ -255,6 +256,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
+--- !u!114 &124285705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124285697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b80be53895ae2a84f99e59be8a469a22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 0
 --- !u!1 &235819213
 GameObject:
   m_ObjectHideFlags: 0
@@ -300,7 +314,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
-  CreateVobs: 1
+  CreateVobs: 0
   CreateWaypoints: 0
   CreateWaypointEdges: 0
   EnableDayTime: 0

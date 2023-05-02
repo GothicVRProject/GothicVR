@@ -38,7 +38,7 @@ namespace GVR.Importer
             var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
 
             LoadWorld(vdfPtr);
-            LoadGothicVM(G1Dir);
+            //LoadGothicVM(G1Dir);
             LoadFonts();
         }
 
@@ -82,6 +82,8 @@ namespace GVR.Importer
             SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, root);
             SingletonBehaviour<VobCreator>.GetOrCreate().Create(root, world);
             SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(root, world);
+
+            SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
         }
 
         private void LoadGothicVM(string G1Dir)

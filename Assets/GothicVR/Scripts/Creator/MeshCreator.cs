@@ -101,8 +101,7 @@ namespace GVR.Creator
                 Destroy(meshRootObject);
             }
 
-            if (null != parent)
-                meshRootObject.transform.parent = parent.transform;
+            meshRootObject.SetParent(parent);
 
             return meshRootObject;
         }
