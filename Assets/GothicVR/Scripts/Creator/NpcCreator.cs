@@ -11,7 +11,7 @@ using PxCs.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
+using System.Threading;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -243,23 +243,109 @@ namespace GVR.Creator
         private static void CreateAnimations(GameObject root)
         {
             var animator = root.AddComponent<Animator>();
-
+            AnimationClip clip = new AnimationClip();
             var playableGraph = PlayableGraph.Create("foobar");
+
+            var cachedAnimations = tempHumanAnimations;
+            var anim = cachedAnimations.First(i => i.name == "S_DANCE1");
             playableGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
 
-            AnimationClip clip = new AnimationClip();
-            AnimationCurve curve = new AnimationCurve();
-            curve.keys = new Keyframe[] { new Keyframe(0f, 0f, 0f, 0f), new Keyframe(1f, 3f, 0f, 0f), new Keyframe(2f, 0f, 0f, 0f) };
-            clip.SetCurve("BIP01 L UPPERARM", typeof(Transform), "m_LocalPosition.z", curve);
+            var curves = new Dictionary<string, List<AnimationCurve>>((int)anim.nodeCount);
+            var boneNames = anim.node_indices.Select(nodeIndex => velayaMdh.nodes[nodeIndex].name).ToArray();
+
+            // Initialize array
+            for (var boneId = 0; boneId < boneNames.Length; boneId++)
+            {
+                var boneName = boneNames[boneId];
+                curves.Add(boneName, new List<AnimationCurve>(7));
+
+                // Initialize 7 dimensions. (3x position, 4x rotation)
+                curves[boneName].AddRange(Enumerable.Range(0, 7).Select(i => new AnimationCurve()).ToArray());
+            }
+
+            // Add KeyFrames from PxSamples
+            for (var i = 0; i < anim.samples.Length; i++)
+            {
+                // We want to know what time it is for the animation.
+                // Therefore we need to know fps multiplied with current sample. As there are nodeCount samples before a new time starts,
+                // we need to add this to the calculation.
+                var time = (1/anim.fps) * (int)(i / anim.nodeCount);
+                var sample = anim.samples[i];
+                var boneId = i % anim.nodeCount;
+                var boneName = boneNames[boneId];
+
+                var boneList = curves[boneName];
+                var uPosition = sample.position / 100; // Gothic locations are too big by factor 100
+
+                // We add 6 properties for location and rotation.
+                boneList[0].AddKey(time, uPosition.X);
+                boneList[1].AddKey(time, uPosition.Y);
+                boneList[2].AddKey(time, uPosition.Z);
+                boneList[3].AddKey(time, sample.rotation.w);
+                boneList[4].AddKey(time, sample.rotation.x);
+                boneList[5].AddKey(time, sample.rotation.y);
+                boneList[6].AddKey(time, sample.rotation.z);
+            }
+
+            foreach (var entry in curves)
+            {
+                clip.SetCurve(entry.Key, typeof(Transform), "m_LocalPosition.x", entry.Value[0]);
+                clip.SetCurve(entry.Key, typeof(Transform), "m_LocalPosition.y", entry.Value[1]);
+                clip.SetCurve(entry.Key, typeof(Transform), "m_LocalPosition.z", entry.Value[2]);
+                clip.SetCurve(entry.Key, typeof(Transform), "m_LocalRotation.w", entry.Value[3]);
+                clip.SetCurve(entry.Key, typeof(Transform), "m_LocalRotation.x", entry.Value[4]);
+                clip.SetCurve(entry.Key, typeof(Transform), "m_LocalRotation.y", entry.Value[5]);
+                clip.SetCurve(entry.Key, typeof(Transform), "m_LocalRotation.z", entry.Value[6]);
+            }
+
             clip.wrapMode = WrapMode.Loop;
 
             var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
-            var playableOutput = AnimationPlayableOutput.Create(playableGraph, "Animation", animator);
+            var playableOutput = AnimationPlayableOutput.Create(playableGraph, anim.name, animator);
+
             playableOutput.SetSourcePlayable(clipPlayable);
+            clipPlayable.SetDuration(anim.frameCount / anim.fps);
 
             GraphVisualizerClient.Show(playableGraph);
-            
+
             playableGraph.Play();
+
+
+            // 0 -> Start, 1 -> middle, 2 -> return to original
+            //AnimationClip clip = new AnimationClip();
+            //AnimationCurve curve = new AnimationCurve();
+            //curve.keys = new Keyframe[] { new Keyframe(0f, 0f, 0f, 0f), new Keyframe(1f, 1f, 0f, 0f), new Keyframe(2f, 0f, 0f, 0f) };
+            //clip.SetCurve("BIP01 L UPPERARM", typeof(Transform), "m_LocalPosition.z", curve);
+            //clip.wrapMode = WrapMode.Loop;
+
+            //var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
+            //var playableOutput = AnimationPlayableOutput.Create(playableGraph, "Animation", animator);
+            //playableOutput.SetSourcePlayable(clipPlayable);
+            //clipPlayable.SetDuration(2f);
+
+            //GraphVisualizerClient.Show(playableGraph);
+
+            //playableGraph.Play();
+
+
+            //var animator = root.AddComponent<Animator>();
+
+            //var playableGraph = PlayableGraph.Create("foobar");
+            //playableGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+
+            //AnimationClip clip = new AnimationClip();
+            //AnimationCurve curve = new AnimationCurve();
+            //curve.keys = new Keyframe[] { new Keyframe(0f, 0f, 0f, 0f), new Keyframe(1f, 3f, 0f, 0f), new Keyframe(2f, 0f, 0f, 0f) };
+            //clip.SetCurve("BIP01 L UPPERARM", typeof(Transform), "m_LocalPosition.z", curve);
+            //clip.wrapMode = WrapMode.Loop;
+
+            //var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
+            //var playableOutput = AnimationPlayableOutput.Create(playableGraph, "Animation", animator);
+            //playableOutput.SetSourcePlayable(clipPlayable);
+
+            //GraphVisualizerClient.Show(playableGraph);
+
+            //playableGraph.Play();
         }
 
         // FIXME - Logic is copy&pasted from VobCreator.cs - We need to create a proper class where we can reuse functionality

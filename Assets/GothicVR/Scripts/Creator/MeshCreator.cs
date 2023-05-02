@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Animations;
 
 namespace GVR.Creator
 {
@@ -427,6 +428,7 @@ namespace GVR.Creator
             for (var i = 0; i < mdh.nodes.Length; i++)
             {
                 var node = mdh.nodes[i];
+                // HINT: We currently don't use the nodeMatrix. So is it really needed?
                 var nodeMatrix = node.transform.ToUnityMatrix();
                 var go = new GameObject(node.name);
                 go.SetParent(root);
