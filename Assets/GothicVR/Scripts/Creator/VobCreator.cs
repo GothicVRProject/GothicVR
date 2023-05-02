@@ -20,25 +20,8 @@ namespace GVR.Creator
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
                 return;
 
-            var itemVobs = GetFlattenedVobsByType(world.vobs, PxWorld.PxVobType.PxVob_oCItem);
-            var vobRootObj = new GameObject("Vobs");
-            vobRootObj.transform.parent = root.transform;
-
-            foreach (var vob in itemVobs)
-            {
-                // FIXME: Add caching of MRM as object will be created multiple times inside a scene.
-                var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, $"{vob.vobName}.MRM");
-
-                if (mrm == null)
-                {
-                    Debug.LogError($"MultiResolutionModel (MRM) >{vob.vobName}.MRM< not found.");
-                    continue;
-                }
-
-                
-                SingletonBehaviour<MeshCreator>.GetOrCreate()
-                    .Create(mrm, $"vob-{vob.vobName}", vob.position.ToUnityVector(), vob.rotation.Value, root);
-            }
+            CreateItems(root, world);
+            
 
             // Currently we don't need to store cachedTextures once the world is loaded.
             cachedTextures.Clear();
@@ -60,6 +43,29 @@ namespace GVR.Creator
             }
 
             return returnVobs;
+        }
+
+
+        private void CreateItems(GameObject root, WorldData world)
+        {
+            var itemVobs = GetFlattenedVobsByType(world.vobs, PxWorld.PxVobType.PxVob_oCItem);
+            var vobRootObj = new GameObject("Vobs");
+            vobRootObj.transform.parent = root.transform;
+
+            foreach (var vob in itemVobs)
+            {
+                // FIXME: Add caching of MRM as object will be created multiple times inside a scene.
+                var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, $"{vob.vobName}.MRM");
+
+                if (mrm == null)
+                {
+                    Debug.LogError($"MultiResolutionModel (MRM) >{vob.vobName}.MRM< not found.");
+                    continue;
+                }
+
+                SingletonBehaviour<MeshCreator>.GetOrCreate()
+                    .Create(mrm, $"vob-{vob.vobName}", vob.position.ToUnityVector(), vob.rotation.Value, root);
+            }
         }
     }
 }

@@ -48,9 +48,8 @@ namespace GVR.Creator
             meshObj.SetParent(parent);
 
             var meshFilter = meshObj.AddComponent<MeshFilter>();
-            var meshRenderer = meshObj.AddComponent<SkinnedMeshRenderer>();
+            var meshRenderer = meshObj.AddComponent<MeshRenderer>();
             var meshCollider = meshObj.AddComponent<MeshCollider>();
-            meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
 
             try
             {
@@ -124,13 +123,13 @@ namespace GVR.Creator
         }
 
 
-        private void PrepareMeshRenderer(MeshRenderer meshRenderer, WorldData.SubMeshData subMesh)
+        private void PrepareMeshRenderer(Renderer renderer, WorldData.SubMeshData subMesh)
         {
             var standardShader = Shader.Find("Standard");
             var material = new Material(standardShader);
             var bMaterial = subMesh.material;
 
-            meshRenderer.material = material;
+            renderer.material = material;
 
             // No texture to add.
             if (bMaterial.texture == "")
@@ -187,7 +186,7 @@ namespace GVR.Creator
             mesh.SetUVs(0, subMesh.uvs);
         }
 
-        private void PrepareMeshRenderer(SkinnedMeshRenderer meshRenderer, PxMultiResolutionMeshData mrmData)
+        private void PrepareMeshRenderer(Renderer renderer, PxMultiResolutionMeshData mrmData)
         {
             var finalMaterials = new List<Material>(mrmData.subMeshes.Length);
 
@@ -197,7 +196,7 @@ namespace GVR.Creator
                 var material = new Material(standardShader);
                 var materialData = subMesh.material;
 
-                meshRenderer.material = material;
+                renderer.material = material;
 
                 // No texture to add.
                 if (materialData.texture == "")
@@ -246,7 +245,7 @@ namespace GVR.Creator
                 finalMaterials.Add(material);
             }
 
-            meshRenderer.SetMaterials(finalMaterials);
+            renderer.SetMaterials(finalMaterials);
         }
 
         private void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
@@ -276,8 +275,6 @@ namespace GVR.Creator
             var verticesAndUvSize = mrmData.subMeshes.Sum(i => i.triangles.Length) * 3;
             var preparedVertices = new List<Vector3>(verticesAndUvSize);
             var preparedUVs = new List<Vector2>(verticesAndUvSize);
-
-            List<BoneWeight> preparedBoneWeights = null;
 
             // 2-dimensional arrays (as there are segregated by submeshes)
             var preparedTriangles = new List<List<int>>(mrmData.subMeshes.Length);
@@ -440,8 +437,8 @@ namespace GVR.Creator
                 go.transform.localRotation = Quaternion.identity;
                 go.transform.localPosition = Vector3.zero;
 
-                Debug.Log("rotation " + nodeMatrix.rotation);
-                Debug.Log("position " + nodeMatrix.GetPosition());
+                //Debug.Log("rotation " + nodeMatrix.rotation);
+                //Debug.Log("position " + nodeMatrix.GetPosition());
 
                 bones[i] = go.transform;
 

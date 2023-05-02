@@ -300,7 +300,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
-  CreateVobs: 0
+  CreateVobs: 1
   CreateWaypoints: 0
   CreateWaypointEdges: 0
   EnableDayTime: 0
