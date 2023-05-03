@@ -1,11 +1,9 @@
 ﻿using GVR.Phoenix.Data;
-using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
-using PxCs.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;

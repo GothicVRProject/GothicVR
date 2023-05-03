@@ -93,11 +93,6 @@ namespace GVR.Creator
             PhoenixBridge.npcRoutines[data.npc].Add(routine);
         }
 
-
-        // FIXME - Performance increased from 20sec load down to 5sec load.
-        // FIXME - Need to be replaced with proper caching later.
-        private static PxAnimationData[] tempHumanAnimations = null;
-
         private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
         {
             var mds = assetCache.TryGetMds(data.visual);

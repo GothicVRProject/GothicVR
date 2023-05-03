@@ -3,8 +3,8 @@ using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data;
-using PxCs.Interface;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using static PxCs.Interface.PxWorld;
 
@@ -12,10 +12,12 @@ namespace GVR.Creator
 {
     public class VobCreator : SingletonBehaviour<VobCreator>
     {   
-        private static AssetCache assetCache;
+        private MeshCreator meshCreator;
+        private AssetCache assetCache;
 
         private void Start()
         {
+            meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
         }
 
@@ -24,17 +26,17 @@ namespace GVR.Creator
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
                 return;
 
-            var vobs = new Dictionary<PxWorld.PxVobType, List<PxVobData>>();
+            var vobs = new Dictionary<PxVobType, List<PxVobData>>();
+
+            // FIXME - Currently we're loading all objects from all worlds (?)
             GetVobs(world.vobs, vobs);
 
-            CreateItems(root, vobs);
-            CreateContainers(root, vobs);
+            CreateMrmVobs(root, vobs);
+            //CreateItems(root, vobs);
+            //CreateContainers(root, vobs);
         }
 
-        /// <summary>
-        /// Convenient method to return specific vob elements in recursive list of PxVobData.childVobs...
-        /// </summary>
-        private void GetVobs(PxVobData[] inVobs, Dictionary<PxWorld.PxVobType, List<PxVobData>> outVobs)
+        private void GetVobs(PxVobData[] inVobs, Dictionary<PxVobType, List<PxVobData>> outVobs)
         {
             foreach (var vob in inVobs)
             {
@@ -46,30 +48,39 @@ namespace GVR.Creator
             }
         }
 
-        private void CreateItems(GameObject root, Dictionary<PxWorld.PxVobType, List<PxVobData>> vobs)
+        private void CreateItems(GameObject root, Dictionary<PxVobType, List<PxVobData>> vobs)
         {
             var vobRootObj = new GameObject("Vob-Items");
             vobRootObj.transform.parent = root.transform;
 
             foreach (var vob in vobs[PxVobType.PxVob_oCItem])
             {
-                // FIXME: Add caching of MRM as object will be created multiple times inside a scene.
                 var mrm = assetCache.TryGetMrm(vob.vobName);
 
                 if (mrm == null)
                 {
-                    Debug.LogError($"MultiResolutionModel (MRM) >{vob.vobName}.MRM< not found.");
+                    Debug.LogWarning($"MultiResolutionModel (MRM) >{vob.vobName}.MRM< not found.");
                     continue;
                 }
 
-                SingletonBehaviour<MeshCreator>.GetOrCreate()
-                    .Create(vob.vobName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
+                meshCreator.Create(vob.vobName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
             }
         }
 
-        private void CreateMob(GameObject root, Dictionary<PxVobType, List<PxVobData>> vobs)
+        private void CreateMrmVobs(GameObject root, Dictionary<PxVobType, List<PxVobData>> vobs)
         {
+            var vobRootObj = new GameObject("Vobs");
+            vobRootObj.transform.parent = root.transform;
 
+            foreach (var vob in vobs.Values.SelectMany(i => i.SelectMany(ii => ii.childVobs)))
+            {
+                var mrm = assetCache.TryGetMrm(vob.vobName);
+
+                if (mrm == null)
+                    continue;
+
+                meshCreator.Create(vob.vobName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
+            }
         }
 
         private void CreateContainers(GameObject root, Dictionary<PxVobType, List<PxVobData>> vobs)
@@ -89,8 +100,7 @@ namespace GVR.Creator
                     continue;
                 }
 
-                SingletonBehaviour<MeshCreator>.GetOrCreate()
-                    .Create(vob.vobName, mdm, mdh, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
+                meshCreator.Create(vob.vobName, mdm, mdh, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
             }
         }
     }
