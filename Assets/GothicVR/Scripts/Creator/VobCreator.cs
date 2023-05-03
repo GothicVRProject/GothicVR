@@ -1,13 +1,12 @@
 ﻿using GVR.Demo;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data;
 using PxCs.Interface;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using UnityEngine;
+using static PxCs.Interface.PxWorld;
 
 namespace GVR.Creator
 {
@@ -25,39 +24,37 @@ namespace GVR.Creator
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
                 return;
 
-            CreateItems(root, world);
-            CreateContainers(root, world);
+            var vobs = new Dictionary<PxWorld.PxVobType, List<PxVobData>>();
+            GetVobs(world.vobs, vobs);
+
+            CreateItems(root, vobs);
+            CreateContainers(root, vobs);
         }
 
         /// <summary>
         /// Convenient method to return specific vob elements in recursive list of PxVobData.childVobs...
         /// </summary>
-        private List<PxVobData> GetFlattenedVobsByType(PxVobData[] vobsToFilter, PxWorld.PxVobType type)
+        private void GetVobs(PxVobData[] inVobs, Dictionary<PxWorld.PxVobType, List<PxVobData>> outVobs)
         {
-            var returnVobs = new List<PxVobData>();
-            for (var i = 0; i < vobsToFilter.Length; i++)
+            foreach (var vob in inVobs)
             {
-                var curVob = vobsToFilter[i];
-                if (curVob.type == type)
-                    returnVobs.Add(curVob);
+                if (!outVobs.ContainsKey(vob.type))
+                    outVobs.Add(vob.type, new());
 
-                returnVobs.AddRange(GetFlattenedVobsByType(curVob.childVobs, type));
+                outVobs[vob.type].Add(vob);
+                GetVobs(vob.childVobs, outVobs);
             }
-
-            return returnVobs;
         }
 
-
-        private void CreateItems(GameObject root, WorldData world)
+        private void CreateItems(GameObject root, Dictionary<PxWorld.PxVobType, List<PxVobData>> vobs)
         {
-            var itemVobs = GetFlattenedVobsByType(world.vobs, PxWorld.PxVobType.PxVob_oCItem);
             var vobRootObj = new GameObject("Vob-Items");
             vobRootObj.transform.parent = root.transform;
 
-            foreach (var vob in itemVobs)
+            foreach (var vob in vobs[PxVobType.PxVob_oCItem])
             {
                 // FIXME: Add caching of MRM as object will be created multiple times inside a scene.
-                var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, $"{vob.vobName}.MRM");
+                var mrm = assetCache.TryGetMrm(vob.vobName);
 
                 if (mrm == null)
                 {
@@ -70,17 +67,18 @@ namespace GVR.Creator
             }
         }
 
-        private void CreateContainers(GameObject root, WorldData world)
+        private void CreateMob(GameObject root, Dictionary<PxVobType, List<PxVobData>> vobs)
         {
-            var itemVobs = GetFlattenedVobsByType(world.vobs, PxWorld.PxVobType.PxVob_oCMobContainer);
+
+        }
+
+        private void CreateContainers(GameObject root, Dictionary<PxVobType, List<PxVobData>> vobs)
+        {
             var vobRootObj = new GameObject("Vob-Containers");
             vobRootObj.transform.parent = root.transform;
 
-            foreach (var vob in itemVobs)
+            foreach (var vob in vobs[PxVobType.PxVob_oCMobContainer])
             {
-                var mdsName = vob.visualName;
-                var mdhName = mdsName.Replace(".MDS", ".MDH", System.StringComparison.OrdinalIgnoreCase);
-
                 var mds = assetCache.TryGetMds(vob.visualName);
                 var mdh = assetCache.TryGetMdh(vob.visualName);
                 var mdm = assetCache.TryGetMdm(mds.skeleton.name);
