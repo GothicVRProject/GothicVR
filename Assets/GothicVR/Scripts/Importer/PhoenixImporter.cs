@@ -39,7 +39,7 @@ namespace GVR.Importer
 
             LoadWorld(vdfPtr);
             LoadGothicVM(G1Dir);
-            LoadFonts();
+            //LoadFonts();
         }
 
 
