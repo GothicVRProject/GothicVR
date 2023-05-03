@@ -1,12 +1,19 @@
-using System;
 using UnityEditor;
 using System.Collections.Generic;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using UnityEngine.XR.OpenXR;
+using UnityEngine.XR.OpenXR.Features.MetaQuestSupport;
+using UnityEngine.XR.OpenXR.Features.PICOSupport;
+using UnityEngine.XR.OpenXR.Features.Interactions;
+using UnityEngine.XR.Management;
+using Unity.VisualScripting;
 
-namespace UnityBuildTools {
 
-    public class UnityBuilderAction
+namespace GVR.Editor.UnityBuildTools
+{
+
+	public class UnityBuilderAction
     {
         static string[] SCENES = FindEnabledEditorScenes();
     
@@ -14,24 +21,23 @@ namespace UnityBuildTools {
         static readonly string TARGET_DIR = "build";
 
 
-        [MenuItem("GothicVR/CI/Build Quest2")]
+        [MenuItem("GothicVR/Build/Build Quest2")]
         static void PerformQuestBuild()
         {
             string target_path = TARGET_DIR + "/Quest/" + APP_NAME + ".apk";
-            SetAndroidSettings();
-
+            SetQuestSettings();
 			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
         }
 
-		[MenuItem("GothicVR/CI/Build Pico4")]
+		[MenuItem("GothicVR/Build/Build Pico4")]
 		static void PerformPicoBuild()
 		{
 			string target_path = TARGET_DIR + "/Pico/" + APP_NAME + ".apk";
-            SetAndroidSettings();
+            SetPicoSettings();
 			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
 		}
 
-		[MenuItem("GothicVR/CI/Build PCVR")]
+		[MenuItem("GothicVR/Build/Build PCVR")]
 		static void PerformWindows64Build()
 		{
 			string target_path = TARGET_DIR + "/Windows64/" + APP_NAME + ".exe";
@@ -44,9 +50,6 @@ namespace UnityBuildTools {
             // Set the target platform for the build
             EditorUserBuildSettings.SwitchActiveBuildTarget(build_target_group, build_target);
     
-            
-            
-    
             // Set BuildPlayerOptions
             BuildPlayerOptions options = new BuildPlayerOptions();
             options.scenes = scenes;
@@ -58,12 +61,6 @@ namespace UnityBuildTools {
             // Build the project
             BuildReport report = BuildPipeline.BuildPlayer(options);
         }
-
-        private static void SetAndroidSettings()
-        {
-			// Set the target device for the build
-			PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
-		}
     
         private static string[] FindEnabledEditorScenes()
         {
@@ -76,6 +73,45 @@ namespace UnityBuildTools {
             
 	    return EditorScenes.ToArray();
         }
+
+        private static void SetPicoSettings(){
+
+			PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
+
+            //Enable Pico
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOTouchControllerProfile>().enabled = true;
+            OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOFeature>().enabled = true;
+
+            //Disable Meta
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled = false;
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = false;
+
+			foreach (var item in OpenXRSettings.ActiveBuildTargetInstance.GetFeatures()) 
+            {
+				Debug.Log(item.name);
+			}
+            Debug.Log("OpenXR settings set for: Pico");  
+            
+        }
+
+
+        private static void SetQuestSettings(){
+
+			PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
+
+			//Enable Meta
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = true;
+            OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled = true;
+
+			//Disable Pico
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOFeature>().enabled = false;
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOTouchControllerProfile>().enabled = false;
+
+			Debug.Log("OpenXR settings set for: Quest");
+        
+        }
+
+        
     }
 }
 

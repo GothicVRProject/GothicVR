@@ -5,10 +5,16 @@ on:
     branches:
       - main
     types: [opened, reopened, synchronize]
+    paths-ignore:
+      - '^(docs|Docs|DOCS)/.*'
+      - "README.md"
     
-  #push:
-  #  branches:
-  #    - 18-create-build-pipeline
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '^(docs|Docs|DOCS)/.*'
+      - "README.md"
 
 jobs:
 
@@ -101,7 +107,7 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
-          buildMethod: UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
+          buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
 
       - uses: actions/upload-artifact@v2
         with:

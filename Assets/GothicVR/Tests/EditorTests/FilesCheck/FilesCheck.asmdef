@@ -1,0 +1,9 @@
+{
+    "name": "FilesCheck",
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ]
+}
