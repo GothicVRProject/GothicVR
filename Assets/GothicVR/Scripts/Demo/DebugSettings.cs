@@ -4,6 +4,14 @@ namespace GVR.Demo
 {
     public class DebugSettings: SingletonBehaviour<DebugSettings>
     {
+        public enum SunMovementPerformance
+        {
+            EveryIngameSecond,
+            EveryIngameMinute,
+            Every10IngameMinutes
+        };
+
+
         public bool CreateVobs;
         public bool CreateWaypoints;
         public bool CreateWaypointEdges;
@@ -12,12 +20,6 @@ namespace GVR.Demo
         public SunMovementPerformance SunMovementPerformanceValue;
 
         public bool EnableNpcRoutines;
-
-        public enum SunMovementPerformance
-        {
-            EveryIngameSecond,
-            EveryIngameMinute,
-            Every10IngameMinutes
-        };
+        public bool CreateExampleAnimation;
     }
 }

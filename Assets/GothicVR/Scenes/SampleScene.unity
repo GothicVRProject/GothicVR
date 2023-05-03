@@ -320,6 +320,7 @@ MonoBehaviour:
   EnableDayTime: 0
   SunMovementPerformanceValue: 2
   EnableNpcRoutines: 0
+  CreateExampleAnimation: 0
 --- !u!1 &703127196
 GameObject:
   m_ObjectHideFlags: 0

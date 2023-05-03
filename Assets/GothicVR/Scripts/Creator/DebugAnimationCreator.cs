@@ -1,3 +1,4 @@
+using GVR.Demo;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -16,20 +17,30 @@ namespace GVR.Creator
     {
         public void Create()
         {
-            var snapperObj = new GameObject("DebugSnapper");
-            SceneManager.GetSceneByName("SampleScene").GetRootGameObjects().Append(snapperObj);
+            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateExampleAnimation)
+                return;
+
+            ///
+            /// File names to change
+            ///
+            var mdsName = "BABE.MDS"; // Snapper: "Snapper.mds"; Velaya: "BABE.MDS"
+            var mdhName = "BABE.mdh"; // Snapper: "Snapper.mdh"; Velaya: "BABE.mdh"
+            var mdlName = "BABE.mdl"; // Snapper: "Snapper.mdl"; Velaya: "BABE.mdl"
+            var mdmName = "Bab_body_Naked0.mdm"; // Snapper: "Sna_Body.mdm"; Velaya: "Bab_body_Naked0.mdm"
+            var mrmName = "BABE.mrm"; // Snapper: "Snapper.mrm"; Velaya: "BABE.mrm"
+            var animationName = "S_DANCE1"; // Snapper: "R_CLEAN"; Velaya: "S_DANCE1"
 
 
-            var mdsName = "Snapper.mds"; // Mdl_SetVisual(self, "Snapper.mds");
-            var mdhName = "Snapper.mdh";
-            var mdmName = "Sna_Body.mdm"; // 	Mdl_SetVisualBody		(self,	"Sna_Body",		DEFAULT,	DEFAULT,	"",			DEFAULT,  	DEFAULT,	-1);
-            var animationName = "R_CLEAN";
+            var debugObj = new GameObject("DebugAnimationObject");
+            SceneManager.GetSceneByName("SampleScene").GetRootGameObjects().Append(debugObj);
 
             var mds = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, mdsName);
+            var mdl = PxModel.LoadModelFromVdf(PhoenixBridge.VdfsPtr, mdlName);
             var mdh = PxModelHierarchy.LoadFromVdf(PhoenixBridge.VdfsPtr, mdhName);
             var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, mdmName);
+            var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, mrmName);
+            var root = SingletonBehaviour<MeshCreator>.GetOrCreate().Create("DebugAnimationObject1", mdm, mdh, default, default, debugObj);
 
-            var root = SingletonBehaviour<MeshCreator>.GetOrCreate().Create("Snapper1", mdm, mdh, default, default, snapperObj);
 
 
             PxAnimationData[] animations = new PxAnimationData[mds.animations.Length];
@@ -40,7 +51,6 @@ namespace GVR.Creator
             }
             var debugAnimationNames = animations.Select(i => i.name).ToArray();
             var anim = animations.First(i => i.name == animationName);
-
 
 
 
@@ -119,7 +129,7 @@ namespace GVR.Creator
 
 
 
-            snapperObj.transform.localPosition = new(-10f, 10f, 0);
+            debugObj.transform.localPosition = new(-10f, 10f, 0);
         }
     }
 }
