@@ -12,9 +12,13 @@ using UnityEngine;
 namespace GVR.Creator
 {
     public class VobCreator : SingletonBehaviour<VobCreator>
-    {
-        // Cache helped speed up loading of G1 world textures from 870ms to 230 (~75% speedup)
-        private Dictionary<string, Texture2D> cachedTextures = new();
+    {   
+        private static AssetCache assetCache;
+
+        private void Start()
+        {
+            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+        }
 
         public void Create(GameObject root, WorldData world)
         {
@@ -23,10 +27,6 @@ namespace GVR.Creator
 
             CreateItems(root, world);
             CreateContainers(root, world);
-
-
-            // Currently we don't need to store cachedTextures once the world is loaded.
-            cachedTextures.Clear();
         }
 
         /// <summary>
@@ -81,15 +81,13 @@ namespace GVR.Creator
                 var mdsName = vob.visualName;
                 var mdhName = mdsName.Replace(".MDS", ".MDH", System.StringComparison.OrdinalIgnoreCase);
 
-                var mds = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, mdsName);
-                var mdh = PxModelHierarchy.LoadFromVdf(PhoenixBridge.VdfsPtr, mdhName);
-
-                var mdmName = mds.skeleton.name.Replace(".ASC", ".MDM", System.StringComparison.OrdinalIgnoreCase);
-                var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, mdmName);
+                var mds = assetCache.TryGetMds(vob.visualName);
+                var mdh = assetCache.TryGetMdh(vob.visualName);
+                var mdm = assetCache.TryGetMdm(mds.skeleton.name);
 
                 if (mdm == null)
                 {
-                    Debug.LogWarning($">{mdmName}< not found.");
+                    Debug.LogWarning($">{mds.skeleton.name}< not found.");
                     continue;
                 }
 

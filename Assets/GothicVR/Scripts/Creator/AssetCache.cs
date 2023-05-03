@@ -21,42 +21,10 @@ namespace GVR.Creator
         private Dictionary<string, PxMultiResolutionMeshData> mrmCache = new();
 
 
-        public bool TryGetTexture(string key, out Texture2D texture)
+        public Texture2D TryGetTexture(string key)
         {
-            return textureCache.TryGetValue(GetPreparedKey(key), out texture);
-        }
-
-        public bool TryGetMds(string key, out PxModelScriptData mds)
-        {
-            return mdsCache.TryGetValue(GetPreparedKey(key), out mds);
-        }
-
-        public bool TryGetMdh(string key, out PxModelHierarchyData mdh)
-        {
-            return mdhCache.TryGetValue(GetPreparedKey(key), out mdh);
-        }
-
-        public bool TryGetMdl(string key, out PxModelData mdl)
-        {
-            return mdlCache.TryGetValue(GetPreparedKey(key), out mdl);
-        }
-
-        public bool TryGetMdm(string key, out PxModelMeshData mdm)
-        {
-            return mdmCache.TryGetValue(GetPreparedKey(key), out mdm);
-        }
-
-        public bool TryGetMrm(string key, out PxMultiResolutionMeshData mrm)
-        {
-            return mrmCache.TryGetValue(GetPreparedKey(key), out mrm);
-        }
-
-
-
-
-        public Texture2D TryAddTexture(string key)
-        {
-            if (TryGetTexture(key, out Texture2D data))
+            var preparedKey = GetPreparedKey(key);
+            if (textureCache.TryGetValue(preparedKey, out Texture2D data))
                 return data;
 
 
@@ -89,61 +57,66 @@ namespace GVR.Creator
 
             texture.Apply();
 
-            textureCache[GetPreparedKey(key)] = texture;
+            textureCache[preparedKey] = texture;
             return texture;
         }
 
-        public PxModelScriptData TryAddMds(string key)
+        public PxModelScriptData TryGetMds(string key)
         {
-            if (TryGetMds(key, out PxModelScriptData data))
+            var preparedKey = GetPreparedKey(key);
+            if (mdsCache.TryGetValue(preparedKey, out PxModelScriptData data))
                 return data;
 
             var newData = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mds");
-            mdsCache[GetPreparedKey(key)] = newData;
+            mdsCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public PxModelHierarchyData TryAddMdh(string key)
+        public PxModelHierarchyData TryGetMdh(string key)
         {
-            if (TryGetMdh(key, out PxModelHierarchyData data))
+            var preparedKey = GetPreparedKey(key);
+            if (mdhCache.TryGetValue(preparedKey, out PxModelHierarchyData data))
                 return data;
 
             var newData = PxModelHierarchy.LoadFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mdh");
-            mdhCache[GetPreparedKey(key)] = newData;
+            mdhCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public PxModelData TryAddMdl(string key)
+        public PxModelData TryGetMdl(string key)
         {
-            if (TryGetMdl(key, out PxModelData data))
+            var preparedKey = GetPreparedKey(key);
+            if (mdlCache.TryGetValue(preparedKey, out PxModelData data))
                 return data;
 
             var newData = PxModel.LoadModelFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mdl");
-            mdlCache[GetPreparedKey(key)] = newData;
+            mdlCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public PxModelMeshData TryAddMdm(string key)
+        public PxModelMeshData TryGetMdm(string key)
         {
-            if (TryGetMdm(key, out PxModelMeshData data))
+            var preparedKey = GetPreparedKey(key);
+            if (mdmCache.TryGetValue(preparedKey, out PxModelMeshData data))
                 return data;
 
             var newData = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mdm");
-            mdmCache[GetPreparedKey(key)] = newData;
+            mdmCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public PxMultiResolutionMeshData TryAddMrm(string key)
+        public PxMultiResolutionMeshData TryGetMrm(string key)
         {
-            if (TryGetMrm(key, out PxMultiResolutionMeshData data))
+            var preparedKey = GetPreparedKey(key);
+            if (mrmCache.TryGetValue(preparedKey, out PxMultiResolutionMeshData data))
                 return data;
 
             var newData = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mrm");
-            mrmCache[GetPreparedKey(key)] = newData;
+            mrmCache[preparedKey] = newData;
 
             return newData;
         }

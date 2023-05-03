@@ -100,12 +100,12 @@ namespace GVR.Creator
 
         private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
         {
-            var mds = assetCache.TryAddMds(data.visual);
+            var mds = assetCache.TryGetMds(data.visual);
 
             // This is something used from OpenGothic. But what is it doing actually? ;-)
             if (mds.skeleton.disableMesh)
             {
-                assetCache.TryAddMdh(data.visual);
+                assetCache.TryGetMdh(data.visual);
             }
             else
             {
@@ -125,7 +125,7 @@ namespace GVR.Creator
             // TBD
             var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
 
-            var mdm = assetCache.TryAddMdm(data.body);
+            var mdm = assetCache.TryGetMdm(data.body);
 
             //SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, default, default, null);
         }
