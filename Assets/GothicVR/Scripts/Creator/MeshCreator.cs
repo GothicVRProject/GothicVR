@@ -9,18 +9,19 @@ using PxCs.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.UIElements;
 
 namespace GVR.Creator
 {
-    public class MeshCreator: SingletonBehaviour<MeshCreator>
+    public class MeshCreator : SingletonBehaviour<MeshCreator>
     {
-        // Cache helped speed up loading of G1 world textures from 870ms to 230 (~75% speedup)
-        private Dictionary<string, Texture2D> cachedTextures = new();
+        private static AssetCache assetCache;
 
+        void Start()
+        {
+            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+        }
+        
         public GameObject Create(WorldData world, GameObject parent = null)
         {
             var meshObj = new GameObject("Mesh");
@@ -144,45 +145,12 @@ namespace GVR.Creator
             if (bMaterial.texture == "")
                 return;
 
-            // Load texture for the first time.
-            if (!cachedTextures.TryGetValue(bMaterial.texture, out Texture2D cachedTexture))
-            {
-                // FIXME - There might be more textures to load compressed. Please check for sake of performance!
-                var pxTexture = PxTexture.GetTextureFromVdf(
-                    PhoenixBridge.VdfsPtr,
-                    bMaterial.texture,
-                    PxTexture.Format.tex_dxt1, PxTexture.Format.tex_dxt5);
+            var texture = assetCache.TryAddTexture(bMaterial.texture);
 
-                // No texture found
-                if (pxTexture == null)
-                {
-                    Debug.LogWarning($"Texture {bMaterial.texture} couldn't be found.");
-                    return;
-                }
+            if (null == texture)
+                throw new Exception("Couldn't get texture from name: " + bMaterial.texture);
 
-                var format = pxTexture.format.AsUnityTextureFormat();
-                if (format == 0)
-                {
-                    Debug.LogWarning($"Format >{pxTexture.format}< is not supported or not yet tested to work with Unity:");
-                    return;
-                }
-
-                var texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, (int)pxTexture.mipmapCount, false);
-
-                texture.name = bMaterial.texture;
-
-                for (var i = 0u; i < pxTexture.mipmapCount; i++)
-                {
-                    texture.SetPixelData(pxTexture.mipmaps[i].mipmap, (int)i);
-                }
-
-                texture.Apply();
-
-                cachedTextures.Add(bMaterial.texture, texture);
-                cachedTexture = texture;
-            }
-
-            material.mainTexture = cachedTexture;
+            material.mainTexture = texture;
         }
 
         private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
@@ -211,45 +179,12 @@ namespace GVR.Creator
                 if (materialData.texture == "")
                     return;
 
-                // Load texture for the first time.
-                if (!cachedTextures.TryGetValue(materialData.texture, out Texture2D cachedTexture))
-                {
-                    // FIXME - There might be more textures to load compressed. Please check for sake of performance!
-                    var pxTexture = PxTexture.GetTextureFromVdf(
-                        PhoenixBridge.VdfsPtr,
-                        materialData.texture,
-                        PxTexture.Format.tex_dxt1, PxTexture.Format.tex_dxt5);
+                var texture = assetCache.TryAddTexture(materialData.texture);
 
-                    // No texture found
-                    if (pxTexture == null)
-                    {
-                        Debug.LogWarning($"Texture {materialData.texture} couldn't be found.");
-                        return;
-                    }
+                if (null == texture)
+                    throw new Exception("Couldn't get texture from name: " + materialData.texture);
 
-                    var format = pxTexture.format.AsUnityTextureFormat();
-                    if (format == 0)
-                    {
-                        Debug.LogWarning($"Format >{pxTexture.format}< is not supported or not yet tested to work with Unity:");
-                        return;
-                    }
-
-                    var texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, (int)pxTexture.mipmapCount, false);
-
-                    texture.name = materialData.texture;
-
-                    for (var i = 0u; i < pxTexture.mipmapCount; i++)
-                    {
-                        texture.SetPixelData(pxTexture.mipmaps[i].mipmap, (int)i);
-                    }
-
-                    texture.Apply();
-
-                    cachedTextures.Add(materialData.texture, texture);
-                    cachedTexture = texture;
-                }
-
-                material.mainTexture = cachedTexture;
+                material.mainTexture = texture;
 
                 finalMaterials.Add(material);
             }

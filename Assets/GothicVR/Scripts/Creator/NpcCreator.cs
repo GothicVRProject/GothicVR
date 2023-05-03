@@ -5,7 +5,6 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Animation;
-using PxCs.Data.Model;
 using PxCs.Extensions;
 using PxCs.Interface;
 using System;
@@ -101,40 +100,12 @@ namespace GVR.Creator
 
         private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
         {
-            var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
+            var mds = assetCache.TryAddMds(data.visual);
 
-            if (name != "Velaya")
-                return;
-
-
-            // Example: visualname = HUMANS.MDS
-            // FIXME - add cache to ModelScript (E.g. HUMANS.MDS are called multiple times)
-
-            // Declaration of animations in a model.
-            var mds = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, data.visual);
-
-            velayaMds = mds;
-
-
-            if (null == tempHumanAnimations)
-            {
-                tempHumanAnimations = new PxAnimationData[mds.animations.Length];
-                for (int i = 0; i < tempHumanAnimations.Length; i++)
-                {
-                    var animName = data.visual.Replace(".MDS", $"-{mds.animations[i].name}.MAN");
-
-                    //// FIXME - cache the right way. (Not in a hidden static temp variable)
-                    tempHumanAnimations[i] = PxAnimation.LoadFromVdf(PhoenixBridge.VdfsPtr, animName);
-                }
-            }
-
-
+            // This is something used from OpenGothic. But what is it doing actually? ;-)
             if (mds.skeleton.disableMesh)
             {
-                var mdhName = data.visual.Replace(".MDS", ".MDH");
-
-                var mdh = PxModelHierarchy.LoadFromVdf(PhoenixBridge.VdfsPtr, mdhName);
-                velayaMdh = mdh;
+                assetCache.TryAddMdh(data.visual);
             }
             else
             {
@@ -147,36 +118,16 @@ namespace GVR.Creator
         private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
         {
             // TBD
-
-            var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
-
-            if (name != "Velaya")
-                return;
-
-            var mds = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, data.overlayname);
         }
-
-
-        private static PxModelHierarchyData velayaMdh;
-        private static PxModelScriptData velayaMds;
-
 
         private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
         {
             // TBD
             var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
 
-            if (name != "Velaya")
-                return;
+            var mdm = assetCache.TryAddMdm(data.body);
 
-            var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, $"{data.body}.MDM");
-
-            CreateNpcMesh(name, mdm, velayaMdh);
-        }
-
-        private static GameObject CreateNpcMesh(string name, PxModelMeshData mdm, PxModelHierarchyData mdh)
-        {
-            return SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, default, default, null);
+            //SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, default, default, null);
         }
     }
 }
