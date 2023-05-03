@@ -6,7 +6,10 @@ namespace GVR.Phoenix.Util
     {
         public static void SetParent(this GameObject obj, GameObject parent = null)
         {
-            obj.transform.parent = parent.transform;
+            if (parent == null)
+                obj.transform.parent = null;
+            else
+                obj.transform.parent = parent.transform;
         }
     }
 }

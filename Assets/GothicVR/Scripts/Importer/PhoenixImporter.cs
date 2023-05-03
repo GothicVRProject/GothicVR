@@ -38,7 +38,7 @@ namespace GVR.Importer
             var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
 
             LoadWorld(vdfPtr);
-            //LoadGothicVM(G1Dir);
+            LoadGothicVM(G1Dir);
             LoadFonts();
         }
 
