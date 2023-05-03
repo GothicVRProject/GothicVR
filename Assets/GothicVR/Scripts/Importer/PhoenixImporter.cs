@@ -1,17 +1,17 @@
-using PxCs;
+using AOT;
+using GVR.Creator;
+using GVR.Phoenix.Interface;
+using GVR.Phoenix.Interface.Vm;
+using GVR.Settings;
+using GVR.Util;
+using PxCs.Interface;
 using System;
 using System.IO;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using GVR.Phoenix.Interface;
-using GVR.Phoenix.Interface.Vm;
-using GVR.Util;
-using GVR.Creator;
-using GVR.Settings;
-using TMPro;
 using UnityEngine.TextCore.LowLevel;
-using AOT;
 
 namespace GVR.Importer
 {
@@ -39,7 +39,7 @@ namespace GVR.Importer
 
             LoadWorld(vdfPtr);
             LoadGothicVM(G1Dir);
-            LoadFonts();
+            //LoadFonts();
         }
 
 
@@ -79,9 +79,11 @@ namespace GVR.Importer
             var scene = SceneManager.GetSceneByName("SampleScene");
             scene.GetRootGameObjects().Append(root);
 
-            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(root, world);
+            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, root);
             SingletonBehaviour<VobCreator>.GetOrCreate().Create(root, world);
             SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(root, world);
+
+            SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
         }
 
         private void LoadGothicVM(string G1Dir)

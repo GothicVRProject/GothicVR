@@ -1,7 +1,6 @@
-﻿using PxCs;
-using System;
-using GVR.Phoenix.Interface;
+﻿using GVR.Phoenix.Interface;
 using GVR.Util;
+using PxCs.Interface;
 
 namespace GVR.Npc.Hero
 {

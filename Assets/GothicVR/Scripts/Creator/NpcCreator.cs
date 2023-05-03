@@ -1,22 +1,33 @@
-using PxCs;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using GVR.Npc;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
+using PxCs.Data.Animation;
+using PxCs.Extensions;
+using PxCs.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.XR.CoreUtils;
+using UnityEngine;
 
 namespace GVR.Creator
 {
     public class NpcCreator : SingletonBehaviour<NpcCreator>
     {
+        private static AssetCache assetCache;
+
         void Start()
         {
+            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+
             VmGothicBridge.PhoenixWld_InsertNpc.AddListener(Wld_InsertNpc);
             VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
+            VmGothicBridge.PhoenixMdl_SetVisual.AddListener(Mdl_SetVisual);
+            VmGothicBridge.PhoenixMdl_ApplyOverlayMds.AddListener(Mdl_ApplyOverlayMds);
+            VmGothicBridge.PhoenixMdl_SetVisualBody.AddListener(Mdl_SetVisualBody);
         }
 
         /// <summary>
@@ -80,6 +91,43 @@ namespace GVR.Creator
             // Add element if key not yet exists.
             PhoenixBridge.npcRoutines.TryAdd(data.npc, new());
             PhoenixBridge.npcRoutines[data.npc].Add(routine);
+        }
+
+
+        // FIXME - Performance increased from 20sec load down to 5sec load.
+        // FIXME - Need to be replaced with proper caching later.
+        private static PxAnimationData[] tempHumanAnimations = null;
+
+        private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
+        {
+            var mds = assetCache.TryAddMds(data.visual);
+
+            // This is something used from OpenGothic. But what is it doing actually? ;-)
+            if (mds.skeleton.disableMesh)
+            {
+                assetCache.TryAddMdh(data.visual);
+            }
+            else
+            {
+                throw new Exception("Not yet implemented");
+                //var skeletonName = mds.skeleton.name.Replace(".ASC", ".MDM");
+                //var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // --> if null
+            }
+        }
+
+        private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
+        {
+            // TBD
+        }
+
+        private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
+        {
+            // TBD
+            var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
+
+            var mdm = assetCache.TryAddMdm(data.body);
+
+            //SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, default, default, null);
         }
     }
 }
