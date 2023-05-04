@@ -78,24 +78,57 @@ namespace GVR.Creator
 
             try
             {
-                foreach (var mesh in mdm.meshes)
+                // There are MDMs where there is no mesh, but meshes are in the attachment fields.
+                if (mdm.meshes.Length == 0)
                 {
-                    var subMesh = new GameObject(mesh.mesh.materials.First().name);
-                    var meshFilter = subMesh.AddComponent<MeshFilter>();
-                    var meshRenderer = subMesh.AddComponent<SkinnedMeshRenderer>();
-                    var meshCollider = subMesh.AddComponent<MeshCollider>();
+                    // FIXME - DEBUG - Currently hard coded use of first element. What is right?
 
-                    PrepareMeshRenderer(meshRenderer, mesh.mesh);
-                    PrepareMeshFilter(meshFilter, mesh);
-                    meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
-                    meshCollider.sharedMesh = meshFilter.mesh;
+                    if (mdm.attachments.Values.Count == 0)
+                        return null;
 
-                    CreateBonesData(subMesh, meshRenderer, mdh);
+                    foreach (var mesh in mdm.attachments.Values)
+                    {
+                        var subMesh = new GameObject(mesh.materials.First().name);
+                        var meshObj = new GameObject(mesh.materials.First().name);
+                        var meshFilter = meshObj.AddComponent<MeshFilter>();
+                        var meshRenderer = meshObj.AddComponent<SkinnedMeshRenderer>();
+                        var meshCollider = meshObj.AddComponent<MeshCollider>();
 
-                    // FIXME - needed?
-                    //meshRenderer.rootBone = meshRootObject.transform;
+                        PrepareMeshRenderer(meshRenderer, mesh);
+                        PrepareMeshFilter(meshFilter, mesh);
+                        meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
+                        meshCollider.sharedMesh = meshFilter.mesh;
 
-                    subMesh.SetParent(meshRootObject);
+                        CreateBonesData(meshObj, meshRenderer, mdh);
+
+                        // FIXME - needed?
+                        //meshRenderer.rootBone = meshRootObject.transform;
+
+                        meshObj.SetParent(meshRootObject);
+                        meshObj.transform.localPosition = Vector3.zero;
+                    }
+                }
+                else
+                {
+                    foreach (var mesh in mdm.meshes)
+                    {
+                        var subMesh = new GameObject(mesh.mesh.materials.First().name);
+                        var meshFilter = subMesh.AddComponent<MeshFilter>();
+                        var meshRenderer = subMesh.AddComponent<SkinnedMeshRenderer>();
+                        var meshCollider = subMesh.AddComponent<MeshCollider>();
+
+                        PrepareMeshRenderer(meshRenderer, mesh.mesh);
+                        PrepareMeshFilter(meshFilter, mesh);
+                        meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
+                        meshCollider.sharedMesh = meshFilter.mesh;
+
+                        CreateBonesData(subMesh, meshRenderer, mdh);
+
+                        // FIXME - needed?
+                        //meshRenderer.rootBone = meshRootObject.transform;
+
+                        subMesh.SetParent(meshRootObject);
+                    }
                 }
             }
             catch (ArgumentOutOfRangeException e)

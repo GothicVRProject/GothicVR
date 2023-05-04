@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static PxCs.Interface.PxWorld;
+using PxCs.Interface;
+using GVR.Phoenix.Interface;
+using System;
 
 namespace GVR.Creator
 {
@@ -32,9 +35,7 @@ namespace GVR.Creator
             // FIXME - Currently we're loading all objects from all worlds (?)
             GetVobs(world.vobs, vobs);
 
-            CreateMrmVobs(root, vobs);
-            //CreateItems(root, vobs);
-            //CreateContainers(root, vobs);
+            CreateAllVobs(root, vobs);
         }
 
         private void GetVobs(PxVobData[] inVobs, Dictionary<PxVobType, List<PxVobData>> outVobs)
@@ -49,59 +50,48 @@ namespace GVR.Creator
             }
         }
 
-        private void CreateItems(GameObject root, Dictionary<PxVobType, List<PxVobData>> vobs)
-        {
-            var vobRootObj = new GameObject("Vob-Items");
-            vobRootObj.transform.parent = root.transform;
-
-            foreach (var vob in vobs[PxVobType.PxVob_oCItem])
-            {
-                var mrm = assetCache.TryGetMrm(vob.vobName);
-
-                if (mrm == null)
-                {
-                    Debug.LogWarning($"MultiResolutionModel (MRM) >{vob.vobName}.MRM< not found.");
-                    continue;
-                }
-
-                meshCreator.Create(vob.vobName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
-            }
-        }
-
-        private void CreateMrmVobs(GameObject root, Dictionary<PxVobType, List<PxVobData>> vobs)
+        private void CreateAllVobs(GameObject root, Dictionary<PxVobType, List<PxVobData>> vobs)
         {
             var vobRootObj = new GameObject("Vobs");
             vobRootObj.transform.parent = root.transform;
 
             foreach (var vob in vobs.Values.SelectMany(i => i.SelectMany(ii => ii.childVobs)))
             {
-                var mrm = assetCache.TryGetMrm(vob.vobName);
-
-                if (mrm == null)
-                    continue;
-
-                meshCreator.Create(vob.vobName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
-            }
-        }
-
-        private void CreateContainers(GameObject root, Dictionary<PxVobType, List<PxVobData>> vobs)
-        {
-            var vobRootObj = new GameObject("Vob-Containers");
-            vobRootObj.transform.parent = root.transform;
-
-            foreach (var vob in vobs[PxVobType.PxVob_oCMobContainer])
-            {
-                var mds = assetCache.TryGetMds(vob.visualName);
-                var mdh = assetCache.TryGetMdh(vob.visualName);
-                var mdm = assetCache.TryGetMdm(mds.skeleton.name);
-
-                if (mdm == null)
+                var mdl = assetCache.TryGetMdl(vob.vobName);
+                if (mdl != null)
                 {
-                    Debug.LogWarning($">{mds.skeleton.name}< not found.");
-                    continue;
+                    if (mdl.mesh.meshes.Length == 0)
+                    {
+                        var attachmentKeys = mdl.hierarchy.nodes.Select(i => i.name).ToArray();
+                        var mdm = assetCache.TryGetMdm(vob.vobName, attachmentKeys);
+
+                        if (mdm != null)
+                        {
+                            meshCreator.Create(vob.vobName, mdm, mdl.hierarchy, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
+                        }
+                        else
+                        {
+                            Debug.LogWarning($">{vob.vobName}<'s .mdm not found.");
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        meshCreator.Create(vob.vobName, mdl.mesh, mdl.hierarchy, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
+                    }
+                }
+                else
+                {
+                    var mrm = assetCache.TryGetMrm(vob.vobName);
+                    if (mrm == null)
+                    {
+                        Debug.LogWarning($">{vob.vobName}<'s .mrm not found.");
+                        continue;
+                    }
+
+                    meshCreator.Create(vob.vobName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
                 }
 
-                meshCreator.Create(vob.vobName, mdm, mdh, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
             }
         }
     }
