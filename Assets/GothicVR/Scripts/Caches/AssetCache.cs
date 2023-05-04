@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace GVR.Creator
+namespace GVR.Caches
 {
     public class AssetCache : SingletonBehaviour<AssetCache>
     {
