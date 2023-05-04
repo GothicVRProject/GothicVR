@@ -9,7 +9,7 @@ using UnityEngine.InputSystem.XR;
 using UnityEditor;
 #endif
 
-using PoseControl = UnityEngine.XR.OpenXR.Input.PoseControl;
+using PoseControl = UnityEngine.InputSystem.XR.PoseControl;
 
 namespace UnityEngine.XR.OpenXR.Features.Interactions
 {
