@@ -9,8 +9,7 @@ Preset:
   m_Name: XRI Default Snap Turn
   m_TargetType:
     m_NativeTypeID: 114
-    m_ManagedTypePPtr: {fileID: 11500000, guid: 2213c36610e3b1c4bbf886810ed9db12,
-      type: 3}
+    m_ManagedTypePPtr: {fileID: 11500000, guid: 2213c36610e3b1c4bbf886810ed9db12, type: 3}
     m_ManagedTypeFallback: 
   m_Properties:
   - target: {fileID: 0}
@@ -46,6 +45,10 @@ Preset:
     value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
+    propertyPath: m_DelayTime
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
     propertyPath: m_LeftHandSnapTurnAction.m_UseReference
     value: 1
     objectReference: {fileID: 0}
@@ -78,10 +81,13 @@ Preset:
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
+    propertyPath: m_LeftHandSnapTurnAction.m_Action.m_Flags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
     propertyPath: m_LeftHandSnapTurnAction.m_Reference
     value: 
-    objectReference: {fileID: 1010738217276881514, guid: c348712bda248c246b8c49b3db54643f,
-      type: 3}
+    objectReference: {fileID: -7374733323251553461, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   - target: {fileID: 0}
     propertyPath: m_RightHandSnapTurnAction.m_UseReference
     value: 1
@@ -115,7 +121,11 @@ Preset:
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
+    propertyPath: m_RightHandSnapTurnAction.m_Action.m_Flags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
     propertyPath: m_RightHandSnapTurnAction.m_Reference
     value: 
-    objectReference: {fileID: -6493913391331992944, guid: c348712bda248c246b8c49b3db54643f,
-      type: 3}
+    objectReference: {fileID: -8525429354371678379, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  m_ExcludedProperties: []
