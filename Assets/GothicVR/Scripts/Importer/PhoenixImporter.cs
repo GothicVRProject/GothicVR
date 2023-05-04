@@ -29,8 +29,11 @@ namespace GVR.Importer
         private void Update()
         {
             // Load after Start() so that other MonoBehaviours can subscribe to DaedalusVM events.
-            if (_loaded) return;
+            if (_loaded)
+                return;
             _loaded = true;
+
+            var watch = System.Diagnostics.Stopwatch.StartNew();
 
             var G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicIPath;
 
@@ -40,6 +43,9 @@ namespace GVR.Importer
             LoadWorld(vdfPtr);
             LoadGothicVM(G1Dir);
             //LoadFonts();
+
+            watch.Stop();
+            Debug.Log($"Time spent for loading world + VM + npc loading: {watch.Elapsed}");
         }
 
 

@@ -1,11 +1,9 @@
 ﻿using GVR.Phoenix.Data;
-using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
-using PxCs.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -145,7 +143,7 @@ namespace GVR.Creator
             if (bMaterial.texture == "")
                 return;
 
-            var texture = assetCache.TryAddTexture(bMaterial.texture);
+            var texture = assetCache.TryGetTexture(bMaterial.texture);
 
             if (null == texture)
                 throw new Exception("Couldn't get texture from name: " + bMaterial.texture);
@@ -179,7 +177,7 @@ namespace GVR.Creator
                 if (materialData.texture == "")
                     return;
 
-                var texture = assetCache.TryAddTexture(materialData.texture);
+                var texture = assetCache.TryGetTexture(materialData.texture);
 
                 if (null == texture)
                     throw new Exception("Couldn't get texture from name: " + materialData.texture);
