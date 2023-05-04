@@ -1,4 +1,5 @@
-﻿using GVR.Phoenix.Data;
+﻿using GVR.Caches;
+using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Mesh;
@@ -71,6 +72,8 @@ namespace GVR.Creator
         public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position = default, PxMatrix3x3Data rotation = default, GameObject parent = null)
         {
             var meshRootObject = new GameObject(objectName);
+
+            // FIXME - I don't know why, but for NPCs we need to set the localPos+localRot twice (Before and after mesh creation).
             SetPosAndRot(meshRootObject, position, rotation);
 
             try
@@ -89,6 +92,7 @@ namespace GVR.Creator
 
                     CreateBonesData(subMesh, meshRenderer, mdh);
 
+                    // FIXME - needed?
                     //meshRenderer.rootBone = meshRootObject.transform;
 
                     subMesh.SetParent(meshRootObject);
@@ -102,12 +106,16 @@ namespace GVR.Creator
 
             meshRootObject.SetParent(parent);
 
+            // FIXME - I don't know why, but for NPCs we need to set the localPos+localRot twice (Before and after mesh creation).
+            SetPosAndRot(meshRootObject, position, rotation);
+
             return meshRootObject;
         }
 
 
         private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
         {
+            // FIXME - This isn't working
             if (position.Equals(default) && rotation.Equals(default))
                 return;
 
@@ -127,8 +135,8 @@ namespace GVR.Creator
             matrix4x4.m21 = rotation.m12;
             matrix4x4.m22 = rotation.m22;
             matrix4x4.m33 = 1;
-            obj.transform.rotation = matrix4x4.rotation;
-            obj.transform.position = position;
+            obj.transform.localRotation = matrix4x4.rotation;
+            obj.transform.localPosition = position;
         }
 
         private void PrepareMeshRenderer(Renderer renderer, WorldData.SubMeshData subMesh)
