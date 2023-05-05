@@ -60,25 +60,7 @@ namespace GVR.Creator
                 var mdl = assetCache.TryGetMdl(vob.vobName);
                 if (mdl != null)
                 {
-                    if (mdl.mesh.meshes.Length == 0)
-                    {
-                        var attachmentKeys = mdl.hierarchy.nodes.Select(i => i.name).ToArray();
-                        var mdm = assetCache.TryGetMdm(vob.vobName, attachmentKeys);
-
-                        if (mdm != null)
-                        {
-                            meshCreator.Create(vob.vobName, mdm, mdl.hierarchy, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
-                        }
-                        else
-                        {
-                            Debug.LogWarning($">{vob.vobName}<'s .mdm not found.");
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        meshCreator.Create(vob.vobName, mdl.mesh, mdl.hierarchy, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
-                    }
+                    meshCreator.Create(vob.vobName, mdl, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
                 }
                 else
                 {

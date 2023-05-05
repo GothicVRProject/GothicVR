@@ -43,30 +43,10 @@ namespace GVR.Creator
             return meshObj;
         }
 
-        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null)
+
+        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null)
         {
-            var meshObj = new GameObject(objectName);
-            meshObj.SetParent(parent);
-
-            var meshFilter = meshObj.AddComponent<MeshFilter>();
-            var meshRenderer = meshObj.AddComponent<MeshRenderer>();
-            var meshCollider = meshObj.AddComponent<MeshCollider>();
-
-            SetPosAndRot(meshObj, position, rotation);
-
-            try
-            {
-                PrepareMeshRenderer(meshRenderer, mrm);
-                PrepareMeshFilter(meshFilter, mrm);
-                meshCollider.sharedMesh = meshFilter.mesh;
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                Debug.LogError(e.Message);
-                Destroy(meshObj);
-            }
-
-            return meshObj;
+            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
         }
 
         public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position = default, PxMatrix3x3Data rotation = default, GameObject parent = null)
@@ -143,6 +123,32 @@ namespace GVR.Creator
             SetPosAndRot(meshRootObject, position, rotation);
 
             return meshRootObject;
+        }
+
+        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null)
+        {
+            var meshObj = new GameObject(objectName);
+            meshObj.SetParent(parent);
+
+            var meshFilter = meshObj.AddComponent<MeshFilter>();
+            var meshRenderer = meshObj.AddComponent<MeshRenderer>();
+            var meshCollider = meshObj.AddComponent<MeshCollider>();
+
+            SetPosAndRot(meshObj, position, rotation);
+
+            try
+            {
+                PrepareMeshRenderer(meshRenderer, mrm);
+                PrepareMeshFilter(meshFilter, mrm);
+                meshCollider.sharedMesh = meshFilter.mesh;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                Debug.LogError(e.Message);
+                Destroy(meshObj);
+            }
+
+            return meshObj;
         }
 
 
