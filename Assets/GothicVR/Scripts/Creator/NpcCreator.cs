@@ -100,7 +100,7 @@ namespace GVR.Creator
 
         private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
         {
-            var symbolIndex = PxVm.pxVmInstanceNpcGetSymbolIndex(data.npcPtr);
+            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
             var npc = lookupCache.npcCache[symbolIndex];
             var mds = assetCache.TryGetMds(data.visual);
 
@@ -126,7 +126,7 @@ namespace GVR.Creator
         private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
         {
             var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
-            var symbolIndex = PxVm.pxVmInstanceNpcGetSymbolIndex(data.npcPtr);
+            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
             var npc = lookupCache.npcCache[symbolIndex];
             var mdh = npc.GetComponent<Properties>().mdh;
             var mdm = assetCache.TryGetMdm(data.body);
