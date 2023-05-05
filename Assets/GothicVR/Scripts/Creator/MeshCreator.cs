@@ -52,6 +52,7 @@ namespace GVR.Creator
         public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position = default, PxMatrix3x3Data rotation = default, GameObject parent = null)
         {
             var meshRootObject = new GameObject(objectName);
+            meshRootObject.SetParent(parent);
 
             // FIXME - I don't know why, but for NPCs we need to set the localPos+localRot twice (Before and after mesh creation).
             SetPosAndRot(meshRootObject, position, rotation);
@@ -64,50 +65,51 @@ namespace GVR.Creator
                     // FIXME - DEBUG - Currently hard coded use of first element. What is right?
 
                     if (mdm.attachments.Values.Count == 0)
+                    {
+                        Debug.LogWarning($"Object >{objectName}< has neither mdm.meshes nor mdm.attachments. Create mesh aborted.");
                         return null;
+                    }
 
                     foreach (var mesh in mdm.attachments.Values)
                     {
-                        var subMesh = new GameObject(mesh.materials.First().name);
-                        var meshObj = new GameObject(mesh.materials.First().name);
-                        var meshFilter = meshObj.AddComponent<MeshFilter>();
-                        var meshRenderer = meshObj.AddComponent<SkinnedMeshRenderer>();
-                        var meshCollider = meshObj.AddComponent<MeshCollider>();
+                        var subMeshObj = new GameObject(mesh.materials.First().name);
+                        subMeshObj.SetParent(meshRootObject, true, true);
+
+                        var meshFilter = subMeshObj.AddComponent<MeshFilter>();
+                        var meshRenderer = subMeshObj.AddComponent<SkinnedMeshRenderer>();
+                        var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
                         PrepareMeshRenderer(meshRenderer, mesh);
                         PrepareMeshFilter(meshFilter, mesh);
                         meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
                         meshCollider.sharedMesh = meshFilter.mesh;
 
-                        CreateBonesData(meshObj, meshRenderer, mdh);
+                        CreateBonesData(subMeshObj, meshRenderer, mdh);
 
                         // FIXME - needed?
                         //meshRenderer.rootBone = meshRootObject.transform;
-
-                        meshObj.SetParent(meshRootObject);
-                        meshObj.transform.localPosition = Vector3.zero;
                     }
                 }
                 else
                 {
                     foreach (var mesh in mdm.meshes)
                     {
-                        var subMesh = new GameObject(mesh.mesh.materials.First().name);
-                        var meshFilter = subMesh.AddComponent<MeshFilter>();
-                        var meshRenderer = subMesh.AddComponent<SkinnedMeshRenderer>();
-                        var meshCollider = subMesh.AddComponent<MeshCollider>();
+                        var subMeshObj = new GameObject(mesh.mesh.materials.First().name);
+                        subMeshObj.SetParent(meshRootObject, true, false);
+
+                        var meshFilter = subMeshObj.AddComponent<MeshFilter>();
+                        var meshRenderer = subMeshObj.AddComponent<SkinnedMeshRenderer>();
+                        var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
                         PrepareMeshRenderer(meshRenderer, mesh.mesh);
                         PrepareMeshFilter(meshFilter, mesh);
                         meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
                         meshCollider.sharedMesh = meshFilter.mesh;
 
-                        CreateBonesData(subMesh, meshRenderer, mdh);
+                        CreateBonesData(subMeshObj, meshRenderer, mdh);
 
                         // FIXME - needed?
                         //meshRenderer.rootBone = meshRootObject.transform;
-
-                        subMesh.SetParent(meshRootObject);
                     }
                 }
             }
@@ -117,10 +119,9 @@ namespace GVR.Creator
                 Destroy(meshRootObject);
             }
 
-            meshRootObject.SetParent(parent);
 
             // FIXME - I don't know why, but for NPCs we need to set the localPos+localRot twice (Before and after mesh creation).
-            SetPosAndRot(meshRootObject, position, rotation);
+            //SetPosAndRot(meshRootObject, position, rotation);
 
             return meshRootObject;
         }
@@ -129,12 +130,11 @@ namespace GVR.Creator
         {
             var meshObj = new GameObject(objectName);
             meshObj.SetParent(parent);
+            SetPosAndRot(meshObj, position, rotation);
 
             var meshFilter = meshObj.AddComponent<MeshFilter>();
             var meshRenderer = meshObj.AddComponent<MeshRenderer>();
             var meshCollider = meshObj.AddComponent<MeshCollider>();
-
-            SetPosAndRot(meshObj, position, rotation);
 
             try
             {
