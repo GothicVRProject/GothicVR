@@ -1,5 +1,6 @@
 using AOT;
 using GVR.Creator;
+using GVR.Demo;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Settings;
@@ -18,10 +19,12 @@ namespace GVR.Importer
     public class PhoenixImporter : SingletonBehaviour<PhoenixImporter>
     {
         private bool _loaded = false;
-
+        private static DebugSettings _debugSettings;
 
         private void Start()
         {
+            _debugSettings = SingletonBehaviour<DebugSettings>.GetOrCreate();
+
             VmGothicBridge.DefaultExternalCallback.AddListener(MissingVmExternalCall);
             PxLogging.pxLoggerSet(PxLoggerCallback);
         }
@@ -63,6 +66,10 @@ namespace GVR.Importer
                     Debug.LogWarning(message);
                     break;
                 case PxLogging.Level.error:
+                    bool isVdfMessage = message.StartsWith("failed to find vdf entry");
+                    if (isVdfMessage && !_debugSettings.ShowVdfsFileNotFoundErrors)
+                        break;
+
                     Debug.LogError(message);
                     break;
             }

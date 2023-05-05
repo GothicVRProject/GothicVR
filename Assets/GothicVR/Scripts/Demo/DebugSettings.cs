@@ -21,5 +21,7 @@ namespace GVR.Demo
 
         public bool EnableNpcRoutines;
         public bool CreateExampleAnimation;
+
+        public bool ShowVdfsFileNotFoundErrors;
     }
 }
