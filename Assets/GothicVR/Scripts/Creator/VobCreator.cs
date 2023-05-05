@@ -67,7 +67,7 @@ namespace GVR.Creator
                     var mrm = assetCache.TryGetMrm(vob.vobName);
                     if (mrm == null)
                     {
-                        Debug.LogWarning($">{vob.vobName}<'s .mrm not found.");
+                        //Debug.LogWarning($">{vob.vobName}<'s .mrm not found.");
                         continue;
                     }
 
