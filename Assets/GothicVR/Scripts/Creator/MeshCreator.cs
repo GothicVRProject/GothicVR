@@ -76,9 +76,6 @@ namespace GVR.Creator
                     PrepareMeshRenderer(meshRenderer, mesh);
                     PrepareMeshFilter(meshFilter, mesh);
                     meshCollider.sharedMesh = meshFilter.mesh;
-
-                    // FIXME - needed?
-                    //meshRenderer.rootBone = meshRootObject.transform;
                 }
             }
             else
