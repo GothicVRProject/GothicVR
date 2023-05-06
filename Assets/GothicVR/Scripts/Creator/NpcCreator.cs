@@ -131,7 +131,7 @@ namespace GVR.Creator
             var mdh = npc.GetComponent<Properties>().mdh;
             var mdm = assetCache.TryGetMdm(data.body);
             
-            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, default, default, npc);
+            // SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, default, default, npc);
         }
     }
 }
