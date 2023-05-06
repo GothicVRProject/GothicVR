@@ -84,8 +84,8 @@ namespace GVR.Editor.UnityBuildTools
 
             //Disable Meta
 			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled = false;
-			// OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = false;
-			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<OculusTouchControllerProfile>().enabled = false;
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = false;
+            OpenXRSettings.ActiveBuildTargetInstance.GetFeature<OculusTouchControllerProfile>().enabled = false;
 
 			foreach (var item in OpenXRSettings.ActiveBuildTargetInstance.GetFeatures()) 
             {
@@ -101,7 +101,7 @@ namespace GVR.Editor.UnityBuildTools
 			PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
 
 			//Enable Meta
-			// OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = true;
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestTouchProControllerProfile>().enabled = true;
 			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<OculusTouchControllerProfile>().enabled = true;
 			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled = true;
 
