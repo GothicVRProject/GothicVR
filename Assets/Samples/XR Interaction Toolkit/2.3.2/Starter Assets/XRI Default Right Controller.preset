@@ -94,6 +94,10 @@ Preset:
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
+    propertyPath: m_PositionAction.m_Action.m_Flags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
     propertyPath: m_PositionAction.m_Reference
     value: 
     objectReference: {fileID: -3326005586356538449, guid: c348712bda248c246b8c49b3db54643f,
@@ -128,6 +132,10 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_RotationAction.m_Action.m_SingletonActionBindings.Array.size
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_RotationAction.m_Action.m_Flags
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
@@ -168,6 +176,10 @@ Preset:
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
+    propertyPath: m_TrackingStateAction.m_Action.m_Flags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
     propertyPath: m_TrackingStateAction.m_Reference
     value: 
     objectReference: {fileID: -1277054153949319361, guid: c348712bda248c246b8c49b3db54643f,
@@ -202,6 +214,10 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_SelectAction.m_Action.m_SingletonActionBindings.Array.size
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_SelectAction.m_Action.m_Flags
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
@@ -242,6 +258,10 @@ Preset:
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
+    propertyPath: m_SelectActionValue.m_Action.m_Flags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
     propertyPath: m_SelectActionValue.m_Reference
     value: 
     objectReference: {fileID: -1758520528963094988, guid: c348712bda248c246b8c49b3db54643f,
@@ -276,6 +296,10 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_ActivateAction.m_Action.m_SingletonActionBindings.Array.size
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ActivateAction.m_Action.m_Flags
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
@@ -316,6 +340,10 @@ Preset:
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
+    propertyPath: m_ActivateActionValue.m_Action.m_Flags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
     propertyPath: m_ActivateActionValue.m_Reference
     value: 
     objectReference: {fileID: 7904272356298805229, guid: c348712bda248c246b8c49b3db54643f,
@@ -350,6 +378,10 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_UIPressAction.m_Action.m_SingletonActionBindings.Array.size
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_UIPressAction.m_Action.m_Flags
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
@@ -390,6 +422,10 @@ Preset:
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
+    propertyPath: m_UIPressActionValue.m_Action.m_Flags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
     propertyPath: m_UIPressActionValue.m_Reference
     value: 
     objectReference: {fileID: -5908353012961274365, guid: c348712bda248c246b8c49b3db54643f,
@@ -424,6 +460,10 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_HapticDeviceAction.m_Action.m_SingletonActionBindings.Array.size
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_HapticDeviceAction.m_Action.m_Flags
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
@@ -464,9 +504,54 @@ Preset:
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
+    propertyPath: m_RotateAnchorAction.m_Action.m_Flags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
     propertyPath: m_RotateAnchorAction.m_Reference
     value: 
     objectReference: {fileID: -5913262927076077117, guid: c348712bda248c246b8c49b3db54643f,
+      type: 3}
+  - target: {fileID: 0}
+    propertyPath: m_DirectionalAnchorRotationAction.m_UseReference
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Name
+    value: Directional Anchor Rotation
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Type
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_ExpectedControlType
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Id
+    value: cde84d10-7ea4-4fb3-8369-aed372df2bf7
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Processors
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Interactions
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_SingletonActionBindings.Array.size
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Flags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_DirectionalAnchorRotationAction.m_Reference
+    value: 
+    objectReference: {fileID: -440298646266941818, guid: c348712bda248c246b8c49b3db54643f,
       type: 3}
   - target: {fileID: 0}
     propertyPath: m_TranslateAnchorAction.m_UseReference
@@ -501,6 +586,10 @@ Preset:
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
+    propertyPath: m_TranslateAnchorAction.m_Action.m_Flags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
     propertyPath: m_TranslateAnchorAction.m_Reference
     value: 
     objectReference: {fileID: 875253871413052681, guid: c348712bda248c246b8c49b3db54643f,
@@ -509,3 +598,4 @@ Preset:
     propertyPath: m_ButtonPressPoint
     value: 0.5
     objectReference: {fileID: 0}
+  m_ExcludedProperties: []
