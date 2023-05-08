@@ -590,7 +590,7 @@ MonoBehaviour:
   CreateWaypoints: 0
   CreateWaypointEdges: 0
   EnableDayTime: 1
-  SunMovementPerformanceValue: 2
+  SunMovementPerformanceValue: 0
   EnableNpcRoutines: 0
   CreateExampleAnimation: 0
 --- !u!1 &703127196
@@ -671,6 +671,7 @@ GameObject:
   m_Component:
   - component: {fileID: 705507995}
   - component: {fileID: 705507994}
+  - component: {fileID: 705507996}
   m_Layer: 0
   m_Name: Sun
   m_TagString: Untagged
@@ -755,6 +756,18 @@ Transform:
   m_Father: {fileID: 893494547}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &705507996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 705507993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98fd5a3a132692b498ccc34760c8d0b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &782628375
 GameObject:
   m_ObjectHideFlags: 0
@@ -1096,7 +1109,6 @@ GameObject:
   m_Component:
   - component: {fileID: 936232198}
   - component: {fileID: 936232197}
-  - component: {fileID: 936232199}
   m_Layer: 0
   m_Name: GameTime
   m_TagString: Untagged
@@ -1117,9 +1129,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
-  secondChangeChannel: {fileID: 11400000, guid: acc3e0392fb2a68429bef539a46e8f62, type: 2}
-  minuteChangeChannel: {fileID: 11400000, guid: 7991669cec1d7b44986c0e5de7109b6d, type: 2}
-  hourChangeChannel: {fileID: 11400000, guid: 591845252bc92fc4c9ee596ce19dc790, type: 2}
+  secondChangeCallback:
+    m_PersistentCalls:
+      m_Calls: []
+  minuteChangeCallback:
+    m_PersistentCalls:
+      m_Calls: []
+  hourChangeCallback:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &936232198
 Transform:
   m_ObjectHideFlags: 0
@@ -1135,22 +1153,6 @@ Transform:
   m_Father: {fileID: 893494547}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &936232199
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 936232196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98fd5a3a132692b498ccc34760c8d0b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sun: {fileID: 705507993}
-  secondChangeEvent: {fileID: 11400000, guid: acc3e0392fb2a68429bef539a46e8f62, type: 2}
-  minuteChangeEvent: {fileID: 11400000, guid: 7991669cec1d7b44986c0e5de7109b6d, type: 2}
-  hourChangeEvent: {fileID: 11400000, guid: 591845252bc92fc4c9ee596ce19dc790, type: 2}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0

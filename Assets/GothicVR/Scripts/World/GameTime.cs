@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using GVR.Demo;
 using GVR.Util;
+using UnityEngine.Events;
 
 namespace GVR.World
 {
@@ -11,9 +12,9 @@ namespace GVR.World
         private static DateTime MIN_TIME = new(1, 1, 1, 0, 0, 0);
         private static DateTime MAX_TIME = new(1, 1, 1, 23, 59, 59);
 
-        public DateTimeGameEvent secondChangeChannel;
-        public DateTimeGameEvent minuteChangeChannel;
-        public DateTimeGameEvent hourChangeChannel;
+        public UnityEvent<DateTime> secondChangeCallback = new();
+        public UnityEvent<DateTime> minuteChangeCallback = new();
+        public UnityEvent<DateTime> hourChangeCallback = new();
 
         private int secondsInMinute = 0;
         private int minutesInHour = 0;
@@ -25,20 +26,6 @@ namespace GVR.World
         // Reference (ger): https://forum.worldofplayers.de/forum/threads/939357-Wie-lange-dauert-ein-Tag-in-Gothic
         private static readonly float ONE_INGAME_SECOND = 0.06944f;
         private DateTime time = new(1, 1, 1, 15, 0, 0);
-
-        private void OnEnable()
-        {
-            //Subscribe to Events
-            secondChangeChannel.OnEventRaised += RaiseMinuteEvent;
-            minuteChangeChannel.OnEventRaised += RaiseHourEvent;
-        }
-
-        private void OnDisable()
-        {
-            //Unsubscribe to Events
-            secondChangeChannel.OnEventRaised -= RaiseMinuteEvent;
-            minuteChangeChannel.OnEventRaised -= RaiseHourEvent;
-        }
 
         void Start()
         {
@@ -62,27 +49,28 @@ namespace GVR.World
                 if (time > MAX_TIME)
                     time = MIN_TIME;
 
-                secondChangeChannel.RaiseEvent(time);
-
+                secondChangeCallback.Invoke(time);
+                RaiseMinuteAndHourEvent();
                 yield return new WaitForSeconds(ONE_INGAME_SECOND);
             }
         }
-        private void RaiseMinuteEvent(DateTime time)
+        private void RaiseMinuteAndHourEvent()
         {
             secondsInMinute++;
             if (secondsInMinute%60==0)
             {
                 secondsInMinute = 0;
-                minuteChangeChannel.RaiseEvent(time);
+                minuteChangeCallback.Invoke(time);
+                RaiseHourEvent();
             }
         }
-        private void RaiseHourEvent(DateTime time)
+        private void RaiseHourEvent()
         {
             minutesInHour++;
             if (minutesInHour % 60 == 0)
             {
                 secondsInMinute = 0;
-                hourChangeChannel.RaiseEvent(time);
+                hourChangeCallback.Invoke(time);
             }
         }
     }
