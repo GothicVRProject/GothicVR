@@ -8,7 +8,7 @@ using UnityEngine;
 public class SunMover : MonoBehaviour
 {
     private DebugSettings.SunMovementPerformance sunPerformanceSetting;
-    public GameObject sun;
+    private GameObject sun;
 
     public DateTimeGameEvent secondChangeEvent;
     public DateTimeGameEvent minuteChangeEvent;
@@ -16,7 +16,21 @@ public class SunMover : MonoBehaviour
 
     private void OnEnable()
     {
-
+        sunPerformanceSetting = SingletonBehaviour<DebugSettings>.GetOrCreate().SunMovementPerformanceValue;
+        switch (sunPerformanceSetting)
+        {
+            case DebugSettings.SunMovementPerformance.EveryIngameSecond:
+                secondChangeEvent.OnEventRaised += RotateSun;
+                break;
+            case DebugSettings.SunMovementPerformance.EveryIngameMinute:
+                minuteChangeEvent.OnEventRaised += RotateSun;
+                break;
+            case DebugSettings.SunMovementPerformance.EveryIngameHour:
+                hourChangeEvent.OnEventRaised += RotateSun;
+                break;
+            default:
+                break;
+        }
     }
     private void OnDisable()
     {
@@ -37,21 +51,7 @@ public class SunMover : MonoBehaviour
     }
     private void Start()
     {
-        sunPerformanceSetting = SingletonBehaviour<DebugSettings>.GetOrCreate().SunMovementPerformanceValue;
-        switch (sunPerformanceSetting)
-        {
-            case DebugSettings.SunMovementPerformance.EveryIngameSecond:
-                secondChangeEvent.OnEventRaised += RotateSun;
-                break;
-            case DebugSettings.SunMovementPerformance.EveryIngameMinute:
-                minuteChangeEvent.OnEventRaised += RotateSun;
-                break;
-            case DebugSettings.SunMovementPerformance.EveryIngameHour:
-                hourChangeEvent.OnEventRaised += RotateSun;
-                break;
-            default:
-                break;
-        }
+        sun = gameObject;
     }
     void RotateSun(DateTime time)
     {
