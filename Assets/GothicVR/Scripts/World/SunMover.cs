@@ -26,6 +26,7 @@ public class SunMover : MonoBehaviour
                 gameTime.minuteChangeCallback.AddListener(RotateSun);
                 break;
             default:
+                Debug.LogError($"{sunPerformanceSetting} isnt handled correctly. Thus SunMover.cs doesnt move the sun.");
                 break;
         }
     }
@@ -44,6 +45,7 @@ public class SunMover : MonoBehaviour
                 gameTime.secondChangeCallback.RemoveListener(RotateSun);
                 break;
             default:
+                Debug.LogError($"{sunPerformanceSetting} isnt handled correctly. Thus SunMover.cs doesnt move the sun.");
                 break;
         }
     }
