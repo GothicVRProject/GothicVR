@@ -1,4 +1,5 @@
-﻿using PxCs.Interface;
+﻿using AOT;
+using PxCs.Interface;
 using System;
 using UnityEngine.Events;
 
@@ -51,6 +52,7 @@ namespace GVR.Phoenix.Interface.Vm
         public static UnityEvent<Mdl_ApplyOverlayMdsData> PhoenixMdl_ApplyOverlayMds = new();
         public static UnityEvent<Mdl_SetVisualBodyData> PhoenixMdl_SetVisualBody = new();
 
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalDefaultCallback))]
         public static void DefaultExternal(IntPtr vmPtr, string missingCallbackName)
         {
             // FIXME: Once solution is released, we can safely throw an exception as it tells us: Brace yourself! The game will not work until you implement it.
@@ -62,6 +64,7 @@ namespace GVR.Phoenix.Interface.Vm
             DefaultExternalCallback.Invoke(vmPtr, missingCallbackName);
         }
 
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Wld_InsertNpc(IntPtr vmPtr)
         {
             var spawnpoint = PxVm.VmStackPopString(vmPtr);
@@ -80,6 +83,8 @@ namespace GVR.Phoenix.Interface.Vm
             public int action;
             public string waypoint;
         }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void TA_MIN(IntPtr vmPtr)
         {
             var waypoint = PxVm.VmStackPopString(vmPtr);
@@ -110,6 +115,8 @@ namespace GVR.Phoenix.Interface.Vm
             public IntPtr npcPtr;
             public string visual;
         }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Mdl_SetVisual(IntPtr vmPtr)
         {
             var visual = PxVm.VmStackPopString(vmPtr);
@@ -130,6 +137,8 @@ namespace GVR.Phoenix.Interface.Vm
             public IntPtr npcPtr;
             public string overlayname;
         }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Mdl_ApplyOverlayMds(IntPtr vmPtr)
         {
             var overlayname = PxVm.VmStackPopString(vmPtr);
@@ -156,6 +165,8 @@ namespace GVR.Phoenix.Interface.Vm
             public int teethTexNr;
             public int armor;
         }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Mdl_SetVisualBody(IntPtr vmPtr)
         {
             var armor = PxVm.pxVmStackPopInt(vmPtr);

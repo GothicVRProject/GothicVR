@@ -337,7 +337,6 @@ MonoBehaviour:
   - {fileID: 1058776458320686667}
   - {fileID: 3495798914392925210}
   - {fileID: -6915401781328135574}
-  - {fileID: -611059889731782994}
   - {fileID: -4821792274733064431}
   - {fileID: -4811179244151626550}
   - {fileID: -3991334409635386996}
@@ -384,7 +383,6 @@ MonoBehaviour:
   - {fileID: 4151857234022136007}
   - {fileID: -7311633094038111889}
   - {fileID: 3564207369133672448}
-  - {fileID: -7074105065151007135}
   - {fileID: -7827386769871617180}
   - {fileID: -1435231240252299680}
   - {fileID: -7904073006550862882}
@@ -560,7 +558,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: feeef8d85de8db242bdda70cc7ff5acd, type: 3}
   m_Name: OculusTouchControllerProfile Android
   m_EditorClassIdentifier: 
-  m_enabled: 0
+  m_enabled: 1
   nameUi: Oculus Touch Controller Profile
   version: 0.0.1
   featureIdInternal: com.unity.openxr.feature.input.oculustouch
