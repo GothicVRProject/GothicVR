@@ -8,7 +8,7 @@ namespace GVR.Demo
         {
             EveryIngameSecond,
             EveryIngameMinute,
-            Every10IngameMinutes
+            EveryIngameHour
         };
 
 
