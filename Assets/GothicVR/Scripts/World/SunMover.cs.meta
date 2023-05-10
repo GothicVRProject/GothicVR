@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 98fd5a3a132692b498ccc34760c8d0b4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - sun: {instanceID: 0}
+  - secondChangeEvent: {fileID: 11400000, guid: acc3e0392fb2a68429bef539a46e8f62, type: 2}
+  - minuteChangeEvent: {fileID: 11400000, guid: 7991669cec1d7b44986c0e5de7109b6d, type: 2}
+  - hourChangeEvent: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
