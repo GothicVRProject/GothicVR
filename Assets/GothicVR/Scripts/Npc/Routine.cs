@@ -13,7 +13,7 @@ namespace GVR.Npc
 {
     public class Routine : MonoBehaviour
     {
-        private static readonly int SPEED = 10;
+        private const int SPEED = 10;
         private GameTime gameTime;
         public List<RoutineData> routines = new();
         private void OnEnable()
