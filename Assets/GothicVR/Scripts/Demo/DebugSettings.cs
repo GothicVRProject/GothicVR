@@ -19,6 +19,7 @@ namespace GVR.Demo
         public bool EnableDayTime;
         public SunMovementPerformance SunMovementPerformanceValue;
 
+        public bool EnableNpc;
         public bool EnableNpcRoutines;
         public bool CreateExampleAnimation;
     }

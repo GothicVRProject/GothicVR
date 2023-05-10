@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.XR.CoreUtils;
 using UnityEngine;
+using GVR.Demo;
 
 namespace GVR.Creator
 {
@@ -130,8 +131,9 @@ namespace GVR.Creator
             var npc = lookupCache.npcCache[symbolIndex];
             var mdh = npc.GetComponent<Properties>().mdh;
             var mdm = assetCache.TryGetMdm(data.body);
-            
-            // SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, default, default, npc);
+
+            if (SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpc)
+                SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, default, default, npc);
         }
     }
 }
