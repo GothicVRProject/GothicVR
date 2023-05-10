@@ -64,17 +64,22 @@ namespace GVR.Creator
                     return null;
                 }
 
-                foreach (var mesh in mdm.attachments.Values)
+                foreach (var mesh in mdm.attachments)
                 {
-                    var subMeshObj = new GameObject(mesh.materials.First().name);
-                    subMeshObj.SetParent(meshRootObject, true, true);
+                    var subMeshName = mesh.Key;
+                    var subMeshObj = new GameObject(subMeshName);
+                    subMeshObj.SetParent(meshRootObject);
+
+                    var matrix = mdh.nodes.First(i => i.name == subMeshName).transform;
+
+                    SetPosAndRot(subMeshObj, matrix);
 
                     var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                     var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
                     var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
-                    PrepareMeshRenderer(meshRenderer, mesh);
-                    PrepareMeshFilter(meshFilter, mesh);
+                    PrepareMeshRenderer(meshRenderer, mesh.Value);
+                    PrepareMeshFilter(meshFilter, mesh.Value);
                     meshCollider.sharedMesh = meshFilter.mesh;
                 }
             }
@@ -129,30 +134,24 @@ namespace GVR.Creator
             return meshObj;
         }
 
+        private void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
+        {
+            var unityMatrix = matrix.ToUnityMatrix();
+            SetPosAndRot(obj, unityMatrix.GetPosition() / 100, unityMatrix.rotation);
+        }
 
         private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
+        {
+            SetPosAndRot(obj, position, rotation.ToUnityMatrix().rotation);
+        }
+
+        private void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
             // FIXME - This isn't working
             if (position.Equals(default) && rotation.Equals(default))
                 return;
 
-            // Rotations from Gothic are a 3x3 matrix.
-            // According to this blog post, we can leverage it to be used the right way automatically:
-            // @see https://forum.unity.com/threads/convert-3x3-rotation-matrix-to-euler-angles.1086392/#post-7002275
-            // Hint 1: The matrix is transposed, i.e. we needed to change e.g. m01=[0,1] to m01=[1,0]
-            // Hint 2: m33 needs to be 1
-            var matrix4x4 = new Matrix4x4();
-            matrix4x4.m00 = rotation.m00;
-            matrix4x4.m01 = rotation.m10;
-            matrix4x4.m02 = rotation.m20;
-            matrix4x4.m10 = rotation.m01;
-            matrix4x4.m11 = rotation.m11;
-            matrix4x4.m12 = rotation.m21;
-            matrix4x4.m20 = rotation.m02;
-            matrix4x4.m21 = rotation.m12;
-            matrix4x4.m22 = rotation.m22;
-            matrix4x4.m33 = 1;
-            obj.transform.localRotation = matrix4x4.rotation;
+            obj.transform.localRotation = rotation;
             obj.transform.localPosition = position;
         }
 
