@@ -8,6 +8,7 @@ using GVR.Phoenix.Util;
 using GVR.Util;
 using GVR.World;
 using System;
+using System.Data;
 
 namespace GVR.Npc
 {
@@ -15,38 +16,56 @@ namespace GVR.Npc
     {
         private const int SPEED = 10;
         private GameTime gameTime;
+        PxCs.Data.WayNet.PxWayPointData waypoint;
+        RoutineData routine;
+
         public List<RoutineData> routines = new();
+
         private void OnEnable()
         {
             gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
             gameTime.minuteChangeCallback.AddListener(routineGo);
         }
 
+        private void Start()
+        {
+            DateTime time = new(1, 1, 1, 15, 0, 0);
+            getRoutine(time);
+            if (routine == null)
+                return;
+            getWaypoint();
+        }
+
+        private void Update()
+        {
+            moveNPC();
+        }
+        private void moveNPC()
+        {
+            if (routine == null)
+                return;
+            var startPosition = gameObject.transform.position;
+            var targetPosition = waypoint.position.ToUnityVector();
+            gameObject.transform.position = Vector3.MoveTowards(startPosition, targetPosition, SPEED * Time.deltaTime);
+        }
 
         void routineGo(DateTime time)
         {
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
                 return;
 
-            var routine = GetCurrentRoutine(time);
-
+            getRoutine(time);
             if (routine == null)
                 return;
-
-            var waypoint = PhoenixBridge.World.waypoints
-                .FirstOrDefault(item => item.name.ToLower() == routine.waypoint.ToLower());
-
-            var startPosition = gameObject.transform.position;
-            gameObject.transform.position = Vector3.MoveTowards(startPosition, waypoint.position.ToUnityVector(), SPEED * Time.deltaTime);
+            getWaypoint();
         }
-
-        private RoutineData GetCurrentRoutine(DateTime time)
+        void getRoutine(DateTime time)
         {
-            var curTime = gameTime.GetCurrentDateTime();
-
-            var routine = routines.FirstOrDefault(item => (item.start <= curTime && curTime < item.stop));
-
-            return routine;
+            routine = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
+        }
+        void getWaypoint()
+        {
+            waypoint = PhoenixBridge.World.waypoints.FirstOrDefault(item => item.name == routine.waypoint);
         }
     }
 }
