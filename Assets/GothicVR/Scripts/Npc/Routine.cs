@@ -7,6 +7,7 @@ using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using GVR.World;
+using System;
 
 namespace GVR.Npc
 {
@@ -15,18 +16,19 @@ namespace GVR.Npc
         private static readonly int SPEED = 10;
         private GameTime gameTime;
         public List<RoutineData> routines = new();
-
-        void Start()
+        private void OnEnable()
         {
             gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
+            gameTime.minuteChangeCallback.AddListener(routineGo);
         }
 
-        void Update()
+
+        void routineGo(DateTime time)
         {
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
                 return;
 
-            var routine = GetCurrentRoutine();
+            var routine = GetCurrentRoutine(time);
 
             if (routine == null)
                 return;
@@ -38,7 +40,7 @@ namespace GVR.Npc
             gameObject.transform.position = Vector3.MoveTowards(startPosition, waypoint.position.ToUnityVector(), SPEED * Time.deltaTime);
         }
 
-        private RoutineData GetCurrentRoutine()
+        private RoutineData GetCurrentRoutine(DateTime time)
         {
             var curTime = gameTime.GetCurrentDateTime();
 
