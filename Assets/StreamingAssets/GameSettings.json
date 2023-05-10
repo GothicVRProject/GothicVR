@@ -1,0 +1,5 @@
+﻿{
+  "GothicIPath": "Path not set! (For gamers: Please put in full path to your GothicI installation. For devs: please set this value inside GameSettings.dev.json)",
+  "GothicMenuFontPath": "(Optional) If it points to an official Gothic font (e.g. from worldofgothic), it will be picked and used for menu texts.",
+  "GothicSubtitleFontPath": "(Optional) If it points to an official Gothic font (e.g. from worldofgothic), it will be picked and used for subtitles."
+}
