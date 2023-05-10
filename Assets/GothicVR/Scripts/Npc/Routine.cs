@@ -19,28 +19,31 @@ namespace GVR.Npc
         PxCs.Data.WayNet.PxWayPointData waypoint;
         RoutineData routine;
 
-        public List<RoutineData> routines = new();
+        //public List<RoutineData> routines = new();
+        public Dictionary<DateTime, RoutineData> routines = new();
+
+        private List<DateTime> startTimes;
 
         private void OnEnable()
         {
-            gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
-            gameTime.minuteChangeCallback.AddListener(routineGo);
+            gameTime.minuteChangeCallback.AddListener(lookUpRoutine);
         }
 
         private void Start()
         {
+            foreach(DateTime key in routines.Keys) {
+                //Debug.LogError(key);
+                startTimes.Add(key);
+            }
             DateTime time = new(1, 1, 1, 15, 0, 0);
-            getRoutine(time);
-            if (routine == null)
-                return;
-            getWaypoint();
+            lookUpRoutine(time);
         }
 
         private void Update()
         {
-            moveNPC();
+            moveNpc();
         }
-        private void moveNPC()
+        private void moveNpc()
         {
             if (routine == null)
                 return;
@@ -49,7 +52,7 @@ namespace GVR.Npc
             gameObject.transform.position = Vector3.MoveTowards(startPosition, targetPosition, SPEED * Time.deltaTime);
         }
 
-        void routineGo(DateTime time)
+        void lookUpRoutine(DateTime time)
         {
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
                 return;
@@ -61,7 +64,12 @@ namespace GVR.Npc
         }
         void getRoutine(DateTime time)
         {
-            routine = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
+            if (startTimes.Contains(time))
+            {
+                Debug.LogError(time);
+                routine = routines[time];
+            }
+            //routine = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
         }
         void getWaypoint()
         {

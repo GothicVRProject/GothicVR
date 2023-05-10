@@ -68,9 +68,10 @@ namespace GVR.Creator
 
             if (PhoenixBridge.npcRoutines.TryGetValue(pxNpc.npcPtr, out List<RoutineData> routines))
             {
-                initialSpawnpoint = PhoenixBridge.World.waypoints
-                    .FirstOrDefault(item => item.name.ToLower() == routines.First().waypoint.ToLower());
-                newNpc.GetComponent<Routine>().routines = routines;
+                initialSpawnpoint = PhoenixBridge.World.waypoints.FirstOrDefault(item => item.name == routines.First().waypoint);
+            }
+            if(PhoenixBridge.npcRoutinesDict.TryGetValue(pxNpc.npcPtr, out Dictionary<DateTime, RoutineData> innerDict)){
+                newNpc.GetComponent<Routine>().routines = innerDict;
             }
 
             newNpc.transform.position = initialSpawnpoint.position.ToUnityVector();
@@ -94,6 +95,8 @@ namespace GVR.Creator
                 waypoint = data.waypoint
             };
 
+            PhoenixBridge.npcRoutinesDict.TryAdd(data.npc, new());
+            PhoenixBridge.npcRoutinesDict[data.npc].Add(routine.start, routine);
             // Add element if key not yet exists.
             PhoenixBridge.npcRoutines.TryAdd(data.npc, new());
             PhoenixBridge.npcRoutines[data.npc].Add(routine);
