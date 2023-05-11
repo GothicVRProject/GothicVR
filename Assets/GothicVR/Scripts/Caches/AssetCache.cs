@@ -43,12 +43,6 @@ namespace GVR.Caches
             }
 
             var format = pxTexture.format.AsUnityTextureFormat();
-            if (format == 0)
-            {
-                Debug.LogWarning($"Format >{pxTexture.format}< is not supported or not yet tested to work with Unity:");
-                return null;
-            }
-
             var texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, (int)pxTexture.mipmapCount, false);
             texture.name = key;
 
