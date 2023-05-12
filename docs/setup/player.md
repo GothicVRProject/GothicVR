@@ -71,7 +71,7 @@ Where to find the `GameSettings.json`:
 # Logging
 
 Where to find the log files?
-* **PCVR:** Location directory for the logging file: `C:\Users%USERPROFILE%\AppData\LocalLow\GothicVRProject\GothicVR\gothicvr_log.txt`
+* **PCVR:** Location directory for the logging file: `C:\Users\%USERPROFILE%\AppData\LocalLow\GothicVRProject\GothicVR\gothicvr_log.txt`
 * **Mobile VR (Quest2/Pico4):** Location directory for the logging file:`/storage/emulated/0/Android/data/com.GothicVRProject.GothicVR/files/gothicvr_log.txt`
 
 # How to Play
