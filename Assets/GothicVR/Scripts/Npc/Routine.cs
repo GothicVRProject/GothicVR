@@ -14,15 +14,13 @@ namespace GVR.Npc
 {
     public class Routine : MonoBehaviour
     {
-        private const int SPEED = 10;
-        private GameTime gameTime;
+        private const float SPEED = 1f;
+        private GameTime gameTime = new();
         PxCs.Data.WayNet.PxWayPointData waypoint;
         RoutineData routine;
 
-        //public List<RoutineData> routines = new();
-        public Dictionary<DateTime, RoutineData> routines = new();
-
-        private List<DateTime> startTimes;
+        public List<RoutineData> routines = new();
+        public Dictionary<string, RoutineData> waypoints = new();
 
         private void OnEnable()
         {
@@ -31,10 +29,7 @@ namespace GVR.Npc
 
         private void Start()
         {
-            foreach(DateTime key in routines.Keys) {
-                //Debug.LogError(key);
-                startTimes.Add(key);
-            }
+            //Initialize first waypoint
             DateTime time = new(1, 1, 1, 15, 0, 0);
             lookUpRoutine(time);
         }
@@ -46,6 +41,8 @@ namespace GVR.Npc
         private void moveNpc()
         {
             if (routine == null)
+                return;
+            if (waypoint == null)
                 return;
             var startPosition = gameObject.transform.position;
             var targetPosition = waypoint.position.ToUnityVector();
@@ -64,16 +61,11 @@ namespace GVR.Npc
         }
         void getRoutine(DateTime time)
         {
-            if (startTimes.Contains(time))
-            {
-                Debug.LogError(time);
-                routine = routines[time];
-            }
-            //routine = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
+            routine = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
         }
         void getWaypoint()
         {
-            waypoint = PhoenixBridge.World.waypoints.FirstOrDefault(item => item.name == routine.waypoint);
+            waypoint = PhoenixBridge.World.waypointsDict[routine.waypoint];
         }
     }
 }
