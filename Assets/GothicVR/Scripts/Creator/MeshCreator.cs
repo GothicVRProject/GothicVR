@@ -64,9 +64,9 @@ namespace GVR.Creator
                     return null;
                 }
 
-                foreach (var mesh in mdm.attachments)
+                foreach (var subMesh in mdm.attachments)
                 {
-                    var subMeshName = mesh.Key;
+                    var subMeshName = subMesh.Key;
                     var subMeshObj = new GameObject(subMeshName);
                     subMeshObj.SetParent(meshRootObject);
 
@@ -78,8 +78,8 @@ namespace GVR.Creator
                     var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
                     var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
-                    PrepareMeshRenderer(meshRenderer, mesh.Value);
-                    PrepareMeshFilter(meshFilter, mesh.Value);
+                    PrepareMeshRenderer(meshRenderer, subMesh.Value);
+                    PrepareMeshFilter(meshFilter, subMesh.Value);
                     meshCollider.sharedMesh = meshFilter.mesh;
                 }
             }

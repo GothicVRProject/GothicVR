@@ -1,5 +1,5 @@
-﻿using GVR.Demo;
-using GVR.Caches;
+﻿using GVR.Caches;
+using GVR.Demo;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -8,9 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static PxCs.Interface.PxWorld;
-using PxCs.Interface;
-using GVR.Phoenix.Interface;
-using System;
 
 namespace GVR.Creator
 {
@@ -55,25 +52,33 @@ namespace GVR.Creator
             var vobRootObj = new GameObject("Vobs");
             vobRootObj.transform.parent = root.transform;
 
-            foreach (var vob in vobs.Values.SelectMany(i => i.SelectMany(ii => ii.childVobs)))
+            foreach (var vobType in vobs)
             {
-                var mdl = assetCache.TryGetMdl(vob.vobName);
-                if (mdl != null)
+                foreach (var vob in vobType.Value)
                 {
-                    meshCreator.Create(vob.vobName, mdl, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
-                }
-                else
-                {
-                    var mrm = assetCache.TryGetMrm(vob.vobName);
-                    if (mrm == null)
+                    string meshName;
+                    if (vob.showVisual)
+                        meshName = vob.visualName;
+                    else
+                        meshName = vob.visualName;
+
+                    var mdl = assetCache.TryGetMdl(meshName);
+                    if (mdl != null)
                     {
-                        //Debug.LogWarning($">{vob.vobName}<'s .mrm not found.");
-                        continue;
+                        meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
                     }
+                    else
+                    {
+                        var mrm = assetCache.TryGetMrm(meshName);
+                        if (mrm == null)
+                        {
+                            Debug.LogWarning($">{meshName}<'s .mrm not found.");
+                            continue;
+                        }
 
-                    meshCreator.Create(vob.vobName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
+                        meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
+                    }
                 }
-
             }
         }
     }
