@@ -91,15 +91,20 @@ namespace GVR.Creator
                     subMeshObj.SetParent(meshRootObject, true, false);
 
                     var meshFilter = subMeshObj.AddComponent<MeshFilter>();
-                    var meshRenderer = subMeshObj.AddComponent<SkinnedMeshRenderer>();
+                    // Changed SkinnedMeshRenderer to MeshRenderer for now bones seems to crash the game on PICO/Quest2
+                    // var meshRenderer = subMeshObj.AddComponent<SkinnedMeshRenderer>();
+                    var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
                     var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
                     PrepareMeshRenderer(meshRenderer, mesh.mesh);
                     PrepareMeshFilter(meshFilter, mesh);
-                    meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
-                    meshCollider.sharedMesh = meshFilter.mesh;
 
-                    CreateBonesData(subMeshObj, meshRenderer, mdh);
+                    //this is needed only for skinnedmeshrenderer
+                    // meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
+                    meshCollider.sharedMesh = meshFilter.mesh;
+                    
+                    // bones commented since we don't use for now skinnedmeshrenderer
+                    // CreateBonesData(subMeshObj, meshRenderer, mdh);
 
                     // FIXME - needed?
                     //meshRenderer.rootBone = meshRootObject.transform;
@@ -362,9 +367,11 @@ namespace GVR.Creator
                     preparedUVs.Add(index2.texture.ToUnityVector());
                     preparedUVs.Add(index3.texture.ToUnityVector());
 
-                    preparedBoneWeights.Add(weights[index1.index].ToBoneWeight());
-                    preparedBoneWeights.Add(weights[index2.index].ToBoneWeight());
-                    preparedBoneWeights.Add(weights[index3.index].ToBoneWeight());
+                    // remove bones to avoid crash on Quest and Pico
+
+                    // preparedBoneWeights.Add(weights[index1.index].ToBoneWeight());
+                    // preparedBoneWeights.Add(weights[index2.index].ToBoneWeight());
+                    // preparedBoneWeights.Add(weights[index3.index].ToBoneWeight());
                 }
                 preparedTriangles.Add(subMeshTriangles);
             }
@@ -375,7 +382,9 @@ namespace GVR.Creator
             // @see: https://answers.unity.com/questions/531968/submesh-vertices.html
             mesh.SetVertices(preparedVertices);
             mesh.SetUVs(0, preparedUVs);
-            mesh.boneWeights = preparedBoneWeights.ToArray();
+
+            // same here for the bones
+            // mesh.boneWeights = preparedBoneWeights.ToArray();
             for (var i = 0; i < pxMesh.subMeshes.Length; i++)
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
