@@ -7,5 +7,7 @@
 
         public string GothicMenuFontPath;
         public string GothicSubtitleFontPath;
+
+        public int LogLevel;
     }
 }
