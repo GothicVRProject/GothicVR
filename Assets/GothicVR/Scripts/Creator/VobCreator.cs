@@ -56,11 +56,10 @@ namespace GVR.Creator
             {
                 foreach (var vob in vobType.Value)
                 {
-                    string meshName;
-                    if (vob.showVisual)
-                        meshName = vob.visualName;
-                    else
-                        meshName = vob.visualName;
+                    var meshName = vob.showVisual ? vob.visualName : vob.vobName;
+
+                    if (meshName == string.Empty)
+                        continue;
 
                     var mdl = assetCache.TryGetMdl(meshName);
                     if (mdl != null)
