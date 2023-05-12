@@ -62,10 +62,17 @@ The `GameSettings.json` file can be used to modify some of GothicVR's settings.
 | GothicIPath | GameSettings.json | Yes (only PCVR) | GothicVR requires a full Gothic1 installation/file-dump at runtime. Name its location here (Windows users: Escape the backslash with `\\`). <br>This setting gets ignored on Android (e.g. Pico 4/Quest 2). |
 | GothicMenuFontPath | GameSettings.json | No | Font which is used within Gothic Menu. .ttf/.otf supported. Feel free to check (e.g.) on worldofgothic for some cool fonts. If not defined, the game will fallback to a default font. |
 | GothicSubtitleFontPath | GameSettings.json | No | Same like font setting above but for subtitles in game. |
+| LogLevel | GameSettings.json | Yes | Defines the level of logging that will be saved. |
 
 Where to find the `GameSettings.json`:
 * **PCVR:** Location is inside download/installation directory: `.\GVR_Data\StreamingAssets\GameSettings.json`
 * **Mobile VR (Quest2/Pico4):** After starting the game for the first time (and/or the file doesn't exist), it will create the `GameSettings.json` file at `/storage/emulated/0/Android/data/com.GothicVRProject.GothicVR/files/GameSettings.json`
+
+# Logging
+
+Where to find the log files?
+* **PCVR:** Location directory for the logging file: `C:\Users%USERPROFILE%\AppData\LocalLow\GothicVRProject\GothicVR\gothicvr_log.txt`
+* **Mobile VR (Quest2/Pico4):** Location directory for the logging file:`/storage/emulated/0/Android/data/com.GothicVRProject.GothicVR/files/gothicvr_log.txt`
 
 # How to Play
 TBD
