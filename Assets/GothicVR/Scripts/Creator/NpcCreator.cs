@@ -66,11 +66,8 @@ namespace GVR.Creator
 
             newNpc.GetComponent<Properties>().npc = pxNpc;
 
-            if (PhoenixBridge.npcRoutines.TryGetValue(pxNpc.npcPtr, out List<RoutineData> routines))
-            {
-                initialSpawnpoint = PhoenixBridge.World.waypointsDict[routines.First().waypoint];
-            }
-
+            var initialSpawnpointName = newNpc.GetComponent<Routine>().routines.First().waypoint;
+            initialSpawnpoint = PhoenixBridge.World.waypointsDict[initialSpawnpointName];
 
             newNpc.transform.position = initialSpawnpoint.position.ToUnityVector();
             newNpc.transform.parent = npcContainer.transform;
