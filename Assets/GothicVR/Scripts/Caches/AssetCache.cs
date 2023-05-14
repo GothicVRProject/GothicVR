@@ -43,12 +43,6 @@ namespace GVR.Caches
             }
 
             var format = pxTexture.format.AsUnityTextureFormat();
-            if (format == 0)
-            {
-                Debug.LogWarning($"Format >{pxTexture.format}< is not supported or not yet tested to work with Unity:");
-                return null;
-            }
-
             var texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, (int)pxTexture.mipmapCount, false);
             texture.name = key;
 
@@ -97,13 +91,13 @@ namespace GVR.Caches
             return newData;
         }
 
-        public PxModelMeshData TryGetMdm(string key)
+        public PxModelMeshData TryGetMdm(string key, params string[] attachmentKeys)
         {
             var preparedKey = GetPreparedKey(key);
             if (mdmCache.TryGetValue(preparedKey, out PxModelMeshData data))
                 return data;
 
-            var newData = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mdm");
+            var newData = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mdm", attachmentKeys);
             mdmCache[preparedKey] = newData;
 
             return newData;

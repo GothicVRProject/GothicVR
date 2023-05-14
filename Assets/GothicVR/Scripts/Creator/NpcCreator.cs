@@ -27,6 +27,7 @@ namespace GVR.Creator
         {
             lookupCache = SingletonBehaviour<LookupCache>.GetOrCreate();
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+            meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
 
             npcContainer = GameObject.Find("NPCs");
 
@@ -136,6 +137,7 @@ namespace GVR.Creator
 
             if (SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpc)
                 meshCreator.Create(name, mdm, mdh, default, default, npc);
+
         }
     }
 }
