@@ -17,7 +17,7 @@ namespace GVR.Npc
         private const float SPEED = 1f;
         private GameTime gameTime = new();
         PxCs.Data.WayNet.PxWayPointData waypoint;
-        RoutineData routine;
+        RoutineData currentRoutine;
 
         public List<RoutineData> routines = new();
         public Dictionary<string, RoutineData> waypoints = new();
@@ -40,7 +40,7 @@ namespace GVR.Npc
         }
         private void moveNpc()
         {
-            if (routine == null)
+            if (currentRoutine == null)
                 return;
             if (waypoint == null)
                 return;
@@ -55,17 +55,17 @@ namespace GVR.Npc
                 return;
 
             setRoutine(time);
-            if (routine == null)
+            if (currentRoutine == null)
                 return;
             setWaypoint();
         }
         void setRoutine(DateTime time)
         {
-            routine = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
+            currentRoutine = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
         }
         void setWaypoint()
         {
-            waypoint = PhoenixBridge.World.waypointsDict[routine.waypoint];
+            waypoint = PhoenixBridge.World.waypointsDict[currentRoutine.waypoint];
         }
     }
 }
