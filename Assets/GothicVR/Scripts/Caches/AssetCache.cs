@@ -91,13 +91,13 @@ namespace GVR.Caches
             return newData;
         }
 
-        public PxModelMeshData TryGetMdm(string key)
+        public PxModelMeshData TryGetMdm(string key, params string[] attachmentKeys)
         {
             var preparedKey = GetPreparedKey(key);
             if (mdmCache.TryGetValue(preparedKey, out PxModelMeshData data))
                 return data;
 
-            var newData = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mdm");
+            var newData = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mdm", attachmentKeys);
             mdmCache[preparedKey] = newData;
 
             return newData;
