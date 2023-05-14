@@ -16,6 +16,9 @@ namespace GVR.Creator
     {
         private static AssetCache assetCache;
 
+        // DEBUG - we can change special mesh entries (trees, walls) based on flags later. But for now we can live with the nature cutout shader.
+        private const string DEFAULT_SHADER = "Nature/Tree Creator Leaves";
+
         void Start()
         {
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
@@ -162,7 +165,7 @@ namespace GVR.Creator
 
         private void PrepareMeshRenderer(Renderer renderer, WorldData.SubMeshData subMesh)
         {
-            var standardShader = Shader.Find("Standard");
+            var standardShader = Shader.Find(DEFAULT_SHADER);
             var material = new Material(standardShader);
             var bMaterial = subMesh.material;
 
@@ -196,7 +199,7 @@ namespace GVR.Creator
 
             foreach (var subMesh in mrmData.subMeshes)
             {
-                var standardShader = Shader.Find("Standard");
+                var standardShader = Shader.Find(DEFAULT_SHADER);
                 var material = new Material(standardShader);
                 var materialData = subMesh.material;
 
