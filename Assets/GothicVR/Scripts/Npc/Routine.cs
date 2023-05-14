@@ -30,8 +30,8 @@ namespace GVR.Npc
         private void Start()
         {
             //Initialize first waypoint
-            DateTime time = new(1, 1, 1, 15, 0, 0);
-            lookUpRoutine(time);
+            DateTime gameStartTime = new(1, 1, 1, 15, 0, 0);
+            lookUpRoutine(gameStartTime);
         }
 
         private void Update()
