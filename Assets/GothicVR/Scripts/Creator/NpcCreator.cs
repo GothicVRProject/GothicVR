@@ -132,9 +132,7 @@ namespace GVR.Creator
             var mdm = assetCache.TryGetMdm(data.body);
 
             if (SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpc)
-                SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, default, default, npc);
-
-            meshCreator.Create(name, mdm, mdh, default, default, npc);
+                meshCreator.Create(name, mdm, mdh, default, default, npc);
         }
     }
 }
