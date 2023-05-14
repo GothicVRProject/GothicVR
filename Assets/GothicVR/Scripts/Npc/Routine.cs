@@ -54,16 +54,16 @@ namespace GVR.Npc
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
                 return;
 
-            getRoutine(time);
+            setRoutine(time);
             if (routine == null)
                 return;
-            getWaypoint();
+            setWaypoint();
         }
-        void getRoutine(DateTime time)
+        void setRoutine(DateTime time)
         {
             routine = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
         }
-        void getWaypoint()
+        void setWaypoint()
         {
             waypoint = PhoenixBridge.World.waypointsDict[routine.waypoint];
         }
