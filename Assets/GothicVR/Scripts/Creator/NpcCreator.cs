@@ -67,9 +67,12 @@ namespace GVR.Creator
 
             newNpc.GetComponent<Properties>().npc = pxNpc;
 
-            var initialSpawnpointName = newNpc.GetComponent<Routine>().routines.First().waypoint;
-            initialSpawnpoint = PhoenixBridge.World.waypointsDict[initialSpawnpointName];
-
+            if (newNpc.GetComponent<Routine>().routines.Any())
+            {
+                var initialSpawnpointName = newNpc.GetComponent<Routine>().routines.First().waypoint;
+                initialSpawnpoint = PhoenixBridge.World.waypointsDict[initialSpawnpointName];
+            }
+            
             newNpc.transform.position = initialSpawnpoint.position.ToUnityVector();
             newNpc.transform.parent = npcContainer.transform;
         }
