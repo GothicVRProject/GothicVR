@@ -17,7 +17,7 @@ namespace GVR.Creator
         private static AssetCache assetCache;
 
         // DEBUG - we can change special mesh entries (trees, walls) based on flags later. But for now we can live with the nature cutout shader.
-        private const string DEFAULT_SHADER = "Nature/Tree Creator Leaves Fast";
+        private const string DEFAULT_SHADER = "Nature/Tree Creator Leaves";
 
         void Start()
         {
