@@ -6,14 +6,14 @@ on:
       - main
     types: [opened, reopened, synchronize]
     paths-ignore:
-      - '^(docs|Docs|DOCS)/.*'
+      - 'docs/**'
       - "README.md"
     
   push:
     branches:
       - main
     paths-ignore:
-      - '^(docs|Docs|DOCS)/.*'
+      - 'docs/**'
       - "README.md"
 
 jobs:
@@ -114,9 +114,3 @@ jobs:
           name: Build-${{ matrix.targetDevice }}
           path: build/${{ matrix.targetDevice }}
           expire-in: 2 days
-
-      #- name: Create Target Directory & copy Build
-      #  run: |
-      #    mkdir -p /builds/PullRequests/${{ github.event.pull_request.number }}:${{ github.event.pull_request.head.ref }}/${{ matrix.targetDevice }}
-      #    rsync -arctuxz --remove-source-files /tmp/build/${{ matrix.targetDevice }} /builds/PullRequests/${{ github.event.pull_request.number }}:${{ github.event.pull_request.head.ref }}/${{ matrix.targetDevice }}/
-
