@@ -7,44 +7,65 @@ using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using GVR.World;
+using System;
+using System.Data;
 
 namespace GVR.Npc
 {
     public class Routine : MonoBehaviour
     {
-        private static readonly int SPEED = 10;
-        private GameTime gameTime;
-        public List<RoutineData> routines = new();
+        private const float SPEED = 1f;
+        private GameTime gameTime = new();
+        PxCs.Data.WayNet.PxWayPointData waypoint;
+        RoutineData currentRoutine;
 
-        void Start()
+        public List<RoutineData> routines = new();
+        public Dictionary<string, RoutineData> waypoints = new();
+
+        private void OnEnable()
         {
-            gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
+            gameTime.minuteChangeCallback.AddListener(lookUpRoutine);
         }
 
-        void Update()
+        private void Start()
+        {
+            //Initialize first waypoint
+            DateTime gameStartTime = new(1, 1, 1, 15, 0, 0);
+            lookUpRoutine(gameStartTime);
+        }
+
+        private void Update()
+        {
+            moveNpc();
+        }
+        private void moveNpc()
+        {
+            if (currentRoutine == null)
+                return;
+            if (waypoint == null)
+                return;
+            var startPosition = gameObject.transform.position;
+            var targetPosition = waypoint.position.ToUnityVector();
+            gameObject.transform.position = Vector3.MoveTowards(startPosition, targetPosition, SPEED * Time.deltaTime);
+        }
+
+        void lookUpRoutine(DateTime time)
         {
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
                 return;
 
-            var routine = GetCurrentRoutine();
-
-            if (routine == null)
+            setRoutine(time);
+            if (currentRoutine == null)
                 return;
-
-            var waypoint = PhoenixBridge.World.waypoints
-                .FirstOrDefault(item => item.name.ToLower() == routine.waypoint.ToLower());
-
-            var startPosition = gameObject.transform.position;
-            gameObject.transform.position = Vector3.MoveTowards(startPosition, waypoint.position.ToUnityVector(), SPEED * Time.deltaTime);
+            setWaypoint();
         }
-
-        private RoutineData GetCurrentRoutine()
+        void setRoutine(DateTime time)
         {
-            var curTime = gameTime.GetCurrentDateTime();
-
-            var routine = routines.FirstOrDefault(item => (item.start <= curTime && curTime < item.stop));
-
-            return routine;
+            currentRoutine = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
+        }
+        void setWaypoint()
+        {
+            waypoint = PhoenixBridge.World.waypointsDict[currentRoutine.waypoint];
         }
     }
 }

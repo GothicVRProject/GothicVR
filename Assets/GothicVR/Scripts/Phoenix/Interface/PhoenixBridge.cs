@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Data.Vm.Gothic;
+using PxCs.Data.WayNet;
 
 namespace GVR.Phoenix.Interface
 {

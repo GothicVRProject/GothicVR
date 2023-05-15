@@ -1,5 +1,6 @@
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
+using PxCs.Data.WayNet;
 using PxCs.Interface;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,11 @@ namespace GVR.Phoenix.Interface
             var materials = PxMesh.GetMaterials(worldMeshPtr);
 
             var waypoints = PxWorld.GetWayPoints(worldPtr);
+            var waypointsDict = new Dictionary<string, PxWayPointData>();
+            foreach (var waypoint in waypoints)
+            {
+                waypointsDict[waypoint.name] = waypoint;
+            }
             var waypointEdges = PxWorld.GetWayEdges(worldPtr);
 
             WorldData world = new()
@@ -44,6 +50,7 @@ namespace GVR.Phoenix.Interface
                 vobs = PxWorld.GetVobs(worldPtr),
 
                 waypoints = waypoints,
+                waypointsDict = waypointsDict,
                 waypointEdges = waypointEdges
             };
 

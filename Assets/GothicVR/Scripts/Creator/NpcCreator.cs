@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.XR.CoreUtils;
 using UnityEngine;
+using GVR.Demo;
 
 namespace GVR.Creator
 {
@@ -67,13 +68,12 @@ namespace GVR.Creator
 
             newNpc.GetComponent<Properties>().npc = pxNpc;
 
-            if (PhoenixBridge.npcRoutines.TryGetValue(pxNpc.npcPtr, out List<RoutineData> routines))
+            if (newNpc.GetComponent<Routine>().routines.Any())
             {
-                initialSpawnpoint = PhoenixBridge.World.waypoints
-                    .FirstOrDefault(item => item.name.ToLower() == routines.First().waypoint.ToLower());
-                newNpc.GetComponent<Routine>().routines = routines;
+                var initialSpawnpointName = newNpc.GetComponent<Routine>().routines.First().waypoint;
+                initialSpawnpoint = PhoenixBridge.World.waypointsDict[initialSpawnpointName];
             }
-
+            
             newNpc.transform.position = initialSpawnpoint.position.ToUnityVector();
             newNpc.transform.parent = npcContainer.transform;
         }
@@ -95,6 +95,8 @@ namespace GVR.Creator
                 waypoint = data.waypoint
             };
 
+            var npcId = PxVm.pxVmInstanceGetSymbolIndex(data.npc);
+            LookupCache.Instance.npcCache[npcId].GetComponent<Routine>().routines.Add(routine);
             // Add element if key not yet exists.
             PhoenixBridge.npcRoutines.TryAdd(data.npc, new());
             PhoenixBridge.npcRoutines[data.npc].Add(routine);
@@ -132,8 +134,10 @@ namespace GVR.Creator
             var npc = lookupCache.npcCache[symbolIndex];
             var mdh = npc.GetComponent<Properties>().mdh;
             var mdm = assetCache.TryGetMdm(data.body);
-            
-            meshCreator.Create(name, mdm, mdh, default, default, npc);
+
+            if (SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpc)
+                meshCreator.Create(name, mdm, mdh, default, default, npc);
+
         }
     }
 }

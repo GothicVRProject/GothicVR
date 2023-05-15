@@ -1,6 +1,7 @@
 ﻿using PxCs.Data;
 using PxCs.Data.Mesh;
 using PxCs.Data.WayNet;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ namespace GVR.Phoenix.Data
         public PxVobData[] vobs;
 
         public PxWayPointData[] waypoints;
+        public Dictionary<string, PxWayPointData> waypointsDict;
         public PxWayEdgeData[] waypointEdges;
-
     }
 }
