@@ -54,10 +54,12 @@ namespace GVR.Settings
 						break;
 					case (int)LogLevel.Error:
 						fileWriter.WriteLine(type + ": " + logString);
+						fileWriter.WriteLine(stackTrace);
 						fileWriter.Flush();
 						break;
 					case (int)LogLevel.Fatal:
 						fileWriter.WriteLine(type + ": " + logString);
+						fileWriter.WriteLine(stackTrace);
 						fileWriter.Flush();
 						break;
 				}
