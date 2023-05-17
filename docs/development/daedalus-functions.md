@@ -3,7 +3,7 @@ Daedalus External Functions
 
 Daedalus is the scripting language used by the Gothic games (more about it in German [here](https://wiki.worldofgothic.de/doku.php?id=daedalus)).
 
-This page is used to keep an overview over the current state of the Daedalus functions' respective implementations. The goal is to implement every single of the following functions. Feel free to pick one from the TODO sections - if they're already "$${\color{red}In\ Progress}$$" just ask on the Discord about it's current progression.
+This page is used to keep an overview over the current state of the Daedalus functions' respective implementations. The goal is to implement every single of the following functions. Feel free to pick one that hasn't been done already - if they're already ${\color{red}In\ Progress}$ just ask on the Discord about it's current progression.
 
 If you work on a function, please update it's status here, so that we don't do duplicate work.
 
