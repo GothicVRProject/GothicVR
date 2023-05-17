@@ -7,6 +7,7 @@ using GVR.Phoenix.Util;
 using GVR.World;
 using System;
 using System.Data;
+using PxCs.Data.WayNet;
 
 namespace GVR.Npc
 {
@@ -58,7 +59,10 @@ namespace GVR.Npc
         }
         void setWaypoint()
         {
-            waypoint = PhoenixBridge.World.waypointsDict[currentDestination.waypoint];
+            if (PhoenixBridge.World.waypointsDict.TryGetValue(currentDestination.waypoint, out PxWayPointData value))
+            {
+                waypoint = value;
+            }
         }
     }
 }
