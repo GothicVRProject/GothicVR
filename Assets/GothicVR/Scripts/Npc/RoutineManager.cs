@@ -10,12 +10,17 @@ using System.Linq;
 
 public class RoutineManager : MonoBehaviour
 {
-    GameTime gameTime = new();
+    GameTime gameTime;
     static Dictionary<DateTime, List<GVR.Npc.Routine>> npcStartTimeDict = new();
 
     private void OnEnable()
     {
-            gameTime.minuteChangeCallback.AddListener(Invoke);
+        gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
+        gameTime.minuteChangeCallback.AddListener(Invoke);
+    }
+    private void OnDisable()
+    {
+        gameTime.minuteChangeCallback.RemoveListener(Invoke);
     }
     private void Start()
     {
