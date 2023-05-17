@@ -10,8 +10,8 @@ using System.Linq;
 
 public class RoutineManager : MonoBehaviour
 {
-    GameTime gameTime = new();
-    Dictionary<DateTime, List<GVR.Npc.Routine>> npcStartTimeDict = new();
+    static GameTime gameTime = new();
+    static Dictionary<DateTime, List<GVR.Npc.Routine>> npcStartTimeDict = new();
 
     private void OnEnable()
     {
@@ -32,15 +32,14 @@ public class RoutineManager : MonoBehaviour
         {
             try
             {
-                var bla = npcStartTimeDict;
-                //if (npcStartTimeDict.ContainsKey(routine.start))
-                if (bla.ContainsKey(routine.start))
+                if (npcStartTimeDict.ContainsKey(routine.start))
                 {
+                    //npcStartTimeDict.Add(routine.start, new List<GVR.Npc.Routine>()); //Die gehört hier nicht hin. Nur zu testzwecken da.
                     npcStartTimeDict[routine.start].Add(npcID);
                 }
                 else
                 {
-                    npcStartTimeDict.Add(routine.start, new());
+                    npcStartTimeDict.Add(routine.start, new List<GVR.Npc.Routine>());
                     npcStartTimeDict[routine.start].Add(npcID);
                 }
             }
@@ -55,11 +54,6 @@ public class RoutineManager : MonoBehaviour
     {
         foreach (RoutineData routine in routines)
         {
-            
-            /*List<GVR.Npc.Routine> routinesList = npcStartTimeDict[routine.start];
-            int index = npcStartTimeDict[(routine.start)].IndexOf(npcID);
-            routinesList[index] = null;*/
-            //npcStartTimeDict[routine.start][npcStartTimeDict[(routine.start)].IndexOf(npcID)] = null;
             npcStartTimeDict[routine.start].Remove(npcID);  //Delete value from List
             if (!npcStartTimeDict[routine.start].Any())     //If List is empty afterwards
                 npcStartTimeDict.Remove(routine.start);     //Delete key aswell

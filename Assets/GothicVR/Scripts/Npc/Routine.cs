@@ -34,7 +34,7 @@ namespace GVR.Npc
         }
         private void Update()
         {
-            //moveNpc();
+            moveNpc();
         }
         private void moveNpc()
         {
