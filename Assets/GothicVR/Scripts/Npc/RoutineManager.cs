@@ -11,11 +11,11 @@ using System.Linq;
 public class RoutineManager : MonoBehaviour
 {
     GameTime gameTime = new();
-    Dictionary<DateTime, List<GVR.Npc.Routine>> npcStartTimeDict;
+    Dictionary<DateTime, List<GVR.Npc.Routine>> npcStartTimeDict = new();
 
     private void OnEnable()
     {
-        gameTime.minuteChangeCallback.AddListener(Invoke);
+            gameTime.minuteChangeCallback.AddListener(Invoke);
     }
     private void Start()
     {
@@ -30,14 +30,24 @@ public class RoutineManager : MonoBehaviour
     {
         foreach (RoutineData routine in routines)
         {
-            if (!npcStartTimeDict.ContainsKey(routine.start))
+            try
             {
-                npcStartTimeDict.Add(routine.start, new());
-                npcStartTimeDict[routine.start].Add(npcID);
+                var bla = npcStartTimeDict;
+                //if (npcStartTimeDict.ContainsKey(routine.start))
+                if (bla.ContainsKey(routine.start))
+                {
+                    npcStartTimeDict[routine.start].Add(npcID);
+                }
+                else
+                {
+                    npcStartTimeDict.Add(routine.start, new());
+                    npcStartTimeDict[routine.start].Add(npcID);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                npcStartTimeDict[routine.start].Add(npcID);
+                Debug.LogException(ex);
+                Console.WriteLine("Fehler beim Hinzufügen zur npcStartTimeDict: " + ex.Message);
             }
         }
     }
@@ -45,11 +55,14 @@ public class RoutineManager : MonoBehaviour
     {
         foreach (RoutineData routine in routines)
         {
-            npcStartTimeDict[routine.start].Remove(npcID);
-            if (!npcStartTimeDict[routine.start].Any())
-            {
-                npcStartTimeDict.Remove(routine.start);
-            }
+            
+            /*List<GVR.Npc.Routine> routinesList = npcStartTimeDict[routine.start];
+            int index = npcStartTimeDict[(routine.start)].IndexOf(npcID);
+            routinesList[index] = null;*/
+            //npcStartTimeDict[routine.start][npcStartTimeDict[(routine.start)].IndexOf(npcID)] = null;
+            npcStartTimeDict[routine.start].Remove(npcID);  //Delete value from List
+            if (!npcStartTimeDict[routine.start].Any())     //If List is empty afterwards
+                npcStartTimeDict.Remove(routine.start);     //Delete key aswell
         }
     }
     private void Invoke(DateTime currTime)

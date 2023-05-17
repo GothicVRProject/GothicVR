@@ -15,12 +15,16 @@ namespace GVR.Npc
         private const float SPEED = 5f;
         private RoutineManager routineManager = new();
         PxCs.Data.WayNet.PxWayPointData waypoint;
-        RoutineData currentRoutine;
+        RoutineData currentDestination;
 
         public List<RoutineData> routines = new();
         public Dictionary<string, RoutineData> waypoints = new();
 
         private void OnEnable()
+        {
+            
+        }
+        private void Start()
         {
             routineManager.Subscribe(gameObject.GetComponent<Routine>(), routines);
         }
@@ -30,11 +34,11 @@ namespace GVR.Npc
         }
         private void Update()
         {
-            moveNpc();
+            //moveNpc();
         }
         private void moveNpc()
         {
-            if (currentRoutine == null)
+            if (currentDestination == null)
                 return;
             if (waypoint == null)
                 return;
@@ -46,17 +50,19 @@ namespace GVR.Npc
         public void lookUpRoutine(DateTime time)
         {
             setRoutine(time);
-            if (currentRoutine == null)
+            if (currentDestination == null)
                 return;
             setWaypoint();
         }
         void setRoutine(DateTime time)
         {
-            currentRoutine = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
+            //With this line the init shouldn't work. I dont think two comparisons instead of one is bad enough to make new functions
+            //currentRoutine = routines.FirstOrDefault(item => item.start==time); 
+            currentDestination = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
         }
         void setWaypoint()
         {
-            waypoint = PhoenixBridge.World.waypointsDict[currentRoutine.waypoint];
+            waypoint = PhoenixBridge.World.waypointsDict[currentDestination.waypoint];
         }
     }
 }
