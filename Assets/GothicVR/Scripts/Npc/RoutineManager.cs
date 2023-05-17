@@ -10,7 +10,7 @@ using System.Linq;
 
 public class RoutineManager : MonoBehaviour
 {
-    static GameTime gameTime = new();
+    GameTime gameTime = new();
     static Dictionary<DateTime, List<GVR.Npc.Routine>> npcStartTimeDict = new();
 
     private void OnEnable()
