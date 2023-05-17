@@ -3,7 +3,7 @@ Daedalus External Functions
 
 Daedalus is the scripting language used by the Gothic games (more about it in German [here](https://wiki.worldofgothic.de/doku.php?id=daedalus)).
 
-This page is used to keep an overview over the current state of the Daedalus functions' respective implementations. The goal is to implement every single of the following functions. Feel free to pick one from the TODO sections - if they're already "In Progress" just ask on the Discord about it's current progression.
+This page is used to keep an overview over the current state of the Daedalus functions' respective implementations. The goal is to implement every single of the following functions. Feel free to pick one from the TODO sections - if they're already "$${\color{red}In\ Progress}$$" just ask on the Discord about it's current progression.
 
 If you work on a function, please update it's status here, so that we don't do duplicate work.
 
@@ -16,8 +16,6 @@ If you got any notes, assumed complexity or something else to add, feel free to 
 All functions have been shamelessly copied from [World of Gothic](https://www.worldofgothic.de/modifikation/article_371.htm).
 
 ## AI Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -95,14 +93,7 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | AI_WhirlAround | schnelle Drehung zu other | void AI_WhirlAround(var c_npc self, var c_npc other) |  |  |  |
 | AI_WhirlAroundToSource | Noch nicht dokumentiert | void AI_WhirlAroundToSource(var instance n0) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Apply Options Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -112,14 +103,7 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | Apply_Options_Performance | Noch nicht dokumentiert | void Apply_Options_Performance() |  |  |  |
 | Apply_Options_Video | Noch nicht dokumentiert | void Apply_Options_Video() |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Doc Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -138,14 +122,7 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | Doc_SetPages | setzt die Anzahl der Seiten dieses Dokuments. Bei mehr als zwei Seiten wird versucht ALLE Seiten auf den Bildschrim zu bekommen | void Doc_SetPages(var int handle, var int pages) |  |  |  |
 | Doc_Show |  | void Doc_Show(var int handle) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Helper Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -158,14 +135,7 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | Hlp_Random | erzeugt einen Zufallswert (wobei n0 Obergrenze : [0..n0-1] ) Rückgabewert integer | int Hlp_Random(var int n0) |  |  |  |
 | Hlp_StrCmp | Hilfsfunktion um zwei Strings miteinander zu vergleichen liefert bei Gleichheit eins zurück | int Hlp_StrCmp(var string s1, var string s2) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Info Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -173,14 +143,7 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | Info_AddChoice | Noch nicht dokumentiert | void Info_AddChoice(var int i0, var string s1, var func f2) |  |  |  |
 | Info_ClearChoices | Noch nicht dokumentiert | void Info_ClearChoices(var int i0) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Log Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -188,39 +151,25 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | Log_CreateTopic | Der Befehl fügt unter der Sektion 'section' ein neues Topic mit Namen 'name' ein. Sollte bereits ein Topic dieses Names in irgendeiner Sektion existieren, wird das Topic nicht hinzugefügt.  Parameter: - name Eine eindeutige Zeichenkette, die sowohl zur Identifikation als auch zur Anzeige des Topics verwendet wird. - section Eine, in der Constants.d definierte Konstante, die besagt, in welcher Sektion das Topic angezeigt werden soll. Die Konstante kann folgende Werte annehmen: - LOG_MISSION - LOG_NOTE | void Log_CreateTopic(var string name, var int section) |  |  |  |
 | Log_SetTopicStatus | Der Befehl ändert den Status des Topics 'name' in 'status'. Er sollte nur für Topics verwendet werden, die für die Sektion LOG_MISSION erzeugt wurden.  Parameter: - name Diejenige Zeichenkette, die bei der Erstellung des Topics per Log_CreateTopic() angegeben wurde. - status Eine, in der Constants.d definierte Konstante, die besagt, unter welchem Status die Mission dargestellt werden soll. Folgende Werte sind möglich: - LOG_RUNNING - LOG_SUCCESS - LOG_FAILED - LOG_OBSOLETE | void Log_SetTopicStatus(var string name, var int status) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Model Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
 | Mdl_ApplyOverlayMDS | Noch nicht dokumentiert | void Mdl_ApplyOverlayMDS(var instance n0, var string s1) |  |  |  |
 | Mdl_ApplyOverlayMDSTimed | Overlay-MDS wird gestartet und automatisch nach der angegebenen Zeit abgeschaltet | void Mdl_ApplyOverlayMDSTimed(var c_npc self, var string overlayname, var float timeticks) |  |  |  |
 | Mdl_ApplyOverlayMds | mit diesem Befehl werden Animationen auf einem höheren Layer gestartet (z.B. hat der Zombie ein Overlay über die normalen Human-Animationen) | void Mdl_ApplyOverlayMds(var c_npc n0, var string s1) |  |  |  |
-| Mdl_ApplyOverlayMdsTimed | Noch nicht dokumentiert | void Mdl_ApplyOverlayMdsTimed(var instance n0, var string s1, var int i2) | In Progress |  |  |
+| Mdl_ApplyOverlayMdsTimed | Noch nicht dokumentiert | void Mdl_ApplyOverlayMdsTimed(var instance n0, var string s1, var int i2) | $${\color{red}In\ Progress}$$ |  |  |
 | Mdl_ApplyRandomAni | Fügt Zufallsanimationen (am Kopf kratzen, an den Sack packen etc (s2)) für bestimmte Animationszustände (s1) ein | void Mdl_ApplyRandomAni(var c_npc n0, var string s1, var string s2) |  |  |  |
 | Mdl_ApplyRandomAniFreq | hiermit kann die Frequenz betimmt werden, wie oft die für den Animationszustand (s1) deklarierten Randomanis abgespielt werden | void Mdl_ApplyRandomAniFreq(var c_npc n0, var string s1, var float f2) |  |  |  |
 | Mdl_ApplyRandomFaceAni | Starte zufällige Gesichtsanimation Mdl_ApplyRandomFaceAni ( self, ANINAME, minTime, minTimeVar, maxTime, maxTimeVar, probMin) minTime = Minimum an Zeit nachdem Ani startet (in Sekunden) maxTime = Maximum an Zeit nachdem Ani startet (in Sekunden) minTimeVar = Abweichung von minTime (in Sekunden) maxTimeVar = Abweichung von maxTime (in Sekunden) probMin = Wahrscheinlichkeit [0..1] ob obere oder untere Grenze der Abweichung benutzt wird | void Mdl_ApplyRandomFaceAni(var c_npc self, var string name, var float timemin, var float timeminvar, var float timemax, var float timemaxvar, var float probmin) |  |  |  |
 | Mdl_RemoveOverlayMDS | Entferne ein Overlay-MDS | void Mdl_RemoveOverlayMDS(var c_npc self, var string overlayname) |  |  |  |
 | Mdl_SetModelFatness | Setzt Model-Z-Skalierung | void Mdl_SetModelFatness(var c_npc self, var float fatness) |  |  |  |
 | Mdl_SetModelScale | zum skalieren des Meshes (Breite,Höhe,Tiefe) 1 = 100%, also Normalgröße! | void Mdl_SetModelScale(var c_npc self, var float x, var float y, var float z) |  |  |  |
-| Mdl_SetVisual | Noch nicht dokumentiert | void Mdl_SetVisual(var instance n0, var string s1) | In Progress |  |  |
-| Mdl_SetVisualBody | Noch nicht dokumentiert | void Mdl_SetVisualBody(var instance n0, var string s1, var int i2, var int i3, var string s4, var int i5, var int i6, var int i7) | In Progress |  |  |
+| Mdl_SetVisual | Noch nicht dokumentiert | void Mdl_SetVisual(var instance n0, var string s1) | $${\color{red}In\ Progress}$$ |  |  |
+| Mdl_SetVisualBody | Noch nicht dokumentiert | void Mdl_SetVisualBody(var instance n0, var string s1, var int i2, var int i3, var string s4, var int i5, var int i6, var int i7) | $${\color{red}In\ Progress}$$ |  |  |
 | Mdl_StartFaceAni | Starte Gesichtsanimation // intensity 1 = 100% // holdTime -1 = forever | void Mdl_StartFaceAni(var c_npc self, var string name, var float intensity, var float holdtime) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Mission Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -230,25 +179,14 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | Mis_RemoveMission | Noch nicht dokumentiert | void Mis_RemoveMission(var instance n0) |  |  |  |
 | Mis_SetStatus | Setzt den Status einer Mission ( Bezogen auf den Spieler ) -> RUNNING, SUCCESS, FAILED etc. ) | void Mis_SetStatus(var int missionname, var int newstatus) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Mob Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
 | Mob_CreateItems | Erzeuge "amount" Items der Instanz "itemInstance" in oCMobContainer mit angegebenen Vobnamen. | void Mob_CreateItems(var string mobname, var int iteminstance, var int amount) |  |  |  |
 | Mob_HasItems | Liefere Anzahl der Items der Instanz "itemInstance" in oCMobContainer mit angegebenen Vobnamen | int Mob_HasItems(var string mobname, var int iteminstance) |  |  |  |
 
-### DONE
-
 ## NPC Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -367,14 +305,7 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | Perc_SetRange | Setze Reichweite fuer eine passive Wahrnehmung int cm | void Perc_SetRange(var int percid, var int range) |  |  |  |
 | Rtn_Exchange | Tausche aktuellen Tagesablauf des NSC "self" gegen angegebenen aus (Name wird automatisch mit "RTN_" am Anfang und NSC-Skript-ID am Ende ergänzt) | void Rtn_Exchange(var string oldroutine, var string newroutine) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Print Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -387,14 +318,7 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | PrintMulti | Printbefehl, der aus den angegebenen Strings einen Auswählt und auf den Bildschirm schreibt | void PrintMulti(var string s0, var string s1, var string s2, var string s3, var string s4) |  |  |  |
 | PrintScreen | Gibt den Text 'msg' auf dem Bildschrim aus und benutzt dabei den Font 'font'. Die Position ist für jede Koordinate eine Zahl zwischen 0 und 99 und gibt die prozentuale Position an. Der Ursprung befindet sich oben links (also 0% X und 0% Y) | void PrintScreen(var int dialognr, var string msg, var int posx, var int posy, var string font, var int timesec) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Sound Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -404,14 +328,7 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | Snd_Play | spielt einen Sound ab | void Snd_Play(var string s0) |  |  |  |
 | Snd_Play3D | spielt einen 3D-Sound ab. | void Snd_Play3D(var c_npc n0, var string s1) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Day Routine Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -419,17 +336,10 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | TA_BeginOverlay | Melde einen Overlay-Tagesablauf an | void TA_BeginOverlay(var c_npc self) |  |  |  |
 | TA_CS | Cutscene an den zuletzt angegebenen Tagesablaufpunkt hängen csName : Name der Cutscene ( der Name des "CS" - Files ) roleName : Die Rolle die der NSC dabei übernehmen soll. | void TA_CS(var c_npc self, var string csname, var string rolename) |  |  |  |
 | TA_EndOverlay | Beende einen Overlay-Tagesablauf | void TA_EndOverlay(var c_npc self) |  |  |  |
-| TA_Min | Tagesablaufpunkt minutengenau angeben | void TA_Min(var c_npc self, var int start_h, var int start_m, var int stop_h, var int stop_m, var func state, var string waypoint) | In Progress |  |  |
+| TA_Min | Tagesablaufpunkt minutengenau angeben | void TA_Min(var c_npc self, var int start_h, var int start_m, var int stop_h, var int stop_m, var func state, var string waypoint) | $${\color{red}In\ Progress}$$ |  |  |
 | TA_RemoveOverlay | Entferne aktiven TA-Overlay | void TA_RemoveOverlay(var c_npc self) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## World Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -468,14 +378,7 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | Wld_SetTime | Setzt die Uhrzeit auf hour:min. hour kann größer als 23 sein, um zum nächsten Tag zu springen. | void Wld_SetTime(var int hour, var int min) |  |  |  |
 | Wld_SpawnNpcRange | Noch nicht dokumentiert | void Wld_SpawnNpcRange(var instance n0, var int i1, var int i2, var float r3) |  |  |  |
 
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
 ## Misc Functions
-
-### TODO
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
 |---|---|---|---|---|---|
@@ -493,9 +396,3 @@ All functions have been shamelessly copied from [World of Gothic](https://www.wo
 | ExitGame | Noch nicht dokumentiert | void ExitGame() |  |  |  |
 | FloatToInt | !!! konvertiert einen float in einen int, hier wäre es noch ganz schön zu wissen, wie mit dem float umgesprungen wird --> schneiden oder runden ??? | int FloatToInt(var float x) |  |  |  |
 | FloatToString | Noch nicht dokumentiert | string FloatToString(var float r0) |  |  |  |
-
-### DONE
-
-| Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
-|---|---|---|---|---|---|
-
