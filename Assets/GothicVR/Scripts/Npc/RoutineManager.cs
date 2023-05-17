@@ -27,12 +27,16 @@ public class RoutineManager : MonoBehaviour
         //Es sollte der Start-Timestamp überprüft werden. Aber gibt es für jede Routine einen bei 15:00?
         //Wenn ich jetzt noch drauf käme, wie vorher sichergestellt wurde, dass das geht...
         //Init starting position
+        if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
+            return;
         DateTime StartTime = new(1, 1, 1, 15, 0, 0);
         Invoke(StartTime);
         
     }
     public void Subscribe(GVR.Npc.Routine npcID, List<RoutineData> routines)
     {
+        if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
+            return;
         foreach (RoutineData routine in routines)
         {
             try
@@ -66,8 +70,7 @@ public class RoutineManager : MonoBehaviour
     }
     private void Invoke(DateTime currTime)
     {
-        if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
-            return;
+        
         if (npcStartTimeDict.ContainsKey(currTime))
         {
             List<GVR.Npc.Routine> routineItems = npcStartTimeDict[currTime];

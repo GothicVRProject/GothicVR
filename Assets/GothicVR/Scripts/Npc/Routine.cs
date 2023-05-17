@@ -12,7 +12,7 @@ namespace GVR.Npc
 {
     public class Routine : MonoBehaviour
     {
-        private const float SPEED = 5f;
+        private const float SPEED = 1f;
         private RoutineManager routineManager = new();
         PxCs.Data.WayNet.PxWayPointData waypoint;
         RoutineData currentDestination;
