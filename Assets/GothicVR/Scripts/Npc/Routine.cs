@@ -20,17 +20,13 @@ namespace GVR.Npc
         public List<RoutineData> routines = new();
         public Dictionary<string, RoutineData> waypoints = new();
 
-        private void OnEnable()
-        {
-            
-        }
         private void Start()
         {
-            routineManager.Subscribe(gameObject.GetComponent<Routine>(), routines);
+            routineManager.Subscribe(this, routines);
         }
         private void OnDisable()
         {
-            routineManager.Unsubscribe(gameObject.GetComponent<Routine>(), routines);
+            routineManager.Unsubscribe(this, routines);
         }
         private void Update()
         {
@@ -47,7 +43,7 @@ namespace GVR.Npc
             gameObject.transform.position = Vector3.MoveTowards(startPosition, targetPosition, SPEED * Time.deltaTime);
         }
 
-        public void lookUpRoutine(DateTime time)
+        public void ChangeRoutine(DateTime time)
         {
             setRoutine(time);
             if (currentDestination == null)
