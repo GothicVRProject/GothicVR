@@ -8,13 +8,14 @@ using GVR.World;
 using System;
 using System.Data;
 using PxCs.Data.WayNet;
+using GVR.Util;
 
 namespace GVR.Npc
 {
     public class Routine : MonoBehaviour
     {
         private const float SPEED = 1f;
-        private RoutineManager routineManager = new();
+        private RoutineManager routineManager;
         PxCs.Data.WayNet.PxWayPointData waypoint;
         RoutineData currentDestination;
 
@@ -23,6 +24,7 @@ namespace GVR.Npc
 
         private void Start()
         {
+            routineManager = SingletonBehaviour<RoutineManager>.GetOrCreate();
             routineManager.Subscribe(this, routines);
         }
         private void OnDisable()

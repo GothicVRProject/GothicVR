@@ -11,10 +11,10 @@ using UnityEngine;
 /// <summary>
 /// Manages the Routines in a central spot. Routines Subscribe here. Calls the Routines when they are due.
 /// </summary>
-public class RoutineManager : MonoBehaviour
+public class RoutineManager : SingletonBehaviour<RoutineManager>
 {
     GameTime gameTime;
-    static Dictionary<DateTime, List<Routine>> npcStartTimeDict = new();
+    Dictionary<DateTime, List<Routine>> npcStartTimeDict = new();
 
     private void OnEnable()
     {
@@ -40,7 +40,7 @@ public class RoutineManager : MonoBehaviour
     {
         if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
             return;
-        foreach (RoutineData routine in routines)
+        foreach (RoutineData routine in routines)   //Todo: fill in routines backwards, for Mud and Scorpio have bugged Routines and will be picked the wrong way as is.
         {
             npcStartTimeDict.TryAdd(routine.start, new());
             npcStartTimeDict[routine.start].Add(npcID);
