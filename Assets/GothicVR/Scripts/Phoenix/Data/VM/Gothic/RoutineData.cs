@@ -14,3 +14,4 @@ namespace GVR.Phoenix.Data.Vm.Gothic
         public string waypoint;
     }
 }
+

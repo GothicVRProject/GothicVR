@@ -1,0 +1,75 @@
+using GVR.Demo;
+using GVR.Npc;
+using GVR.Phoenix.Data.Vm.Gothic;
+using GVR.Util;
+using GVR.World;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+/// <summary>
+/// Manages the Routines in a central spot. Routines Subscribe here. Calls the Routines when they are due.
+/// </summary>
+public class RoutineManager : SingletonBehaviour<RoutineManager>
+{
+    GameTime gameTime;
+    Dictionary<DateTime, List<Routine>> npcStartTimeDict = new();
+
+    private void OnEnable()
+    {
+        gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
+        gameTime.minuteChangeCallback.AddListener(Invoke);
+    }
+
+    private void OnDisable()
+    {
+        gameTime.minuteChangeCallback.RemoveListener(Invoke);
+    }
+
+    private void Start()
+    {
+        //Init starting position
+        if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
+            return;
+        DateTime StartTime = new(1, 1, 1, 15, 0, 0);
+        Invoke(StartTime);
+    }
+
+    public void Subscribe(Routine npcID, List<RoutineData> routines)
+    {
+        if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
+            return;
+        foreach (RoutineData routine in routines)   //Todo: fill in routines backwards, for Mud and Scorpio have bugged Routines and will be picked the wrong way as is.
+        {
+            npcStartTimeDict.TryAdd(routine.start, new());
+            npcStartTimeDict[routine.start].Add(npcID);
+        }
+    }
+
+    public void Unsubscribe(Routine routineInstance, List<RoutineData> routines)
+    {
+        foreach (RoutineData routine in routines)
+        {
+            npcStartTimeDict[routine.start].Remove(routineInstance);    //Delete value from List
+            if (!npcStartTimeDict[routine.start].Any())                 //If List is empty afterwards
+                npcStartTimeDict.Remove(routine.start);                 //Delete key aswell
+        }
+    }
+
+    /// <summary>
+    /// Calls the routineInstances that are due.
+    /// Triggers Routine Change
+    /// </summary>
+    private void Invoke(DateTime currTime)
+    {
+        if (npcStartTimeDict.ContainsKey(currTime))
+        {
+            List<Routine> routineItems = npcStartTimeDict[currTime];
+            foreach (var routineItem in routineItems)
+            {
+                routineItem.ChangeRoutine(currTime);
+            }
+        }
+    }
+}
