@@ -15,6 +15,23 @@ If you got any notes, assumed complexity or something else to add, feel free to 
 
 All functions have been shamelessly copied from [World of Gothic](https://www.worldofgothic.de/modifikation/article_371.htm).
 
+Jump to section:
+- [AI](#ai-functions)
+- [Apply Options](#apply-options-functions)
+- [Doc](#doc-functions)
+- [Helper](#helper-functions)
+- [Info](#info-functions)
+- [Log](#log-functions)
+- [Model](#model-functions)
+- [Mission](#mission-functions)
+- [Mob](#mob-functions)
+- [NPC](#npc-functions)
+- [Print](#print-functions)
+- [Sound](#sound-functions)
+- [Day Routine](#day-routine-functions)
+- [World](#world-functions)
+- [Misc](#misc-functions)
+
 ## AI Functions
 
 | Function Name | Original Description | Function Parameter | Current State | Assumed Complexity | Unity Implementation Idea |
