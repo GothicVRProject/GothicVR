@@ -8,7 +8,6 @@ using GVR.Util;
 using PxCs.Extensions;
 using PxCs.Interface;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Unity.XR.CoreUtils;
 using UnityEngine;
