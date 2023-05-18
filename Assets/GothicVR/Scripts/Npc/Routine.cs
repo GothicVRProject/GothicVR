@@ -4,9 +4,7 @@ using UnityEngine;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
-using GVR.World;
 using System;
-using System.Data;
 using PxCs.Data.WayNet;
 using GVR.Util;
 

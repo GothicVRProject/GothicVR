@@ -1,6 +1,5 @@
 ﻿using PxCs.Data.Model;
 using PxCs.Data.Vm;
-using System;
 using UnityEngine;
 
 namespace GVR.Npc
