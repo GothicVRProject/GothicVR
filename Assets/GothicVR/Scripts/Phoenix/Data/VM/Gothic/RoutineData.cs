@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace GVR.Phoenix.Data.Vm.Gothic
 {
@@ -12,6 +14,7 @@ namespace GVR.Phoenix.Data.Vm.Gothic
         public DateTime stop;
         public int action;
         public string waypoint;
+        public List<Vector3> route;
     }
 }
 
