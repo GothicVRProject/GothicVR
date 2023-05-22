@@ -40,6 +40,7 @@ public class RoutineManager : SingletonBehaviour<RoutineManager>
     {
         if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
             return;
+        
         foreach (RoutineData routine in routines)   //Todo: fill in routines backwards, for Mud and Scorpio have bugged Routines and will be picked the wrong way as is.
         {
             npcStartTimeDict.TryAdd(routine.start, new());
@@ -49,6 +50,9 @@ public class RoutineManager : SingletonBehaviour<RoutineManager>
 
     public void Unsubscribe(Routine routineInstance, List<RoutineData> routines)
     {
+        if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
+            return;
+        
         foreach (RoutineData routine in routines)
         {
             npcStartTimeDict[routine.start].Remove(routineInstance);    //Delete value from List
