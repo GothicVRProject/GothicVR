@@ -3,7 +3,11 @@ Daedalus External Functions
 
 Daedalus is the scripting language used by the Gothic games (more about it in German [here](https://wiki.worldofgothic.de/doku.php?id=daedalus)).
 
-This page is used to keep an overview over the current state of the Daedalus functions' respective implementations. The goal is to implement every single of the following functions. Feel free to pick one that hasn't been done already - if they're already ${\color{red}In\ Progress}$ just ask on the Discord about it's current progression.
+This page is used to keep an overview over the current state of the Daedalus functions' respective implementations. The goal is to implement every single of the following functions.
+Current state can be one of the following:
+- ${\color{red}TODO}$ (or empty): Feel free to grab and work on it!
+- ${\color{orange}In\ Progress}$: Function is being worked on currently; just ask on the Discord if you want to help
+- ${\color{green}Done}$: Function is fully implemented and usable
 
 If you work on a function, please update it's status here, so that we don't do duplicate work.
 
@@ -175,15 +179,15 @@ Jump to section:
 | Mdl_ApplyOverlayMDS | Noch nicht dokumentiert | void Mdl_ApplyOverlayMDS(var instance n0, var string s1) |  |  |  |
 | Mdl_ApplyOverlayMDSTimed | Overlay-MDS wird gestartet und automatisch nach der angegebenen Zeit abgeschaltet | void Mdl_ApplyOverlayMDSTimed(var c_npc self, var string overlayname, var float timeticks) |  |  |  |
 | Mdl_ApplyOverlayMds | mit diesem Befehl werden Animationen auf einem höheren Layer gestartet (z.B. hat der Zombie ein Overlay über die normalen Human-Animationen) | void Mdl_ApplyOverlayMds(var c_npc n0, var string s1) |  |  |  |
-| Mdl_ApplyOverlayMdsTimed | Noch nicht dokumentiert | void Mdl_ApplyOverlayMdsTimed(var instance n0, var string s1, var int i2) | $${\color{red}In\ Progress}$$ |  |  |
+| Mdl_ApplyOverlayMdsTimed | Noch nicht dokumentiert | void Mdl_ApplyOverlayMdsTimed(var instance n0, var string s1, var int i2) | $${\color{orange}In\ Progress}$$ |  |  |
 | Mdl_ApplyRandomAni | Fügt Zufallsanimationen (am Kopf kratzen, an den Sack packen etc (s2)) für bestimmte Animationszustände (s1) ein | void Mdl_ApplyRandomAni(var c_npc n0, var string s1, var string s2) |  |  |  |
 | Mdl_ApplyRandomAniFreq | hiermit kann die Frequenz betimmt werden, wie oft die für den Animationszustand (s1) deklarierten Randomanis abgespielt werden | void Mdl_ApplyRandomAniFreq(var c_npc n0, var string s1, var float f2) |  |  |  |
 | Mdl_ApplyRandomFaceAni | Starte zufällige Gesichtsanimation Mdl_ApplyRandomFaceAni ( self, ANINAME, minTime, minTimeVar, maxTime, maxTimeVar, probMin) minTime = Minimum an Zeit nachdem Ani startet (in Sekunden) maxTime = Maximum an Zeit nachdem Ani startet (in Sekunden) minTimeVar = Abweichung von minTime (in Sekunden) maxTimeVar = Abweichung von maxTime (in Sekunden) probMin = Wahrscheinlichkeit [0..1] ob obere oder untere Grenze der Abweichung benutzt wird | void Mdl_ApplyRandomFaceAni(var c_npc self, var string name, var float timemin, var float timeminvar, var float timemax, var float timemaxvar, var float probmin) |  |  |  |
 | Mdl_RemoveOverlayMDS | Entferne ein Overlay-MDS | void Mdl_RemoveOverlayMDS(var c_npc self, var string overlayname) |  |  |  |
 | Mdl_SetModelFatness | Setzt Model-Z-Skalierung | void Mdl_SetModelFatness(var c_npc self, var float fatness) |  |  |  |
 | Mdl_SetModelScale | zum skalieren des Meshes (Breite,Höhe,Tiefe) 1 = 100%, also Normalgröße! | void Mdl_SetModelScale(var c_npc self, var float x, var float y, var float z) |  |  |  |
-| Mdl_SetVisual | Noch nicht dokumentiert | void Mdl_SetVisual(var instance n0, var string s1) | $${\color{red}In\ Progress}$$ |  |  |
-| Mdl_SetVisualBody | Noch nicht dokumentiert | void Mdl_SetVisualBody(var instance n0, var string s1, var int i2, var int i3, var string s4, var int i5, var int i6, var int i7) | $${\color{red}In\ Progress}$$ |  |  |
+| Mdl_SetVisual | Noch nicht dokumentiert | void Mdl_SetVisual(var instance n0, var string s1) | $${\color{orange}In\ Progress}$$ |  |  |
+| Mdl_SetVisualBody | Noch nicht dokumentiert | void Mdl_SetVisualBody(var instance n0, var string s1, var int i2, var int i3, var string s4, var int i5, var int i6, var int i7) | $${\color{orange}In\ Progress}$$ |  |  |
 | Mdl_StartFaceAni | Starte Gesichtsanimation // intensity 1 = 100% // holdTime -1 = forever | void Mdl_StartFaceAni(var c_npc self, var string name, var float intensity, var float holdtime) |  |  |  |
 
 ## Mission Functions
@@ -353,7 +357,7 @@ Jump to section:
 | TA_BeginOverlay | Melde einen Overlay-Tagesablauf an | void TA_BeginOverlay(var c_npc self) |  |  |  |
 | TA_CS | Cutscene an den zuletzt angegebenen Tagesablaufpunkt hängen csName : Name der Cutscene ( der Name des "CS" - Files ) roleName : Die Rolle die der NSC dabei übernehmen soll. | void TA_CS(var c_npc self, var string csname, var string rolename) |  |  |  |
 | TA_EndOverlay | Beende einen Overlay-Tagesablauf | void TA_EndOverlay(var c_npc self) |  |  |  |
-| TA_Min | Tagesablaufpunkt minutengenau angeben | void TA_Min(var c_npc self, var int start_h, var int start_m, var int stop_h, var int stop_m, var func state, var string waypoint) | $${\color{red}In\ Progress}$$ |  |  |
+| TA_Min | Tagesablaufpunkt minutengenau angeben | void TA_Min(var c_npc self, var int start_h, var int start_m, var int stop_h, var int stop_m, var func state, var string waypoint) | $${\color{orange}In\ Progress}$$ |  |  |
 | TA_RemoveOverlay | Entferne aktiven TA-Overlay | void TA_RemoveOverlay(var c_npc self) |  |  |  |
 
 ## World Functions
@@ -375,7 +379,7 @@ Jump to section:
 | Wld_GetPlayerPortalGuild | liefert Gilde des aktiven Raums, in dem sich der SC gerade befindet, zurück - wenn der SC 'draußen' ist, dann wird GIL_NONE zurückgegeben - wenn der aktive Raum gildenlos ist, dann wird GIL_NONE zurückgeliefert | int Wld_GetPlayerPortalGuild() |  |  |  |
 | Wld_GetPlayerPortalOwner | liefert den NSC des aktiven Raums, in dem sich der SC gerade befindet, zurück - wenn der SC 'draußen' ist, dann ist der Rückgabe-Npc 'notValid' - wenn der aktive Raum besitzerlos ist, dann ist der Rückgabe-Npc 'notValid' | c_npc Wld_GetPlayerPortalOwner() |  |  |  |
 | Wld_InsertItem | Füge Item in Welt ein entweder an einem WP oder einem FP Vorsicht, funktioniert nicht, Items werden immer im Mittelpunkt der Welt inserted | void Wld_InsertItem(var int iteminstance, var string spawnpoint) |  |  |  |
-| Wld_InsertNpc | Füge NSC in Welt ein. Wobei SPawnpoint entweder ein WP oder ein FP sein darf. | void Wld_InsertNpc(var int npcinstance, var string spawnpoint) | $${\color{red}In\ Progress}$$ | High | Creates a new GameObject with the associated data. Complexity is based on additional spwan point calculation (TA_Min) |
+| Wld_InsertNpc | Füge NSC in Welt ein. Wobei SPawnpoint entweder ein WP oder ein FP sein darf. | void Wld_InsertNpc(var int npcinstance, var string spawnpoint) | $${\color{orange}In\ Progress}$$ | High | Creates a new GameObject with the associated data. Complexity is based on additional spwan point calculation (TA_Min) |
 | Wld_InsertNpcAndRespawn | Füge NSC in Welt ein. Wobei SPawnpoint entweder ein WP oder ein FP sein darf. Stirbt dieser NSC wird nach "spawnDelay"-Sekunden ein neuer NSC am Spawnpoint erzeugt. | void Wld_InsertNpcAndRespawn(var int instance, var string spawnpoint, var float spawndelay) |  |  |  |
 | Wld_InsertObject | Noch nicht dokumentiert | void Wld_InsertObject(var string s0, var string s1) |  |  |  |
 | Wld_IsFPAvailable | Sucht einen Freepoint im Umkreis von 20m vom NSC und liefert TRUE falls vorhanden und frei ('self' zählt als Blockierer nicht!) und sichtbar | int Wld_IsFPAvailable(var c_npc self, var string fpname) |  |  |  |
