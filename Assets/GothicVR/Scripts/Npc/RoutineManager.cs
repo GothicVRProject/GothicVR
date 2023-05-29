@@ -39,6 +39,7 @@ public class RoutineManager : SingletonBehaviour<RoutineManager>
     {
         if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
             return;
+        
         foreach (RoutineData routine in routines)   //Todo: fill in routines backwards, for Mud and Scorpio have bugged Routines and will be picked the wrong way as is.
         {
             npcStartTimeDict.TryAdd(routine.start, new());
@@ -50,9 +51,14 @@ public class RoutineManager : SingletonBehaviour<RoutineManager>
     {
         foreach (RoutineData routine in routines)
         {
-            npcStartTimeDict[routine.start].Remove(routineInstance);    //Delete value from List
-            if (!npcStartTimeDict[routine.start].Any())                 //If List is empty afterwards
-                npcStartTimeDict.Remove(routine.start);                 //Delete key aswell
+            if (!npcStartTimeDict.TryGetValue(routine.start, out List<Routine> routinesForStartPoint))
+                return;
+
+            routinesForStartPoint.Remove(routineInstance);
+
+            // Remove element if empty
+            if (npcStartTimeDict[routine.start].Count == 0)
+                npcStartTimeDict.Remove(routine.start);
         }
     }
 
