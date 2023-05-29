@@ -50,14 +50,16 @@ public class RoutineManager : SingletonBehaviour<RoutineManager>
 
     public void Unsubscribe(Routine routineInstance, List<RoutineData> routines)
     {
-        if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
-            return;
-        
         foreach (RoutineData routine in routines)
         {
-            npcStartTimeDict[routine.start].Remove(routineInstance);    //Delete value from List
-            if (!npcStartTimeDict[routine.start].Any())                 //If List is empty afterwards
-                npcStartTimeDict.Remove(routine.start);                 //Delete key aswell
+            if (!npcStartTimeDict.TryGetValue(routine.start, out List<Routine> routinesForStartPoint))
+                return;
+
+            routinesForStartPoint.Remove(routineInstance);
+
+            // Remove element if empty
+            if (npcStartTimeDict[routine.start].Count == 0)
+                npcStartTimeDict.Remove(routine.start);
         }
     }
 
