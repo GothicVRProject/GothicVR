@@ -5,9 +5,9 @@ namespace GVR.Phoenix.Data.Vm.Gothic
 {
     public class EdgeData
     {
-        public uint a;
+        public uint startID;
         public Vector3 startPos;
-        public uint b;
+        public uint endID;
         public Vector3 endPos;
         public float edgeLength;
         public string edgeName;
