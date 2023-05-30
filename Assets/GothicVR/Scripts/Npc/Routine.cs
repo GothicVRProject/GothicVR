@@ -7,6 +7,7 @@ using GVR.Phoenix.Util;
 using System;
 using PxCs.Data.WayNet;
 using GVR.Util;
+using GVR.Creator;
 
 namespace GVR.Npc
 {
@@ -16,6 +17,7 @@ namespace GVR.Npc
         private RoutineManager routineManager;
         PxCs.Data.WayNet.PxWayPointData waypoint;
         RoutineData currentDestination;
+        RouteCreatorDijkstra routeCreator;
 
         public List<RoutineData> routines = new();
         public Dictionary<string, RoutineData> waypoints = new();
@@ -24,6 +26,7 @@ namespace GVR.Npc
         {
             routineManager = SingletonBehaviour<RoutineManager>.GetOrCreate();
             routineManager.Subscribe(this, routines);
+            CreateRoutes();
         }
         private void OnDisable()
         {
@@ -33,6 +36,27 @@ namespace GVR.Npc
         {
             moveNpc();
         }
+
+        void CreateRoutes()
+        {
+            WaypointRelationData startPoint;
+            WaypointRelationData endPoint;
+            for (int i = 0; i < routines.Count; i++)
+            {
+
+                RoutineData currPoint = routines[i];
+                RoutineData nextPoint;
+                if (i < routines.Count) //If it's the last element startPoint...
+                    nextPoint = routines[i + 1];
+                else
+                    nextPoint = routines[0];// get nextPoint from the first element.
+                startPoint = WaynetCreator.waypointsDict[currPoint.waypoint];
+                endPoint = WaynetCreator.waypointsDict[nextPoint.waypoint];
+                routeCreator.StartRouting(startPoint, endPoint);
+            }
+            
+        }
+
         private void moveNpc()
         {
             if (currentDestination == null)

@@ -12,7 +12,7 @@ namespace GVR.Creator
     {
         static Dictionary<string, EdgeData> edgesDict = new();
         static List<EdgeData> edges = new();
-        static Dictionary<string, WaypointRelationData> waypointsDict = new();
+        public static Dictionary<string, WaypointRelationData> waypointsDict = new();
         static List<WaypointRelationData> waypoints = new();
 
         public void Create(GameObject root, WorldData world)
@@ -35,17 +35,18 @@ namespace GVR.Creator
             var waypointsObj = new GameObject(string.Format("Waypoints"));
             waypointsObj.transform.parent = parent.transform;
 
-            foreach (var waypoint in world.waypoints)
+            for (int i = 0; i < world.waypoints.Length; i++)
             {
                 
                 var wpobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
-                wpobject.name = waypoint.name;
-                wpobject.transform.position = waypoint.position.ToUnityVector();
+                wpobject.name = world.waypoints[i].name;
+                wpobject.transform.position = world.waypoints[i].position.ToUnityVector();
 
                 wpobject.transform.parent = waypointsObj.transform;
                 //the index of waypoints list has to be the same as world.waypoints
-                waypoints.Add(new(wpobject.name, wpobject.transform.position)); 
+                waypoints.Add(new(wpobject.name, wpobject.transform.position));
+                WriteWaypointDataToDict(i);
             }
         }
         #endregion
@@ -60,7 +61,7 @@ namespace GVR.Creator
                 CalculateEdgeMagnitude(world, i);
                 CalculateEdgeName(world, i);
                 WriteEdgeDataToDict(i);
-
+                
                 if (SingletonBehaviour<DebugSettings>.GetOrCreate().CreateWaypointEdges)
                     DrawEdgeLine(ref parent, edges[i]);
             }
@@ -110,16 +111,19 @@ namespace GVR.Creator
         {
             for (int i = 0; i < edges.Count; i++)
             {
-                var StartID = (int)edges[i].startID;
-                var EndID = (int)edges[i].endID;
-                waypoints[StartID].AddNeighbor(waypoints[EndID]);
-                waypoints[EndID].AddNeighbor(waypoints[StartID]);
-                WriteWaypointDataToDict(i);
+                var startID = (int)edges[i].startID;
+                var endID = (int)edges[i].endID;
+                var bla = waypoints;
+                var neighborA = waypoints[endID];
+                var neighborB = waypoints[startID];
+                waypoints[startID].AddNeighbor(neighborA);
+                waypoints[endID].AddNeighbor(neighborB);
+                
             }
         }
         private void WriteWaypointDataToDict(int i)
         {
-            waypointsDict.TryAdd(waypoints[i].name, waypoints[i]);
+            waypointsDict.Add(waypoints[i].name, waypoints[i]);
         }
         #endregion
 
