@@ -3,9 +3,10 @@ using GVR.Demo;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
-using PxCs.Data;
+using PxCs.Data.Vob;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 using UnityEngine;
 using static PxCs.Interface.PxWorld;
 
@@ -52,32 +53,65 @@ namespace GVR.Creator
             var vobRootObj = new GameObject("Vobs");
             vobRootObj.transform.parent = root.transform;
 
-            foreach (var vobType in vobs)
+            foreach (var vobsByType in vobs)
             {
-                foreach (var vob in vobType.Value)
+                switch (vobsByType.Key)
                 {
-                    var meshName = vob.showVisual ? vob.visualName : vob.vobName;
-
-                    if (meshName == string.Empty)
-                        continue;
-
-                    var mdl = assetCache.TryGetMdl(meshName);
-                    if (mdl != null)
-                    {
-                        meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
-                    }
-                    else
-                    {
-                        var mrm = assetCache.TryGetMrm(meshName);
-                        if (mrm == null)
-                        {
-                            Debug.LogWarning($">{meshName}<'s .mrm not found.");
-                            continue;
-                        }
-
-                        meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, vobRootObj);
-                    }
+                    case PxVobType.PxVob_oCMobContainer:
+                        CreateMobContainer(vobRootObj, vobsByType.Value);
+                        break;
+                    default:
+                        //CreateDefaultVobs(vobRootObj, vobsByType.Value);
+                        break;
                 }
+            }
+        }
+
+        private void CreateMobContainer(GameObject root, List<PxVobData> vobs)
+        {
+            foreach (PxVobMobContainerData vob in vobs)
+            {
+                var vobObj = CreateDefaultVob(root, vob);
+
+                if (vobObj == null)
+                    continue;
+
+                var lootComp = vobObj.AddComponent<DemoContainerLoot>();
+                lootComp.SetContent(vob.contents);
+            }
+        }
+
+        private void CreateDefaultVobs(GameObject root, List<PxVobData> vobs)
+        {
+            foreach (var vob in vobs)
+            {
+                CreateDefaultVob(root, vob);
+            }
+        }
+
+        private GameObject CreateDefaultVob(GameObject root, PxVobData vob)
+        {
+            var meshName = vob.showVisual ? vob.visualName : vob.vobName;
+
+            if (meshName == string.Empty)
+                return null;
+
+            var mds = assetCache.TryGetMds(meshName);
+            var mdl = assetCache.TryGetMdl(meshName);
+            if (mdl != null)
+            {
+                return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.Value, root);
+            }
+            else
+            {
+                var mrm = assetCache.TryGetMrm(meshName);
+                if (mrm == null)
+                {
+                    Debug.LogWarning($">{meshName}<'s .mrm not found.");
+                    return null;
+                }
+
+                return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, root);
             }
         }
     }
