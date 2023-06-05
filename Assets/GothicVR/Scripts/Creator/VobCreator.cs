@@ -4,15 +4,13 @@ using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Vob;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using static PxCs.Interface.PxWorld;
 
 namespace GVR.Creator
 {
-    public class VobCreator : SingletonBehaviour<VobCreator>
+	public class VobCreator : SingletonBehaviour<VobCreator>
     {   
         private MeshCreator meshCreator;
         private AssetCache assetCache;
