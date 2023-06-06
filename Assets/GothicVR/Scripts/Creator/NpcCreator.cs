@@ -1,5 +1,6 @@
-using GVR.Npc;
 using GVR.Caches;
+using GVR.Demo;
+using GVR.Npc;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
@@ -8,15 +9,13 @@ using GVR.Util;
 using PxCs.Extensions;
 using PxCs.Interface;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Unity.XR.CoreUtils;
 using UnityEngine;
-using GVR.Demo;
 
 namespace GVR.Creator
 {
-    public class NpcCreator : SingletonBehaviour<NpcCreator>
+	public class NpcCreator : SingletonBehaviour<NpcCreator>
     {
         private static LookupCache lookupCache;
         private static AssetCache assetCache;
@@ -64,7 +63,7 @@ namespace GVR.Creator
             newNpc.name = string.Format("{0}-{1}", string.Concat(pxNpc.names), spawnpoint);
             var npcRoutine = pxNpc.routine;
 
-            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, (uint)npcRoutine, pxNpc.npcPtr);
+            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, (uint)npcRoutine, pxNpc.instancePtr);
 
             newNpc.GetComponent<Properties>().npc = pxNpc;
 

@@ -5,6 +5,7 @@ using GVR.Util;
 using PxCs.Interface;
 using System;
 using System.Collections.Generic;
+using GVR.Phoenix.Util;
 using UnityEngine;
 using static UnityEditor.Progress;
 
@@ -66,20 +67,18 @@ namespace GVR.Demo
 				});
 			}
 		}
-
-
+		
 		private void SpawnContent()
 		{
+			var itemsObj = new GameObject("Items");
+			itemsObj.SetParent(gameObject, true);
+			
 			foreach (var item in content)
 			{
-				// Get instance from name
-				// INSTANCE ItKeLockpick(C_Item)
+				var pxItem = PxVm.InitializeItem(PhoenixBridge.VmGothicPtr, item.name);
 
-				// Read visual
-				// visual = "ItKe_Lockpick_01.3ds";
-
-				// Load mesh
-				// assetCache.TryGet*(...);
+				var mrm = assetCache.TryGetMrm(pxItem?.visual);
+				var itemObj = meshCreator.Create(item.name, mrm, default, default, itemsObj);
 			}
 		}
 	}
