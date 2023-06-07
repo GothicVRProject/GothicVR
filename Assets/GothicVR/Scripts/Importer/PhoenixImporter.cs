@@ -45,6 +45,7 @@ namespace GVR.Importer
 
             LoadWorld(vdfPtr);
             LoadGothicVM(G1Dir);
+            LoadSound(vdfPtr, "INFO_FREEMINEORC_GIVEPOTION_17_05");
             //LoadFonts();
 
             watch.Stop();
@@ -109,6 +110,11 @@ namespace GVR.Importer
             PhoenixBridge.VmGothicPtr = vmPtr;
 
             PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
+        }
+
+        private void LoadSound(IntPtr vdfPtr, string name)
+        {
+            SingletonBehaviour<SoundTest>.GetOrCreate().Create(vdfPtr, name);
         }
 
 
