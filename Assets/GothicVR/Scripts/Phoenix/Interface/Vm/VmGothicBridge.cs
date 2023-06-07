@@ -43,6 +43,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisual", Mdl_SetVisual);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_ApplyOverlayMds", Mdl_ApplyOverlayMds);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisualBody", Mdl_SetVisualBody);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
         }
 
         public static UnityEvent<IntPtr, string> DefaultExternalCallback = new();
@@ -51,6 +52,8 @@ namespace GVR.Phoenix.Interface.Vm
         public static UnityEvent<Mdl_SetVisualData> PhoenixMdl_SetVisual = new();
         public static UnityEvent<Mdl_ApplyOverlayMdsData> PhoenixMdl_ApplyOverlayMds = new();
         public static UnityEvent<Mdl_SetVisualBodyData> PhoenixMdl_SetVisualBody = new();
+        public static UnityEvent<string> PhoenixMdl_AI_OUTPUT = new();
+
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalDefaultCallback))]
         public static void DefaultExternal(IntPtr vmPtr, string missingCallbackName)
@@ -193,5 +196,12 @@ namespace GVR.Phoenix.Interface.Vm
             );
         }
 
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void AI_OUTPUT(IntPtr vmPtr)
+        {
+            var soundString = PxVm.VmStackPopString(vmPtr);
+
+            PhoenixMdl_AI_OUTPUT.Invoke(soundString);
+        }
     }
 }
