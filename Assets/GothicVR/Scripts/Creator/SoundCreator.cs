@@ -5,6 +5,10 @@ using GVR.Util;
 using PxCs.Interface;
 using System;
 using System.Runtime.InteropServices;
+using GVR.Caches;
+using JetBrains.Annotations;
+using PxCs.Data.Vob;
+using PxCs.Extensions;
 using UnityEngine;
 
 
@@ -13,8 +17,12 @@ namespace GVR.Creator
 {
     public class SoundCreator : SingletonBehaviour<SoundCreator>
     {
-        void Start()
+        private AssetCache assetCache;
+
+        private void Start()
         {
+            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+            
             VmGothicBridge.PhoenixMdl_AI_OUTPUT.AddListener(AI_OUTPUT);
         }
 
@@ -56,7 +64,7 @@ namespace GVR.Creator
             ulong size = PxBuffer.pxBufferSize(wavSound);
 
             var array = IntPtr.Zero;
-            array = PxBuffer.pxBufferLoadArray(wavSound);
+            array = PxBuffer.pxBufferArray(wavSound);
 
             byte[] wavFile = new byte[size];
 
@@ -71,5 +79,34 @@ namespace GVR.Creator
 
             source.Play();
         }
+        
+        // FIXME - add caching for audio file
+        public GameObject Create(PxVobSoundData vobSound, GameObject parent = null)
+        {
+            // so Unity will handle the spatial side of things correctly 
+            var soundObject = new GameObject(string.Format(name));
+            soundObject.SetParent(parent);
+            
+            // FIXME - Load actual .wav file name from 
+            // INSTANCE FIRE_SMALL (C_SFX_DEF) {file= "fire_small01.wav"; vol = 100; ...}
+            var wavFile = assetCache.TryGetSound(vobSound.soundName);
+
+            if (wavFile == null)
+            {
+                Debug.LogError($"No .wav data returned for {vobSound.soundName}");
+                return null;
+            }
+            AudioSource source = soundObject.AddComponent<AudioSource>();
+            source.clip = SoundConverter.ToAudioClip(wavFile);
+
+            // Some data added for testing purposes. More properties are still to add.
+            source.loop = vobSound.mode == PxWorld.PxVobSoundMode.PxVobSoundModeLoop;
+            
+            if (vobSound.initiallyPlaying)
+                source.Play();
+
+            return soundObject;
+        }
+
     }
 }

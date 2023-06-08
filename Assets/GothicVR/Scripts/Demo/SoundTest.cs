@@ -37,7 +37,7 @@ namespace GVR.Demo
 
             var array = IntPtr.Zero;
 
-            array = PxBuffer.pxBufferLoadArray(wavSound);
+            array = PxBuffer.pxBufferArray(wavSound);
 
             byte[] wavFile = new byte[size];
 

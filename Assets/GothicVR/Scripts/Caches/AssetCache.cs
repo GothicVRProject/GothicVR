@@ -1,3 +1,4 @@
+using System;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -6,6 +7,7 @@ using PxCs.Data.Model;
 using PxCs.Interface;
 using System.Collections.Generic;
 using System.IO;
+using PxCs.Extensions;
 using UnityEngine;
 
 namespace GVR.Caches
@@ -19,6 +21,8 @@ namespace GVR.Caches
         private Dictionary<string, PxModelData> mdlCache = new();
         private Dictionary<string, PxModelMeshData> mdmCache = new();
         private Dictionary<string, PxMultiResolutionMeshData> mrmCache = new();
+
+        private Dictionary<string, byte[]> soundCache = new();
 
 
         public Texture2D TryGetTexture(string key)
@@ -113,6 +117,46 @@ namespace GVR.Caches
             mrmCache[preparedKey] = newData;
 
             return newData;
+        }
+
+        public byte[] TryGetSound(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (soundCache.TryGetValue(preparedKey, out byte[] data))
+                return data;
+            
+            // FIXME - outsource this whole loading to a convenient PxCs method like with meshes.
+            var vdfEntrySound = PxVdf.pxVdfGetEntryByName(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.wav");
+
+            if (vdfEntrySound == IntPtr.Zero)
+            {
+                Debug.LogError("Sound not found");
+                return null;
+            }
+
+            var wavSound = PxVdf.pxVdfEntryOpenBuffer(vdfEntrySound);
+
+            if (wavSound == IntPtr.Zero)
+            {
+                Debug.LogError("Sound could not be loaded");
+                return null;
+            }
+            
+            var size = PxBuffer.pxBufferSize(wavSound);
+
+            if (size > uint.MaxValue)
+            {
+                Debug.LogError("ulong values aren't yet handled by sound marshal copy.");
+                return null;
+            }
+            
+            // FIXME - Check if we need to cleanup memory afterwards? (i.e. is phoenix creating new objects on Heap?)
+            var array = PxBuffer.pxBufferArray(wavSound);
+            
+            var wavFile = array.MarshalAsArray<byte>((uint)size);
+            soundCache[preparedKey] = wavFile;
+
+            return wavFile;
         }
 
 
