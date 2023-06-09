@@ -45,6 +45,7 @@ namespace GVR.Importer
 
             LoadWorld(vdfPtr);
             LoadGothicVM(G1Dir);
+            LoadSfxVM(G1Dir);
             LoadSound(vdfPtr, "INFO_FREEMINEORC_GIVEPOTION_17_05");
             //LoadFonts();
 
@@ -111,6 +112,16 @@ namespace GVR.Importer
 
             PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
         }
+        
+        private void LoadSfxVM(string G1Dir)
+        {
+            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
+            var vmPtr = VmGothicBridge.LoadVm(fullPath);
+
+            VmGothicBridge.RegisterExternals(vmPtr);
+
+            PhoenixBridge.VmSfxPtr = vmPtr;
+        }
 
         private void LoadSound(IntPtr vdfPtr, string name)
         {
@@ -171,6 +182,12 @@ namespace GVR.Importer
             {
                 PxVm.pxVmDestroy(PhoenixBridge.VmGothicPtr);
                 PhoenixBridge.VmGothicPtr = IntPtr.Zero;
+            }
+            
+            if (PhoenixBridge.VmSfxPtr != IntPtr.Zero)
+            {
+                PxVm.pxVmDestroy(PhoenixBridge.VmSfxPtr);
+                PhoenixBridge.VmSfxPtr = IntPtr.Zero;
             }
         }
     }
