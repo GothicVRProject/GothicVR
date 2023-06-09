@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using GVR.Phoenix.Util;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 namespace GVR.Demo
 {
