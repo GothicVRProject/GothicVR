@@ -2,10 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using GVR.Phoenix.Data.Vm.Gothic;
-using GVR.Phoenix.Interface;
-using GVR.Phoenix.Util;
 using System;
-using PxCs.Data.WayNet;
 using GVR.Util;
 using GVR.Creator;
 
@@ -14,14 +11,17 @@ namespace GVR.Npc
     public class Routine : MonoBehaviour
     {
         private const float SPEED = 1f;
+        private const float MIN_DISTANCE_TO_SWITCH_ROUTE_ID = 0.1f; //Some random value near the target. Probably needs to be adjustet
+
         private RoutineManager routineManager;
-        PxCs.Data.WayNet.PxWayPointData waypoint;
+        int currentTargetCoordinatesID = 0;
         RoutineData currentDestination;
-        RouteCreatorDijkstra routeCreator;
+        RouteCreatorDijkstra routeCreator = new();
 
         public List<RoutineData> routines = new();
         public Dictionary<string, RoutineData> waypoints = new();
 
+        #region atStart
         private void Start()
         {
             routineManager = SingletonBehaviour<RoutineManager>.GetOrCreate();
@@ -32,39 +32,73 @@ namespace GVR.Npc
         {
             routineManager.Unsubscribe(this, routines);
         }
-        private void Update()
-        {
-            moveNpc();
-        }
+
 
         void CreateRoutes()
         {
+            if (routines == null)
+                return;
             WaypointRelationData startPoint;
             WaypointRelationData endPoint;
+            
             for (int i = 0; i < routines.Count; i++)
             {
-
                 RoutineData currPoint = routines[i];
                 RoutineData nextPoint;
-                if (i < routines.Count) //If it's the last element startPoint...
+                if (i < routines.Count - 1) 
                     nextPoint = routines[i + 1];
+                else                            //If it's the last element startPoint...
+                    nextPoint = routines[0];    // get nextPoint from the first element.
+
+                if (WaynetCreator.waypointsDict.TryGetValue(currPoint.waypoint.ToUpper(), out startPoint) &&
+                            WaynetCreator.waypointsDict.TryGetValue(nextPoint.waypoint.ToUpper(), out endPoint))
+                {
+                    routines[i].route = null;
+                    //routines[i].route = routeCreator.StartRouting(startPoint, endPoint);
+                }
                 else
-                    nextPoint = routines[0];// get nextPoint from the first element.
-                startPoint = WaynetCreator.waypointsDict[currPoint.waypoint];
-                endPoint = WaynetCreator.waypointsDict[nextPoint.waypoint];
-                routeCreator.StartRouting(startPoint, endPoint);
+                {
+                    Debug.LogError("Waypoint not found in waypointsDict: >" + currPoint.waypoint + "< >" + nextPoint.waypoint + "<");
+                }
+            }
+        }
+        #endregion
+        #region Runtime
+        private void Update()
+        {
+            if (currentDestination == null || currentDestination.route == null)
+                return;
+            if (currentDestination.route.Count == 0)
+                return;
+            var destination = GetTargetVector3();
+            moveNpc(destination);
+        }
+        private Vector3 GetTargetVector3()
+        {
+            if (currentTargetCoordinatesID > currentDestination.route.Count)
+                return new();
+
+            var startPosition = gameObject.transform.position;
+            Vector3 targetPosition = new();
+            
+            try
+            {
+                targetPosition = currentDestination.route[currentTargetCoordinatesID];
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                Debug.LogError("ID: " + currentTargetCoordinatesID);
             }
             
+            var distanceVector = startPosition - targetPosition;
+            if (distanceVector.magnitude < MIN_DISTANCE_TO_SWITCH_ROUTE_ID)
+                currentTargetCoordinatesID++;
+            return targetPosition;
         }
-
-        private void moveNpc()
+        private void moveNpc(Vector3 targetPosition)
         {
-            if (currentDestination == null)
-                return;
-            if (waypoint == null)
-                return;
             var startPosition = gameObject.transform.position;
-            var targetPosition = waypoint.position.ToUnityVector();
             gameObject.transform.position = Vector3.MoveTowards(startPosition, targetPosition, SPEED * Time.deltaTime);
         }
 
@@ -73,20 +107,16 @@ namespace GVR.Npc
             setRoutine(time);
             if (currentDestination == null)
                 return;
-            setWaypoint();
+            resetRouteID();
         }
         void setRoutine(DateTime time)
         {
-            //With this line the init shouldn't work. I dont think two comparisons instead of one is bad enough to make new functions
-            //currentRoutine = routines.FirstOrDefault(item => item.start==time); 
             currentDestination = routines.FirstOrDefault(item => (item.start <= time && time < item.stop));
         }
-        void setWaypoint()
+        void resetRouteID()
         {
-            if (PhoenixBridge.World.waypointsDict.TryGetValue(currentDestination.waypoint, out PxWayPointData value))
-            {
-                waypoint = value;
-            }
+            currentTargetCoordinatesID = 0;
         }
+        #endregion
     }
 }

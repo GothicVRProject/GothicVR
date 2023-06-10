@@ -84,11 +84,7 @@ namespace GVR.Creator
 
             RoutineData routine = new()
             {
-                start_h = data.start_h,
-                start_m = data.start_m,
                 start = new(1, 1, 1, data.start_h, data.start_m, 0),
-                stop_h = data.stop_h,
-                stop_m = data.stop_m,
                 stop = new(1, 1, 1, stop_hFormatted, data.stop_m, 0),
                 action = data.action,
                 waypoint = data.waypoint

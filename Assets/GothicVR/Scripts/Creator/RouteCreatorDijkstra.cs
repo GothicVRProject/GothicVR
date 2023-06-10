@@ -1,7 +1,6 @@
 using GVR.Phoenix.Data.Vm.Gothic;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 /// <summary>
 /// This is based on a Dijkstra Route finding algorithm with weighting. 
 /// 
@@ -18,7 +17,6 @@ using System.Linq;
 /// 
 /// If the goal Point is found, the alogrithm is finished
 /// </summary>
-/// 
 namespace GVR.Creator
 {
     public class RouteCreatorDijkstra : MonoBehaviour
@@ -28,15 +26,23 @@ namespace GVR.Creator
         private WaypointRelationData endPoint;
         List<Vector3> route = new();
 
-
+        private void Start()
+        {
+            if (WaynetCreator.waypointsDict.TryGetValue("OCR_OUTSIDE_HUT_54", out startPoint))
+                if (WaynetCreator.waypointsDict.TryGetValue("OCR_HUT_7", out startPoint))
+                    StartRouting(startPoint, endPoint);
+        }
         public List<Vector3> StartRouting(WaypointRelationData startPoint, WaypointRelationData endPoint)
         {
             this.startPoint = startPoint;
             this.endPoint = endPoint;
 
             startPoint.predecessor = startPoint;
+            startPoint.cost = 0;
             overAllList.Add(startPoint);
-            RecursiveCalculateRoute(overAllList[0]);
+            Debug.LogError("->->->->->->->sp: " + startPoint.name + " <-<-<-<-<-<-<-");
+            Debug.LogError("->->->->->->->ep: " + endPoint.name + " <-<-<-<-<-<-<-");
+            RecursiveCalculateRoute(overAllList[0]); //Todo endless loop possible
             TraceBackRoute();
 
             return route;
@@ -44,27 +50,26 @@ namespace GVR.Creator
         #region recursive Part
         void RecursiveCalculateRoute(WaypointRelationData currentPoint)
         {
-            RemoveLastUsed();//so its not used again
+            Debug.LogError("Name: " + overAllList[0].name + " - " + overAllList[0].cost +
+                " Pred: " + overAllList[0].predecessor.name + " - " + overAllList[0].predecessor.cost);
+            RemoveLastUsed(currentPoint);
             var currentNeighbors = CalculateNeighborsList(currentPoint);
             AddCurrentNeighborsToOverAllList(currentNeighbors);
-            if (currentPoint != endPoint)
+            if (currentPoint.name != endPoint.name)
+            {
                 RecursiveCalculateRoute(overAllList[0]);
+            }
         }
 
-        private void RemoveLastUsed()
+        private void RemoveLastUsed(WaypointRelationData currentPoint)
         {
-            if (overAllList.Any())
+            if (overAllList.Count > 1) //TODO: make sure not to have just one element if the startnode has just one neighbor - && currentPoint.neighbors.Count() > 1
                 overAllList.RemoveAt(0);
         }
         #region calculate neighbors
-        /// <summary>
-        /// This function looks for all neighbors of the current waypoint.
-        /// If the predecessor is null it means, its untouched yet and will be set to current.
-        /// The values of untouched waypoints will be calculated.
-        /// then addet to the List
-        /// 
-        /// TODO: If neighbors can be reached with less cost than the values they already have it not updated. I guess this will be very rare, but it would be good anyways.
-        /// </summary>
+
+        // TODO: If neighbors can be reached with less cost than the values they already have it not updated. I guess this will be very rare, but it would be good anyways.
+
         List<WaypointRelationData> CalculateNeighborsList(WaypointRelationData currentPoint)
         {
             List<WaypointRelationData> currentList = new();
@@ -81,7 +86,7 @@ namespace GVR.Creator
         }
         void CalculateWaypointValues(WaypointRelationData currentPoint, WaypointRelationData predecessorPoint)
         {
-            currentPoint.cost = currentPoint.predecessor.cost + getVectorLength(startPoint, predecessorPoint);
+             currentPoint.cost = currentPoint.predecessor.cost + getVectorLength(startPoint, predecessorPoint);
             currentPoint.distanceToGoal = getVectorLength(currentPoint, endPoint);
             currentPoint.sum = currentPoint.cost + currentPoint.distanceToGoal;
         }

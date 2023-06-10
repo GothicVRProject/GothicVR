@@ -49,6 +49,10 @@ namespace GVR.Creator
                 WriteWaypointDataToDict(i);
             }
         }
+        private void WriteWaypointDataToDict(int i)
+        {
+            waypointsDict.Add(waypoints[i].name.ToUpper(), waypoints[i]);
+        }
         #endregion
 
         #region CreateWayPointEdges
@@ -68,19 +72,19 @@ namespace GVR.Creator
         }
         private void CopyWorldDataToEdgesList(WorldData world, int i)
         {
-            edges[i].startID = world.waypointEdges[i].a;
-            edges[i].endID = world.waypointEdges[i].b;
+            edges[i].startPointID = world.waypointEdges[i].a;
+            edges[i].endPointID = world.waypointEdges[i].b;
         }
         private void CalculateEdgeMagnitude(WorldData world, int i)
         {
-            var startPos = world.waypoints[(int)edges[i].startID].position.ToUnityVector();
-            var endPos = world.waypoints[(int)edges[i].endID].position.ToUnityVector();
+            var startPos = world.waypoints[(int)edges[i].startPointID].position.ToUnityVector();
+            var endPos = world.waypoints[(int)edges[i].endPointID].position.ToUnityVector();
             var edgeVector = startPos - endPos;
             edges[i].edgeLength = edgeVector.magnitude;
         }
         private void CalculateEdgeName(WorldData world, int i)
         {
-            edges[i].edgeName = world.waypoints[(int)edges[i].startID].name + world.waypoints[(int)edges[i].endID].name;
+            edges[i].edgeName = world.waypoints[(int)edges[i].startPointID].name + world.waypoints[(int)edges[i].endPointID].name;
         }
         private void WriteEdgeDataToDict(int i)
         {
@@ -100,7 +104,7 @@ namespace GVR.Creator
             lr.SetPosition(0, edge.startPos);
             lr.SetPosition(1, edge.endPos);
 
-            lineObj.name = string.Format("{0}->{1}", edge.startID, edge.endID);
+            lineObj.name = string.Format("{0}->{1}", edge.startPointID, edge.endPointID);
             lineObj.transform.position = edge.startPos;
             lineObj.transform.parent = waypointEdgesObj.transform;
         }
@@ -111,8 +115,8 @@ namespace GVR.Creator
         {
             for (int i = 0; i < edges.Count; i++)
             {
-                var startID = (int)edges[i].startID;
-                var endID = (int)edges[i].endID;
+                var startID = (int)edges[i].startPointID;
+                var endID = (int)edges[i].endPointID;
                 var bla = waypoints;
                 var neighborA = waypoints[endID];
                 var neighborB = waypoints[startID];
@@ -121,10 +125,7 @@ namespace GVR.Creator
                 
             }
         }
-        private void WriteWaypointDataToDict(int i)
-        {
-            waypointsDict.Add(waypoints[i].name, waypoints[i]);
-        }
+
         #endregion
 
 

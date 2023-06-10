@@ -9,6 +9,8 @@ namespace GVR.World
 {
     public class GameTime : SingletonBehaviour<GameTime>
     {
+        private const int GAMETEMPO = 30; //Normal value =1, This is the amount of seconds each ingame second goes by. Has to be a divisor of 60
+
         private static DateTime MIN_TIME = new(1, 1, 1, 0, 0, 0);
         private static DateTime MAX_TIME = new(1, 1, 1, 23, 59, 59);
 
@@ -44,7 +46,7 @@ namespace GVR.World
         {
             while (true)
             {
-                time = time.AddSeconds(1);
+                time = time.AddSeconds(GAMETEMPO);
 
                 if (time > MAX_TIME)
                     time = MIN_TIME;
