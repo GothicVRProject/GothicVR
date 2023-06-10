@@ -103,8 +103,17 @@ namespace GVR.Creator
                 Debug.LogError($"No .wav data returned for {vobSound.soundName}");
                 return null;
             }
+            
             AudioSource source = soundObject.AddComponent<AudioSource>();
             source.clip = SoundConverter.ToAudioClip(wavFile);
+            
+
+            // Both need to be set, that Audio can be heard only within defined range.
+            // https://answers.unity.com/questions/1316535/how-to-have-audio-only-be-heard-in-a-certain-radiu.html
+            source.rolloffMode = AudioRolloffMode.Linear;
+            source.spatialBlend = 1f;
+
+            source.maxDistance = vobSound.radius / 100; // Gothic's values are in cm, Unity's in m.
 
             // Some data added for testing purposes. More properties are still to add.
             source.loop = vobSound.mode == PxWorld.PxVobSoundMode.PxVobSoundModeLoop;
