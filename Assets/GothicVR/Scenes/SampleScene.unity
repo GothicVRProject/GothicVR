@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
+  m_IndirectSpecularColor: {r: 0.172768, g: 0.21589169, b: 0.29782546, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -167,6 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff27067532e5fb14d8e963d887bb60cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 0
 --- !u!1 &118755270
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,6 +388,7 @@ GameObject:
   - component: {fileID: 124285704}
   - component: {fileID: 124285698}
   - component: {fileID: 124285702}
+  - component: {fileID: 124285707}
   - component: {fileID: 124285706}
   m_Layer: 0
   m_Name: Importer
@@ -485,6 +487,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b80be53895ae2a84f99e59be8a469a22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 0
+--- !u!114 &124285707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124285697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efa344ebb42a67d4eb1235b9875d273e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
@@ -601,12 +616,12 @@ MonoBehaviour:
   dontDestroyOnLoad: 0
   CreateVobs: 1
   CreateWaypoints: 0
-  CreateWaypointEdges: 1
-  EnableDayTime: 1
+  CreateWaypointEdges: 0
+  EnableDayTime: 0
   SunMovementPerformanceValue: 0
-  EnableNpc: 1
-  EnableNpcRoutines: 1
-  CreateExampleAnimation: 1
+  EnableNpc: 0
+  EnableNpcRoutines: 0
+  CreateExampleAnimation: 0
   ShowVdfsFileNotFoundErrors: 0
 --- !u!4 &668062117 stripped
 Transform:
