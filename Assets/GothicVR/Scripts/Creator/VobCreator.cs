@@ -64,8 +64,11 @@ namespace GVR.Creator
                     case PxVobType.PxVob_zCVobSound:
                         CreateSounds(vobRootObj, vobsByType.Value);
                         break;
+                    case PxVobType.PxVob_zCVobSoundDaytime:
+                        CreateSoundsDaytime(vobRootObj, vobsByType.Value);
+                        break;
                     default:
-                        //CreateDefaultVobs(vobRootObj, vobsByType.Value);
+                        CreateDefaultVobs(vobRootObj, vobsByType.Value);
                         break;
                 }
             }
@@ -85,11 +88,26 @@ namespace GVR.Creator
             }
         }
         
+        // FIXME - change values for AudioClip based on Sfx and vob value (value overloads itself)
         private void CreateSounds(GameObject root, List<PxVobData> vobs)
         {
             foreach (PxVobSoundData vob in vobs)
             {
                 var vobObj = soundCreator.Create(vob, root);
+                if (!vobObj)
+                    continue;
+                
+                SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
+            }
+        }
+        
+        // FIXME - add specific daytime logic!
+        private void CreateSoundsDaytime(GameObject root, List<PxVobData> vobs)
+        {
+            foreach (PxVobSoundDaytimeData vob in vobs)
+            {
+                var vobObj = soundCreator.Create(vob, root);
+                vobObj.name = "daytime-" + vobObj.name; // FIXME - For easy debugging purposes only. Can be removed.
                 if (!vobObj)
                     continue;
                 

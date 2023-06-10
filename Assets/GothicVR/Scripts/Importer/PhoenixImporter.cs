@@ -43,9 +43,11 @@ namespace GVR.Importer
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "Data"));
             var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
 
-            LoadWorld(vdfPtr);
             LoadGothicVM(G1Dir);
             LoadSfxVM(G1Dir);
+            LoadWorld(vdfPtr);
+
+            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
             LoadSound(vdfPtr, "INFO_FREEMINEORC_GIVEPOTION_17_05");
             //LoadFonts();
 
@@ -109,17 +111,12 @@ namespace GVR.Importer
             VmGothicBridge.RegisterExternals(vmPtr);
 
             PhoenixBridge.VmGothicPtr = vmPtr;
-
-            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
         }
         
         private void LoadSfxVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
             var vmPtr = VmGothicBridge.LoadVm(fullPath);
-
-            VmGothicBridge.RegisterExternals(vmPtr);
-
             PhoenixBridge.VmSfxPtr = vmPtr;
         }
 
