@@ -2,7 +2,7 @@ using System;
 using GVR.World;
 using UnityEngine;
 
-namespace GothicVR.Scripts.Items
+namespace GothicVR.Items
 {
     public class SoundDaytime : MonoBehaviour
     {

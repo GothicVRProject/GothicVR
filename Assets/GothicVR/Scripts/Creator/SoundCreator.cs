@@ -1,18 +1,14 @@
+using System;
+using System.Runtime.InteropServices;
+using GothicVR.Items;
+using GVR.Caches;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
-using PxCs.Interface;
-using System;
-using System.Runtime.InteropServices;
-using GothicVR.Scripts.Items;
-using GVR.Caches;
-using JetBrains.Annotations;
 using PxCs.Data.Vob;
-using PxCs.Extensions;
+using PxCs.Interface;
 using UnityEngine;
-
-
 
 namespace GVR.Creator
 {
@@ -145,17 +141,18 @@ namespace GVR.Creator
             AudioSource source = soundObject.AddComponent<AudioSource>();
             source.clip = SoundConverter.ToAudioClip(wavFile);
             
-
             // Both need to be set, that Audio can be heard only within defined range.
             // https://answers.unity.com/questions/1316535/how-to-have-audio-only-be-heard-in-a-certain-radiu.html
             source.rolloffMode = AudioRolloffMode.Linear;
             source.spatialBlend = 1f;
 
             source.maxDistance = soundData.radius / 100; // Gothic's values are in cm, Unity's in m.
+            source.volume = soundData.volume / 100; // Gothic's volume is 0...100, Unity's is 0...1. 
 
-            // Some data added for testing purposes. More properties are still to add.
             source.loop = soundData.mode == PxWorld.PxVobSoundMode.PxVobSoundModeLoop;
 
+            // FIXME - Random play isn't implemented yet.
+            
             return source;
         }
     }
