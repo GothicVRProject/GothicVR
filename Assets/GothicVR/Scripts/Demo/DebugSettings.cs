@@ -1,4 +1,6 @@
-﻿using GVR.Util;
+﻿using System;
+using GVR.Util;
+using UnityEngine;
 
 namespace GVR.Demo
 {
@@ -17,6 +19,12 @@ namespace GVR.Demo
         public bool CreateWaypointEdges;
 
         public bool EnableDayTime;
+
+        [Range(0, 23)] public int StartHour;
+        [Range(0, 59)] public int StartMinute;
+
+        public string foo;
+
         public SunMovementPerformance SunMovementPerformanceValue;
 
         public bool EnableNpc;

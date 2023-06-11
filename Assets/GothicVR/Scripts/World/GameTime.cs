@@ -9,8 +9,8 @@ namespace GVR.World
 {
     public class GameTime : SingletonBehaviour<GameTime>
     {
-        private static DateTime MIN_TIME = new(1, 1, 1, 0, 0, 0);
-        private static DateTime MAX_TIME = new(1, 1, 1, 23, 59, 59);
+        public static readonly DateTime MIN_TIME = new(1, 1, 1, 0, 0, 0);
+        public static readonly DateTime MAX_TIME = new(1, 1, 1, 23, 59, 59);
 
         public UnityEvent<DateTime> secondChangeCallback = new();
         public UnityEvent<DateTime> minuteChangeCallback = new();
@@ -32,6 +32,11 @@ namespace GVR.World
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableDayTime)
                 return;
 
+            // Set debug value for current Time.
+            time = new DateTime(time.Year, time.Month, time.Day,
+                    DebugSettings.Instance.StartHour, DebugSettings.Instance.StartMinute, time.Second);
+            minutesInHour = DebugSettings.Instance.StartMinute;
+            
             StartCoroutine(TimeTick());
         }
 
@@ -69,7 +74,7 @@ namespace GVR.World
             minutesInHour++;
             if (minutesInHour % 60 == 0)
             {
-                secondsInMinute = 0;
+                minutesInHour = 0;
                 hourChangeCallback.Invoke(time);
             }
         }

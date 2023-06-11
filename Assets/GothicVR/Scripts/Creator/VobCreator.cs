@@ -68,7 +68,7 @@ namespace GVR.Creator
                         CreateSoundsDaytime(vobRootObj, vobsByType.Value);
                         break;
                     default:
-                        CreateDefaultVobs(vobRootObj, vobsByType.Value);
+                        CreateDefaultVobs(vobRootObj, vobsByType.Value, vobsByType.Key);
                         break;
                 }
             }
@@ -76,9 +76,12 @@ namespace GVR.Creator
 
         private void CreateMobContainers(GameObject root, List<PxVobData> vobs)
         {
+            var typeRoot = new GameObject("PxVob_oCMobContainer");
+            typeRoot.SetParent(root);
+            
             foreach (PxVobMobContainerData vob in vobs)
             {
-                var vobObj = CreateDefaultVob(root, vob);
+                var vobObj = CreateDefaultVob(typeRoot, vob);
 
                 if (vobObj == null)
                     continue;
@@ -91,9 +94,12 @@ namespace GVR.Creator
         // FIXME - change values for AudioClip based on Sfx and vob value (value overloads itself)
         private void CreateSounds(GameObject root, List<PxVobData> vobs)
         {
+            var typeRoot = new GameObject("PxVob_zCVobSound");
+            typeRoot.SetParent(root);
+            
             foreach (PxVobSoundData vob in vobs)
             {
-                var vobObj = soundCreator.Create(vob, root);
+                var vobObj = soundCreator.Create(vob, typeRoot);
                 if (!vobObj)
                     continue;
                 
@@ -104,9 +110,12 @@ namespace GVR.Creator
         // FIXME - add specific daytime logic!
         private void CreateSoundsDaytime(GameObject root, List<PxVobData> vobs)
         {
+            var typeRoot = new GameObject("PxVob_zCVobSoundDaytime");
+            typeRoot.SetParent(root);
+            
             foreach (PxVobSoundDaytimeData vob in vobs)
             {
-                var vobObj = soundCreator.Create(vob, root);
+                var vobObj = soundCreator.Create(vob, typeRoot);
                 vobObj.name = "daytime-" + vobObj.name; // FIXME - For easy debugging purposes only. Can be removed.
                 if (!vobObj)
                     continue;
@@ -115,11 +124,14 @@ namespace GVR.Creator
             }
         }
 
-        private void CreateDefaultVobs(GameObject root, List<PxVobData> vobs)
+        private void CreateDefaultVobs(GameObject root, List<PxVobData> vobs, PxVobType type)
         {
+            var typeRoot = new GameObject(type.ToString());
+            typeRoot.SetParent(root);
+            
             foreach (var vob in vobs)
             {
-                CreateDefaultVob(root, vob);
+                CreateDefaultVob(typeRoot, vob);
             }
         }
 

@@ -5,6 +5,7 @@ using GVR.Util;
 using PxCs.Interface;
 using System;
 using System.Runtime.InteropServices;
+using GothicVR.Scripts.Items;
 using GVR.Caches;
 using JetBrains.Annotations;
 using PxCs.Data.Vob;
@@ -85,22 +86,59 @@ namespace GVR.Creator
         {
             var soundObject = new GameObject(vobSound.soundName);
             soundObject.SetParent(parent);
+
+            var audioSource = CreateAndAddAudioSource(soundObject, vobSound.soundName, vobSound);
+
+            if (!audioSource)
+                return soundObject;
+
+            if (vobSound.initiallyPlaying)
+                audioSource.Play();
+
+            return soundObject;
+        }
+
+        /// <summary>
+        /// Creating AudioSource from PxVobSoundDaytimeData is very similar to PxVobSoundData one.
+        /// There are only two differences:
+        ///     1. This one has two AudioSources
+        ///     2. The sources will be toggled during gameplay when start/end time is reached.
+        /// </summary>
+        public GameObject Create(PxVobSoundDaytimeData vobSoundDaytime, GameObject parent = null)
+        {
+            var soundObject = new GameObject($"{vobSoundDaytime.soundName}-{vobSoundDaytime.soundName2}");
+            soundObject.SetParent(parent);
+
+            var audioSource1 = CreateAndAddAudioSource(soundObject, vobSoundDaytime.soundName, vobSoundDaytime);
+            var audioSource2 = CreateAndAddAudioSource(soundObject, vobSoundDaytime.soundName2, vobSoundDaytime);
+
+            if (!audioSource1 || !audioSource2)
+                return soundObject;
             
+            var audioDaytimeComp = soundObject.AddComponent<SoundDaytime>();
+            
+            audioDaytimeComp.SetAudioTimeSwitch(vobSoundDaytime.startTime, vobSoundDaytime.endTime, audioSource1, audioSource2);
+            
+            return soundObject;
+        }
+
+        private AudioSource CreateAndAddAudioSource(GameObject soundObject, string soundName, PxVobSoundData soundData)
+        {
             byte[] wavFile;
             // Bugfix - Normally the data is to get C_SFX_DEF entries from VM. But sometimes there might be the real .wav file stored.
-            if (vobSound.soundName.ToLower().EndsWith(".wav"))
+            if (soundName.ToLower().EndsWith(".wav"))
             {
-                wavFile = assetCache.TryGetSound(vobSound.soundName);
+                wavFile = assetCache.TryGetSound(soundData.soundName);
             }
             else
             {
-                var sfxData = assetCache.TryGetSfxData(vobSound.soundName);
+                var sfxData = assetCache.TryGetSfxData(soundData.soundName);
                 wavFile = assetCache.TryGetSound(sfxData.file);
             }
 
             if (wavFile == null)
             {
-                Debug.LogError($"No .wav data returned for {vobSound.soundName}");
+                Debug.LogError($"No .wav data returned for {soundData.soundName}");
                 return null;
             }
             
@@ -113,16 +151,12 @@ namespace GVR.Creator
             source.rolloffMode = AudioRolloffMode.Linear;
             source.spatialBlend = 1f;
 
-            source.maxDistance = vobSound.radius / 100; // Gothic's values are in cm, Unity's in m.
+            source.maxDistance = soundData.radius / 100; // Gothic's values are in cm, Unity's in m.
 
             // Some data added for testing purposes. More properties are still to add.
-            source.loop = vobSound.mode == PxWorld.PxVobSoundMode.PxVobSoundModeLoop;
-            
-            if (vobSound.initiallyPlaying)
-                source.Play();
+            source.loop = soundData.mode == PxWorld.PxVobSoundMode.PxVobSoundModeLoop;
 
-            return soundObject;
+            return source;
         }
-
     }
 }
