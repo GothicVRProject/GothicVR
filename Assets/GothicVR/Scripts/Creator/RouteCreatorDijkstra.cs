@@ -49,6 +49,7 @@ namespace GVR.Creator
             RemoveLastUsed(currentPoint);
             var currentNeighbors = CalculateNeighborsList(currentPoint);
             AddCurrentNeighborsToOverAllList(currentNeighbors);
+            //Hier passieren merkwürdige Dinge
             if (currentPoint.name != endPoint.name)
             {
                 RecursiveCalculateRoute(overAllList[0]);
