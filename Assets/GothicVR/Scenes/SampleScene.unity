@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
+  m_IndirectSpecularColor: {r: 0.17276807, g: 0.21589197, b: 0.29782572, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -167,6 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff27067532e5fb14d8e963d887bb60cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 0
 --- !u!1 &118755270
 GameObject:
   m_ObjectHideFlags: 0
@@ -601,12 +602,12 @@ MonoBehaviour:
   dontDestroyOnLoad: 0
   CreateVobs: 1
   CreateWaypoints: 0
-  CreateWaypointEdges: 1
+  CreateWaypointEdges: 0
   EnableDayTime: 1
   SunMovementPerformanceValue: 0
   EnableNpc: 1
   EnableNpcRoutines: 1
-  CreateExampleAnimation: 1
+  CreateExampleAnimation: 0
   ShowVdfsFileNotFoundErrors: 0
 --- !u!4 &668062117 stripped
 Transform:
@@ -692,6 +693,7 @@ GameObject:
   - component: {fileID: 705507995}
   - component: {fileID: 705507994}
   - component: {fileID: 705507996}
+  - component: {fileID: 705507997}
   m_Layer: 0
   m_Name: Sun
   m_TagString: Untagged
@@ -788,6 +790,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98fd5a3a132692b498ccc34760c8d0b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &705507997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 705507993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!1 &782628375
 GameObject:
   m_ObjectHideFlags: 0
@@ -1882,6 +1907,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1353668847}
     m_Modifications:
+    - target: {fileID: 3286136461689514587, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Id
+      value: d4c5d6f0-1bc6-4937-990e-ec2fc89854b3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136461689514587, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Name
+      value: Directional Anchor Rotation
+      objectReference: {fileID: 0}
     - target: {fileID: 3286136461689514588, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_InteractionManager
       value: 
@@ -1938,6 +1971,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3286136462967229777, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Id
+      value: b9d7674c-4ef8-4812-b704-d131705ff861
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136462967229777, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Name
+      value: Directional Anchor Rotation
+      objectReference: {fileID: 0}
     - target: {fileID: 3286136462967229778, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_InteractionManager
       value: 
@@ -1946,6 +1987,14 @@ PrefabInstance:
       propertyPath: m_InteractionManager
       value: 
       objectReference: {fileID: 1300502571}
+    - target: {fileID: 3286136463242076557, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Id
+      value: 948d3695-4f25-451c-baaf-7e2f6fbfecbf
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136463242076557, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Name
+      value: Directional Anchor Rotation
+      objectReference: {fileID: 0}
     - target: {fileID: 3286136463242076558, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_InteractionManager
       value: 

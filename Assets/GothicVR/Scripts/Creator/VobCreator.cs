@@ -59,7 +59,7 @@ namespace GVR.Creator
                         CreateMobContainer(vobRootObj, vobsByType.Value);
                         break;
                     default:
-                        //CreateDefaultVobs(vobRootObj, vobsByType.Value);
+                        CreateDefaultVobs(vobRootObj, vobsByType.Value);
                         break;
                 }
             }
