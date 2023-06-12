@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
+using PxCs.Data.Sound;
 using PxCs.Extensions;
 using UnityEngine;
 
@@ -25,7 +26,7 @@ namespace GVR.Caches
         private Dictionary<string, PxMultiResolutionMeshData> mrmCache = new();
 
         private Dictionary<string, PxVmSfxData> sfxDataCache = new();
-        private Dictionary<string, byte[]> soundCache = new();
+        private Dictionary<string, PxSoundData<float>> soundCache = new();
 
 
         public Texture2D TryGetTexture(string key)
@@ -134,41 +135,14 @@ namespace GVR.Caches
             return newData;
         }
         
-        public byte[] TryGetSound(string key)
+        public PxSoundData<float> TryGetSound(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (soundCache.TryGetValue(preparedKey, out byte[] data))
+            if (soundCache.TryGetValue(preparedKey, out PxSoundData<float> data))
                 return data;
             
-            // FIXME - outsource this whole loading to a convenient PxCs method like with meshes.
-            var vdfEntrySound = PxVdf.pxVdfGetEntryByName(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.wav");
-
-            if (vdfEntrySound == IntPtr.Zero)
-            {
-                Debug.LogError("Sound not found");
-                return null;
-            }
-
-            var wavSound = PxVdf.pxVdfEntryOpenBuffer(vdfEntrySound);
-
-            if (wavSound == IntPtr.Zero)
-            {
-                Debug.LogError("Sound could not be loaded");
-                return null;
-            }
+            var wavFile = PxSound.GetSoundArrayFromVDF<float>(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.wav");
             
-            var size = PxBuffer.pxBufferSize(wavSound);
-
-            if (size > uint.MaxValue)
-            {
-                Debug.LogError("ulong values aren't yet handled by sound marshal copy.");
-                return null;
-            }
-            
-            // FIXME - Check if we need to cleanup memory afterwards? (i.e. is phoenix creating new objects on Heap?)
-            var array = PxBuffer.pxBufferArray(wavSound);
-            
-            var wavFile = array.MarshalAsArray<byte>((uint)size);
             soundCache[preparedKey] = wavFile;
 
             return wavFile;

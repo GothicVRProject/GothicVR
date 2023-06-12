@@ -7,6 +7,7 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Vob;
+using PxCs.Data.Sound;
 using PxCs.Interface;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace GVR.Creator
         private void Start()
         {
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
-            
+
             VmGothicBridge.PhoenixMdl_AI_OUTPUT.AddListener(AI_OUTPUT);
         }
 
@@ -110,17 +111,17 @@ namespace GVR.Creator
 
             if (!audioSource1 || !audioSource2)
                 return soundObject;
-            
+
             var audioDaytimeComp = soundObject.AddComponent<SoundDaytime>();
-            
+
             audioDaytimeComp.SetAudioTimeSwitch(vobSoundDaytime.startTime, vobSoundDaytime.endTime, audioSource1, audioSource2);
-            
+
             return soundObject;
         }
 
         private AudioSource CreateAndAddAudioSource(GameObject soundObject, string soundName, PxVobSoundData soundData)
         {
-            byte[] wavFile;
+            PxSoundData<float> wavFile;
             // Bugfix - Normally the data is to get C_SFX_DEF entries from VM. But sometimes there might be the real .wav file stored.
             if (soundName.ToLower().EndsWith(".wav"))
             {
@@ -137,10 +138,10 @@ namespace GVR.Creator
                 Debug.LogError($"No .wav data returned for {soundData.soundName}");
                 return null;
             }
-            
+
             AudioSource source = soundObject.AddComponent<AudioSource>();
-            source.clip = SoundConverter.ToAudioClip(wavFile);
-            
+            source.clip = SoundConverter.ToAudioClip(wavFile.sound);
+
             // Both need to be set, that Audio can be heard only within defined range.
             // https://answers.unity.com/questions/1316535/how-to-have-audio-only-be-heard-in-a-certain-radiu.html
             source.rolloffMode = AudioRolloffMode.Linear;
@@ -152,7 +153,7 @@ namespace GVR.Creator
             source.loop = soundData.mode == PxWorld.PxVobSoundMode.PxVobSoundModeLoop;
 
             // FIXME - Random play isn't implemented yet.
-            
+
             return source;
         }
     }
