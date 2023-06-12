@@ -9,7 +9,7 @@ namespace GVR.Phoenix.Data.Vm.Gothic
         public new string name = "";
         public Vector3 position;
         public List<WaypointRelationData> neighbors = new();
-        public float cost = 9999999999f; //Current Costs
+        public float cost = 9999999999999999999999f; //Current Costs
         public float distanceToGoal; //Heuristic
         public float sum; //cost + heuristic
         public WaypointRelationData predecessor;

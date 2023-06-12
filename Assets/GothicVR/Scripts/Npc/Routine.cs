@@ -50,11 +50,14 @@ namespace GVR.Npc
                 else                            //If it's the last element startPoint...
                     nextPoint = routines[0];    // get nextPoint from the first element.
 
-                if (WaynetCreator.waypointsDict.TryGetValue(currPoint.waypoint.ToUpper(), out startPoint) &&
-                            WaynetCreator.waypointsDict.TryGetValue(nextPoint.waypoint.ToUpper(), out endPoint))
+                //if (WaynetCreator.waypointsDict.TryGetValue(currPoint.waypoint.ToUpper(), out startPoint) &&
+                //            WaynetCreator.waypointsDict.TryGetValue(nextPoint.waypoint.ToUpper(), out endPoint))
+                if (WaynetCreator.waypointsDict.TryGetValue("OCR_HUT_7", out startPoint) &&
+                    WaynetCreator.waypointsDict.TryGetValue("OCR_TO_PALISADES_01", out endPoint))
+                    //WaynetCreator.waypointsDict.TryGetValue("OCR_OUTSIDE_HUT_54", out endPoint))
                 {
-                    routines[i].route = null;
-                    //routines[i].route = routeCreator.StartRouting(startPoint, endPoint);
+                    
+                    routines[i].route = routeCreator.StartRouting(startPoint, endPoint);
                 }
                 else
                 {

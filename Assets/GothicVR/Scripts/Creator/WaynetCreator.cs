@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using GVR.Demo;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
@@ -32,6 +33,8 @@ namespace GVR.Creator
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateWaypoints)
                 return;
 
+            
+
             var waypointsObj = new GameObject(string.Format("Waypoints"));
             waypointsObj.transform.parent = parent.transform;
 
@@ -39,12 +42,20 @@ namespace GVR.Creator
             {
                 
                 var wpobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                //Display Text start
+                var textObj = new GameObject("Text");
+                textObj.transform.parent = wpobject.transform;
+                var text = textObj.AddComponent<TextMesh>();
 
+                text.text = world.waypoints[i].name;
+                text.fontSize = 12; 
+                text.anchor = TextAnchor.MiddleCenter; 
+                text.alignment = TextAlignment.Center; 
+                //Display Text end
                 wpobject.name = world.waypoints[i].name;
                 wpobject.transform.position = world.waypoints[i].position.ToUnityVector();
 
                 wpobject.transform.parent = waypointsObj.transform;
-                //the index of waypoints list has to be the same as world.waypoints
                 waypoints.Add(new(wpobject.name, wpobject.transform.position));
                 WriteWaypointDataToDict(i);
             }
@@ -66,7 +77,7 @@ namespace GVR.Creator
                 CalculateEdgeName(world, i);
                 WriteEdgeDataToDict(i);
                 
-                if (SingletonBehaviour<DebugSettings>.GetOrCreate().CreateWaypointEdges)
+                //if (SingletonBehaviour<DebugSettings>.GetOrCreate().CreateWaypointEdges)
                     DrawEdgeLine(ref parent, edges[i]);
             }
         }
@@ -107,6 +118,7 @@ namespace GVR.Creator
             lineObj.name = string.Format("{0}->{1}", edge.startPointID, edge.endPointID);
             lineObj.transform.position = edge.startPos;
             lineObj.transform.parent = waypointEdgesObj.transform;
+            lr.enabled = true;
         }
         #endregion
 

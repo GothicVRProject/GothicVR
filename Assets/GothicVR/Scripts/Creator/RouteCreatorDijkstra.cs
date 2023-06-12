@@ -26,12 +26,7 @@ namespace GVR.Creator
         private WaypointRelationData endPoint;
         List<Vector3> route = new();
 
-        private void Start()
-        {
-            if (WaynetCreator.waypointsDict.TryGetValue("OCR_OUTSIDE_HUT_54", out startPoint))
-                if (WaynetCreator.waypointsDict.TryGetValue("OCR_HUT_7", out startPoint))
-                    StartRouting(startPoint, endPoint);
-        }
+
         public List<Vector3> StartRouting(WaypointRelationData startPoint, WaypointRelationData endPoint)
         {
             this.startPoint = startPoint;
@@ -40,9 +35,9 @@ namespace GVR.Creator
             startPoint.predecessor = startPoint;
             startPoint.cost = 0;
             overAllList.Add(startPoint);
-            Debug.LogError("->->->->->->->sp: " + startPoint.name + " <-<-<-<-<-<-<-");
-            Debug.LogError("->->->->->->->ep: " + endPoint.name + " <-<-<-<-<-<-<-");
-            RecursiveCalculateRoute(overAllList[0]); //Todo endless loop possible
+            //Debug.LogError("->->->->->->->sp: " + startPoint.name + " - " + endPoint.name + " <-<-<-<-<-<-<-");
+            RecursiveCalculateRoute(overAllList[0]); //Todo endless loop possible //currentPoint counter ++ to see, if an element gets selected repeatedly?
+
             TraceBackRoute();
 
             return route;
@@ -50,8 +45,7 @@ namespace GVR.Creator
         #region recursive Part
         void RecursiveCalculateRoute(WaypointRelationData currentPoint)
         {
-            Debug.LogError("Name: " + overAllList[0].name + " - " + overAllList[0].cost +
-                " Pred: " + overAllList[0].predecessor.name + " - " + overAllList[0].predecessor.cost);
+            //Debug.LogError("Name: " + overAllList[0].name + " - " + overAllList[0].cost + " Pred: " + overAllList[0].predecessor.name + " - " + overAllList[0].predecessor.cost);
             RemoveLastUsed(currentPoint);
             var currentNeighbors = CalculateNeighborsList(currentPoint);
             AddCurrentNeighborsToOverAllList(currentNeighbors);
@@ -68,7 +62,6 @@ namespace GVR.Creator
         }
         #region calculate neighbors
 
-        // TODO: If neighbors can be reached with less cost than the values they already have it not updated. I guess this will be very rare, but it would be good anyways.
 
         List<WaypointRelationData> CalculateNeighborsList(WaypointRelationData currentPoint)
         {
@@ -78,22 +71,28 @@ namespace GVR.Creator
                 if (neighbor.predecessor == null)
                 {
                     neighbor.predecessor = currentPoint;
-                    CalculateWaypointValues(neighbor, neighbor.predecessor);
+                    var sum = CalculateWaypointValues(neighbor, neighbor.predecessor);
+                    if (currentPoint.sum > sum)
+                    {
+                        currentPoint.sum = sum;
+                    }
                     currentList.Add(neighbor);
                 }
             }
             return currentList;
         }
-        void CalculateWaypointValues(WaypointRelationData currentPoint, WaypointRelationData predecessorPoint)
+        float CalculateWaypointValues(WaypointRelationData currentPoint, WaypointRelationData predecessorPoint)
         {
-             currentPoint.cost = currentPoint.predecessor.cost + getVectorLength(startPoint, predecessorPoint);
+            var length = getVectorLength(startPoint, predecessorPoint);
+            currentPoint.cost = currentPoint.predecessor.cost + length;
             currentPoint.distanceToGoal = getVectorLength(currentPoint, endPoint);
-            currentPoint.sum = currentPoint.cost + currentPoint.distanceToGoal;
+            return currentPoint.cost + currentPoint.distanceToGoal;
         }
         float getVectorLength(WaypointRelationData start, WaypointRelationData end)
         {
-            var vector = start.position - end.position;
-            return vector.magnitude;
+            var vectorDiff = start.position - end.position;
+            var length = vectorDiff.magnitude;
+            return length;
         }
         #endregion
 
@@ -110,11 +109,10 @@ namespace GVR.Creator
 
         void TraceBackRoute()
         {
-            var currentPoint = endPoint;
-            while (currentPoint != startPoint) 
+            while (endPoint.name != startPoint.name) 
             {
-                route.Insert(0, currentPoint.position);
-                currentPoint = currentPoint.predecessor;
+                route.Insert(0, endPoint.position);
+                endPoint = endPoint.predecessor;
             }
         }
     }
