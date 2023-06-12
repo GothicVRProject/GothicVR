@@ -4,6 +4,7 @@ using GVR.Phoenix.Util;
 using GVR.Util;
 using System;
 using System.Runtime.InteropServices;
+using PxCs.Data.Sound;
 
 namespace GVR.Demo
 {
@@ -13,39 +14,13 @@ namespace GVR.Demo
         public void Create(IntPtr vdfPtr, string name)
         {
 
-            if (!name.Contains(".WAV"))
-            {
-                name += ".WAV";
-            }
-            var vdfEntrySound = PxVdf.pxVdfGetEntryByName(vdfPtr, name);
-
-            if (vdfEntrySound == IntPtr.Zero)
-            {
-                Debug.Log("Sound not found");
-                return;
-            }
-
-            var wavSound = PxVdf.pxVdfEntryOpenBuffer(vdfEntrySound);
-
-            if (wavSound == IntPtr.Zero)
-            {
-                Debug.Log("Sound could not be loaded");
-                return;
-            }
-
-            ulong size = PxBuffer.pxBufferSize(wavSound);
-
-            var array = IntPtr.Zero;
-
-            array = PxBuffer.pxBufferArray(wavSound);
-
-            byte[] wavFile = new byte[size];
-
-            Marshal.Copy(array, wavFile, 0, (int)size);
-            var SoundObject = new GameObject(string.Format("Sound"));
-            AudioSource source = SoundObject.AddComponent<AudioSource>();
-            source.clip = SoundConverter.ToAudioClip(wavFile);
-            // source.loop = true;
+            // Bugfix - Normally the data is to get C_SFX_DEF entries from VM. But sometimes there might be the real .wav file stored.
+            var wavFile = PxSound.GetSoundArrayFromVDF<float>(vdfPtr, $"{name}.wav");
+            
+            var soundObject = new GameObject(string.Format("Sound"));
+            AudioSource source = soundObject.AddComponent<AudioSource>();
+            source.clip = SoundConverter.ToAudioClip(wavFile.sound);
+            // // source.loop = true;
             source.Play();
 
         }
