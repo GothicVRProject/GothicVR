@@ -37,47 +37,8 @@ namespace GVR.Creator
             // and we have to check how to play sounds for animations
             // https://gothic-modding-community.github.io/gmc/zengin/sound/ 
 
-            var vdfPtr = PhoenixBridge.VdfsPtr;
-
-            if (!name.Contains(".WAV"))
-            {
-                name += ".WAV";
-            }
-            var vdfEntrySound = PxVdf.pxVdfGetEntryByName(vdfPtr, name);
-
-            if (vdfEntrySound == IntPtr.Zero)
-            {
-                Debug.Log("Sound not found");
-                return;
-            }
-
-            var wavSound = PxVdf.pxVdfEntryOpenBuffer(vdfEntrySound);
-
-            if (wavSound == IntPtr.Zero)
-            {
-                Debug.Log("Sound could not be loaded");
-                return;
-            }
-
-            ulong size = PxBuffer.pxBufferSize(wavSound);
-
-            var array = IntPtr.Zero;
-            array = PxBuffer.pxBufferArray(wavSound);
-
-            byte[] wavFile = new byte[size];
-
-            Marshal.Copy(array, wavFile, 0, (int)size);
-
-            // TODO: We create a new GameObject here but we need to attach it to the source of the sound
-            // so Unity will handle the spatial side of things correctly 
-            var SoundObject = new GameObject(string.Format(name));
-
-            AudioSource source = SoundObject.AddComponent<AudioSource>();
-            source.clip = SoundConverter.ToAudioClip(wavFile);
-
-            source.Play();
         }
-        
+
         // FIXME - add caching for audio file - 1) PxVmSfxData and/or 2) byte[]
         public GameObject Create(PxVobSoundData vobSound, GameObject parent = null)
         {
