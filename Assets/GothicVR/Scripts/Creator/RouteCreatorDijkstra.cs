@@ -63,31 +63,34 @@ namespace GVR.Creator
         }
         #region calculate neighbors
 
-
-        List<WaypointRelationData> CalculateNeighborsList(WaypointRelationData currentPoint)
+        /// <summary>
+        /// The corePoint has one or more neighbors. Its a star topology. With the core and neighbors.
+        /// For each neighbor calculate the sum of the cost up to it and the distance to goal (sum=cost+dist)
+        /// </summary>
+        List<WaypointRelationData> CalculateNeighborsList(WaypointRelationData corePoint)
         {
             List<WaypointRelationData> currentList = new();
-            foreach (var neighbor in currentPoint.neighbors)
+            foreach (var neighbor in corePoint.neighbors)
             {
                 if (neighbor.predecessor == null)
+                    neighbor.predecessor = corePoint;
+
+                var sum = CalculateWaypointValues(neighbor, corePoint);
+                if (neighbor.sum > sum)
                 {
-                    neighbor.predecessor = currentPoint;
-                    var sum = CalculateWaypointValues(neighbor, neighbor.predecessor);
-                    if (currentPoint.sum > sum)
-                    {
-                        currentPoint.sum = sum;
-                    }
-                    currentList.Add(neighbor);
+                    neighbor.sum = sum;
+                    neighbor.predecessor = corePoint;
                 }
+                currentList.Add(neighbor);
             }
             return currentList;
         }
-        float CalculateWaypointValues(WaypointRelationData currentPoint, WaypointRelationData predecessorPoint)
+        float CalculateWaypointValues(WaypointRelationData neighbor, WaypointRelationData corePoint)
         {
-            var length = getVectorLength(startPoint, predecessorPoint);
-            currentPoint.cost = currentPoint.predecessor.cost + length;
-            currentPoint.distanceToGoal = getVectorLength(currentPoint, endPoint);
-            return currentPoint.cost + currentPoint.distanceToGoal;
+            var length = getVectorLength(startPoint, corePoint);
+            neighbor.cost = neighbor.predecessor.cost + length;
+            neighbor.distanceToGoal = getVectorLength(neighbor, endPoint);
+            return neighbor.cost + neighbor.distanceToGoal;
         }
         float getVectorLength(WaypointRelationData start, WaypointRelationData end)
         {
