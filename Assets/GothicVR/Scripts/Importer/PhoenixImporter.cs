@@ -50,6 +50,7 @@ namespace GVR.Importer
             PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
             LoadSound(vdfPtr, "INFO_FREEMINEORC_GIVEPOTION_17_05");
             //LoadFonts();
+            LoadTestMusic(G1Dir);
 
             watch.Stop();
             Debug.Log($"Time spent for loading world + VM + npc loading: {watch.Elapsed}");
@@ -124,7 +125,10 @@ namespace GVR.Importer
         {
             SingletonBehaviour<SoundTest>.GetOrCreate().Create(vdfPtr, name);
         }
-
+        private void LoadTestMusic(string G1Dir)
+        {
+            SingletonBehaviour<MusicTest>.GetOrCreate().Create(G1Dir);
+        }
 
         /// <summary>
         /// If there are Gothic ttf fonts stored on the current system, we will use them.
