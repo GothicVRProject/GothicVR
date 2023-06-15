@@ -53,6 +53,9 @@ namespace GVR.Phoenix.Interface
                 waypointsDict = waypointsDict,
                 waypointEdges = waypointEdges
             };
+            
+            var subMeshes = WorldBridge.CreateSubmeshesForUnity(world);
+            world.subMeshes = subMeshes;
 
             PxWorld.pxWorldDestroy(worldPtr);
 
