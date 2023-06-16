@@ -16,8 +16,7 @@ namespace GVR.Creator
     {
         private static AssetCache assetCache;
 
-        // DEBUG - we can change special mesh entries (trees, walls) based on flags later. But for now we can live with the nature cutout shader.
-        private const string DEFAULT_SHADER = "Universal Render Pipeline/Unlit";
+        private const string DEFAULT_SHADER = "Unlit/Transparent Cutout";
 
         void Start()
         {
