@@ -8,29 +8,41 @@ using PxCs.Data.Struct;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace GVR.Creator
 {
     public class MeshCreator : SingletonBehaviour<MeshCreator>
     {
-        private static AssetCache assetCache;
+        private AssetCache assetCache;
 
         private const string DEFAULT_SHADER = "Unlit/Transparent Cutout";
 
-        void Start()
+        private void Start()
         {
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+        }
+
+        /// <summary>
+        /// Inject singletons if we use this class from EditorMode.
+        /// </summary>
+        public void EditorInject(AssetCache assetCache)
+        {
+            this.assetCache = assetCache;
         }
         
         public GameObject Create(WorldData world, GameObject parent = null)
         {
             var meshObj = new GameObject("Mesh");
+            meshObj.isStatic = true;
             meshObj.SetParent(parent);
 
             foreach (var subMesh in world.subMeshes.Values)
             {
                 var subMeshObj = new GameObject(string.Format("submesh-{0}", subMesh.material.name));
+                subMeshObj.isStatic = true;
+
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
                 var meshCollider = subMeshObj.AddComponent<MeshCollider>();
@@ -38,8 +50,7 @@ namespace GVR.Creator
                 PrepareMeshRenderer(meshRenderer, subMesh);
                 PrepareMeshFilter(meshFilter, subMesh);
                 meshCollider.sharedMesh = meshFilter.mesh;
-
-                subMeshObj.transform.parent = meshObj.transform;
+                subMeshObj.SetParent(meshObj);
             }
 
             return meshObj;
