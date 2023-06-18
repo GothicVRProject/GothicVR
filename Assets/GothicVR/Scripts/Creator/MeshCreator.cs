@@ -133,7 +133,6 @@ namespace GVR.Creator
 
             var meshFilter = meshObj.AddComponent<MeshFilter>();
             var meshRenderer = meshObj.AddComponent<MeshRenderer>();
-            var meshCollider = meshObj.AddComponent<MeshCollider>();
 
             PrepareMeshRenderer(meshRenderer, mrm);
             PrepareMeshFilter(meshFilter, mrm);
