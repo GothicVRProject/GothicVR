@@ -125,7 +125,7 @@ namespace GVR.Creator
             return meshRootObject;
         }
 
-        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null)
+        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null)
         {
             var meshObj = new GameObject(objectName);
             meshObj.SetParent(parent);
@@ -136,7 +136,9 @@ namespace GVR.Creator
 
             PrepareMeshRenderer(meshRenderer, mrm);
             PrepareMeshFilter(meshFilter, mrm);
-            PrepareMeshCollider(meshObj, meshFilter.mesh, mrm.materials);
+            
+            if (withCollider)
+                PrepareMeshCollider(meshObj, meshFilter.mesh, mrm.materials);
 
             return meshObj;
         }
@@ -393,6 +395,15 @@ namespace GVR.Creator
             }
         }
 
+        private void PrepareMeshCollider(GameObject obj, Mesh mesh)
+        {
+            var meshCollider = obj.AddComponent<MeshCollider>();
+            meshCollider.sharedMesh = mesh;
+        }
+        
+        /// <summary>
+        /// Check if Collider needs to be added.
+        /// </summary>
         private void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
         {
             if (materialData.disableCollision ||
@@ -402,11 +413,13 @@ namespace GVR.Creator
             }
             else 
             {
-                var meshCollider = obj.AddComponent<MeshCollider>();
-                meshCollider.sharedMesh = mesh;
+                PrepareMeshCollider(obj, mesh);
             }
         }
 
+        /// <summary>
+        /// Check if Collider needs to be added.
+        /// </summary>
         private void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData[] materialDatas)
         {
             var anythingDisableCollission = materialDatas.Any(i => i.disableCollision);
@@ -418,8 +431,7 @@ namespace GVR.Creator
             }
             else
             {
-                var meshCollider = obj.AddComponent<MeshCollider>();
-                meshCollider.sharedMesh = mesh;
+                PrepareMeshCollider(obj, mesh);
             }
         }
 
