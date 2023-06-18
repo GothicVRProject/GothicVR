@@ -84,10 +84,6 @@ namespace GVR.Importer
         {
             var world = WorldBridge.LoadWorld(vdfPtr, "world.zen"); // world.zen -> G1, newworld.zen/oldworld.zen/addonworld.zen -> G2
 
-            var subMeshes = WorldBridge.CreateSubmeshesForUnity(world);
-            world.subMeshes = subMeshes;
-
-
             PhoenixBridge.VdfsPtr = vdfPtr;
             PhoenixBridge.World = world;
 
