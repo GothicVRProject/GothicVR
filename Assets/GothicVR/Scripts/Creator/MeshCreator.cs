@@ -135,17 +135,9 @@ namespace GVR.Creator
             var meshRenderer = meshObj.AddComponent<MeshRenderer>();
             var meshCollider = meshObj.AddComponent<MeshCollider>();
 
-            try
-            {
-                PrepareMeshRenderer(meshRenderer, mrm);
-                PrepareMeshFilter(meshFilter, mrm);
-                meshCollider.sharedMesh = meshFilter.mesh;
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                Debug.LogError(e.Message);
-                Destroy(meshObj);
-            }
+            PrepareMeshRenderer(meshRenderer, mrm);
+            PrepareMeshFilter(meshFilter, mrm);
+            PrepareMeshCollider(meshObj, meshFilter.mesh, mrm.materials);
 
             return meshObj;
         }
