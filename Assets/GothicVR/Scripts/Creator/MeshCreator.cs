@@ -1,14 +1,14 @@
-﻿using GVR.Caches;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using GVR.Caches;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
+using PxCs.Interface;
 using UnityEngine;
 
 namespace GVR.Creator
@@ -45,11 +45,11 @@ namespace GVR.Creator
 
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
-                var meshCollider = subMeshObj.AddComponent<MeshCollider>();
-
+                
                 PrepareMeshRenderer(meshRenderer, subMesh);
                 PrepareMeshFilter(meshFilter, subMesh);
-                meshCollider.sharedMesh = meshFilter.mesh;
+                PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
+
                 subMeshObj.SetParent(meshObj);
             }
 
@@ -89,11 +89,10 @@ namespace GVR.Creator
 
                     var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                     var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
-                    var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
                     PrepareMeshRenderer(meshRenderer, subMesh.Value);
                     PrepareMeshFilter(meshFilter, subMesh.Value);
-                    meshCollider.sharedMesh = meshFilter.mesh;
+                    PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.Value.materials);
                 }
             }
             else
@@ -107,14 +106,13 @@ namespace GVR.Creator
                     // Changed SkinnedMeshRenderer to MeshRenderer for now bones seems to crash the game on PICO/Quest2
                     // var meshRenderer = subMeshObj.AddComponent<SkinnedMeshRenderer>();
                     var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
-                    var meshCollider = subMeshObj.AddComponent<MeshCollider>();
 
                     PrepareMeshRenderer(meshRenderer, mesh.mesh);
                     PrepareMeshFilter(meshFilter, mesh);
 
                     //this is needed only for skinnedmeshrenderer
                     // meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
-                    meshCollider.sharedMesh = meshFilter.mesh;
+                    PrepareMeshCollider(subMeshObj, meshFilter.mesh, mesh.mesh.materials);
                     
                     // bones commented since we don't use for now skinnedmeshrenderer
                     // CreateBonesData(subMeshObj, meshRenderer, mdh);
@@ -401,6 +399,36 @@ namespace GVR.Creator
             for (var i = 0; i < pxMesh.subMeshes.Length; i++)
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
+            }
+        }
+
+        private void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
+        {
+            if (materialData.disableCollision ||
+                materialData.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water)
+            {
+                // Do not add colliders
+            }
+            else 
+            {
+                var meshCollider = obj.AddComponent<MeshCollider>();
+                meshCollider.sharedMesh = mesh;
+            }
+        }
+
+        private void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData[] materialDatas)
+        {
+            var anythingDisableCollission = materialDatas.Any(i => i.disableCollision);
+            var anythingWater = materialDatas.Any(i => i.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water);
+
+            if (anythingDisableCollission || anythingWater)
+            {
+                // Do not add colliders
+            }
+            else
+            {
+                var meshCollider = obj.AddComponent<MeshCollider>();
+                meshCollider.sharedMesh = mesh;
             }
         }
 
