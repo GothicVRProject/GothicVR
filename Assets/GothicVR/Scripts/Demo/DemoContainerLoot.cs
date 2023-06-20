@@ -77,7 +77,7 @@ namespace GVR.Demo
 				var pxItem = PxVm.InitializeItem(PhoenixBridge.VmGothicPtr, item.name);
 
 				var mrm = assetCache.TryGetMrm(pxItem?.visual);
-				var itemObj = meshCreator.Create(item.name, mrm, default, default, itemsObj);
+				var itemObj = meshCreator.Create(item.name, mrm, default, default, true, itemsObj);
 			}
 		}
 	}

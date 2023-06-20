@@ -109,7 +109,10 @@ namespace GVR.Creator
                     return null;
                 }
 
-                return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, root);
+                // If the object is a dynamic one, it will collide.
+                var withCollider = vob.cdDynamic;
+                
+                return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, withCollider, root);
             }
         }
     }
