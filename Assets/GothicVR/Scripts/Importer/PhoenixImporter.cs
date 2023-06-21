@@ -47,9 +47,8 @@ namespace GVR.Importer
             LoadSfxVM(G1Dir);
             LoadWorld(vdfPtr);
 
-            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
-            LoadSound(vdfPtr, "INFO_FREEMINEORC_GIVEPOTION_17_05");
-            //LoadFonts();
+            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)        
+           //LoadFonts();
             LoadTestMusic(G1Dir);
 
             watch.Stop();
@@ -117,10 +116,6 @@ namespace GVR.Importer
             PhoenixBridge.VmSfxPtr = vmPtr;
         }
 
-        private void LoadSound(IntPtr vdfPtr, string name)
-        {
-            SingletonBehaviour<SoundTest>.GetOrCreate().Create(vdfPtr, name);
-        }
         private void LoadTestMusic(string G1Dir)
         {
             SingletonBehaviour<MusicTest>.GetOrCreate().Create(G1Dir);
