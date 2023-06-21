@@ -6,12 +6,6 @@ namespace GothicVR.Items
 {
     public class SoundDaytime : MonoBehaviour
     {
-        
-#if UNITY_EDITOR
-        [TextArea]
-        public string DbgValue;
-#endif
-        
         // Cache for performance reasons.
         private AudioSource audioSource1;
         private AudioSource audioSource2;
@@ -51,12 +45,6 @@ namespace GothicVR.Items
 
             // Now set active sound initially
             HourEventCallback(GameTime.Instance.GetCurrentDateTime());
-            
-#if UNITY_EDITOR
-            var s = this.startSound1.ToString("hh:mm:ss");
-            var e = this.endSound1.ToString("hh:mm:ss");
-            DbgValue = $"sound1Start={s}, \nsound1End={e}";
-#endif
         }
 
         private void HourEventCallback(DateTime currentTime)
