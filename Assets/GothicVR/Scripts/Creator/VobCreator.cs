@@ -5,6 +5,7 @@ using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Vob;
 using System.Collections.Generic;
+using PxCs.Data.Struct;
 using UnityEngine;
 using static PxCs.Interface.PxWorld;
 
@@ -13,11 +14,13 @@ namespace GVR.Creator
 	public class VobCreator : SingletonBehaviour<VobCreator>
     {   
         private MeshCreator meshCreator;
+        private SoundCreator soundCreator;
         private AssetCache assetCache;
 
         private void Start()
         {
             meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
+            soundCreator = SingletonBehaviour<SoundCreator>.GetOrCreate();
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
         }
 
@@ -56,20 +59,29 @@ namespace GVR.Creator
                 switch (vobsByType.Key)
                 {
                     case PxVobType.PxVob_oCMobContainer:
-                        CreateMobContainer(vobRootObj, vobsByType.Value);
+                        CreateMobContainers(vobRootObj, vobsByType.Value);
+                        break;
+                    case PxVobType.PxVob_zCVobSound:
+                        CreateSounds(vobRootObj, vobsByType.Value);
+                        break;
+                    case PxVobType.PxVob_zCVobSoundDaytime:
+                        CreateSoundsDaytime(vobRootObj, vobsByType.Value);
                         break;
                     default:
-                        CreateDefaultVobs(vobRootObj, vobsByType.Value);
+                        CreateDefaultVobs(vobRootObj, vobsByType.Value, vobsByType.Key);
                         break;
                 }
             }
         }
 
-        private void CreateMobContainer(GameObject root, List<PxVobData> vobs)
+        private void CreateMobContainers(GameObject root, List<PxVobData> vobs)
         {
+            var typeRoot = new GameObject("PxVob_oCMobContainer");
+            typeRoot.SetParent(root);
+            
             foreach (PxVobMobContainerData vob in vobs)
             {
-                var vobObj = CreateDefaultVob(root, vob);
+                var vobObj = CreateDefaultVob(typeRoot, vob);
 
                 if (vobObj == null)
                     continue;
@@ -78,12 +90,48 @@ namespace GVR.Creator
                 lootComp.SetContent(vob.contents);
             }
         }
-
-        private void CreateDefaultVobs(GameObject root, List<PxVobData> vobs)
+        
+        // FIXME - change values for AudioClip based on Sfx and vob value (value overloads itself)
+        private void CreateSounds(GameObject root, List<PxVobData> vobs)
         {
+            var typeRoot = new GameObject("PxVob_zCVobSound");
+            typeRoot.SetParent(root);
+            
+            foreach (PxVobSoundData vob in vobs)
+            {
+                var vobObj = soundCreator.Create(vob, typeRoot);
+                if (!vobObj)
+                    continue;
+                
+                SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
+            }
+        }
+        
+        // FIXME - add specific daytime logic!
+        private void CreateSoundsDaytime(GameObject root, List<PxVobData> vobs)
+        {
+            var typeRoot = new GameObject("PxVob_zCVobSoundDaytime");
+            typeRoot.SetParent(root);
+            
+            foreach (PxVobSoundDaytimeData vob in vobs)
+            {
+                var vobObj = soundCreator.Create(vob, typeRoot);
+                vobObj.name = "daytime-" + vobObj.name; // FIXME - For easy debugging purposes only. Can be removed.
+                if (!vobObj)
+                    continue;
+                
+                SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
+            }
+        }
+
+        private void CreateDefaultVobs(GameObject root, List<PxVobData> vobs, PxVobType type)
+        {
+            var typeRoot = new GameObject(type.ToString());
+            typeRoot.SetParent(root);
+            
             foreach (var vob in vobs)
             {
-                CreateDefaultVob(root, vob);
+                CreateDefaultVob(typeRoot, vob);
             }
         }
 
@@ -114,6 +162,21 @@ namespace GVR.Creator
                 
                 return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, withCollider, root);
             }
+        }
+        
+        private void SetPosAndRot(GameObject obj, System.Numerics.Vector3 position, PxMatrix3x3Data rotation)
+        {
+            SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityMatrix().rotation);
+        }
+
+        private void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
+        {
+            // FIXME - This isn't working
+            if (position.Equals(default) && rotation.Equals(default))
+                return;
+
+            obj.transform.localRotation = rotation;
+            obj.transform.localPosition = position;
         }
     }
 }

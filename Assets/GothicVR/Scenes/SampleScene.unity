@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
+  m_IndirectSpecularColor: {r: 0.172768, g: 0.21589169, b: 0.29782546, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -388,6 +388,7 @@ GameObject:
   - component: {fileID: 124285704}
   - component: {fileID: 124285698}
   - component: {fileID: 124285702}
+  - component: {fileID: 124285707}
   - component: {fileID: 124285706}
   m_Layer: 0
   m_Name: Importer
@@ -486,6 +487,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b80be53895ae2a84f99e59be8a469a22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 0
+--- !u!114 &124285707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124285697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efa344ebb42a67d4eb1235b9875d273e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
@@ -605,9 +619,11 @@ MonoBehaviour:
   CreateWaypointEdges: 0
   EnableDayTime: 1
   SunMovementPerformanceValue: 0
+  StartHour: 17
+  StartMinute: 59
   EnableNpc: 1
   EnableNpcRoutines: 1
-  CreateExampleAnimation: 0
+  CreateExampleAnimation: 1
   ShowVdfsFileNotFoundErrors: 0
 --- !u!4 &668062117 stripped
 Transform:
@@ -1926,6 +1942,10 @@ PrefabInstance:
     - target: {fileID: 3286136461781483594, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_Name
       value: VRPlayer_v4 (romey)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136461781483594, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_RootOrder

@@ -1,3 +1,4 @@
+using System;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -6,6 +7,10 @@ using PxCs.Data.Model;
 using PxCs.Interface;
 using System.Collections.Generic;
 using System.IO;
+using PxCs.Data.Vm;
+using PxCs.Data.Vob;
+using PxCs.Data.Sound;
+using PxCs.Extensions;
 using UnityEngine;
 
 namespace GVR.Caches
@@ -19,6 +24,9 @@ namespace GVR.Caches
         private Dictionary<string, PxModelData> mdlCache = new();
         private Dictionary<string, PxModelMeshData> mdmCache = new();
         private Dictionary<string, PxMultiResolutionMeshData> mrmCache = new();
+
+        private Dictionary<string, PxVmSfxData> sfxDataCache = new();
+        private Dictionary<string, PxSoundData<float>> soundCache = new();
 
 
         public Texture2D TryGetTexture(string key)
@@ -113,6 +121,31 @@ namespace GVR.Caches
             mrmCache[preparedKey] = newData;
 
             return newData;
+        }
+
+        public PxVmSfxData TryGetSfxData(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (sfxDataCache.TryGetValue(preparedKey, out PxVmSfxData data))
+                return data;
+
+            var newData = PxVm.InitializeSfx(PhoenixBridge.VmSfxPtr, preparedKey);
+            sfxDataCache[preparedKey] = newData;
+
+            return newData;
+        }
+        
+        public PxSoundData<float> TryGetSound(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (soundCache.TryGetValue(preparedKey, out PxSoundData<float> data))
+                return data;
+            
+            var wavFile = PxSound.GetSoundArrayFromVDF<float>(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.wav");
+            
+            soundCache[preparedKey] = wavFile;
+
+            return wavFile;
         }
 
 

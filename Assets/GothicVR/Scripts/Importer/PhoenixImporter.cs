@@ -43,9 +43,13 @@ namespace GVR.Importer
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "Data"));
             var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
 
-            LoadWorld(vdfPtr);
             LoadGothicVM(G1Dir);
-            //LoadFonts();
+            LoadSfxVM(G1Dir);
+            LoadWorld(vdfPtr);
+
+            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)        
+           //LoadFonts();
+            LoadTestMusic(G1Dir);
 
             watch.Stop();
             Debug.Log($"Time spent for loading world + VM + npc loading: {watch.Elapsed}");
@@ -103,10 +107,19 @@ namespace GVR.Importer
             VmGothicBridge.RegisterExternals(vmPtr);
 
             PhoenixBridge.VmGothicPtr = vmPtr;
-
-            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)
+        }
+        
+        private void LoadSfxVM(string G1Dir)
+        {
+            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
+            var vmPtr = VmGothicBridge.LoadVm(fullPath);
+            PhoenixBridge.VmSfxPtr = vmPtr;
         }
 
+        private void LoadTestMusic(string G1Dir)
+        {
+            SingletonBehaviour<MusicTest>.GetOrCreate().Create(G1Dir);
+        }
 
         /// <summary>
         /// If there are Gothic ttf fonts stored on the current system, we will use them.
@@ -161,6 +174,12 @@ namespace GVR.Importer
             {
                 PxVm.pxVmDestroy(PhoenixBridge.VmGothicPtr);
                 PhoenixBridge.VmGothicPtr = IntPtr.Zero;
+            }
+            
+            if (PhoenixBridge.VmSfxPtr != IntPtr.Zero)
+            {
+                PxVm.pxVmDestroy(PhoenixBridge.VmSfxPtr);
+                PhoenixBridge.VmSfxPtr = IntPtr.Zero;
             }
         }
     }
