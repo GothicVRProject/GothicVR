@@ -121,6 +121,8 @@ namespace GVR.Creator
             AudioSource source = soundObject.AddComponent<AudioSource>();
             source.clip = SoundConverter.ToAudioClip(wavFile.sound);
 
+            soundObject.AddComponent<CheckIfAudible>();
+
             // Both need to be set, that Audio can be heard only within defined range.
             // https://answers.unity.com/questions/1316535/how-to-have-audio-only-be-heard-in-a-certain-radiu.html
             source.rolloffMode = AudioRolloffMode.Linear;
