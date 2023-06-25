@@ -57,9 +57,11 @@ namespace GVR.Creator
             var soundObject = new GameObject(string.Format("BACKROUND MUSIC"));
 
             AudioSource source = soundObject.AddComponent<AudioSource>();
-            AudioClip audioClip = AudioClip.Create("Sound", bufferSize * 4, 2, 44100, true, PrepareData);
+            source.priority = 0;
+            AudioClip audioClip = AudioClip.Create("Music", bufferSize * 4, 2, 44100, true, PrepareData);
 
             source.clip = audioClip;
+            source.loop = true;
             source.Play();
         }
 
