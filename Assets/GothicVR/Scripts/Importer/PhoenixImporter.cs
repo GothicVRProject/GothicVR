@@ -126,7 +126,7 @@ namespace GVR.Importer
 
         private void LoadTestMusic(string G1Dir)
         {
-            SingletonBehaviour<MusicMixer>.GetOrCreate().Create(G1Dir);
+            SingletonBehaviour<MusicCreator>.GetOrCreate().Create(G1Dir);
         }
 
         /// <summary>

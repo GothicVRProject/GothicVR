@@ -7,9 +7,9 @@ using DMCs.Interface;
 using PxCs.Interface;
 using PxCs.Data.Vm;
 
-namespace GVR.Phoenix.Util
+namespace GVR.Creator
 {
-    public class MusicMixer : SingletonBehaviour<MusicMixer>
+    public class MusicCreator : SingletonBehaviour<MusicCreator>
     {
         private IntPtr mixer;
         private IntPtr music;
@@ -160,7 +160,10 @@ namespace GVR.Phoenix.Util
         public void SetMusic(string zone, Tags tags)
         {
             bool isDay = (tags & Tags.Ngt) == 0;
+
             string result = zone.Substring(zone.IndexOf("_") + 1);
+
+            // TODO: final tag should be dynamic not STD
             string name = result + "_" + (isDay ? "DAY" : "NGT") + "_" + "STD";
 
             var theme = PxVm.InitializeMusic(PhoenixBridge.VmMusicPtr, name);
@@ -168,7 +171,6 @@ namespace GVR.Phoenix.Util
             reloadTheme = pendingTheme.file != theme.file;
             pendingTheme = theme;
             pendingTags = tags;
-
             hasPending = true;
         }
 

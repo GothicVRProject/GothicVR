@@ -1,5 +1,6 @@
 using UnityEngine;
 using GVR.Util;
+using GVR.Creator;
 using System.Collections.Generic;
 
 namespace GVR.Phoenix.Util
@@ -14,7 +15,7 @@ namespace GVR.Phoenix.Util
 
             musicZones.Add(gameObject.name);
 
-            SingletonBehaviour<MusicMixer>.GetOrCreate().SetMusic(gameObject.name, MusicMixer.Tags.Std);
+            SingletonBehaviour<MusicCreator>.GetOrCreate().SetMusic(gameObject.name, MusicCreator.Tags.Std);
         }
 
         void OnTriggerExit(Collider other)
@@ -25,7 +26,7 @@ namespace GVR.Phoenix.Util
 
             if (musicZones.Count > 0) return;
 
-            SingletonBehaviour<MusicMixer>.GetOrCreate().SetMusic("MUSICZONE_DEF", MusicMixer.Tags.Std);
+            SingletonBehaviour<MusicCreator>.GetOrCreate().SetMusic("MUSICZONE_DEF", MusicCreator.Tags.Std);
         }
     }
 }
