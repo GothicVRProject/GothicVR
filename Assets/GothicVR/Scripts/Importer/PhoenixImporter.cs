@@ -123,9 +123,10 @@ namespace GVR.Importer
             var vmPtr = VmGothicBridge.LoadVm(fullPath);
             PhoenixBridge.VmMusicPtr = vmPtr;
         }
+
         private void LoadTestMusic(string G1Dir)
         {
-            SingletonBehaviour<MusicTest>.GetOrCreate().Create(G1Dir);
+            SingletonBehaviour<MusicMixer>.GetOrCreate().Create(G1Dir);
         }
 
         /// <summary>
