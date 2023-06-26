@@ -165,8 +165,15 @@ namespace GVR.Creator
 
             string result = zone.Substring(zone.IndexOf("_") + 1);
 
-            // TODO: final tag should be dynamic not STD
-            string name = result + "_" + (isDay ? "DAY" : "NGT") + "_" + "STD";
+            var musicTag = "STD";
+
+            if ((tags & Tags.Fgt) != 0)
+                musicTag = "FGT";
+
+            if ((tags & Tags.Thr) != 0)
+                musicTag = "THR";
+
+            string name = result + "_" + (isDay ? "DAY" : "NGT") + "_" + musicTag;
 
             var theme = PxVm.InitializeMusic(PhoenixBridge.VmMusicPtr, name);
 
