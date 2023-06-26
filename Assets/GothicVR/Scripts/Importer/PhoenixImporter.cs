@@ -47,10 +47,10 @@ namespace GVR.Importer
             LoadSfxVM(G1Dir);
             LoadMusicVM(G1Dir);
             LoadWorld(vdfPtr);
+            LoadMusic(G1Dir);
 
             PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)        
            //LoadFonts();
-            LoadTestMusic(G1Dir);
 
             watch.Stop();
             Debug.Log($"Time spent for loading world + VM + npc loading: {watch.Elapsed}");
@@ -124,7 +124,7 @@ namespace GVR.Importer
             PhoenixBridge.VmMusicPtr = vmPtr;
         }
 
-        private void LoadTestMusic(string G1Dir)
+        private void LoadMusic(string G1Dir)
         {
             SingletonBehaviour<MusicCreator>.GetOrCreate().Create(G1Dir);
         }
