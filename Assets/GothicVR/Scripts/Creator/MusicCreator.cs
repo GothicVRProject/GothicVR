@@ -55,7 +55,8 @@ namespace GVR.Creator
             AddMusicPath(fullPath, "newworld");
             AddMusicPath(fullPath, "AddonWorld");
 
-            var buffer = new float[bufferSize * 4];
+            // Set initial music
+            setMusic("SYS_Menu");
 
             // Initialize audio source and clip
             var soundObject = CreateSoundObject();
@@ -211,9 +212,9 @@ namespace GVR.Creator
             hasPending = true;
         }
 
-        public void SetMenuMusic()
+        public void setMusic(string name)
         {
-            var theme = PxVm.InitializeMusic(PhoenixBridge.VmMusicPtr, "SYS_Menu");
+            var theme = PxVm.InitializeMusic(PhoenixBridge.VmMusicPtr, name);
             reloadTheme = true;
             pendingTheme = theme;
             hasPending = true;
