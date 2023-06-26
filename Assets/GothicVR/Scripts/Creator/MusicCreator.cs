@@ -38,28 +38,53 @@ namespace GVR.Creator
 
         public void Create(string G1Dir)
         {
-            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/Music/"));
+            // Combine paths using Path.Combine instead of Path.Join
+            var fullPath = Path.Combine(G1Dir, "_work", "DATA", "Music");
 
+            // Initialize DirectMusic components
             mixer = DMMixer.DMusicInitMixer();
             music = DMMusic.DMusicInitMusic();
             directmusic = DMDirectMusic.DMusicInitDirectMusic();
 
-            DMDirectMusic.DMusicAddPath(directmusic, Path.GetFullPath(Path.Join(fullPath, "dungeon")));
-            DMDirectMusic.DMusicAddPath(directmusic, Path.GetFullPath(Path.Join(fullPath, "menu_men")));
-            DMDirectMusic.DMusicAddPath(directmusic, Path.GetFullPath(Path.Join(fullPath, "orchestra")));
+            // Add paths for G1
+            AddMusicPath(fullPath, "dungeon");
+            AddMusicPath(fullPath, "menu_men");
+            AddMusicPath(fullPath, "orchestra");
 
-            SetMenuMusic();
+            // Add paths for G2
+            AddMusicPath(fullPath, "newworld");
+            AddMusicPath(fullPath, "AddonWorld");
 
             var buffer = new float[bufferSize * 4];
 
-            shortBuffer = new short[bufferSize * 2];
+            // Initialize audio source and clip
+            var soundObject = CreateSoundObject();
+            var audioClip = CreateAudioClip();
 
-            var soundObject = new GameObject(string.Format("BACKROUND MUSIC"));
+            // Set audio source properties and play music
+            SetAudioSourceProperties(soundObject, audioClip);
+        }
 
-            AudioSource source = soundObject.AddComponent<AudioSource>();
+        private void AddMusicPath(string fullPath, string path)
+        {
+            fullPath = Path.Combine(fullPath, path);
+            DMDirectMusic.DMusicAddPath(directmusic, fullPath);
+        }
+
+        private GameObject CreateSoundObject()
+        {
+            return new GameObject("Background Music");
+        }
+
+        private AudioClip CreateAudioClip()
+        {
+            return AudioClip.Create("Music", bufferSize * 4, 2, 44100, true, PrepareData);
+        }
+
+        private void SetAudioSourceProperties(GameObject soundObject, AudioClip audioClip)
+        {
+            var source = soundObject.AddComponent<AudioSource>();
             source.priority = 0;
-            AudioClip audioClip = AudioClip.Create("Music", bufferSize * 4, 2, 44100, true, PrepareData);
-
             source.clip = audioClip;
             source.loop = true;
             source.Play();
@@ -69,12 +94,15 @@ namespace GVR.Creator
         {
             UpdateMusic();
 
+            shortBuffer = new short[bufferSize * 2];
+
             DMMixer.DMusicMix(mixer, shortBuffer, (uint)data.Length / 2);
 
             byte[] byteArray = new byte[data.Length * 2];
             Buffer.BlockCopy(shortBuffer, 0, byteArray, 0, byteArray.Length);
-            var buffer = Convert16BitByteArrayToFloatArray(byteArray, 0, byteArray.Length);
-            Array.Copy(buffer, data, buffer.Length);
+
+            float[] floatArray = Convert16BitByteArrayToFloatArray(byteArray, 0, byteArray.Length);
+            Array.Copy(floatArray, data, floatArray.Length);
         }
 
         private void UpdateMusic()
