@@ -108,64 +108,57 @@ namespace GVR.Creator
 
         private void UpdateMusic()
         {
-            PxVmMusicData theme = new PxVmMusicData();
-            bool updateTheme = false;
-            Tags tags = new Tags();
-
-            if (hasPending)
-            {
-                hasPending = false;
-                updateTheme = true;
-                theme = pendingTheme;
-                tags = pendingTags;
-            }
-
-            if (!updateTheme)
+            if (!hasPending)
             {
                 return;
             }
 
             hasPending = false;
-            if (reloadTheme)
-            {
-                var pattern = DMDirectMusic.DMusicLoadFile(directmusic, theme.file, theme.file.Length);
+            PxVmMusicData theme = pendingTheme;
+            Tags tags = pendingTags;
 
-                DMMusic.DMusicAddPattern(music, pattern);
-
-
-                Tags cur = currentTags & (Tags.Std | Tags.Fgt | Tags.Thr);
-                Tags next = tags & (Tags.Std | Tags.Fgt | Tags.Thr);
-
-                int em = 8; // end
-
-                if (next == Tags.Std)
-                {
-                    if (cur != Tags.Std)
-                    {
-                        em = 2; // break
-                        Debug.Log("break");
-                    }
-                    else if (next == Tags.Fgt)
-                    {
-                        if (cur == Tags.Thr)
-                        {
-                            em = 1; // fill
-                            Debug.Log("fill");
-                        }
-                    }
-                    else if (next == Tags.Thr)
-                    {
-                        if (cur == Tags.Fgt)
-                        {
-                            em = 0; // normal
-                            Debug.Log("normal");
-                        }
-                    }
-                }
-                DMMixer.DMusicSetMusic(mixer, music, em);
-                currentTags = tags;
-            }
             DMMixer.DMusicSetMusicVolume(mixer, pendingTheme.vol);
+
+            if (!reloadTheme)
+            {
+                return;
+            }
+
+            var pattern = DMDirectMusic.DMusicLoadFile(directmusic, theme.file, theme.file.Length);
+
+            DMMusic.DMusicAddPattern(music, pattern);
+
+            Tags cur = currentTags & (Tags.Std | Tags.Fgt | Tags.Thr);
+            Tags next = tags & (Tags.Std | Tags.Fgt | Tags.Thr);
+
+            int em = 8; // end
+
+            if (next == Tags.Std)
+            {
+                if (cur != Tags.Std)
+                {
+                    em = 2; // break
+                    Debug.Log("break");
+                }
+            }
+            else if (next == Tags.Fgt)
+            {
+                if (cur == Tags.Thr)
+                {
+                    em = 1; // fill
+                    Debug.Log("fill");
+                }
+            }
+            else if (next == Tags.Thr)
+            {
+                if (cur == Tags.Fgt)
+                {
+                    em = 0; // normal
+                    Debug.Log("normal");
+                }
+            }
+            DMMixer.DMusicSetMusic(mixer, music, em);
+            currentTags = tags;
         }
 
         private static float[] Convert16BitByteArrayToFloatArray(byte[] source, int headerOffset, int dataSize)
