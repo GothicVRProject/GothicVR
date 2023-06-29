@@ -5,8 +5,11 @@ using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Vob;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using JetBrains.Annotations;
 using PxCs.Data.Struct;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
 
 namespace GVR.Creator
@@ -58,6 +61,9 @@ namespace GVR.Creator
             {
                 switch (vobsByType.Key)
                 {
+                    case PxVobType.PxVob_oCItem:
+                        CreateItems(vobRootObj, vobsByType.Value);
+                        break;
                     case PxVobType.PxVob_oCMobContainer:
                         CreateMobContainers(vobRootObj, vobsByType.Value);
                         break;
@@ -74,6 +80,28 @@ namespace GVR.Creator
             }
         }
 
+        private void CreateItems(GameObject root, List<PxVobData> vobs)
+        {
+            var typeRoot = new GameObject("PxVob_oCItem");
+            typeRoot.SetParent(root);
+            
+            foreach (PxVobItemData vob in vobs)
+            {
+                var vobObj = CreateDefaultVob(typeRoot, vob);
+
+                if (vobObj == null)
+                    continue;
+
+                var colliderComp = vobObj.GetComponent<MeshCollider>();
+                
+                var rigidComp = vobObj.AddComponent<Rigidbody>();
+                vobObj.AddComponent<XRGrabInteractable>();
+
+                // colliderComp.convex = true; // Items fall down on the ground if activated.
+                rigidComp.isKinematic = true;
+            }
+        }
+        
         private void CreateMobContainers(GameObject root, List<PxVobData> vobs)
         {
             var typeRoot = new GameObject("PxVob_oCMobContainer");
