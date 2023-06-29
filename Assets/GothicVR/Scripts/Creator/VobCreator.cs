@@ -87,18 +87,17 @@ namespace GVR.Creator
             
             foreach (PxVobItemData vob in vobs)
             {
-                var vobObj = CreateDefaultVob(typeRoot, vob);
+                var prefabInstance = PrefabCache.Instance.TryGetObject(PrefabCache.PrefabType.VobItem);
+                var vobObj = CreateDefaultVob(typeRoot, vob, prefabInstance);
 
                 if (vobObj == null)
+                {
+                    Destroy(prefabInstance); // No mesh created. Delete the prefab instance again.
                     continue;
+                }
 
                 var colliderComp = vobObj.GetComponent<MeshCollider>();
-                
-                var rigidComp = vobObj.AddComponent<Rigidbody>();
-                vobObj.AddComponent<XRGrabInteractable>();
-
-                // colliderComp.convex = true; // Items fall down on the ground if activated.
-                rigidComp.isKinematic = true;
+                colliderComp.convex = true;
             }
         }
         
@@ -163,7 +162,7 @@ namespace GVR.Creator
             }
         }
 
-        private GameObject CreateDefaultVob(GameObject root, PxVobData vob)
+        private GameObject CreateDefaultVob(GameObject root, PxVobData vob, GameObject prefab = null)
         {
             var meshName = vob.showVisual ? vob.visualName : vob.vobName;
 
@@ -174,7 +173,7 @@ namespace GVR.Creator
             var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.Value, root);
+                return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value, root, prefab);
             }
             else
             {
@@ -188,7 +187,7 @@ namespace GVR.Creator
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.cdDynamic;
                 
-                return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation.Value, withCollider, root);
+                return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, root, prefab);
             }
         }
         
