@@ -2,6 +2,8 @@ using UnityEngine;
 using System;
 using System.IO;
 using GVR.Util;
+using GVR.Settings;
+using GVR.Demo;
 using GVR.Phoenix.Interface;
 using DMCs.Interface;
 using PxCs.Interface;
@@ -25,19 +27,26 @@ namespace GVR.Creator
             Thr = 1 << 2
         }
 
-        public Tags pendingTags = Tags.Day;
-        public Tags currentTags = Tags.Day;
+        private Tags pendingTags = Tags.Day;
+        private Tags currentTags = Tags.Day;
 
         private bool hasPending = false;
         private bool reloadTheme = false;
 
         private PxVmMusicData pendingTheme;
 
-        public int bufferSize = 2048;
+        private int bufferSize = 2048;
         private short[] shortBuffer;
 
-        public void Create(string G1Dir)
+        private static GameObject backgroundMusic;
+
+        void Start()
         {
+
+            backgroundMusic = GameObject.Find("BackgroundMusic");
+
+            var G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicIPath;
+
             // Combine paths using Path.Combine instead of Path.Join
             var fullPath = Path.Combine(G1Dir, "_work", "DATA", "Music");
 
@@ -58,37 +67,22 @@ namespace GVR.Creator
             // Set initial music
             setMusic("SYS_Menu");
 
-            // Initialize audio source and clip
-            var soundObject = CreateSoundObject();
-            var audioClip = CreateAudioClip();
+            // Create audio clip with, 4 times the bufferSize so we have enough room, 2 channels and 44100Hz
+            var audioClip = AudioClip.Create("Music", bufferSize * 4, 2, 44100, true, PrepareData);
 
-            // Set audio source properties and play music
-            SetAudioSourceProperties(soundObject, audioClip);
+            var source = backgroundMusic.AddComponent<AudioSource>();
+            source.priority = 0;
+            source.clip = audioClip;
+            source.loop = true;
+
+            if (SingletonBehaviour<DebugSettings>.GetOrCreate().EnableMusic)
+                source.Play();
         }
 
         private void AddMusicPath(string fullPath, string path)
         {
             fullPath = Path.Combine(fullPath, path);
             DMDirectMusic.DMusicAddPath(directmusic, fullPath);
-        }
-
-        private GameObject CreateSoundObject()
-        {
-            return new GameObject("Background Music");
-        }
-
-        private AudioClip CreateAudioClip()
-        {
-            return AudioClip.Create("Music", bufferSize * 4, 2, 44100, true, PrepareData);
-        }
-
-        private void SetAudioSourceProperties(GameObject soundObject, AudioClip audioClip)
-        {
-            var source = soundObject.AddComponent<AudioSource>();
-            source.priority = 0;
-            source.clip = audioClip;
-            source.loop = true;
-            source.Play();
         }
 
         private void PrepareData(float[] data)
