@@ -12,6 +12,7 @@ namespace GVR.Phoenix.Interface
         public static IntPtr VdfsPtr;
         public static IntPtr VmGothicPtr;
         public static IntPtr VmSfxPtr;
+        public static IntPtr VmMusicPtr;
 
         public static WorldData World;
 

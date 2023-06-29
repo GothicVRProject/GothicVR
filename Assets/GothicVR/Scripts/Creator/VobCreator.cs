@@ -1,4 +1,4 @@
-﻿using GVR.Caches;
+using GVR.Caches;
 using GVR.Demo;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
@@ -65,7 +65,9 @@ namespace GVR.Creator
                         CreateSounds(vobRootObj, vobsByType.Value);
                         break;
                     case PxVobType.PxVob_zCVobSoundDaytime:
-                        CreateSoundsDaytime(vobRootObj, vobsByType.Value);
+                        break;
+                    case PxVobType.PxVob_oCZoneMusic:
+                        CreateZone(vobRootObj, vobsByType.Value);
                         break;
                     default:
                         CreateDefaultVobs(vobRootObj, vobsByType.Value, vobsByType.Key);
@@ -121,6 +123,19 @@ namespace GVR.Creator
                     continue;
                 
                 SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
+            }
+        }
+
+        private void CreateZone(GameObject root, List<PxVobData> vobs)
+        {
+            var typeRoot = new GameObject("PxVob_oCZoneMusic");
+            typeRoot.SetParent(root);
+
+            foreach (PxVobZoneMusicData vob in vobs)
+            {
+                var vobObj = soundCreator.Create(vob, typeRoot);
+                if (!vobObj)
+                    continue;
             }
         }
 
