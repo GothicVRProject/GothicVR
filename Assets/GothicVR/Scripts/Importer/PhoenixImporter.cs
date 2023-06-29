@@ -47,7 +47,6 @@ namespace GVR.Importer
             LoadSfxVM(G1Dir);
             LoadMusicVM(G1Dir);
             LoadWorld(vdfPtr);
-            LoadMusic(G1Dir);
 
             PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)        
            //LoadFonts();
@@ -122,11 +121,6 @@ namespace GVR.Importer
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
             var vmPtr = VmGothicBridge.LoadVm(fullPath);
             PhoenixBridge.VmMusicPtr = vmPtr;
-        }
-
-        private void LoadMusic(string G1Dir)
-        {
-            SingletonBehaviour<MusicCreator>.GetOrCreate().Create(G1Dir);
         }
 
         /// <summary>
