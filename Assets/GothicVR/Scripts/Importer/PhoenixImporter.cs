@@ -183,6 +183,11 @@ namespace GVR.Importer
                 PxVm.pxVmDestroy(PhoenixBridge.VmSfxPtr);
                 PhoenixBridge.VmSfxPtr = IntPtr.Zero;
             }
+            if(PhoenixBridge.VmMusicPtr != IntPtr.Zero)
+            {
+                PxVm.pxVmDestroy(PhoenixBridge.VmMusicPtr);
+                PhoenixBridge.VmMusicPtr = IntPtr.Zero;
+            }
         }
     }
 }
