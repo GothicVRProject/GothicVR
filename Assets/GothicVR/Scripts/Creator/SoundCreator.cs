@@ -1,5 +1,5 @@
-using GothicVR.Vob;
 using GVR.Caches;
+using GVR.Demo;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -66,7 +66,8 @@ namespace GVR.Creator
             soundObject.transform.localScale = (max - min);
             soundObjectCollider.isTrigger = true;
 
-            var musicCollisionHandler = soundObject.AddComponent<MusicCollisionHandler>();
+            if (SingletonBehaviour<DebugSettings>.GetOrCreate().EnableMusic)
+                soundObject.AddComponent<MusicCollisionHandler>();
 
             return soundObject;
         }
