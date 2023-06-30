@@ -13,8 +13,9 @@ namespace GVR.Settings
         private const string SETTINGS_FILE_NAME_DEV = "GameSettings.dev.json";
 
 
-        private void Start()
+        protected override void Awake()
         {
+            base.Awake();
             LoadGameSettings();
         }
 
