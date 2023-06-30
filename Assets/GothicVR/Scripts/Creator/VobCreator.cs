@@ -1,17 +1,20 @@
+using System;
+using System.Collections.Generic;
+using GothicVR.Vob;
 using GVR.Caches;
 using GVR.Demo;
 using GVR.Phoenix.Data;
+using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
-using PxCs.Data.Vob;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using GothicVR.Vob;
-using JetBrains.Annotations;
 using PxCs.Data.Struct;
+using PxCs.Data.Vm;
+using PxCs.Data.Vob;
+using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
+using Vector3 = System.Numerics.Vector3;
 
 namespace GVR.Creator
 {
@@ -90,13 +93,28 @@ namespace GVR.Creator
             
             foreach (PxVobItemData vob in vobs)
             {
+                string itemName;
+
+                if (!string.IsNullOrEmpty(vob.instance))
+                    itemName = vob.instance;
+                else if (!string.IsNullOrEmpty(vob.vobName))
+                    itemName = vob.vobName;
+                else
+                    throw new Exception("PxVobItemData -> no usable INSTANCE name found.");
+                
+                var item = PxVm.InitializeItem(PhoenixBridge.VmGothicPtr, itemName);
+
+                // e.g. ItMiCello is commented out on misc.d file.
+                if (item == null)
+                    continue;
+                
                 var prefabInstance = PrefabCache.Instance.TryGetObject(PrefabCache.PrefabType.VobItem);
-                var vobObj = CreateDefaultVob(typeRoot, vob, prefabInstance);
+                var vobObj = CreateItemMesh(typeRoot, vob, item, prefabInstance);
                 
                 if (vobObj == null)
                 {
                     Destroy(prefabInstance); // No mesh created. Delete the prefab instance again.
-                    Debug.LogError("There should be no! object which can't be found. We need to use >PxVobItem.instance< to do it right!");
+                    Debug.LogError($"There should be no! object which can't be found n:{vob.vobName} i:{vob.instance}. We need to use >PxVobItem.instance< to do it right!");
                     continue;
                 }
 
@@ -118,7 +136,7 @@ namespace GVR.Creator
             
             foreach (PxVobMobContainerData vob in vobs)
             {
-                var vobObj = CreateDefaultVob(typeRoot, vob);
+                var vobObj = CreateDefaultMesh(typeRoot, vob);
 
                 if (vobObj == null)
                     continue;
@@ -181,11 +199,18 @@ namespace GVR.Creator
             
             foreach (var vob in vobs)
             {
-                CreateDefaultVob(typeRoot, vob);
+                CreateDefaultMesh(typeRoot, vob);
             }
         }
 
-        private GameObject CreateDefaultVob(GameObject root, PxVobData vob, GameObject prefab = null)
+        private GameObject CreateItemMesh(GameObject root, PxVobItemData vob, PxVmItemData item, GameObject go)
+        {
+            var mrm = assetCache.TryGetMrm(item.visual);
+
+            return meshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, root, go);
+        }
+        
+        private GameObject CreateDefaultMesh(GameObject root, PxVobData vob, GameObject prefab = null)
         {
             var meshName = vob.showVisual ? vob.visualName : vob.vobName;
 
@@ -214,12 +239,12 @@ namespace GVR.Creator
             }
         }
         
-        private void SetPosAndRot(GameObject obj, System.Numerics.Vector3 position, PxMatrix3x3Data rotation)
+        private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
         {
             SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityMatrix().rotation);
         }
 
-        private void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
+        private void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, Quaternion rotation)
         {
             // FIXME - This isn't working
             if (position.Equals(default) && rotation.Equals(default))
