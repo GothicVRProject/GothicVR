@@ -24,6 +24,8 @@ namespace GVR.Creator
         private SoundCreator soundCreator;
         private AssetCache assetCache;
 
+        private Dictionary<PxVobType, GameObject> parentGos = new();
+
         private void Start()
         {
             meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
@@ -35,183 +37,136 @@ namespace GVR.Creator
         {
             if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
                 return;
+            
+            var vobRootObj = new GameObject("Vobs");
+            vobRootObj.SetParent(root);
 
-            var vobs = new Dictionary<PxVobType, List<PxVobData>>();
-
-            // FIXME - Currently we're loading all objects from all worlds (?)
-            GetVobs(world.vobs, vobs);
-
-            CreateAllVobs(root, vobs);
+            CreateParentVobObject(vobRootObj);
+            CreateVobs(vobRootObj, world.vobs);
         }
 
-        private void GetVobs(PxVobData[] inVobs, Dictionary<PxVobType, List<PxVobData>> outVobs)
+        private void CreateParentVobObject(GameObject root)
         {
-            foreach (var vob in inVobs)
+            foreach (var type in (PxVobType[]) Enum.GetValues(typeof(PxVobType)))
             {
-                if (!outVobs.ContainsKey(vob.type))
-                    outVobs.Add(vob.type, new());
-
-                outVobs[vob.type].Add(vob);
-                GetVobs(vob.childVobs, outVobs);
+                var newGo = new GameObject(type.ToString());
+                newGo.SetParent(root);
+                
+                parentGos.Add(type, newGo);
             }
         }
 
-        private void CreateAllVobs(GameObject root, Dictionary<PxVobType, List<PxVobData>> vobs)
+        private void CreateVobs(GameObject root, PxVobData[] vobs)
         {
-            var vobRootObj = new GameObject("Vobs");
-            vobRootObj.transform.parent = root.transform;
-
-            foreach (var vobsByType in vobs)
+            foreach (var vob in vobs)
             {
-                switch (vobsByType.Key)
+                switch (vob.type)
                 {
                     case PxVobType.PxVob_oCItem:
-                        CreateItems(vobRootObj, vobsByType.Value);
+                        CreateItem((PxVobItemData)vob);
                         break;
                     case PxVobType.PxVob_oCMobContainer:
-                        CreateMobContainers(vobRootObj, vobsByType.Value);
+                        CreateMobContainer((PxVobMobContainerData)vob);
                         break;
                     case PxVobType.PxVob_zCVobSound:
-                        CreateSounds(vobRootObj, vobsByType.Value);
+                        CreateSound((PxVobSoundData)vob);
                         break;
                     case PxVobType.PxVob_zCVobSoundDaytime:
+                        CreateSoundDaytime((PxVobSoundData)vob);
                         break;
                     case PxVobType.PxVob_oCZoneMusic:
-                        CreateZone(vobRootObj, vobsByType.Value);
+                        CreateZoneMusic((PxVobZoneMusicData)vob);
                         break;
                     default:
-                        CreateDefaultVobs(vobRootObj, vobsByType.Value, vobsByType.Key);
+                        CreateDefaultMesh(vob);
                         break;
                 }
+                
+            // Load children
+            CreateVobs(root, vob.childVobs);
             }
+            
         }
 
-        private void CreateItems(GameObject root, List<PxVobData> vobs)
+        private void CreateItem(PxVobItemData vob)
         {
-            var typeRoot = new GameObject("PxVob_oCItem");
-            typeRoot.SetParent(root);
+            string itemName;
+
+            if (!string.IsNullOrEmpty(vob.instance))
+                itemName = vob.instance;
+            else if (!string.IsNullOrEmpty(vob.vobName))
+                itemName = vob.vobName;
+            else
+                throw new Exception("PxVobItemData -> no usable INSTANCE name found.");
             
-            foreach (PxVobItemData vob in vobs)
+            var item = PxVm.InitializeItem(PhoenixBridge.VmGothicPtr, itemName);
+
+            // e.g. ItMiCello is commented out on misc.d file.
+            if (item == null)
+                return;
+            
+            var prefabInstance = PrefabCache.Instance.TryGetObject(PrefabCache.PrefabType.VobItem);
+            var vobObj = CreateItemMesh(vob, item, prefabInstance);
+            
+            if (vobObj == null)
             {
-                string itemName;
-
-                if (!string.IsNullOrEmpty(vob.instance))
-                    itemName = vob.instance;
-                else if (!string.IsNullOrEmpty(vob.vobName))
-                    itemName = vob.vobName;
-                else
-                    throw new Exception("PxVobItemData -> no usable INSTANCE name found.");
-                
-                var item = PxVm.InitializeItem(PhoenixBridge.VmGothicPtr, itemName);
-
-                // e.g. ItMiCello is commented out on misc.d file.
-                if (item == null)
-                    continue;
-                
-                var prefabInstance = PrefabCache.Instance.TryGetObject(PrefabCache.PrefabType.VobItem);
-                var vobObj = CreateItemMesh(typeRoot, vob, item, prefabInstance);
-                
-                if (vobObj == null)
-                {
-                    Destroy(prefabInstance); // No mesh created. Delete the prefab instance again.
-                    Debug.LogError($"There should be no! object which can't be found n:{vob.vobName} i:{vob.instance}. We need to use >PxVobItem.instance< to do it right!");
-                    continue;
-                }
-
-                // It will set some default values for collider and grabbing now.
-                // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
-                var grabComp = vobObj.AddComponent<XRGrabInteractable>();
-                var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
-                var colliderComp = vobObj.GetComponent<MeshCollider>();
-                
-                colliderComp.convex = true;
-                grabComp.selectExited.AddListener(eventComp.SelectExited);
+                Destroy(prefabInstance); // No mesh created. Delete the prefab instance again.
+                Debug.LogError($"There should be no! object which can't be found n:{vob.vobName} i:{vob.instance}. We need to use >PxVobItem.instance< to do it right!");
+                return;
             }
+
+            // It will set some default values for collider and grabbing now.
+            // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
+            var grabComp = vobObj.AddComponent<XRGrabInteractable>();
+            var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
+            var colliderComp = vobObj.GetComponent<MeshCollider>();
+            
+            colliderComp.convex = true;
+            grabComp.selectExited.AddListener(eventComp.SelectExited);
         }
         
-        private void CreateMobContainers(GameObject root, List<PxVobData> vobs)
+        private void CreateMobContainer(PxVobMobContainerData vob)
         {
-            var typeRoot = new GameObject("PxVob_oCMobContainer");
-            typeRoot.SetParent(root);
-            
-            foreach (PxVobMobContainerData vob in vobs)
+            var vobObj = CreateDefaultMesh(vob);
+
+            if (vobObj == null)
             {
-                var vobObj = CreateDefaultMesh(typeRoot, vob);
-
-                if (vobObj == null)
-                    continue;
-
-                var lootComp = vobObj.AddComponent<DemoContainerLoot>();
-                lootComp.SetContent(vob.contents);
+                Debug.LogWarning($"{vob.vobName} - mesh for MobContainer not found.");
+                return;
             }
+            
+            var lootComp = vobObj.AddComponent<DemoContainerLoot>();
+            lootComp.SetContent(vob.contents);
         }
         
         // FIXME - change values for AudioClip based on Sfx and vob value (value overloads itself)
-        private void CreateSounds(GameObject root, List<PxVobData> vobs)
+        private void CreateSound(PxVobSoundData vob)
         {
-            var typeRoot = new GameObject("PxVob_zCVobSound");
-            typeRoot.SetParent(root);
-            
-            foreach (PxVobSoundData vob in vobs)
-            {
-                var vobObj = soundCreator.Create(vob, typeRoot);
-                if (!vobObj)
-                    continue;
-                
-                SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
-            }
+            var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
+            SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
         }
         
         // FIXME - add specific daytime logic!
-        private void CreateSoundsDaytime(GameObject root, List<PxVobData> vobs)
+        private void CreateSoundDaytime(PxVobSoundData vob)
         {
-            var typeRoot = new GameObject("PxVob_zCVobSoundDaytime");
-            typeRoot.SetParent(root);
-            
-            foreach (PxVobSoundDaytimeData vob in vobs)
-            {
-                var vobObj = soundCreator.Create(vob, typeRoot);
-                vobObj.name = "daytime-" + vobObj.name; // FIXME - For easy debugging purposes only. Can be removed.
-                if (!vobObj)
-                    continue;
-                
-                SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
-            }
+            var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
+            SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
         }
 
-        private void CreateZone(GameObject root, List<PxVobData> vobs)
+        private void CreateZoneMusic(PxVobZoneMusicData vob)
         {
-            var typeRoot = new GameObject("PxVob_oCZoneMusic");
-            typeRoot.SetParent(root);
-
-            foreach (PxVobZoneMusicData vob in vobs)
-            {
-                var vobObj = soundCreator.Create(vob, typeRoot);
-                if (!vobObj)
-                    continue;
-            }
+            soundCreator.Create(vob, parentGos[vob.type]);
         }
 
-        private void CreateDefaultVobs(GameObject root, List<PxVobData> vobs, PxVobType type)
-        {
-            var typeRoot = new GameObject(type.ToString());
-            typeRoot.SetParent(root);
-            
-            foreach (var vob in vobs)
-            {
-                CreateDefaultMesh(typeRoot, vob);
-            }
-        }
-
-        private GameObject CreateItemMesh(GameObject root, PxVobItemData vob, PxVmItemData item, GameObject go)
+        private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
             var mrm = assetCache.TryGetMrm(item.visual);
-
-            return meshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, root, go);
+            return meshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
         }
         
-        private GameObject CreateDefaultMesh(GameObject root, PxVobData vob, GameObject prefab = null)
+        private GameObject CreateDefaultMesh(PxVobData vob)
         {
+            var parent = parentGos[vob.type];
             var meshName = vob.showVisual ? vob.visualName : vob.vobName;
 
             if (meshName == string.Empty)
@@ -221,7 +176,7 @@ namespace GVR.Creator
             var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value, root, prefab);
+                return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value, parent);
             }
             else
             {
@@ -235,7 +190,7 @@ namespace GVR.Creator
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.cdDynamic;
                 
-                return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, root, prefab);
+                return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
             }
         }
         

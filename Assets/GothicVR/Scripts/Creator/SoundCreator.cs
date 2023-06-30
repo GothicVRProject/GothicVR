@@ -53,7 +53,7 @@ namespace GVR.Creator
 
             return soundObject;
         }
-        public GameObject Create(PxVobZoneMusicData vobSound, GameObject parent = null)
+        public void Create(PxVobZoneMusicData vobSound, GameObject parent = null)
         {
             var soundObject = new GameObject(vobSound.vobName);
             soundObject.SetParent(parent);
@@ -69,8 +69,6 @@ namespace GVR.Creator
 
             if (SingletonBehaviour<DebugSettings>.GetOrCreate().EnableMusic)
                 soundObject.AddComponent<MusicCollisionHandler>();
-
-            return soundObject;
         }
 
         /// <summary>
