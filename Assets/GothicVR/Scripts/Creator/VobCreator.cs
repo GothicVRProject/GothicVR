@@ -6,6 +6,7 @@ using GVR.Util;
 using PxCs.Data.Vob;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using GothicVR.Vob;
 using JetBrains.Annotations;
 using PxCs.Data.Struct;
 using UnityEngine;
@@ -89,15 +90,22 @@ namespace GVR.Creator
             {
                 var prefabInstance = PrefabCache.Instance.TryGetObject(PrefabCache.PrefabType.VobItem);
                 var vobObj = CreateDefaultVob(typeRoot, vob, prefabInstance);
-
+                
                 if (vobObj == null)
                 {
                     Destroy(prefabInstance); // No mesh created. Delete the prefab instance again.
+                    Debug.LogError("There should be no! object which can't be found. We need to use >PxVobItem.instance< to do it right!");
                     continue;
                 }
 
+                // It will set some default values for collider and grabbing now.
+                // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
+                var grabComp = vobObj.AddComponent<XRGrabInteractable>();
+                var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
                 var colliderComp = vobObj.GetComponent<MeshCollider>();
+                
                 colliderComp.convex = true;
+                grabComp.selectExited.AddListener(eventComp.SelectExited);
             }
         }
         
