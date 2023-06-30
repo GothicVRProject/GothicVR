@@ -52,6 +52,24 @@ namespace GVR.Creator
 
             return soundObject;
         }
+        public GameObject Create(PxVobZoneMusicData vobSound, GameObject parent = null)
+        {
+            var soundObject = new GameObject(vobSound.vobName);
+            soundObject.SetParent(parent);
+
+            var soundObjectCollider = soundObject.AddComponent<BoxCollider>();
+
+            var min = vobSound.boundingBox.min.ToUnityVector();
+            var max = vobSound.boundingBox.max.ToUnityVector();
+
+            soundObject.transform.position = (min + max) / 2f;
+            soundObject.transform.localScale = (max - min);
+            soundObjectCollider.isTrigger = true;
+
+            var musicCollisionHandler = soundObject.AddComponent<MusicCollisionHandler>();
+
+            return soundObject;
+        }
 
         /// <summary>
         /// Creating AudioSource from PxVobSoundDaytimeData is very similar to PxVobSoundData one.
@@ -99,6 +117,8 @@ namespace GVR.Creator
 
             AudioSource source = soundObject.AddComponent<AudioSource>();
             source.clip = SoundConverter.ToAudioClip(wavFile.sound);
+
+            soundObject.AddComponent<InaudibleSoundDisabler>();
 
             // Both need to be set, that Audio can be heard only within defined range.
             // https://answers.unity.com/questions/1316535/how-to-have-audio-only-be-heard-in-a-certain-radiu.html
