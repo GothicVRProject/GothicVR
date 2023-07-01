@@ -142,6 +142,9 @@ namespace GVR.Creator
         // FIXME - change values for AudioClip based on Sfx and vob value (value overloads itself)
         private void CreateSound(PxVobSoundData vob)
         {
+            if (!DebugSettings.Instance.EnableSounds)
+                return;
+            
             var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
             SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
         }
@@ -149,6 +152,9 @@ namespace GVR.Creator
         // FIXME - add specific daytime logic!
         private void CreateSoundDaytime(PxVobSoundData vob)
         {
+            if (!DebugSettings.Instance.EnableSounds)
+                return;
+            
             var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
             SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
         }
