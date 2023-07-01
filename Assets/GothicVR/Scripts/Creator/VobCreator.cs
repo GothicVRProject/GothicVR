@@ -72,7 +72,7 @@ namespace GVR.Creator
                         CreateSound((PxVobSoundData)vob);
                         break;
                     case PxVobType.PxVob_zCVobSoundDaytime:
-                        CreateSoundDaytime((PxVobSoundData)vob);
+                        CreateSoundDaytime((PxVobSoundDaytimeData)vob);
                         break;
                     case PxVobType.PxVob_oCZoneMusic:
                         CreateZoneMusic((PxVobZoneMusicData)vob);
@@ -150,7 +150,7 @@ namespace GVR.Creator
         }
         
         // FIXME - add specific daytime logic!
-        private void CreateSoundDaytime(PxVobSoundData vob)
+        private void CreateSoundDaytime(PxVobSoundDaytimeData vob)
         {
             if (!DebugSettings.Instance.EnableSounds)
                 return;
