@@ -99,7 +99,7 @@ namespace GVR.Creator
             else
                 throw new Exception("PxVobItemData -> no usable INSTANCE name found.");
             
-            var item = PxVm.InitializeItem(PhoenixBridge.VmGothicPtr, itemName);
+            var item = assetCache.TryGetItemData(itemName);
 
             // e.g. ItMiCello is commented out on misc.d file.
             if (item == null)
