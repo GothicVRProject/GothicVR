@@ -207,5 +207,40 @@ namespace GVR.Creator
             pendingTheme = theme;
             hasPending = true;
         }
+
+        private void StopMusic()
+        {
+            if (musicSource.isPlaying)
+                musicSource.Pause();
+
+            // reinitialize music
+            DMMusic.DMusicFreeMusic(music);
+            music = DMMusic.DMusicInitMusic();
+
+            DMMixer.DMusicSetMusic(mixer, music);
+        }
+
+        private void RestartMusic()
+        {
+            hasPending = true;
+            reloadTheme = true;
+        }
+
+        public void setEnabled(bool enable)
+        {
+            var isPlaying = musicSource.isPlaying;
+            if (isPlaying == enable)
+                return;
+
+            if (enable)
+            {
+                RestartMusic();
+                musicSource.Play();
+            }
+            else
+            {
+                StopMusic();
+            }
+        }
     }
 }
