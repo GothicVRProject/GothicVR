@@ -47,9 +47,10 @@ namespace GVR.Importer
             LoadSfxVM(G1Dir);
             LoadMusicVM(G1Dir);
             LoadWorld(vdfPtr);
+            LoadMusic();
 
             PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)        
-           //LoadFonts();
+                                                                                 //LoadFonts();
 
             watch.Stop();
             Debug.Log($"Time spent for loading world + VM + npc loading: {watch.Elapsed}");
@@ -64,7 +65,7 @@ namespace GVR.Importer
         [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]
         public static void PxLoggerCallback(PxLogging.Level level, string message)
         {
-            switch(level)
+            switch (level)
             {
                 case PxLogging.Level.warn:
                     Debug.LogWarning(message);
@@ -108,7 +109,7 @@ namespace GVR.Importer
 
             PhoenixBridge.VmGothicPtr = vmPtr;
         }
-        
+
         private void LoadSfxVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
@@ -121,6 +122,17 @@ namespace GVR.Importer
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
             var vmPtr = VmGothicBridge.LoadVm(fullPath);
             PhoenixBridge.VmMusicPtr = vmPtr;
+        }
+
+        private void LoadMusic()
+        {
+            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableMusic)
+                return;
+            var music = SingletonBehaviour<MusicCreator>.GetOrCreate();
+            music.Create();
+            music.setEnabled(true);
+            music.setMusic("SYS_LOADING");
+            Debug.Log("Loading music");
         }
 
         /// <summary>
@@ -177,13 +189,13 @@ namespace GVR.Importer
                 PxVm.pxVmDestroy(PhoenixBridge.VmGothicPtr);
                 PhoenixBridge.VmGothicPtr = IntPtr.Zero;
             }
-            
+
             if (PhoenixBridge.VmSfxPtr != IntPtr.Zero)
             {
                 PxVm.pxVmDestroy(PhoenixBridge.VmSfxPtr);
                 PhoenixBridge.VmSfxPtr = IntPtr.Zero;
             }
-            if(PhoenixBridge.VmMusicPtr != IntPtr.Zero)
+            if (PhoenixBridge.VmMusicPtr != IntPtr.Zero)
             {
                 PxVm.pxVmDestroy(PhoenixBridge.VmMusicPtr);
                 PhoenixBridge.VmMusicPtr = IntPtr.Zero;
