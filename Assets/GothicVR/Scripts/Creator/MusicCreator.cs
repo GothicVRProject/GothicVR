@@ -38,12 +38,14 @@ namespace GVR.Creator
         private int bufferSize = 2048;
         private short[] shortBuffer;
 
+        private static AudioSource musicSource;
+
         private static GameObject backgroundMusic;
 
         void Start()
         {
-
             backgroundMusic = GameObject.Find("BackgroundMusic");
+            musicSource = backgroundMusic.AddComponent<AudioSource>();
 
             var G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicIPath;
 
