@@ -46,6 +46,12 @@ namespace GVR.Creator
         {
             backgroundMusic = GameObject.Find("BackgroundMusic");
             musicSource = backgroundMusic.AddComponent<AudioSource>();
+        }
+
+        public void Create()
+        {
+            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableMusic)
+                return;
 
             var G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicIPath;
 
@@ -66,19 +72,12 @@ namespace GVR.Creator
             AddMusicPath(fullPath, "newworld");
             AddMusicPath(fullPath, "AddonWorld");
 
-            // Set initial music
-            setMusic("SYS_Menu");
-
             // Create audio clip with, 4 times the bufferSize so we have enough room, 2 channels and 44100Hz
             var audioClip = AudioClip.Create("Music", bufferSize * 4, 2, 44100, true, PrepareData);
 
-            var source = backgroundMusic.AddComponent<AudioSource>();
-            source.priority = 0;
-            source.clip = audioClip;
-            source.loop = true;
-
-            if (SingletonBehaviour<DebugSettings>.GetOrCreate().EnableMusic)
-                source.Play();
+            musicSource.priority = 0;
+            musicSource.clip = audioClip;
+            musicSource.loop = true;
         }
 
         private void AddMusicPath(string fullPath, string path)
