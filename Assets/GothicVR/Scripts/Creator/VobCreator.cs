@@ -4,17 +4,20 @@ using GothicVR.Vob;
 using GVR.Caches;
 using GVR.Demo;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
-using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
+
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
+
 
 namespace GVR.Creator
 {
@@ -76,6 +79,12 @@ namespace GVR.Creator
                         break;
                     case PxVobType.PxVob_oCZoneMusic:
                         CreateZoneMusic((PxVobZoneMusicData)vob);
+                        break;
+                    case PxVobType.PxVob_zCVobSpot:
+                        CreateSpot(vob);
+                        break;
+                    // Do nothing
+                    case PxVobType.PxVob_zCVobLevelCompo:
                         break;
                     default:
                         CreateDefaultMesh(vob);
@@ -162,6 +171,36 @@ namespace GVR.Creator
         private void CreateZoneMusic(PxVobZoneMusicData vob)
         {
             soundCreator.Create(vob, parentGos[vob.type]);
+        }
+
+        /// <summary>
+        /// Basically a free point where NPCs can do something like sitting on a bench etc.
+        /// @see for more information: https://ataulien.github.io/Inside-Gothic/objects/spot/
+        /// </summary>
+        private void CreateSpot(PxVobData vob)
+        {
+            var spot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Destroy(spot.GetComponent<SphereCollider>()); // No need for collider here!
+
+            if (DebugSettings.Instance.EnableVobFPMesh)
+            {
+#if UNITY_EDITOR
+                if (DebugSettings.Instance.EnableVobFPMeshEditorLabel)
+                {
+                    var iconContent = EditorGUIUtility.IconContent("sv_label_4");
+                    EditorGUIUtility.SetIconForObject(spot, (Texture2D) iconContent.image);
+                }
+#endif
+            }
+            else
+            {
+                Destroy(spot.GetComponent<MeshRenderer>());
+            }
+
+            spot.name = vob.vobName;
+            spot.SetParent(parentGos[vob.type]);
+            
+            SetPosAndRot(spot, vob.position, vob.rotation!.Value);
         }
 
         private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
