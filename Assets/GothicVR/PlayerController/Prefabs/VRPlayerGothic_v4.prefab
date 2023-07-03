@@ -2793,6 +2793,7 @@ GameObject:
   - component: {fileID: 3286136463054414638}
   - component: {fileID: 3286136463054414635}
   - component: {fileID: 3286136463054414637}
+  - component: {fileID: 9105039786394560442}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2884,57 +2885,25 @@ MonoBehaviour:
   m_PositionInput:
     m_UseReference: 0
     m_Action:
-      m_Name: Position
+      m_Name: 
       m_Type: 0
-      m_ExpectedControlType: Vector3
-      m_Id: 001f9c42-7af1-4c73-8faf-1c931dc72d73
+      m_ExpectedControlType: 
+      m_Id: 
       m_Processors: 
       m_Interactions: 
-      m_SingletonActionBindings:
-      - m_Name: 
-        m_Id: 2cb95044-c2b4-4585-b6ef-28649357a2c4
-        m_Path: <XRHMD>/centerEyePosition
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
-        m_Action: Position
-        m_Flags: 0
-      - m_Name: 
-        m_Id: 6c2d2ac3-9eef-4075-9892-f4714a38c417
-        m_Path: <HandheldARInputDevice>/devicePosition
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
-        m_Action: Position
-        m_Flags: 0
+      m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 0}
   m_RotationInput:
     m_UseReference: 0
     m_Action:
-      m_Name: Rotation
+      m_Name: 
       m_Type: 0
-      m_ExpectedControlType: Quaternion
-      m_Id: d51dab67-a818-465e-bc67-d67251544abf
+      m_ExpectedControlType: 
+      m_Id: 
       m_Processors: 
       m_Interactions: 
-      m_SingletonActionBindings:
-      - m_Name: 
-        m_Id: 06b64a05-e584-48ab-baf7-3efd9e67afda
-        m_Path: <XRHMD>/centerEyeRotation
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
-        m_Action: Rotation
-        m_Flags: 0
-      - m_Name: 
-        m_Id: 6b8030a6-fa09-40ea-9257-b8df808e225a
-        m_Path: <HandheldARInputDevice>/deviceRotation
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
-        m_Action: Rotation
-        m_Flags: 0
+      m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 0}
   m_TrackingStateInput:
@@ -2968,6 +2937,14 @@ MonoBehaviour:
     m_SingletonActionBindings: []
     m_Flags: 0
   m_HasMigratedActions: 1
+--- !u!81 &9105039786394560442
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3286136463054414639}
+  m_Enabled: 1
 --- !u!1 &3286136463242076545
 GameObject:
   m_ObjectHideFlags: 0

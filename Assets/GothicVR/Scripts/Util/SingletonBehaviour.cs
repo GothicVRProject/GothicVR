@@ -50,7 +50,7 @@ namespace GVR.Util
             return null;
         }
 
-        protected void Awake()
+        protected virtual void Awake()
         {
             if (Created && _instance != this)
             {

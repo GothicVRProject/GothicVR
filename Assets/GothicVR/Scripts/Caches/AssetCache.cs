@@ -25,7 +25,9 @@ namespace GVR.Caches
         private Dictionary<string, PxModelMeshData> mdmCache = new();
         private Dictionary<string, PxMultiResolutionMeshData> mrmCache = new();
 
+        private Dictionary<string, PxVmItemData> itemDataCache = new();
         private Dictionary<string, PxVmSfxData> sfxDataCache = new();
+
         private Dictionary<string, PxSoundData<float>> soundCache = new();
 
 
@@ -123,6 +125,24 @@ namespace GVR.Caches
             return newData;
         }
 
+        /// <summary>
+        /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
+        /// </summary>
+        public PxVmItemData TryGetItemData(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (itemDataCache.TryGetValue(preparedKey, out PxVmItemData data))
+                return data;
+
+            var newData = PxVm.InitializeItem(PhoenixBridge.VmGothicPtr, preparedKey);
+            itemDataCache[preparedKey] = newData;
+
+            return newData;
+        }
+        
+        /// <summary>
+        /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
+        /// </summary>
         public PxVmSfxData TryGetSfxData(string key)
         {
             var preparedKey = GetPreparedKey(key);
@@ -134,7 +154,7 @@ namespace GVR.Caches
 
             return newData;
         }
-        
+
         public PxSoundData<float> TryGetSound(string key)
         {
             var preparedKey = GetPreparedKey(key);

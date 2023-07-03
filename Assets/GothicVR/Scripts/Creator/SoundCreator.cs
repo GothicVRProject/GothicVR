@@ -1,14 +1,11 @@
-using System;
-using System.Runtime.InteropServices;
-using GothicVR.Items;
+using GothicVR.Vob;
 using GVR.Caches;
 using GVR.Demo;
-using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
-using PxCs.Data.Vob;
 using PxCs.Data.Sound;
+using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
 
@@ -56,7 +53,8 @@ namespace GVR.Creator
 
             return soundObject;
         }
-        public GameObject Create(PxVobZoneMusicData vobSound, GameObject parent = null)
+        
+        public void Create(PxVobZoneMusicData vobSound, GameObject parent = null)
         {
             var soundObject = new GameObject(vobSound.vobName);
             soundObject.SetParent(parent);
@@ -72,8 +70,6 @@ namespace GVR.Creator
 
             if (SingletonBehaviour<DebugSettings>.GetOrCreate().EnableMusic)
                 soundObject.AddComponent<MusicCollisionHandler>();
-
-            return soundObject;
         }
 
         /// <summary>
@@ -87,6 +83,7 @@ namespace GVR.Creator
             var soundObject = new GameObject($"{vobSoundDaytime.soundName}-{vobSoundDaytime.soundName2}");
             soundObject.SetParent(parent);
 
+            // TODO - Is it right to have two AudioSources on one GO? Or would it be more Unity like to have two separate sub-GOs with one Source each?
             var audioSource1 = CreateAndAddAudioSource(soundObject, vobSoundDaytime.soundName, vobSoundDaytime);
             var audioSource2 = CreateAndAddAudioSource(soundObject, vobSoundDaytime.soundName2, vobSoundDaytime);
 

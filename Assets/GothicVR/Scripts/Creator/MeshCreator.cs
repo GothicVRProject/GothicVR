@@ -57,16 +57,17 @@ namespace GVR.Creator
         }
 
 
-        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null)
+        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
+            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
         }
 
-        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null)
+        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            var meshRootObject = new GameObject(objectName);
-            meshRootObject.SetParent(parent);
-            SetPosAndRot(meshRootObject, position, rotation);
+            rootGo ??= new GameObject();
+            rootGo.name = objectName;
+            rootGo.SetParent(parent);
+            SetPosAndRot(rootGo, position, rotation);
 
             // There are MDMs where there is no mesh, but meshes are in the attachment fields.
             if (mdm.meshes.Length == 0)
@@ -81,7 +82,7 @@ namespace GVR.Creator
                 {
                     var subMeshName = subMesh.Key;
                     var subMeshObj = new GameObject(subMeshName);
-                    subMeshObj.SetParent(meshRootObject);
+                    subMeshObj.SetParent(rootGo);
 
                     var matrix = mdh.nodes.First(i => i.name == subMeshName).transform;
 
@@ -100,7 +101,7 @@ namespace GVR.Creator
                 foreach (var mesh in mdm.meshes)
                 {
                     var subMeshObj = new GameObject(mesh.mesh.materials.First().name);
-                    subMeshObj.SetParent(meshRootObject, true, false);
+                    subMeshObj.SetParent(rootGo, true, false);
 
                     var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                     // Changed SkinnedMeshRenderer to MeshRenderer for now bones seems to crash the game on PICO/Quest2
@@ -122,25 +123,26 @@ namespace GVR.Creator
                 }
             }
 
-            return meshRootObject;
+            return rootGo;
         }
 
-        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null)
+        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
-            var meshObj = new GameObject(objectName);
-            meshObj.SetParent(parent);
-            SetPosAndRot(meshObj, position, rotation);
+            rootGo ??= new GameObject();
+            rootGo.name = objectName;
+            rootGo.SetParent(parent);
+            SetPosAndRot(rootGo, position, rotation);
 
-            var meshFilter = meshObj.AddComponent<MeshFilter>();
-            var meshRenderer = meshObj.AddComponent<MeshRenderer>();
+            var meshFilter = rootGo.AddComponent<MeshFilter>();
+            var meshRenderer = rootGo.AddComponent<MeshRenderer>();
 
             PrepareMeshRenderer(meshRenderer, mrm);
             PrepareMeshFilter(meshFilter, mrm);
             
             if (withCollider)
-                PrepareMeshCollider(meshObj, meshFilter.mesh, mrm.materials);
+                PrepareMeshCollider(rootGo, meshFilter.mesh, mrm.materials);
 
-            return meshObj;
+            return rootGo;
         }
 
         private void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
@@ -164,13 +166,13 @@ namespace GVR.Creator
             obj.transform.localPosition = position;
         }
 
-        private void PrepareMeshRenderer(Renderer renderer, WorldData.SubMeshData subMesh)
+        private void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
             var standardShader = Shader.Find(DEFAULT_SHADER);
             var material = new Material(standardShader);
             var bMaterial = subMesh.material;
 
-            renderer.material = material;
+            rend.material = material;
 
             // No texture to add.
             if (bMaterial.texture == "")
@@ -194,7 +196,7 @@ namespace GVR.Creator
             mesh.SetUVs(0, subMesh.uvs);
         }
 
-        private void PrepareMeshRenderer(Renderer renderer, PxMultiResolutionMeshData mrmData)
+        private void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
             var finalMaterials = new List<Material>(mrmData.subMeshes.Length);
 
@@ -204,7 +206,7 @@ namespace GVR.Creator
                 var material = new Material(standardShader);
                 var materialData = subMesh.material;
 
-                renderer.material = material;
+                rend.material = material;
 
                 // No texture to add.
                 if (materialData.texture == "")
@@ -220,7 +222,7 @@ namespace GVR.Creator
                 finalMaterials.Add(material);
             }
 
-            renderer.SetMaterials(finalMaterials);
+            rend.SetMaterials(finalMaterials);
         }
 
         private void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)

@@ -44,6 +44,8 @@ namespace GVR.Creator
 
         void Start()
         {
+            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableMusic)
+                return;
             backgroundMusic = GameObject.Find("BackgroundMusic");
             musicSource = backgroundMusic.AddComponent<AudioSource>();
         }

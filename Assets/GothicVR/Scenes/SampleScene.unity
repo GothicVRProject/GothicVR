@@ -668,8 +668,9 @@ MonoBehaviour:
   StartMinute: 59
   EnableNpc: 1
   EnableNpcRoutines: 1
-  CreateExampleAnimation: 1
+  CreateExampleAnimation: 0
   ShowVdfsFileNotFoundErrors: 0
+  EnableSounds: 1
   EnableMusic: 0
 --- !u!4 &668062117 stripped
 Transform:
@@ -1999,31 +2000,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -67.66
+      value: -13.19
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -6.53
+      value: -0.36
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 26.84
+      value: -29.36
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: -0.24135515
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0.031558197
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.96991056
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: -0.005035247
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2077,12 +2078,13 @@ PrefabInstance:
       propertyPath: m_InteractionManager
       value: 
       objectReference: {fileID: 1300502571}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 165658155289251460, guid: 4600f492db92202478d7c53019a519d0, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3286136463054414639, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      insertIndex: -1
+      insertIndex: 3
       addedObject: {fileID: 1263267812}
   m_SourcePrefab: {fileID: 100100000, guid: 4600f492db92202478d7c53019a519d0, type: 3}
 --- !u!1 &1263267811 stripped
@@ -2268,6 +2270,7 @@ GameObject:
   - component: {fileID: 1613829617}
   - component: {fileID: 1613829616}
   - component: {fileID: 1613829615}
+  - component: {fileID: 1613829618}
   m_Layer: 0
   m_Name: Caches
   m_TagString: Untagged
@@ -2316,6 +2319,20 @@ Transform:
   m_Father: {fileID: 1896514214}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1613829618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1613829614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df312223c670449aaa1e5a3724cb8e63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 0
+  prefabRootGo: {fileID: 0}
 --- !u!1 &1678676055
 GameObject:
   m_ObjectHideFlags: 0

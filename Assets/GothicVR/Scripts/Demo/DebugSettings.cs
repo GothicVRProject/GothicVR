@@ -32,7 +32,8 @@ namespace GVR.Demo
         [Header("__________SPAMmy debug messages__________")]
         public bool ShowVdfsFileNotFoundErrors;
 
-        [Header("__________Music__________")]
+        [Header("__________Audio__________")]
+        public bool EnableSounds;
         public bool EnableMusic;
 
     }
