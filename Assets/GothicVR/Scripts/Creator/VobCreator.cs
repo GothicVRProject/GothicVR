@@ -10,6 +10,7 @@ using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
@@ -85,6 +86,12 @@ namespace GVR.Creator
                         break;
                     // Do nothing
                     case PxVobType.PxVob_zCVobLevelCompo:
+                        break;
+                    case PxVobType.PxVob_zCVob:
+                        if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
+                            CreateDecal(vob);
+                        else
+                            CreateDefaultMesh(vob);
                         break;
                     default:
                         CreateDefaultMesh(vob);
@@ -208,6 +215,34 @@ namespace GVR.Creator
             var mrm = assetCache.TryGetMrm(item.visual);
             return meshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
         }
+
+        private GameObject CreateDecal(PxVobData vob)
+        {
+            var parent = parentGos[vob.type];
+            
+            if (vob.visualName.ToLower().EndsWith(".tga"))
+            {
+                var decalProjectorGo = new GameObject(vob.visualName);
+                var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
+                var texture = assetCache.TryGetTexture(vob.visualName);
+                
+                decalProjectorGo.SetParent(parent);
+                SetPosAndRot(decalProjectorGo, vob.position, vob.rotation!.Value);
+
+                // FIXME use Prefab!
+                // https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@12.0/manual/creating-a-decal-projector-at-runtime.html
+                var standardShader = Shader.Find("Shader Graphs/Decal");
+                var material = new Material(standardShader);
+                material.mainTexture = texture;
+                
+                decalProj.material = material;
+                
+                return decalProjectorGo;
+            }
+            
+            Debug.LogWarning("Decals are currently only supported for .tga: " + vob.visualName);
+            return null;
+        }
         
         private GameObject CreateDefaultMesh(PxVobData vob)
         {
@@ -216,10 +251,10 @@ namespace GVR.Creator
 
             if (meshName == string.Empty)
                 return null;
-            else if (meshName.ToLower().EndsWith(".pfx"))
+            if (meshName.ToLower().EndsWith(".pfx"))
                 // FIXME - PFX effects not yet implemented
                 return null;
-            
+
             // MDL
             var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
