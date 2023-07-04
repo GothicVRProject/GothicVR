@@ -216,7 +216,10 @@ namespace GVR.Creator
 
             if (meshName == string.Empty)
                 return null;
-
+            else if (meshName.ToLower().EndsWith(".pfx"))
+                // FIXME - PFX effects not yet implemented
+                return null;
+            
             var mds = assetCache.TryGetMds(meshName);
             var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
