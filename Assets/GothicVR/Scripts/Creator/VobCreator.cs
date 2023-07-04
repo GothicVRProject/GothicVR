@@ -220,26 +220,35 @@ namespace GVR.Creator
                 // FIXME - PFX effects not yet implemented
                 return null;
             
-            var mds = assetCache.TryGetMds(meshName);
+            // MDL
             var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
                 return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value, parent);
             }
-            else
-            {
-                var mrm = assetCache.TryGetMrm(meshName);
-                if (mrm == null)
-                {
-                    Debug.LogWarning($">{meshName}<'s .mrm not found.");
-                    return null;
-                }
+            
+            // MDH + MDM
+            var mdh = assetCache.TryGetMdh(meshName);
+            var mdm = assetCache.TryGetMdm(meshName);
 
+            if (mdh != null && mdm != null)
+            {
+                return meshCreator.Create(meshName, mdm, mdh, vob.position.ToUnityVector(), vob.rotation!.Value,
+                    parent);
+            }
+            
+            // MRM
+            var mrm = assetCache.TryGetMrm(meshName);
+            if (mrm != null)
+            {
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.cdDynamic;
-                
+
                 return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
             }
+
+            Debug.LogWarning($">{meshName}<'s has no mdl/mdh/mdm/mrm.");
+            return null;
         }
         
         private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
