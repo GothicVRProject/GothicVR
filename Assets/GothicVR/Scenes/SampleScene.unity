@@ -667,6 +667,7 @@ MonoBehaviour:
   StartHour: 17
   StartMinute: 59
   EnableVobFPMesh: 1
+  EnableVobFPMeshEditorLabel: 0
   EnableNpc: 1
   EnableNpcRoutines: 1
   CreateExampleAnimation: 0
