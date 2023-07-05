@@ -23,7 +23,9 @@ using Vector3 = System.Numerics.Vector3;
 namespace GVR.Creator
 {
 	public class VobCreator : SingletonBehaviour<VobCreator>
-    {   
+    {
+        private const float decalOpacity = 0.5f;
+        
         private MeshCreator meshCreator;
         private SoundCreator soundCreator;
         private AssetCache assetCache;
@@ -231,18 +233,20 @@ namespace GVR.Creator
                 // x/y needs to be made twice the size and transformed from cm in m.
                 // z - value is close to what we see in Gothic spacer.
                 decalProj.size = new(decalData.dimension.X * 2 / 100, decalData.dimension.Y * 2 / 100, 0.5f);
-                decalProj.pivot = UnityEngine.Vector3.zero;
                 decalProjectorGo.SetParent(parent);
                 SetPosAndRot(decalProjectorGo, vob.position, vob.rotation!.Value);
-
+                
+                decalProj.pivot = UnityEngine.Vector3.zero;
+                decalProj.fadeFactor = decalOpacity;
+                
                 // FIXME use Prefab!
                 // https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@12.0/manual/creating-a-decal-projector-at-runtime.html
                 var standardShader = Shader.Find("Shader Graphs/Decal");
                 var material = new Material(standardShader);
-                material.SetTexture("_BaseMap", texture);;
-                
+                material.SetTexture(Shader.PropertyToID("Base_Map"), texture);
+
                 decalProj.material = material;
-                
+
                 return;
             }
 

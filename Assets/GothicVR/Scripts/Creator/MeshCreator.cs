@@ -17,7 +17,9 @@ namespace GVR.Creator
     {
         private AssetCache assetCache;
 
-        private const string DEFAULT_SHADER = "Unlit/Transparent Cutout";
+        // Decals work only on URP shaders. We therefore temporarily change everything to this
+        // until we know how to change specifics to the cutout only. (e.g. bushes)
+        private const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
 
         private void Start()
         {
@@ -168,7 +170,7 @@ namespace GVR.Creator
 
         private void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
-            var standardShader = Shader.Find(DEFAULT_SHADER);
+            var standardShader = Shader.Find(defaultShader);
             var material = new Material(standardShader);
             var bMaterial = subMesh.material;
 
@@ -202,7 +204,7 @@ namespace GVR.Creator
 
             foreach (var subMesh in mrmData.subMeshes)
             {
-                var standardShader = Shader.Find(DEFAULT_SHADER);
+                var standardShader = Shader.Find(defaultShader);
                 var material = new Material(standardShader);
                 var materialData = subMesh.material;
 
