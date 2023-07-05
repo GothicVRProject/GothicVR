@@ -216,16 +216,22 @@ namespace GVR.Creator
             return meshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
         }
 
-        private GameObject CreateDecal(PxVobData vob)
+        private void CreateDecal(PxVobData vob)
         {
             var parent = parentGos[vob.type];
             
-            if (vob.visualName.ToLower().EndsWith(".tga"))
+            if (vob.vobDecal.HasValue)
             {
-                var decalProjectorGo = new GameObject(vob.visualName);
+                var decalData = vob.vobDecal.Value;
+
+                var decalProjectorGo = new GameObject(decalData.name);
                 var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
                 var texture = assetCache.TryGetTexture(vob.visualName);
                 
+                // x/y needs to be made twice the size and transformed from cm in m.
+                // z - value is close to what we see in Gothic spacer.
+                decalProj.size = new(decalData.dimension.X * 2 / 100, decalData.dimension.Y * 2 / 100, 0.5f);
+                decalProj.pivot = UnityEngine.Vector3.zero;
                 decalProjectorGo.SetParent(parent);
                 SetPosAndRot(decalProjectorGo, vob.position, vob.rotation!.Value);
 
@@ -233,15 +239,14 @@ namespace GVR.Creator
                 // https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@12.0/manual/creating-a-decal-projector-at-runtime.html
                 var standardShader = Shader.Find("Shader Graphs/Decal");
                 var material = new Material(standardShader);
-                material.mainTexture = texture;
+                material.SetTexture("_BaseMap", texture);;
                 
                 decalProj.material = material;
                 
-                return decalProjectorGo;
+                return;
             }
-            
-            Debug.LogWarning("Decals are currently only supported for .tga: " + vob.visualName);
-            return null;
+
+            Debug.LogWarning("No decalData was set for: " + vob.visualName);
         }
         
         private GameObject CreateDefaultMesh(PxVobData vob)
