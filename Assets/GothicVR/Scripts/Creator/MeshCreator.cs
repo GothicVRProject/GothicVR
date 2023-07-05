@@ -170,10 +170,9 @@ namespace GVR.Creator
 
         private void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
-            var standardShader = Shader.Find(defaultShader);
-            var material = new Material(standardShader);
+            var material = GetEmptyMaterial();
             var bMaterial = subMesh.material;
-
+            
             rend.material = material;
 
             // No texture to add.
@@ -204,8 +203,7 @@ namespace GVR.Creator
 
             foreach (var subMesh in mrmData.subMeshes)
             {
-                var standardShader = Shader.Find(defaultShader);
-                var material = new Material(standardShader);
+                var material = GetEmptyMaterial();
                 var materialData = subMesh.material;
 
                 rend.material = material;
@@ -472,6 +470,17 @@ namespace GVR.Creator
 
             renderer.sharedMesh.bindposes = bindPoses;
             renderer.bones = bones;
+        }
+        
+        private Material GetEmptyMaterial()
+        {
+            var standardShader = Shader.Find(defaultShader);
+            var material = new Material(standardShader);
+            
+            // Enable cutting of alpha values.
+            material.EnableKeyword("_ALPHATEST_ON");
+
+            return material;
         }
     }
 }
