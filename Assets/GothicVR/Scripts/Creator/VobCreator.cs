@@ -86,6 +86,20 @@ namespace GVR.Creator
                     case PxVobType.PxVob_zCVobSpot:
                         CreateSpot(vob);
                         break;
+                    case PxVobType.PxVob_zCVobScreenFX:
+                    case PxVobType.PxVob_zCVobAnimate:
+                    case PxVobType.PxVob_zCVobStartpoint:
+                    case PxVobType.PxVob_zCTriggerWorldStart:
+                    case PxVobType.PxVob_zCTriggerList:
+                    case PxVobType.PxVob_oCCSTrigger:
+                    case PxVobType.PxVob_oCTriggerScript:
+                    case PxVobType.PxVob_oCTriggerChangeLevel:
+                    case PxVobType.PxVob_zCVobLensFlare:
+                    case PxVobType.PxVob_zCVobLight:
+                    case PxVobType.PxVob_zCMoverController:
+                    case PxVobType.PxVob_zCPFXController:
+                        Debug.LogWarning($"{vob.type} not yet implemented.");
+                        break;
                     // Do nothing
                     case PxVobType.PxVob_zCVobLevelCompo:
                         break;
@@ -271,16 +285,6 @@ namespace GVR.Creator
                 return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value, parent);
             }
             
-            // MDH + MDM
-            var mdh = assetCache.TryGetMdh(meshName);
-            var mdm = assetCache.TryGetMdm(meshName);
-
-            if (mdh != null && mdm != null)
-            {
-                return meshCreator.Create(meshName, mdm, mdh, vob.position.ToUnityVector(), vob.rotation!.Value,
-                    parent);
-            }
-            
             // MRM
             var mrm = assetCache.TryGetMrm(meshName);
             if (mrm != null)
@@ -291,7 +295,7 @@ namespace GVR.Creator
                 return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
             }
 
-            Debug.LogWarning($">{meshName}<'s has no mdl/mdh/mdm/mrm.");
+            Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");
             return null;
         }
         

@@ -477,7 +477,7 @@ namespace GVR.Creator
             var standardShader = Shader.Find(defaultShader);
             var material = new Material(standardShader);
             
-            // Enable cutting of alpha values.
+            // Enable clipping of alpha values.
             material.EnableKeyword("_ALPHATEST_ON");
 
             return material;
