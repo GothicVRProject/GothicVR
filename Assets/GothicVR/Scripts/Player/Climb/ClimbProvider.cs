@@ -30,7 +30,7 @@ namespace GothicVR.Player.Climb
 
         private void HandActivated(string controllerName)
         {
-            if(controllerName == "LeftHand Controller")
+            if (controllerName == "LeftHandBaseController")
             {
                 leftActive = true;
                 rightActive = false;
@@ -52,7 +52,7 @@ namespace GothicVR.Player.Climb
                 rightActive = false;
                 ClimbInActive?.Invoke();
             }
-            else if (leftActive && controllerName == "LeftHand Controller")
+            else if (leftActive && controllerName == "LeftHandBaseController")
             {
                 leftActive = false;
                 ClimbInActive?.Invoke();
