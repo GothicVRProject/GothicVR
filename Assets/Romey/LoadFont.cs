@@ -15,18 +15,19 @@ public class LoadFont : MonoBehaviour
         // https://github.com/GothicVRProject/GothicVR/issues/80
 
         if (!fontloaded)
-            LoadGothicFont();
+            StartCoroutine(LoadGothicFont());
     }
-    public void LoadGothicFont()
+    public IEnumerator LoadGothicFont()
     {
-
+        fontloaded = true;
+        yield return new WaitForSeconds(2);
         var textMesh = transform.GetComponent<TMP_Text>();
 
         if (PhoenixBridge.GothicMenuFont)
         {
             textMesh.font = PhoenixBridge.GothicSubtitleFont;
             //textMesh.fontMaterial.color = Color.black;
-            fontloaded = true;
+            
 
         }
     }
