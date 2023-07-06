@@ -1399,6 +1399,7 @@ GameObject:
   - component: {fileID: 3286136462831979467}
   - component: {fileID: 3286136462831979465}
   - component: {fileID: 3286136462831979464}
+  - component: {fileID: 6313854337910320399}
   m_Layer: 0
   m_Name: Locomotion System
   m_TagString: Untagged
@@ -1572,6 +1573,43 @@ MonoBehaviour:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 0}
+--- !u!114 &6313854337910320399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3286136462831979470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfc8d6f571474f58965b8bfe77fcc4b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterController: {fileID: 3286136461781483592}
+  velocityRight:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Velocity Right
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 8a500f3f-fc3d-401d-b183-b329ffd43c95
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: -2446297833567266351, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  velocityLeft:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Velocity Left
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 1ec9d6e4-34f5-480d-811c-d57a5c68d6a8
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: -4538930393538190949, guid: c348712bda248c246b8c49b3db54643f, type: 3}
 --- !u!1 &3286136462967229782
 GameObject:
   m_ObjectHideFlags: 0
@@ -2886,10 +2924,10 @@ MonoBehaviour:
   m_PositionInput:
     m_UseReference: 0
     m_Action:
-      m_Name: Position Input
+      m_Name: 
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: 0a13750c-d2f9-455f-bf18-d5edbcc11411
+      m_Id: 
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -2898,10 +2936,10 @@ MonoBehaviour:
   m_RotationInput:
     m_UseReference: 0
     m_Action:
-      m_Name: Rotation Input
+      m_Name: 
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: 2712204c-38f3-48a3-83b2-51c514c62fb2
+      m_Id: 
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace GothicVR.Player
+namespace GothicVR.Player.Climb
 {
     /// <summary>
     /// @see https://medium.com/@dnwesdman/climbing-in-vr-with-the-xr-interaction-toolkit-164f6b381ed9
