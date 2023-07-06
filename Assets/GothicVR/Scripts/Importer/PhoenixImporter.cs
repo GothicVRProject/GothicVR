@@ -18,6 +18,8 @@ namespace GVR.Importer
 {
     public class PhoenixImporter : SingletonBehaviour<PhoenixImporter>
     {
+        public GameObject worldGo;
+        
         private bool _loaded = false;
         private static DebugSettings _debugSettings;
 
@@ -88,14 +90,12 @@ namespace GVR.Importer
             PhoenixBridge.World = world;
 
 
-            var root = new GameObject("World");
-
             var scene = SceneManager.GetSceneByName("SampleScene");
-            scene.GetRootGameObjects().Append(root);
+            scene.GetRootGameObjects().Append(worldGo);
 
-            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, root);
-            SingletonBehaviour<VobCreator>.GetOrCreate().Create(root, world);
-            SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(root, world);
+            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, worldGo);
+            SingletonBehaviour<VobCreator>.GetOrCreate().Create(worldGo, world);
+            SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(worldGo, world);
 
             SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
         }

@@ -16,6 +16,10 @@ namespace GVR.Creator
 {
     public class MeshCreator : SingletonBehaviour<MeshCreator>
     {
+        public GameObject world;
+        public GameObject worldMesh;
+        
+        
         private AssetCache assetCache;
 
         private const string DEFAULT_SHADER = "Unlit/Transparent Cutout";
@@ -35,10 +39,7 @@ namespace GVR.Creator
         
         public GameObject Create(WorldData world, GameObject parent = null)
         {
-            var meshObj = new GameObject("Mesh");
-            meshObj.isStatic = true;
-            meshObj.SetParent(parent);
-            var teleportarea = meshObj.AddComponent<TeleportationArea>();
+            var teleportArea = worldMesh.GetComponent<TeleportationArea>();
 
             foreach (var subMesh in world.subMeshes.Values)
             {
@@ -53,14 +54,12 @@ namespace GVR.Creator
                 var singlecollider = PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
                 
                 if(singlecollider != null)
-                {
-                    teleportarea.colliders.Add(singlecollider);
-                }
+                    teleportArea.colliders.Add(singlecollider);
 
-                subMeshObj.SetParent(meshObj);
+                subMeshObj.SetParent(worldMesh);
             }
 
-            return meshObj;
+            return worldMesh;
         }
 
 
