@@ -10,6 +10,7 @@ using PxCs.Data.Model;
 using PxCs.Data.Struct;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace GVR.Creator
 {
@@ -37,18 +38,24 @@ namespace GVR.Creator
             var meshObj = new GameObject("Mesh");
             meshObj.isStatic = true;
             meshObj.SetParent(parent);
+            var teleportarea = meshObj.AddComponent<TeleportationArea>();
 
             foreach (var subMesh in world.subMeshes.Values)
             {
                 var subMeshObj = new GameObject(string.Format("submesh-{0}", subMesh.material.name));
                 subMeshObj.isStatic = true;
-
+                
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
                 
                 PrepareMeshRenderer(meshRenderer, subMesh);
                 PrepareMeshFilter(meshFilter, subMesh);
-                PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
+                var singlecollider = PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
+                
+                if(singlecollider != null)
+                {
+                    teleportarea.colliders.Add(singlecollider);
+                }
 
                 subMeshObj.SetParent(meshObj);
             }
@@ -397,25 +404,27 @@ namespace GVR.Creator
             }
         }
 
-        private void PrepareMeshCollider(GameObject obj, Mesh mesh)
+        private Collider PrepareMeshCollider(GameObject obj, Mesh mesh)
         {
             var meshCollider = obj.AddComponent<MeshCollider>();
             meshCollider.sharedMesh = mesh;
+            return meshCollider;
         }
         
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        private void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
+        private Collider PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
         {
             if (materialData.disableCollision ||
                 materialData.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water)
             {
                 // Do not add colliders
+                return null;
             }
             else 
             {
-                PrepareMeshCollider(obj, mesh);
+               return PrepareMeshCollider(obj, mesh);
             }
         }
 
