@@ -20,15 +20,13 @@ public class LoadFont : MonoBehaviour
     public IEnumerator LoadGothicFont()
     {
         fontloaded = true;
-        yield return new WaitForSeconds(2);
+        yield return new WaitForEndOfFrame();
         var textMesh = transform.GetComponent<TMP_Text>();
 
-        if (PhoenixBridge.GothicMenuFont)
+        if (PhoenixBridge.GothicSubtitleFont)
         {
             textMesh.font = PhoenixBridge.GothicSubtitleFont;
             //textMesh.fontMaterial.color = Color.black;
-            
-
         }
     }
 }

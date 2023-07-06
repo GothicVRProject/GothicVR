@@ -151,15 +151,12 @@ namespace GVR.Importer
             GlyphRenderMode renderMode = GlyphRenderMode.COLOR;
             int atlasWidth = 100;
             int atlasHeight = 100;
-
-
+            
             if (File.Exists(menuFontPath))
                 PhoenixBridge.GothicMenuFont = TMP_FontAsset.CreateFontAsset(menuFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
 
             if (File.Exists(subtitleFontPath))
-                PhoenixBridge.GothicMenuFont = TMP_FontAsset.CreateFontAsset(subtitleFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
-
-
+                PhoenixBridge.GothicSubtitleFont = TMP_FontAsset.CreateFontAsset(subtitleFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
         }
 
 
