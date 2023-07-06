@@ -24,7 +24,7 @@ namespace GothicVR.Player
         {
             base.OnSelectEntered(args);
 
-            if (args.interactableObject.transform.gameObject.CompareTag("Climb"))
+            if (args.interactableObject.transform.gameObject.CompareTag("Climbable"))
             {
                 ClimbHandActivated?.Invoke(controllerName);
             }

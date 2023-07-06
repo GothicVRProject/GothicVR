@@ -234,12 +234,14 @@ namespace GVR.Creator
         {
             // FIXME - use Prefab instead.
             var go = CreateDefaultMesh(vob);
-            var grabComp = go.AddComponent<XRGrabInteractable>();
-            var rigidbodyComp = go.GetComponent<Rigidbody>();
+            var meshGo = go;
+            var grabComp = meshGo.AddComponent<XRGrabInteractable>();
+            var rigidbodyComp = meshGo.GetComponent<Rigidbody>();
+
+            meshGo.tag = "Climbable";
             rigidbodyComp.isKinematic = true;
             grabComp.trackPosition = false;
             grabComp.trackRotation = false;
-
         }
 
         private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
