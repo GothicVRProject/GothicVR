@@ -8,8 +8,10 @@ using GVR.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
+using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace GVR.Creator
 {
@@ -17,8 +19,12 @@ namespace GVR.Creator
     {
         private AssetCache assetCache;
 
-        private const string DEFAULT_SHADER = "Unlit/Transparent Cutout";
+        // Decals work only on URP shaders. We therefore temporarily change everything to this
+        // until we know how to change specifics to the cutout only. (e.g. bushes)
+        private const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        private const float decalOpacity = 0.75f;
 
+        
         private void Start()
         {
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
@@ -145,6 +151,40 @@ namespace GVR.Creator
             return rootGo;
         }
 
+        public GameObject CreateDecal(PxVobData vob, GameObject parent)
+        {
+            if (!vob.vobDecal.HasValue)
+            {
+                Debug.LogWarning("No decalData was set for: " + vob.visualName);
+                return null;
+            }
+
+            var decalData = vob.vobDecal.Value;
+
+            var decalProjectorGo = new GameObject(decalData.name);
+            var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
+            var texture = assetCache.TryGetTexture(vob.visualName);
+            
+            // x/y needs to be made twice the size and transformed from cm in m.
+            // z - value is close to what we see in Gothic spacer.
+            decalProj.size = new(decalData.dimension.X * 2 / 100, decalData.dimension.Y * 2 / 100, 0.5f);
+            decalProjectorGo.SetParent(parent);
+            SetPosAndRot(decalProjectorGo, vob.position.ToUnityVector(), vob.rotation!.Value);
+            
+            decalProj.pivot = UnityEngine.Vector3.zero;
+            decalProj.fadeFactor = decalOpacity;
+            
+            // FIXME use Prefab!
+            // https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@12.0/manual/creating-a-decal-projector-at-runtime.html
+            var standardShader = Shader.Find("Shader Graphs/Decal");
+            var material = new Material(standardShader);
+            material.SetTexture(Shader.PropertyToID("Base_Map"), texture);
+
+            decalProj.material = material;
+
+            return decalProjectorGo;
+        }
+
         private void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
         {
             var unityMatrix = matrix.ToUnityMatrix();
@@ -168,10 +208,9 @@ namespace GVR.Creator
 
         private void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
-            var standardShader = Shader.Find(DEFAULT_SHADER);
-            var material = new Material(standardShader);
+            var material = GetEmptyMaterial();
             var bMaterial = subMesh.material;
-
+            
             rend.material = material;
 
             // No texture to add.
@@ -202,8 +241,7 @@ namespace GVR.Creator
 
             foreach (var subMesh in mrmData.subMeshes)
             {
-                var standardShader = Shader.Find(DEFAULT_SHADER);
-                var material = new Material(standardShader);
+                var material = GetEmptyMaterial();
                 var materialData = subMesh.material;
 
                 rend.material = material;
@@ -470,6 +508,17 @@ namespace GVR.Creator
 
             renderer.sharedMesh.bindposes = bindPoses;
             renderer.bones = bones;
+        }
+        
+        private Material GetEmptyMaterial()
+        {
+            var standardShader = Shader.Find(defaultShader);
+            var material = new Material(standardShader);
+            
+            // Enable clipping of alpha values.
+            material.EnableKeyword("_ALPHATEST_ON");
+
+            return material;
         }
     }
 }
