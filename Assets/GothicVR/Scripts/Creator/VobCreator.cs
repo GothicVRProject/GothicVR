@@ -213,8 +213,8 @@ namespace GVR.Creator
 
             gameObject.transform.localScale = (max-min);
 
-            // if(SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
-                // gameObject.AddComponent<ChangeLevelCollisionHandler>();
+            if(SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
+                gameObject.AddComponent<ChangeLevelTriggerHandler>();
         }
 
         /// <summary>
