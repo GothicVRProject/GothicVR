@@ -46,11 +46,11 @@ namespace GVR.Importer
             LoadGothicVM(G1Dir);
             LoadSfxVM(G1Dir);
             LoadMusicVM(G1Dir);
-            LoadWorld(vdfPtr);
+            LoadWorld(vdfPtr, "world");
             LoadMusic();
 
-            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)        
-                                                                                 //LoadFonts();
+            // PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)        
+            //LoadFonts();
 
             watch.Stop();
             Debug.Log($"Time spent for loading world + VM + npc loading: {watch.Elapsed}");
@@ -80,9 +80,26 @@ namespace GVR.Importer
             }
         }
 
-        private void LoadWorld(IntPtr vdfPtr)
+        public void LoadWorld(IntPtr vdfPtr, string zen)
         {
-            var world = WorldBridge.LoadWorld(vdfPtr, "world.zen"); // world.zen -> G1, newworld.zen/oldworld.zen/addonworld.zen -> G2
+            var worldScene = SceneManager.GetSceneByName("world");
+
+            if (!worldScene.isLoaded)
+            {
+                SceneManager.LoadScene("world", LoadSceneMode.Additive);
+            }
+            else
+            {
+                // if the world scene is already loaded it could mean that we have a world loaded in
+                // so we delete everything :D
+                if (worldScene.GetRootGameObjects().Length != 0)
+                    foreach (var item in worldScene.GetRootGameObjects())
+                    {
+                        GameObject.Destroy(item);
+                    }
+            }
+
+            var world = WorldBridge.LoadWorld(vdfPtr, $"{zen}.zen"); // world.zen -> G1, newworld.zen/oldworld.zen/addonworld.zen -> G2
 
             PhoenixBridge.VdfsPtr = vdfPtr;
             PhoenixBridge.World = world;
@@ -98,6 +115,30 @@ namespace GVR.Importer
             SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(root, world);
 
             SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
+
+            // we are creating the objects directly in SampleScene as we have the asset cache 
+            // and everything we need to generate the world
+            // and after that move everything to world scene
+            SceneManager.MoveGameObjectToScene(root, SceneManager.GetSceneByName("world"));
+
+            // just start position to for each world
+            // as we need to have a starting position in the new world
+            var startGO = "";
+            if (zen == "world")
+            {
+                startGO = "ENTRANCE_SURFACE_OLDMINE";
+            }
+            if (zen == "oldmine" || zen == "freemine")
+            {
+                startGO = "ENTRANCE_OLDMINE_SURFACE";
+            }
+            if (zen == "orcgraveyard")
+            {
+                startGO = "ENTRANCE_ORCGRAVEYARD_SURFACE";
+            }
+
+            GameObject.Find("VRPlayer_v4 (romey)").transform.position = GameObject.Find(startGO).transform.position;
+
         }
 
         private void LoadGothicVM(string G1Dir)

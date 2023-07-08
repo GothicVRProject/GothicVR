@@ -13,7 +13,7 @@ namespace GVR.Phoenix.Util
 
             Debug.Log("Triggered " + gameObject.name + " teleporting to " + gameObject.name.Split('_')[2]);
 
-            // SingletonBehaviour<PhoenixImporter>.GetOrCreate().LoadWorld(PhoenixBridge.VdfsPtr, gameObject.name.Split('_')[2].ToLower());
+            SingletonBehaviour<PhoenixImporter>.GetOrCreate().LoadWorld(PhoenixBridge.VdfsPtr, gameObject.name.Split('_')[2].ToLower());
             
 
         }
