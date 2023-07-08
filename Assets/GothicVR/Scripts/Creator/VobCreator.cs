@@ -4,22 +4,26 @@ using GothicVR.Vob;
 using GVR.Caches;
 using GVR.Demo;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
-using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
 
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
+
+
 namespace GVR.Creator
 {
 	public class VobCreator : SingletonBehaviour<VobCreator>
-    {   
+    {
         private MeshCreator meshCreator;
         private SoundCreator soundCreator;
         private AssetCache assetCache;
@@ -76,6 +80,32 @@ namespace GVR.Creator
                         break;
                     case PxVobType.PxVob_oCZoneMusic:
                         CreateZoneMusic((PxVobZoneMusicData)vob);
+                        break;
+                    case PxVobType.PxVob_zCVobSpot:
+                        CreateSpot(vob);
+                        break;
+                    case PxVobType.PxVob_zCVobScreenFX:
+                    case PxVobType.PxVob_zCVobAnimate:
+                    case PxVobType.PxVob_zCVobStartpoint:
+                    case PxVobType.PxVob_zCTriggerWorldStart:
+                    case PxVobType.PxVob_zCTriggerList:
+                    case PxVobType.PxVob_oCCSTrigger:
+                    case PxVobType.PxVob_oCTriggerScript:
+                    case PxVobType.PxVob_oCTriggerChangeLevel:
+                    case PxVobType.PxVob_zCVobLensFlare:
+                    case PxVobType.PxVob_zCVobLight:
+                    case PxVobType.PxVob_zCMoverController:
+                    case PxVobType.PxVob_zCPFXController:
+                        Debug.LogWarning($"{vob.type} not yet implemented.");
+                        break;
+                    // Do nothing
+                    case PxVobType.PxVob_zCVobLevelCompo:
+                        break;
+                    case PxVobType.PxVob_zCVob:
+                        if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
+                            CreateDecal(vob);
+                        else
+                            CreateDefaultMesh(vob);
                         break;
                     default:
                         CreateDefaultMesh(vob);
@@ -164,10 +194,49 @@ namespace GVR.Creator
             soundCreator.Create(vob, parentGos[vob.type]);
         }
 
+        /// <summary>
+        /// Basically a free point where NPCs can do something like sitting on a bench etc.
+        /// @see for more information: https://ataulien.github.io/Inside-Gothic/objects/spot/
+        /// </summary>
+        private void CreateSpot(PxVobData vob)
+        {
+            var spot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Destroy(spot.GetComponent<SphereCollider>()); // No need for collider here!
+            
+            if (DebugSettings.Instance.EnableVobFPMesh)
+            {
+#if UNITY_EDITOR
+                if (DebugSettings.Instance.EnableVobFPMeshEditorLabel)
+                {
+                    var iconContent = EditorGUIUtility.IconContent("sv_label_4");
+                    EditorGUIUtility.SetIconForObject(spot, (Texture2D) iconContent.image);
+                }
+#endif
+            }
+            else
+            {
+                // Quick win: If we don't want to render the spots, we just remove the Renderer.
+                // FIXME - Loading can be optimized with a proper Prefab
+                Destroy(spot.GetComponent<MeshRenderer>());
+            }
+
+            spot.name = vob.vobName;
+            spot.SetParent(parentGos[vob.type]);
+            
+            SetPosAndRot(spot, vob.position, vob.rotation!.Value);
+        }
+
         private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
             var mrm = assetCache.TryGetMrm(item.visual);
             return meshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
+        }
+
+        private void CreateDecal(PxVobData vob)
+        {
+            var parent = parentGos[vob.type];
+            
+            meshCreator.CreateDecal(vob, parent);
         }
         
         private GameObject CreateDefaultMesh(PxVobData vob)
@@ -177,27 +246,29 @@ namespace GVR.Creator
 
             if (meshName == string.Empty)
                 return null;
+            if (meshName.ToLower().EndsWith(".pfx"))
+                // FIXME - PFX effects not yet implemented
+                return null;
 
-            var mds = assetCache.TryGetMds(meshName);
+            // MDL
             var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
                 return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value, parent);
             }
-            else
+            
+            // MRM
+            var mrm = assetCache.TryGetMrm(meshName);
+            if (mrm != null)
             {
-                var mrm = assetCache.TryGetMrm(meshName);
-                if (mrm == null)
-                {
-                    Debug.LogWarning($">{meshName}<'s .mrm not found.");
-                    return null;
-                }
-
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.cdDynamic;
-                
+
                 return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
             }
+
+            Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");
+            return null;
         }
         
         private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)

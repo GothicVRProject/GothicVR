@@ -100,6 +100,12 @@ namespace GVR.Creator
         private AudioSource CreateAndAddAudioSource(GameObject soundObject, string soundName, PxVobSoundData soundData)
         {
             PxSoundData<float> wavFile;
+
+            if(soundName.ToLower() == "nosound.wav")
+            {
+                //instead of decoding nosound.wav which might be decoded incorrectly, just return null
+                return null;
+            }
             // Bugfix - Normally the data is to get C_SFX_DEF entries from VM. But sometimes there might be the real .wav file stored.
             if (soundName.ToLower().EndsWith(".wav"))
             {
