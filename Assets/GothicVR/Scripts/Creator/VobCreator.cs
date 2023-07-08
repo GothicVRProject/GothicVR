@@ -84,6 +84,9 @@ namespace GVR.Creator
                     case PxVobType.PxVob_zCVobSpot:
                         CreateSpot(vob);
                         break;
+                    case PxVobType.PxVob_oCTriggerChangeLevel:
+                        CreateTriggerChangeLevel((PxVobTriggerChangeLevelData)vob);
+                        break;
                     case PxVobType.PxVob_zCVobScreenFX:
                     case PxVobType.PxVob_zCVobAnimate:
                     case PxVobType.PxVob_zCVobStartpoint:
@@ -91,7 +94,6 @@ namespace GVR.Creator
                     case PxVobType.PxVob_zCTriggerList:
                     case PxVobType.PxVob_oCCSTrigger:
                     case PxVobType.PxVob_oCTriggerScript:
-                    case PxVobType.PxVob_oCTriggerChangeLevel:
                     case PxVobType.PxVob_zCVobLensFlare:
                     case PxVobType.PxVob_zCVobLight:
                     case PxVobType.PxVob_zCMoverController:
@@ -192,6 +194,27 @@ namespace GVR.Creator
         private void CreateZoneMusic(PxVobZoneMusicData vob)
         {
             soundCreator.Create(vob, parentGos[vob.type]);
+        }
+
+        private void CreateTriggerChangeLevel(PxVobTriggerChangeLevelData vob)
+        {
+
+            var gameObject = new GameObject(vob.vobName);
+            gameObject.SetParent(parentGos[vob.type]);
+
+            // SetPosAndRot(gameObject, vob.position, vob.rotation!.Value);
+
+            var trigger = gameObject.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            gameObject.transform.position = (min + max) / 2f;
+
+            gameObject.transform.localScale = (max-min);
+
+            // if(SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
+                // gameObject.AddComponent<ChangeLevelCollisionHandler>();
         }
 
         /// <summary>
