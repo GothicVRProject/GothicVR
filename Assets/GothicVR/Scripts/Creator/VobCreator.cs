@@ -44,6 +44,7 @@ namespace GVR.Creator
             
             var vobRootObj = new GameObject("Vobs");
             vobRootObj.SetParent(root);
+            parentGos = new();
 
             CreateParentVobObject(vobRootObj);
             CreateVobs(vobRootObj, world.vobs);
