@@ -1391,6 +1391,17 @@ Transform:
   m_Father: {fileID: 782628379}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1028331250 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3286136462831979469, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+  m_PrefabInstance: {fileID: 1263267810}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01f69dc1cb084aa42b2f2f8cd87bc770, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1136909782
 GameObject:
   m_ObjectHideFlags: 0
@@ -2007,10 +2018,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1353668847}
     m_Modifications:
-    - target: {fileID: 2245872298724127228, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_RaycastTriggerInteraction
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 3286136461689514588, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_InteractionManager
       value: 
@@ -2071,26 +2078,10 @@ PrefabInstance:
       propertyPath: m_InteractionManager
       value: 
       objectReference: {fileID: 1300502571}
-    - target: {fileID: 3286136463048429805, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Id
-      value: d25b7a86-69b0-46d1-a37c-52315d99e9f8
-      objectReference: {fileID: 0}
-    - target: {fileID: 3286136463048429805, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Name
-      value: Directional Anchor Rotation
-      objectReference: {fileID: 0}
     - target: {fileID: 3286136463048429806, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_InteractionManager
       value: 
       objectReference: {fileID: 1300502571}
-    - target: {fileID: 3286136463048429806, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_RaycastMask.m_Bits
-      value: 32
-      objectReference: {fileID: 0}
-    - target: {fileID: 3286136463048429806, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_RaycastTriggerInteraction
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 3286136463054414637, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_PositionInput.m_Action.m_Id
       value: 2775a29b-b69e-4792-86ed-092596b734ad
@@ -2175,6 +2166,30 @@ PrefabInstance:
       propertyPath: m_InteractionManager
       value: 
       objectReference: {fileID: 1300502571}
+    - target: {fileID: 3581348687545788442, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_Color.a
+      value: 0.4392157
+      objectReference: {fileID: 0}
+    - target: {fileID: 5600730176210799987, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5600730176210799987, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5600730176210799987, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749832964000603116, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749832964000603116, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2956,7 +2971,7 @@ MonoBehaviour:
   m_OnDeactivate:
     m_PersistentCalls:
       m_Calls: []
-  m_TeleportationProvider: {fileID: 0}
+  m_TeleportationProvider: {fileID: 1028331250}
   m_MatchOrientation: 0
   m_MatchDirectionalInput: 0
   m_TeleportTrigger: 0
