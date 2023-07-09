@@ -114,6 +114,13 @@ namespace GVR.Creator
             else
             {
                 var sfxData = assetCache.TryGetSfxData(soundData.soundName);
+
+                if (sfxData == null)
+                {
+                    Debug.LogError($"No sfx data returned for {soundData.soundName}");
+                    return null;
+                }
+
                 wavFile = assetCache.TryGetSound(sfxData.file);
             }
 
