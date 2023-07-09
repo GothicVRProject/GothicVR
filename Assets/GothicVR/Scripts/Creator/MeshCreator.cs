@@ -11,12 +11,17 @@ using PxCs.Data.Struct;
 using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.Rendering.Universal;
 
 namespace GVR.Creator
 {
     public class MeshCreator : SingletonBehaviour<MeshCreator>
     {
+        public GameObject world;
+        public GameObject worldMesh;
+        
+        
         private AssetCache assetCache;
 
         // Decals work only on URP shaders. We therefore temporarily change everything to this
@@ -40,26 +45,27 @@ namespace GVR.Creator
         
         public GameObject Create(WorldData world, GameObject parent = null)
         {
-            var meshObj = new GameObject("Mesh");
-            meshObj.isStatic = true;
-            meshObj.SetParent(parent);
+            var teleportArea = worldMesh.GetComponent<TeleportationArea>();
 
             foreach (var subMesh in world.subMeshes.Values)
             {
                 var subMeshObj = new GameObject(string.Format("submesh-{0}", subMesh.material.name));
                 subMeshObj.isStatic = true;
-
+                
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
                 
                 PrepareMeshRenderer(meshRenderer, subMesh);
                 PrepareMeshFilter(meshFilter, subMesh);
-                PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
+                var singlecollider = PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
+                
+                if(singlecollider != null)
+                    teleportArea.colliders.Add(singlecollider);
 
-                subMeshObj.SetParent(meshObj);
+                subMeshObj.SetParent(worldMesh);
             }
 
-            return meshObj;
+            return worldMesh;
         }
 
 
@@ -435,25 +441,27 @@ namespace GVR.Creator
             }
         }
 
-        private void PrepareMeshCollider(GameObject obj, Mesh mesh)
+        private Collider PrepareMeshCollider(GameObject obj, Mesh mesh)
         {
             var meshCollider = obj.AddComponent<MeshCollider>();
             meshCollider.sharedMesh = mesh;
+            return meshCollider;
         }
         
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        private void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
+        private Collider PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
         {
             if (materialData.disableCollision ||
                 materialData.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water)
             {
                 // Do not add colliders
+                return null;
             }
             else 
             {
-                PrepareMeshCollider(obj, mesh);
+               return PrepareMeshCollider(obj, mesh);
             }
         }
 
