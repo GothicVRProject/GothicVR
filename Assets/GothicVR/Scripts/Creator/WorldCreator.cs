@@ -6,12 +6,10 @@ namespace GVR.Creator
 {
     public class WorldCreator : SingletonBehaviour<WorldCreator>
     {
-        public GameObject worldMesh;
-        
         /// <summary>
         /// Logic to be called after world is fully loaded.
         /// </summary>
-        public void PostCreate()
+        public void PostCreate(GameObject worldMesh)
         {
             // If we load a new scene, just remove the existing one.
             if (worldMesh.TryGetComponent(out TeleportationArea teleportArea))
