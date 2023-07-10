@@ -138,7 +138,7 @@ namespace GVR.Creator
                 return;
             }
 
-            if (item.visual.EndsWith(".mms"))
+            if (item.visual.ToLower().EndsWith(".mms"))
             {
                 Debug.LogError($"Item {item.visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
                 return;
