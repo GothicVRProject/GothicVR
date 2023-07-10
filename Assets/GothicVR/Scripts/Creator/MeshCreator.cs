@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
@@ -134,16 +134,16 @@ namespace GVR.Creator
 
         public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
+            if (mrm == null)
+            {
+                Debug.LogError("No mesh data was found for: " + objectName);
+                return null;
+            }
+
             rootGo ??= new GameObject();
             rootGo.name = objectName;
             rootGo.SetParent(parent);
             SetPosAndRot(rootGo, position, rotation);
-
-            if (mrm == null)
-            {
-                Debug.LogError("No mesh data was found for: " + objectName);
-                return rootGo;
-            }
 
             var meshFilter = rootGo.AddComponent<MeshFilter>();
             var meshRenderer = rootGo.AddComponent<MeshRenderer>();
