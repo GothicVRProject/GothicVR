@@ -43,9 +43,8 @@ namespace GothicVR.Editor
             // As we ensured our Window is only active when not playing, we can safely reuse it for now.
             PhoenixBridge.VdfsPtr = _vdfsPtr;
             
-            var world = WorldBridge.LoadWorld(_vdfsPtr, "world.zen");
-
-            _meshCreator.Create(world);
+            // use PhoenixImporter to handle loading the world and setting it to the correct scene.
+            SingletonBehaviour<PhoenixImporter>.GetOrCreate().LoadEditorWorld(_vdfsPtr, "world");
         }
 
         void OnGUI()
