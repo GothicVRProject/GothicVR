@@ -11,7 +11,6 @@ using PxCs.Data.Struct;
 using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.Rendering.Universal;
 
 namespace GVR.Creator
@@ -43,13 +42,11 @@ namespace GVR.Creator
             this.assetCache = assetCache;
         }
         
-        public GameObject Create(WorldData world, GameObject parent = null)
+        public GameObject Create(WorldData world)
         {
-            var teleportArea = worldMesh.GetComponent<TeleportationArea>();
-
             foreach (var subMesh in world.subMeshes.Values)
             {
-                var subMeshObj = new GameObject(string.Format("submesh-{0}", subMesh.material.name));
+                var subMeshObj = new GameObject(subMesh.material.name);
                 subMeshObj.isStatic = true;
                 
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
@@ -57,14 +54,11 @@ namespace GVR.Creator
                 
                 PrepareMeshRenderer(meshRenderer, subMesh);
                 PrepareMeshFilter(meshFilter, subMesh);
-                var singlecollider = PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
+                PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
                 
-                if(singlecollider != null)
-                    teleportArea.colliders.Add(singlecollider);
-
                 subMeshObj.SetParent(worldMesh);
             }
-
+            
             return worldMesh;
         }
 
@@ -177,7 +171,7 @@ namespace GVR.Creator
             decalProjectorGo.SetParent(parent);
             SetPosAndRot(decalProjectorGo, vob.position.ToUnityVector(), vob.rotation!.Value);
             
-            decalProj.pivot = UnityEngine.Vector3.zero;
+            decalProj.pivot = Vector3.zero;
             decalProj.fadeFactor = decalOpacity;
             
             // FIXME use Prefab!

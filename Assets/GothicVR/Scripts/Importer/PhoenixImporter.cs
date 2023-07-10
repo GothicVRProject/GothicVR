@@ -92,10 +92,11 @@ namespace GVR.Importer
 
             var scene = SceneManager.GetSceneByName("SampleScene");
             scene.GetRootGameObjects().Append(worldGo);
-
-            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, worldGo);
+            
+            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world);
             SingletonBehaviour<VobCreator>.GetOrCreate().Create(worldGo, world);
             SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(worldGo, world);
+            SingletonBehaviour<WorldCreator>.GetOrCreate().PostCreate();
 
             SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
         }
