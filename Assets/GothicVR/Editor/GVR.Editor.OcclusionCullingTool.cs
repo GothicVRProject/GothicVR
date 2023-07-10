@@ -10,12 +10,21 @@ using UnityEngine;
 
 namespace GothicVR.Editor
 {
+    /// HOW TO USE:
+    /// 1. LOAD THE SCENE FOR WHICH YOU WANT OCCULUSION CULLING
+    /// 2. SET THE SCENE AS ACTIVE SCENE
+    /// 3. RUN GothicVR/Tools/OcclusionCulling
+    /// 4. MAKE SURE THAT THE CORRECT SCENE IS SET AS ACTIVE
+    /// 5. SELECT ALL MESHES IN THE SCENE
+    /// 6. Window/Rendering/Occlusion Culling
+    /// 7. BAKE THE OCCULUSION CULLING
+    /// 8. SAVE THE SCENE
+    /// 9. DONE
     public class OcclusionCullingTool : EditorWindow
     {
         private const string _G1DIR = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic";
         private static IntPtr _vdfsPtr = IntPtr.Zero;
         private static MeshCreator _meshCreator;
-
         
         [MenuItem("GothicVR/Tools/Occlusion Culling", true)]
         private static bool ValidateMyMenuItem()
