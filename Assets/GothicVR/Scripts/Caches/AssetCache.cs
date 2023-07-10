@@ -162,7 +162,6 @@ namespace GVR.Caches
                 return data;
             
             var wavFile = PxSound.GetSoundArrayFromVDF<float>(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.wav");
-            
             soundCache[preparedKey] = wavFile;
 
             return wavFile;

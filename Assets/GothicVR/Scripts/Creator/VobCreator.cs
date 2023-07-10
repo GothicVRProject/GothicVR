@@ -133,7 +133,16 @@ namespace GVR.Creator
 
             // e.g. ItMiCello is commented out on misc.d file.
             if (item == null)
+            {
+                Debug.LogError($"Item {itemName} not found.");
                 return;
+            }
+
+            if (item.visual.ToLower().EndsWith(".mms"))
+            {
+                Debug.LogError($"Item {item.visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
+                return;
+            }
             
             var prefabInstance = PrefabCache.Instance.TryGetObject(PrefabCache.PrefabType.VobItem);
             var vobObj = CreateItemMesh(vob, item, prefabInstance);
