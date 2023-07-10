@@ -5,18 +5,22 @@ using UnityEngine.UI;
 using UnityEngine.XR;
 
 public class ControllerManager : MonoBehaviour
-{ 
+{
+    public enum TurnSetting { none, snap, continuous }
+    public TurnSetting turnsetting;
+
     public GameObject raycastLeft;
     public GameObject raycastRight;
     public GameObject directLeft;
     public GameObject directRight;
+    public GameObject settingsMenue;
     //public GameObject healthBar;
     //public GameObject manaBar;
     //public GameObject inventoryBag; was removed from game
     //public GameObject quickAccessSlots;
     //public GameObject mainMenue;
     //public GameObject inventory;
-   // private InventoryClose inventoryCloseScript;
+    // private InventoryClose inventoryCloseScript;
     public bool raycastActive = false;
     private InputDeviceCharacteristics leftControllerCharacteristic = InputDeviceCharacteristics.Left;
     private InputDeviceCharacteristics rightControllerCharacteristic = InputDeviceCharacteristics.Right;
@@ -77,7 +81,8 @@ public class ControllerManager : MonoBehaviour
         //Right Controller - Primary button
         if (rightprimarybuttonvalue == true)
         {
-            ShowInventory();
+            ShowSettingsMenue();
+            //ShowInventory();
         }
         else
         {
@@ -134,6 +139,17 @@ public class ControllerManager : MonoBehaviour
         directLeft.SetActive(true);
         directRight.SetActive(true);
     }
+
+
+    public void ShowSettingsMenue()
+    {
+            if (!settingsMenue.activeSelf)
+            {
+                 settingsMenue.gameObject.transform.parent = null;
+                 settingsMenue.SetActive(true);
+            }
+        }
+
 
     public void ShowMainMenue()
     {

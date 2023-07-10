@@ -18,6 +18,8 @@ namespace GVR.Importer
 {
     public class PhoenixImporter : SingletonBehaviour<PhoenixImporter>
     {
+        public GameObject worldGo;
+        
         private bool _loaded = false;
         private static DebugSettings _debugSettings;
 
@@ -105,14 +107,13 @@ namespace GVR.Importer
             PhoenixBridge.World = world;
 
 
-            var root = new GameObject("World");
-
             var scene = SceneManager.GetSceneByName("SampleScene");
-            scene.GetRootGameObjects().Append(root);
-
-            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, root);
-            SingletonBehaviour<VobCreator>.GetOrCreate().Create(root, world);
-            SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(root, world);
+            scene.GetRootGameObjects().Append(worldGo);
+            
+            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world);
+            SingletonBehaviour<VobCreator>.GetOrCreate().Create(worldGo, world);
+            SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(worldGo, world);
+            SingletonBehaviour<WorldCreator>.GetOrCreate().PostCreate();
 
             SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
 
@@ -192,25 +193,12 @@ namespace GVR.Importer
             GlyphRenderMode renderMode = GlyphRenderMode.COLOR;
             int atlasWidth = 100;
             int atlasHeight = 100;
-
-
+            
             if (File.Exists(menuFontPath))
                 PhoenixBridge.GothicMenuFont = TMP_FontAsset.CreateFontAsset(menuFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
 
             if (File.Exists(subtitleFontPath))
-                PhoenixBridge.GothicMenuFont = TMP_FontAsset.CreateFontAsset(subtitleFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
-
-            // DEBUG - Example to show how the font is being picked.
-            var obj = GameObject.Find("HelloWorld");
-            var textMesh = obj.GetComponent<TMP_Text>();
-
-            textMesh.fontSize = 50;
-            textMesh.autoSizeTextContainer = true;
-
-            textMesh.text = "Is it Gothic font?";
-
-            if (PhoenixBridge.GothicMenuFont)
-                textMesh.font = PhoenixBridge.GothicMenuFont;
+                PhoenixBridge.GothicSubtitleFont = TMP_FontAsset.CreateFontAsset(subtitleFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
         }
 
 
