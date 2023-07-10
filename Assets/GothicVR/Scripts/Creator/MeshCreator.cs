@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
@@ -221,7 +221,6 @@ namespace GVR.Creator
 
             // No texture to add.
             if (bMaterial.texture == "")
-
             {
                 Debug.LogWarning("No texture was set for: " + bMaterial.name);
                 return;
@@ -230,11 +229,12 @@ namespace GVR.Creator
             var texture = assetCache.TryGetTexture(bMaterial.texture);
 
             if (null == texture)
-                // throw new Exception("Couldn't get texture from name: " + bMaterial.texture);
+            {
                 if (bMaterial.texture.EndsWith(".TGA"))
                     Debug.LogError("This is supposed to be a decal: " + bMaterial.texture);
                 else
                     Debug.LogError("Couldn't get texture from name: " + bMaterial.texture);
+            }
 
             material.mainTexture = texture;
         }
