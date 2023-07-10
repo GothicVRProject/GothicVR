@@ -161,18 +161,7 @@ namespace GVR.Caches
             if (soundCache.TryGetValue(preparedKey, out PxSoundData<float> data))
                 return data;
             
-            PxSoundData<float> wavFile = new PxSoundData<float>();
-
-            try
-            {
-                wavFile = PxSound.GetSoundArrayFromVDF<float>(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.wav");
-            }
-            catch
-            {
-                Debug.LogError("AccessViolationException: Sound not found.");
-                return null;
-            }
-            
+            var wavFile = PxSound.GetSoundArrayFromVDF<float>(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.wav");
             soundCache[preparedKey] = wavFile;
 
             return wavFile;
