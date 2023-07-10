@@ -14,6 +14,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.LowLevel;
 
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
+
 namespace GVR.Importer
 {
     public class PhoenixImporter : SingletonBehaviour<PhoenixImporter>
@@ -124,13 +128,23 @@ namespace GVR.Importer
             // is related to occlusion culling
             SceneManager.sceneLoaded += SetActiveScene;
         }
-                // if the world scene is already loaded it could mean that we have a world loaded in
-                // so we delete everything :D
-                if (worldScene.GetRootGameObjects().Length != 0)
-                    foreach (var item in worldScene.GetRootGameObjects())
-                    {
-                        GameObject.Destroy(item);
-                    }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// Loads the world.
+        /// </summary>
+        /// <param name="vdfPtr">The VDF pointer.</param>
+        /// <param name="zen">The name of the .zen world to load.</param>
+        public void LoadEditorWorld(IntPtr vdfPtr, string zen)
+        {
+            var worldScene = EditorSceneManager.GetSceneByName(zen);
+
+            if (!worldScene.isLoaded)
+            {
+                // unload the current scene and load the new one
+                EditorSceneManager.UnloadSceneAsync(EditorSceneManager.GetActiveScene());
+                EditorSceneManager.LoadScene(zen, LoadSceneMode.Additive);
+                worldScene = EditorSceneManager.GetSceneByName(zen); // we do this to reload the values for the new scene which are no updated for the above cast
             }
 
             var world = WorldBridge.LoadWorld(vdfPtr, $"{zen}.zen"); // world.zen -> G1, newworld.zen/oldworld.zen/addonworld.zen -> G2
@@ -138,21 +152,29 @@ namespace GVR.Importer
             PhoenixBridge.VdfsPtr = vdfPtr;
             PhoenixBridge.World = world;
 
+            var worldGo = new GameObject("World");
 
-            var scene = SceneManager.GetSceneByName("SampleScene");
-            scene.GetRootGameObjects().Append(worldGo);
-            
-            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world);
-            SingletonBehaviour<VobCreator>.GetOrCreate().Create(worldGo, world);
-            SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(worldGo, world);
-            SingletonBehaviour<WorldCreator>.GetOrCreate().PostCreate();
+            // We use SampleScene because it contains all the VM pointers and asset cache necesarry to generate the world
+            var sampleScene = EditorSceneManager.GetSceneByName("SampleScene");
+            EditorSceneManager.SetActiveScene(sampleScene);
+            sampleScene.GetRootGameObjects().Append(worldGo);
 
-            SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
+            var worldMesh = SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, worldGo);
+            // SingletonBehaviour<VobCreator>.GetOrCreate().Create(worldGo, world);
+            // SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(worldGo, world);
+            // SingletonBehaviour<WorldCreator>.GetOrCreate().PostCreate(worldMesh);
 
-            // we are creating the objects directly in SampleScene as we have the asset cache 
-            // and everything we need to generate the world
-            // and after that move everything to world scene
-            SceneManager.MoveGameObjectToScene(root, SceneManager.GetSceneByName("world"));
+            // SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
+
+            // move the world to the correct scene
+            EditorSceneManager.MoveGameObjectToScene(worldGo, worldScene);
+
+            // Subscribe the SetActiveScene method to the sceneLoaded event
+            // so that we can set the proper scene as active when the scene is finally loaded
+            // is related to occlusion culling
+            EditorSceneManager.sceneLoaded += SetActiveScene;
+        }
+#endif
 
         private void SetActiveScene(Scene scene, LoadSceneMode mode)
         {
@@ -233,7 +255,7 @@ namespace GVR.Importer
             GlyphRenderMode renderMode = GlyphRenderMode.COLOR;
             int atlasWidth = 100;
             int atlasHeight = 100;
-            
+
             if (File.Exists(menuFontPath))
                 PhoenixBridge.GothicMenuFont = TMP_FontAsset.CreateFontAsset(menuFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
 
