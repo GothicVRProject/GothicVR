@@ -1,7 +1,7 @@
 using UnityEngine;
 using GVR.Util;
 using GVR.Phoenix.Interface;
-using GVR.Importer;
+using GVR.Creator;
 
 namespace GVR.Phoenix.Util
 {
@@ -12,12 +12,8 @@ namespace GVR.Phoenix.Util
         void OnTriggerEnter(Collider other)
         {
             if (!other.CompareTag("Player")) return;
-
-            Debug.Log("Triggered " + gameObject.name + " teleporting to " + levelName.Split(".")[0] + " having level name " + levelName + " and start vob " + startVob);
-
-            SingletonBehaviour<PhoenixImporter>.GetOrCreate().LoadWorld(PhoenixBridge.VdfsPtr, levelName.Split(".")[0], startVob.Trim(' '));
-
-
+            
+            SingletonBehaviour<WorldCreator>.GetOrCreate().LoadWorld(PhoenixBridge.VdfsPtr, levelName.Split(".")[0], startVob.Trim(' '));
         }
 
     }

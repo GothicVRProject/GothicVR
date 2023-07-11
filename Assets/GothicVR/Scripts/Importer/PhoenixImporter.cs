@@ -50,7 +50,7 @@ namespace GVR.Importer
             LoadGothicVM(G1Dir);
             LoadSfxVM(G1Dir);
             LoadMusicVM(G1Dir);
-            LoadWorld(vdfPtr, "world", "ENTRANCE_SURFACE_OLDMINE");
+            LoadWorld(vdfPtr);
             LoadMusic();
 
             // PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)        
@@ -84,61 +84,9 @@ namespace GVR.Importer
             }
         }
 
-        /// <summary>
-        /// Loads the world.
-        /// </summary>
-        /// <param name="vdfPtr">The VDF pointer.</param>
-        /// <param name="zen">The name of the .zen world to load.</param>
-        public void LoadWorld(IntPtr vdfPtr, string zen, string startVob)
+        private void LoadWorld(IntPtr vdfPtr)
         {
-            var worldScene = SceneManager.GetSceneByName(zen);
-
-            if (!worldScene.isLoaded)
-            {
-                // unload the current scene and load the new one
-                SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
-                SceneManager.LoadScene(zen, LoadSceneMode.Additive);
-                worldScene = SceneManager.GetSceneByName(zen); // we do this to reload the values for the new scene which are no updated for the above cast
-            }
-
-            var world = WorldBridge.LoadWorld(vdfPtr, $"{zen}.zen"); // world.zen -> G1, newworld.zen/oldworld.zen/addonworld.zen -> G2
-
-            PhoenixBridge.VdfsPtr = vdfPtr;
-            PhoenixBridge.World = world;
-
-            var worldGo = new GameObject("World");
-
-            // We use SampleScene because it contains all the VM pointers and asset cache necesarry to generate the world
-            var sampleScene = SceneManager.GetSceneByName("SampleScene");
-            SceneManager.SetActiveScene(sampleScene);
-            sampleScene.GetRootGameObjects().Append(worldGo);
-
-            var worldMesh = SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, worldGo);
-            SingletonBehaviour<VobCreator>.GetOrCreate().Create(worldGo, world);
-            SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(worldGo, world);
-            SingletonBehaviour<WorldCreator>.GetOrCreate().PostCreate(worldMesh);
-
-            SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
-
-            // move the world to the correct scene
-            SceneManager.MoveGameObjectToScene(worldGo, worldScene);
-
-            // Subscribe the SetActiveScene method to the sceneLoaded event
-            // so that we can set the proper scene as active when the scene is finally loaded
-            // is related to occlusion culling
-            SceneManager.sceneLoaded += (scene, mode) =>
-            {
-                SceneManager.SetActiveScene(scene);
-            };
-
-            // Subscribe the SetActiveScene method so wen can properly place the player in the correct spot
-            SceneManager.activeSceneChanged += (oldScene, newScene) =>
-            {
-                if (newScene == worldScene)
-                {
-                    GameObject.Find("VRPlayer_v4 (romey)").transform.position = GameObject.Find(startVob).transform.position;
-                }
-            };
+            SingletonBehaviour<WorldCreator>.GetOrCreate().LoadWorld(vdfPtr, "world", "ENTRANCE_SURFACE_OLDMINE");
         }
 
 #if UNITY_EDITOR
