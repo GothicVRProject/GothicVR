@@ -54,7 +54,7 @@ namespace GothicVR.Editor
             PhoenixBridge.VdfsPtr = _vdfsPtr;
             
             // use PhoenixImporter to handle loading the world and setting it to the correct scene.
-            SingletonBehaviour<PhoenixImporter>.GetOrCreate().LoadEditorWorld(_vdfsPtr, "world");
+            SingletonBehaviour<WorldCreator>.GetOrCreate().LoadEditorWorld(_vdfsPtr, "world");
         }
 
         void OnGUI()

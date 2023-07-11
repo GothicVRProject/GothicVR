@@ -6,6 +6,10 @@ using UnityEngine.XR.Interaction.Toolkit;
 using System;
 using System.Linq;
 
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
+
 namespace GVR.Creator
 {
     public class WorldCreator : SingletonBehaviour<WorldCreator>
@@ -81,5 +85,49 @@ namespace GVR.Creator
             // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
             worldMesh.AddComponent<TeleportationArea>();
         }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// Loads the world for occlusion culling.
+        /// </summary>
+        /// <param name="vdfPtr">The VDF pointer.</param>
+        /// <param name="zen">The name of the .zen world to load.</param>
+        public void LoadEditorWorld(IntPtr vdfPtr, string zen)
+        {
+            var worldScene = EditorSceneManager.GetSceneByName(zen);
+
+            if (!worldScene.isLoaded)
+            {
+                // unload the current scene and load the new one
+                if (EditorSceneManager.GetActiveScene().name != "Bootstrap")
+                    EditorSceneManager.UnloadSceneAsync(EditorSceneManager.GetActiveScene());
+                EditorSceneManager.LoadScene(zen, LoadSceneMode.Additive);
+                worldScene = EditorSceneManager.GetSceneByName(zen); // we do this to reload the values for the new scene which are no updated for the above cast
+            }
+
+            var world = WorldBridge.LoadWorld(vdfPtr, $"{zen}.zen"); // world.zen -> G1, newworld.zen/oldworld.zen/addonworld.zen -> G2
+
+            PhoenixBridge.VdfsPtr = vdfPtr;
+            PhoenixBridge.World = world;
+
+            var worldGo = new GameObject("World");
+
+            // We use SampleScene because it contains all the VM pointers and asset cache necesarry to generate the world
+            var sampleScene = EditorSceneManager.GetSceneByName("Bootstrap");
+            EditorSceneManager.SetActiveScene(sampleScene);
+            sampleScene.GetRootGameObjects().Append(worldGo);
+
+            // load only the world mesh
+            SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, worldGo);
+
+            // move the world to the correct scene
+            EditorSceneManager.MoveGameObjectToScene(worldGo, worldScene);
+
+            // Subscribe the SetActiveScene method to the sceneLoaded event
+            // so that we can set the proper scene as active when the scene is finally loaded
+            // is related to occlusion culling
+            EditorSceneManager.sceneLoaded += (scene, mode) => EditorSceneManager.SetActiveScene(scene);
+        }
+#endif
     }
 }
