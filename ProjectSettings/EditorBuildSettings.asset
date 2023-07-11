@@ -6,8 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/GothicVR/Scenes/SampleScene.unity
+    path: Assets/GothicVR/Scenes/Bootstrap.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/GothicVR/Scenes/Generic.unity
+    guid: 7fb2dedbd5edb7d4a92ee584eec7cc33
   - enabled: 1
     path: Assets/GothicVR/Scenes/world.unity
     guid: e7021be45b2527d4d93e275ffd7dd908
