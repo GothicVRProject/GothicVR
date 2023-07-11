@@ -414,7 +414,7 @@ MonoBehaviour:
   EnableNpcRoutines: 1
   CreateExampleAnimation: 0
   ShowVdfsFileNotFoundErrors: 0
-  EnableSounds: 0
+  EnableSounds: 1
   EnableMusic: 0
 --- !u!1 &703127196
 GameObject:
