@@ -50,7 +50,7 @@ namespace GVR.Importer
             LoadGothicVM(G1Dir);
             LoadSfxVM(G1Dir);
             LoadMusicVM(G1Dir);
-            LoadWorld(vdfPtr, "world");
+            LoadWorld(vdfPtr, "world", "ENTRANCE_SURFACE_OLDMINE");
             LoadMusic();
 
             // PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)        
@@ -89,7 +89,7 @@ namespace GVR.Importer
         /// </summary>
         /// <param name="vdfPtr">The VDF pointer.</param>
         /// <param name="zen">The name of the .zen world to load.</param>
-        public void LoadWorld(IntPtr vdfPtr, string zen)
+        public void LoadWorld(IntPtr vdfPtr, string zen, string startVob)
         {
             var worldScene = SceneManager.GetSceneByName(zen);
 
@@ -126,7 +126,19 @@ namespace GVR.Importer
             // Subscribe the SetActiveScene method to the sceneLoaded event
             // so that we can set the proper scene as active when the scene is finally loaded
             // is related to occlusion culling
-            SceneManager.sceneLoaded += SetActiveScene;
+            SceneManager.sceneLoaded += (scene, mode) =>
+            {
+                SceneManager.SetActiveScene(scene);
+            };
+
+            // Subscribe the SetActiveScene method so wen can properly place the player in the correct spot
+            SceneManager.activeSceneChanged += (oldScene, newScene) =>
+            {
+                if (newScene == worldScene)
+                {
+                    GameObject.Find("VRPlayer_v4 (romey)").transform.position = GameObject.Find(startVob).transform.position;
+                }
+            };
         }
 
 #if UNITY_EDITOR
@@ -172,37 +184,9 @@ namespace GVR.Importer
             // Subscribe the SetActiveScene method to the sceneLoaded event
             // so that we can set the proper scene as active when the scene is finally loaded
             // is related to occlusion culling
-            EditorSceneManager.sceneLoaded += SetActiveScene;
+            EditorSceneManager.sceneLoaded += (scene, mode) => EditorSceneManager.SetActiveScene(scene);
         }
 #endif
-
-        private void SetActiveScene(Scene scene, LoadSceneMode mode)
-        {
-            // just start position to for each world
-            // as we need to have a starting position in the new world
-            var startPosition = "";
-            if (scene.name == "world")
-            {
-                startPosition = "ENTRANCE_SURFACE_OLDMINE";
-            }
-            if (scene.name == "oldmine" || scene.name == "freemine")
-            {
-                startPosition = "ENTRANCE_OLDMINE_SURFACE";
-            }
-            if (scene.name == "orcgraveyard")
-            {
-                startPosition = "ENTRANCE_ORCGRAVEYARD_SURFACE";
-            }
-            if (scene.name == "orctempel")
-            {
-                startPosition = "ENTRANCE_ORCTEMPLE_SURFACE";
-            }
-            GameObject.Find("VRPlayer_v4 (romey)").transform.position = GameObject.Find(startPosition).transform.position;
-
-            Debug.Log(scene.name + " " + startPosition);
-
-            SceneManager.SetActiveScene(scene);
-        }
 
         private void LoadGothicVM(string G1Dir)
         {

@@ -212,8 +212,6 @@ namespace GVR.Creator
             var gameObject = new GameObject(vob.vobName);
             gameObject.SetParent(parentGos[vob.type]);
 
-            // SetPosAndRot(gameObject, vob.position, vob.rotation!.Value);
-
             var trigger = gameObject.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
 
@@ -221,10 +219,14 @@ namespace GVR.Creator
             var max = vob.boundingBox.max.ToUnityVector();
             gameObject.transform.position = (min + max) / 2f;
 
-            gameObject.transform.localScale = (max-min);
+            gameObject.transform.localScale = (max - min);
 
-            if(SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
-                gameObject.AddComponent<ChangeLevelTriggerHandler>();
+            if (SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
+            {
+                var triggerHandler = gameObject.AddComponent<ChangeLevelTriggerHandler>();
+                triggerHandler.levelName = vob.levelName;
+                triggerHandler.startVob = vob.startVob;
+            }
         }
 
         /// <summary>
