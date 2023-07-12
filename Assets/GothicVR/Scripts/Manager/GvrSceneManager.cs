@@ -15,15 +15,18 @@ namespace GVR.Manager
 
         private string newWorldName;
         private string startVobAfterLoading;
-        
+        private Scene generalScene;
+
+        private GameObject player;
+
         /// <summary>
         /// Called once after bootstrapping scene is done.
         /// Then load either menu or a world defined inside DebugSettings.
         /// </summary>
         public void LoadStartupScenes()
         {
-            SceneManager.LoadScene(generalSceneName, LoadSceneMode.Additive);
-            
+            generalScene = SceneManager.LoadScene(generalSceneName, new LoadSceneParameters(LoadSceneMode.Additive));
+
             LoadWorld("world", "ENTRANCE_SURFACE_OLDMINE");
         }
 
@@ -52,6 +55,12 @@ namespace GVR.Manager
         /// </summary>
         private void WorldSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            if (scene == generalScene)
+            {
+                var playerParent = generalScene.GetRootGameObjects().FirstOrDefault(o => o.name == "PlayerController");
+                player = playerParent.transform.Find("VRPlayer_v4 (romey)").gameObject;
+                return;
+            }
             SceneManager.SetActiveScene(scene);
             
             WorldCreator.I.Create(newWorldName);
@@ -62,7 +71,9 @@ namespace GVR.Manager
         /// </summary>
         private void ActiveSceneChanged(Scene oldScene, Scene newScene)
         {
-            GameObject.Find("VRPlayer_v4 (romey)").transform.position = GameObject.Find(startVobAfterLoading).transform.position;
+            // TODO: Dont use GameObject.Find as it will be more computationally expensive in the future with more GO to check
+            if (newScene == GameData.I.WorldScene)
+                player.transform.position = GameObject.Find(startVobAfterLoading).transform.position;
         }
     }
 }
