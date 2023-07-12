@@ -296,7 +296,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &235819215
 MonoBehaviour:
@@ -632,6 +632,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1613829617}
+  - component: {fileID: 1613829619}
   - component: {fileID: 1613829616}
   - component: {fileID: 1613829615}
   - component: {fileID: 1613829618}
@@ -697,6 +698,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   prefabRootGo: {fileID: 0}
+--- !u!114 &1613829619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1613829614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 885aa1f171f8e3248b8a9eba04046f65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 0
+  GothicMenuFont: {fileID: 0}
+  GothicSubtitleFont: {fileID: 0}
+  WorldScene:
+    m_Handle: 0
 --- !u!1 &1892061892
 GameObject:
   m_ObjectHideFlags: 0
@@ -740,7 +758,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1896514212
 GameObject:
@@ -752,6 +770,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1896514214}
   - component: {fileID: 1896514213}
+  - component: {fileID: 1896514215}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -787,3 +806,16 @@ Transform:
   m_Father: {fileID: 1054640329}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1896514215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 943ded366cc83b447a209cb52b2d3209, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 0

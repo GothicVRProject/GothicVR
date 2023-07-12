@@ -4,7 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using GVR.Phoenix.Data;
+using GVR.Phoenix.Util;
+using PxCs.Data.WayNet;
+using PxCs.Interface;
 
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
@@ -14,65 +19,23 @@ namespace GVR.Creator
 {
     public class WorldCreator : SingletonBehaviour<WorldCreator>
     {
-
-        /// <summary>
-        /// Loads the world.
-        /// </summary>
-        /// <param name="vdfPtr">The VDF pointer.</param>
-        /// <param name="zen">The name of the .zen world to load.</param>
-        public void LoadWorld(IntPtr vdfPtr, string zen, string startVob)
+        public void Create(string worldName)
         {
-            var worldScene = SceneManager.GetSceneByName(zen);
-
-            if (!worldScene.isLoaded)
-            {
-                // unload the current scene and load the new one
-                if (SceneManager.GetActiveScene().name != "Bootstrap")
-                    SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
-                SceneManager.LoadScene(zen, LoadSceneMode.Additive);
-                worldScene = SceneManager.GetSceneByName(zen); // we do this to reload the values for the new scene which are no updated for the above cast
-            }
-
-            var world = WorldBridge.LoadWorld(vdfPtr, $"{zen}.zen"); // world.zen -> G1, newworld.zen/oldworld.zen/addonworld.zen -> G2
-
-            PhoenixBridge.VdfsPtr = vdfPtr;
-            PhoenixBridge.World = world;
+            var world = LoadWorld($"{worldName}.zen");
+            GameData.I.World = world;
 
             var worldGo = new GameObject("World");
 
-            // We use SampleScene because it contains all the VM pointers and asset cache necesarry to generate the world
-            var sampleScene = SceneManager.GetSceneByName("Bootstrap");
-            SceneManager.SetActiveScene(sampleScene);
-            sampleScene.GetRootGameObjects().Append(worldGo);
+            GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
 
-            var worldMesh = SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, worldGo);
+            var worldMesh = MeshCreator.I.Create(world, worldGo);
             SingletonBehaviour<VobCreator>.GetOrCreate().Create(worldGo, world);
             SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(worldGo, world);
-            SingletonBehaviour<WorldCreator>.GetOrCreate().PostCreate(worldMesh);
+            PostCreate(worldMesh);
 
             SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
-
-            // move the world to the correct scene
-            SceneManager.MoveGameObjectToScene(worldGo, worldScene);
-
-            // Subscribe the SetActiveScene method to the sceneLoaded event
-            // so that we can set the proper scene as active when the scene is finally loaded
-            // is related to occlusion culling
-            SceneManager.sceneLoaded += (scene, mode) =>
-            {
-                SceneManager.SetActiveScene(scene);
-            };
-
-            // Subscribe the SetActiveScene method so wen can properly place the player in the correct spot
-            SceneManager.activeSceneChanged += (oldScene, newScene) =>
-            {
-                if (newScene == worldScene)
-                {
-                    GameObject.Find("VRPlayer_v4 (romey)").transform.position = GameObject.Find(startVob).transform.position;
-                }
-            };
         }
-
+        
         /// <summary>
         /// Logic to be called after world is fully loaded.
         /// </summary>
@@ -85,6 +48,102 @@ namespace GVR.Creator
             // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
             worldMesh.AddComponent<TeleportationArea>();
         }
+        
+        private WorldData LoadWorld(string worldName)
+        {
+            var worldPtr = PxWorld.pxWorldLoadFromVdf(GameData.I.VdfsPtr, worldName);
+            if (worldPtr == IntPtr.Zero)
+                throw new ArgumentException($"World >{worldName}< couldn't be found.");
+
+            var worldMeshPtr = PxWorld.pxWorldGetMesh(worldPtr);
+            if (worldMeshPtr == IntPtr.Zero)
+                throw new ArgumentException($"No mesh in world >{worldName}< found.");
+
+            var vertexIndices = PxMesh.GetPolygonVertexIndices(worldMeshPtr);
+            var materialIndices = PxMesh.GetPolygonMaterialIndices(worldMeshPtr);
+            var featureIndices = PxMesh.GetPolygonFeatureIndices(worldMeshPtr);
+
+            var vertices = PxMesh.GetVertices(worldMeshPtr);
+            var features = PxMesh.GetFeatures(worldMeshPtr);
+            var materials = PxMesh.GetMaterials(worldMeshPtr);
+
+            var waypoints = PxWorld.GetWayPoints(worldPtr);
+            var waypointsDict = new Dictionary<string, PxWayPointData>();
+            foreach (var waypoint in waypoints)
+            {
+                waypointsDict[waypoint.name] = waypoint;
+            }
+            var waypointEdges = PxWorld.GetWayEdges(worldPtr);
+
+            WorldData world = new()
+            {
+                vertexIndices = vertexIndices,
+                materialIndices = materialIndices,
+                featureIndices = featureIndices,
+
+                vertices = vertices,
+                features = features,
+                materials = materials,
+
+
+                vobs = PxWorld.GetVobs(worldPtr),
+
+                waypoints = waypoints,
+                waypointsDict = waypointsDict,
+                waypointEdges = waypointEdges
+            };
+            
+            var subMeshes = CreateSubmeshesForUnity(world);
+            world.subMeshes = subMeshes;
+
+            PxWorld.pxWorldDestroy(worldPtr);
+
+            return world;
+        }
+
+        private Dictionary<int, WorldData.SubMeshData> CreateSubmeshesForUnity(WorldData world)
+        {
+            Dictionary<int, WorldData.SubMeshData> subMeshes = new(world.materials.Length);
+            var vertices = world.vertices;
+            var vertexIndices = world.vertexIndices;
+            var featureIndices = world.featureIndices;
+            var features = world.features;
+
+            // We need to put vertex_indices (aka triangles) in reversed order
+            // to make Unity draw mesh elements right (instead of upside down)
+            for (var loopVertexIndexId = vertexIndices.LongLength - 1; loopVertexIndexId >= 0; loopVertexIndexId--)
+            {
+                // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
+                var materialIndex = world.materialIndices[loopVertexIndexId / 3];
+
+                // The materialIndex was never used before.
+                if (!subMeshes.ContainsKey(materialIndex))
+                {
+                    var newSubMesh = new WorldData.SubMeshData()
+                    {
+                        materialIndex = materialIndex,
+                        material = world.materials[materialIndex]
+                    };
+
+                    subMeshes.Add(materialIndex, newSubMesh);
+                }
+
+                var currentSubMesh = subMeshes[materialIndex];
+                var origVertexIndex = vertexIndices[loopVertexIndexId];
+
+                // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
+                currentSubMesh.vertices.Add(vertices[origVertexIndex].ToUnityVector());
+
+                var featureIndex = featureIndices[loopVertexIndexId];
+                currentSubMesh.uvs.Add(features[featureIndex].texture.ToUnityVector());
+                currentSubMesh.normals.Add(features[featureIndex].normal.ToUnityVector());
+
+                currentSubMesh.triangles.Add(currentSubMesh.vertices.Count - 1);
+            }
+
+            return subMeshes;
+        }
+        
 
 #if UNITY_EDITOR
         /// <summary>
@@ -105,10 +164,11 @@ namespace GVR.Creator
                 worldScene = EditorSceneManager.GetSceneByName(zen); // we do this to reload the values for the new scene which are no updated for the above cast
             }
 
-            var world = WorldBridge.LoadWorld(vdfPtr, $"{zen}.zen"); // world.zen -> G1, newworld.zen/oldworld.zen/addonworld.zen -> G2
+            var world = LoadWorld($"{zen}.zen");
 
-            PhoenixBridge.VdfsPtr = vdfPtr;
-            PhoenixBridge.World = world;
+            // FIXME - Might not work as we have no context inside Editor mode. Need to test and find alternative.
+            GameData.I.VdfsPtr = vdfPtr;
+            GameData.I.World = world;
 
             var worldGo = new GameObject("World");
 

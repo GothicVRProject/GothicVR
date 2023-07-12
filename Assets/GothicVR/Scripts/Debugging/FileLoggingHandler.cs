@@ -1,7 +1,7 @@
 using System.IO;
 using UnityEngine;
 
-namespace GVR.Settings
+namespace GVR.Debugging
 {
     public class FileLoggingHandler : MonoBehaviour
     {

@@ -1,28 +1,29 @@
+using System;
+using System.Diagnostics;
+using System.IO;
 using AOT;
 using GVR.Creator;
+using GVR.Debugging;
 using GVR.Demo;
+using GVR.Manager;
+using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
-using GVR.Settings;
 using GVR.Util;
 using PxCs.Interface;
-using System;
-using System.IO;
 using TMPro;
-using UnityEngine;
+using Unity.VisualScripting;
 using UnityEngine.TextCore.LowLevel;
+using Debug = UnityEngine.Debug;
 
-namespace GVR.Importer
+namespace GVR.Bootstrap
 {
-    public class PhoenixImporter : SingletonBehaviour<PhoenixImporter>
+    public class PhoenixBootstrapper : SingletonBehaviour<PhoenixBootstrapper>
     {
         private bool _loaded = false;
-        private static DebugSettings _debugSettings;
 
         private void Start()
         {
-            _debugSettings = SingletonBehaviour<DebugSettings>.GetOrCreate();
-
             VmGothicBridge.DefaultExternalCallback.AddListener(MissingVmExternalCall);
             PxLogging.pxLoggerSet(PxLoggerCallback);
         }
@@ -34,24 +35,25 @@ namespace GVR.Importer
                 return;
             _loaded = true;
 
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var watch = Stopwatch.StartNew();
 
-            var G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicIPath;
+            var g1Dir = SettingsManager.Instance.GameSettings.GothicIPath;
 
-            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "Data"));
-            var vdfPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
+            var fullPath = Path.GetFullPath(Path.Join(g1Dir, "Data"));
 
-            LoadGothicVM(G1Dir);
-            LoadSfxVM(G1Dir);
-            LoadMusicVM(G1Dir);
-            LoadWorld(vdfPtr);
+            // Holy grail of everything! If this pointer is zero, we have nothing but a plain empty wormhole.
+            GameData.I.VdfsPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
+
+            LoadGothicVM(g1Dir);
+            LoadSfxVM(g1Dir);
+            LoadMusicVM(g1Dir);
             LoadMusic();
-
-            // PxVm.CallFunction(PhoenixBridge.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); // Goal: Spawn Bloodwyn ;-)        
-            //LoadFonts();
+            LoadFonts();
 
             watch.Stop();
-            Debug.Log($"Time spent for loading world + VM + npc loading: {watch.Elapsed}");
+            Debug.Log($"Time spent for Bootstrapping Phoenix: {watch.Elapsed}");
+
+            GvrSceneManager.Instance.LoadStartupScenes();
         }
 
 
@@ -69,18 +71,13 @@ namespace GVR.Importer
                     Debug.LogWarning(message);
                     break;
                 case PxLogging.Level.error:
-                    bool isVdfMessage = message.StartsWith("failed to find vdf entry");
-                    if (isVdfMessage && !_debugSettings.ShowVdfsFileNotFoundErrors)
+                    var isVdfMessage = message.StartsWith("failed to find vdf entry");
+                    if (isVdfMessage && !FeatureFlags.I.ShowVdfsFileNotFoundErrors)
                         break;
 
                     Debug.LogError(message);
                     break;
             }
-        }
-
-        private void LoadWorld(IntPtr vdfPtr)
-        {
-            SingletonBehaviour<WorldCreator>.GetOrCreate().LoadWorld(vdfPtr, "world", "ENTRANCE_SURFACE_OLDMINE");
         }
 
         private void LoadGothicVM(string G1Dir)
@@ -90,26 +87,26 @@ namespace GVR.Importer
 
             VmGothicBridge.RegisterExternals(vmPtr);
 
-            PhoenixBridge.VmGothicPtr = vmPtr;
+            GameData.Instance.VmGothicPtr = vmPtr;
         }
 
         private void LoadSfxVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
             var vmPtr = VmGothicBridge.LoadVm(fullPath);
-            PhoenixBridge.VmSfxPtr = vmPtr;
+            GameData.Instance.VmSfxPtr = vmPtr;
         }
 
         private void LoadMusicVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
             var vmPtr = VmGothicBridge.LoadVm(fullPath);
-            PhoenixBridge.VmMusicPtr = vmPtr;
+            GameData.Instance.VmMusicPtr = vmPtr;
         }
 
         private void LoadMusic()
         {
-            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableMusic)
+            if (!SingletonBehaviour<FeatureFlags>.GetOrCreate().EnableMusic)
                 return;
             var music = SingletonBehaviour<MusicCreator>.GetOrCreate();
             music.Create();
@@ -136,40 +133,10 @@ namespace GVR.Importer
             int atlasHeight = 100;
 
             if (File.Exists(menuFontPath))
-                PhoenixBridge.GothicMenuFont = TMP_FontAsset.CreateFontAsset(menuFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
+                GameData.Instance.GothicMenuFont = TMP_FontAsset.CreateFontAsset(menuFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
 
             if (File.Exists(subtitleFontPath))
-                PhoenixBridge.GothicSubtitleFont = TMP_FontAsset.CreateFontAsset(subtitleFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
-        }
-
-
-        // FIXME: This destructor is called multiple times when starting Unity game (Also during start of game)
-        // FIXME: We need to check why and improve!
-        // Destroy memory on phoenix DLL when game closes.
-        ~PhoenixImporter()
-        {
-            if (PhoenixBridge.VdfsPtr != IntPtr.Zero)
-            {
-                PxVdf.pxVdfDestroy(PhoenixBridge.VdfsPtr);
-                PhoenixBridge.VdfsPtr = IntPtr.Zero;
-            }
-
-            if (PhoenixBridge.VmGothicPtr != IntPtr.Zero)
-            {
-                PxVm.pxVmDestroy(PhoenixBridge.VmGothicPtr);
-                PhoenixBridge.VmGothicPtr = IntPtr.Zero;
-            }
-
-            if (PhoenixBridge.VmSfxPtr != IntPtr.Zero)
-            {
-                PxVm.pxVmDestroy(PhoenixBridge.VmSfxPtr);
-                PhoenixBridge.VmSfxPtr = IntPtr.Zero;
-            }
-            if (PhoenixBridge.VmMusicPtr != IntPtr.Zero)
-            {
-                PxVm.pxVmDestroy(PhoenixBridge.VmMusicPtr);
-                PhoenixBridge.VmMusicPtr = IntPtr.Zero;
-            }
+                GameData.I.GothicSubtitleFont = TMP_FontAsset.CreateFontAsset(subtitleFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
         }
     }
 }

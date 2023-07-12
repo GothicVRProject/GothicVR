@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GothicVR.Vob;
 using GVR.Caches;
+using GVR.Debugging;
 using GVR.Demo;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
@@ -39,7 +40,7 @@ namespace GVR.Creator
 
         public void Create(GameObject root, WorldData world)
         {
-            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
+            if (!SingletonBehaviour<FeatureFlags>.GetOrCreate().CreateVobs)
                 return;
             
             var vobRootObj = new GameObject("Vobs");
@@ -184,7 +185,7 @@ namespace GVR.Creator
         // FIXME - change values for AudioClip based on Sfx and vob value (value overloads itself)
         private void CreateSound(PxVobSoundData vob)
         {
-            if (!DebugSettings.Instance.EnableSounds)
+            if (!FeatureFlags.I.EnableSounds)
                 return;
             
             var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
@@ -194,7 +195,7 @@ namespace GVR.Creator
         // FIXME - add specific daytime logic!
         private void CreateSoundDaytime(PxVobSoundDaytimeData vob)
         {
-            if (!DebugSettings.Instance.EnableSounds)
+            if (!FeatureFlags.Instance.EnableSounds)
                 return;
             
             var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
@@ -221,7 +222,7 @@ namespace GVR.Creator
 
             gameObject.transform.localScale = (max - min);
 
-            if (SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
+            if (SingletonBehaviour<FeatureFlags>.GetOrCreate().CreateVobs)
             {
                 var triggerHandler = gameObject.AddComponent<ChangeLevelTriggerHandler>();
                 triggerHandler.levelName = vob.levelName;
@@ -238,10 +239,10 @@ namespace GVR.Creator
             var spot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             Destroy(spot.GetComponent<SphereCollider>()); // No need for collider here!
             
-            if (DebugSettings.Instance.EnableVobFPMesh)
+            if (FeatureFlags.Instance.EnableVobFPMesh)
             {
 #if UNITY_EDITOR
-                if (DebugSettings.Instance.EnableVobFPMeshEditorLabel)
+                if (FeatureFlags.Instance.EnableVobFPMeshEditorLabel)
                 {
                     var iconContent = EditorGUIUtility.IconContent("sv_label_4");
                     EditorGUIUtility.SetIconForObject(spot, (Texture2D) iconContent.image);

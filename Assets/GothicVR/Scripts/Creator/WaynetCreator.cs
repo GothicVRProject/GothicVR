@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using GVR.Debugging;
+using UnityEngine;
 using GVR.Demo;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
@@ -20,7 +21,7 @@ namespace GVR.Creator
 
         private void CreateWaypoints(GameObject parent, WorldData world)
         {
-            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateWaypoints)
+            if (!FeatureFlags.I.CreateWaypoints)
                 return;
 
             var waypointsObj = new GameObject(string.Format("Waypoints"));
@@ -39,7 +40,7 @@ namespace GVR.Creator
 
         private void CreateWaypointEdges(GameObject parent, WorldData world)
         {
-            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateWaypointEdges)
+            if (!SingletonBehaviour<FeatureFlags>.GetOrCreate().CreateWaypointEdges)
                 return;
 
             var waypointEdgesObj = new GameObject(string.Format("Edges"));

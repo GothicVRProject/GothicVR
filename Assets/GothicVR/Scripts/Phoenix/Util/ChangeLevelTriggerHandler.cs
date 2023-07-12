@@ -1,7 +1,5 @@
+using GVR.Manager;
 using UnityEngine;
-using GVR.Util;
-using GVR.Phoenix.Interface;
-using GVR.Creator;
 
 namespace GVR.Phoenix.Util
 {
@@ -9,11 +7,13 @@ namespace GVR.Phoenix.Util
     {
         public string levelName;
         public string startVob;
+        
         void OnTriggerEnter(Collider other)
         {
-            if (!other.CompareTag("Player")) return;
+            if (!other.CompareTag("Player"))
+                return;
             
-            SingletonBehaviour<WorldCreator>.GetOrCreate().LoadWorld(PhoenixBridge.VdfsPtr, levelName.Split(".")[0], startVob.Trim(' '));
+            GvrSceneManager.I.LoadWorld(levelName.Split(".")[0], startVob.Trim());
         }
 
     }
