@@ -34,6 +34,8 @@ namespace GVR.Creator
             PostCreate(worldMesh);
 
             SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
+
+            SceneManager.MoveGameObjectToScene(worldGo, SceneManager.GetSceneByName(worldName));
         }
         
         /// <summary>
