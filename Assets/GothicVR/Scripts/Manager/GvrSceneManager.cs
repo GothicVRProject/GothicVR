@@ -42,9 +42,11 @@ namespace GVR.Manager
             {
                 SceneManager.UnloadSceneAsync(GameData.I.WorldScene.Value);
             }
-            
+
             GameData.I.WorldScene = newWorldScene;
-            
+
+            WorldCreator.I.Create(newWorldName);
+
             SceneManager.sceneLoaded += WorldSceneLoaded;
             SceneManager.activeSceneChanged += ActiveSceneChanged;
         }
@@ -62,10 +64,8 @@ namespace GVR.Manager
                 return;
             }
             SceneManager.SetActiveScene(scene);
-            
-            WorldCreator.I.Create(newWorldName);
         }
-        
+
         /// <summary>
         /// Subscribe the SetActiveScene method so wen can properly place the player in the correct spot.
         /// </summary>
