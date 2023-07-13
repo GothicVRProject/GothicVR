@@ -237,8 +237,9 @@ namespace GVR.Creator
         private void CreateSpot(PxVobData vob)
         {
             var spot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            spot.tag = "PxVob_zCVobSpot";
             Destroy(spot.GetComponent<SphereCollider>()); // No need for collider here!
-            
+
             if (FeatureFlags.Instance.EnableVobFPMesh)
             {
 #if UNITY_EDITOR
