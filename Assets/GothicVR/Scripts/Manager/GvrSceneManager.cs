@@ -77,7 +77,7 @@ namespace GVR.Manager
             {
                 // we set manually the XR Interaction Manager as Unity creates a new one in Bootstrap 
                 // and we don't want to use it since we have one in General scene
-
+                WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
                 GameObject startPoint = null;
                 var spots = GameObject.FindGameObjectsWithTag("PxVob_zCVobSpot");
                 for (int i = 0; i < spots.Length; i++)

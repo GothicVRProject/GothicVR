@@ -35,8 +35,6 @@ namespace GVR.Creator
             SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(worldGo, world);
 
             SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
-            WorldCreator.I.PostCreate();
-
 
             SceneManager.MoveGameObjectToScene(worldGo, SceneManager.GetSceneByName(worldName));
         }
@@ -44,7 +42,7 @@ namespace GVR.Creator
         /// <summary>
         /// Logic to be called after world is fully loaded.
         /// </summary>
-        public void PostCreate()
+        public void PostCreate(XRInteractionManager interactionManager)
         {
             // If we load a new scene, just remove the existing one.
             if (worldMesh.TryGetComponent(out TeleportationArea teleportArea))
@@ -52,6 +50,10 @@ namespace GVR.Creator
 
             // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
             var teleportationArea = worldMesh.AddComponent<TeleportationArea>();
+            if (interactionManager != null)
+            {
+                teleportationArea.interactionManager = interactionManager;
+            }
         }
 
         private WorldData LoadWorld(string worldName)
