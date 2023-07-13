@@ -84,6 +84,7 @@ namespace GVR.Creator
                         CreateZoneMusic((PxVobZoneMusicData)vob);
                         break;
                     case PxVobType.PxVob_zCVobSpot:
+                    case PxVobType.PxVob_zCVobStartpoint:
                         CreateSpot(vob);
                         break;
                     case PxVobType.PxVob_oCTriggerChangeLevel:
@@ -91,7 +92,6 @@ namespace GVR.Creator
                         break;
                     case PxVobType.PxVob_zCVobScreenFX:
                     case PxVobType.PxVob_zCVobAnimate:
-                    case PxVobType.PxVob_zCVobStartpoint:
                     case PxVobType.PxVob_zCTriggerWorldStart:
                     case PxVobType.PxVob_zCTriggerList:
                     case PxVobType.PxVob_oCCSTrigger:
