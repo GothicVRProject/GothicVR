@@ -77,8 +77,28 @@ namespace GVR.Manager
                 WorldCreator.I.PostCreate(
                     generalScene.GetRootGameObjects().FirstOrDefault(o => o.name == "XR Interaction Manager").GetComponent<XRInteractionManager>()
                     );
-                // TODO: Dont use GameObject.Find as it will be more computationally expensive in the future with more GO to check
-                player.transform.position = GameObject.Find(startVobAfterLoading).transform.position;
+
+                GameObject startPoint = null;
+                var spots = GameObject.FindGameObjectsWithTag("PxVob_zCVobSpot");
+                for (int i = 0; i < spots.Length; i++)
+                {
+                    if (spots[i].name == startVobAfterLoading)
+                    {
+                        startPoint = spots[i];
+                    }
+                }
+                if (startPoint == null)
+                {
+                    for (int i = 0; i < spots.Length; i++)
+                    {
+                        if ((spots[i].name == "START" || spots[i].name == "START_GOTHIC2") && spots[i].scene == newScene)
+                        {
+                            startPoint = spots[i];
+                        }
+                    }
+                }
+                if (startPoint != null)
+                    player.transform.position = startPoint.transform.position;
             }
         }
     }
