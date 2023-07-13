@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1080,7 +1080,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6803edce0201f574f923fd9d10e5b30a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_InteractionManager: {fileID: 1300502571}
+  m_InteractionManager: {fileID: 0}
   m_InteractionLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -1413,11 +1413,11 @@ PrefabInstance:
     - target: {fileID: 3286136461689514588, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_InteractionManager
       value: 
-      objectReference: {fileID: 1300502571}
+      objectReference: {fileID: 0}
     - target: {fileID: 3286136461704158093, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_InteractionManager
       value: 
-      objectReference: {fileID: 1300502571}
+      objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483594, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_Name
       value: VRPlayer_v4 (romey)
@@ -1469,7 +1469,7 @@ PrefabInstance:
     - target: {fileID: 3286136462967229778, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_InteractionManager
       value: 
-      objectReference: {fileID: 1300502571}
+      objectReference: {fileID: 0}
     - target: {fileID: 3286136463048429805, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_DirectionalAnchorRotationAction.m_Action.m_Id
       value: d25b7a86-69b0-46d1-a37c-52315d99e9f8
@@ -1481,7 +1481,7 @@ PrefabInstance:
     - target: {fileID: 3286136463048429806, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_InteractionManager
       value: 
-      objectReference: {fileID: 1300502571}
+      objectReference: {fileID: 0}
     - target: {fileID: 3286136463048429806, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_RaycastMask.m_Bits
       value: 32
@@ -1573,58 +1573,12 @@ PrefabInstance:
     - target: {fileID: 3286136463242076558, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_InteractionManager
       value: 
-      objectReference: {fileID: 1300502571}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4600f492db92202478d7c53019a519d0, type: 3}
---- !u!1 &1300502570
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1300502572}
-  - component: {fileID: 1300502571}
-  m_Layer: 0
-  m_Name: XR Interaction Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1300502571
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1300502570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83e4e6cca11330d4088d729ab4fc9d9f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_StartingHoverFilters: []
-  m_StartingSelectFilters: []
---- !u!4 &1300502572
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1300502570}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -71.330414, y: -5.2919607, z: 78.12079}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1353668846
 GameObject:
   m_ObjectHideFlags: 0
@@ -1648,7 +1602,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1353668846}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1657,7 +1611,7 @@ Transform:
   - {fileID: 118755272}
   - {fileID: 782628379}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1678676055
 GameObject:
@@ -2357,7 +2311,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6803edce0201f574f923fd9d10e5b30a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_InteractionManager: {fileID: 1300502571}
+  m_InteractionManager: {fileID: 0}
   m_InteractionLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295

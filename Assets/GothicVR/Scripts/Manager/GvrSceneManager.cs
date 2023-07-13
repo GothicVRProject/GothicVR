@@ -18,6 +18,8 @@ namespace GVR.Manager
 
         private GameObject player;
 
+        public GameObject interactionManager;
+
         /// <summary>
         /// Called once after bootstrapping scene is done.
         /// Then load either menu or a world defined inside DebugSettings.
@@ -25,8 +27,9 @@ namespace GVR.Manager
         public void LoadStartupScenes()
         {
             generalScene = SceneManager.LoadScene(generalSceneName, new LoadSceneParameters(LoadSceneMode.Additive));
+            SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
 
-            LoadWorld("world", "ENTRANCE_SURFACE_OLDMINE");
+            LoadWorld("world", "FP_PICKRICE_SWAMP_02");
         }
 
         public void LoadWorld(string worldName, string startVob)
@@ -74,9 +77,6 @@ namespace GVR.Manager
             {
                 // we set manually the XR Interaction Manager as Unity creates a new one in Bootstrap 
                 // and we don't want to use it since we have one in General scene
-                WorldCreator.I.PostCreate(
-                    generalScene.GetRootGameObjects().FirstOrDefault(o => o.name == "XR Interaction Manager").GetComponent<XRInteractionManager>()
-                    );
 
                 GameObject startPoint = null;
                 var spots = GameObject.FindGameObjectsWithTag("PxVob_zCVobSpot");
