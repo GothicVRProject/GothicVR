@@ -19,6 +19,8 @@ namespace GVR.Creator
 {
     public class WorldCreator : SingletonBehaviour<WorldCreator>
     {
+
+        private GameObject worldMesh;
         public void Create(string worldName)
         {
             var world = LoadWorld($"{worldName}.zen");
@@ -28,29 +30,34 @@ namespace GVR.Creator
 
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
 
-            var worldMesh = MeshCreator.I.Create(world, worldGo);
+            worldMesh = MeshCreator.I.Create(world, worldGo);
             SingletonBehaviour<VobCreator>.GetOrCreate().Create(worldGo, world);
             SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(worldGo, world);
-            PostCreate(worldMesh);
 
             SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
 
             SceneManager.MoveGameObjectToScene(worldGo, SceneManager.GetSceneByName(worldName));
         }
-        
+
         /// <summary>
         /// Logic to be called after world is fully loaded.
         /// </summary>
-        public void PostCreate(GameObject worldMesh)
+        public void PostCreate(XRInteractionManager interactionManager)
         {
             // If we load a new scene, just remove the existing one.
             if (worldMesh.TryGetComponent(out TeleportationArea teleportArea))
                 Destroy(teleportArea);
 
             // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
-            worldMesh.AddComponent<TeleportationArea>();
+            var teleportationArea = worldMesh.AddComponent<TeleportationArea>();
+
+            // Set interaction manager to the one we want, not the one unity defaults to
+            if (interactionManager != null)
+            {
+                teleportationArea.interactionManager = interactionManager;
+            }
         }
-        
+
         private WorldData LoadWorld(string worldName)
         {
             var worldPtr = PxWorld.pxWorldLoadFromVdf(GameData.I.VdfsPtr, worldName);
@@ -94,7 +101,7 @@ namespace GVR.Creator
                 waypointsDict = waypointsDict,
                 waypointEdges = waypointEdges
             };
-            
+
             var subMeshes = CreateSubmeshesForUnity(world);
             world.subMeshes = subMeshes;
 
@@ -145,7 +152,7 @@ namespace GVR.Creator
 
             return subMeshes;
         }
-        
+
 
 #if UNITY_EDITOR
         /// <summary>

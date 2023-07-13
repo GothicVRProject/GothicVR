@@ -1,11 +1,10 @@
-using System;
-using System.ComponentModel;
 using System.Linq;
 using GVR.Creator;
 using GVR.Phoenix.Interface;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace GVR.Manager
 {
@@ -53,7 +52,7 @@ namespace GVR.Manager
 
         /// <summary>
         /// We need to set world scene loaded as active scene. This is the only way OcclusionCulling data is fetched
-        /// for the world in a multi-scene scenario.
+        /// for the world in a multi-scene scenario. Also set the player to we have a reference regardless of scene
         /// </summary>
         private void WorldSceneLoaded(Scene scene, LoadSceneMode mode)
         {
@@ -71,9 +70,16 @@ namespace GVR.Manager
         /// </summary>
         private void ActiveSceneChanged(Scene oldScene, Scene newScene)
         {
-            // TODO: Dont use GameObject.Find as it will be more computationally expensive in the future with more GO to check
             if (newScene == GameData.I.WorldScene)
+            {
+                // we set manually the XR Interaction Manager as Unity creates a new one in Bootstrap 
+                // and we don't want to use it since we have one in General scene
+                WorldCreator.I.PostCreate(
+                    generalScene.GetRootGameObjects().FirstOrDefault(o => o.name == "XR Interaction Manager").GetComponent<XRInteractionManager>()
+                    );
+                // TODO: Dont use GameObject.Find as it will be more computationally expensive in the future with more GO to check
                 player.transform.position = GameObject.Find(startVobAfterLoading).transform.position;
+            }
         }
     }
 }
