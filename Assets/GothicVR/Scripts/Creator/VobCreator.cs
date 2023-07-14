@@ -29,6 +29,8 @@ namespace GVR.Creator
         private SoundCreator soundCreator;
         private AssetCache assetCache;
 
+        private const string editorLabelColor = "sv_label4";
+
         private Dictionary<PxVobType, GameObject> parentGos = new();
 
         private void Start()
@@ -245,7 +247,7 @@ namespace GVR.Creator
 #if UNITY_EDITOR
                 if (FeatureFlags.I.EnableVobFPMeshEditorLabel)
                 {
-                    var iconContent = EditorGUIUtility.IconContent("sv_label_4");
+                    var iconContent = EditorGUIUtility.IconContent(editorLabelColor);
                     EditorGUIUtility.SetIconForObject(spot, (Texture2D) iconContent.image);
                 }
 #endif
