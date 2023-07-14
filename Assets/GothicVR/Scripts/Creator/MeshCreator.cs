@@ -46,7 +46,7 @@ namespace GVR.Creator
 
             foreach (var subMesh in world.subMeshes.Values)
             {
-                var subMeshObj = new GameObject(string.Format("submesh-{0}", subMesh.material.name));
+                var subMeshObj = new GameObject(subMesh.material.name);
                 subMeshObj.isStatic = true;
 
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
