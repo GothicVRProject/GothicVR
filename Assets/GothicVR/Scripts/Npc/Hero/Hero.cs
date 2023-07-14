@@ -9,7 +9,7 @@ namespace GVR.Npc.Hero
 
         private void Start()
         {
-            var hero = PxVm.InitializeNpc(PhoenixBridge.VmGothicPtr, "hero");
+            var hero = PxVm.InitializeNpc(GameData.I.VmGothicPtr, "hero");
             GetComponent<Properties>().npc = hero;
         }
     }

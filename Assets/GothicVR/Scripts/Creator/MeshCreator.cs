@@ -17,10 +17,6 @@ namespace GVR.Creator
 {
     public class MeshCreator : SingletonBehaviour<MeshCreator>
     {
-        public GameObject world;
-        public GameObject worldMesh;
-        
-        
         private AssetCache assetCache;
 
         // Decals work only on URP shaders. We therefore temporarily change everything to this
@@ -42,24 +38,28 @@ namespace GVR.Creator
             this.assetCache = assetCache;
         }
 
-        public GameObject Create(WorldData world)
+        public GameObject Create(WorldData world, GameObject parent)
         {
+            var meshObj = new GameObject("Mesh");
+            meshObj.isStatic = true;
+            meshObj.SetParent(parent);
+
             foreach (var subMesh in world.subMeshes.Values)
             {
                 var subMeshObj = new GameObject(subMesh.material.name);
                 subMeshObj.isStatic = true;
-                
+
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
                 PrepareMeshRenderer(meshRenderer, subMesh);
                 PrepareMeshFilter(meshFilter, subMesh);
                 PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
-                
-                subMeshObj.SetParent(worldMesh);
+
+                subMeshObj.SetParent(meshObj);
             }
-            
-            return worldMesh;
+
+            return meshObj;
         }
 
 
@@ -490,7 +490,7 @@ namespace GVR.Creator
             }
             else
             {
-               return PrepareMeshCollider(obj, mesh);
+                return PrepareMeshCollider(obj, mesh);
             }
         }
 

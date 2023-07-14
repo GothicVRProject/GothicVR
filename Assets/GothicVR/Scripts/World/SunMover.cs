@@ -2,27 +2,28 @@ using GVR.Demo;
 using GVR.Util;
 using GVR.World;
 using System;
+using GVR.Debugging;
 using UnityEngine;
 
 public class SunMover : MonoBehaviour
 {
-    private DebugSettings.SunMovementPerformance sunPerformanceSetting;
+    private FeatureFlags.SunMovementPerformance sunPerformanceSetting;
     private GameObject sun;
 
     private void OnEnable()
     {
-        var gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
-        sunPerformanceSetting = SingletonBehaviour<DebugSettings>.GetOrCreate().SunMovementPerformanceValue;
+        var gameTime = GameTime.I;
+        sunPerformanceSetting = FeatureFlags.I.SunMovementPerformanceValue;
         switch (sunPerformanceSetting)
         {
-            case DebugSettings.SunMovementPerformance.EveryIngameSecond:
+            case FeatureFlags.SunMovementPerformance.EveryIngameSecond:
                 gameTime.secondChangeCallback.AddListener(RotateSun);
                 break;
-            case DebugSettings.SunMovementPerformance.EveryIngameMinute:
+            case FeatureFlags.SunMovementPerformance.EveryIngameMinute:
                 gameTime.minuteChangeCallback.AddListener(RotateSun);
 
                 break;
-            case DebugSettings.SunMovementPerformance.EveryIngameHour:
+            case FeatureFlags.SunMovementPerformance.EveryIngameHour:
                 gameTime.minuteChangeCallback.AddListener(RotateSun);
                 break;
             default:
@@ -32,16 +33,16 @@ public class SunMover : MonoBehaviour
     }
     private void OnDisable()
     {
-        var gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
+        var gameTime = GameTime.I;
         switch (sunPerformanceSetting)
         {
-            case DebugSettings.SunMovementPerformance.EveryIngameSecond:
+            case FeatureFlags.SunMovementPerformance.EveryIngameSecond:
                 gameTime.secondChangeCallback.RemoveListener(RotateSun);
                 break;
-            case DebugSettings.SunMovementPerformance.EveryIngameMinute:
+            case FeatureFlags.SunMovementPerformance.EveryIngameMinute:
                 gameTime.secondChangeCallback.RemoveListener(RotateSun);
                 break;
-            case DebugSettings.SunMovementPerformance.EveryIngameHour:
+            case FeatureFlags.SunMovementPerformance.EveryIngameHour:
                 gameTime.secondChangeCallback.RemoveListener(RotateSun);
                 break;
             default:
@@ -57,11 +58,11 @@ public class SunMover : MonoBehaviour
     /// Based on performance settings, the sun direction is changed more or less frequent.
     ///
     /// Unity rotation settings:
-    /// 270° = midnight (no light)
-    /// 90° = noon (full light)
+    /// 270Â° = midnight (no light)
+    /// 90Â° = noon (full light)
     /// 
     /// Calculation: 270f is the starting midnight value
-    /// Calculation: One full DateTime == 360°. --> e.g. 15° * 24h + 0min + 0sec == 360°
+    /// Calculation: One full DateTime == 360Â°. --> e.g. 15Â° * 24h + 0min + 0sec == 360Â°
     /// </summary>
     void RotateSun(DateTime time)
     {
