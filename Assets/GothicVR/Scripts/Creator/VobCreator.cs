@@ -273,6 +273,10 @@ namespace GVR.Creator
 
         private void CreateDecal(PxVobData vob)
         {
+            if(!FeatureFlags.Instance.EnableDecals)
+            {
+                return;
+            }
             var parent = parentGos[vob.type];
             
             meshCreator.CreateDecal(vob, parent);

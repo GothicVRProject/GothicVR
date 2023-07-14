@@ -320,11 +320,12 @@ MonoBehaviour:
   StartMinute: 59
   EnableVobFPMesh: 0
   EnableVobFPMeshEditorLabel: 0
+  EnableDecals: 0
   EnableNpc: 1
   EnableNpcRoutines: 1
   CreateExampleAnimation: 0
   ShowVdfsFileNotFoundErrors: 0
-  EnableSounds: 1
+  EnableSounds: 0
   EnableMusic: 0
 --- !u!1 &705507993
 GameObject:

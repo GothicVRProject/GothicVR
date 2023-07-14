@@ -29,6 +29,7 @@ namespace GVR.Debugging
         public bool EnableVobFPMesh;
         [Tooltip("For Debug purposes within Scene view in Editor only. Might imply some performance issues in Editor mode.")]
         public bool EnableVobFPMeshEditorLabel;
+        public bool EnableDecals;
         
         [Header("__________NPCs__________")]
         public bool EnableNpc;
