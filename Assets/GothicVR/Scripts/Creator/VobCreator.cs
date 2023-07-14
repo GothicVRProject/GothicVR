@@ -89,6 +89,9 @@ namespace GVR.Creator
                     case PxVobType.PxVob_zCVobStartpoint:
                         CreateSpot(vob);
                         break;
+                    case PxVobType.PxVob_oCMobLadder:
+                        CreateLadder(vob);
+                        break;
                     case PxVobType.PxVob_oCTriggerChangeLevel:
                         CreateTriggerChangeLevel((PxVobTriggerChangeLevelData)vob);
                         break;
@@ -238,6 +241,7 @@ namespace GVR.Creator
         /// </summary>
         private void CreateSpot(PxVobData vob)
         {
+            // FIXME - change to a Prefab in the future.
             var spot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             spot.tag = "PxVob_zCVobSpot";
             Destroy(spot.GetComponent<SphereCollider>()); // No need for collider here!
@@ -263,6 +267,20 @@ namespace GVR.Creator
             spot.SetParent(parentGos[vob.type]);
             
             SetPosAndRot(spot, vob.position, vob.rotation!.Value);
+        }
+
+        private void CreateLadder(PxVobData vob)
+        {
+            // FIXME - use Prefab instead.
+            var go = CreateDefaultMesh(vob);
+            var meshGo = go;
+            var grabComp = meshGo.AddComponent<XRGrabInteractable>();
+            var rigidbodyComp = meshGo.GetComponent<Rigidbody>();
+
+            meshGo.tag = "Climbable";
+            rigidbodyComp.isKinematic = true;
+            grabComp.trackPosition = false;
+            grabComp.trackRotation = false;
         }
 
         private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
