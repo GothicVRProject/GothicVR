@@ -13,7 +13,7 @@ namespace GVR.Phoenix.Util
             if (!other.CompareTag("Player"))
                 return;
             
-            GvrSceneManager.I.LoadWorld(levelName.Split(".")[0], startVob.Trim());
+            GvrSceneManager.I.LoadWorld(levelName, startVob.Trim());
         }
 
     }

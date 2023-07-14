@@ -29,7 +29,7 @@ namespace GVR.Manager
             generalScene = SceneManager.LoadScene(generalSceneName, new LoadSceneParameters(LoadSceneMode.Additive));
             SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
 
-            LoadWorld("world", "FP_PICKRICE_SWAMP_02");
+            LoadWorld("world.zen", "FP_PICKRICE_SWAMP_02");
         }
 
         public void LoadWorld(string worldName, string startVob)

@@ -23,7 +23,7 @@ namespace GVR.Creator
         private GameObject worldMesh;
         public void Create(string worldName)
         {
-            var world = LoadWorld($"{worldName}.zen");
+            var world = LoadWorld(worldName);
             GameData.I.World = world;
 
             var worldGo = new GameObject("World");
