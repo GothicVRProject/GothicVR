@@ -38,7 +38,7 @@ namespace GVR.Creator
             this.assetCache = assetCache;
         }
 
-        public GameObject Create(WorldData world, GameObject parent = null)
+        public GameObject Create(WorldData world, GameObject parent)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.isStatic = true;
