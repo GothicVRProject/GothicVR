@@ -40,7 +40,7 @@ namespace GVR.Creator
 
         private void CreateWaypointEdges(GameObject parent, WorldData world)
         {
-            if (!SingletonBehaviour<FeatureFlags>.GetOrCreate().CreateWaypointEdges)
+            if (!FeatureFlags.I.CreateWaypointEdges)
                 return;
 
             var waypointEdgesObj = new GameObject(string.Format("Edges"));

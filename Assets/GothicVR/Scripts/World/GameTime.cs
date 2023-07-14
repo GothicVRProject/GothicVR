@@ -35,8 +35,8 @@ namespace GVR.World
 
             // Set debug value for current Time.
             time = new DateTime(time.Year, time.Month, time.Day,
-                    FeatureFlags.I.StartHour, FeatureFlags.Instance.StartMinute, time.Second);
-            minutesInHour = FeatureFlags.Instance.StartMinute;
+                    FeatureFlags.I.StartHour, FeatureFlags.I.StartMinute, time.Second);
+            minutesInHour = FeatureFlags.I.StartMinute;
             
             StartCoroutine(TimeTick());
         }

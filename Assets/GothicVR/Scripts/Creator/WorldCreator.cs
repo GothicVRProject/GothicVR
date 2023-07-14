@@ -31,10 +31,10 @@ namespace GVR.Creator
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
 
             worldMesh = MeshCreator.I.Create(world, worldGo);
-            SingletonBehaviour<VobCreator>.GetOrCreate().Create(worldGo, world);
-            SingletonBehaviour<WaynetCreator>.GetOrCreate().Create(worldGo, world);
+            VobCreator.I.Create(worldGo, world);
+            WaynetCreator.I.Create(worldGo, world);
 
-            SingletonBehaviour<DebugAnimationCreator>.GetOrCreate().Create();
+            DebugAnimationCreator.I.Create();
 
             SceneManager.MoveGameObjectToScene(worldGo, SceneManager.GetSceneByName(worldName));
         }

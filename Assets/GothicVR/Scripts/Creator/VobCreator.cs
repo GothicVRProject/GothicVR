@@ -40,7 +40,7 @@ namespace GVR.Creator
 
         public void Create(GameObject root, WorldData world)
         {
-            if (!SingletonBehaviour<FeatureFlags>.GetOrCreate().CreateVobs)
+            if (!FeatureFlags.I.CreateVobs)
                 return;
             
             var vobRootObj = new GameObject("Vobs");
@@ -148,7 +148,7 @@ namespace GVR.Creator
                 return;
             }
             
-            var prefabInstance = PrefabCache.Instance.TryGetObject(PrefabCache.PrefabType.VobItem);
+            var prefabInstance = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobItem);
             var vobObj = CreateItemMesh(vob, item, prefabInstance);
             
             if (vobObj == null)
@@ -195,7 +195,7 @@ namespace GVR.Creator
         // FIXME - add specific daytime logic!
         private void CreateSoundDaytime(PxVobSoundDaytimeData vob)
         {
-            if (!FeatureFlags.Instance.EnableSounds)
+            if (!FeatureFlags.I.EnableSounds)
                 return;
             
             var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
@@ -222,7 +222,7 @@ namespace GVR.Creator
 
             gameObject.transform.localScale = (max - min);
 
-            if (SingletonBehaviour<FeatureFlags>.GetOrCreate().CreateVobs)
+            if (FeatureFlags.I.CreateVobs)
             {
                 var triggerHandler = gameObject.AddComponent<ChangeLevelTriggerHandler>();
                 triggerHandler.levelName = vob.levelName;
@@ -240,10 +240,10 @@ namespace GVR.Creator
             spot.tag = "PxVob_zCVobSpot";
             Destroy(spot.GetComponent<SphereCollider>()); // No need for collider here!
 
-            if (FeatureFlags.Instance.EnableVobFPMesh)
+            if (FeatureFlags.I.EnableVobFPMesh)
             {
 #if UNITY_EDITOR
-                if (FeatureFlags.Instance.EnableVobFPMeshEditorLabel)
+                if (FeatureFlags.I.EnableVobFPMeshEditorLabel)
                 {
                     var iconContent = EditorGUIUtility.IconContent("sv_label_4");
                     EditorGUIUtility.SetIconForObject(spot, (Texture2D) iconContent.image);

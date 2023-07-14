@@ -33,7 +33,7 @@ public class SunMover : MonoBehaviour
     }
     private void OnDisable()
     {
-        var gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
+        var gameTime = GameTime.I;
         switch (sunPerformanceSetting)
         {
             case FeatureFlags.SunMovementPerformance.EveryIngameSecond:
