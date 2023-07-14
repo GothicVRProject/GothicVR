@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GothicVR.Vob;
 using GVR.Caches;
+using GVR.Debugging;
 using GVR.Demo;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
@@ -24,11 +25,11 @@ namespace GVR.Creator
 {
 	public class VobCreator : SingletonBehaviour<VobCreator>
     {
-        private const float decalOpacity = 0.5f;
-        
         private MeshCreator meshCreator;
         private SoundCreator soundCreator;
         private AssetCache assetCache;
+
+        private const string editorLabelColor = "sv_label4";
 
         private Dictionary<PxVobType, GameObject> parentGos = new();
 
@@ -41,11 +42,12 @@ namespace GVR.Creator
 
         public void Create(GameObject root, WorldData world)
         {
-            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateVobs)
+            if (!FeatureFlags.I.CreateVobs)
                 return;
             
             var vobRootObj = new GameObject("Vobs");
             vobRootObj.SetParent(root);
+            parentGos = new();
 
             CreateParentVobObject(vobRootObj);
             CreateVobs(vobRootObj, world.vobs);
@@ -84,19 +86,21 @@ namespace GVR.Creator
                         CreateZoneMusic((PxVobZoneMusicData)vob);
                         break;
                     case PxVobType.PxVob_zCVobSpot:
+                    case PxVobType.PxVob_zCVobStartpoint:
                         CreateSpot(vob);
                         break;
                     case PxVobType.PxVob_oCMobLadder:
                         CreateLadder(vob);
                         break;
+                    case PxVobType.PxVob_oCTriggerChangeLevel:
+                        CreateTriggerChangeLevel((PxVobTriggerChangeLevelData)vob);
+                        break;
                     case PxVobType.PxVob_zCVobScreenFX:
                     case PxVobType.PxVob_zCVobAnimate:
-                    case PxVobType.PxVob_zCVobStartpoint:
                     case PxVobType.PxVob_zCTriggerWorldStart:
                     case PxVobType.PxVob_zCTriggerList:
                     case PxVobType.PxVob_oCCSTrigger:
                     case PxVobType.PxVob_oCTriggerScript:
-                    case PxVobType.PxVob_oCTriggerChangeLevel:
                     case PxVobType.PxVob_zCVobLensFlare:
                     case PxVobType.PxVob_zCVobLight:
                     case PxVobType.PxVob_zCMoverController:
@@ -138,9 +142,18 @@ namespace GVR.Creator
 
             // e.g. ItMiCello is commented out on misc.d file.
             if (item == null)
+            {
+                Debug.LogError($"Item {itemName} not found.");
                 return;
+            }
+
+            if (item.visual.ToLower().EndsWith(".mms"))
+            {
+                Debug.LogError($"Item {item.visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
+                return;
+            }
             
-            var prefabInstance = PrefabCache.Instance.TryGetObject(PrefabCache.PrefabType.VobItem);
+            var prefabInstance = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobItem);
             var vobObj = CreateItemMesh(vob, item, prefabInstance);
             
             if (vobObj == null)
@@ -177,7 +190,7 @@ namespace GVR.Creator
         // FIXME - change values for AudioClip based on Sfx and vob value (value overloads itself)
         private void CreateSound(PxVobSoundData vob)
         {
-            if (!DebugSettings.Instance.EnableSounds)
+            if (!FeatureFlags.I.EnableSounds)
                 return;
             
             var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
@@ -187,7 +200,7 @@ namespace GVR.Creator
         // FIXME - add specific daytime logic!
         private void CreateSoundDaytime(PxVobSoundDaytimeData vob)
         {
-            if (!DebugSettings.Instance.EnableSounds)
+            if (!FeatureFlags.I.EnableSounds)
                 return;
             
             var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
@@ -199,6 +212,29 @@ namespace GVR.Creator
             soundCreator.Create(vob, parentGos[vob.type]);
         }
 
+        private void CreateTriggerChangeLevel(PxVobTriggerChangeLevelData vob)
+        {
+
+            var gameObject = new GameObject(vob.vobName);
+            gameObject.SetParent(parentGos[vob.type]);
+
+            var trigger = gameObject.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            gameObject.transform.position = (min + max) / 2f;
+
+            gameObject.transform.localScale = (max - min);
+
+            if (FeatureFlags.I.CreateVobs)
+            {
+                var triggerHandler = gameObject.AddComponent<ChangeLevelTriggerHandler>();
+                triggerHandler.levelName = vob.levelName;
+                triggerHandler.startVob = vob.startVob;
+            }
+        }
+
         /// <summary>
         /// Basically a free point where NPCs can do something like sitting on a bench etc.
         /// @see for more information: https://ataulien.github.io/Inside-Gothic/objects/spot/
@@ -207,20 +243,23 @@ namespace GVR.Creator
         {
             // FIXME - change to a Prefab in the future.
             var spot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            spot.tag = "PxVob_zCVobSpot";
             Destroy(spot.GetComponent<SphereCollider>()); // No need for collider here!
 
-            if (DebugSettings.Instance.EnableVobFPMesh)
+            if (FeatureFlags.I.EnableVobFPMesh)
             {
 #if UNITY_EDITOR
-                if (DebugSettings.Instance.EnableVobFPMeshEditorLabel)
+                if (FeatureFlags.I.EnableVobFPMeshEditorLabel)
                 {
-                    var iconContent = EditorGUIUtility.IconContent("sv_label_4");
+                    var iconContent = EditorGUIUtility.IconContent(editorLabelColor);
                     EditorGUIUtility.SetIconForObject(spot, (Texture2D) iconContent.image);
                 }
 #endif
             }
             else
             {
+                // Quick win: If we don't want to render the spots, we just remove the Renderer.
+                // FIXME - Loading can be optimized with a proper Prefab
                 Destroy(spot.GetComponent<MeshRenderer>());
             }
 
@@ -254,35 +293,7 @@ namespace GVR.Creator
         {
             var parent = parentGos[vob.type];
             
-            if (vob.vobDecal.HasValue)
-            {
-                var decalData = vob.vobDecal.Value;
-
-                var decalProjectorGo = new GameObject(decalData.name);
-                var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
-                var texture = assetCache.TryGetTexture(vob.visualName);
-                
-                // x/y needs to be made twice the size and transformed from cm in m.
-                // z - value is close to what we see in Gothic spacer.
-                decalProj.size = new(decalData.dimension.X * 2 / 100, decalData.dimension.Y * 2 / 100, 0.5f);
-                decalProjectorGo.SetParent(parent);
-                SetPosAndRot(decalProjectorGo, vob.position, vob.rotation!.Value);
-                
-                decalProj.pivot = UnityEngine.Vector3.zero;
-                decalProj.fadeFactor = decalOpacity;
-                
-                // FIXME use Prefab!
-                // https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@12.0/manual/creating-a-decal-projector-at-runtime.html
-                var standardShader = Shader.Find("Shader Graphs/Decal");
-                var material = new Material(standardShader);
-                material.SetTexture(Shader.PropertyToID("Base_Map"), texture);
-
-                decalProj.material = material;
-
-                return;
-            }
-
-            Debug.LogWarning("No decalData was set for: " + vob.visualName);
+            meshCreator.CreateDecal(vob, parent);
         }
         
         private GameObject CreateDefaultMesh(PxVobData vob)

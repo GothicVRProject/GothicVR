@@ -8,9 +8,20 @@ namespace GVR.Util
 
         protected static T _instance;
 
-        public static bool Created
-        { get { return _instance != null; } }
+        public static bool Created { get { return _instance != null; } }
 
+        /// <summary>
+        /// Always returns the first created instance.
+        /// Shorthand version of .Instance
+        /// </summary>
+        public static T I
+        {
+            get
+            {
+                return Instance;
+            }
+        }
+        
         /// <summary>
         /// Always returns the first created instance.
         /// </summary>

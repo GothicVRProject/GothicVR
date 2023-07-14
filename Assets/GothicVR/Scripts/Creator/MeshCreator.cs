@@ -8,8 +8,10 @@ using GVR.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
+using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace GVR.Creator
 {
@@ -20,6 +22,8 @@ namespace GVR.Creator
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
         private const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        private const float decalOpacity = 0.75f;
+
 
         private void Start()
         {
@@ -33,8 +37,8 @@ namespace GVR.Creator
         {
             this.assetCache = assetCache;
         }
-        
-        public GameObject Create(WorldData world, GameObject parent = null)
+
+        public GameObject Create(WorldData world, GameObject parent)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.isStatic = true;
@@ -42,12 +46,12 @@ namespace GVR.Creator
 
             foreach (var subMesh in world.subMeshes.Values)
             {
-                var subMeshObj = new GameObject(string.Format("submesh-{0}", subMesh.material.name));
+                var subMeshObj = new GameObject(subMesh.material.name);
                 subMeshObj.isStatic = true;
 
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
-                
+
                 PrepareMeshRenderer(meshRenderer, subMesh);
                 PrepareMeshFilter(meshFilter, subMesh);
                 PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
@@ -116,7 +120,7 @@ namespace GVR.Creator
                     //this is needed only for skinnedmeshrenderer
                     // meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
                     PrepareMeshCollider(subMeshObj, meshFilter.mesh, mesh.mesh.materials);
-                    
+
                     // bones commented since we don't use for now skinnedmeshrenderer
                     // CreateBonesData(subMeshObj, meshRenderer, mdh);
 
@@ -130,6 +134,12 @@ namespace GVR.Creator
 
         public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
+            if (mrm == null)
+            {
+                Debug.LogError("No mesh data was found for: " + objectName);
+                return null;
+            }
+
             rootGo ??= new GameObject();
             rootGo.name = objectName;
             rootGo.SetParent(parent);
@@ -140,11 +150,45 @@ namespace GVR.Creator
 
             PrepareMeshRenderer(meshRenderer, mrm);
             PrepareMeshFilter(meshFilter, mrm);
-            
+
             if (withCollider)
                 PrepareMeshCollider(rootGo, meshFilter.mesh, mrm.materials);
 
             return rootGo;
+        }
+
+        public GameObject CreateDecal(PxVobData vob, GameObject parent)
+        {
+            if (!vob.vobDecal.HasValue)
+            {
+                Debug.LogWarning("No decalData was set for: " + vob.visualName);
+                return null;
+            }
+
+            var decalData = vob.vobDecal.Value;
+
+            var decalProjectorGo = new GameObject(decalData.name);
+            var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
+            var texture = assetCache.TryGetTexture(vob.visualName);
+
+            // x/y needs to be made twice the size and transformed from cm in m.
+            // z - value is close to what we see in Gothic spacer.
+            decalProj.size = new(decalData.dimension.X * 2 / 100, decalData.dimension.Y * 2 / 100, 0.5f);
+            decalProjectorGo.SetParent(parent);
+            SetPosAndRot(decalProjectorGo, vob.position.ToUnityVector(), vob.rotation!.Value);
+
+            decalProj.pivot = Vector3.zero;
+            decalProj.fadeFactor = decalOpacity;
+
+            // FIXME use Prefab!
+            // https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@12.0/manual/creating-a-decal-projector-at-runtime.html
+            var standardShader = Shader.Find("Shader Graphs/Decal");
+            var material = new Material(standardShader);
+            material.SetTexture(Shader.PropertyToID("Base_Map"), texture);
+
+            decalProj.material = material;
+
+            return decalProjectorGo;
         }
 
         private void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
@@ -172,17 +216,25 @@ namespace GVR.Creator
         {
             var material = GetEmptyMaterial();
             var bMaterial = subMesh.material;
-            
+
             rend.material = material;
 
             // No texture to add.
             if (bMaterial.texture == "")
+            {
+                Debug.LogWarning("No texture was set for: " + bMaterial.name);
                 return;
+            }
 
             var texture = assetCache.TryGetTexture(bMaterial.texture);
 
             if (null == texture)
-                throw new Exception("Couldn't get texture from name: " + bMaterial.texture);
+            {
+                if (bMaterial.texture.EndsWith(".TGA"))
+                    Debug.LogError("This is supposed to be a decal: " + bMaterial.texture);
+                else
+                    Debug.LogError("Couldn't get texture from name: " + bMaterial.texture);
+            }
 
             material.mainTexture = texture;
         }
@@ -199,6 +251,14 @@ namespace GVR.Creator
 
         private void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
+            // check if mrmData.subMeshes is null
+
+            if (null == mrmData)
+            {
+                Debug.LogError("No mesh data could be added to renderer: " + rend.transform.parent.name);
+                return;
+            }
+
             var finalMaterials = new List<Material>(mrmData.subMeshes.Length);
 
             foreach (var subMesh in mrmData.subMeshes)
@@ -210,12 +270,20 @@ namespace GVR.Creator
 
                 // No texture to add.
                 if (materialData.texture == "")
+                {
+                    Debug.LogWarning("No texture was set for: " + materialData.name);
                     return;
+                }
 
                 var texture = assetCache.TryGetTexture(materialData.texture);
 
                 if (null == texture)
-                    throw new Exception("Couldn't get texture from name: " + materialData.texture);
+                    if (materialData.texture.EndsWith(".TGA"))
+                        Debug.LogError("This is supposed to be a decal: " + materialData.texture);
+                    else
+                        Debug.LogError("Couldn't get texture from name: " + materialData.texture);
+
+
 
                 material.mainTexture = texture;
 
@@ -247,6 +315,11 @@ namespace GVR.Creator
              */
             var mesh = new Mesh();
             meshFilter.mesh = mesh;
+            if (null == mrmData)
+            {
+                Debug.LogError("No mesh data could be added to filter: " + meshFilter.transform.parent.name);
+                return;
+            }
             mesh.subMeshCount = mrmData.subMeshes.Length;
 
             var verticesAndUvSize = mrmData.subMeshes.Sum(i => i.triangles.Length) * 3;
@@ -397,25 +470,27 @@ namespace GVR.Creator
             }
         }
 
-        private void PrepareMeshCollider(GameObject obj, Mesh mesh)
+        private Collider PrepareMeshCollider(GameObject obj, Mesh mesh)
         {
             var meshCollider = obj.AddComponent<MeshCollider>();
             meshCollider.sharedMesh = mesh;
+            return meshCollider;
         }
-        
+
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        private void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
+        private Collider PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
         {
             if (materialData.disableCollision ||
                 materialData.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water)
             {
                 // Do not add colliders
+                return null;
             }
-            else 
+            else
             {
-                PrepareMeshCollider(obj, mesh);
+                return PrepareMeshCollider(obj, mesh);
             }
         }
 
@@ -471,12 +546,12 @@ namespace GVR.Creator
             renderer.sharedMesh.bindposes = bindPoses;
             renderer.bones = bones;
         }
-        
+
         private Material GetEmptyMaterial()
         {
             var standardShader = Shader.Find(defaultShader);
             var material = new Material(standardShader);
-            
+
             // Enable clipping of alpha values.
             material.EnableKeyword("_ALPHATEST_ON");
 

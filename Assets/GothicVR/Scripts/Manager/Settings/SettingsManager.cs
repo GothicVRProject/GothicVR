@@ -3,7 +3,7 @@ using System.IO;
 using UnityEngine;
 using GVR.Util;
 
-namespace GVR.Settings
+namespace GVR.Manager.Settings
 {
     public class SettingsManager : SingletonBehaviour<SettingsManager>
     {

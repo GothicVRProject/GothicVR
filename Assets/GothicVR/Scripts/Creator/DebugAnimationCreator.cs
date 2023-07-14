@@ -6,6 +6,7 @@ using PxCs.Data.Animation;
 using PxCs.Interface;
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Debugging;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -17,7 +18,7 @@ namespace GVR.Creator
     {
         public void Create()
         {
-            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateExampleAnimation)
+            if (!FeatureFlags.I.CreateExampleAnimation)
                 return;
 
             ///
@@ -34,11 +35,11 @@ namespace GVR.Creator
             var debugObj = new GameObject("DebugAnimationObject");
             SceneManager.GetSceneByName("SampleScene").GetRootGameObjects().Append(debugObj);
 
-            var mds = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, mdsName);
-            var mdl = PxModel.LoadModelFromVdf(PhoenixBridge.VdfsPtr, mdlName);
-            var mdh = PxModelHierarchy.LoadFromVdf(PhoenixBridge.VdfsPtr, mdhName);
-            var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, mdmName);
-            var mrm = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, mrmName);
+            var mds = PxModelScript.GetModelScriptFromVdf(GameData.I.VdfsPtr, mdsName);
+            var mdl = PxModel.LoadModelFromVdf(GameData.I.VdfsPtr, mdlName);
+            var mdh = PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, mdhName);
+            var mdm = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, mdmName);
+            var mrm = PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, mrmName);
             var root = SingletonBehaviour<MeshCreator>.GetOrCreate().Create("DebugAnimationObject1", mdm, mdh, default, default, debugObj);
 
 
@@ -47,7 +48,7 @@ namespace GVR.Creator
             for (int i = 0; i < animations.Length; i++)
             {
                 var animName = mdsName.Replace(".MDS", $"-{mds.animations[i].name}.MAN", System.StringComparison.OrdinalIgnoreCase);
-                animations[i] = PxAnimation.LoadFromVdf(PhoenixBridge.VdfsPtr, animName);
+                animations[i] = PxAnimation.LoadFromVdf(GameData.I.VdfsPtr, animName);
             }
             var debugAnimationNames = animations.Select(i => i.name).ToArray();
             var anim = animations.First(i => i.name == animationName);

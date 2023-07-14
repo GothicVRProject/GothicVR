@@ -1,13 +1,13 @@
-using UnityEngine;
 using System;
 using System.IO;
-using GVR.Util;
-using GVR.Settings;
-using GVR.Demo;
-using GVR.Phoenix.Interface;
 using DMCs.Interface;
-using PxCs.Interface;
+using GVR.Debugging;
+using GVR.Manager.Settings;
+using GVR.Phoenix.Interface;
+using GVR.Util;
 using PxCs.Data.Vm;
+using PxCs.Interface;
+using UnityEngine;
 
 namespace GVR.Creator
 {
@@ -44,7 +44,7 @@ namespace GVR.Creator
 
         void Start()
         {
-            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableMusic)
+            if (!FeatureFlags.I.EnableMusic)
                 return;
             backgroundMusic = GameObject.Find("BackgroundMusic");
             musicSource = backgroundMusic.AddComponent<AudioSource>();
@@ -52,13 +52,13 @@ namespace GVR.Creator
 
         public void Create()
         {
-            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableMusic)
+            if (!FeatureFlags.I.EnableMusic)
                 return;
 
-            var G1Dir = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicIPath;
+            var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
 
             // Combine paths using Path.Combine instead of Path.Join
-            var fullPath = Path.Combine(G1Dir, "_work", "DATA", "Music");
+            var fullPath = Path.Combine(g1Dir, "_work", "DATA", "Music");
 
             // Initialize DirectMusic components
             mixer = DMMixer.DMusicInitMixer();
@@ -194,7 +194,7 @@ namespace GVR.Creator
 
             string name = result + "_" + (isDay ? "DAY" : "NGT") + "_" + musicTag;
 
-            var theme = PxVm.InitializeMusic(PhoenixBridge.VmMusicPtr, name);
+            var theme = PxVm.InitializeMusic(GameData.I.VmMusicPtr, name);
 
             reloadTheme = pendingTheme.file != theme.file;
             pendingTheme = theme;
@@ -204,7 +204,7 @@ namespace GVR.Creator
 
         public void setMusic(string name)
         {
-            var theme = PxVm.InitializeMusic(PhoenixBridge.VmMusicPtr, name);
+            var theme = PxVm.InitializeMusic(GameData.I.VmMusicPtr, name);
             reloadTheme = true;
             pendingTheme = theme;
             hasPending = true;

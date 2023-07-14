@@ -1,27 +1,39 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace GVR.Phoenix.Util
 {
     public class InaudibleSoundDisabler : MonoBehaviour
     {
-        private AudioListener audioListener;
         private AudioSource audioSource;
-        private float distanceFromPlayer;
+        private bool isAudioListenerObtained;
+        private AudioListener audioListener;
+
+        private bool IsAudioListenerObtained
+        {
+            get
+            {
+                if (!isAudioListenerObtained)
+                {
+                    isAudioListenerObtained = true;
+                    audioListener = Camera.main?.GetComponent<AudioListener>();
+                }
+                return audioListener != null;
+            }
+        }
+
+        private float DistanceFromPlayer => IsAudioListenerObtained ? Vector3.Distance(transform.position, audioListener.transform.position) : 0f;
 
         void Start()
         {
-            // Finds the Audio Listener and the Audio Source on the object
-            audioListener = Camera.main.GetComponent<AudioListener>();
-            audioSource = gameObject.GetComponent<AudioSource>();
+            audioSource = GetComponent<AudioSource>();
         }
 
         void Update()
         {
-            distanceFromPlayer = Vector3.Distance(transform.position, audioListener.transform.position);
+            if (!IsAudioListenerObtained)
+                return;
 
-            if (distanceFromPlayer <= audioSource.maxDistance)
+            if (DistanceFromPlayer <= audioSource.maxDistance)
             {
                 ToggleAudioSource(true);
             }
@@ -33,6 +45,9 @@ namespace GVR.Phoenix.Util
 
         void ToggleAudioSource(bool isAudible)
         {
+            if (audioSource == null)
+                return;
+
             if (!isAudible && audioSource.isPlaying)
             {
                 audioSource.Pause();

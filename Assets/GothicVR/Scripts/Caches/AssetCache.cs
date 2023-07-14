@@ -1,16 +1,13 @@
-using System;
+using System.Collections.Generic;
+using System.IO;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
-using PxCs.Interface;
-using System.Collections.Generic;
-using System.IO;
-using PxCs.Data.Vm;
-using PxCs.Data.Vob;
 using PxCs.Data.Sound;
-using PxCs.Extensions;
+using PxCs.Data.Vm;
+using PxCs.Interface;
 using UnityEngine;
 
 namespace GVR.Caches
@@ -40,7 +37,7 @@ namespace GVR.Caches
 
             // FIXME - There might be more textures to load compressed. Please check for sake of performance!
             var pxTexture = PxTexture.GetTextureFromVdf(
-                PhoenixBridge.VdfsPtr,
+                GameData.I.VdfsPtr,
                 key,
                 PxTexture.Format.tex_dxt1, PxTexture.Format.tex_dxt5
             );
@@ -71,7 +68,7 @@ namespace GVR.Caches
             if (mdsCache.TryGetValue(preparedKey, out PxModelScriptData data))
                 return data;
 
-            var newData = PxModelScript.GetModelScriptFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mds");
+            var newData = PxModelScript.GetModelScriptFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mds");
             mdsCache[preparedKey] = newData;
 
             return newData;
@@ -83,7 +80,7 @@ namespace GVR.Caches
             if (mdhCache.TryGetValue(preparedKey, out PxModelHierarchyData data))
                 return data;
 
-            var newData = PxModelHierarchy.LoadFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mdh");
+            var newData = PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdh");
             mdhCache[preparedKey] = newData;
 
             return newData;
@@ -95,7 +92,7 @@ namespace GVR.Caches
             if (mdlCache.TryGetValue(preparedKey, out PxModelData data))
                 return data;
 
-            var newData = PxModel.LoadModelFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mdl");
+            var newData = PxModel.LoadModelFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdl");
             mdlCache[preparedKey] = newData;
 
             return newData;
@@ -107,7 +104,7 @@ namespace GVR.Caches
             if (mdmCache.TryGetValue(preparedKey, out PxModelMeshData data))
                 return data;
 
-            var newData = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mdm", attachmentKeys);
+            var newData = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdm", attachmentKeys);
             mdmCache[preparedKey] = newData;
 
             return newData;
@@ -119,7 +116,7 @@ namespace GVR.Caches
             if (mrmCache.TryGetValue(preparedKey, out PxMultiResolutionMeshData data))
                 return data;
 
-            var newData = PxMultiResolutionMesh.GetMRMFromVdf(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.mrm");
+            var newData = PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mrm");
             mrmCache[preparedKey] = newData;
 
             return newData;
@@ -134,7 +131,7 @@ namespace GVR.Caches
             if (itemDataCache.TryGetValue(preparedKey, out PxVmItemData data))
                 return data;
 
-            var newData = PxVm.InitializeItem(PhoenixBridge.VmGothicPtr, preparedKey);
+            var newData = PxVm.InitializeItem(GameData.I.VmGothicPtr, preparedKey);
             itemDataCache[preparedKey] = newData;
 
             return newData;
@@ -149,7 +146,7 @@ namespace GVR.Caches
             if (sfxDataCache.TryGetValue(preparedKey, out PxVmSfxData data))
                 return data;
 
-            var newData = PxVm.InitializeSfx(PhoenixBridge.VmSfxPtr, preparedKey);
+            var newData = PxVm.InitializeSfx(GameData.I.VmSfxPtr, preparedKey);
             sfxDataCache[preparedKey] = newData;
 
             return newData;
@@ -161,8 +158,7 @@ namespace GVR.Caches
             if (soundCache.TryGetValue(preparedKey, out PxSoundData<float> data))
                 return data;
             
-            var wavFile = PxSound.GetSoundArrayFromVDF<float>(PhoenixBridge.VdfsPtr, $"{GetPreparedKey(key)}.wav");
-            
+            var wavFile = PxSound.GetSoundArrayFromVDF<float>(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.wav");
             soundCache[preparedKey] = wavFile;
 
             return wavFile;

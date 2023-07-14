@@ -2,9 +2,9 @@
 using GVR.Util;
 using UnityEngine;
 
-namespace GVR.Demo
+namespace GVR.Debugging
 {
-    public class DebugSettings: SingletonBehaviour<DebugSettings>
+    public class FeatureFlags: SingletonBehaviour<FeatureFlags>
     {
         public enum SunMovementPerformance
         {

@@ -10,6 +10,7 @@ using PxCs.Extensions;
 using PxCs.Interface;
 using System;
 using System.Linq;
+using GVR.Debugging;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 
@@ -46,7 +47,7 @@ namespace GVR.Creator
         /// </summary>
         public static void Wld_InsertNpc(int npcInstance, string spawnpoint)
         {
-            var initialSpawnpoint = PhoenixBridge.World.waypoints
+            var initialSpawnpoint = GameData.I.World.waypoints
                 .FirstOrDefault(item => item.name.ToLower() == spawnpoint.ToLower());
 
             if (initialSpawnpoint == null)
@@ -58,19 +59,19 @@ namespace GVR.Creator
             var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
             lookupCache.npcCache.Add((uint)npcInstance, newNpc);
 
-            var pxNpc = PxVm.InitializeNpc(PhoenixBridge.VmGothicPtr, (uint)npcInstance);
+            var pxNpc = PxVm.InitializeNpc(GameData.I.VmGothicPtr, (uint)npcInstance);
 
             newNpc.name = string.Format("{0}-{1}", string.Concat(pxNpc.names), spawnpoint);
             var npcRoutine = pxNpc.routine;
 
-            PxVm.CallFunction(PhoenixBridge.VmGothicPtr, (uint)npcRoutine, pxNpc.instancePtr);
+            PxVm.CallFunction(GameData.I.VmGothicPtr, (uint)npcRoutine, pxNpc.instancePtr);
 
             newNpc.GetComponent<Properties>().npc = pxNpc;
 
             if (newNpc.GetComponent<Routine>().routines.Any())
             {
                 var initialSpawnpointName = newNpc.GetComponent<Routine>().routines.First().waypoint;
-                initialSpawnpoint = PhoenixBridge.World.waypointsDict[initialSpawnpointName];
+                initialSpawnpoint = GameData.I.World.waypointsDict[initialSpawnpointName];
             }
             
             newNpc.transform.position = initialSpawnpoint.position.ToUnityVector();
@@ -97,8 +98,8 @@ namespace GVR.Creator
             var npcId = PxVm.pxVmInstanceGetSymbolIndex(data.npc);
             LookupCache.Instance.npcCache[npcId].GetComponent<Routine>().routines.Add(routine);
             // Add element if key not yet exists.
-            PhoenixBridge.npcRoutines.TryAdd(data.npc, new());
-            PhoenixBridge.npcRoutines[data.npc].Add(routine);
+            GameData.I.npcRoutines.TryAdd(data.npc, new());
+            GameData.I.npcRoutines[data.npc].Add(routine);
         }
 
         private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
@@ -117,7 +118,7 @@ namespace GVR.Creator
             {
                 throw new Exception("Not yet implemented");
                 //var skeletonName = mds.skeleton.name.Replace(".ASC", ".MDM");
-                //var mdm = PxModelMesh.LoadModelMeshFromVdf(PhoenixBridge.VdfsPtr, skeletonName); // --> if null
+                //var mdm = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, skeletonName); // --> if null
             }
         }
 
@@ -134,7 +135,7 @@ namespace GVR.Creator
             var mdh = npc.GetComponent<Properties>().mdh;
             var mdm = assetCache.TryGetMdm(data.body);
 
-            if (SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpc)
+            if (FeatureFlags.I.EnableNpc)
                 meshCreator.Create(name, mdm, mdh, default, default, npc);
 
         }

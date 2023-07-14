@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using GVR.Debugging;
 using UnityEngine;
 using GVR.Demo;
 using GVR.Util;
@@ -29,13 +30,13 @@ namespace GVR.World
 
         void Start()
         {
-            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableDayTime)
+            if (!FeatureFlags.I.EnableDayTime)
                 return;
 
             // Set debug value for current Time.
             time = new DateTime(time.Year, time.Month, time.Day,
-                    DebugSettings.Instance.StartHour, DebugSettings.Instance.StartMinute, time.Second);
-            minutesInHour = DebugSettings.Instance.StartMinute;
+                    FeatureFlags.I.StartHour, FeatureFlags.I.StartMinute, time.Second);
+            minutesInHour = FeatureFlags.I.StartMinute;
             
             StartCoroutine(TimeTick());
         }

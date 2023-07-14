@@ -68,3 +68,7 @@ Assets/UberLogger.meta
 Assets/UberLogger/
 Assets/Pickle.meta
 Assets/Pickle/
+ProjectSettings/ShaderGraphSettings.asset
+ProjectSettings/Packages/com.unity.testtools.codecoverage/Settings.json
+Assets/XR/Settings/OpenXR Package Settings.asset
+Assets/StreamingAssets/GameSettings.json

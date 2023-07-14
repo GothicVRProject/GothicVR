@@ -193,7 +193,7 @@ MonoBehaviour:
       m_Name: Directional Anchor Rotation
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: ae64219f-b30a-4d4a-97df-8f5d28cd3f3a
+      m_Id: d4c5d6f0-1bc6-4937-990e-ec2fc89854b3
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -960,7 +960,6 @@ GameObject:
   - component: {fileID: 3286136461781483592}
   - component: {fileID: 3286136461781483593}
   - component: {fileID: 3490461415993468589}
-  - component: {fileID: 165658155289251460}
   m_Layer: 8
   m_Name: VRPlayerGothic_v4
   m_TagString: Player
@@ -984,7 +983,7 @@ Transform:
   - {fileID: 3329884094427662597}
   - {fileID: 2926818186072010583}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3286136461781483606
 MonoBehaviour:
@@ -1000,9 +999,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Camera: {fileID: 3286136463054414635}
   m_OriginBaseGameObject: {fileID: 3286136461781483594}
-  m_CameraFloorOffsetObject: {fileID: 0}
+  m_CameraFloorOffsetObject: {fileID: 5086955422694840730}
   m_RequestedTrackingOriginMode: 0
-  m_CameraYOffset: 1.89
+  m_CameraYOffset: 1.8
 --- !u!114 &3286136461781483607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1037,12 +1036,12 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 3
   m_Height: 2
-  m_Radius: 0.4
+  m_Radius: 0.5
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3286136461781483593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1056,8 +1055,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_LocomotionProvider: {fileID: 3286136462831979469}
-  m_MinHeight: 0.5
-  m_MaxHeight: 2
+  m_MinHeight: 0
+  m_MaxHeight: Infinity
 --- !u!82 &3490461415993468589
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1154,14 +1153,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!81 &165658155289251460
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3286136461781483594}
-  m_Enabled: 1
 --- !u!1 &3286136462172449750
 GameObject:
   m_ObjectHideFlags: 0
@@ -1801,10 +1792,10 @@ MonoBehaviour:
   m_DirectionalAnchorRotationAction:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Directional Anchor Rotation
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: 
+      m_Id: b9d7674c-4ef8-4812-b704-d131705ff861
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -2831,6 +2822,7 @@ GameObject:
   - component: {fileID: 3286136463054414638}
   - component: {fileID: 3286136463054414635}
   - component: {fileID: 3286136463054414637}
+  - component: {fileID: 4120851453766024974}
   - component: {fileID: 9105039786394560442}
   - component: {fileID: -6551154984765006358}
   m_Layer: 0
@@ -2903,7 +2895,7 @@ Camera:
   m_AllowMSAA: 1
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
-  m_OcclusionCulling: 0
+  m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
 --- !u!114 &3286136463054414637
@@ -2924,25 +2916,57 @@ MonoBehaviour:
   m_PositionInput:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Position
       m_Type: 0
-      m_ExpectedControlType: 
-      m_Id: 
+      m_ExpectedControlType: Vector3
+      m_Id: 2775a29b-b69e-4792-86ed-092596b734ad
       m_Processors: 
       m_Interactions: 
-      m_SingletonActionBindings: []
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: ccdec020-8317-4f2e-a903-78972dde8404
+        m_Path: <XRHMD>/centerEyePosition
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Position
+        m_Flags: 0
+      - m_Name: 
+        m_Id: abbccc6f-4adf-490a-a4f8-94d174e36ca6
+        m_Path: <HandheldARInputDevice>/devicePosition
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Position
+        m_Flags: 0
       m_Flags: 0
     m_Reference: {fileID: 0}
   m_RotationInput:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Rotation
       m_Type: 0
-      m_ExpectedControlType: 
-      m_Id: 
+      m_ExpectedControlType: Quaternion
+      m_Id: f89a5beb-0947-4dee-87b0-1976dbf8c78e
       m_Processors: 
       m_Interactions: 
-      m_SingletonActionBindings: []
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 9db4ea54-e6b7-401f-afff-de2af6720a90
+        m_Path: <XRHMD>/centerEyeRotation
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Rotation
+        m_Flags: 0
+      - m_Name: 
+        m_Id: 3f93e030-9465-4abe-a0e7-a4315f2bc435
+        m_Path: <HandheldARInputDevice>/deviceRotation
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Rotation
+        m_Flags: 0
       m_Flags: 0
     m_Reference: {fileID: 0}
   m_TrackingStateInput:
@@ -2951,7 +2975,7 @@ MonoBehaviour:
       m_Name: Tracking State Input
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: 74dc23b0-c117-42c2-9c22-93a054be370c
+      m_Id: 331e04fe-0e8b-4759-92ab-0a2b5d59bd28
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -2976,6 +3000,49 @@ MonoBehaviour:
     m_SingletonActionBindings: []
     m_Flags: 0
   m_HasMigratedActions: 1
+--- !u!114 &4120851453766024974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3286136463054414639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    quality: 3
+    frameInfluence: 0.1
+    jitterScale: 1
+    mipBias: 0
+    varianceClampScale: 0.9
+    contrastAdaptiveSharpening: 0
 --- !u!81 &9105039786394560442
 AudioListener:
   m_ObjectHideFlags: 0
@@ -3220,7 +3287,7 @@ MonoBehaviour:
       m_Name: Directional Anchor Rotation
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: 384cd7d5-63cd-40a1-bc35-e99b73411f2b
+      m_Id: 948d3695-4f25-451c-baaf-7e2f6fbfecbf
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -3389,10 +3456,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bffdd595b98b434cad5e6bbbb2a0bed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  turnsetting: 0
   raycastLeft: {fileID: 3286136463048429795}
   raycastRight: {fileID: 3286136461704158082}
   directLeft: {fileID: 3286136461689514591}
   directRight: {fileID: 3286136463242076545}
+  settingsMenue: {fileID: 0}
   raycastActive: 0
 --- !u!1 &5086955422694840730
 GameObject:
@@ -3418,7 +3487,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5086955422694840730}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

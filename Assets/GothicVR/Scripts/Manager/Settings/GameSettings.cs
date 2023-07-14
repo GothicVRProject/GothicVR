@@ -1,4 +1,4 @@
-﻿namespace GVR.Settings
+﻿namespace GVR.Manager.Settings
 {
     [System.Serializable]
     public class GameSettings
