@@ -11,14 +11,15 @@ public class ImageController : MonoBehaviour
     public Material backgroundmaterial;
     private Texture2D buttontexture;
     public Material buttonmaterial;
-   // public TMP_FontAsset textMesh;
+    bool textureloaded = false;
+    // public TMP_FontAsset textMesh;
 
-        
-            
+
+
     // Update is called once per frame
     void Update()
     {
-        if (PhoenixBridge.VdfsPtr != IntPtr.Zero)
+        if ( !textureloaded && PhoenixBridge.VdfsPtr != IntPtr.Zero)
         {
             LoadBackground();
         }
@@ -26,6 +27,7 @@ public class ImageController : MonoBehaviour
 
     public void LoadBackground()
     {
+        textureloaded = true;
         backgroundtexture = SingletonBehaviour<AssetCache>.GetOrCreate().TryGetTexture("LOG_PAPER.TGA");
         backgroundmaterial.mainTexture = backgroundtexture;
 
