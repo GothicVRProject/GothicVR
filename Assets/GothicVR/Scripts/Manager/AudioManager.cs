@@ -94,7 +94,6 @@ namespace GVR.Manager
             audioSourcesInCell.Add(gameObj);
 
             // Deactivate the gameobject to prevent audio from being played and CPU usage
-            gameObj.SetActive(false);
         }
 
         public void SetAudible(GameObject gameObj, bool isAudible)

@@ -57,6 +57,8 @@ namespace GVR.Creator
 
             if (vobSound.initiallyPlaying)
                 audioSource.Play();
+            
+            soundObject.SetActive(false);
 
             return soundObject;
         }
@@ -102,6 +104,8 @@ namespace GVR.Creator
             var audioDaytimeComp = soundObject.AddComponent<SoundDaytime>();
 
             audioDaytimeComp.SetAudioTimeSwitch(vobSoundDaytime.startTime, vobSoundDaytime.endTime, audioSource1, audioSource2);
+
+            soundObject.SetActive(false);
 
             return soundObject;
         }
