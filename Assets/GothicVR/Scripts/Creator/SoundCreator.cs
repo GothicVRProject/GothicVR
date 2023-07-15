@@ -2,13 +2,17 @@ using GothicVR.Vob;
 using GVR.Caches;
 using GVR.Debugging;
 using GVR.Demo;
+using GVR.Manager;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Sound;
+using PxCs.Data.Struct;
 using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
+using Vector3 = System.Numerics.Vector3;
+
 
 namespace GVR.Creator
 {
@@ -43,6 +47,8 @@ namespace GVR.Creator
         {
             var soundObject = new GameObject(vobSound.soundName);
             soundObject.SetParent(parent);
+            SetPosAndRot(soundObject, vobSound.position, vobSound.rotation!.Value);
+
 
             var audioSource = CreateAndAddAudioSource(soundObject, vobSound.soundName, vobSound);
 
@@ -54,7 +60,7 @@ namespace GVR.Creator
 
             return soundObject;
         }
-        
+
         public void Create(PxVobZoneMusicData vobSound, GameObject parent = null)
         {
             var soundObject = new GameObject(vobSound.vobName);
@@ -84,6 +90,8 @@ namespace GVR.Creator
             var soundObject = new GameObject($"{vobSoundDaytime.soundName}-{vobSoundDaytime.soundName2}");
             soundObject.SetParent(parent);
 
+            SetPosAndRot(soundObject, vobSoundDaytime.position, vobSoundDaytime.rotation!.Value);
+
             // TODO - Is it right to have two AudioSources on one GO? Or would it be more Unity like to have two separate sub-GOs with one Source each?
             var audioSource1 = CreateAndAddAudioSource(soundObject, vobSoundDaytime.soundName, vobSoundDaytime);
             var audioSource2 = CreateAndAddAudioSource(soundObject, vobSoundDaytime.soundName2, vobSoundDaytime);
@@ -102,7 +110,7 @@ namespace GVR.Creator
         {
             PxSoundData<float> wavFile;
 
-            if(soundName.ToLower() == "nosound.wav")
+            if (soundName.ToLower() == "nosound.wav")
             {
                 //instead of decoding nosound.wav which might be decoded incorrectly, just return null
                 return null;
@@ -134,7 +142,7 @@ namespace GVR.Creator
             AudioSource source = soundObject.AddComponent<AudioSource>();
             source.clip = SoundConverter.ToAudioClip(wavFile.sound);
 
-            soundObject.AddComponent<InaudibleSoundDisabler>();
+            AudioSourceManager.I.AddAudioSource(soundObject, source);
 
             // Both need to be set, that Audio can be heard only within defined range.
             // https://answers.unity.com/questions/1316535/how-to-have-audio-only-be-heard-in-a-certain-radiu.html
@@ -149,6 +157,21 @@ namespace GVR.Creator
             // FIXME - Random play isn't implemented yet.
 
             return source;
+        }
+
+        private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
+        {
+            SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityMatrix().rotation);
+        }
+
+        private void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, Quaternion rotation)
+        {
+            // FIXME - This isn't working
+            if (position.Equals(default) && rotation.Equals(default))
+                return;
+
+            obj.transform.localRotation = rotation;
+            obj.transform.localPosition = position;
         }
     }
 }

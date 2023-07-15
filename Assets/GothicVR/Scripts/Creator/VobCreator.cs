@@ -193,8 +193,7 @@ namespace GVR.Creator
             if (!FeatureFlags.I.EnableSounds)
                 return;
             
-            var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
-            SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
+            soundCreator.Create(vob, parentGos[vob.type]);
         }
         
         // FIXME - add specific daytime logic!
@@ -203,8 +202,7 @@ namespace GVR.Creator
             if (!FeatureFlags.I.EnableSounds)
                 return;
             
-            var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
-            SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
+            soundCreator.Create(vob, parentGos[vob.type]);
         }
 
         private void CreateZoneMusic(PxVobZoneMusicData vob)
