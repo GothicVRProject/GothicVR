@@ -15,15 +15,16 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
+using System.Threading.Tasks;
 
 #if UNITY_EDITOR
-    using UnityEditor;
+using UnityEditor;
 #endif
 
 
 namespace GVR.Creator
 {
-	public class VobCreator : SingletonBehaviour<VobCreator>
+    public class VobCreator : SingletonBehaviour<VobCreator>
     {
         private MeshCreator meshCreator;
         private SoundCreator soundCreator;
@@ -40,31 +41,31 @@ namespace GVR.Creator
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
         }
 
-        public void Create(GameObject root, WorldData world)
+        public async Task Create(GameObject root, WorldData world)
         {
             if (!FeatureFlags.I.CreateVobs)
                 return;
-            
+
             var vobRootObj = new GameObject("Vobs");
             vobRootObj.SetParent(root);
             parentGos = new();
 
             CreateParentVobObject(vobRootObj);
-            CreateVobs(vobRootObj, world.vobs);
+            await CreateVobs(vobRootObj, world.vobs);
         }
 
         private void CreateParentVobObject(GameObject root)
         {
-            foreach (var type in (PxVobType[]) Enum.GetValues(typeof(PxVobType)))
+            foreach (var type in (PxVobType[])Enum.GetValues(typeof(PxVobType)))
             {
                 var newGo = new GameObject(type.ToString());
                 newGo.SetParent(root);
-                
+
                 parentGos.Add(type, newGo);
             }
         }
 
-        private void CreateVobs(GameObject root, PxVobData[] vobs)
+        private async Task CreateVobs(GameObject root, PxVobData[] vobs)
         {
             foreach (var vob in vobs)
             {
@@ -111,23 +112,23 @@ namespace GVR.Creator
                     case PxVobType.PxVob_zCVobLevelCompo:
                         break;
                     case PxVobType.PxVob_zCVob:
-                        if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
-                            CreateDecal(vob);
-                        else
-                            CreateDefaultMesh(vob);
+                        // if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
+                        // CreateDecal(vob);
+                        // else
+                        await CreateDefaultMesh(vob);
                         break;
                     default:
-                        CreateDefaultMesh(vob);
+                        await CreateDefaultMesh(vob);
                         break;
                 }
-                
-            // Load children
-            CreateVobs(root, vob.childVobs);
+
+                // Load children
+                await CreateVobs(root, vob.childVobs);
             }
-            
+
         }
 
-        private void CreateItem(PxVobItemData vob)
+        private async void CreateItem(PxVobItemData vob)
         {
             string itemName;
 
@@ -137,7 +138,7 @@ namespace GVR.Creator
                 itemName = vob.vobName;
             else
                 throw new Exception("PxVobItemData -> no usable INSTANCE name found.");
-            
+
             var item = assetCache.TryGetItemData(itemName);
 
             // e.g. ItMiCello is commented out on misc.d file.
@@ -152,10 +153,10 @@ namespace GVR.Creator
                 Debug.LogError($"Item {item.visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
                 return;
             }
-            
+
             var prefabInstance = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobItem);
-            var vobObj = CreateItemMesh(vob, item, prefabInstance);
-            
+            var vobObj = await CreateItemMesh(vob, item, prefabInstance);
+
             if (vobObj == null)
             {
                 Destroy(prefabInstance); // No mesh created. Delete the prefab instance again.
@@ -168,35 +169,35 @@ namespace GVR.Creator
             var grabComp = vobObj.AddComponent<XRGrabInteractable>();
             var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
             var colliderComp = vobObj.GetComponent<MeshCollider>();
-            
+
             colliderComp.convex = true;
             grabComp.selectExited.AddListener(eventComp.SelectExited);
         }
-        
-        private void CreateMobContainer(PxVobMobContainerData vob)
+
+        private async void CreateMobContainer(PxVobMobContainerData vob)
         {
-            var vobObj = CreateDefaultMesh(vob);
+            var vobObj = await CreateDefaultMesh(vob);
 
             if (vobObj == null)
             {
                 Debug.LogWarning($"{vob.vobName} - mesh for MobContainer not found.");
                 return;
             }
-            
+
             var lootComp = vobObj.AddComponent<DemoContainerLoot>();
             lootComp.SetContent(vob.contents);
         }
-        
+
         // FIXME - change values for AudioClip based on Sfx and vob value (value overloads itself)
         private void CreateSound(PxVobSoundData vob)
         {
             if (!FeatureFlags.I.EnableSounds)
                 return;
-            
+
             var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
             SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
         }
-        
+
         // FIXME - add specific daytime logic!
         private void CreateSoundDaytime(PxVobSoundDaytimeData vob)
         {
@@ -252,7 +253,7 @@ namespace GVR.Creator
                 if (FeatureFlags.I.EnableVobFPMeshEditorLabel)
                 {
                     var iconContent = EditorGUIUtility.IconContent(editorLabelColor);
-                    EditorGUIUtility.SetIconForObject(spot, (Texture2D) iconContent.image);
+                    EditorGUIUtility.SetIconForObject(spot, (Texture2D)iconContent.image);
                 }
 #endif
             }
@@ -265,14 +266,14 @@ namespace GVR.Creator
 
             spot.name = vob.vobName;
             spot.SetParent(parentGos[vob.type]);
-            
+
             SetPosAndRot(spot, vob.position, vob.rotation!.Value);
         }
 
-        private void CreateLadder(PxVobData vob)
+        private async void CreateLadder(PxVobData vob)
         {
             // FIXME - use Prefab instead.
-            var go = CreateDefaultMesh(vob);
+            var go = await CreateDefaultMesh(vob);
             var meshGo = go;
             var grabComp = meshGo.AddComponent<XRGrabInteractable>();
             var rigidbodyComp = meshGo.GetComponent<Rigidbody>();
@@ -283,24 +284,24 @@ namespace GVR.Creator
             grabComp.trackRotation = false;
         }
 
-        private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
+        private async Task<GameObject> CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
-            var mrm = assetCache.TryGetMrm(item.visual);
-            return meshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
+            var mrm = await assetCache.TryGetMrmAsync(item.visual);
+            return await meshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
         }
 
         private void CreateDecal(PxVobData vob)
         {
-            if(!FeatureFlags.Instance.EnableDecals)
+            if (!FeatureFlags.Instance.EnableDecals)
             {
                 return;
             }
             var parent = parentGos[vob.type];
-            
+
             meshCreator.CreateDecal(vob, parent);
         }
-        
-        private GameObject CreateDefaultMesh(PxVobData vob)
+
+        private async Task<GameObject> CreateDefaultMesh(PxVobData vob)
         {
             var parent = parentGos[vob.type];
             var meshName = vob.showVisual ? vob.visualName : vob.vobName;
@@ -312,26 +313,26 @@ namespace GVR.Creator
                 return null;
 
             // MDL
-            var mdl = assetCache.TryGetMdl(meshName);
+            var mdl = await assetCache.TryGetMdlAsync(meshName);
             if (mdl != null)
             {
-                return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value, parent);
+                return await meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value, parent);
             }
-            
+
             // MRM
-            var mrm = assetCache.TryGetMrm(meshName);
+            var mrm = await assetCache.TryGetMrmAsync(meshName);
             if (mrm != null)
             {
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.cdDynamic;
 
-                return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
+                return await meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
             }
 
             Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");
             return null;
         }
-        
+
         private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
         {
             SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityMatrix().rotation);
