@@ -147,10 +147,10 @@ namespace GVR.Importer
             // FIXME: These values are debug values. They need to be adjusted for optimized results.
             int faceIndex = 0;
             int samplingPointSize = 100;
-            int atlasPadding = 0;
+            int atlasPadding = 5;
             GlyphRenderMode renderMode = GlyphRenderMode.COLOR;
-            int atlasWidth = 100;
-            int atlasHeight = 100;
+            int atlasWidth = 1024;
+            int atlasHeight = 1024;
             
             if (File.Exists(menuFontPath))
                 PhoenixBridge.GothicMenuFont = TMP_FontAsset.CreateFontAsset(menuFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);

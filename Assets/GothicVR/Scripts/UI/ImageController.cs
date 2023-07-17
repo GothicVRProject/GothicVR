@@ -11,6 +11,14 @@ public class ImageController : MonoBehaviour
     public Material backgroundmaterial;
     private Texture2D buttontexture;
     public Material buttonmaterial;
+    private Texture2D slidertexture;
+    public Material slidermaterial;
+    private Texture2D sliderpositiontexture;
+    public Material sliderpositionmaterial;
+    private Texture2D arrowtexture;
+    public Material arrowmaterial;
+    private Texture2D fillertexture;
+    public Material fillermaterial;
     bool textureloaded = false;
     // public TMP_FontAsset textMesh;
 
@@ -21,11 +29,11 @@ public class ImageController : MonoBehaviour
     {
         if ( !textureloaded && PhoenixBridge.VdfsPtr != IntPtr.Zero)
         {
-            LoadBackground();
+            LoadCustomTextures();
         }
     }
 
-    public void LoadBackground()
+    public void LoadCustomTextures()
     {
         textureloaded = true;
         backgroundtexture = SingletonBehaviour<AssetCache>.GetOrCreate().TryGetTexture("LOG_PAPER.TGA");
@@ -34,7 +42,21 @@ public class ImageController : MonoBehaviour
         buttontexture = SingletonBehaviour<AssetCache>.GetOrCreate().TryGetTexture("INV_SLOT.TGA");
         buttonmaterial.mainTexture = buttontexture;
 
+        slidertexture = SingletonBehaviour<AssetCache>.GetOrCreate().TryGetTexture("MENU_SLIDER_BACK.TGA");
+        slidermaterial.mainTexture = slidertexture;
+
+        sliderpositiontexture = SingletonBehaviour<AssetCache>.GetOrCreate().TryGetTexture("MENU_SLIDER_POS.TGA");
+        sliderpositionmaterial.mainTexture = sliderpositiontexture;
+
+        fillertexture = SingletonBehaviour<AssetCache>.GetOrCreate().TryGetTexture("MENU_BUTTONBACK-C.TEX");
+        fillermaterial.mainTexture = fillertexture;
+
+        arrowtexture = SingletonBehaviour<AssetCache>.GetOrCreate().TryGetTexture("U.TGA");
+        arrowmaterial.mainTexture = arrowtexture;
+
         //textMesh = PhoenixBridge.GothicSubtitleFont;
 
     }
+
+ 
 }

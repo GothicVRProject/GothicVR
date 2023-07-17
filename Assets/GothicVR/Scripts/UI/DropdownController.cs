@@ -22,7 +22,6 @@ public class DropdownController : MonoBehaviour
         dropdown.options.Clear();
 
         List<string> items = new List<string>();
-        items.Add("No turning");
         items.Add("Snap turn");
         items.Add("Continuous turn");
 
@@ -42,21 +41,37 @@ public class DropdownController : MonoBehaviour
     void DropdownItemSelected(TMP_Dropdown dropdown)
     {
 
-        if (dropdown.value == 0) 
+        switch(dropdown.value)
         {
-            snapTurn.enabled = false;
-            continuousTurn.enabled = false; 
+            case 0:
+                snapTurn.enabled = true;
+                continuousTurn.enabled = false;
+                break;
+            case 1:
+                snapTurn.enabled = false;
+                continuousTurn.enabled = true;
+                break;
+            default:
+                snapTurn.enabled = true;
+                continuousTurn.enabled = false;
+                break;
         }
-        if (dropdown.value == 1)
-        {
-            snapTurn.enabled = true;
-            continuousTurn.enabled = false;
-        }
-        if (dropdown.value == 2)
-        {
-            snapTurn.enabled = false;
-            continuousTurn.enabled = true;
-        }
+
+        //if (dropdown.value == 0) 
+        //{
+        //    snapTurn.enabled = false;
+        //    continuousTurn.enabled = false; 
+        //}
+        //if (dropdown.value == 1)
+        //{
+        //    snapTurn.enabled = true;
+        //    continuousTurn.enabled = false;
+        //}
+        //if (dropdown.value == 2)
+        //{
+        //    snapTurn.enabled = false;
+        //    continuousTurn.enabled = true;
+        //}
 
     }
 
