@@ -16,7 +16,7 @@ namespace GVR.Creator
 {
     public class DebugAnimationCreator : SingletonBehaviour<DebugAnimationCreator>
     {
-        public void Create()
+        public async void Create()
         {
             if (!FeatureFlags.I.CreateExampleAnimation)
                 return;
@@ -40,7 +40,7 @@ namespace GVR.Creator
             var mdh = PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, mdhName);
             var mdm = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, mdmName);
             var mrm = PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, mrmName);
-            var root = SingletonBehaviour<MeshCreator>.GetOrCreate().Create("DebugAnimationObject1", mdm, mdh, default, default, debugObj);
+            var root = await SingletonBehaviour<MeshCreator>.GetOrCreate().Create("DebugAnimationObject1", mdm, mdh, default, default, debugObj);
 
 
 

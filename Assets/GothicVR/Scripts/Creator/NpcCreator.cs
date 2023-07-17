@@ -127,7 +127,7 @@ namespace GVR.Creator
             // TBD
         }
 
-        private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
+        private static async void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
         {
             var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
@@ -136,7 +136,7 @@ namespace GVR.Creator
             var mdm = assetCache.TryGetMdm(data.body);
 
             if (FeatureFlags.I.EnableNpc)
-                meshCreator.Create(name, mdm, mdh, default, default, npc);
+                await meshCreator.Create(name, mdm, mdh, default, default, npc);
 
         }
     }
