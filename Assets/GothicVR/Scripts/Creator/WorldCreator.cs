@@ -6,6 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using PxCs.Data.WayNet;
@@ -21,7 +22,8 @@ namespace GVR.Creator
     {
 
         private GameObject worldMesh;
-        public void Create(string worldName)
+
+        public async Task<GameObject> Create(string worldName)
         {
             var world = LoadWorld(worldName);
             GameData.I.World = world;
@@ -30,13 +32,13 @@ namespace GVR.Creator
 
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
 
-            worldMesh = MeshCreator.I.Create(world, worldGo);
-            VobCreator.I.Create(worldGo, world);
+            worldMesh = await MeshCreator.I.Create(world, worldGo);
+            await VobCreator.I.Create(worldGo, world);
             WaynetCreator.I.Create(worldGo, world);
 
             DebugAnimationCreator.I.Create();
 
-            SceneManager.MoveGameObjectToScene(worldGo, SceneManager.GetSceneByName(worldName));
+            return worldGo;
         }
 
         /// <summary>
