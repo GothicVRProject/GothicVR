@@ -5,6 +5,7 @@ using GVR.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.Events;
 
 namespace GVR.Manager
 {
@@ -16,7 +17,7 @@ namespace GVR.Manager
         private string startVobAfterLoading;
         private Scene generalScene;
 
-        private GameObject player;
+        private GameObject startPoint;
 
         public GameObject interactionManager;
 
@@ -26,14 +27,17 @@ namespace GVR.Manager
         /// </summary>
         public void LoadStartupScenes()
         {
-            generalScene = SceneManager.LoadScene(generalSceneName, new LoadSceneParameters(LoadSceneMode.Additive));
-            SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
-
-            LoadWorld("world.zen", "FP_PICKRICE_SWAMP_02");
+            LoadWorld("world.zen", "OC");
+            // PxCs.Interface.PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
         }
 
-        public void LoadWorld(string worldName, string startVob)
+        public async void LoadWorld(string worldName, string startVob)
         {
+            if (generalScene.isLoaded)
+            {
+                SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName("Bootstrap"));
+                SceneManager.UnloadSceneAsync(generalScene);
+            }
             newWorldName = worldName;
             startVobAfterLoading = startVob;
             var newWorldScene = SceneManager.LoadScene(worldName, new LoadSceneParameters(LoadSceneMode.Additive));
@@ -47,58 +51,58 @@ namespace GVR.Manager
 
             GameData.I.WorldScene = newWorldScene;
 
-            WorldCreator.I.Create(newWorldName);
+            var worldGo = await WorldCreator.I.Create(newWorldName);
+            generalScene = SceneManager.LoadScene(generalSceneName, new LoadSceneParameters(LoadSceneMode.Additive));
+
+            SceneManager.MoveGameObjectToScene(worldGo, newWorldScene);
+
+            FindSpot(newWorldScene);
+
+            if (worldGo)
+            {
+                SceneManager.SetActiveScene(newWorldScene);
+            }
 
             SceneManager.sceneLoaded += WorldSceneLoaded;
-            SceneManager.activeSceneChanged += ActiveSceneChanged;
         }
 
         /// <summary>
-        /// We need to set world scene loaded as active scene. This is the only way OcclusionCulling data is fetched
-        /// for the world in a multi-scene scenario. Also set the player to we have a reference regardless of scene
+        /// We need to set the player's position.
         /// </summary>
         private void WorldSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             if (scene == generalScene)
             {
-                var playerParent = generalScene.GetRootGameObjects().FirstOrDefault(o => o.name == "PlayerController");
-                player = playerParent.transform.Find("VRPlayer_v4 (romey)").gameObject;
+                SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
+
+                WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
+
+                var playerParent = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
+                playerParent.transform.Find("VRPlayer_v4 (romey)").transform.position = startPoint.transform.position;
+
                 return;
             }
-            SceneManager.SetActiveScene(scene);
         }
 
-        /// <summary>
-        /// Subscribe the SetActiveScene method so wen can properly place the player in the correct spot.
-        /// </summary>
-        private void ActiveSceneChanged(Scene oldScene, Scene newScene)
+        private void FindSpot(Scene worldScene)
         {
-            if (newScene == GameData.I.WorldScene)
+            var spots = GameObject.FindGameObjectsWithTag("PxVob_zCVobSpot");
+            for (int i = 0; i < spots.Length; i++)
             {
-                // we set manually the XR Interaction Manager as Unity creates a new one in Bootstrap 
-                // and we don't want to use it since we have one in General scene
-                WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
-                GameObject startPoint = null;
-                var spots = GameObject.FindGameObjectsWithTag("PxVob_zCVobSpot");
+                if (spots[i].name == startVobAfterLoading)
+                {
+                    startPoint = spots[i];
+                }
+            }
+            if (startPoint == null)
+            {
                 for (int i = 0; i < spots.Length; i++)
                 {
-                    if (spots[i].name == startVobAfterLoading)
+                    if ((spots[i].name == "START" || spots[i].name == "START_GOTHIC2") && spots[i].scene == worldScene)
                     {
                         startPoint = spots[i];
                     }
                 }
-                if (startPoint == null)
-                {
-                    for (int i = 0; i < spots.Length; i++)
-                    {
-                        if ((spots[i].name == "START" || spots[i].name == "START_GOTHIC2") && spots[i].scene == newScene)
-                        {
-                            startPoint = spots[i];
-                        }
-                    }
-                }
-                if (startPoint != null)
-                    player.transform.position = startPoint.transform.position;
             }
         }
     }
