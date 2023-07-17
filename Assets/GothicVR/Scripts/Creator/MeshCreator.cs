@@ -12,6 +12,7 @@ using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using System.Threading.Tasks;
 
 namespace GVR.Creator
 {
@@ -38,7 +39,7 @@ namespace GVR.Creator
             this.assetCache = assetCache;
         }
 
-        public GameObject Create(WorldData world, GameObject parent)
+        public async Task<GameObject> Create(WorldData world, GameObject parent)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.isStatic = true;
@@ -52,7 +53,8 @@ namespace GVR.Creator
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
-                PrepareMeshRenderer(meshRenderer, subMesh);
+                await PrepareMeshRenderer(meshRenderer, subMesh);
+
                 PrepareMeshFilter(meshFilter, subMesh);
                 PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
 
@@ -63,12 +65,12 @@ namespace GVR.Creator
         }
 
 
-        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null, GameObject rootGo = null)
+        public async Task<GameObject> Create(string objectName, PxModelData mdl, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
+            return await Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
         }
 
-        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null, GameObject rootGo = null)
+        public async Task<GameObject> Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null, GameObject rootGo = null)
         {
             rootGo ??= new GameObject();
             rootGo.name = objectName;
@@ -97,7 +99,7 @@ namespace GVR.Creator
                     var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                     var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
-                    PrepareMeshRenderer(meshRenderer, subMesh.Value);
+                    await PrepareMeshRenderer(meshRenderer, subMesh.Value);
                     PrepareMeshFilter(meshFilter, subMesh.Value);
                     PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.Value.materials);
                 }
@@ -114,7 +116,7 @@ namespace GVR.Creator
                     // var meshRenderer = subMeshObj.AddComponent<SkinnedMeshRenderer>();
                     var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
-                    PrepareMeshRenderer(meshRenderer, mesh.mesh);
+                    await PrepareMeshRenderer(meshRenderer, mesh.mesh);
                     PrepareMeshFilter(meshFilter, mesh);
 
                     //this is needed only for skinnedmeshrenderer
@@ -132,7 +134,7 @@ namespace GVR.Creator
             return rootGo;
         }
 
-        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+        public async Task<GameObject> Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             if (mrm == null)
             {
@@ -148,7 +150,7 @@ namespace GVR.Creator
             var meshFilter = rootGo.AddComponent<MeshFilter>();
             var meshRenderer = rootGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(meshRenderer, mrm);
+            await PrepareMeshRenderer(meshRenderer, mrm);
             PrepareMeshFilter(meshFilter, mrm);
 
             if (withCollider)
@@ -212,7 +214,7 @@ namespace GVR.Creator
             obj.transform.localPosition = position;
         }
 
-        private void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
+        private async Task PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
             var material = GetEmptyMaterial();
             var bMaterial = subMesh.material;
@@ -226,7 +228,7 @@ namespace GVR.Creator
                 return;
             }
 
-            var texture = assetCache.TryGetTexture(bMaterial.texture);
+            var texture = await assetCache.TryGetTextureAsync(bMaterial.texture);
 
             if (null == texture)
             {
@@ -249,7 +251,7 @@ namespace GVR.Creator
             mesh.SetUVs(0, subMesh.uvs);
         }
 
-        private void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
+        private async Task PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
             // check if mrmData.subMeshes is null
 
@@ -275,7 +277,7 @@ namespace GVR.Creator
                     return;
                 }
 
-                var texture = assetCache.TryGetTexture(materialData.texture);
+                var texture = await assetCache.TryGetTextureAsync(materialData.texture);
 
                 if (null == texture)
                     if (materialData.texture.EndsWith(".TGA"))
