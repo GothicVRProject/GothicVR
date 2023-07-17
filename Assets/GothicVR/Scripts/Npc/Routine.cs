@@ -61,7 +61,7 @@ namespace GVR.Npc
         }
         void setWaypoint()
         {
-            if (PhoenixBridge.World.waypointsDict.TryGetValue(currentDestination.waypoint, out PxWayPointData value))
+            if (GameData.I.World.waypointsDict.TryGetValue(currentDestination.waypoint, out PxWayPointData value))
             {
                 waypoint = value;
             }

@@ -15,18 +15,33 @@ public class LoadFont : MonoBehaviour
         // https://github.com/GothicVRProject/GothicVR/issues/80
 
         if (!fontloaded)
-            StartCoroutine(LoadGothicFont());
+           LoadGothicFont();
     }
-    public IEnumerator LoadGothicFont()
+    //public IEnumerator LoadGothicFont()
+    //{
+    //    fontloaded = true;
+    //    yield return new WaitForEndOfFrame();
+    //    var textMesh = transform.GetComponent<TMP_Text>();
+
+    //    if (GameData.I.GothicSubtitleFont)
+    //    {
+    //        textMesh.font = GameData.I.GothicSubtitleFont;
+    //        //textMesh.fontMaterial.color = Color.black;
+    //    }
+    //}
+
+    public void LoadGothicFont()
     {
         fontloaded = true;
-        yield return new WaitForEndOfFrame();
         var textMesh = transform.GetComponent<TMP_Text>();
 
-        if (PhoenixBridge.GothicSubtitleFont)
+        if (GameData.I.GothicMenuFont)
         {
-            textMesh.font = PhoenixBridge.GothicSubtitleFont;
+            textMesh.font = GameData.I.GothicSubtitleFont;
             //textMesh.fontMaterial.color = Color.black;
+            
+
         }
     }
+
 }

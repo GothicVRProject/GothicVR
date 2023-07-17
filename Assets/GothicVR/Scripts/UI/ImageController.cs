@@ -27,7 +27,7 @@ public class ImageController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if ( !textureloaded && PhoenixBridge.VdfsPtr != IntPtr.Zero)
+        if ( !textureloaded && GameData.I.VdfsPtr != IntPtr.Zero)
         {
             LoadCustomTextures();
         }

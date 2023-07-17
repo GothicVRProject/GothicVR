@@ -15,7 +15,7 @@ public class DropdownController : MonoBehaviour
     public ActionBasedSnapTurnProvider snapTurn;
     public ActionBasedContinuousTurnProvider continuousTurn;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
 
         var dropdown = transform.GetComponent<TMP_Dropdown>();
@@ -87,14 +87,14 @@ public class DropdownController : MonoBehaviour
 
     public void LoadGothicFont()
     {
-       
+        fontloaded = true;
         var textMesh = textAsset.transform.GetComponent<TMP_Text>();
 
-        if (PhoenixBridge.GothicMenuFont)
+        if (GameData.I.GothicMenuFont)
         {
-            textMesh.font = PhoenixBridge.GothicSubtitleFont;
+            textMesh.font = GameData.I.GothicSubtitleFont;
             //textMesh.fontMaterial.color = Color.black;
-            fontloaded = true;
+            
 
         }
     }
