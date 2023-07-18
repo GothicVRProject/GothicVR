@@ -34,5 +34,44 @@ namespace GVR.Phoenix.Util
             data.weight3 = weights[3].weight;
             return data;
         }
+
+        public static BoneWeight ToBoneWeight(this PxWeightEntryData[] weights, int[] nodeMapping)
+        {
+            if (weights == null)
+                throw new ArgumentNullException("Weights are null.");
+            if (weights.Length == 0 || weights.Length > 4)
+                throw new ArgumentOutOfRangeException($"Only 1...4 weights are currently supported but >{weights.Length}< provided.");
+
+            var data = new BoneWeight();
+
+            for (int i = 0; i < weights.Length; i++)
+            {
+                int index = Array.IndexOf(nodeMapping, weights[i].nodeIndex);
+                if (index == -1)
+                    throw new ArgumentException($"No matching node index found in nodeMapping for weights[{i}].nodeIndex.");
+
+                switch (i)
+                {
+                    case 0:
+                        data.boneIndex0 = index;
+                        data.weight0 = weights[i].weight;
+                        break;
+                    case 1:
+                        data.boneIndex1 = index;
+                        data.weight1 = weights[i].weight;
+                        break;
+                    case 2:
+                        data.boneIndex2 = index;
+                        data.weight2 = weights[i].weight;
+                        break;
+                    case 3:
+                        data.boneIndex3 = index;
+                        data.weight3 = weights[i].weight;
+                        break;
+                }
+            }
+
+            return data;
+        }
     }
 }

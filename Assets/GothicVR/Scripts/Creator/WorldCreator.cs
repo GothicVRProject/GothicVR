@@ -34,7 +34,9 @@ namespace GVR.Creator
             VobCreator.I.Create(worldGo, world);
             WaynetCreator.I.Create(worldGo, world);
 
-            DebugAnimationCreator.I.Create();
+            DebugAnimationCreator.I.Create(worldName);
+            DebugAnimationCreatorBSFire.I.Create(worldName);
+            DebugAnimationCreatorVelaya.I.Create(worldName);
 
             SceneManager.MoveGameObjectToScene(worldGo, SceneManager.GetSceneByName(worldName));
         }
