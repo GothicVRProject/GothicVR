@@ -23,7 +23,7 @@ namespace GVR.Creator
 
         private GameObject worldMesh;
 
-        public async Task<GameObject> Create(string worldName)
+        public async Task<GameObject> Create(string worldName, Action<float> progressCallback)
         {
             var world = LoadWorld(worldName);
             GameData.I.World = world;
@@ -32,11 +32,13 @@ namespace GVR.Creator
 
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
 
-            worldMesh = await MeshCreator.I.Create(world, worldGo);
-            await VobCreator.I.Create(worldGo, world);
+            worldMesh = await MeshCreator.I.Create(world, worldGo, progress => progressCallback?.Invoke(progress * 0.5f));
+            await VobCreator.I.Create(worldGo, world, progress => progressCallback?.Invoke(progress));
             WaynetCreator.I.Create(worldGo, world);
 
             DebugAnimationCreator.I.Create();
+
+            progressCallback?.Invoke(1f);
 
             return worldGo;
         }
