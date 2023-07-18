@@ -4,7 +4,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![Build](https://github.com/GothicVRProject/GothicVR/actions/workflows/test_and_build.yml/badge.svg?branch=main)
 
-Fan project recreating the classic Gothic experience in VR.
+Fan project recreating the classic Gothic I and II experience in VR.
 
 
 ## Usage
