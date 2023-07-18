@@ -49,7 +49,7 @@ namespace GVR.Bootstrap
             LoadMusicVM(g1Dir);
             LoadMusic();
             LoadFonts();
-
+            LoadTextures();
             watch.Stop();
             Debug.Log($"Time spent for Bootstrapping Phoenix: {watch.Elapsed}");
 
@@ -113,6 +113,11 @@ namespace GVR.Bootstrap
             music.setEnabled(true);
             music.setMusic("SYS_LOADING");
             Debug.Log("Loading music");
+        }
+
+        private void LoadTextures()
+        {
+            UIManager.I.LoadDefaultTextures();
         }
 
         /// <summary>
