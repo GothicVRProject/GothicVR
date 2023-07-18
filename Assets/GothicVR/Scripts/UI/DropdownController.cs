@@ -1,11 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
-using GVR.Phoenix.Interface;
-
 
 public class DropdownController : MonoBehaviour
 {
@@ -17,7 +13,6 @@ public class DropdownController : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-
         var dropdown = transform.GetComponent<TMP_Dropdown>();
         dropdown.options.Clear();
 
@@ -33,14 +28,10 @@ public class DropdownController : MonoBehaviour
         dropdown.onValueChanged.AddListener(delegate { DropdownItemSelected(dropdown); });
         snapTurn = locomotionsystem.GetComponent<ActionBasedSnapTurnProvider>();
         continuousTurn = locomotionsystem.GetComponent<ActionBasedContinuousTurnProvider>();
-
-        
-
     }
 
     void DropdownItemSelected(TMP_Dropdown dropdown)
     {
-
         switch(dropdown.value)
         {
             case 0:
@@ -56,48 +47,5 @@ public class DropdownController : MonoBehaviour
                 continuousTurn.enabled = false;
                 break;
         }
-
-        //if (dropdown.value == 0) 
-        //{
-        //    snapTurn.enabled = false;
-        //    continuousTurn.enabled = false; 
-        //}
-        //if (dropdown.value == 1)
-        //{
-        //    snapTurn.enabled = true;
-        //    continuousTurn.enabled = false;
-        //}
-        //if (dropdown.value == 2)
-        //{
-        //    snapTurn.enabled = false;
-        //    continuousTurn.enabled = true;
-        //}
-
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        // FIXME - Need to change to Event based approach once it's implemented
-        // https://github.com/GothicVRProject/GothicVR/issues/80
-
-        if (!fontloaded)
-        LoadGothicFont();
-    }
-
-    public void LoadGothicFont()
-    {
-        fontloaded = true;
-        var textMesh = textAsset.transform.GetComponent<TMP_Text>();
-
-        if (GameData.I.GothicMenuFont)
-        {
-            textMesh.font = GameData.I.GothicSubtitleFont;
-            //textMesh.fontMaterial.color = Color.black;
-            
-
-        }
-    }
-
-
 }

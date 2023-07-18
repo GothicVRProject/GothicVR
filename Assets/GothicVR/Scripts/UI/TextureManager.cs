@@ -5,7 +5,7 @@ using GVR.Util;
 using GVR.Phoenix.Interface;
 using TMPro;
 
-public class ImageController : MonoBehaviour
+public class TextureManager : MonoBehaviour
 {
     private Texture2D backgroundtexture;
     public Material backgroundmaterial;
