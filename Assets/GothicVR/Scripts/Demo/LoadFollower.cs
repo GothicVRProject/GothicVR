@@ -31,5 +31,6 @@ public class LogoFollower : MonoBehaviour
 
         // Rotate the logo to face the camera
         transform.LookAt(target);
+        transform.Rotate(0f, 0f, 180f);
     }
 }
