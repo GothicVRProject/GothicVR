@@ -816,6 +816,7 @@ GameObject:
   - component: {fileID: 1896514214}
   - component: {fileID: 1896514213}
   - component: {fileID: 1896514215}
+  - component: {fileID: 1896514216}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -865,3 +866,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   interactionManager: {fileID: 1300502570}
+--- !u!114 &1896514216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34b7e97b277d2b9448536ffb853c106c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 0
+  GothicMenuMaterial: {fileID: 2100000, guid: 6fdd223541452c64088e845a642bba5b, type: 2}
+  LoadingBarBackgroundMaterial: {fileID: 2100000, guid: fe64b3856aced89469bf17ade6c23b59, type: 2}
+  LoadingBarMaterial: {fileID: 2100000, guid: d6c58ffdb5f6faf4ba754490363bdd33, type: 2}
