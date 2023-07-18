@@ -39,11 +39,16 @@ namespace GVR.Creator
             this.assetCache = assetCache;
         }
 
-        public async Task<GameObject> Create(WorldData world, GameObject parent)
+        public async Task<GameObject> Create(WorldData world, GameObject parent, Action<float> progressCallback)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.isStatic = true;
             meshObj.SetParent(parent);
+
+            // Track the progress of each sub-mesh creation separately
+            float subMeshCreationProgress = 0f;
+            int numSubMeshes = world.subMeshes.Values.Count;
+            int subMeshCounter = 0;
 
             foreach (var subMesh in world.subMeshes.Values)
             {
@@ -59,8 +64,22 @@ namespace GVR.Creator
                 PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
 
                 subMeshObj.SetParent(meshObj);
+
+                // Update the sub-mesh creation progress
+                subMeshCounter++;
+                subMeshCreationProgress = (float)subMeshCounter / numSubMeshes;
+
+                // Invoke the progress callback with the subMeshCreationProgress
+                progressCallback?.Invoke(subMeshCreationProgress);
             }
 
+            // Use the overall progress value as needed (e.g., update a loading progress UI)
+            float overallProgress = subMeshCreationProgress;
+
+            // Invoke the progress callback with the overallProgress
+            progressCallback?.Invoke(overallProgress);
+
+            // Return the meshObj
             return meshObj;
         }
 
@@ -159,7 +178,7 @@ namespace GVR.Creator
             return rootGo;
         }
 
-        public GameObject CreateDecal(PxVobData vob, GameObject parent)
+        public async Task<GameObject> CreateDecal(PxVobData vob, GameObject parent)
         {
             if (!vob.vobDecal.HasValue)
             {
@@ -171,7 +190,7 @@ namespace GVR.Creator
 
             var decalProjectorGo = new GameObject(decalData.name);
             var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
-            var texture = assetCache.TryGetTexture(vob.visualName);
+            var texture = await assetCache.TryGetTextureAsync(vob.visualName);
 
             // x/y needs to be made twice the size and transformed from cm in m.
             // z - value is close to what we see in Gothic spacer.
