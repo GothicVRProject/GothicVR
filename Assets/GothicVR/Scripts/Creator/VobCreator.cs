@@ -41,7 +41,7 @@ namespace GVR.Creator
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
         }
 
-        public async Task Create(GameObject root, WorldData world)
+        public async Task Create(GameObject root, WorldData world, Action<float> progressCallback)
         {
             if (!FeatureFlags.I.CreateVobs)
                 return;
@@ -51,7 +51,7 @@ namespace GVR.Creator
             parentGos = new();
 
             CreateParentVobObject(vobRootObj);
-            await CreateVobs(vobRootObj, world.vobs);
+            await CreateVobs(vobRootObj, world.vobs, progress => progressCallback?.Invoke(progress));
         }
 
         private void CreateParentVobObject(GameObject root)
@@ -65,10 +65,15 @@ namespace GVR.Creator
             }
         }
 
-        private async Task CreateVobs(GameObject root, PxVobData[] vobs)
+        private async Task CreateVobs(GameObject root, PxVobData[] vobs, Action<float> progressCallback, float progress = 0.5f)
         {
+            float totalProgress = progress;
+            float increment = (1f - progress) / (vobs.Length + 1); // +1 for the progress update before creating each vob
+            float maxProgress = totalProgress;
+
             foreach (var vob in vobs)
             {
+
                 switch (vob.type)
                 {
                     case PxVobType.PxVob_oCItem:
@@ -113,9 +118,9 @@ namespace GVR.Creator
                         break;
                     case PxVobType.PxVob_zCVob:
                         // if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
-                        // CreateDecal(vob);
+                            // CreateDecal(vob);
                         // else
-                        await CreateDefaultMesh(vob);
+                            await CreateDefaultMesh(vob);
                         break;
                     default:
                         await CreateDefaultMesh(vob);
@@ -123,9 +128,12 @@ namespace GVR.Creator
                 }
 
                 // Load children
-                await CreateVobs(root, vob.childVobs);
-            }
+                await CreateVobs(root, vob.childVobs, progressCallback, totalProgress);
 
+                maxProgress = Mathf.Max(maxProgress, totalProgress);
+                totalProgress += increment;
+            }
+            progressCallback?.Invoke(maxProgress);
         }
 
         private async void CreateItem(PxVobItemData vob)
@@ -203,7 +211,7 @@ namespace GVR.Creator
         {
             if (!FeatureFlags.I.EnableSounds)
                 return;
-            
+
             var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
             SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
         }
@@ -264,7 +272,7 @@ namespace GVR.Creator
                 Destroy(spot.GetComponent<MeshRenderer>());
             }
 
-            spot.name = vob.vobName;
+            spot.name = vob.vobName != string.Empty ? vob.vobName : "START";
             spot.SetParent(parentGos[vob.type]);
 
             SetPosAndRot(spot, vob.position, vob.rotation!.Value);
@@ -290,7 +298,7 @@ namespace GVR.Creator
             return await meshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
         }
 
-        private void CreateDecal(PxVobData vob)
+        private async void CreateDecal(PxVobData vob)
         {
             if (!FeatureFlags.Instance.EnableDecals)
             {
@@ -298,7 +306,7 @@ namespace GVR.Creator
             }
             var parent = parentGos[vob.type];
 
-            meshCreator.CreateDecal(vob, parent);
+            await meshCreator.CreateDecal(vob, parent);
         }
 
         private async Task<GameObject> CreateDefaultMesh(PxVobData vob)
