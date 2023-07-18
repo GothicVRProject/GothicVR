@@ -879,6 +879,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
-  GothicMenuMaterial: {fileID: 2100000, guid: 6fdd223541452c64088e845a642bba5b, type: 2}
+  GothicLoadingMenuMaterial: {fileID: 2100000, guid: 6fdd223541452c64088e845a642bba5b, type: 2}
   LoadingBarBackgroundMaterial: {fileID: 2100000, guid: fe64b3856aced89469bf17ade6c23b59, type: 2}
   LoadingBarMaterial: {fileID: 2100000, guid: d6c58ffdb5f6faf4ba754490363bdd33, type: 2}
