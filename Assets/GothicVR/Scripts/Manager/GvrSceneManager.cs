@@ -122,7 +122,7 @@ namespace GVR.Manager
             {
             // TODO: for new game we need to load texture "LOADING.TGA"
                 var textureString = "LOADING_" + worldName.Split('.')[0].ToUpper() + ".TGA";
-                UIManager.I.setTexture(textureString, UIManager.I.GothicMenuMaterial);
+                UIManager.I.setTexture(textureString, UIManager.I.GothicLoadingMenuMaterial);
             }
 
             var loadingScene = SceneManager.LoadScene("Loading", new LoadSceneParameters(LoadSceneMode.Additive));

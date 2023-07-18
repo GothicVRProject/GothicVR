@@ -12,13 +12,13 @@ namespace GVR.Manager
 {
     public class UIManager : SingletonBehaviour<UIManager>
     {
-        public Material GothicMenuMaterial;
+        public Material GothicLoadingMenuMaterial;
         public Material LoadingBarBackgroundMaterial;
         public Material LoadingBarMaterial;
         public void LoadDefaultTextures()
         {
-            var backgroundTexture = AssetCache.I.TryGetTexture("LOADING.TGA");
-            GothicMenuMaterial.mainTexture = backgroundTexture;
+            var loadingBackgroundTexture = AssetCache.I.TryGetTexture("LOADING.TGA");
+            GothicLoadingMenuMaterial.mainTexture = loadingBackgroundTexture;
 
             var progressBackgroundTexture = AssetCache.I.TryGetTexture("PROGRESS.TGA");
             LoadingBarBackgroundMaterial.mainTexture = progressBackgroundTexture;
