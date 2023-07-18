@@ -12,6 +12,7 @@ using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UIElements;
 
 namespace GVR.Creator
 {
@@ -22,6 +23,7 @@ namespace GVR.Creator
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
         private const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        private const string waterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
         private const float decalOpacity = 0.75f;
 
 
@@ -214,7 +216,17 @@ namespace GVR.Creator
 
         private void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
-            var material = GetEmptyMaterial();
+            Material material;
+            switch (subMesh.material.group)
+            {
+                case PxMaterial.PxMaterialGroup.PxMaterialGroup_Water:
+                    material = GetWaterMaterial(subMesh.material);
+                    break;
+                default:
+                    material = GetDefaultMaterial();
+                    break;
+            }
+
             var bMaterial = subMesh.material;
 
             rend.material = material;
@@ -263,7 +275,7 @@ namespace GVR.Creator
 
             foreach (var subMesh in mrmData.subMeshes)
             {
-                var material = GetEmptyMaterial();
+                var material = GetDefaultMaterial();
                 var materialData = subMesh.material;
 
                 rend.material = material;
@@ -547,13 +559,41 @@ namespace GVR.Creator
             renderer.bones = bones;
         }
 
-        private Material GetEmptyMaterial()
+        private Material GetDefaultMaterial()
         {
+            // FIXME - put shader in cache for performance during load.
             var standardShader = Shader.Find(defaultShader);
             var material = new Material(standardShader);
 
             // Enable clipping of alpha values.
             material.EnableKeyword("_ALPHATEST_ON");
+
+            return material;
+        }
+
+        private Material GetWaterMaterial(PxMaterialData materialData)
+        {
+            var shader = Shader.Find(waterShader);
+            Material material = new Material(shader);
+            
+
+            // FIXME - Here we need to see if we can change materialData.waveSpeed
+            //Currently just a static value
+            if (materialData.animFps == 0)
+            {
+                material.SetFloat("_ScrollSpeed", 0f);
+            }
+            else
+            {
+                material.SetFloat("_ScrollSpeed", -(materialData.animFps/75f));
+            }
+
+            material.SetFloat("_Surface", 1);
+            material.SetInt("_ZWrite", 0);
+            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+
 
             return material;
         }
