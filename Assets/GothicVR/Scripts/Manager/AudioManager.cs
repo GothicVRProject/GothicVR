@@ -47,7 +47,18 @@ namespace GVR.Manager
             playerCell = listenerCell;
 
             // Iterate over the cells around the player in a circular area
-            int radius = 3;
+            UpdateAudioSourcesWithinRadius(listenerCell: listenerCell, radius: 3);
+        }
+        /// <summary>
+        /// Updates the audio sources within a specified radius around the listener cell.
+        /// It iterates over each cell within the radius and checks if it falls within the circular area.
+        /// If so, it retrieves the audio sources associated with that cell and determines if they should be audible.
+        /// https://demonstrations.wolfram.com/ApproximatingSpheresWithBoxes/ - graphical visualisation of how the sphere would look like
+        /// </summary>
+        /// <param name="listenerCell">The position of the listener cell.</param>
+        /// <param name="radius">The radius of the circular area.</param>
+        private void UpdateAudioSourcesWithinRadius(Vector3Int listenerCell, int radius)
+        {
             for (int x = listenerCell.x - radius; x <= listenerCell.x + radius; x++)
             {
                 for (int y = listenerCell.y - radius; y <= listenerCell.y + radius; y++)
@@ -74,44 +85,6 @@ namespace GVR.Manager
                     }
                 }
             }
-        }
-
-        public void AddAudioSource(GameObject gameObj, AudioSource audioSource)
-        {
-            if (audioSources.ContainsKey(gameObj))
-            {
-                return;
-            }
-            audioSources.Add(gameObj, audioSource);
-
-            // Add the audio source to the appropriate grid cell
-            Vector3Int gridCell = GetGridCellFromPosition(gameObj.transform.position);
-            if (!gridCells.TryGetValue(gridCell, out List<GameObject> audioSourcesInCell))
-            {
-                audioSourcesInCell = new List<GameObject>();
-                gridCells.Add(gridCell, audioSourcesInCell);
-            }
-            audioSourcesInCell.Add(gameObj);
-
-            // Deactivate the gameobject to prevent audio from being played and CPU usage
-        }
-
-        public void SetAudible(GameObject gameObj, bool isAudible)
-        {
-            gameObj.SetActive(isAudible);
-        }
-
-        public void SetAudioListener(AudioListener audioListener)
-        {
-            this.audioListener = audioListener;
-        }
-
-        private Vector3Int GetGridCellFromPosition(Vector3 position)
-        {
-            int x = Mathf.FloorToInt(position.x / cellSize);
-            int y = Mathf.FloorToInt(position.y / cellSize);
-            int z = Mathf.FloorToInt(position.z / cellSize);
-            return new Vector3Int(x, y, z);
         }
 
         private bool ShouldBeAudible(GameObject gameObj)
