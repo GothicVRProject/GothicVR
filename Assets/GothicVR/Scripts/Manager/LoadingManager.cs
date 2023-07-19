@@ -37,6 +37,14 @@ namespace GVR.Manager
             }
         }
 
+        public void ResetProgress()
+        {
+            foreach (LoadingProgressType progressType in progressByType.Keys.ToList())
+            {
+                progressByType[progressType] = 0f;
+            }
+        }
+
         public void SetBarFromScene(Scene scene)
         {
             this.bar = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground/ProgressBar").gameObject;
