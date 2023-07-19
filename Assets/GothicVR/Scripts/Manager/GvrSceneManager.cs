@@ -81,6 +81,8 @@ namespace GVR.Manager
 
         private async Task ShowLoadingScene(string worldName = null)
         {
+            UIManager.I.LoadLoadingDefaultTextures();
+
             generalScene = SceneManager.GetSceneByName(generalSceneName);
             if (generalScene.isLoaded)
             {
@@ -139,8 +141,6 @@ namespace GVR.Manager
             }
             if (scene.name == "Loading")
             {
-                UIManager.I.LoadLoadingDefaultTextures();
-                
                 LoadingManager.I.SetBarFromScene(scene);
                 LoadingManager.I.SetMaterialForLoading(scene);
             }
