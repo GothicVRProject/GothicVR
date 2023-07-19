@@ -189,7 +189,7 @@ namespace GVR.Creator
             sampleScene.GetRootGameObjects().Append(worldGo);
 
             // load only the world mesh
-            await SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, worldGo);
+            await MeshCreator.I.Create(world, worldGo);
 
             // move the world to the correct scene
             EditorSceneManager.MoveGameObjectToScene(worldGo, worldScene);
