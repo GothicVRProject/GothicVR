@@ -49,6 +49,22 @@ namespace GVR.Manager
             // Iterate over the cells around the player in a circular area
             UpdateAudioSourcesWithinRadius(listenerCell: listenerCell, radius: 3);
         }
+
+        /// <summary>
+        /// Converts a position in world space to the corresponding grid cell position.
+        /// This function divides the position coordinates by the cell size and rounds down to the nearest integer to determine the grid cell coordinates.
+        /// The resulting grid cell position is returned as a Vector3Int.
+        /// </summary>
+        /// <param name="position">The position in world space.</param>
+        /// <returns>The corresponding grid cell position.</returns>
+        private Vector3Int GetGridCellFromPosition(Vector3 position)
+        {
+            int x = Mathf.FloorToInt(position.x / cellSize);
+            int y = Mathf.FloorToInt(position.y / cellSize);
+            int z = Mathf.FloorToInt(position.z / cellSize);
+            return new Vector3Int(x, y, z);
+        }
+
         /// <summary>
         /// Updates the audio sources within a specified radius around the listener cell.
         /// It iterates over each cell within the radius and checks if it falls within the circular area.
