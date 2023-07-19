@@ -326,6 +326,7 @@ namespace GVR.Creator
             var verticesAndUvSize = mrmData.subMeshes.Sum(i => i.triangles.Length) * 3;
             var preparedVertices = new List<Vector3>(verticesAndUvSize);
             var preparedUVs = new List<Vector2>(verticesAndUvSize);
+            var preparedNormals = new List<Vector3>(verticesAndUvSize);
 
             // 2-dimensional arrays (as there are segregated by submeshes)
             var preparedTriangles = new List<List<int>>(mrmData.subMeshes.Length);
@@ -333,6 +334,7 @@ namespace GVR.Creator
             foreach (var subMesh in mrmData.subMeshes)
             {
                 var vertices = mrmData.positions;
+                var normals = mrmData.normals;
                 var triangles = subMesh.triangles;
                 var wedges = subMesh.wedges;
 
@@ -361,6 +363,10 @@ namespace GVR.Creator
                     preparedUVs.Add(index1.texture.ToUnityVector());
                     preparedUVs.Add(index2.texture.ToUnityVector());
                     preparedUVs.Add(index3.texture.ToUnityVector());
+                    
+                    preparedNormals.Add(normals[index1.index].ToUnityVector());
+                    preparedNormals.Add(normals[index2.index].ToUnityVector());
+                    preparedNormals.Add(normals[index3.index].ToUnityVector());
                 }
                 preparedTriangles.Add(subMeshTriangles);
             }
@@ -371,6 +377,7 @@ namespace GVR.Creator
             // @see: https://answers.unity.com/questions/531968/submesh-vertices.html
             mesh.SetVertices(preparedVertices);
             mesh.SetUVs(0, preparedUVs);
+            mesh.SetNormals(preparedNormals);
             for (var i = 0; i < mrmData.subMeshes.Length; i++)
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
@@ -409,6 +416,7 @@ namespace GVR.Creator
 
             var verticesAndUvSize = pxMesh.subMeshes.Sum(i => i.triangles.Length) * 3;
             var preparedVertices = new List<Vector3>(verticesAndUvSize);
+            var preparedNormals = new List<Vector3>(verticesAndUvSize);
             var preparedUVs = new List<Vector2>(verticesAndUvSize);
             var preparedBoneWeights = new List<BoneWeight>(verticesAndUvSize);
 
@@ -418,6 +426,7 @@ namespace GVR.Creator
             foreach (var subMesh in pxMesh.subMeshes)
             {
                 var vertices = pxMesh.positions;
+                var normals = pxMesh.normals;
                 var triangles = subMesh.triangles;
                 var wedges = subMesh.wedges;
 
@@ -462,6 +471,7 @@ namespace GVR.Creator
             // @see: https://answers.unity.com/questions/531968/submesh-vertices.html
             mesh.SetVertices(preparedVertices);
             mesh.SetUVs(0, preparedUVs);
+            mesh.SetNormals(preparedNormals);
 
             // same here for the bones
             // mesh.boneWeights = preparedBoneWeights.ToArray();
