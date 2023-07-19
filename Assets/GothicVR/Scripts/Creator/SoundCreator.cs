@@ -172,10 +172,6 @@ namespace GVR.Creator
 
         private void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, Quaternion rotation)
         {
-            // FIXME - This isn't working
-            if (position.Equals(default) && rotation.Equals(default))
-                return;
-
             obj.transform.localRotation = rotation;
             obj.transform.localPosition = position;
         }
