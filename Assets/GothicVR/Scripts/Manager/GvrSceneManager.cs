@@ -132,7 +132,7 @@ namespace GVR.Manager
             {
                 if (scene == loadingScene)
                 {
-                    bar = loadingScene.GetRootGameObjects().FirstOrDefault(go => go.name == "VRPlayer_v4 (romey)").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground/ProgressBar").gameObject;
+                    SetMaterialForLoading(loadingScene);
                 }
             };
             // Delay for magic number amount to make sure that bar can be found
@@ -140,9 +140,12 @@ namespace GVR.Manager
             await Task.Delay(5);
         }
 
-        private void UpdateLoadingBar(float progress)
+        private void SetMaterialForLoading(Scene scene)
         {
-            bar.GetComponent<Image>().fillAmount = progress;
+            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground/ProgressBar").gameObject.GetComponent<Image>().material = UIManager.I.LoadingBarMaterial;
+            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground").gameObject.GetComponent<Image>().material = UIManager.I.LoadingBarBackgroundMaterial;
+            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage").gameObject.GetComponent<Image>().material = UIManager.I.GothicLoadingMenuMaterial;
+            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").GetComponent<MeshRenderer>().material = UIManager.I.LoadingSphereMaterial;
         }
 
         private void HideLoadingScene()
