@@ -48,12 +48,16 @@ namespace GVR.Creator
             var mdl = PxModel.LoadModelFromVdf(GameData.I.VdfsPtr, mdlName);
 
 
-            var obj = CreateBSFireObj(name, mdl);
-            SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
+            var obj1 = CreateBSFireObj(name, mdl);
+            var obj2 = MeshCreator.I.Create(name + "2", mdl, new(-26f, 10f, 0), Quaternion.identity);
 
-            obj.transform.localPosition = new(-25f, 10f, 0);
+            SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj1);
+            SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj2);
 
-            PlayAnimationBSFire(obj, mds, mdl, mdsName, animationName);
+            obj1.transform.localPosition = new(-25f, 10f, 0);
+
+            PlayAnimationBSFire(obj1, mds, mdl, mdsName, animationName);
+            PlayAnimationBSFire(obj2, mds, mdl, mdsName, animationName);
         }
 
         private GameObject CreateBSFireObj(string objectName, PxModelData mdl)
@@ -64,7 +68,6 @@ namespace GVR.Creator
             var rootObj = new GameObject(objectName);
 
             var nodeObjects = new GameObject[mdh.nodes!.Length];
-            var rootTranslation = mdh.rootTranslation.ToUnityVector();
             
             // Create empty GameObjects from hierarchy
             {
@@ -87,20 +90,12 @@ namespace GVR.Creator
                         nodeObj.SetParent(nodeObjects[node.parentIndex]);
                 }
                 
-                // Set matrixValues to default
-                var matrixValues = Enumerable.Range(0, mdh.nodes.Length).Select(_ => Matrix4x4.identity).ToArray();
-                mkSkeleton(mdh.nodes, matrixValues, -1);
-
-                
                 for (var i=0; i<nodeObjects.Length; i++)
                 {
                     if (mdh.nodes[i].parentIndex == -1)
-                    {
                         nodeObjects[i].transform.position = mdh.rootTranslation.ToUnityVector();
-                        // FIXME - it might be, that we need to remove rotation from root objects. As there's only rootTranslation as position, not rotation...
-                    }
                     else
-                        SetPosAndRot(nodeObjects[i], matrixValues[i]);
+                        SetPosAndRot(nodeObjects[i], mdh.nodes[i].transform.ToUnityMatrix());
                 }
             }
 
@@ -123,7 +118,7 @@ namespace GVR.Creator
 
                 meshRenderer.sharedMesh = meshFilter.mesh;
 
-                CreateBonesData(rootObj, nodeObjects, meshRenderer, mdh, softSkinMesh);
+                CreateBonesData(rootObj, nodeObjects, meshRenderer, softSkinMesh);
             }
 
 
@@ -146,33 +141,9 @@ namespace GVR.Creator
 
             return rootObj;
         }
-
         
-        /// <summary>
-        /// Method used from OpenGothic.
-        ///
-        /// FIXME: Seems unoptimized as for every node we potentially have n iterations of the whole array. (n*m)
-        /// </summary>
-        private void mkSkeleton(PxModelHierarchyNodeData[] nodes, Matrix4x4[] matrixValues, int parentIndex)
-        {
-            for(var i = 0; i < nodes.Length; ++i){
-                if (nodes[i].parentIndex == parentIndex)
-                {
-                    if (parentIndex == -1)
-                    {
-                        // matrixValues[i] = nodes[i].transform.ToUnityMatrix();
-                    }
-                    else
-                        matrixValues[i] = nodes[i].transform.ToUnityMatrix();
-
-                    mkSkeleton(nodes, matrixValues, i);
-                }
-            }
-        }
-
         private void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
         {
-            var unityMatrix = matrix.ToUnityMatrix();
             SetPosAndRot(obj, matrix.ToUnityMatrix());
         }
         
@@ -384,7 +355,7 @@ namespace GVR.Creator
             }
         }
 
-        private static void CreateBonesData(GameObject rootObj, GameObject[] nodeObjects, SkinnedMeshRenderer renderer, PxModelHierarchyData mdh, PxSoftSkinMeshData mesh)
+        private static void CreateBonesData(GameObject rootObj, GameObject[] nodeObjects, SkinnedMeshRenderer renderer, PxSoftSkinMeshData mesh)
         {
             var meshBones = new Transform[mesh.nodes!.Length];
             var bindPoses = new Matrix4x4[mesh.nodes!.Length];

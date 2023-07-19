@@ -15,10 +15,9 @@ namespace GVR.Phoenix.Util
         }
 
         /// <summary>
-        /// Transform Vector3 to UnitVector3.
-        /// optional: Adjust value by factor 100 if it's a position from original gothic.
+        /// Transform Vector3 to Unity Vector3.
         /// </summary>
-        public static UnityEngine.Vector3 ToUnityVector(this Vector3 vector3, bool correctGothicFactor = true)
+        public static UnityEngine.Vector3 ToUnityVector(this Vector3 vector3)
         {
             var vector = new UnityEngine.Vector3()
             {
@@ -27,11 +26,8 @@ namespace GVR.Phoenix.Util
                 z = vector3.Z
             };
 
-            // Gothic positions are too big for Unity. (factor 100)
-            if (correctGothicFactor)
-                return vector / 100;
-            else
-                return vector;
+            // Gothic positions are in cm, but Unity in m. (factor 100)
+            return vector / 100;
         }
 
 
