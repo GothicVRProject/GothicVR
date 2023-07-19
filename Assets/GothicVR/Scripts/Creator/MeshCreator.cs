@@ -139,9 +139,13 @@ namespace GVR.Creator
                 PrepareMeshFilter(meshFilter, subMesh.Value);
             }
 
-            // We need to set the root translation after we add children above. Otherwise the "additive" position/rotation will be broken.
             SetPosAndRot(rootGo, position, rotation);
 
+            // We need to set the root translation after we add children above. Otherwise the "additive" position/rotation will be broken.
+            // We need to reset the rootBones position to zero. Otherwise Vobs won't be placed right.
+            // Due to Unity's parent-child transformation magic, we need to do it at the end. ╰(*°▽°*)╯
+            nodeObjects[0].transform.localPosition = Vector3.zero;
+            
             return rootGo;
         }
 
