@@ -112,9 +112,6 @@ namespace GVR.Manager
 
         private bool ShouldBeAudible(GameObject gameObj)
         {
-            if (audioListener == null)
-                return false;
-
             float maxDistance = audioSources[gameObj].maxDistance;
             float distanceFromPlayer = Vector3.Distance(gameObj.transform.position, audioListener.transform.position);
             return distanceFromPlayer <= maxDistance;
