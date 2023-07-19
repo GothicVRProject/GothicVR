@@ -21,7 +21,7 @@ namespace GVR.Creator
 
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
-        private const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        private const string defaultShader = "Universal Render Pipeline/Lit"; // "Unlit/Transparent Cutout";
         private const float decalOpacity = 0.75f;
 
 
@@ -247,6 +247,7 @@ namespace GVR.Creator
             mesh.SetVertices(subMesh.vertices);
             mesh.SetTriangles(subMesh.triangles, 0);
             mesh.SetUVs(0, subMesh.uvs);
+            mesh.SetNormals(subMesh.normals);
         }
 
         private void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
