@@ -39,8 +39,7 @@ namespace GVR.Manager
             await ShowLoadingScene(worldName);
             newWorldName = worldName;
             startVobAfterLoading = startVob;
-            var asyncLoad = SceneManager.LoadSceneAsync(worldName, new LoadSceneParameters(LoadSceneMode.Additive));
-            Scene newWorldScene;
+            var newWorldScene = SceneManager.LoadScene(worldName, new LoadSceneParameters(LoadSceneMode.Additive));
 
             // Remove previous scene.
             // TODO - it might be, that we need to wait for old map to be removed before loading new one. Let's see...
@@ -55,32 +54,25 @@ namespace GVR.Manager
                 SceneManager.UnloadSceneAsync(GameData.I.WorldScene.Value);
             }
 
-            asyncLoad.completed += async (asyncOperation) =>
+            newWorldScene = SceneManager.GetSceneByName(newWorldName);
+
+            GameData.I.WorldScene = newWorldScene;
+
+            var worldGo = await WorldCreator.I.Create(newWorldName);
+            SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) =>
             {
-                newWorldScene = SceneManager.GetSceneByName(newWorldName);
-
-                GameData.I.WorldScene = newWorldScene;
-
-                var worldGo = await WorldCreator.I.Create(newWorldName, progress =>
-                {
-                    UpdateLoadingBar(progress);
-                });
-
-                SceneManager.sceneLoaded += (Scene scene, LoadSceneMode mode) =>
-                {
-                    if (scene.name == newWorldName)
-                        SceneManager.SetActiveScene(SceneManager.GetSceneByName(newWorldName));
-                };
-                // Delay for one frame to make sure that the scene can be set active successfully
-                await Task.Delay(1);
-
-                if (worldGo)
-                {
-                    SceneManager.MoveGameObjectToScene(worldGo, newWorldScene);
-                    FindSpot(newWorldScene);
-                    HideLoadingScene();
-                }
+                if (scene.name == newWorldName)
+                    SceneManager.SetActiveScene(SceneManager.GetSceneByName(newWorldName));
             };
+            // Delay for one frame to make sure that the scene can be set active successfully
+            await Task.Delay(1);
+
+            if (worldGo)
+            {
+                SceneManager.MoveGameObjectToScene(worldGo, newWorldScene);
+                FindSpot(newWorldScene);
+                HideLoadingScene();
+            }
         }
 
         private void FindSpot(Scene worldScene)
