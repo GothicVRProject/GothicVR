@@ -6,6 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Debugging;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using PxCs.Data.WayNet;
@@ -38,6 +39,9 @@ namespace GVR.Creator
             DebugAnimationCreatorBSFire.I.Create(worldName);
             DebugAnimationCreatorVelaya.I.Create(worldName);
 
+            if (FeatureFlags.I.CreateOcNpcs)
+                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
+            
             SceneManager.MoveGameObjectToScene(worldGo, SceneManager.GetSceneByName(worldName));
         }
 

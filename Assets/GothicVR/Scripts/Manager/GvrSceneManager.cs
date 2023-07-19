@@ -101,5 +101,11 @@ namespace GVR.Manager
                     player.transform.position = startPoint.transform.position;
             }
         }
+
+        public void MoveToWorldScene(GameObject go)
+        {
+            GameData.I.WorldScene!.Value.GetRootGameObjects().Append(go);
+            SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.I.WorldScene.Value.name));
+        }
     }
 }

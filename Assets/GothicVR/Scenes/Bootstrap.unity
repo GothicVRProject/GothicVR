@@ -342,15 +342,15 @@ MonoBehaviour:
   CreateVobs: 1
   CreateWaypoints: 0
   CreateWaypointEdges: 0
-  EnableDayTime: 0
+  EnableDayTime: 1
   SunMovementPerformanceValue: 0
   StartHour: 17
   StartMinute: 59
   EnableVobFPMesh: 0
   EnableVobFPMeshEditorLabel: 0
   EnableDecals: 0
-  EnableNpc: 0
-  EnableNpcRoutines: 0
+  CreateOcNpcs: 1
+  EnableNpcRoutines: 1
   CreateExampleAnimation: 1
   ShowVdfsFileNotFoundErrors: 0
   EnableSounds: 0
@@ -844,6 +844,7 @@ GameObject:
   - component: {fileID: 1896514214}
   - component: {fileID: 1896514213}
   - component: {fileID: 1896514215}
+  - component: {fileID: 1896514216}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -893,3 +894,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   interactionManager: {fileID: 1300502570}
+--- !u!114 &1896514216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff27067532e5fb14d8e963d887bb60cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 0

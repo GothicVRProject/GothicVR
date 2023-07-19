@@ -11,8 +11,10 @@ using PxCs.Interface;
 using System;
 using System.Linq;
 using GVR.Debugging;
+using GVR.Manager;
 using Unity.XR.CoreUtils;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace GVR.Creator
 {
@@ -20,7 +22,7 @@ namespace GVR.Creator
     {
         private static LookupCache lookupCache;
         private static AssetCache assetCache;
-        private static GameObject npcContainer;
+        private static GameObject npcRootGo;
         private static MeshCreator meshCreator;
 
         void Start()
@@ -28,14 +30,24 @@ namespace GVR.Creator
             lookupCache = SingletonBehaviour<LookupCache>.GetOrCreate();
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
             meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
-
-            npcContainer = GameObject.Find("NPCs");
-
+            
             VmGothicBridge.PhoenixWld_InsertNpc.AddListener(Wld_InsertNpc);
             VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
             VmGothicBridge.PhoenixMdl_SetVisual.AddListener(Mdl_SetVisual);
             VmGothicBridge.PhoenixMdl_ApplyOverlayMds.AddListener(Mdl_ApplyOverlayMds);
             VmGothicBridge.PhoenixMdl_SetVisualBody.AddListener(Mdl_SetVisualBody);
+        }
+
+        private static GameObject GetRootGo()
+        {
+            // GO need to be created after world is loaded. Otherwise we will spawn NPCs inside Bootstrap.unity
+            if (npcRootGo != null)
+                return npcRootGo;
+            
+            npcRootGo = new GameObject("NPCs");
+            GvrSceneManager.I.MoveToWorldScene(npcRootGo);
+            
+            return npcRootGo;
         }
 
         /// <summary>
@@ -75,7 +87,7 @@ namespace GVR.Creator
             }
             
             newNpc.transform.position = initialSpawnpoint.position.ToUnityVector();
-            newNpc.transform.parent = npcContainer.transform;
+            newNpc.transform.parent = GetRootGo().transform;
         }
 
         private static void TA_MIN(VmGothicBridge.TA_MINData data)
@@ -135,9 +147,7 @@ namespace GVR.Creator
             var mdh = npc.GetComponent<Properties>().mdh;
             var mdm = assetCache.TryGetMdm(data.body);
 
-            if (FeatureFlags.I.EnableNpc)
-                meshCreator.Create(name, mdm, mdh, default, default, npc);
-
+            meshCreator.Create(name, mdm, mdh, default, default, npc);
         }
     }
 }
