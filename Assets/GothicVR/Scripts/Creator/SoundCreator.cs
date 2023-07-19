@@ -57,7 +57,8 @@ namespace GVR.Creator
 
             if (vobSound.initiallyPlaying)
                 audioSource.Play();
-            
+
+            // Deactivate the gameobject to prevent audio from being played and CPU usage
             soundObject.SetActive(false);
 
             return soundObject;
@@ -105,6 +106,7 @@ namespace GVR.Creator
 
             audioDaytimeComp.SetAudioTimeSwitch(vobSoundDaytime.startTime, vobSoundDaytime.endTime, audioSource1, audioSource2);
 
+            // Deactivate the gameobject to prevent audio from being played and CPU usage
             soundObject.SetActive(false);
 
             return soundObject;
