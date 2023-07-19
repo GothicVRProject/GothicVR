@@ -23,7 +23,7 @@ namespace GVR.Manager
             LoadingSphereMaterial.color = new Color(.25f, .25f, .25f, 1f); // dark gray
         }
 
-        public void LoadDefaultTextures()
+        public void LoadLoadingDefaultTextures()
         {
             var loadingBackgroundTexture = AssetCache.I.TryGetTexture("LOADING.TGA");
             GothicLoadingMenuMaterial.mainTexture = loadingBackgroundTexture;

@@ -31,7 +31,7 @@ namespace GVR.Manager
         /// </summary>
         public void LoadStartupScenes()
         {
-            LoadWorld("oldmine.zen", "ENTRANCE_SURFACE_OLDMINE");
+            LoadWorld("world.zen", "ENTRANCE_SURFACE_OLDMINE");
             // PxCs.Interface.PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); FP_GUARD_A_OC_179
         }
 
@@ -139,6 +139,8 @@ namespace GVR.Manager
             }
             if (scene.name == "Loading")
             {
+                UIManager.I.LoadLoadingDefaultTextures();
+                
                 LoadingManager.I.SetBarFromScene(scene);
                 LoadingManager.I.SetMaterialForLoading(scene);
             }
