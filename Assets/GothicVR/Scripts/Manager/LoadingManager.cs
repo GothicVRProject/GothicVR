@@ -2,38 +2,78 @@ using GVR.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace GVR.Manager
 {
     public class LoadingManager : SingletonBehaviour<LoadingManager>
     {
+
+        public enum LoadingProgressType
+        {
+            WorldMesh,
+            VOb,
+            NPC
+        }
         private GameObject bar;
 
         private Scene loadingScene;
 
         private const string loadingSceneName = "Loading";
 
-        private float progress = 0f;
+        private Dictionary<LoadingProgressType, float> progressByType = new Dictionary<LoadingProgressType, float>();
 
+        private void Start()
+        {
+            // Initializing the Dictionary with the default progress (which is 0) for each type
+            foreach (LoadingProgressType progressType in Enum.GetValues(typeof(LoadingProgressType)))
+            {
+                if (!progressByType.ContainsKey(progressType))
+                {
+                    progressByType.Add(progressType, 0f);
+                }
+            }
+        }
 
         public void SetBarFromScene(Scene scene)
         {
             this.bar = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground/ProgressBar").gameObject;
         }
 
-        public void UpdateLoadingBar()
+        private float CalculateOverallProgress()
         {
-            bar.GetComponent<Image>().fillAmount = this.progress;
+            float totalProgress = 0f;
+            int numTypes = progressByType.Count;
+
+            foreach (var progressPair in progressByType)
+            {
+                totalProgress += progressPair.Value / numTypes;
+            }
+
+            return totalProgress;
         }
-        public void SetProgress(float progress)
+
+        private void UpdateLoadingBar()
         {
-            this.progress = progress;
+            // Calculate the overall progress based on individual progress values
+            float overallProgress = CalculateOverallProgress();
+
+            // Update the loading bar with the overall progress
+            bar.GetComponent<Image>().fillAmount = overallProgress;
+        }
+
+        public void SetProgress(LoadingProgressType progressType, float progress)
+        {
+            progressByType[progressType] = progress;
             UpdateLoadingBar();
         }
-        public void AddProgress(float progress)
+
+        public void AddProgress(LoadingProgressType progressType, float progress)
         {
-            this.progress += progress;
+            float newProgress = progressByType[progressType] + progress;
+            progressByType[progressType] = newProgress;
             UpdateLoadingBar();
         }
     }
