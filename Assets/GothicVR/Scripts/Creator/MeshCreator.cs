@@ -47,9 +47,7 @@ namespace GVR.Creator
             meshObj.SetParent(parent);
 
             // Track the progress of each sub-mesh creation separately
-            float subMeshCreationProgress = 0f;
             int numSubMeshes = world.subMeshes.Values.Count;
-            int subMeshCounter = 0;
 
             foreach (var subMesh in world.subMeshes.Values)
             {
@@ -66,22 +64,8 @@ namespace GVR.Creator
 
                 subMeshObj.SetParent(meshObj);
 
-                // Update the sub-mesh creation progress
-                subMeshCounter++;
-                subMeshCreationProgress = (float)subMeshCounter / numSubMeshes;
-
-                // Invoke the progress callback with the subMeshCreationProgress
-                // progressCallback?.Invoke(subMeshCreationProgress);
-                LoadingManager.I.SetProgress(subMeshCreationProgress * 0.5f);
+                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
             }
-
-            // Use the overall progress value as needed (e.g., update a loading progress UI)
-            float overallProgress = subMeshCreationProgress;
-
-            // Invoke the progress callback with the overallProgress
-            // progressCallback?.Invoke(overallProgress);
-            LoadingManager.I.SetProgress(overallProgress * 0.5f);
-
             // Return the meshObj
             return meshObj;
         }

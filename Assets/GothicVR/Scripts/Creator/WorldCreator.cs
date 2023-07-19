@@ -38,7 +38,7 @@ namespace GVR.Creator
 
             DebugAnimationCreator.I.Create();
 
-            LoadingManager.I.SetProgress(1f);
+            LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
 
             return worldGo;
         }

@@ -35,6 +35,8 @@ namespace GVR.Creator
 
         private Dictionary<PxVobType, GameObject> parentGos = new();
 
+        private int totalVObs;
+
         private void Start()
         {
             meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
@@ -42,10 +44,24 @@ namespace GVR.Creator
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
         }
 
+        private int GetTotalVobCount(PxVobData[] vobs)
+        {
+            int count = vobs.Length;
+
+            foreach (var vob in vobs)
+            {
+                count += GetTotalVobCount(vob.childVobs);
+            }
+
+            return count;
+        }
+
         public async Task Create(GameObject root, WorldData world)
         {
             if (!FeatureFlags.I.CreateVobs)
                 return;
+
+            totalVObs = GetTotalVobCount(world.vobs);
 
             var vobRootObj = new GameObject("Vobs");
             vobRootObj.SetParent(root);
@@ -66,15 +82,10 @@ namespace GVR.Creator
             }
         }
 
-        private async Task CreateVobs(GameObject root, PxVobData[] vobs, float progress = 0.5f)
+        private async Task CreateVobs(GameObject root, PxVobData[] vobs)
         {
-            float totalProgress = progress;
-            float increment = (1f - progress) / (vobs.Length + 1); // +1 for the progress update before creating each vob
-            float maxProgress = totalProgress;
-
             foreach (var vob in vobs)
             {
-
                 switch (vob.type)
                 {
                     case PxVobType.PxVob_oCItem:
@@ -119,22 +130,19 @@ namespace GVR.Creator
                         break;
                     case PxVobType.PxVob_zCVob:
                         // if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
-                            // CreateDecal(vob);
+                        // CreateDecal(vob);
                         // else
-                            await CreateDefaultMesh(vob);
+                        await CreateDefaultMesh(vob);
                         break;
                     default:
                         await CreateDefaultMesh(vob);
                         break;
                 }
-
+                
+                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / totalVObs);
                 // Load children
-                await CreateVobs(root, vob.childVobs, totalProgress);
-
-                maxProgress = Mathf.Max(maxProgress, totalProgress);
-                totalProgress += increment;
+                await CreateVobs(root, vob.childVobs);
             }
-            LoadingManager.I.SetProgress(maxProgress);
         }
 
         private async void CreateItem(PxVobItemData vob)
