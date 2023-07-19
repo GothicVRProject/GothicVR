@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using GVR.Phoenix.Interface;
 using GVR.Util;
+using System;
+using GVR.Caches;
+
 
 
 namespace GVR.Manager
@@ -11,19 +14,28 @@ namespace GVR.Manager
     public class FontManager : SingletonBehaviour <FontManager>
     {
         public Dictionary<string, TMP_FontAsset> fontDictionary = new Dictionary<string, TMP_FontAsset>(); // Dictionary to store font assets for each tag
+        private bool fontloaded = false;
 
         //either do it like this or just have a public Create() for this
-        private void Start()
-        {
-            // Populate the font dictionary with tag-fontAsset pairs
-            fontDictionary["MenuUI"] = GameData.I.GothicMenuFont;
-            fontDictionary["Subtitle"] = GameData.I.GothicSubtitleFont;
+    
+            void Update()
+            {
+                if (!fontloaded && GameData.I.VdfsPtr != IntPtr.Zero)
+                {
 
-            ChangeFont();
+                    fontloaded = true;
+                    // Populate the font dictionary with tag-fontAsset pairs
+                    fontDictionary["MenuUI"] = GameData.I.GothicMenuFont;
+                    fontDictionary["Subtitle"] = GameData.I.GothicSubtitleFont;
 
-            // Subscribe to the OnFontAssetChanged event to handle font changes for newly created UI elements
-            SceneManager.sceneLoaded += OnSceneLoaded;
-        }
+                    ChangeFont();
+
+                    // Subscribe to the OnFontAssetChanged event to handle font changes for newly created UI elements
+                    SceneManager.sceneLoaded += OnSceneLoaded;
+                }
+            }
+           
+        
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
