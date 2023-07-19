@@ -27,9 +27,16 @@ namespace GVR.Manager
         {
             // Initialize the grid cells
             gridCells.Clear();
+            // invokes the function once every second
         }
 
-        private void Update()
+        private void Start()
+        {
+            // run the function every half a second
+            InvokeRepeating("UpdateAudioSourcesAroundPlayer", 1f, 0.5f);
+        }
+
+        private void UpdateAudioSourcesAroundPlayer()
         {
             if (!IsAudioListenerObtained)
             {
