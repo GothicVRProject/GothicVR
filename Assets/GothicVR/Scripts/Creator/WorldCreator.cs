@@ -1,14 +1,14 @@
-using GVR.Util;
+using GVR.Manager;
+using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
+using GVR.Phoenix.Util;
+using GVR.Util;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GVR.Phoenix.Data;
-using GVR.Phoenix.Util;
 using PxCs.Data.WayNet;
 using PxCs.Interface;
 
@@ -23,7 +23,7 @@ namespace GVR.Creator
 
         private GameObject worldMesh;
 
-        public async Task<GameObject> Create(string worldName, Action<float> progressCallback)
+        public async Task<GameObject> Create(string worldName)
         {
             var world = LoadWorld(worldName);
             GameData.I.World = world;
@@ -32,13 +32,13 @@ namespace GVR.Creator
 
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
 
-            worldMesh = await MeshCreator.I.Create(world, worldGo, progress => progressCallback?.Invoke(progress * 0.5f));
-            await VobCreator.I.Create(worldGo, world, progress => progressCallback?.Invoke(progress));
+            worldMesh = await MeshCreator.I.Create(world, worldGo);
+            await VobCreator.I.Create(worldGo, world);
             WaynetCreator.I.Create(worldGo, world);
 
             DebugAnimationCreator.I.Create();
 
-            progressCallback?.Invoke(1f);
+            LoadingManager.I.SetProgress(1f);
 
             return worldGo;
         }
@@ -189,7 +189,7 @@ namespace GVR.Creator
             sampleScene.GetRootGameObjects().Append(worldGo);
 
             // load only the world mesh
-            await SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, worldGo, progress => { });
+            await SingletonBehaviour<MeshCreator>.GetOrCreate().Create(world, worldGo);
 
             // move the world to the correct scene
             EditorSceneManager.MoveGameObjectToScene(worldGo, worldScene);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
+using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -39,7 +40,7 @@ namespace GVR.Creator
             this.assetCache = assetCache;
         }
 
-        public async Task<GameObject> Create(WorldData world, GameObject parent, Action<float> progressCallback)
+        public async Task<GameObject> Create(WorldData world, GameObject parent)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.isStatic = true;
@@ -70,14 +71,16 @@ namespace GVR.Creator
                 subMeshCreationProgress = (float)subMeshCounter / numSubMeshes;
 
                 // Invoke the progress callback with the subMeshCreationProgress
-                progressCallback?.Invoke(subMeshCreationProgress);
+                // progressCallback?.Invoke(subMeshCreationProgress);
+                LoadingManager.I.SetProgress(subMeshCreationProgress * 0.5f);
             }
 
             // Use the overall progress value as needed (e.g., update a loading progress UI)
             float overallProgress = subMeshCreationProgress;
 
             // Invoke the progress callback with the overallProgress
-            progressCallback?.Invoke(overallProgress);
+            // progressCallback?.Invoke(overallProgress);
+            LoadingManager.I.SetProgress(overallProgress * 0.5f);
 
             // Return the meshObj
             return meshObj;

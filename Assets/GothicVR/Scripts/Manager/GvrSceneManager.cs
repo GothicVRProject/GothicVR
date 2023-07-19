@@ -20,8 +20,6 @@ namespace GVR.Manager
         private Scene generalScene;
         private bool generalSceneLoaded = false;
 
-        private GameObject bar;
-
         private GameObject startPoint;
 
         public GameObject interactionManager;
@@ -120,10 +118,9 @@ namespace GVR.Manager
             // set the loading background texture properly
             if (worldName != null)
             {
-            // TODO: for new game we need to load texture "LOADING.TGA"
+                // TODO: for new game we need to load texture "LOADING.TGA"
                 var textureString = "LOADING_" + worldName.Split('.')[0].ToUpper() + ".TGA";
                 UIManager.I.SetTexture(textureString, UIManager.I.GothicLoadingMenuMaterial);
-
             }
 
             var loadingScene = SceneManager.LoadScene("Loading", new LoadSceneParameters(LoadSceneMode.Additive));
@@ -132,6 +129,7 @@ namespace GVR.Manager
             {
                 if (scene == loadingScene)
                 {
+                    LoadingManager.I.SetBarFromScene(scene);
                     SetMaterialForLoading(loadingScene);
                 }
             };

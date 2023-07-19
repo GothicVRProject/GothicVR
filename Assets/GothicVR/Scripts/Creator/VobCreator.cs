@@ -4,6 +4,7 @@ using GothicVR.Vob;
 using GVR.Caches;
 using GVR.Debugging;
 using GVR.Demo;
+using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -41,7 +42,7 @@ namespace GVR.Creator
             assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
         }
 
-        public async Task Create(GameObject root, WorldData world, Action<float> progressCallback)
+        public async Task Create(GameObject root, WorldData world)
         {
             if (!FeatureFlags.I.CreateVobs)
                 return;
@@ -51,7 +52,7 @@ namespace GVR.Creator
             parentGos = new();
 
             CreateParentVobObject(vobRootObj);
-            await CreateVobs(vobRootObj, world.vobs, progress => progressCallback?.Invoke(progress));
+            await CreateVobs(vobRootObj, world.vobs);
         }
 
         private void CreateParentVobObject(GameObject root)
@@ -65,7 +66,7 @@ namespace GVR.Creator
             }
         }
 
-        private async Task CreateVobs(GameObject root, PxVobData[] vobs, Action<float> progressCallback, float progress = 0.5f)
+        private async Task CreateVobs(GameObject root, PxVobData[] vobs, float progress = 0.5f)
         {
             float totalProgress = progress;
             float increment = (1f - progress) / (vobs.Length + 1); // +1 for the progress update before creating each vob
@@ -128,12 +129,12 @@ namespace GVR.Creator
                 }
 
                 // Load children
-                await CreateVobs(root, vob.childVobs, progressCallback, totalProgress);
+                await CreateVobs(root, vob.childVobs, totalProgress);
 
                 maxProgress = Mathf.Max(maxProgress, totalProgress);
                 totalProgress += increment;
             }
-            progressCallback?.Invoke(maxProgress);
+            LoadingManager.I.SetProgress(maxProgress);
         }
 
         private async void CreateItem(PxVobItemData vob)
