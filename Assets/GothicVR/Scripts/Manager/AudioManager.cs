@@ -57,6 +57,34 @@ namespace GVR.Manager
             UpdateAudioSourcesWithinRadius(listenerCell: listenerCell, radius: 3);
         }
 
+        public void AddAudioSource(GameObject gameObj, AudioSource audioSource)
+        {
+            if (audioSources.ContainsKey(gameObj))
+            {
+                return;
+            }
+            audioSources.Add(gameObj, audioSource);
+
+            // Add the audio source to the appropriate grid cell
+            Vector3Int gridCell = GetGridCellFromPosition(gameObj.transform.position);
+            if (!gridCells.TryGetValue(gridCell, out List<GameObject> audioSourcesInCell))
+            {
+                audioSourcesInCell = new List<GameObject>();
+                gridCells.Add(gridCell, audioSourcesInCell);
+            }
+            audioSourcesInCell.Add(gameObj);
+        }
+
+        public void SetAudible(GameObject gameObj, bool isAudible)
+        {
+            gameObj.SetActive(isAudible);
+        }
+
+        public void SetAudioListener(AudioListener audioListener)
+        {
+            this.audioListener = audioListener;
+        }
+
         /// <summary>
         /// Converts a position in world space to the corresponding grid cell position.
         /// This function divides the position coordinates by the cell size and rounds down to the nearest integer to determine the grid cell coordinates.
