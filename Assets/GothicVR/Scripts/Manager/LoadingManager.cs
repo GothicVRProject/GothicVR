@@ -84,5 +84,13 @@ namespace GVR.Manager
             progressByType[progressType] = newProgress;
             UpdateLoadingBar();
         }
+
+        public void SetMaterialForLoading(Scene scene)
+        {
+            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground/ProgressBar").gameObject.GetComponent<Image>().material = UIManager.I.LoadingBarMaterial;
+            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground").gameObject.GetComponent<Image>().material = UIManager.I.LoadingBarBackgroundMaterial;
+            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage").gameObject.GetComponent<Image>().material = UIManager.I.GothicLoadingMenuMaterial;
+            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").GetComponent<MeshRenderer>().material = UIManager.I.LoadingSphereMaterial;
+        }
     }
 }

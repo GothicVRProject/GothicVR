@@ -122,20 +122,12 @@ namespace GVR.Manager
                 if (scene == loadingScene)
                 {
                     LoadingManager.I.SetBarFromScene(scene);
-                    SetMaterialForLoading(loadingScene);
+                    LoadingManager.I.SetMaterialForLoading(loadingScene);
                 }
             };
             // Delay for magic number amount to make sure that bar can be found
             // 1 and 2 caused issues for the 3rd time showing the loading scene in editor
             await Task.Delay(5);
-        }
-
-        private void SetMaterialForLoading(Scene scene)
-        {
-            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground/ProgressBar").gameObject.GetComponent<Image>().material = UIManager.I.LoadingBarMaterial;
-            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground").gameObject.GetComponent<Image>().material = UIManager.I.LoadingBarBackgroundMaterial;
-            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage").gameObject.GetComponent<Image>().material = UIManager.I.GothicLoadingMenuMaterial;
-            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").GetComponent<MeshRenderer>().material = UIManager.I.LoadingSphereMaterial;
         }
 
         private void HideLoadingScene()
