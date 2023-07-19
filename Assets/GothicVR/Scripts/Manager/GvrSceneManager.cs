@@ -61,6 +61,8 @@ namespace GVR.Manager
         {
             if (scene == generalScene)
             {
+                AudioSourceManager.I.SetAudioListener(Camera.main?.GetComponent<AudioListener>());
+
                 var playerParent = generalScene.GetRootGameObjects().FirstOrDefault(o => o.name == "PlayerController");
                 player = playerParent.transform.Find("VRPlayer_v4 (romey)").gameObject;
                 return;
