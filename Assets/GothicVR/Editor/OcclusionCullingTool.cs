@@ -40,8 +40,8 @@ namespace GothicVR.Editor
             if (Application.isPlaying)
                 return;
             
-            _meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
-            var assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+            _meshCreator = MeshCreator.I;
+            var assetCache = AssetCache.I;
 
             _meshCreator.EditorInject(assetCache);
             

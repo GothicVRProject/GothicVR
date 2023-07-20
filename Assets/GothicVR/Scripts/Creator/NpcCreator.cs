@@ -27,9 +27,9 @@ namespace GVR.Creator
 
         void Start()
         {
-            lookupCache = SingletonBehaviour<LookupCache>.GetOrCreate();
-            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
-            meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
+            lookupCache = LookupCache.I;
+            assetCache = AssetCache.I;
+            meshCreator = MeshCreator.I;
             
             VmGothicBridge.PhoenixWld_InsertNpc.AddListener(Wld_InsertNpc);
             VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
@@ -108,7 +108,7 @@ namespace GVR.Creator
             };
 
             var npcId = PxVm.pxVmInstanceGetSymbolIndex(data.npc);
-            LookupCache.Instance.npcCache[npcId].GetComponent<Routine>().routines.Add(routine);
+            LookupCache.I.npcCache[npcId].GetComponent<Routine>().routines.Add(routine);
             // Add element if key not yet exists.
             GameData.I.npcRoutines.TryAdd(data.npc, new());
             GameData.I.npcRoutines[data.npc].Add(routine);

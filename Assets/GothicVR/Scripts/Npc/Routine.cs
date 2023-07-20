@@ -24,7 +24,7 @@ namespace GVR.Npc
 
         private void Start()
         {
-            routineManager = SingletonBehaviour<RoutineManager>.GetOrCreate();
+            routineManager = RoutineManager.I;
             routineManager.Subscribe(this, routines);
         }
         private void OnDisable()
