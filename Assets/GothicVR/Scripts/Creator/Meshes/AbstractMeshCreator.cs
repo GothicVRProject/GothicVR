@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using GVR.Caches;
 using GVR.Phoenix.Data;
@@ -12,31 +13,16 @@ using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace GVR.Creator
+namespace GVR.Creator.Meshes
 {
-    public class MeshCreator : SingletonBehaviour<MeshCreator>
+    public abstract class AbstractMeshCreator<T> : SingletonBehaviour<T> where T : AbstractMeshCreator<T>
     {
-        private AssetCache assetCache;
-
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
-        private const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
-        private const float decalOpacity = 0.75f;
+        protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        protected const float decalOpacity = 0.75f;
 
-
-        private void Start()
-        {
-            assetCache = AssetCache.I;
-        }
-
-        /// <summary>
-        /// Inject singletons if we use this class from EditorMode.
-        /// </summary>
-        public void EditorInject(AssetCache assetCache)
-        {
-            this.assetCache = assetCache;
-        }
-
+        
         public GameObject Create(WorldData world, GameObject parent)
         {
             var meshObj = new GameObject("Mesh");
@@ -207,7 +193,7 @@ namespace GVR.Creator
 
             var decalProjectorGo = new GameObject(decalData.name);
             var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
-            var texture = assetCache.TryGetTexture(vob.visualName);
+            var texture = AssetCache.I.TryGetTexture(vob.visualName);
 
             // x/y needs to be made twice the size and transformed from cm in m.
             // z - value is close to what we see in Gothic spacer.
@@ -264,7 +250,7 @@ namespace GVR.Creator
                 return;
             }
 
-            var texture = assetCache.TryGetTexture(bMaterial.texture);
+            var texture = AssetCache.I.TryGetTexture(bMaterial.texture);
 
             if (null == texture)
             {
@@ -313,7 +299,7 @@ namespace GVR.Creator
                     return;
                 }
 
-                var texture = assetCache.TryGetTexture(materialData.texture);
+                var texture = AssetCache.I.TryGetTexture(materialData.texture);
 
                 if (null == texture)
                     if (materialData.texture.EndsWith(".TGA"))

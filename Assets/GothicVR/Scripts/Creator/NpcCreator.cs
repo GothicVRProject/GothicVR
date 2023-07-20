@@ -10,6 +10,7 @@ using PxCs.Extensions;
 using PxCs.Interface;
 using System;
 using System.Linq;
+using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Manager;
 using Unity.XR.CoreUtils;
@@ -23,13 +24,11 @@ namespace GVR.Creator
         private static LookupCache lookupCache;
         private static AssetCache assetCache;
         private static GameObject npcRootGo;
-        private static MeshCreator meshCreator;
 
         void Start()
         {
             lookupCache = LookupCache.I;
             assetCache = AssetCache.I;
-            meshCreator = MeshCreator.I;
             
             VmGothicBridge.PhoenixWld_InsertNpc.AddListener(Wld_InsertNpc);
             VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
@@ -148,7 +147,7 @@ namespace GVR.Creator
             var mdm = assetCache.TryGetMdm(data.body);
             var mmb = assetCache.TryGetMmb(data.head);
 
-            meshCreator.CreateNpc(name, mdm, mdh, mmb, npc);
+            NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, npc);
         }
     }
 }

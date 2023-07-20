@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GothicVR.Vob;
 using GVR.Caches;
+using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Demo;
 using GVR.Phoenix.Data;
@@ -25,7 +26,6 @@ namespace GVR.Creator
 {
 	public class VobCreator : SingletonBehaviour<VobCreator>
     {
-        private MeshCreator meshCreator;
         private SoundCreator soundCreator;
         private AssetCache assetCache;
 
@@ -35,7 +35,6 @@ namespace GVR.Creator
 
         private void Start()
         {
-            meshCreator = MeshCreator.I;
             soundCreator = SoundCreator.I;
             assetCache = AssetCache.I;
         }
@@ -284,7 +283,7 @@ namespace GVR.Creator
         private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
             var mrm = assetCache.TryGetMrm(item.visual);
-            return meshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
+            return VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
         }
 
         private void CreateDecal(PxVobData vob)
@@ -295,7 +294,7 @@ namespace GVR.Creator
             }
             var parent = parentGos[vob.type];
             
-            meshCreator.CreateDecal(vob, parent);
+            VobMeshCreator.I.CreateDecal(vob, parent);
         }
         
         private GameObject CreateDefaultMesh(PxVobData vob)
@@ -313,7 +312,7 @@ namespace GVR.Creator
             var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value.ToUnityMatrix().rotation, parent);
+                return VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value.ToUnityMatrix().rotation, parent);
             }
             
             // MRM
@@ -323,7 +322,7 @@ namespace GVR.Creator
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.cdDynamic;
 
-                return meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
+                return VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
             }
 
             Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");
