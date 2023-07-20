@@ -63,15 +63,14 @@ namespace GVR.Creator
         }
 
 
-        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
-            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
+            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
         }
 
-        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
-            rootGo ??= new GameObject();
-            rootGo.name = objectName;
+            var rootGo = new GameObject(objectName);
             rootGo.SetParent(parent);
 
             var nodeObjects = new GameObject[mdh.nodes!.Length];
