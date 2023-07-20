@@ -62,16 +62,38 @@ namespace GVR.Creator
             return meshObj;
         }
 
-
-        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh, PxMorphMeshData mmb, GameObject parent = null)
         {
-            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
+            var npcGo = Create(npcName, mdm, mdh, default, default, parent);
+
+            
+            // Add Head
+            var headGo = npcGo.FindChildRecursively("BIP01 HEAD");
+
+            // No head found
+            if (headGo == null)
+            {
+                Debug.LogWarning($"No NPC head found for {npcName}");
+                return npcGo;
+            }
+            
+            var headMeshFilter = headGo.AddComponent<MeshFilter>();
+            var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
+            
+            PrepareMeshRenderer(headMeshRenderer, mmb.mesh);
+            PrepareMeshFilter(headMeshFilter, mmb.mesh);
+
+            return npcGo;
         }
 
-        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
-            rootGo ??= new GameObject();
-            rootGo.name = objectName;
+            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
+        }
+
+        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null)
+        {
+            var rootGo = new GameObject(objectName);
             rootGo.SetParent(parent);
 
             var nodeObjects = new GameObject[mdh.nodes!.Length];

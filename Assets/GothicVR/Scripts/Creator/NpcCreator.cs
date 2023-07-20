@@ -146,8 +146,9 @@ namespace GVR.Creator
             var npc = lookupCache.npcCache[symbolIndex];
             var mdh = npc.GetComponent<Properties>().mdh;
             var mdm = assetCache.TryGetMdm(data.body);
+            var mmb = assetCache.TryGetMmb(data.head);
 
-            meshCreator.Create(name, mdm, mdh, default, default, npc);
+            meshCreator.CreateNpc(name, mdm, mdh, mmb, npc);
         }
     }
 }
