@@ -62,6 +62,29 @@ namespace GVR.Creator
             return meshObj;
         }
 
+        public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh, PxMorphMeshData mmb, GameObject parent = null)
+        {
+            var npcGo = Create(npcName, mdm, mdh, default, default, parent);
+
+            
+            // Add Head
+            var headGo = npcGo.FindChildRecursively("BIP01 HEAD");
+
+            // No head found
+            if (headGo == null)
+            {
+                Debug.LogWarning($"No NPC head found for {npcName}");
+                return npcGo;
+            }
+            
+            var headMeshFilter = headGo.AddComponent<MeshFilter>();
+            var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
+            
+            PrepareMeshRenderer(headMeshRenderer, mmb.mesh);
+            PrepareMeshFilter(headMeshFilter, mmb.mesh);
+
+            return npcGo;
+        }
 
         public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
         {

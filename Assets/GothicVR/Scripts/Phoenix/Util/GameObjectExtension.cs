@@ -18,5 +18,27 @@ namespace GVR.Phoenix.Util
             if (resetRotation)
                 obj.transform.localRotation = Quaternion.identity;
         }
+
+        public static GameObject FindChildRecursively(this GameObject go, string name)
+        {
+            var result = go.transform.Find(name);
+
+            // The child object was found
+            if (result != null)
+                return result.gameObject;
+
+            // Search recursively in the children of the current object
+            foreach (Transform child in go.transform)
+            {
+                var resultGo = child.gameObject.FindChildRecursively(name);
+
+                // The child object was found in a recursive call
+                if (resultGo != null)
+                    return resultGo;
+            }
+
+            // The child object was not found
+            return null;
+        }
     }
 }
