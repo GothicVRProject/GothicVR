@@ -47,30 +47,6 @@ namespace GVR.Creator.Meshes
             return meshObj;
         }
 
-        public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh, PxMorphMeshData mmb, GameObject parent = null)
-        {
-            var npcGo = Create(npcName, mdm, mdh, default, default, parent);
-
-            
-            // Add Head
-            var headGo = npcGo.FindChildRecursively("BIP01 HEAD");
-
-            // No head found
-            if (headGo == null)
-            {
-                Debug.LogWarning($"No NPC head found for {npcName}");
-                return npcGo;
-            }
-            
-            var headMeshFilter = headGo.AddComponent<MeshFilter>();
-            var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
-            
-            PrepareMeshRenderer(headMeshRenderer, mmb.mesh);
-            PrepareMeshFilter(headMeshFilter, mmb.mesh);
-
-            return npcGo;
-        }
-
         public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
             return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
@@ -181,62 +157,28 @@ namespace GVR.Creator.Meshes
             return rootGo;
         }
 
-        public GameObject CreateDecal(PxVobData vob, GameObject parent)
-        {
-            if (!vob.vobDecal.HasValue)
-            {
-                Debug.LogWarning("No decalData was set for: " + vob.visualName);
-                return null;
-            }
-
-            var decalData = vob.vobDecal.Value;
-
-            var decalProjectorGo = new GameObject(decalData.name);
-            var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
-            var texture = AssetCache.I.TryGetTexture(vob.visualName);
-
-            // x/y needs to be made twice the size and transformed from cm in m.
-            // z - value is close to what we see in Gothic spacer.
-            decalProj.size = new(decalData.dimension.X * 2 / 100, decalData.dimension.Y * 2 / 100, 0.5f);
-            decalProjectorGo.SetParent(parent);
-            SetPosAndRot(decalProjectorGo, vob.position.ToUnityVector(), vob.rotation!.Value);
-
-            decalProj.pivot = Vector3.zero;
-            decalProj.fadeFactor = decalOpacity;
-
-            // FIXME use Prefab!
-            // https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@12.0/manual/creating-a-decal-projector-at-runtime.html
-            var standardShader = Shader.Find("Shader Graphs/Decal");
-            var material = new Material(standardShader);
-            material.SetTexture(Shader.PropertyToID("Base_Map"), texture);
-
-            decalProj.material = material;
-
-            return decalProjectorGo;
-        }
-
-        private void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
+        protected void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
         {
             SetPosAndRot(obj, matrix.ToUnityMatrix());
         }
 
-        private void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
+        protected void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
         {
             SetPosAndRot(obj, matrix.GetPosition() / 100, matrix.rotation);
         }
 
-        private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
+        protected void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
         {
             SetPosAndRot(obj, position, rotation.ToUnityMatrix().rotation);
         }
 
-        private void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
+        protected void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
             obj.transform.localRotation = rotation;
             obj.transform.localPosition = position;
         }
 
-        private void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
+        protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
             var material = GetEmptyMaterial();
             var bMaterial = subMesh.material;
@@ -250,7 +192,7 @@ namespace GVR.Creator.Meshes
                 return;
             }
 
-            var texture = AssetCache.I.TryGetTexture(bMaterial.texture);
+            var texture = GetTexture(bMaterial.texture);
 
             if (null == texture)
             {
@@ -263,7 +205,7 @@ namespace GVR.Creator.Meshes
             material.mainTexture = texture;
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
         {
             var mesh = new Mesh();
             meshFilter.mesh = mesh;
@@ -273,7 +215,7 @@ namespace GVR.Creator.Meshes
             mesh.SetUVs(0, subMesh.uvs);
         }
 
-        private void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
+        protected void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
             // check if mrmData.subMeshes is null
 
@@ -299,7 +241,7 @@ namespace GVR.Creator.Meshes
                     return;
                 }
 
-                var texture = AssetCache.I.TryGetTexture(materialData.texture);
+                var texture = GetTexture(materialData.texture);
 
                 if (null == texture)
                     if (materialData.texture.EndsWith(".TGA"))
@@ -317,7 +259,7 @@ namespace GVR.Creator.Meshes
             rend.SetMaterials(finalMaterials);
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
         {
             /**
              * Ok, brace yourself:
@@ -401,7 +343,7 @@ namespace GVR.Creator.Meshes
         }
 
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
         {
             /**
              * Ok, brace yourself:
@@ -553,7 +495,12 @@ namespace GVR.Creator.Meshes
             renderer.bones = meshBones;
         }
 
-        private Material GetEmptyMaterial()
+        protected virtual Texture2D GetTexture(string name)
+        {
+            return AssetCache.I.TryGetTexture(name);
+        }
+
+        protected Material GetEmptyMaterial()
         {
             var standardShader = Shader.Find(defaultShader);
             var material = new Material(standardShader);
