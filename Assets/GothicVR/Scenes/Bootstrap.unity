@@ -137,11 +137,9 @@ GameObject:
   - component: {fileID: 124285698}
   - component: {fileID: 124285702}
   - component: {fileID: 124285707}
+  - component: {fileID: 124285706}
   - component: {fileID: 124285708}
   - component: {fileID: 124285709}
-  - component: {fileID: 124285706}
-  - component: {fileID: 124285711}
-  - component: {fileID: 124285710}
   m_Layer: 0
   m_Name: Creator
   m_TagString: Untagged
@@ -268,32 +266,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
---- !u!114 &124285710
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 124285697}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f6e8ef0920744ae8ed7ceb5a830252c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 0
---- !u!114 &124285711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 124285697}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2b3f3f5cc5240d89bfb2eb95106b7ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 0
 --- !u!1 &235819213
 GameObject:
   m_ObjectHideFlags: 0
@@ -349,11 +321,11 @@ MonoBehaviour:
   EnableVobFPMesh: 0
   EnableVobFPMeshEditorLabel: 0
   EnableDecals: 0
-  CreateOcNpcs: 1
+  EnableNpc: 1
   EnableNpcRoutines: 1
-  CreateExampleAnimation: 1
+  CreateExampleAnimation: 0
   ShowVdfsFileNotFoundErrors: 0
-  EnableSounds: 0
+  EnableSounds: 1
   EnableMusic: 0
 --- !u!1 &705507993
 GameObject:
@@ -903,7 +875,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1896514212}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff27067532e5fb14d8e963d887bb60cf, type: 3}
+  m_Script: {fileID: 11500000, guid: f6e066dc57a010048b3bf267b7ba35cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
