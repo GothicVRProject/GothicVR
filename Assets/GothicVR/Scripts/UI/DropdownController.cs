@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using GVR.Phoenix.Interface;
 
 public class DropdownController : MonoBehaviour
 {
@@ -23,7 +24,9 @@ public class DropdownController : MonoBehaviour
         foreach (var item in items)
         {
             dropdown.options.Add(new TMP_Dropdown.OptionData() { text = item });
+
         }
+        dropdown.itemText.font = GameData.I.GothicSubtitleFont;
 
         dropdown.onValueChanged.AddListener(delegate { DropdownItemSelected(dropdown); });
         snapTurn = locomotionsystem.GetComponent<ActionBasedSnapTurnProvider>();
@@ -32,7 +35,7 @@ public class DropdownController : MonoBehaviour
 
     void DropdownItemSelected(TMP_Dropdown dropdown)
     {
-        switch(dropdown.value)
+        switch (dropdown.value)
         {
             case 0:
                 snapTurn.enabled = true;
