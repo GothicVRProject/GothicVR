@@ -17,8 +17,8 @@ public class CloseMenueScript : MonoBehaviour
     public void closeFunction()
     {
         gameObject.transform.parent = menueParent.transform;
-       // gameObject.transform.localRotation = menueRotation;
-       // gameObject.transform.localPosition = menuePosition;
+        gameObject.transform.localRotation = menueRotation;
+        gameObject.transform.localPosition = menuePosition;
         gameObject.SetActive(false);
     }
 }
