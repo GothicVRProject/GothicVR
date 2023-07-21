@@ -1474,6 +1474,18 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Subtitle
       objectReference: {fileID: 0}
+    - target: {fileID: 3248644345949349052, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3248644345949349052, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3248644345949349052, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3286136461689514588, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_InteractionManager
       value: 

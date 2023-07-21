@@ -19,6 +19,8 @@ public class TextureManager : MonoBehaviour
     public Material arrowmaterial;
     private Texture2D fillertexture;
     public Material fillermaterial;
+    private Texture2D skytexture;
+    public Material skymaterial;
     bool textureloaded = false;
     // public TMP_FontAsset textMesh;
 
@@ -53,6 +55,9 @@ public class TextureManager : MonoBehaviour
 
         arrowtexture = SingletonBehaviour<AssetCache>.GetOrCreate().TryGetTexture("U.TGA");
         arrowmaterial.mainTexture = arrowtexture;
+
+        skytexture = SingletonBehaviour<AssetCache>.GetOrCreate().TryGetTexture("SKYDAY_LAYER0_A0-C.TEX");
+        skymaterial.mainTexture = skytexture;
 
         //textMesh = PhoenixBridge.GothicSubtitleFont;
 
