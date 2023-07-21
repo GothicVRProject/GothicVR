@@ -1,3 +1,4 @@
+using GVR.Manager;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -147,6 +148,7 @@ public class ControllerManager : MonoBehaviour
             {
                  settingsMenue.gameObject.transform.parent = null;
                  settingsMenue.SetActive(true);
+                 FontManager.I.ChangeFont();
             }
         }
 

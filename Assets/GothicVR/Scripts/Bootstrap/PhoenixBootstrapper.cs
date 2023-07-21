@@ -137,6 +137,8 @@ namespace GVR.Bootstrap
 
             if (File.Exists(subtitleFontPath))
                 GameData.I.GothicSubtitleFont = TMP_FontAsset.CreateFontAsset(subtitleFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
+
+            FontManager.I.Create();
         }
     }
 }
