@@ -585,14 +585,16 @@ namespace GVR.Creator
             }
             else
             {
-                material.SetFloat("_ScrollSpeed", -(materialData.animFps/75f));
+                material.SetFloat("_ScrollSpeed", -(materialData.animFps/50f));
             }
 
-            material.SetFloat("_Surface", 1);
+            // material.EnableKeyword("_ALPHATEST_ON");
+            material.SetFloat("_Surface", 0);
             material.SetInt("_ZWrite", 0);
             material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
             material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            ////material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+
 
 
             return material;
