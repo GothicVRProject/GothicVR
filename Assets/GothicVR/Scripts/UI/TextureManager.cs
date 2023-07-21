@@ -25,7 +25,7 @@ public class TextureManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if ( !textureloaded && GameData.I.VdfsPtr != IntPtr.Zero)
+        if (!textureloaded && GameData.I.VdfsPtr != IntPtr.Zero)
         {
             LoadCustomTextures();
         }
@@ -54,7 +54,6 @@ public class TextureManager : MonoBehaviour
 
         skytexture = SingletonBehaviour<AssetCache>.GetOrCreate().TryGetTexture("SKYDAY_LAYER0_A0-C.TEX");
         skymaterial.mainTexture = skytexture;
-
     }
 
 }

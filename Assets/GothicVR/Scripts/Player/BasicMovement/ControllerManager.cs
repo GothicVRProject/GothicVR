@@ -29,11 +29,9 @@ public class ControllerManager : MonoBehaviour
     private InputDevice leftController;
     private InputDevice rightController;
 
-
     private void Start()
     {
         TryInitialize();
-        // inventoryCloseScript =  inventory.gameObject.GetComponent<InventoryClose>();
     }
 
     private void Update()
@@ -48,8 +46,6 @@ public class ControllerManager : MonoBehaviour
             //Use the first configuration set of controller buttons
             ControllerManager_v1();
         }
-
-
     }
 
     void ControllerManager_v1()
@@ -85,44 +81,20 @@ public class ControllerManager : MonoBehaviour
             ShowSettingsMenue();
             //ShowInventory();
         }
-        else
-        {
-
-        }
 
         //Right Controller - Secondary button
         if (rightsecondarybuttonvalue == true)
         {
             ShowMainMenue();
         }
-        else
-        {
-
-        }
     }
 
     public void ShowUI()
     {
-        //manaBar.SetActive(true);
-        //healthBar.SetActive(true);
-        //if (quickAccessSlots)
-        //quickAccessSlots.SetActive(true);
-
     }
 
     public void HideUI()
     {
-        //if (healthBar.gameObject.GetComponent<HealthBarFollowPlayer>().currentlyEating == false)
-        //{
-        //    healthBar.SetActive(false);
-        //}
-
-        //if (manaBar.gameObject.GetComponent<HealthBarFollowPlayer>().currentlyEating == false)
-        //{
-        //    manaBar.SetActive(false);
-        //}
-        //if (quickAccessSlots)
-        //quickAccessSlots.SetActive(false);
     }
 
     public void ShowRayCasts()
@@ -141,54 +113,34 @@ public class ControllerManager : MonoBehaviour
         directRight.SetActive(true);
     }
 
-
     public void ShowSettingsMenue()
     {
-            if (!settingsMenue.activeSelf)
-            {
-                 settingsMenue.gameObject.transform.parent = null;
-                 settingsMenue.SetActive(true);
-                 FontManager.I.ChangeFont();
-            }
+        if (!settingsMenue.activeSelf)
+        {
+            settingsMenue.gameObject.transform.parent = null;
+            settingsMenue.SetActive(true);
+            FontManager.I.ChangeFont();
         }
-
+    }
 
     public void ShowMainMenue()
     {
-       // mainMenue.SetActive(true);
     }
 
     public void HideMainMenue()
     {
-       // mainMenue.SetActive(false);
     }
 
     public void ShowInventory()
     {
-        //if (!inventory.activeSelf)
-        //{
-        //    inventory.gameObject.transform.parent = null;
-        //    inventory.SetActive(true);
-        //}
-        //else
-        //{
-        //    // Show and hide are toggeling too fast when pressing the controller button
-        //   // HideInventory();
-        //}
- 
+
     }
 
     public void HideInventory()
     {
-        //if (inventoryCloseScript != null)
-        //{
-        //    inventoryCloseScript.closeFunction();
-        //}
     }
 
-  
-
-      //  IEnumerator (float delay)
+    //  IEnumerator (float delay)
     void TryInitialize()
     {
         List<InputDevice> leftDevices = new List<InputDevice>();

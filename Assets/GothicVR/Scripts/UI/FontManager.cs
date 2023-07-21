@@ -1,33 +1,19 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.SceneManagement;
-using System.Collections.Generic;
 using GVR.Phoenix.Interface;
 using GVR.Util;
-using System;
-using GVR.Caches;
+using System.Collections.Generic;
+using TMPro;
 
 namespace GVR.Manager
 {
-    public class FontManager : SingletonBehaviour <FontManager>
+    public class FontManager : SingletonBehaviour<FontManager>
     {
         public Dictionary<string, TMP_FontAsset> fontDictionary = new Dictionary<string, TMP_FontAsset>(); // Dictionary to store font assets for each tag
-    
-            public void Create()
-            {
-                    // Populate the font dictionary with tag-fontAsset pairs
-                    fontDictionary["MenuUI"] = GameData.I.GothicMenuFont;
-                    fontDictionary["Subtitle"] = GameData.I.GothicSubtitleFont;
 
-                    ChangeFont();
-
-                    // Subscribe to the OnFontAssetChanged event to handle font changes for newly created UI elements
-                    SceneManager.sceneLoaded += OnSceneLoaded;
-            }
-           
-        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        public void Create()
         {
-            ChangeFont();
+            // Populate the font dictionary with tag-fontAsset pairs
+            fontDictionary["MenuUI"] = GameData.I.GothicMenuFont;
+            fontDictionary["Subtitle"] = GameData.I.GothicSubtitleFont;
         }
 
         public void ChangeFont()

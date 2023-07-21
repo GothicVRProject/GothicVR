@@ -12,10 +12,10 @@ public class MoveSpeedController : MonoBehaviour
     {
         Slider speedslider = transform.GetComponent<Slider>();
         speedslider.onValueChanged.AddListener(ChangeMoveSpeed);
-     }
+    }
 
     void ChangeMoveSpeed(float movespeed)
-    {  
+    {
         movecontroller.moveSpeed = movespeed;
     }
 }

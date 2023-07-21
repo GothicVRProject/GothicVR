@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CloseMenueScript : MonoBehaviour
@@ -14,6 +12,7 @@ public class CloseMenueScript : MonoBehaviour
         menueParent = gameObject.transform.parent.gameObject;
         gameObject.SetActive(false);
     }
+
     public void closeFunction()
     {
         gameObject.transform.parent = menueParent.transform;
