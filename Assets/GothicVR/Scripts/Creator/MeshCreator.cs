@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
 using GVR.Phoenix.Data;
@@ -27,7 +26,7 @@ namespace GVR.Creator
 
         private void Start()
         {
-            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+            assetCache = AssetCache.I;
         }
 
         /// <summary>

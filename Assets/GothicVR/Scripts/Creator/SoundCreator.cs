@@ -22,7 +22,7 @@ namespace GVR.Creator
 
         private void Start()
         {
-            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+            assetCache = AssetCache.I;
 
             VmGothicBridge.PhoenixMdl_AI_OUTPUT.AddListener(AI_OUTPUT);
         }

@@ -27,7 +27,7 @@ namespace GVR.Creator
 
         private void Start()
         {
-            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+            assetCache = AssetCache.I;
         }
 
         public void Create(string worldName)

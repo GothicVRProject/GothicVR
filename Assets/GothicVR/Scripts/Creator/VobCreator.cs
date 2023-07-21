@@ -35,9 +35,9 @@ namespace GVR.Creator
 
         private void Start()
         {
-            meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
-            soundCreator = SingletonBehaviour<SoundCreator>.GetOrCreate();
-            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+            meshCreator = MeshCreator.I;
+            soundCreator = SoundCreator.I;
+            assetCache = AssetCache.I;
         }
 
         public void Create(GameObject root, WorldData world)
@@ -289,7 +289,7 @@ namespace GVR.Creator
 
         private void CreateDecal(PxVobData vob)
         {
-            if(!FeatureFlags.Instance.EnableDecals)
+            if(!FeatureFlags.I.EnableDecals)
             {
                 return;
             }

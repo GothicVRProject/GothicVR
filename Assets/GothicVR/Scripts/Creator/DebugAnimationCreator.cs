@@ -27,7 +27,7 @@ namespace GVR.Creator
 
         private void Start()
         {
-            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+            assetCache = AssetCache.I;
         }
 
         public void Create(string worldName)
@@ -455,7 +455,7 @@ namespace GVR.Creator
             var mdm = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, mdmName);
             var mrm = PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, mrmName);
 
-            var obj = SingletonBehaviour<MeshCreator>.GetOrCreate().Create(name, mdm, mdh, default, default, debugObj);
+            var obj = MeshCreator.I.Create(name, mdm, mdh, default, default, debugObj);
 
 
 
