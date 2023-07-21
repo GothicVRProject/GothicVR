@@ -4,7 +4,6 @@ using GVR.Caches;
 using GVR.Util;
 using GVR.Phoenix.Interface;
 using TMPro;
-
 public class TextureManager : MonoBehaviour
 {
     private Texture2D backgroundtexture;
@@ -22,9 +21,6 @@ public class TextureManager : MonoBehaviour
     private Texture2D skytexture;
     public Material skymaterial;
     bool textureloaded = false;
-    // public TMP_FontAsset textMesh;
-
-
 
     // Update is called once per frame
     void Update()
@@ -59,9 +55,6 @@ public class TextureManager : MonoBehaviour
         skytexture = SingletonBehaviour<AssetCache>.GetOrCreate().TryGetTexture("SKYDAY_LAYER0_A0-C.TEX");
         skymaterial.mainTexture = skytexture;
 
-        //textMesh = PhoenixBridge.GothicSubtitleFont;
-
     }
 
- 
 }

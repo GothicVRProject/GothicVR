@@ -3,10 +3,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using GVR.Phoenix.Interface;
-
 public class DropdownController : MonoBehaviour
 {
-    bool fontloaded = false;
     public GameObject textAsset;
     public GameObject locomotionsystem;
     public ActionBasedSnapTurnProvider snapTurn;
