@@ -28,8 +28,8 @@ namespace GVR.Demo
 
 		private void Start()
 		{
-			meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
-			assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+			meshCreator = MeshCreator.I;
+			assetCache = AssetCache.I;
 		}
 
 		private void Update()

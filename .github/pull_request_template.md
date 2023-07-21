@@ -6,7 +6,8 @@
 
 # Testing
 * [ ] Merged _main_ into this branch and tested with the latest features
-* [ ] Tested with PCVR and one mobile VR device (Pico/Quest)
+* [ ] Tested with PCVR
+* [ ] Tested with Pico / Quest
 
 ## Dependencies
 * [ ] If libphoenix-shared.dll is changed, .so is also changed
