@@ -21,13 +21,14 @@ public class TurnSettingDropdownController : MonoBehaviour
         foreach (var item in items)
         {
             dropdown.options.Add(new TMP_Dropdown.OptionData() { text = item });
-
         }
         dropdown.itemText.font = GameData.I.GothicSubtitleFont;
-
         dropdown.onValueChanged.AddListener(delegate { DropdownItemSelected(dropdown); });
         snapTurn = locomotionsystem.GetComponent<ActionBasedSnapTurnProvider>();
         continuousTurn = locomotionsystem.GetComponent<ActionBasedContinuousTurnProvider>();
+
+        dropdown.value = PlayerPrefs.GetInt("TurnSetting");
+        DropdownItemSelected(dropdown);
     }
 
     void DropdownItemSelected(TMP_Dropdown dropdown)
@@ -35,17 +36,28 @@ public class TurnSettingDropdownController : MonoBehaviour
         switch (dropdown.value)
         {
             case 0:
-                snapTurn.enabled = true;
-                continuousTurn.enabled = false;
+                EnableSnapTurn();
                 break;
             case 1:
-                snapTurn.enabled = false;
-                continuousTurn.enabled = true;
+                EnableContinuousTurn();
                 break;
             default:
-                snapTurn.enabled = true;
-                continuousTurn.enabled = false;
+                EnableSnapTurn();
                 break;
         }
+    }
+
+    void EnableSnapTurn()
+    {
+        snapTurn.enabled = true;
+        continuousTurn.enabled = false;
+        PlayerPrefs.SetInt("TurnSetting", 0);
+    }
+
+    void EnableContinuousTurn()
+    {
+        snapTurn.enabled = false;
+        continuousTurn.enabled = true;
+        PlayerPrefs.SetInt("TurnSetting", 1);
     }
 }
