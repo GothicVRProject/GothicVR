@@ -36,12 +36,10 @@ public class TurnSettingDropdownController : MonoBehaviour
     {
         switch (dropdown.value)
         {
-            case 0:
-                EnableSnapTurn();
-                break;
             case 1:
                 EnableContinuousTurn();
                 break;
+            case 0:
             default:
                 EnableSnapTurn();
                 break;
