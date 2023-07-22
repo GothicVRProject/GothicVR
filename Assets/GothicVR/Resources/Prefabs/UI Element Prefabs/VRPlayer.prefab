@@ -1578,7 +1578,7 @@ GameObject:
   - component: {fileID: 3286136461781483593}
   - component: {fileID: 3490461415993468589}
   m_Layer: 7
-  m_Name: VRPlayerGothic_v4
+  m_Name: VRPlayer
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3494,57 +3494,25 @@ MonoBehaviour:
   m_PositionInput:
     m_UseReference: 0
     m_Action:
-      m_Name: Position
+      m_Name: 
       m_Type: 0
-      m_ExpectedControlType: Vector3
-      m_Id: 2775a29b-b69e-4792-86ed-092596b734ad
+      m_ExpectedControlType: 
+      m_Id: 
       m_Processors: 
       m_Interactions: 
-      m_SingletonActionBindings:
-      - m_Name: 
-        m_Id: ccdec020-8317-4f2e-a903-78972dde8404
-        m_Path: <XRHMD>/centerEyePosition
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
-        m_Action: Position
-        m_Flags: 0
-      - m_Name: 
-        m_Id: abbccc6f-4adf-490a-a4f8-94d174e36ca6
-        m_Path: <HandheldARInputDevice>/devicePosition
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
-        m_Action: Position
-        m_Flags: 0
+      m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 0}
   m_RotationInput:
     m_UseReference: 0
     m_Action:
-      m_Name: Rotation
+      m_Name: 
       m_Type: 0
-      m_ExpectedControlType: Quaternion
-      m_Id: f89a5beb-0947-4dee-87b0-1976dbf8c78e
+      m_ExpectedControlType: 
+      m_Id: 
       m_Processors: 
       m_Interactions: 
-      m_SingletonActionBindings:
-      - m_Name: 
-        m_Id: 9db4ea54-e6b7-401f-afff-de2af6720a90
-        m_Path: <XRHMD>/centerEyeRotation
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
-        m_Action: Rotation
-        m_Flags: 0
-      - m_Name: 
-        m_Id: 3f93e030-9465-4abe-a0e7-a4315f2bc435
-        m_Path: <HandheldARInputDevice>/deviceRotation
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
-        m_Action: Rotation
-        m_Flags: 0
+      m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 0}
   m_TrackingStateInput:
@@ -4516,7 +4484,7 @@ GameObject:
   - component: {fileID: 5947627685331031975}
   m_Layer: 5
   m_Name: Item Label
-  m_TagString: Subtitle
+  m_TagString: IngameText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4817,7 +4785,7 @@ GameObject:
   - component: {fileID: 5432214410414505154}
   m_Layer: 5
   m_Name: Label
-  m_TagString: Subtitle
+  m_TagString: IngameText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5080,7 +5048,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6670382117503956553, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_TagString
-      value: Subtitle
+      value: IngameText
       objectReference: {fileID: 0}
     - target: {fileID: 8181131269388117416, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_Pivot.x
@@ -5218,7 +5186,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3513774324671529904, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
       propertyPath: m_TagString
-      value: Subtitle
+      value: IngameText
       objectReference: {fileID: 0}
     - target: {fileID: 3785205150403104431, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
       propertyPath: m_text
@@ -5414,7 +5382,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6670382117503956553, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_TagString
-      value: Subtitle
+      value: IngameText
       objectReference: {fileID: 0}
     - target: {fileID: 8181131269388117416, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_Pivot.x
@@ -5518,29 +5486,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 175793357394625908}
     m_Modifications:
-    - target: {fileID: 6401121504383089494, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
-      propertyPath: m_text
-      value: Turn setting
-      objectReference: {fileID: 0}
-    - target: {fileID: 6401121504383089494, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
-      propertyPath: m_margin.w
-      value: 0.40376377
-      objectReference: {fileID: 0}
-    - target: {fileID: 6401121504383089494, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
-      propertyPath: m_margin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6401121504383089494, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
-      propertyPath: m_margin.z
-      value: 1.3756027
-      objectReference: {fileID: 0}
     - target: {fileID: 6670382117503956553, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_Name
       value: TurnSettingLabel
       objectReference: {fileID: 0}
     - target: {fileID: 6670382117503956553, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_TagString
-      value: Subtitle
+      value: IngameText
       objectReference: {fileID: 0}
     - target: {fileID: 8181131269388117416, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_Pivot.x
@@ -5577,18 +5529,6 @@ PrefabInstance:
     - target: {fileID: 8181131269388117416, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_SizeDelta.y
       value: 21.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8181131269388117416, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.32428694
-      objectReference: {fileID: 0}
-    - target: {fileID: 8181131269388117416, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.32428694
-      objectReference: {fileID: 0}
-    - target: {fileID: 8181131269388117416, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.32428694
       objectReference: {fileID: 0}
     - target: {fileID: 8181131269388117416, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_LocalPosition.x
