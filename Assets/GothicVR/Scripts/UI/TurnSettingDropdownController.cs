@@ -9,7 +9,7 @@ public class TurnSettingDropdownController : MonoBehaviour
     public GameObject locomotionsystem;
     public ActionBasedSnapTurnProvider snapTurn;
     public ActionBasedContinuousTurnProvider continuousTurn;
-    // Start is called before the first frame update
+
     void Awake()
     {
         var dropdown = transform.GetComponent<TMP_Dropdown>();
