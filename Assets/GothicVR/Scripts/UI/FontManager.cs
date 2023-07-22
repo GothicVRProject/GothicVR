@@ -7,13 +7,12 @@ namespace GVR.Manager
 {
     public class FontManager : SingletonBehaviour<FontManager>
     {
-        public Dictionary<string, TMP_FontAsset> fontDictionary = new Dictionary<string, TMP_FontAsset>(); // Dictionary to store font assets for each tag
+        public Dictionary<string, TMP_FontAsset> fontDictionary = new(); // Dictionary to store font assets for each tag
 
         public void Create()
         {
-            // Populate the font dictionary with tag-fontAsset pairs
-            fontDictionary["Title"] = GameData.I.GothicMenuFont;
-            fontDictionary["IngameText"] = GameData.I.GothicSubtitleFont;
+            fontDictionary[ConstantsManager.I.MenuFontTag] = GameData.I.GothicMenuFont;
+            fontDictionary[ConstantsManager.I.SubtitleFontTag] = GameData.I.GothicSubtitleFont;
         }
 
         public void ChangeFont()

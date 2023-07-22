@@ -5,7 +5,6 @@ using UnityEngine.XR.Interaction.Toolkit;
 using GVR.Phoenix.Interface;
 public class TurnSettingDropdownController : MonoBehaviour
 {
-    public GameObject textAsset;
     public GameObject locomotionsystem;
     public ActionBasedSnapTurnProvider snapTurn;
     public ActionBasedContinuousTurnProvider continuousTurn;

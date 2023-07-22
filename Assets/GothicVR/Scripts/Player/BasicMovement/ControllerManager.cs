@@ -7,6 +7,10 @@ using UnityEngine.XR;
 
 public class ControllerManager : MonoBehaviour
 {
+    // TODO - Thats the empty template of user interaction from the PoC
+    // In case the concept will be reused some functions can be reused as well. Otherwise a major refactor is necessary.
+
+
     public enum TurnSetting { none, snap, continuous }
     public TurnSetting turnsetting;
 

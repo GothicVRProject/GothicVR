@@ -1406,14 +1406,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1353668847}
     m_Modifications:
-    - target: {fileID: 2607070973345983837, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_TagString
-      value: IngameText
-      objectReference: {fileID: 0}
-    - target: {fileID: 3227623639313175419, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_TagString
-      value: IngameText
-      objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483594, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_Name
       value: VRPlayer
@@ -1481,22 +1473,6 @@ PrefabInstance:
     - target: {fileID: 5749832964000603116, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6210251732444140945, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_TagString
-      value: IngameText
-      objectReference: {fileID: 0}
-    - target: {fileID: 7664108043965032652, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_TagString
-      value: IngameText
-      objectReference: {fileID: 0}
-    - target: {fileID: 8765416009891714543, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_TagString
-      value: IngameText
-      objectReference: {fileID: 0}
-    - target: {fileID: 9072211675861733662, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_TagString
-      value: IngameText
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
