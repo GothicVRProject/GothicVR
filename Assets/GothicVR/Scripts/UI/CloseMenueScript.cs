@@ -13,7 +13,7 @@ public class CloseMenueScript : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void closeFunction()
+    public void CloseFunction()
     {
         transform.parent = menueParent.transform;
         transform.localRotation = menueRotation;

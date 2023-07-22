@@ -6,7 +6,7 @@ namespace GVR.Manager
 {
     public class ConstantsManager : SingletonBehaviour<ConstantsManager>
     {
-        public static LayerMask ItemLayer;
+        public LayerMask ItemLayer;
 
         protected override void Awake()
         {
