@@ -44,11 +44,11 @@ public class ControllerManager : MonoBehaviour
         else
         {
             //Use the first configuration set of controller buttons
-            ControllerManager_v1();
+            ButtonManager();
         }
     }
 
-    void ControllerManager_v1()
+    void ButtonManager()
     {
         leftController.TryGetFeatureValue(CommonUsages.primaryButton, out bool leftprimarybuttonvalue);
         leftController.TryGetFeatureValue(CommonUsages.secondaryButton, out bool leftsecondarybuttonvalue);

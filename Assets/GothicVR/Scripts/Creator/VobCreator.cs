@@ -15,9 +15,10 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
+using GVR.Phoenix.Interface;
 
 #if UNITY_EDITOR
-    using UnityEditor;
+using UnityEditor;
 #endif
 
 
@@ -169,7 +170,7 @@ namespace GVR.Creator
             var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
             var colliderComp = vobObj.GetComponent<MeshCollider>();
 
-            vobObj.layer = LayerMask.NameToLayer("Item");
+            vobObj.layer = GVR.Manager.ConstantsManager.ItemLayer;
 
 
             colliderComp.convex = true;

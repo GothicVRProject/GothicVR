@@ -7,17 +7,17 @@ public class CloseMenueScript : MonoBehaviour
     private GameObject menueParent;
     private void Start()
     {
-        menuePosition = gameObject.transform.localPosition;
-        menueRotation = gameObject.transform.localRotation;
-        menueParent = gameObject.transform.parent.gameObject;
+        menuePosition = transform.localPosition;
+        menueRotation = transform.localRotation;
+        menueParent = transform.parent.gameObject;
         gameObject.SetActive(false);
     }
 
     public void closeFunction()
     {
-        gameObject.transform.parent = menueParent.transform;
-        gameObject.transform.localRotation = menueRotation;
-        gameObject.transform.localPosition = menuePosition;
+        transform.parent = menueParent.transform;
+        transform.localRotation = menueRotation;
+        transform.localPosition = menuePosition;
         gameObject.SetActive(false);
     }
 }

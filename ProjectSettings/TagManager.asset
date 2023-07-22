@@ -6,7 +6,8 @@ TagManager:
   tags:
   - PxVob_zCVobSpot
   - Climbable
-  - Subtitle
+  - Title
+  - IngameText
   layers:
   - Default
   - TransparentFX

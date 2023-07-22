@@ -339,8 +339,8 @@ RectTransform:
   m_Father: {fileID: 4040883227042795174}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.18666631}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -629,7 +629,7 @@ GameObject:
   - component: {fileID: 3286136461689514587}
   - component: {fileID: 3286136461689514588}
   - component: {fileID: 3286136461689514589}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: LeftHandBaseController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -949,7 +949,7 @@ GameObject:
   - component: {fileID: 3286136461704158094}
   - component: {fileID: 3286136461704158095}
   - component: {fileID: 3286136461704158080}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: RightHandRayController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1577,7 +1577,7 @@ GameObject:
   - component: {fileID: 3286136461781483592}
   - component: {fileID: 3286136461781483593}
   - component: {fileID: 3490461415993468589}
-  m_Layer: 8
+  m_Layer: 7
   m_Name: VRPlayerGothic_v4
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1779,7 +1779,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3286136462172449749}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Hands
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1812,7 +1812,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3286136462477416103}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: LeftHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1846,7 +1846,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3286136462517919273}
   - component: {fileID: 4574803525266435527}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: RightHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2007,7 +2007,7 @@ GameObject:
   - component: {fileID: 3286136462831979467}
   - component: {fileID: 3286136462831979465}
   - component: {fileID: 3286136462831979464}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Locomotion System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2193,7 +2193,7 @@ GameObject:
   - component: {fileID: 3286136462967229778}
   - component: {fileID: 3286136462967229779}
   - component: {fileID: 3286136462967229780}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: RightHandTeleportController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2776,7 +2776,7 @@ GameObject:
   - component: {fileID: 3286136463048429807}
   - component: {fileID: 3286136463048429792}
   - component: {fileID: 3286136463048429793}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: LeftHandRayController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3103,8 +3103,8 @@ MonoBehaviour:
   m_SphereCastRadius: 0.1
   m_RaycastMask:
     serializedVersion: 2
-    m_Bits: 4294967295
-  m_RaycastTriggerInteraction: 1
+    m_Bits: 32
+  m_RaycastTriggerInteraction: 2
   m_RaycastSnapVolumeInteraction: 1
   m_HitClosestOnly: 0
   m_HoverToSelect: 0
@@ -3403,7 +3403,7 @@ GameObject:
   - component: {fileID: 3286136463054414637}
   - component: {fileID: 4120851453766024974}
   - component: {fileID: 9105039786394560442}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -3641,7 +3641,7 @@ GameObject:
   - component: {fileID: 3286136463242076557}
   - component: {fileID: 3286136463242076558}
   - component: {fileID: 3286136463242076559}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: RightHandBaseController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4059,9 +4059,9 @@ RectTransform:
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -17, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1992438223746071283
 MonoBehaviour:
@@ -4124,7 +4124,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2926818186072010583}
   - component: {fileID: 100025301}
-  m_Layer: 8
+  m_Layer: 7
   m_Name: ControllerManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4174,7 +4174,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3329884094427662597}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Camera Offset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4514,10 +4514,9 @@ GameObject:
   - component: {fileID: 2826283365658379717}
   - component: {fileID: 2698132100822848819}
   - component: {fileID: 5947627685331031975}
-  - component: {fileID: 5411729514072122955}
   m_Layer: 5
   m_Name: Item Label
-  m_TagString: Untagged
+  m_TagString: Subtitle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4641,18 +4640,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &5411729514072122955
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7664108043965032652}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0fd8a6fa467b074f8fa40ccee2fe903, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8107681351574567912
 GameObject:
   m_ObjectHideFlags: 0
@@ -4830,7 +4817,7 @@ GameObject:
   - component: {fileID: 5432214410414505154}
   m_Layer: 5
   m_Name: Label
-  m_TagString: Untagged
+  m_TagString: Subtitle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5091,6 +5078,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MoveSpeedLabel
       objectReference: {fileID: 0}
+    - target: {fileID: 6670382117503956553, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
+      propertyPath: m_TagString
+      value: Subtitle
+      objectReference: {fileID: 0}
     - target: {fileID: 8181131269388117416, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -5221,6 +5212,14 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 3286136463054414635}
+    - target: {fileID: 3513774324671529904, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3513774324671529904, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
+      propertyPath: m_TagString
+      value: Subtitle
+      objectReference: {fileID: 0}
     - target: {fileID: 3785205150403104431, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
       propertyPath: m_text
       value: Close
@@ -5413,6 +5412,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SettingsMenuLabel
       objectReference: {fileID: 0}
+    - target: {fileID: 6670382117503956553, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
+      propertyPath: m_TagString
+      value: Subtitle
+      objectReference: {fileID: 0}
     - target: {fileID: 8181131269388117416, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -5534,6 +5537,10 @@ PrefabInstance:
     - target: {fileID: 6670382117503956553, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_Name
       value: TurnSettingLabel
+      objectReference: {fileID: 0}
+    - target: {fileID: 6670382117503956553, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
+      propertyPath: m_TagString
+      value: Subtitle
       objectReference: {fileID: 0}
     - target: {fileID: 8181131269388117416, guid: 4293d805a850fb84885c55f47b7299bd, type: 3}
       propertyPath: m_Pivot.x

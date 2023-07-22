@@ -863,6 +863,7 @@ GameObject:
   - component: {fileID: 1896514217}
   - component: {fileID: 1896514218}
   - component: {fileID: 1896514219}
+  - component: {fileID: 1896514220}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -965,3 +966,15 @@ MonoBehaviour:
   arrowmaterial: {fileID: 2100000, guid: dc6ce4e18c065d34f9037b5b60259872, type: 2}
   fillermaterial: {fileID: 2100000, guid: 7f15366450c487344a1e66a13b22a847, type: 2}
   skymaterial: {fileID: 0}
+--- !u!114 &1896514220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 028fdcc2e72ea274b90d0669a8203144, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

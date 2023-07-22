@@ -12,8 +12,8 @@ namespace GVR.Manager
         public void Create()
         {
             // Populate the font dictionary with tag-fontAsset pairs
-            fontDictionary["MenuUI"] = GameData.I.GothicMenuFont;
-            fontDictionary["Subtitle"] = GameData.I.GothicSubtitleFont;
+            fontDictionary["Title"] = GameData.I.GothicMenuFont;
+            fontDictionary["IngameText"] = GameData.I.GothicSubtitleFont;
         }
 
         public void ChangeFont()
