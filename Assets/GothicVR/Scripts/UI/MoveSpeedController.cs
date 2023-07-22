@@ -12,10 +12,12 @@ public class MoveSpeedController : MonoBehaviour
     {
         Slider speedslider = transform.GetComponent<Slider>();
         speedslider.onValueChanged.AddListener(ChangeMoveSpeed);
+        speedslider.value = PlayerPrefs.GetFloat("MoveSpeed", 8f);
     }
 
     void ChangeMoveSpeed(float movespeed)
     {
         movecontroller.moveSpeed = movespeed;
+        PlayerPrefs.SetFloat("MoveSpeed", movespeed);
     }
 }
