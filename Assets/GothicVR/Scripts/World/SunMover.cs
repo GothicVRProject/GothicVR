@@ -8,10 +8,12 @@ using UnityEngine;
 public class SunMover : MonoBehaviour
 {
     private FeatureFlags.SunMovementPerformance sunPerformanceSetting;
-    private GameObject sun;
+    private GameObject sun; // aka this
 
-    private void OnEnable()
+    private void Start()
     {
+        sun = gameObject; // aka this
+
         var gameTime = GameTime.I;
         sunPerformanceSetting = FeatureFlags.I.SunMovementPerformanceValue;
         switch (sunPerformanceSetting)
@@ -21,17 +23,17 @@ public class SunMover : MonoBehaviour
                 break;
             case FeatureFlags.SunMovementPerformance.EveryIngameMinute:
                 gameTime.minuteChangeCallback.AddListener(RotateSun);
-
                 break;
             case FeatureFlags.SunMovementPerformance.EveryIngameHour:
                 gameTime.minuteChangeCallback.AddListener(RotateSun);
                 break;
             default:
-                Debug.LogError($"{sunPerformanceSetting} isnt handled correctly. Thus SunMover.cs doesnt move the sun.");
+                Debug.LogError($"{sunPerformanceSetting} isn't handled correctly. Therefore SunMover.cs won't move the sun.");
                 break;
         }
     }
-    private void OnDisable()
+
+    private void OnDestroy()
     {
         var gameTime = GameTime.I;
         switch (sunPerformanceSetting)
@@ -50,10 +52,7 @@ public class SunMover : MonoBehaviour
                 break;
         }
     }
-    private void Start()
-    {
-        sun = gameObject;
-    }
+    
     /// <summary>
     /// Based on performance settings, the sun direction is changed more or less frequent.
     ///
