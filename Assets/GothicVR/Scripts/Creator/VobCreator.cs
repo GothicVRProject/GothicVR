@@ -170,7 +170,7 @@ namespace GVR.Creator
             var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
             var colliderComp = vobObj.GetComponent<MeshCollider>();
 
-            vobObj.layer = GVR.Manager.ConstantsManager.ItemLayer;
+            vobObj.layer = ConstantsManager.I.ItemLayer;
 
 
             colliderComp.convex = true;
