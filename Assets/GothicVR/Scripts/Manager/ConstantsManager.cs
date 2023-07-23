@@ -12,6 +12,7 @@ namespace GVR.Manager
 
         protected override void Awake()
         {
+            base.Awake();
             ItemLayer = LayerMask.NameToLayer("Item");
         }
     }
