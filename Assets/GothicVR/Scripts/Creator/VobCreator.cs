@@ -17,7 +17,7 @@ using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
 
 #if UNITY_EDITOR
-    using UnityEditor;
+using UnityEditor;
 #endif
 
 
@@ -168,7 +168,10 @@ namespace GVR.Creator
             var grabComp = vobObj.AddComponent<XRGrabInteractable>();
             var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
             var colliderComp = vobObj.GetComponent<MeshCollider>();
-            
+
+            vobObj.layer = GVR.Manager.ConstantsManager.I.ItemLayer;
+
+
             colliderComp.convex = true;
             grabComp.selectExited.AddListener(eventComp.SelectExited);
         }

@@ -6,6 +6,8 @@ TagManager:
   tags:
   - PxVob_zCVobSpot
   - Climbable
+  - Title
+  - IngameText
   layers:
   - Default
   - TransparentFX
@@ -13,8 +15,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Item
+  - Player
   - 
   - 
   - 
