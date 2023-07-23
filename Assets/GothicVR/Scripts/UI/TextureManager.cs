@@ -19,12 +19,13 @@ public class TextureManager : MonoBehaviour
     private Texture2D fillertexture;
     public Material fillermaterial;
     private Texture2D skytexture;
-    public Material skymaterial;
-    bool textureloaded = false;
+    // public Material skymaterial;
 
-    // Update is called once per frame
+    private bool textureloaded = false;
+
     void Update()
     {
+        // FIXME - We should register to a "BootstrapDone" event rather than checking every frame.
         if (!textureloaded && GameData.I.VdfsPtr != IntPtr.Zero)
         {
             LoadCustomTextures();
@@ -52,8 +53,9 @@ public class TextureManager : MonoBehaviour
         arrowtexture = AssetCache.I.TryGetTexture("U.TGA");
         arrowmaterial.mainTexture = arrowtexture;
 
-        skytexture = AssetCache.I.TryGetTexture("SKYDAY_LAYER0_A0-C.TEX");
-        skymaterial.mainTexture = skytexture;
+        // FIXME - No material found in Assets. commenting it out right now.
+        // skytexture = AssetCache.I.TryGetTexture("SKYDAY_LAYER0_A0-C.TEX");
+        // skymaterial.mainTexture = skytexture;
     }
 
 }
