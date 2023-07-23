@@ -23,10 +23,8 @@ namespace GVR.Manager
             // Change the font of the TextMeshPro components based on their tags
             foreach (TMP_Text textComponent in textComponents)
             {
-                if (fontDictionary.ContainsKey(textComponent.tag))
-                {
-                    textComponent.font = fontDictionary[textComponent.tag];
-                }
+                if (fontDictionary.TryGetValue(textComponent.tag, out var value))
+                    textComponent.font = value;
             }
         }
     }
