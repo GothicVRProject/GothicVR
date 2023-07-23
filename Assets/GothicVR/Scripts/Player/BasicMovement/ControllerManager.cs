@@ -1,3 +1,4 @@
+using GVR.Manager;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,10 @@ using UnityEngine.XR;
 
 public class ControllerManager : MonoBehaviour
 {
+    // TODO - Thats the empty template of user interaction from the PoC
+    // In case the concept will be reused some functions can be reused as well. Otherwise a major refactor is necessary.
+
+
     public enum TurnSetting { none, snap, continuous }
     public TurnSetting turnsetting;
 
@@ -28,11 +33,9 @@ public class ControllerManager : MonoBehaviour
     private InputDevice leftController;
     private InputDevice rightController;
 
-
     private void Start()
     {
         TryInitialize();
-        // inventoryCloseScript =  inventory.gameObject.GetComponent<InventoryClose>();
     }
 
     private void Update()
@@ -45,13 +48,11 @@ public class ControllerManager : MonoBehaviour
         else
         {
             //Use the first configuration set of controller buttons
-            ControllerManager_v1();
+            ButtonManager();
         }
-
-
     }
 
-    void ControllerManager_v1()
+    void ButtonManager()
     {
         leftController.TryGetFeatureValue(CommonUsages.primaryButton, out bool leftprimarybuttonvalue);
         leftController.TryGetFeatureValue(CommonUsages.secondaryButton, out bool leftsecondarybuttonvalue);
@@ -84,44 +85,20 @@ public class ControllerManager : MonoBehaviour
             ShowSettingsMenue();
             //ShowInventory();
         }
-        else
-        {
-
-        }
 
         //Right Controller - Secondary button
         if (rightsecondarybuttonvalue == true)
         {
             ShowMainMenue();
         }
-        else
-        {
-
-        }
     }
 
     public void ShowUI()
     {
-        //manaBar.SetActive(true);
-        //healthBar.SetActive(true);
-        //if (quickAccessSlots)
-        //quickAccessSlots.SetActive(true);
-
     }
 
     public void HideUI()
     {
-        //if (healthBar.gameObject.GetComponent<HealthBarFollowPlayer>().currentlyEating == false)
-        //{
-        //    healthBar.SetActive(false);
-        //}
-
-        //if (manaBar.gameObject.GetComponent<HealthBarFollowPlayer>().currentlyEating == false)
-        //{
-        //    manaBar.SetActive(false);
-        //}
-        //if (quickAccessSlots)
-        //quickAccessSlots.SetActive(false);
     }
 
     public void ShowRayCasts()
@@ -140,53 +117,34 @@ public class ControllerManager : MonoBehaviour
         directRight.SetActive(true);
     }
 
-
     public void ShowSettingsMenue()
     {
-            if (!settingsMenue.activeSelf)
-            {
-                 settingsMenue.gameObject.transform.parent = null;
-                 settingsMenue.SetActive(true);
-            }
+        if (!settingsMenue.activeSelf)
+        {
+            settingsMenue.gameObject.transform.parent = null;
+            settingsMenue.SetActive(true);
+            FontManager.I.ChangeFont();
         }
-
+    }
 
     public void ShowMainMenue()
     {
-       // mainMenue.SetActive(true);
     }
 
     public void HideMainMenue()
     {
-       // mainMenue.SetActive(false);
     }
 
     public void ShowInventory()
     {
-        //if (!inventory.activeSelf)
-        //{
-        //    inventory.gameObject.transform.parent = null;
-        //    inventory.SetActive(true);
-        //}
-        //else
-        //{
-        //    // Show and hide are toggeling too fast when pressing the controller button
-        //   // HideInventory();
-        //}
- 
+
     }
 
     public void HideInventory()
     {
-        //if (inventoryCloseScript != null)
-        //{
-        //    inventoryCloseScript.closeFunction();
-        //}
     }
 
-  
-
-      //  IEnumerator (float delay)
+    //  IEnumerator (float delay)
     void TryInitialize()
     {
         List<InputDevice> leftDevices = new List<InputDevice>();
