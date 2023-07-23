@@ -35,9 +35,9 @@ namespace GVR.Creator
 
         private void Start()
         {
-            meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
-            soundCreator = SingletonBehaviour<SoundCreator>.GetOrCreate();
-            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+            meshCreator = MeshCreator.I;
+            soundCreator = SoundCreator.I;
+            assetCache = AssetCache.I;
         }
 
         public void Create(GameObject root, WorldData world)
@@ -193,8 +193,7 @@ namespace GVR.Creator
             if (!FeatureFlags.I.EnableSounds)
                 return;
             
-            var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
-            SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
+            soundCreator.Create(vob, parentGos[vob.type]);
         }
         
         // FIXME - add specific daytime logic!
@@ -203,8 +202,7 @@ namespace GVR.Creator
             if (!FeatureFlags.I.EnableSounds)
                 return;
             
-            var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
-            SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
+            soundCreator.Create(vob, parentGos[vob.type]);
         }
 
         private void CreateZoneMusic(PxVobZoneMusicData vob)
@@ -291,7 +289,7 @@ namespace GVR.Creator
 
         private void CreateDecal(PxVobData vob)
         {
-            if(!FeatureFlags.Instance.EnableDecals)
+            if(!FeatureFlags.I.EnableDecals)
             {
                 return;
             }
@@ -315,7 +313,7 @@ namespace GVR.Creator
             var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value, parent);
+                return meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value.ToUnityMatrix().rotation, parent);
             }
             
             // MRM

@@ -19,7 +19,7 @@ public class RoutineManager : SingletonBehaviour<RoutineManager>
 
     private void OnEnable()
     {
-        gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
+        gameTime = GameTime.I;
         gameTime.minuteChangeCallback.AddListener(Invoke);
     }
 

@@ -15,7 +15,7 @@ namespace GVR.Phoenix.Util
 
             musicZones.Add(gameObject.name);
 
-            SingletonBehaviour<MusicCreator>.GetOrCreate().SetMusic(gameObject.name, MusicCreator.Tags.Std);
+            MusicCreator.I.SetMusic(gameObject.name, MusicCreator.Tags.Std);
         }
 
         void OnTriggerExit(Collider other)
@@ -26,7 +26,7 @@ namespace GVR.Phoenix.Util
 
             if (musicZones.Count > 0) return;
 
-            SingletonBehaviour<MusicCreator>.GetOrCreate().SetMusic("MUSICZONE_DEF", MusicCreator.Tags.Std);
+            MusicCreator.I.SetMusic("MUSICZONE_DEF", MusicCreator.Tags.Std);
         }
     }
 }
