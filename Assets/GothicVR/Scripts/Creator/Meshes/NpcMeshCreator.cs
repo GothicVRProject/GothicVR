@@ -60,6 +60,8 @@ namespace GVR.Creator.Meshes
                 return base.GetTexture(name);
             }
 
+            // This regex replaces the suffix of V0_C0 with values of corresponding data.
+            // e.g. Some_Texture_V0_C0.TGA --> Some_Texture_V1_C2.TGA
             var formattedTextureName = Regex.Replace(name, "(?<=.*?)V0_C0", $"V{tmpBodyTexNr}_C{tmpBodyTexColor}");
 
             return AssetCache.I.TryGetTexture(formattedTextureName);
