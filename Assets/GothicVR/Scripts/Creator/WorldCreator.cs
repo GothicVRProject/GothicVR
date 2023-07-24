@@ -34,7 +34,7 @@ namespace GVR.Creator
 
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
 
-            worldMesh = MeshCreator.I.Create(world, worldGo);
+            worldMesh = await MeshCreator.I.Create(world, worldGo);
             await VobCreator.I.Create(worldGo, world);
             WaynetCreator.I.Create(worldGo, world);
 

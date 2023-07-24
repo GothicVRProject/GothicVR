@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using GVR.Caches;
+using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -22,12 +24,15 @@ namespace GVR.Creator.Meshes
         protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
         protected const float decalOpacity = 0.75f;
 
-        
-        public GameObject Create(WorldData world, GameObject parent)
+
+        public async Task<GameObject> Create(WorldData world, GameObject parent)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.isStatic = true;
             meshObj.SetParent(parent);
+
+            // Track the progress of each sub-mesh creation separately
+            int numSubMeshes = world.subMeshes.Values.Count;
 
             foreach (var subMesh in world.subMeshes.Values)
             {
@@ -37,11 +42,13 @@ namespace GVR.Creator.Meshes
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
-                PrepareMeshRenderer(meshRenderer, subMesh);
+                await PrepareMeshRenderer(meshRenderer, subMesh);
                 PrepareMeshFilter(meshFilter, subMesh);
                 PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
 
                 subMeshObj.SetParent(meshObj);
+
+                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
             }
 
             return meshObj;
@@ -79,8 +86,8 @@ namespace GVR.Creator.Meshes
                     else
                         nodeObj.SetParent(nodeObjects[node.parentIndex]);
                 }
-                
-                for (var i=0; i<nodeObjects.Length; i++)
+
+                for (var i = 0; i < nodeObjects.Length; i++)
                 {
                     if (mdh.nodes[i].parentIndex == -1)
                         nodeObjects[i].transform.localPosition = mdh.rootTranslation.ToUnityVector();
@@ -88,7 +95,7 @@ namespace GVR.Creator.Meshes
                         SetPosAndRot(nodeObjects[i], mdh.nodes[i].transform);
                 }
             }
-            
+
             //// Fill GameObjects with Meshes from "original" Mesh
             foreach (var softSkinMesh in mdm.meshes!)
             {
@@ -102,7 +109,7 @@ namespace GVR.Creator.Meshes
 
                 // FIXME - hard coded as it's the right value for BSFire. Need to be more dynamic by using element which has parent=-1.
                 meshRenderer.rootBone = nodeObjects[0].transform;
-                
+
                 PrepareMeshRenderer(meshRenderer, mesh);
                 PrepareMeshFilter(meshFilter, softSkinMesh);
 
@@ -128,7 +135,7 @@ namespace GVR.Creator.Meshes
             // We need to reset the rootBones position to zero. Otherwise Vobs won't be placed right.
             // Due to Unity's parent-child transformation magic, we need to do it at the end. ╰(*°▽°*)╯
             nodeObjects[0].transform.localPosition = Vector3.zero;
-            
+
             return rootGo;
         }
 
@@ -178,7 +185,7 @@ namespace GVR.Creator.Meshes
             obj.transform.localPosition = position;
         }
 
-        protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
+        protected async Task PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
             var material = GetEmptyMaterial();
             var bMaterial = subMesh.material;
@@ -192,7 +199,7 @@ namespace GVR.Creator.Meshes
                 return;
             }
 
-            var texture = GetTexture(bMaterial.texture);
+            var texture = await GetTexture(bMaterial.texture);
 
             if (null == texture)
             {
@@ -215,7 +222,7 @@ namespace GVR.Creator.Meshes
             mesh.SetUVs(0, subMesh.uvs);
         }
 
-        protected void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
+        protected async void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
             // check if mrmData.subMeshes is null
 
@@ -241,7 +248,7 @@ namespace GVR.Creator.Meshes
                     return;
                 }
 
-                var texture = GetTexture(materialData.texture);
+                var texture = await GetTexture(materialData.texture);
 
                 if (null == texture)
                     if (materialData.texture.EndsWith(".TGA"))
@@ -366,7 +373,7 @@ namespace GVR.Creator.Meshes
             var mesh = new Mesh();
             var pxMesh = soft.mesh;
             var weights = soft.weights;
-            
+
             meshFilter.mesh = mesh;
             mesh.subMeshCount = soft!.mesh!.subMeshes!.Length;
 
@@ -409,7 +416,7 @@ namespace GVR.Creator.Meshes
                     preparedUVs.Add(index1.texture.ToUnityVector());
                     preparedUVs.Add(index2.texture.ToUnityVector());
                     preparedUVs.Add(index3.texture.ToUnityVector());
-                    
+
                     preparedBoneWeights.Add(weights[index1.index].ToBoneWeight(soft.nodes));
                     preparedBoneWeights.Add(weights[index2.index].ToBoneWeight(soft.nodes));
                     preparedBoneWeights.Add(weights[index3.index].ToBoneWeight(soft.nodes));
@@ -472,7 +479,7 @@ namespace GVR.Creator.Meshes
                 PrepareMeshCollider(obj, mesh);
             }
         }
-        
+
         /// <summary>
         /// We basically only set the values from official Unity documentation. No added sugar for the bingPoses.
         /// @see https://docs.unity3d.com/ScriptReference/Mesh-bindposes.html
@@ -495,9 +502,9 @@ namespace GVR.Creator.Meshes
             renderer.bones = meshBones;
         }
 
-        protected virtual Texture2D GetTexture(string name)
+        protected virtual async Task<Texture2D> GetTexture(string name)
         {
-            return AssetCache.I.TryGetTexture(name);
+            return await AssetCache.I.TryGetTextureAsync(name);
         }
 
         protected Material GetEmptyMaterial()

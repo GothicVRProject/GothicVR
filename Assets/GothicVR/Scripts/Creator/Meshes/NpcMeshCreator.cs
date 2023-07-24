@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using GVR.Caches;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
@@ -48,7 +49,7 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Change texture name based on VisualBodyData.
         /// </summary>
-        protected override Texture2D GetTexture(string name)
+        protected override Task<Texture2D> GetTexture(string name)
         {
             // FIXME: Dirty hack. Needs to be optimized.
             if (name.ToUpper().Contains("MOUTH") || name.ToUpper().Contains("TEETH"))
@@ -64,7 +65,7 @@ namespace GVR.Creator.Meshes
             // e.g. Some_Texture_V0_C0.TGA --> Some_Texture_V1_C2.TGA
             var formattedTextureName = Regex.Replace(name, "(?<=.*?)V0_C0", $"V{tmpBodyTexNr}_C{tmpBodyTexColor}");
 
-            return AssetCache.I.TryGetTexture(formattedTextureName);
+            return AssetCache.I.TryGetTextureAsync(formattedTextureName);
         }
     }
 }
