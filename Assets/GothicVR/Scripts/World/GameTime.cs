@@ -1,9 +1,8 @@
 using System;
 using System.Collections;
 using GVR.Debugging;
-using UnityEngine;
-using GVR.Demo;
 using GVR.Util;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace GVR.World
