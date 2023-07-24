@@ -11,7 +11,6 @@ namespace GVR.Manager
 {
     public class LoadingManager : SingletonBehaviour<LoadingManager>
     {
-
         public enum LoadingProgressType
         {
             WorldMesh,
@@ -89,10 +88,11 @@ namespace GVR.Manager
 
         public void SetMaterialForLoading(Scene scene)
         {
-            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground/ProgressBar").gameObject.GetComponent<Image>().material = UIManager.I.LoadingBarMaterial;
-            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground").gameObject.GetComponent<Image>().material = UIManager.I.LoadingBarBackgroundMaterial;
-            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage").gameObject.GetComponent<Image>().material = UIManager.I.GothicLoadingMenuMaterial;
-            scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").GetComponent<MeshRenderer>().material = UIManager.I.LoadingSphereMaterial;
+            var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
+            sphere.GetComponent<MeshRenderer>().material = TextureManager.I.LoadingSphereMaterial;
+            sphere.FindChildRecursively("LoadingImage").GetComponent<Image>().material = TextureManager.I.GothicLoadingMenuMaterial;
+            sphere.FindChildRecursively("ProgressBackground").gameObject.GetComponent<Image>().material = TextureManager.I.LoadingBarBackgroundMaterial;
+            sphere.FindChildRecursively("ProgressBar").gameObject.GetComponent<Image>().material = TextureManager.I.LoadingBarMaterial;
         }
     }
 }

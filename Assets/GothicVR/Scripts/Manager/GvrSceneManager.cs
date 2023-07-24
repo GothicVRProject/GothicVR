@@ -81,7 +81,7 @@ namespace GVR.Manager
 
         private async Task ShowLoadingScene(string worldName = null)
         {
-            UIManager.I.LoadLoadingDefaultTextures();
+            TextureManager.I.LoadLoadingDefaultTextures();
 
             generalScene = SceneManager.GetSceneByName(generalSceneName);
             if (generalScene.isLoaded)
@@ -108,7 +108,7 @@ namespace GVR.Manager
             // set the loading background texture properly
             // TODO: for new game we need to load texture "LOADING.TGA"
             var textureString = "LOADING_" + worldName.Split('.')[0].ToUpper() + ".TGA";
-            UIManager.I.SetTexture(textureString, UIManager.I.GothicLoadingMenuMaterial);
+            TextureManager.I.SetTexture(textureString, TextureManager.I.GothicLoadingMenuMaterial);
         }
 
         private void HideLoadingScene()

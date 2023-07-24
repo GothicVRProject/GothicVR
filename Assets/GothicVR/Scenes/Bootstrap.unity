@@ -327,7 +327,7 @@ MonoBehaviour:
   EnableDecals: 0
   CreateOcNpcs: 1
   EnableNpcRoutines: 1
-  CreateExampleAnimation: 1
+  CreateExampleAnimation: 0
   ShowVdfsFileNotFoundErrors: 0
   EnableSounds: 1
   EnableMusic: 0
@@ -891,7 +891,6 @@ GameObject:
   - component: {fileID: 1896514219}
   - component: {fileID: 1896514220}
   - component: {fileID: 1896514221}
-  - component: {fileID: 1896514222}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -993,6 +992,10 @@ MonoBehaviour:
   sliderpositionmaterial: {fileID: 2100000, guid: ef75494119d9122438ca7408644d2e66, type: 2}
   arrowmaterial: {fileID: 2100000, guid: dc6ce4e18c065d34f9037b5b60259872, type: 2}
   fillermaterial: {fileID: 2100000, guid: 7f15366450c487344a1e66a13b22a847, type: 2}
+  GothicLoadingMenuMaterial: {fileID: 0}
+  LoadingBarBackgroundMaterial: {fileID: 0}
+  LoadingBarMaterial: {fileID: 0}
+  LoadingSphereMaterial: {fileID: 0}
 --- !u!114 &1896514220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1022,19 +1025,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f52da940a06b6c14898752eff5823ea9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1896514222
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1896514212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34b7e97b277d2b9448536ffb853c106c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GothicLoadingMenuMaterial: {fileID: 0}
-  LoadingBarBackgroundMaterial: {fileID: 0}
-  LoadingBarMaterial: {fileID: 0}
-  LoadingSphereMaterial: {fileID: 0}
