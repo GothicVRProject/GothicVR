@@ -32,26 +32,6 @@ public class SunMover : MonoBehaviour
                 break;
         }
     }
-
-    private void OnDestroy()
-    {
-        var gameTime = GameTime.I;
-        switch (sunPerformanceSetting)
-        {
-            case FeatureFlags.SunMovementPerformance.EveryIngameSecond:
-                gameTime.secondChangeCallback.RemoveListener(RotateSun);
-                break;
-            case FeatureFlags.SunMovementPerformance.EveryIngameMinute:
-                gameTime.secondChangeCallback.RemoveListener(RotateSun);
-                break;
-            case FeatureFlags.SunMovementPerformance.EveryIngameHour:
-                gameTime.secondChangeCallback.RemoveListener(RotateSun);
-                break;
-            default:
-                Debug.LogError($"{sunPerformanceSetting} isnt handled correctly. Thus SunMover.cs doesnt move the sun.");
-                break;
-        }
-    }
     
     /// <summary>
     /// Based on performance settings, the sun direction is changed more or less frequent.
