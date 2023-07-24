@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using GVR.Caches;
 using GVR.Phoenix.Data;
@@ -12,31 +13,16 @@ using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace GVR.Creator
+namespace GVR.Creator.Meshes
 {
-    public class MeshCreator : SingletonBehaviour<MeshCreator>
+    public abstract class AbstractMeshCreator<T> : SingletonBehaviour<T> where T : AbstractMeshCreator<T>
     {
-        private AssetCache assetCache;
-
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
-        private const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
-        private const float decalOpacity = 0.75f;
+        protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        protected const float decalOpacity = 0.75f;
 
-
-        private void Start()
-        {
-            assetCache = AssetCache.I;
-        }
-
-        /// <summary>
-        /// Inject singletons if we use this class from EditorMode.
-        /// </summary>
-        public void EditorInject(AssetCache assetCache)
-        {
-            this.assetCache = assetCache;
-        }
-
+        
         public GameObject Create(WorldData world, GameObject parent)
         {
             var meshObj = new GameObject("Mesh");
@@ -59,30 +45,6 @@ namespace GVR.Creator
             }
 
             return meshObj;
-        }
-
-        public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh, PxMorphMeshData mmb, GameObject parent = null)
-        {
-            var npcGo = Create(npcName, mdm, mdh, default, default, parent);
-
-            
-            // Add Head
-            var headGo = npcGo.FindChildRecursively("BIP01 HEAD");
-
-            // No head found
-            if (headGo == null)
-            {
-                Debug.LogWarning($"No NPC head found for {npcName}");
-                return npcGo;
-            }
-            
-            var headMeshFilter = headGo.AddComponent<MeshFilter>();
-            var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
-            
-            PrepareMeshRenderer(headMeshRenderer, mmb.mesh);
-            PrepareMeshFilter(headMeshFilter, mmb.mesh);
-
-            return npcGo;
         }
 
         public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
@@ -195,62 +157,28 @@ namespace GVR.Creator
             return rootGo;
         }
 
-        public GameObject CreateDecal(PxVobData vob, GameObject parent)
-        {
-            if (!vob.vobDecal.HasValue)
-            {
-                Debug.LogWarning("No decalData was set for: " + vob.visualName);
-                return null;
-            }
-
-            var decalData = vob.vobDecal.Value;
-
-            var decalProjectorGo = new GameObject(decalData.name);
-            var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
-            var texture = assetCache.TryGetTexture(vob.visualName);
-
-            // x/y needs to be made twice the size and transformed from cm in m.
-            // z - value is close to what we see in Gothic spacer.
-            decalProj.size = new(decalData.dimension.X * 2 / 100, decalData.dimension.Y * 2 / 100, 0.5f);
-            decalProjectorGo.SetParent(parent);
-            SetPosAndRot(decalProjectorGo, vob.position.ToUnityVector(), vob.rotation!.Value);
-
-            decalProj.pivot = Vector3.zero;
-            decalProj.fadeFactor = decalOpacity;
-
-            // FIXME use Prefab!
-            // https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@12.0/manual/creating-a-decal-projector-at-runtime.html
-            var standardShader = Shader.Find("Shader Graphs/Decal");
-            var material = new Material(standardShader);
-            material.SetTexture(Shader.PropertyToID("Base_Map"), texture);
-
-            decalProj.material = material;
-
-            return decalProjectorGo;
-        }
-
-        private void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
+        protected void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
         {
             SetPosAndRot(obj, matrix.ToUnityMatrix());
         }
 
-        private void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
+        protected void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
         {
             SetPosAndRot(obj, matrix.GetPosition() / 100, matrix.rotation);
         }
 
-        private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
+        protected void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
         {
             SetPosAndRot(obj, position, rotation.ToUnityMatrix().rotation);
         }
 
-        private void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
+        protected void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
             obj.transform.localRotation = rotation;
             obj.transform.localPosition = position;
         }
 
-        private void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
+        protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
             var material = GetEmptyMaterial();
             var bMaterial = subMesh.material;
@@ -264,7 +192,7 @@ namespace GVR.Creator
                 return;
             }
 
-            var texture = assetCache.TryGetTexture(bMaterial.texture);
+            var texture = GetTexture(bMaterial.texture);
 
             if (null == texture)
             {
@@ -277,7 +205,7 @@ namespace GVR.Creator
             material.mainTexture = texture;
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
         {
             var mesh = new Mesh();
             meshFilter.mesh = mesh;
@@ -287,7 +215,7 @@ namespace GVR.Creator
             mesh.SetUVs(0, subMesh.uvs);
         }
 
-        private void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
+        protected void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
             // check if mrmData.subMeshes is null
 
@@ -313,7 +241,7 @@ namespace GVR.Creator
                     return;
                 }
 
-                var texture = assetCache.TryGetTexture(materialData.texture);
+                var texture = GetTexture(materialData.texture);
 
                 if (null == texture)
                     if (materialData.texture.EndsWith(".TGA"))
@@ -331,7 +259,7 @@ namespace GVR.Creator
             rend.SetMaterials(finalMaterials);
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
         {
             /**
              * Ok, brace yourself:
@@ -415,7 +343,7 @@ namespace GVR.Creator
         }
 
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
         {
             /**
              * Ok, brace yourself:
@@ -567,7 +495,12 @@ namespace GVR.Creator
             renderer.bones = meshBones;
         }
 
-        private Material GetEmptyMaterial()
+        protected virtual Texture2D GetTexture(string name)
+        {
+            return AssetCache.I.TryGetTexture(name);
+        }
+
+        protected Material GetEmptyMaterial()
         {
             var standardShader = Shader.Find(defaultShader);
             var material = new Material(standardShader);

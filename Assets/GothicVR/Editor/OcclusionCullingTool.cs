@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using GVR.Caches;
 using GVR.Creator;
+using GVR.Creator.Meshes;
 using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
@@ -43,7 +44,8 @@ namespace GothicVR.Editor
             _meshCreator = MeshCreator.I;
             var assetCache = AssetCache.I;
 
-            _meshCreator.EditorInject(assetCache);
+            // FIXME: We need to re-implement it as we refactured the whole MeshCreator logic.
+            // _meshCreator.EditorInject(assetCache);
             
             var fullPath = Path.GetFullPath(Path.Join(_G1DIR, "Data"));
             _vdfsPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
