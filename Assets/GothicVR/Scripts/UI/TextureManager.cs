@@ -19,7 +19,7 @@ public class TextureManager : MonoBehaviour
     private Texture2D fillertexture;
     public Material fillermaterial;
     private Texture2D skytexture;
-    // public Material skymaterial;
+    public Material skymaterial;
 
     private bool textureloaded = false;
 
@@ -53,9 +53,8 @@ public class TextureManager : MonoBehaviour
         arrowtexture = AssetCache.I.TryGetTexture("U.TGA");
         arrowmaterial.mainTexture = arrowtexture;
 
-        // FIXME - No material found in Assets. commenting it out right now.
-        // skytexture = AssetCache.I.TryGetTexture("SKYDAY_LAYER0_A0-C.TEX");
-        // skymaterial.mainTexture = skytexture;
+        skytexture = AssetCache.I.TryGetTexture("SKYDAY_LAYER0_A0-C.TEX");
+        skymaterial.mainTexture = skytexture;
     }
 
 }

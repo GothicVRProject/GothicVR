@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 39ac659c922b5b1489714aacd9b952e9, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -991,7 +991,7 @@ MonoBehaviour:
   sliderpositionmaterial: {fileID: 2100000, guid: ef75494119d9122438ca7408644d2e66, type: 2}
   arrowmaterial: {fileID: 2100000, guid: dc6ce4e18c065d34f9037b5b60259872, type: 2}
   fillermaterial: {fileID: 2100000, guid: 7f15366450c487344a1e66a13b22a847, type: 2}
-  skymaterial: {fileID: 0}
+  skymaterial: {fileID: 2100000, guid: 39ac659c922b5b1489714aacd9b952e9, type: 2}
 --- !u!114 &1896514220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1004,3 +1004,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 028fdcc2e72ea274b90d0669a8203144, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ItemLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  MenuFontTag: Title
+  SubtitleFontTag: IngameText
