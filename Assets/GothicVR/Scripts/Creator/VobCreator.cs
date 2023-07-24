@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GothicVR.Vob;
 using GVR.Caches;
+using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Demo;
 using GVR.Manager;
@@ -27,7 +28,6 @@ namespace GVR.Creator
 {
     public class VobCreator : SingletonBehaviour<VobCreator>
     {
-        private MeshCreator meshCreator;
         private SoundCreator soundCreator;
         private AssetCache assetCache;
 
@@ -39,9 +39,8 @@ namespace GVR.Creator
 
         private void Start()
         {
-            meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
-            soundCreator = SingletonBehaviour<SoundCreator>.GetOrCreate();
-            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+            soundCreator = SoundCreator.I;
+            assetCache = AssetCache.I;
         }
 
         private int GetTotalVobCount(PxVobData[] vobs)
@@ -138,7 +137,7 @@ namespace GVR.Creator
                         await CreateDefaultMesh(vob);
                         break;
                 }
-                
+
                 LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / totalVObs);
                 // Load children
                 await CreateVobs(root, vob.childVobs);
@@ -303,19 +302,19 @@ namespace GVR.Creator
 
         private async Task<GameObject> CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
-            var mrm = await assetCache.TryGetMrmAsync(item.visual);
-            return await meshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
+            var mrm = assetCache.TryGetMrm(item.visual);
+            return VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
         }
 
         private async void CreateDecal(PxVobData vob)
         {
-            if (!FeatureFlags.Instance.EnableDecals)
+            if(!FeatureFlags.I.EnableDecals)
             {
                 return;
             }
             var parent = parentGos[vob.type];
 
-            await meshCreator.CreateDecal(vob, parent);
+            VobMeshCreator.I.CreateDecal(vob, parent);
         }
 
         private async Task<GameObject> CreateDefaultMesh(PxVobData vob)
@@ -333,7 +332,7 @@ namespace GVR.Creator
             var mdl = await assetCache.TryGetMdlAsync(meshName);
             if (mdl != null)
             {
-                return await meshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value, parent);
+                return VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value.ToUnityMatrix().rotation, parent);
             }
 
             // MRM
@@ -343,7 +342,7 @@ namespace GVR.Creator
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.cdDynamic;
 
-                return await meshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
+                return VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
             }
 
             Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");

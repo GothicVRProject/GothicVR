@@ -22,6 +22,7 @@ namespace GVR.Caches
         private Dictionary<string, PxModelData> mdlCache = new();
         private Dictionary<string, PxModelMeshData> mdmCache = new();
         private Dictionary<string, PxMultiResolutionMeshData> mrmCache = new();
+        private Dictionary<string, PxMorphMeshData> mmbCache = new();
 
         private Dictionary<string, PxVmItemData> itemDataCache = new();
         private Dictionary<string, PxVmSfxData> sfxDataCache = new();
@@ -195,7 +196,7 @@ namespace GVR.Caches
             if (mrmCache.TryGetValue(preparedKey, out PxMultiResolutionMeshData data))
                 return data;
 
-            var newData = PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mrm");
+            var newData = PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mrm");
             mrmCache[preparedKey] = newData;
 
             return newData;
@@ -209,6 +210,18 @@ namespace GVR.Caches
 
             var newData = await Task.Run(() => PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mrm"));
             mrmCache[preparedKey] = newData;
+
+            return newData;
+        }
+
+        public PxMorphMeshData TryGetMmb(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (mmbCache.TryGetValue(preparedKey, out PxMorphMeshData data))
+                return data;
+
+            var newData = PxMorphMesh.LoadMorphMeshFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mmb");
+            mmbCache[preparedKey] = newData;
 
             return newData;
         }

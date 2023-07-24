@@ -132,12 +132,14 @@ namespace GVR.Manager
             }
             if (scene == generalScene)
             {
+                AudioSourceManager.I.SetAudioListener(Camera.main?.GetComponent<AudioListener>());
+
                 SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
 
                 WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
 
                 var playerParent = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
-                playerParent.transform.Find("VRPlayer_v4 (romey)").transform.position = startPoint.transform.position;
+                playerParent.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
             }
             if (scene.name == "Loading")
             {
@@ -175,6 +177,12 @@ namespace GVR.Manager
                     }
                 }
             }
+        }
+
+        public void MoveToWorldScene(GameObject go)
+        {
+            GameData.I.WorldScene!.Value.GetRootGameObjects().Append(go);
+            SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.I.WorldScene.Value.name));
         }
     }
 }

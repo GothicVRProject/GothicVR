@@ -32,7 +32,7 @@ namespace GVR.Debugging
         public bool EnableDecals;
         
         [Header("__________NPCs__________")]
-        public bool EnableNpc;
+        public bool CreateOcNpcs;
         public bool EnableNpcRoutines;
         public bool CreateExampleAnimation;
 

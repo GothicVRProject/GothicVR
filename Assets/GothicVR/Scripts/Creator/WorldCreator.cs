@@ -8,6 +8,8 @@ using UnityEngine.XR.Interaction.Toolkit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Creator.Meshes;
+using GVR.Debugging;
 using System.Threading.Tasks;
 using PxCs.Data.WayNet;
 using PxCs.Interface;
@@ -32,12 +34,17 @@ namespace GVR.Creator
 
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
 
-            worldMesh = await MeshCreator.I.Create(world, worldGo);
+            worldMesh = MeshCreator.I.Create(world, worldGo);
             await VobCreator.I.Create(worldGo, world);
             WaynetCreator.I.Create(worldGo, world);
 
-            DebugAnimationCreator.I.Create();
+            DebugAnimationCreator.I.Create(worldName);
+            DebugAnimationCreatorBSFire.I.Create(worldName);
+            DebugAnimationCreatorVelaya.I.Create(worldName);
 
+            if (FeatureFlags.I.CreateOcNpcs)
+                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
+            
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
 
             return worldGo;
@@ -189,7 +196,7 @@ namespace GVR.Creator
             sampleScene.GetRootGameObjects().Append(worldGo);
 
             // load only the world mesh
-            await MeshCreator.I.Create(world, worldGo);
+            MeshCreator.I.Create(world, worldGo);
 
             // move the world to the correct scene
             EditorSceneManager.MoveGameObjectToScene(worldGo, worldScene);

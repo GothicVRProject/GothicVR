@@ -37,7 +37,7 @@ namespace GVR.Bootstrap
 
             var watch = Stopwatch.StartNew();
 
-            var g1Dir = SettingsManager.Instance.GameSettings.GothicIPath;
+            var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
 
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "Data"));
 
@@ -52,7 +52,7 @@ namespace GVR.Bootstrap
             watch.Stop();
             Debug.Log($"Time spent for Bootstrapping Phoenix: {watch.Elapsed}");
 
-            GvrSceneManager.Instance.LoadStartupScenes();
+            GvrSceneManager.I.LoadStartupScenes();
         }
 
 
@@ -86,28 +86,28 @@ namespace GVR.Bootstrap
 
             VmGothicBridge.RegisterExternals(vmPtr);
 
-            GameData.Instance.VmGothicPtr = vmPtr;
+            GameData.I.VmGothicPtr = vmPtr;
         }
 
         private void LoadSfxVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
             var vmPtr = VmGothicBridge.LoadVm(fullPath);
-            GameData.Instance.VmSfxPtr = vmPtr;
+            GameData.I.VmSfxPtr = vmPtr;
         }
 
         private void LoadMusicVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
             var vmPtr = VmGothicBridge.LoadVm(fullPath);
-            GameData.Instance.VmMusicPtr = vmPtr;
+            GameData.I.VmMusicPtr = vmPtr;
         }
 
         private void LoadMusic()
         {
-            if (!SingletonBehaviour<FeatureFlags>.GetOrCreate().EnableMusic)
+            if (!FeatureFlags.I.EnableMusic)
                 return;
-            var music = SingletonBehaviour<MusicCreator>.GetOrCreate();
+            var music = MusicCreator.I;
             music.Create();
             music.setEnabled(true);
             music.setMusic("SYS_LOADING");
@@ -120,8 +120,8 @@ namespace GVR.Bootstrap
         /// </summary>
         private void LoadFonts()
         {
-            var menuFontPath = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicMenuFontPath;
-            var subtitleFontPath = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.GothicSubtitleFontPath;
+            var menuFontPath = SettingsManager.I.GameSettings.GothicMenuFontPath;
+            var subtitleFontPath = SettingsManager.I.GameSettings.GothicSubtitleFontPath;
 
             // FIXME: These values are debug values. They need to be adjusted for optimized results.
             int faceIndex = 0;
@@ -132,10 +132,12 @@ namespace GVR.Bootstrap
             int atlasHeight = 100;
 
             if (File.Exists(menuFontPath))
-                GameData.Instance.GothicMenuFont = TMP_FontAsset.CreateFontAsset(menuFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
+                GameData.I.GothicMenuFont = TMP_FontAsset.CreateFontAsset(menuFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
 
             if (File.Exists(subtitleFontPath))
                 GameData.I.GothicSubtitleFont = TMP_FontAsset.CreateFontAsset(subtitleFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
+
+            FontManager.I.Create();
         }
     }
 }

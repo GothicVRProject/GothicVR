@@ -149,7 +149,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483594, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_Name
-      value: VRPlayer_v4 (romey)
+      value: VRPlayer
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_RootOrder

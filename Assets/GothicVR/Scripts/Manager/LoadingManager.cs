@@ -1,3 +1,4 @@
+using GVR.Phoenix.Util;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -47,7 +48,8 @@ namespace GVR.Manager
 
         public void SetBarFromScene(Scene scene)
         {
-            this.bar = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").transform.Find("LoadingCanvas/LoadingImage/ProgressBackground/ProgressBar").gameObject;
+            var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
+            this.bar = sphere.FindChildRecursively("ProgressBar");
         }
 
         private float CalculateOverallProgress()

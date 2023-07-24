@@ -1,8 +1,7 @@
-﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using GVR.Caches;
-using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -13,41 +12,22 @@ using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
-using System.Threading.Tasks;
 
-namespace GVR.Creator
+namespace GVR.Creator.Meshes
 {
-    public class MeshCreator : SingletonBehaviour<MeshCreator>
+    public abstract class AbstractMeshCreator<T> : SingletonBehaviour<T> where T : AbstractMeshCreator<T>
     {
-        private AssetCache assetCache;
-
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
-        private const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
-        private const float decalOpacity = 0.75f;
+        protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        protected const float decalOpacity = 0.75f;
 
-
-        private void Start()
-        {
-            assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
-        }
-
-        /// <summary>
-        /// Inject singletons if we use this class from EditorMode.
-        /// </summary>
-        public void EditorInject(AssetCache assetCache)
-        {
-            this.assetCache = assetCache;
-        }
-
-        public async Task<GameObject> Create(WorldData world, GameObject parent)
+        
+        public GameObject Create(WorldData world, GameObject parent)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.isStatic = true;
             meshObj.SetParent(parent);
-
-            // Track the progress of each sub-mesh creation separately
-            int numSubMeshes = world.subMeshes.Values.Count;
 
             foreach (var subMesh in world.subMeshes.Values)
             {
@@ -57,90 +37,102 @@ namespace GVR.Creator
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
-                await PrepareMeshRenderer(meshRenderer, subMesh);
-
+                PrepareMeshRenderer(meshRenderer, subMesh);
                 PrepareMeshFilter(meshFilter, subMesh);
                 PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
 
                 subMeshObj.SetParent(meshObj);
-
-                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
             }
-            // Return the meshObj
+
             return meshObj;
         }
 
-
-        public async Task<GameObject> Create(string objectName, PxModelData mdl, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null, GameObject rootGo = null)
+        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
-            return await Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
+            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
         }
 
-        public async Task<GameObject> Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, PxMatrix3x3Data rotation, GameObject parent = null, GameObject rootGo = null)
+        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
-            rootGo ??= new GameObject();
-            rootGo.name = objectName;
+            var rootGo = new GameObject(objectName);
             rootGo.SetParent(parent);
+
+            var nodeObjects = new GameObject[mdh.nodes!.Length];
+
+            // Create empty GameObjects from hierarchy
+            {
+                for (var i = 0; i < mdh.nodes.Length; i++)
+                {
+                    nodeObjects[i] = new GameObject(mdh.nodes[i].name);
+                }
+
+                // Now set parents
+                for (var i = 0; i < mdh.nodes.Length; i++)
+                {
+                    var node = mdh.nodes[i];
+                    var nodeObj = nodeObjects[i];
+
+                    SetPosAndRot(nodeObj, node.transform);
+
+                    if (node.parentIndex == -1)
+                        nodeObj.SetParent(rootGo);
+                    else
+                        nodeObj.SetParent(nodeObjects[node.parentIndex]);
+                }
+                
+                for (var i=0; i<nodeObjects.Length; i++)
+                {
+                    if (mdh.nodes[i].parentIndex == -1)
+                        nodeObjects[i].transform.localPosition = mdh.rootTranslation.ToUnityVector();
+                    else
+                        SetPosAndRot(nodeObjects[i], mdh.nodes[i].transform);
+                }
+            }
+            
+            //// Fill GameObjects with Meshes from "original" Mesh
+            foreach (var softSkinMesh in mdm.meshes!)
+            {
+                var mesh = softSkinMesh.mesh;
+
+                var meshObj = new GameObject("JaX_ZM_0");
+                meshObj.SetParent(rootGo);
+
+                var meshFilter = meshObj.AddComponent<MeshFilter>();
+                var meshRenderer = meshObj.AddComponent<SkinnedMeshRenderer>();
+
+                // FIXME - hard coded as it's the right value for BSFire. Need to be more dynamic by using element which has parent=-1.
+                meshRenderer.rootBone = nodeObjects[0].transform;
+                
+                PrepareMeshRenderer(meshRenderer, mesh);
+                PrepareMeshFilter(meshFilter, softSkinMesh);
+
+                meshRenderer.sharedMesh = meshFilter.mesh;
+
+                CreateBonesData(rootGo, nodeObjects, meshRenderer, softSkinMesh);
+            }
+
+            // Fill GameObjects with Meshes from attachments
+            foreach (var subMesh in mdm.attachments!)
+            {
+                var meshObj = nodeObjects.First(bone => bone.name == subMesh.Key);
+                var meshFilter = meshObj.AddComponent<MeshFilter>();
+                var meshRenderer = meshObj.AddComponent<MeshRenderer>();
+
+                PrepareMeshRenderer(meshRenderer, subMesh.Value);
+                PrepareMeshFilter(meshFilter, subMesh.Value);
+            }
+
             SetPosAndRot(rootGo, position, rotation);
 
-            // There are MDMs where there is no mesh, but meshes are in the attachment fields.
-            if (mdm.meshes.Length == 0)
-            {
-                if (mdm.attachments.Values.Count == 0)
-                {
-                    Debug.LogWarning($"Object >{objectName}< has neither mdm.meshes nor mdm.attachments. Create mesh aborted.");
-                    return null;
-                }
-
-                foreach (var subMesh in mdm.attachments)
-                {
-                    var subMeshName = subMesh.Key;
-                    var subMeshObj = new GameObject(subMeshName);
-                    subMeshObj.SetParent(rootGo);
-
-                    var matrix = mdh.nodes.First(i => i.name == subMeshName).transform;
-
-                    SetPosAndRot(subMeshObj, matrix);
-
-                    var meshFilter = subMeshObj.AddComponent<MeshFilter>();
-                    var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
-
-                    await PrepareMeshRenderer(meshRenderer, subMesh.Value);
-                    PrepareMeshFilter(meshFilter, subMesh.Value);
-                    PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.Value.materials);
-                }
-            }
-            else
-            {
-                foreach (var mesh in mdm.meshes)
-                {
-                    var subMeshObj = new GameObject(mesh.mesh.materials.First().name);
-                    subMeshObj.SetParent(rootGo, true, false);
-
-                    var meshFilter = subMeshObj.AddComponent<MeshFilter>();
-                    // Changed SkinnedMeshRenderer to MeshRenderer for now bones seems to crash the game on PICO/Quest2
-                    // var meshRenderer = subMeshObj.AddComponent<SkinnedMeshRenderer>();
-                    var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
-
-                    await PrepareMeshRenderer(meshRenderer, mesh.mesh);
-                    PrepareMeshFilter(meshFilter, mesh);
-
-                    //this is needed only for skinnedmeshrenderer
-                    // meshRenderer.sharedMesh = meshFilter.mesh; // FIXME - We could get rid of meshFilter as the same mesh is needed on SkinnedMeshRenderer. Need to test...
-                    PrepareMeshCollider(subMeshObj, meshFilter.mesh, mesh.mesh.materials);
-
-                    // bones commented since we don't use for now skinnedmeshrenderer
-                    // CreateBonesData(subMeshObj, meshRenderer, mdh);
-
-                    // FIXME - needed?
-                    //meshRenderer.rootBone = meshRootObject.transform;
-                }
-            }
-
+            // We need to set the root translation after we add children above. Otherwise the "additive" position/rotation will be broken.
+            // We need to reset the rootBones position to zero. Otherwise Vobs won't be placed right.
+            // Due to Unity's parent-child transformation magic, we need to do it at the end. ╰(*°▽°*)╯
+            nodeObjects[0].transform.localPosition = Vector3.zero;
+            
             return rootGo;
         }
 
-        public async Task<GameObject> Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             if (mrm == null)
             {
@@ -156,7 +148,7 @@ namespace GVR.Creator
             var meshFilter = rootGo.AddComponent<MeshFilter>();
             var meshRenderer = rootGo.AddComponent<MeshRenderer>();
 
-            await PrepareMeshRenderer(meshRenderer, mrm);
+            PrepareMeshRenderer(meshRenderer, mrm);
             PrepareMeshFilter(meshFilter, mrm);
 
             if (withCollider)
@@ -165,62 +157,28 @@ namespace GVR.Creator
             return rootGo;
         }
 
-        public async Task<GameObject> CreateDecal(PxVobData vob, GameObject parent)
+        protected void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
         {
-            if (!vob.vobDecal.HasValue)
-            {
-                Debug.LogWarning("No decalData was set for: " + vob.visualName);
-                return null;
-            }
-
-            var decalData = vob.vobDecal.Value;
-
-            var decalProjectorGo = new GameObject(decalData.name);
-            var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
-            var texture = await assetCache.TryGetTextureAsync(vob.visualName);
-
-            // x/y needs to be made twice the size and transformed from cm in m.
-            // z - value is close to what we see in Gothic spacer.
-            decalProj.size = new(decalData.dimension.X * 2 / 100, decalData.dimension.Y * 2 / 100, 0.5f);
-            decalProjectorGo.SetParent(parent);
-            SetPosAndRot(decalProjectorGo, vob.position.ToUnityVector(), vob.rotation!.Value);
-
-            decalProj.pivot = Vector3.zero;
-            decalProj.fadeFactor = decalOpacity;
-
-            // FIXME use Prefab!
-            // https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@12.0/manual/creating-a-decal-projector-at-runtime.html
-            var standardShader = Shader.Find("Shader Graphs/Decal");
-            var material = new Material(standardShader);
-            material.SetTexture(Shader.PropertyToID("Base_Map"), texture);
-
-            decalProj.material = material;
-
-            return decalProjectorGo;
+            SetPosAndRot(obj, matrix.ToUnityMatrix());
         }
 
-        private void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
+        protected void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
         {
-            var unityMatrix = matrix.ToUnityMatrix();
-            SetPosAndRot(obj, unityMatrix.GetPosition() / 100, unityMatrix.rotation);
+            SetPosAndRot(obj, matrix.GetPosition() / 100, matrix.rotation);
         }
 
-        private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
+        protected void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
         {
             SetPosAndRot(obj, position, rotation.ToUnityMatrix().rotation);
         }
 
-        private void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
+        protected void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
-            // FIXME - This isn't working
-            if (position.Equals(default) && rotation.Equals(default))
-                return;
-
             obj.transform.localRotation = rotation;
             obj.transform.localPosition = position;
         }
 
-        private async Task PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
+        protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
             var material = GetEmptyMaterial();
             var bMaterial = subMesh.material;
@@ -234,7 +192,7 @@ namespace GVR.Creator
                 return;
             }
 
-            var texture = await assetCache.TryGetTextureAsync(bMaterial.texture);
+            var texture = GetTexture(bMaterial.texture);
 
             if (null == texture)
             {
@@ -247,7 +205,7 @@ namespace GVR.Creator
             material.mainTexture = texture;
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
         {
             var mesh = new Mesh();
             meshFilter.mesh = mesh;
@@ -257,7 +215,7 @@ namespace GVR.Creator
             mesh.SetUVs(0, subMesh.uvs);
         }
 
-        private async Task PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
+        protected void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
             // check if mrmData.subMeshes is null
 
@@ -283,7 +241,7 @@ namespace GVR.Creator
                     return;
                 }
 
-                var texture = await assetCache.TryGetTextureAsync(materialData.texture);
+                var texture = GetTexture(materialData.texture);
 
                 if (null == texture)
                     if (materialData.texture.EndsWith(".TGA"))
@@ -301,7 +259,7 @@ namespace GVR.Creator
             rend.SetMaterials(finalMaterials);
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
         {
             /**
              * Ok, brace yourself:
@@ -385,7 +343,7 @@ namespace GVR.Creator
         }
 
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
         {
             /**
              * Ok, brace yourself:
@@ -408,13 +366,11 @@ namespace GVR.Creator
             var mesh = new Mesh();
             var pxMesh = soft.mesh;
             var weights = soft.weights;
-
-            var DebugWeightIndices = weights.SelectMany(i => i).Select(i => i.nodeIndex).GroupBy(i => i).ToArray();
-
+            
             meshFilter.mesh = mesh;
-            mesh.subMeshCount = soft.mesh.subMeshes.Length;
+            mesh.subMeshCount = soft!.mesh!.subMeshes!.Length;
 
-            var verticesAndUvSize = pxMesh.subMeshes.Sum(i => i.triangles.Length) * 3;
+            var verticesAndUvSize = pxMesh!.subMeshes!.Sum(i => i.triangles!.Length) * 3;
             var preparedVertices = new List<Vector3>(verticesAndUvSize);
             var preparedUVs = new List<Vector2>(verticesAndUvSize);
             var preparedBoneWeights = new List<BoneWeight>(verticesAndUvSize);
@@ -432,17 +388,17 @@ namespace GVR.Creator
                 // Therefore new submesh triangles start referencing their vertices with an offset from previous runs.
                 var verticesIndexOffset = preparedVertices.Count;
 
-                var subMeshTriangles = new List<int>(triangles.Length * 3);
+                var subMeshTriangles = new List<int>(triangles!.Length * 3);
                 for (var i = 0; i < triangles.Length; i++)
                 {
                     // One triangle is made of 3 elements for Unity. We therefore need to prepare 3 elements within one loop.
                     var preparedIndex = i * 3 + verticesIndexOffset;
 
-                    var index1 = wedges[triangles[i].c];
+                    var index1 = wedges![triangles[i].c];
                     var index2 = wedges[triangles[i].b];
                     var index3 = wedges[triangles[i].a];
 
-                    preparedVertices.Add(vertices[index1.index].ToUnityVector());
+                    preparedVertices.Add(vertices![index1.index].ToUnityVector());
                     preparedVertices.Add(vertices[index2.index].ToUnityVector());
                     preparedVertices.Add(vertices[index3.index].ToUnityVector());
 
@@ -453,12 +409,10 @@ namespace GVR.Creator
                     preparedUVs.Add(index1.texture.ToUnityVector());
                     preparedUVs.Add(index2.texture.ToUnityVector());
                     preparedUVs.Add(index3.texture.ToUnityVector());
-
-                    // remove bones to avoid crash on Quest and Pico
-
-                    // preparedBoneWeights.Add(weights[index1.index].ToBoneWeight());
-                    // preparedBoneWeights.Add(weights[index2.index].ToBoneWeight());
-                    // preparedBoneWeights.Add(weights[index3.index].ToBoneWeight());
+                    
+                    preparedBoneWeights.Add(weights[index1.index].ToBoneWeight(soft.nodes));
+                    preparedBoneWeights.Add(weights[index2.index].ToBoneWeight(soft.nodes));
+                    preparedBoneWeights.Add(weights[index3.index].ToBoneWeight(soft.nodes));
                 }
                 preparedTriangles.Add(subMeshTriangles);
             }
@@ -470,8 +424,7 @@ namespace GVR.Creator
             mesh.SetVertices(preparedVertices);
             mesh.SetUVs(0, preparedUVs);
 
-            // same here for the bones
-            // mesh.boneWeights = preparedBoneWeights.ToArray();
+            mesh.boneWeights = preparedBoneWeights.ToArray();
             for (var i = 0; i < pxMesh.subMeshes.Length; i++)
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
@@ -519,43 +472,35 @@ namespace GVR.Creator
                 PrepareMeshCollider(obj, mesh);
             }
         }
-
-
-        private static void CreateBonesData(GameObject root, SkinnedMeshRenderer renderer, PxModelHierarchyData mdh)
+        
+        /// <summary>
+        /// We basically only set the values from official Unity documentation. No added sugar for the bingPoses.
+        /// @see https://docs.unity3d.com/ScriptReference/Mesh-bindposes.html
+        /// @see https://forum.unity.com/threads/some-explanations-on-bindposes.86185/
+        /// </summary>
+        private static void CreateBonesData(GameObject rootObj, GameObject[] nodeObjects, SkinnedMeshRenderer renderer, PxSoftSkinMeshData mesh)
         {
-            Transform[] bones = new Transform[mdh.nodes.Length];
-            Matrix4x4[] bindPoses = new Matrix4x4[mdh.nodes.Length];
+            var meshBones = new Transform[mesh.nodes!.Length];
+            var bindPoses = new Matrix4x4[mesh.nodes!.Length];
 
-            for (var i = 0; i < mdh.nodes.Length; i++)
+            for (var i = 0; i < mesh.nodes.Length; i++)
             {
-                var node = mdh.nodes[i];
-                // HINT: We currently don't use the nodeMatrix. So is it really needed?
-                var nodeMatrix = node.transform.ToUnityMatrix();
-                var go = new GameObject(node.name);
-                go.SetParent(root);
+                var nodeIndex = mesh.nodes[i];
 
-                // FIXME - used?
-                //go.transform.rotation = nodeMatrix.rotation;
-                //go.transform.localPosition = nodeMatrix.GetPosition(); // FIXME - needed? -> Unity positions are too big by factor 100.
-
-                go.transform.localRotation = Quaternion.identity;
-                go.transform.localPosition = Vector3.zero;
-
-                //Debug.Log("rotation " + nodeMatrix.rotation);
-                //Debug.Log("position " + nodeMatrix.GetPosition());
-
-                bones[i] = go.transform;
-
-                // FIXME - is this right or the other one?
-                //bindPoses[i] = go.transform.worldToLocalMatrix;//.worldToLocalMatrix * go.transform.localToWorldMatrix;
-                bindPoses[i] = bones[i].worldToLocalMatrix * root.transform.localToWorldMatrix;
+                meshBones[i] = nodeObjects[nodeIndex].transform;
+                bindPoses[i] = meshBones[i].worldToLocalMatrix * rootObj.transform.localToWorldMatrix;
             }
 
             renderer.sharedMesh.bindposes = bindPoses;
-            renderer.bones = bones;
+            renderer.bones = meshBones;
         }
 
-        private Material GetEmptyMaterial()
+        protected virtual Texture2D GetTexture(string name)
+        {
+            return AssetCache.I.TryGetTexture(name);
+        }
+
+        protected Material GetEmptyMaterial()
         {
             var standardShader = Shader.Find(defaultShader);
             var material = new Material(standardShader);

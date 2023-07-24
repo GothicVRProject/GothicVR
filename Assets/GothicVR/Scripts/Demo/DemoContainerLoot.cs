@@ -5,6 +5,7 @@ using GVR.Util;
 using PxCs.Interface;
 using System;
 using System.Collections.Generic;
+using GVR.Creator.Meshes;
 using GVR.Phoenix.Util;
 using UnityEngine;
 
@@ -22,14 +23,11 @@ namespace GVR.Demo
         }
         public List<Content> content = new();
 
-
-		private MeshCreator meshCreator;
 		private AssetCache assetCache;
 
 		private void Start()
 		{
-			meshCreator = SingletonBehaviour<MeshCreator>.GetOrCreate();
-			assetCache = SingletonBehaviour<AssetCache>.GetOrCreate();
+			assetCache = AssetCache.I;
 		}
 
 		private void Update()
@@ -77,7 +75,7 @@ namespace GVR.Demo
 				var pxItem = assetCache.TryGetItemData(item.name);
 
 				var mrm = assetCache.TryGetMrm(pxItem?.visual);
-				var itemObj = meshCreator.Create(item.name, mrm, default, default, true, itemsObj);
+				var itemObj = MeshCreator.I.Create(item.name, mrm, default, default, true, itemsObj);
 			}
 		}
 	}
