@@ -303,12 +303,12 @@ namespace GVR.Creator
         private async Task<GameObject> CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
             var mrm = assetCache.TryGetMrm(item.visual);
-            return VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
+            return await VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
         }
 
-        private async void CreateDecal(PxVobData vob)
+        private void CreateDecal(PxVobData vob)
         {
-            if(!FeatureFlags.I.EnableDecals)
+            if (!FeatureFlags.I.EnableDecals)
             {
                 return;
             }
@@ -329,20 +329,20 @@ namespace GVR.Creator
                 return null;
 
             // MDL
-            var mdl = await assetCache.TryGetMdlAsync(meshName);
+            var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                return VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value.ToUnityMatrix().rotation, parent);
+                return await VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value.ToUnityMatrix().rotation, parent);
             }
 
             // MRM
-            var mrm = await assetCache.TryGetMrmAsync(meshName);
+            var mrm = assetCache.TryGetMrm(meshName);
             if (mrm != null)
             {
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.cdDynamic;
 
-                return VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
+                return await VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
             }
 
             Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");

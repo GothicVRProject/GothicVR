@@ -13,23 +13,23 @@ namespace GVR.Creator.Meshes
     {
         private int tmpBodyTexNr;
         private int tmpBodyTexColor;
-        
+
         private VmGothicBridge.Mdl_SetVisualBodyData tempBodyData;
 
-        public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
+        public async Task<GameObject> CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
             PxMorphMeshData morphMesh, VmGothicBridge.Mdl_SetVisualBodyData bodyData, GameObject parent)
         {
             tmpBodyTexNr = bodyData.bodyTexNr;
             tmpBodyTexColor = bodyData.bodyTexColor;
-            
-            var npcGo = Create(npcName, mdm, mdh, default, default, parent);
+
+            var npcGo = await Create(npcName, mdm, mdh, default, default, parent);
 
             AddHead(npcName, npcGo, morphMesh);
-            
+
             return npcGo;
         }
 
-        private void AddHead(string npcName, GameObject npcGo, PxMorphMeshData morphMesh)
+        private async void AddHead(string npcName, GameObject npcGo, PxMorphMeshData morphMesh)
         {
             var headGo = npcGo.FindChildRecursively("BIP01 HEAD");
 
@@ -42,7 +42,7 @@ namespace GVR.Creator.Meshes
             var headMeshFilter = headGo.AddComponent<MeshFilter>();
             var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(headMeshRenderer, morphMesh.mesh);
+            await PrepareMeshRenderer(headMeshRenderer, morphMesh.mesh);
             PrepareMeshFilter(headMeshFilter, morphMesh.mesh);
         }
 
@@ -54,7 +54,7 @@ namespace GVR.Creator.Meshes
             // FIXME: Dirty hack. Needs to be optimized.
             if (name.ToUpper().Contains("MOUTH") || name.ToUpper().Contains("TEETH"))
                 return base.GetTexture(name);
-            
+
             if (!name.ToUpper().EndsWith("V0_C0.TGA"))
             {
                 Debug.LogError($"The format of body texture isn't right for ${name}");

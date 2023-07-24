@@ -31,7 +31,7 @@ namespace GVR.Creator
             assetCache = AssetCache.I;
         }
 
-        public void Create(string worldName)
+        public async void Create(string worldName)
         {
             if (!FeatureFlags.I.CreateExampleAnimation)
                 return;
@@ -50,7 +50,7 @@ namespace GVR.Creator
 
 
             var obj1 = CreateBSFireObj(name, mdl);
-            var obj2 = MeshCreator.I.Create(name + "2", mdl, new(-26f, 10f, 0), Quaternion.identity);
+            var obj2 = await MeshCreator.I.Create(name + "2", mdl, new(-26f, 10f, 0), Quaternion.identity);
 
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj1);
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj2);

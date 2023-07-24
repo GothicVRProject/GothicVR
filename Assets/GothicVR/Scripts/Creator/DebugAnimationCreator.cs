@@ -31,7 +31,7 @@ namespace GVR.Creator
             assetCache = AssetCache.I;
         }
 
-        public async void Create(string worldName)
+        public void Create(string worldName)
         {
             if (!FeatureFlags.I.CreateExampleAnimation)
                 return;
@@ -433,7 +433,7 @@ namespace GVR.Creator
         }
         #endregion
 
-        private void CreateBloodfly()
+        private async void CreateBloodfly()
         {
             ///
             /// File names to change
@@ -455,7 +455,7 @@ namespace GVR.Creator
             var mdh = PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, mdhName);
             var mdm = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, mdmName);
             var mrm = PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, mrmName);
-            var obj = MeshCreator.I.Create(name, mdm, mdh, default, default, debugObj);
+            var obj = await MeshCreator.I.Create(name, mdm, mdh, default, default, debugObj);
 
 
 

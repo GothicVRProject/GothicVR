@@ -54,12 +54,12 @@ namespace GVR.Creator.Meshes
             return meshObj;
         }
 
-        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
+        public async Task<GameObject> Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
-            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
+            return await Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
         }
 
-        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null)
+        public async Task<GameObject> Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
             var rootGo = new GameObject(objectName);
             rootGo.SetParent(parent);
@@ -110,7 +110,7 @@ namespace GVR.Creator.Meshes
                 // FIXME - hard coded as it's the right value for BSFire. Need to be more dynamic by using element which has parent=-1.
                 meshRenderer.rootBone = nodeObjects[0].transform;
 
-                PrepareMeshRenderer(meshRenderer, mesh);
+                await PrepareMeshRenderer(meshRenderer, mesh);
                 PrepareMeshFilter(meshFilter, softSkinMesh);
 
                 meshRenderer.sharedMesh = meshFilter.mesh;
@@ -125,7 +125,7 @@ namespace GVR.Creator.Meshes
                 var meshFilter = meshObj.AddComponent<MeshFilter>();
                 var meshRenderer = meshObj.AddComponent<MeshRenderer>();
 
-                PrepareMeshRenderer(meshRenderer, subMesh.Value);
+                await PrepareMeshRenderer(meshRenderer, subMesh.Value);
                 PrepareMeshFilter(meshFilter, subMesh.Value);
             }
 
@@ -139,7 +139,7 @@ namespace GVR.Creator.Meshes
             return rootGo;
         }
 
-        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+        public async Task<GameObject> Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             if (mrm == null)
             {
@@ -155,7 +155,7 @@ namespace GVR.Creator.Meshes
             var meshFilter = rootGo.AddComponent<MeshFilter>();
             var meshRenderer = rootGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(meshRenderer, mrm);
+            await PrepareMeshRenderer(meshRenderer, mrm);
             PrepareMeshFilter(meshFilter, mrm);
 
             if (withCollider)
@@ -222,7 +222,7 @@ namespace GVR.Creator.Meshes
             mesh.SetUVs(0, subMesh.uvs);
         }
 
-        protected async void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
+        protected async Task PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
             // check if mrmData.subMeshes is null
 
@@ -249,14 +249,11 @@ namespace GVR.Creator.Meshes
                 }
 
                 var texture = await GetTexture(materialData.texture);
-
                 if (null == texture)
                     if (materialData.texture.EndsWith(".TGA"))
                         Debug.LogError("This is supposed to be a decal: " + materialData.texture);
                     else
                         Debug.LogError("Couldn't get texture from name: " + materialData.texture);
-
-
 
                 material.mainTexture = texture;
 
