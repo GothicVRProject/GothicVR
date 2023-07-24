@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
+using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Demo;
 using GVR.Phoenix.Interface;

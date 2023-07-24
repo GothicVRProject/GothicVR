@@ -6,6 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
