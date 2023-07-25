@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 using GVR.Caches;
+using GVR.Phoenix.Util;
 using GVR.Util;
-using GVR.Phoenix.Interface;
-using TMPro;
+
 public class TextureManager : SingletonBehaviour<TextureManager>
 {
     public Material backgroundmaterial;
@@ -23,11 +22,18 @@ public class TextureManager : SingletonBehaviour<TextureManager>
 
     private void Start()
     {
-        GothicLoadingMenuMaterial = GetEmptyMaterial();
-        LoadingBarBackgroundMaterial = GetEmptyMaterial();
-        LoadingBarMaterial = GetEmptyMaterial();
+        GothicLoadingMenuMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        LoadingBarBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        LoadingBarMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
 
-        LoadingSphereMaterial = GetEmptyMaterial();
+        // backgroundmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        // buttonmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+        // slidermaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+        // sliderpositionmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+        // arrowmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+        // fillermaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+
+        LoadingSphereMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
         LoadingSphereMaterial.color = new Color(.25f, .25f, .25f, 1f); // dark gray
     }
 
@@ -66,13 +72,20 @@ public class TextureManager : SingletonBehaviour<TextureManager>
         material.mainTexture = AssetCache.I.TryGetTexture(texture);
     }
 
-    private Material GetEmptyMaterial()
+    private Material GetEmptyMaterial(MaterialExtension.BlendMode blendMode = MaterialExtension.BlendMode.Opaque)
     {
         var standardShader = Shader.Find(defaultShader);
         var material = new Material(standardShader);
 
-        material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
-
+        switch (blendMode)
+        {
+            case MaterialExtension.BlendMode.Opaque:
+                material.ToOpaqueMode();
+                break;
+            case MaterialExtension.BlendMode.Transparent:
+                material.ToTransparentMode();
+                break;
+        }
         // Enable clipping of alpha values.
         material.EnableKeyword("_ALPHATEST_ON");
 
