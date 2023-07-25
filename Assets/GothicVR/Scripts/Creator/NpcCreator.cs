@@ -147,7 +147,7 @@ namespace GVR.Creator
             var mdm = assetCache.TryGetMdm(data.body);
             var mmb = assetCache.TryGetMmb(data.head);
 
-            NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
+            await NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
         }
     }
 }
