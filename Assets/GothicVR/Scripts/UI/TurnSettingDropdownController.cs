@@ -8,6 +8,7 @@ public class TurnSettingDropdownController : MonoBehaviour
     public GameObject locomotionsystem;
     public ActionBasedSnapTurnProvider snapTurn;
     public ActionBasedContinuousTurnProvider continuousTurn;
+    private const string turnSettingPlayerPref = "TurnSetting";
 
     void Awake()
     {
@@ -27,7 +28,7 @@ public class TurnSettingDropdownController : MonoBehaviour
         snapTurn = locomotionsystem.GetComponent<ActionBasedSnapTurnProvider>();
         continuousTurn = locomotionsystem.GetComponent<ActionBasedContinuousTurnProvider>();
 
-        dropdown.value = PlayerPrefs.GetInt("TurnSetting");
+        dropdown.value = PlayerPrefs.GetInt(turnSettingPlayerPref);
         DropdownItemSelected(dropdown);
     }
 
