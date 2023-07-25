@@ -101,7 +101,7 @@ namespace GVR.Caches
             if (mdsCache.TryGetValue(preparedKey, out PxModelScriptData data))
                 return data;
 
-            var newData = PxModelScript.GetModelScriptFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mds");
+            var newData = PxModelScript.GetModelScriptFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mds");
             mdsCache[preparedKey] = newData;
 
             return newData;
@@ -113,7 +113,7 @@ namespace GVR.Caches
             if (mdhCache.TryGetValue(preparedKey, out PxModelHierarchyData data))
                 return data;
 
-            var newData = PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdh");
+            var newData = PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mdh");
             mdhCache[preparedKey] = newData;
 
             return newData;
@@ -125,7 +125,7 @@ namespace GVR.Caches
             if (mdlCache.TryGetValue(preparedKey, out PxModelData data))
                 return data;
 
-            var newData = PxModel.LoadModelFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdl");
+            var newData = PxModel.LoadModelFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mdl");
             mdlCache[preparedKey] = newData;
 
             return newData;
@@ -137,7 +137,7 @@ namespace GVR.Caches
             if (mdmCache.TryGetValue(preparedKey, out PxModelMeshData data))
                 return data;
 
-            var newData = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdm", attachmentKeys);
+            var newData = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mdm", attachmentKeys);
             mdmCache[preparedKey] = newData;
 
             return newData;
@@ -203,7 +203,7 @@ namespace GVR.Caches
             if (soundCache.TryGetValue(preparedKey, out PxSoundData<float> data))
                 return data;
 
-            var wavFile = PxSound.GetSoundArrayFromVDF<float>(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.wav");
+            var wavFile = PxSound.GetSoundArrayFromVDF<float>(GameData.I.VdfsPtr, $"{preparedKey}.wav");
             soundCache[preparedKey] = wavFile;
 
             return wavFile;
