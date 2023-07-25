@@ -26,6 +26,7 @@ public class TextureManager : SingletonBehaviour<TextureManager>
         LoadingBarBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
         LoadingBarMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
 
+        // TODO: remove the middleman materials and use these for settings menu
         // backgroundmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
         // buttonmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
         // slidermaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
