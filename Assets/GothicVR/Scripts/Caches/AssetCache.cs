@@ -24,6 +24,7 @@ namespace GVR.Caches
         private Dictionary<string, PxMorphMeshData> mmbCache = new();
 
         private Dictionary<string, PxVmItemData> itemDataCache = new();
+
         private Dictionary<string, PxVmSfxData> sfxDataCache = new();
 
         private Dictionary<string, PxSoundData<float>> soundCache = new();
@@ -136,20 +137,35 @@ namespace GVR.Caches
         }
 
         /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
+        /// Hint: Instances only need to be initialized once on phoenix.
+        /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
+        /// </summary>
+        public PxVmItemData TryGetItemData(uint instanceId)
+        {
+            var symbol = PxVm.GetSymbol(GameData.I.VmGothicPtr, instanceId);
+
+            if (symbol == null)
+                return null;
+
+            return TryGetItemData(symbol.name);
+        }
+        
+        /// <summary>
+        /// Hint: Instances only need to be initialized once on phoenix.
+        /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
         /// </summary>
         public PxVmItemData TryGetItemData(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (itemDataCache.TryGetValue(preparedKey, out PxVmItemData data))
-                return data;
+            if (itemDataCache.TryGetValue(preparedKey, out PxVmItemData item))
+                return item;
 
             var newData = PxVm.InitializeItem(GameData.I.VmGothicPtr, preparedKey);
             itemDataCache[preparedKey] = newData;
 
             return newData;
         }
-        
+
         /// <summary>
         /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
         /// </summary>
@@ -176,9 +192,7 @@ namespace GVR.Caches
 
             return wavFile;
         }
-
-
-
+        
         private string GetPreparedKey(string key)
         {
             var lowerKey = key.ToLower();
