@@ -9,10 +9,12 @@ using GVR.Util;
 using PxCs.Extensions;
 using PxCs.Interface;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Manager;
+using PxCs.Data.Mesh;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -147,18 +149,27 @@ namespace GVR.Creator
             var mdm = assetCache.TryGetMdm(data.body);
             var mmb = assetCache.TryGetMmb(data.head);
 
+
+            // FIXME - DEBUGging right now.
+            if (data.armor >= 0)
+            {
+                var armorData = assetCache.TryGetItemData((uint)data.armor);
+                var armorMrm = assetCache.TryGetMrm(armorData?.visual);
+
+                List<PxMultiResolutionMeshSubMeshData> subMeshes = new();
+                subMeshes.AddRange(mdm.meshes[0].mesh.subMeshes);
+                subMeshes.AddRange(armorMrm.subMeshes);
+                mdm.meshes[0].mesh.subMeshes = armorMrm.subMeshes;  //or this one subMeshes.ToArray();
+            }
+
             var npcGo = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
 
-            var armorData = assetCache.TryGetItemData((uint)data.armor);
+            
 
-            if (armorData == null)
-                return;
+            // if (!FeatureFlags.I.CreateNpcArmor)
+            //     return;
 
-            if (!FeatureFlags.I.CreateNpcArmor)
-                return;
-
-            var armorMrm = assetCache.TryGetMrm(armorData.visual);
-            MeshCreator.I.Create($"{name}-{armorData.visual}", armorMrm, default, default, false, npcGo);
+            // MeshCreator.I.Create($"{name}-{armorData.visual}", armorMrm, default, default, false, npcGo);
         }
     }
 }
