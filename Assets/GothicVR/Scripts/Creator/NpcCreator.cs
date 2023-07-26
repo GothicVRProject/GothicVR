@@ -154,17 +154,16 @@ namespace GVR.Creator
             if (data.armor >= 0)
             {
                 var armorData = assetCache.TryGetItemData((uint)data.armor);
-                var armorMrm = assetCache.TryGetMrm(armorData?.visual);
+                var armorMdm = assetCache.TryGetMdm(armorData?.visualChange);
+                
 
-                List<PxMultiResolutionMeshSubMeshData> subMeshes = new();
-                subMeshes.AddRange(mdm.meshes[0].mesh.subMeshes);
-                subMeshes.AddRange(armorMrm.subMeshes);
-                mdm.meshes[0].mesh.subMeshes = armorMrm.subMeshes;  //or this one subMeshes.ToArray();
+                var npcGo = NpcMeshCreator.I.CreateNpc(name, armorMdm, mdh, mmb, data, npc);
+            }
+            else
+            {
+                var npcGo = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
             }
 
-            var npcGo = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
-
-            
 
             // if (!FeatureFlags.I.CreateNpcArmor)
             //     return;
