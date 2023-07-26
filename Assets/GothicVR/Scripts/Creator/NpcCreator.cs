@@ -147,9 +147,18 @@ namespace GVR.Creator
             var mdm = assetCache.TryGetMdm(data.body);
             var mmb = assetCache.TryGetMmb(data.head);
 
+            var npcGo = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
+
             var armorData = assetCache.TryGetItemData((uint)data.armor);
-            
-            NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
+
+            if (armorData == null)
+                return;
+
+            if (!FeatureFlags.I.CreateNpcArmor)
+                return;
+
+            var armorMrm = assetCache.TryGetMrm(armorData.visual);
+            MeshCreator.I.Create($"{name}-{armorData.visual}", armorMrm, default, default, false, npcGo);
         }
     }
 }
