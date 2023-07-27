@@ -113,16 +113,16 @@ namespace GVR.Creator
             GameData.I.npcRoutines[data.npc].Add(routine);
         }
 
-        private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
+        private static async void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
         {
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
             var npc = lookupCache.npcCache[symbolIndex];
-            var mds = assetCache.TryGetMds(data.visual);
+            var mds = await assetCache.TryGetMdsAsync(data.visual);
 
             // This is something used from OpenGothic. But what is it doing actually? ;-)
             if (mds.skeleton.disableMesh)
             {
-                var mdh = assetCache.TryGetMdh(data.visual);
+                var mdh = await assetCache.TryGetMdhAsync(data.visual);
                 npc.GetComponent<Properties>().mdh = mdh;
             }
             else
@@ -144,8 +144,8 @@ namespace GVR.Creator
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
             var npc = lookupCache.npcCache[symbolIndex];
             var mdh = npc.GetComponent<Properties>().mdh;
-            var mdm = assetCache.TryGetMdm(data.body);
-            var mmb = assetCache.TryGetMmb(data.head);
+            var mdm = await assetCache.TryGetMdmAsync(data.body);
+            var mmb = await assetCache.TryGetMmbAsync(data.head);
 
             await NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
         }

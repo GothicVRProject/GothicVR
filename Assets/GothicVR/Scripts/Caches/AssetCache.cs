@@ -225,6 +225,17 @@ namespace GVR.Caches
 
             return newData;
         }
+        public async Task<PxMorphMeshData> TryGetMmbAsync(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (mmbCache.TryGetValue(preparedKey, out PxMorphMeshData data))
+                return data;
+
+            var newData = await Task.Run(() => PxMorphMesh.LoadMorphMeshFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mmb"));
+            mmbCache[preparedKey] = newData;
+
+            return newData;
+        }
 
         /// <summary>
         /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
@@ -240,18 +251,6 @@ namespace GVR.Caches
 
             return newData;
         }
-        public async Task<PxVmItemData> TryGetItemDataAsync(string key)
-        {
-            var preparedKey = GetPreparedKey(key);
-            if (itemDataCache.TryGetValue(preparedKey, out PxVmItemData data))
-                return data;
-
-            var newData = await Task.Run(() => PxVm.InitializeItem(GameData.I.VmGothicPtr, preparedKey));
-            itemDataCache[preparedKey] = newData;
-
-            return newData;
-        }
-
 
         /// <summary>
         /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
@@ -268,18 +267,6 @@ namespace GVR.Caches
             return newData;
         }
 
-        public async Task<PxVmSfxData> TryGetSfxDataAsync(string key)
-        {
-            var preparedKey = GetPreparedKey(key);
-            if (sfxDataCache.TryGetValue(preparedKey, out PxVmSfxData data))
-                return data;
-
-            var newData = await Task.Run(() => PxVm.InitializeSfx(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.sfx"));
-            sfxDataCache[preparedKey] = newData;
-
-            return newData;
-        }
-
         public PxSoundData<float> TryGetSound(string key)
         {
             var preparedKey = GetPreparedKey(key);
@@ -290,18 +277,6 @@ namespace GVR.Caches
             soundCache[preparedKey] = wavFile;
 
             return wavFile;
-        }
-
-        public async Task<PxSoundData<float>> TryGetSoundAsync(string key)
-        {
-            var preparedKey = GetPreparedKey(key);
-            if (soundCache.TryGetValue(preparedKey, out PxSoundData<float> data))
-                return data;
-
-            var newData = await Task.Run(() => PxSound.GetSoundArrayFromVDF<float>(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.sound"));
-            soundCache[preparedKey] = newData;
-
-            return newData;
         }
 
         private string GetPreparedKey(string key)

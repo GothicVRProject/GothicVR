@@ -329,14 +329,14 @@ namespace GVR.Creator
                 return null;
 
             // MDL
-            var mdl = assetCache.TryGetMdl(meshName);
+            var mdl = await assetCache.TryGetMdlAsync(meshName);
             if (mdl != null)
             {
                 return await VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value.ToUnityMatrix().rotation, parent);
             }
 
             // MRM
-            var mrm = assetCache.TryGetMrm(meshName);
+            var mrm = await assetCache.TryGetMrmAsync(meshName);
             if (mrm != null)
             {
                 // If the object is a dynamic one, it will collide.
