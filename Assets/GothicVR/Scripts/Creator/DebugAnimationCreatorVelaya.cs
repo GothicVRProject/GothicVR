@@ -49,10 +49,10 @@ namespace GVR.Creator
             var animationName = "S_DANCE1";
 
 
-            var mds = PxModelScript.GetModelScriptFromVdf(GameData.I.VdfsPtr, mdsName);
-            var mdh = PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, mdhName);
-            var mdm = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, mdmName);
-            var mmb = PxMorphMesh.LoadMorphMeshFromVdf(GameData.I.VdfsPtr, mmbName);
+            var mds = PxModelScript.GetModelScriptFromVfs(GameData.I.VfsPtr, mdsName);
+            var mdh = PxModelHierarchy.LoadFromVfs(GameData.I.VfsPtr, mdhName);
+            var mdm = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, mdmName);
+            var mmb = PxMorphMesh.LoadMorphMeshFromVfs(GameData.I.VfsPtr, mmbName);
 
 
             var obj = CreateVelayaObj(name, mdh, mdm, mmb);
@@ -420,7 +420,7 @@ namespace GVR.Creator
             for (int i = 0; i < animations.Length; i++)
             {
                 var animName = mdsName.Replace(".MDS", $"-{mds.animations[i].name}.MAN", StringComparison.OrdinalIgnoreCase);
-                animations[i] = PxAnimation.LoadFromVdf(GameData.I.VdfsPtr, animName);
+                animations[i] = PxAnimation.LoadFromVfs(GameData.I.VfsPtr, animName);
             }
             var animation = animations.First(i => i.name == animationName);
 

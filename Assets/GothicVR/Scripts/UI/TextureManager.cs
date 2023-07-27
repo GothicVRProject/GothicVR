@@ -26,7 +26,7 @@ public class TextureManager : MonoBehaviour
     void Update()
     {
         // FIXME - We should register to a "BootstrapDone" event rather than checking every frame.
-        if (!textureloaded && GameData.I.VdfsPtr != IntPtr.Zero)
+        if (!textureloaded && GameData.I.VfsPtr != IntPtr.Zero)
         {
             LoadCustomTextures();
         }
