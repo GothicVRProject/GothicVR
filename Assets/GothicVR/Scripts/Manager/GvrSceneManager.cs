@@ -39,7 +39,7 @@ namespace GVR.Manager
         {
             SceneManagerActionHandler();
 
-            await ShowLoadingSphere(worldName);
+            await ShowLoadingScene(worldName);
 
             newWorldName = worldName;
             startVobAfterLoading = startVob;
@@ -47,7 +47,7 @@ namespace GVR.Manager
             LoadNewWorldScene(newWorldName);
             await CreateWorld();
 
-            HideLoadingSphere();
+            HideLoadingScene();
         }
 
         private void LoadNewWorldScene(string worldName)
@@ -79,22 +79,21 @@ namespace GVR.Manager
             }
         }
 
-        private async Task ShowLoadingSphere(string worldName = null)
+        private async Task ShowLoadingScene(string worldName = null)
         {
             TextureManager.I.LoadLoadingDefaultTextures();
 
             generalScene = SceneManager.GetSceneByName(generalSceneName);
-            if (!generalScene.isLoaded)
+            if (generalScene.isLoaded)
             {
-                generalScene = SceneManager.LoadScene(generalSceneName, new LoadSceneParameters(LoadSceneMode.Additive));
-            }
-            else
-            {
-                generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").gameObject.SetActive(true);
-                generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController").gameObject.SetActive(false);
+                SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName("Bootstrap"));
+                SceneManager.UnloadSceneAsync(generalScene);
+                generalSceneLoaded = false;
             }
 
             SetLoadingTextureForWorld(worldName);
+
+            var loadingScene = SceneManager.LoadScene("Loading", new LoadSceneParameters(LoadSceneMode.Additive));
 
             // Delay for magic number amount to make sure that bar can be found
             // 1 and 2 caused issues for the 3rd time showing the loading scene in editor
@@ -112,16 +111,9 @@ namespace GVR.Manager
             TextureManager.I.SetTexture(textureString, TextureManager.I.GothicLoadingMenuMaterial);
         }
 
-        private void HideLoadingSphere()
+        private void HideLoadingScene()
         {
-
-            generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").gameObject.SetActive(false);
-            generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController").gameObject.SetActive(true);
-
-            WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
-            SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
-
-            MovePlayerToSpot();
+            SceneManager.UnloadSceneAsync("Loading");
 
             LoadingManager.I.ResetProgress();
         }
@@ -129,6 +121,8 @@ namespace GVR.Manager
         private void SceneManagerActionHandler()
         {
             SceneManager.sceneLoaded += OnWorldSceneLoaded;
+
+            SceneManager.sceneUnloaded += OnLoadingSceneUnloaded;
         }
         private void OnWorldSceneLoaded(Scene scene, LoadSceneMode mode)
         {
@@ -138,13 +132,28 @@ namespace GVR.Manager
             }
             if (scene == generalScene)
             {
-                scene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController").SetActive(false);
-                scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere").SetActive(true);
+                AudioSourceManager.I.SetAudioListener(Camera.main?.GetComponent<AudioListener>());
 
+                SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
+
+                WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
+
+                var playerParent = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
+                playerParent.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
+            }
+            if (scene.name == "Loading")
+            {
                 LoadingManager.I.SetBarFromScene(scene);
                 LoadingManager.I.SetMaterialForLoading(scene);
+            }
+        }
 
-                AudioSourceManager.I.SetAudioListener(Camera.main?.GetComponent<AudioListener>());
+        private void OnLoadingSceneUnloaded(Scene scene)
+        {
+            if (scene.name == "Loading" && !generalSceneLoaded)
+            {
+                generalScene = SceneManager.LoadScene(generalSceneName, new LoadSceneParameters(LoadSceneMode.Additive));
+                generalSceneLoaded = true;
             }
         }
 
@@ -168,12 +177,6 @@ namespace GVR.Manager
                     }
                 }
             }
-        }
-
-        private void MovePlayerToSpot()
-        {
-            var playerParent = generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
-            playerParent.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
         }
 
         public void MoveToWorldScene(GameObject go)

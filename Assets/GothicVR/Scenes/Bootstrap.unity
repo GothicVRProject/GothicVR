@@ -325,8 +325,8 @@ MonoBehaviour:
   EnableVobFPMesh: 0
   EnableVobFPMeshEditorLabel: 0
   EnableDecals: 0
-  CreateOcNpcs: 0
-  EnableNpcRoutines: 0
+  CreateOcNpcs: 1
+  EnableNpcRoutines: 1
   CreateExampleAnimation: 0
   ShowVdfsFileNotFoundErrors: 0
   EnableSounds: 1
