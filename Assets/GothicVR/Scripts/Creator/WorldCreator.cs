@@ -163,7 +163,7 @@ namespace GVR.Creator
         /// <summary>
         /// Loads the world for occlusion culling.
         /// </summary>
-        /// <param name="vfsPtr">The VDF pointer.</param>
+        /// <param name="vfsPtr">The VFS pointer.</param>
         /// <param name="zen">The name of the .zen world to load.</param>
         public void LoadEditorWorld(IntPtr vfsPtr, string zen)
         {
