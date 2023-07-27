@@ -37,7 +37,7 @@ namespace GVR.Debugging
         public bool CreateExampleAnimation;
 
         [Header("__________SPAMmy debug messages__________")]
-        public bool ShowVdfsFileNotFoundErrors;
+        public bool ShowVfsFileNotFoundErrors;
 
         [Header("__________Audio__________")]
         public bool EnableSounds;
