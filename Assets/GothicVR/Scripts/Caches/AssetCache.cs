@@ -106,6 +106,17 @@ namespace GVR.Caches
 
             return newData;
         }
+        public async Task<PxModelScriptData> TryGetMdsAsync(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (mdsCache.TryGetValue(preparedKey, out PxModelScriptData data))
+                return data;
+
+            var newData = await Task.Run(() => PxModelScript.GetModelScriptFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mds"));
+            mdsCache[preparedKey] = newData;
+
+            return newData;
+        }
 
         public PxModelHierarchyData TryGetMdh(string key)
         {
@@ -114,6 +125,18 @@ namespace GVR.Caches
                 return data;
 
             var newData = PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mdh");
+            mdhCache[preparedKey] = newData;
+
+            return newData;
+        }
+
+        public async Task<PxModelHierarchyData> TryGetMdhAsync(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (mdhCache.TryGetValue(preparedKey, out PxModelHierarchyData data))
+                return data;
+
+            var newData = await Task.Run(() => PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdh"));
             mdhCache[preparedKey] = newData;
 
             return newData;
@@ -131,6 +154,18 @@ namespace GVR.Caches
             return newData;
         }
 
+        public async Task<PxModelData> TryGetMdlAsync(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (mdlCache.TryGetValue(preparedKey, out PxModelData data))
+                return data;
+
+            var newData = await Task.Run(() => PxModel.LoadModelFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdl"));
+            mdlCache[preparedKey] = newData;
+
+            return newData;
+        }
+
         public PxModelMeshData TryGetMdm(string key, params string[] attachmentKeys)
         {
             var preparedKey = GetPreparedKey(key);
@@ -143,6 +178,18 @@ namespace GVR.Caches
             return newData;
         }
 
+        public async Task<PxModelMeshData> TryGetMdmAsync(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (mdmCache.TryGetValue(preparedKey, out PxModelMeshData data))
+                return data;
+
+            var newData = await Task.Run(() => PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdm"));
+            mdmCache[preparedKey] = newData;
+
+            return newData;
+        }
+
         public PxMultiResolutionMeshData TryGetMrm(string key)
         {
             var preparedKey = GetPreparedKey(key);
@@ -150,6 +197,18 @@ namespace GVR.Caches
                 return data;
 
             var newData = PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mrm");
+            mrmCache[preparedKey] = newData;
+
+            return newData;
+        }
+
+        public async Task<PxMultiResolutionMeshData> TryGetMrmAsync(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (mrmCache.TryGetValue(preparedKey, out PxMultiResolutionMeshData data))
+                return data;
+
+            var newData = await Task.Run(() => PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mrm"));
             mrmCache[preparedKey] = newData;
 
             return newData;
@@ -181,6 +240,18 @@ namespace GVR.Caches
 
             return newData;
         }
+        public async Task<PxVmItemData> TryGetItemDataAsync(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (itemDataCache.TryGetValue(preparedKey, out PxVmItemData data))
+                return data;
+
+            var newData = await Task.Run(() => PxVm.InitializeItem(GameData.I.VmGothicPtr, preparedKey));
+            itemDataCache[preparedKey] = newData;
+
+            return newData;
+        }
+
 
         /// <summary>
         /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
@@ -197,6 +268,18 @@ namespace GVR.Caches
             return newData;
         }
 
+        public async Task<PxVmSfxData> TryGetSfxDataAsync(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (sfxDataCache.TryGetValue(preparedKey, out PxVmSfxData data))
+                return data;
+
+            var newData = await Task.Run(() => PxVm.InitializeSfx(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.sfx"));
+            sfxDataCache[preparedKey] = newData;
+
+            return newData;
+        }
+
         public PxSoundData<float> TryGetSound(string key)
         {
             var preparedKey = GetPreparedKey(key);
@@ -207,6 +290,18 @@ namespace GVR.Caches
             soundCache[preparedKey] = wavFile;
 
             return wavFile;
+        }
+
+        public async Task<PxSoundData<float>> TryGetSoundAsync(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (soundCache.TryGetValue(preparedKey, out PxSoundData<float> data))
+                return data;
+
+            var newData = await Task.Run(() => PxSound.GetSoundArrayFromVDF<float>(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.sound"));
+            soundCache[preparedKey] = newData;
+
+            return newData;
         }
 
         private string GetPreparedKey(string key)
