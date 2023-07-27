@@ -69,7 +69,7 @@ namespace GVR.Creator
 
         private WorldData LoadWorld(string worldName)
         {
-            var worldPtr = PxWorld.pxWorldLoadFromVdf(GameData.I.VdfsPtr, worldName);
+            var worldPtr = PxWorld.pxWorldLoadFromVfs(GameData.I.VfsPtr, worldName);
             if (worldPtr == IntPtr.Zero)
                 throw new ArgumentException($"World >{worldName}< couldn't be found.");
 
@@ -167,9 +167,9 @@ namespace GVR.Creator
         /// <summary>
         /// Loads the world for occlusion culling.
         /// </summary>
-        /// <param name="vdfPtr">The VDF pointer.</param>
+        /// <param name="vfsPtr">The VFS pointer.</param>
         /// <param name="zen">The name of the .zen world to load.</param>
-        public async void LoadEditorWorld(IntPtr vdfPtr, string zen)
+        public async void LoadEditorWorld(IntPtr vfsPtr, string zen)
         {
             var worldScene = EditorSceneManager.GetSceneByName(zen);
 
@@ -185,7 +185,7 @@ namespace GVR.Creator
             var world = LoadWorld(zen);
 
             // FIXME - Might not work as we have no context inside Editor mode. Need to test and find alternative.
-            GameData.I.VdfsPtr = vdfPtr;
+            GameData.I.VfsPtr = vfsPtr;
             GameData.I.World = world;
 
             var worldGo = new GameObject("World");
@@ -196,7 +196,7 @@ namespace GVR.Creator
             sampleScene.GetRootGameObjects().Append(worldGo);
 
             // load only the world mesh
-            MeshCreator.I.Create(world, worldGo);
+            await MeshCreator.I.Create(world, worldGo);
 
             // move the world to the correct scene
             EditorSceneManager.MoveGameObjectToScene(worldGo, worldScene);

@@ -24,7 +24,7 @@ namespace GothicVR.Editor
     public class OcclusionCullingTool : EditorWindow
     {
         private const string _G1DIR = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic";
-        private static IntPtr _vdfsPtr = IntPtr.Zero;
+        private static IntPtr _vfsPtr = IntPtr.Zero;
         private static MeshCreator _meshCreator;
         
         [MenuItem("GothicVR/Tools/Occlusion Culling", true)]
@@ -48,16 +48,16 @@ namespace GothicVR.Editor
             // _meshCreator.EditorInject(assetCache);
             
             var fullPath = Path.GetFullPath(Path.Join(_G1DIR, "Data"));
-            _vdfsPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
+            _vfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);
             
             // Hint: When we load meshes/textures via MeshCreator.cs, there's hard coded GameData.I.VdfPtr used.
             // As we ensured our Window is only active when not playing, we can safely reuse it for now.
 
             // FIXME - won't work as we have no instance set up before. Need to test it.
-            GameData.I.VdfsPtr = _vdfsPtr;
+            GameData.I.VfsPtr = _vfsPtr;
             
             // use PhoenixImporter to handle loading the world and setting it to the correct scene.
-            WorldCreator.I.LoadEditorWorld(_vdfsPtr, "world.zen");
+            WorldCreator.I.LoadEditorWorld(_vfsPtr, "world.zen");
         }
 
         void OnGUI()
@@ -72,11 +72,11 @@ namespace GothicVR.Editor
 
         void OnDestroy()
         {
-            if (_vdfsPtr == IntPtr.Zero)
+            if (_vfsPtr == IntPtr.Zero)
                 return;
 
-            PxVdf.pxVdfDestroy(_vdfsPtr);
-            _vdfsPtr = IntPtr.Zero;
+            PxVfs.DestroyVfs(_vfsPtr);
+            _vfsPtr = IntPtr.Zero;
 
             // Hint: If window closes as the game is started, we must not! clear GameData.I.VdfPtr as it would crash the game.
             // Therefore just leave it as it is...

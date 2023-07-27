@@ -129,7 +129,7 @@ namespace GVR.Creator
             {
                 throw new Exception("Not yet implemented");
                 //var skeletonName = mds.skeleton.name.Replace(".ASC", ".MDM");
-                //var mdm = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, skeletonName); // --> if null
+                //var mdm = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, skeletonName); // --> if null
             }
         }
 

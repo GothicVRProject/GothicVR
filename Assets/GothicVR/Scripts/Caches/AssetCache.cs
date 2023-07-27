@@ -38,8 +38,8 @@ namespace GVR.Caches
 
 
             // FIXME - There might be more textures to load compressed. Please check for sake of performance!
-            var pxTexture = PxTexture.GetTextureFromVdf(
-                GameData.I.VdfsPtr,
+            var pxTexture = PxTexture.GetTextureFromVfs(
+                GameData.I.VfsPtr,
                 key,
                 PxTexture.Format.tex_dxt1, PxTexture.Format.tex_dxt5
             );
@@ -70,8 +70,8 @@ namespace GVR.Caches
             if (textureCache.TryGetValue(preparedKey, out Texture2D data))
                 return data;
 
-            var pxTexture = await Task.Run(() => PxTexture.GetTextureFromVdf(
-                GameData.I.VdfsPtr,
+            var pxTexture = await Task.Run(() => PxTexture.GetTextureFromVfs(
+                GameData.I.VfsPtr,
                 key,
                 PxTexture.Format.tex_dxt1, PxTexture.Format.tex_dxt5
             ));
@@ -101,7 +101,7 @@ namespace GVR.Caches
             if (mdsCache.TryGetValue(preparedKey, out PxModelScriptData data))
                 return data;
 
-            var newData = PxModelScript.GetModelScriptFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mds");
+            var newData = PxModelScript.GetModelScriptFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mds");
             mdsCache[preparedKey] = newData;
 
             return newData;
@@ -112,7 +112,7 @@ namespace GVR.Caches
             if (mdsCache.TryGetValue(preparedKey, out PxModelScriptData data))
                 return data;
 
-            var newData = await Task.Run(() => PxModelScript.GetModelScriptFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mds"));
+            var newData = await Task.Run(() => PxModelScript.GetModelScriptFromVfs(GameData.I.VfsPtr, $"{GetPreparedKey(key)}.mds"));
             mdsCache[preparedKey] = newData;
 
             return newData;
@@ -124,7 +124,7 @@ namespace GVR.Caches
             if (mdhCache.TryGetValue(preparedKey, out PxModelHierarchyData data))
                 return data;
 
-            var newData = PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mdh");
+            var newData = PxModelHierarchy.LoadFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mdh");
             mdhCache[preparedKey] = newData;
 
             return newData;
@@ -136,7 +136,7 @@ namespace GVR.Caches
             if (mdhCache.TryGetValue(preparedKey, out PxModelHierarchyData data))
                 return data;
 
-            var newData = await Task.Run(() => PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdh"));
+            var newData = await Task.Run(() => PxModelHierarchy.LoadFromVfs(GameData.I.VfsPtr, $"{GetPreparedKey(key)}.mdh"));
             mdhCache[preparedKey] = newData;
 
             return newData;
@@ -148,7 +148,7 @@ namespace GVR.Caches
             if (mdlCache.TryGetValue(preparedKey, out PxModelData data))
                 return data;
 
-            var newData = PxModel.LoadModelFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mdl");
+            var newData = PxModel.LoadModelFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mdl");
             mdlCache[preparedKey] = newData;
 
             return newData;
@@ -160,11 +160,12 @@ namespace GVR.Caches
             if (mdlCache.TryGetValue(preparedKey, out PxModelData data))
                 return data;
 
-            var newData = await Task.Run(() => PxModel.LoadModelFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdl"));
+            var newData = await Task.Run(() => PxModel.LoadModelFromVfs(GameData.I.VfsPtr, $"{GetPreparedKey(key)}.mdl"));
             mdlCache[preparedKey] = newData;
 
             return newData;
         }
+
 
         public PxModelMeshData TryGetMdm(string key, params string[] attachmentKeys)
         {
@@ -172,7 +173,7 @@ namespace GVR.Caches
             if (mdmCache.TryGetValue(preparedKey, out PxModelMeshData data))
                 return data;
 
-            var newData = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mdm", attachmentKeys);
+            var newData = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mdm", attachmentKeys);
             mdmCache[preparedKey] = newData;
 
             return newData;
@@ -184,11 +185,12 @@ namespace GVR.Caches
             if (mdmCache.TryGetValue(preparedKey, out PxModelMeshData data))
                 return data;
 
-            var newData = await Task.Run(() => PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mdm"));
+            var newData = await Task.Run(() => PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, $"{GetPreparedKey(key)}.mdm"));
             mdmCache[preparedKey] = newData;
 
             return newData;
         }
+
 
         public PxMultiResolutionMeshData TryGetMrm(string key)
         {
@@ -196,7 +198,7 @@ namespace GVR.Caches
             if (mrmCache.TryGetValue(preparedKey, out PxMultiResolutionMeshData data))
                 return data;
 
-            var newData = PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mrm");
+            var newData = PxMultiResolutionMesh.GetMRMFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mrm");
             mrmCache[preparedKey] = newData;
 
             return newData;
@@ -208,7 +210,7 @@ namespace GVR.Caches
             if (mrmCache.TryGetValue(preparedKey, out PxMultiResolutionMeshData data))
                 return data;
 
-            var newData = await Task.Run(() => PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, $"{GetPreparedKey(key)}.mrm"));
+            var newData = await Task.Run(() => PxMultiResolutionMesh.GetMRMFromVfs(GameData.I.VfsPtr, $"{GetPreparedKey(key)}.mrm"));
             mrmCache[preparedKey] = newData;
 
             return newData;
@@ -220,7 +222,7 @@ namespace GVR.Caches
             if (mmbCache.TryGetValue(preparedKey, out PxMorphMeshData data))
                 return data;
 
-            var newData = PxMorphMesh.LoadMorphMeshFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mmb");
+            var newData = PxMorphMesh.LoadMorphMeshFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mmb");
             mmbCache[preparedKey] = newData;
 
             return newData;
@@ -231,7 +233,7 @@ namespace GVR.Caches
             if (mmbCache.TryGetValue(preparedKey, out PxMorphMeshData data))
                 return data;
 
-            var newData = await Task.Run(() => PxMorphMesh.LoadMorphMeshFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mmb"));
+            var newData = await Task.Run(() => PxMorphMesh.LoadMorphMeshFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mmb"));
             mmbCache[preparedKey] = newData;
 
             return newData;
@@ -272,8 +274,8 @@ namespace GVR.Caches
             var preparedKey = GetPreparedKey(key);
             if (soundCache.TryGetValue(preparedKey, out PxSoundData<float> data))
                 return data;
-
-            var wavFile = PxSound.GetSoundArrayFromVDF<float>(GameData.I.VdfsPtr, $"{preparedKey}.wav");
+            
+            var wavFile = PxSound.GetSoundArrayFromVfs<float>(GameData.I.VfsPtr, $"{preparedKey}.wav");
             soundCache[preparedKey] = wavFile;
 
             return wavFile;

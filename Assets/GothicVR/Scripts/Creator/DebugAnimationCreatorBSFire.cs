@@ -45,8 +45,8 @@ namespace GVR.Creator
             var animationName = "S_S1";
 
 
-            var mds = PxModelScript.GetModelScriptFromVdf(GameData.I.VdfsPtr, mdsName);
-            var mdl = PxModel.LoadModelFromVdf(GameData.I.VdfsPtr, mdlName);
+            var mds = PxModelScript.GetModelScriptFromVfs(GameData.I.VfsPtr, mdsName);
+            var mdl = PxModel.LoadModelFromVfs(GameData.I.VfsPtr, mdlName);
 
 
             var obj1 = CreateBSFireObj(name, mdl);
@@ -381,7 +381,7 @@ namespace GVR.Creator
             for (int i = 0; i < animations.Length; i++)
             {
                 var animName = mdsName.Replace(".MDS", $"-{mds.animations[i].name}.MAN", StringComparison.OrdinalIgnoreCase);
-                animations[i] = PxAnimation.LoadFromVdf(GameData.I.VdfsPtr, animName);
+                animations[i] = PxAnimation.LoadFromVfs(GameData.I.VfsPtr, animName);
             }
             var animation = animations.First(i => i.name == animationName);
 
