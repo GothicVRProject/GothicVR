@@ -66,19 +66,29 @@ namespace GVR.Creator
 
             CreateParentVobObject(vobRootObj);
 
-            IEnumerator coroutine = CreateCoroutineVobs(root, world.vobs, meshesPerFrame, tcs);
+            List<PxVobData> allVobs = new List<PxVobData>();
+            AddVobsToList(world.vobs, allVobs);
+
+            IEnumerator coroutine = CreateCoroutineVobs(root, allVobs.ToArray(), meshesPerFrame, tcs);
             while (coroutine.MoveNext())
             {
                 yield return coroutine.Current;
             }
         }
-
-        private IEnumerator CreateCoroutineVobs(GameObject root, PxVobData[] vobs, int meshesPerFrame, TaskCompletionSource<Boolean> tcs)
+        private void AddVobsToList(PxVobData[] vobs, List<PxVobData> allVobs)
         {
             foreach (var vob in vobs)
             {
-                yield return CreateCoroutineVobs(root, vob.childVobs, meshesPerFrame, null);
+                allVobs.Add(vob);
+                AddVobsToList(vob.childVobs, allVobs);
+            }
+        }
 
+        private IEnumerator CreateCoroutineVobs(GameObject root, PxVobData[] vobs, int meshesPerFrame, TaskCompletionSource<Boolean> tcs)
+        {
+            int count = 0;
+            foreach (var vob in vobs)
+            {
                 switch (vob.type)
                 {
                     case PxVobType.PxVob_oCItem:
@@ -132,6 +142,13 @@ namespace GVR.Creator
                         break;
                 }
                 // yield return null;
+
+                count++;
+                if (count >= meshesPerFrame)
+                {
+                    count = 0;
+                    yield return null; // Wait for the next frame
+                }
 
                 LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / totalVObs);
                 // Load children
