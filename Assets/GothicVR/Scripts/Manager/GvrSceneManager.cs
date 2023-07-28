@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator;
@@ -6,6 +7,7 @@ using GVR.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
+using Debug = UnityEngine.Debug;
 
 namespace GVR.Manager
 {
@@ -37,6 +39,8 @@ namespace GVR.Manager
 
         public async void LoadWorld(string worldName, string startVob)
         {
+            var watch = Stopwatch.StartNew();
+
             SceneManagerActionHandler();
 
             await ShowLoadingScene(worldName);
@@ -48,6 +52,8 @@ namespace GVR.Manager
             await CreateWorld();
 
             HideLoadingScene();
+            watch.Stop();
+            Debug.Log($"Time spent for loading {worldName}: {watch.Elapsed}");
         }
 
         private void LoadNewWorldScene(string worldName)
