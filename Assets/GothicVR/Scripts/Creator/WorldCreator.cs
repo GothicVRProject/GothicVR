@@ -22,7 +22,6 @@ namespace GVR.Creator
 {
     public class WorldCreator : SingletonBehaviour<WorldCreator>
     {
-
         private GameObject worldMesh;
 
         public async Task<GameObject> Create(string worldName)
@@ -35,10 +34,10 @@ namespace GVR.Creator
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
 
             TaskCompletionSource<GameObject> worldTcs = new TaskCompletionSource<GameObject>();
-            StartCoroutine(MeshCreator.I.CreateCoroutineInitial(world, worldGo, 100, worldTcs));
+            StartCoroutine(MeshCreator.I.CreateCoroutineInitial(world, worldGo, ConstantsManager.I.MeshPerFrame, worldTcs));
 
             TaskCompletionSource<Boolean> vobTcs = new TaskCompletionSource<Boolean>();
-            StartCoroutine(VobCreator.I.CreateCoroutineInitial(worldGo, world, 100, vobTcs));
+            StartCoroutine(VobCreator.I.CreateCoroutineInitial(worldGo, world, ConstantsManager.I.VObPerFrame, vobTcs));
 
             await Task.WhenAll(worldTcs.Task, vobTcs.Task);
 

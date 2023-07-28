@@ -10,6 +10,9 @@ namespace GVR.Manager
         public string MenuFontTag = "Title";
         public string SubtitleFontTag = "IngameText";
 
+        public int MeshPerFrame = 10;
+        public int VObPerFrame = 75;
+
         protected override void Awake()
         {
             base.Awake();
