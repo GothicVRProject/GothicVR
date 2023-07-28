@@ -16,20 +16,20 @@ namespace GVR.Creator.Meshes
 
         private VmGothicBridge.Mdl_SetVisualBodyData tempBodyData;
 
-        public async Task<GameObject> CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
+        public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
             PxMorphMeshData morphMesh, VmGothicBridge.Mdl_SetVisualBodyData bodyData, GameObject parent)
         {
             tmpBodyTexNr = bodyData.bodyTexNr;
             tmpBodyTexColor = bodyData.bodyTexColor;
 
-            var npcGo = await Create(npcName, mdm, mdh, default, default, parent);
+            var npcGo = Create(npcName, mdm, mdh, default, default, parent);
 
             AddHead(npcName, npcGo, morphMesh);
 
             return npcGo;
         }
 
-        private async void AddHead(string npcName, GameObject npcGo, PxMorphMeshData morphMesh)
+        private void AddHead(string npcName, GameObject npcGo, PxMorphMeshData morphMesh)
         {
             var headGo = npcGo.FindChildRecursively("BIP01 HEAD");
 
@@ -42,14 +42,14 @@ namespace GVR.Creator.Meshes
             var headMeshFilter = headGo.AddComponent<MeshFilter>();
             var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
 
-            await PrepareMeshRenderer(headMeshRenderer, morphMesh.mesh);
+            PrepareMeshRenderer(headMeshRenderer, morphMesh.mesh);
             PrepareMeshFilter(headMeshFilter, morphMesh.mesh);
         }
 
         /// <summary>
         /// Change texture name based on VisualBodyData.
         /// </summary>
-        protected override Task<Texture2D> GetTexture(string name)
+        protected override Texture2D GetTexture(string name)
         {
             // FIXME: Dirty hack. Needs to be optimized.
             if (name.ToUpper().Contains("MOUTH") || name.ToUpper().Contains("TEETH"))
@@ -59,6 +59,25 @@ namespace GVR.Creator.Meshes
             {
                 Debug.LogError($"The format of body texture isn't right for ${name}");
                 return base.GetTexture(name);
+            }
+
+            // This regex replaces the suffix of V0_C0 with values of corresponding data.
+            // e.g. Some_Texture_V0_C0.TGA --> Some_Texture_V1_C2.TGA
+            var formattedTextureName = Regex.Replace(name, "(?<=.*?)V0_C0", $"V{tmpBodyTexNr}_C{tmpBodyTexColor}");
+
+            return AssetCache.I.TryGetTexture(formattedTextureName);
+        }
+
+        protected override Task<Texture2D> GetTextureAsync(string name)
+        {
+            // FIXME: Dirty hack. Needs to be optimized.
+            if (name.ToUpper().Contains("MOUTH") || name.ToUpper().Contains("TEETH"))
+                return base.GetTextureAsync(name);
+
+            if (!name.ToUpper().EndsWith("V0_C0.TGA"))
+            {
+                Debug.LogError($"The format of body texture isn't right for ${name}");
+                return base.GetTextureAsync(name);
             }
 
             // This regex replaces the suffix of V0_C0 with values of corresponding data.

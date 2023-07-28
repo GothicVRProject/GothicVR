@@ -76,14 +76,16 @@ namespace GVR.Manager
         public void SetProgress(LoadingProgressType progressType, float progress)
         {
             progressByType[progressType] = progress;
-            UpdateLoadingBar();
+            if (bar != null)
+                UpdateLoadingBar();
         }
 
         public void AddProgress(LoadingProgressType progressType, float progress)
         {
             float newProgress = progressByType[progressType] + progress;
             progressByType[progressType] = newProgress;
-            UpdateLoadingBar();
+            if (bar != null)
+                UpdateLoadingBar();
         }
 
         public void SetMaterialForLoading(Scene scene)

@@ -18,6 +18,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
 using System.Threading.Tasks;
+using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -55,7 +56,91 @@ namespace GVR.Creator
             return count;
         }
 
-        public async Task Create(GameObject root, WorldData world)
+        public IEnumerator CreateCoroutineInitial(GameObject root, WorldData world, int meshesPerFrame, TaskCompletionSource<Boolean> tcs)
+        {
+            totalVObs = GetTotalVobCount(world.vobs);
+
+            var vobRootObj = new GameObject("Vobs");
+            vobRootObj.SetParent(root);
+            parentGos = new();
+
+            CreateParentVobObject(vobRootObj);
+
+            IEnumerator coroutine = CreateCoroutineVobs(root, world.vobs, meshesPerFrame, tcs);
+            while (coroutine.MoveNext())
+            {
+                yield return coroutine.Current;
+            }
+        }
+
+        private IEnumerator CreateCoroutineVobs(GameObject root, PxVobData[] vobs, int meshesPerFrame, TaskCompletionSource<Boolean> tcs)
+        {
+            foreach (var vob in vobs)
+            {
+                yield return CreateCoroutineVobs(root, vob.childVobs, meshesPerFrame, null);
+
+                switch (vob.type)
+                {
+                    case PxVobType.PxVob_oCItem:
+                        CreateItem((PxVobItemData)vob);
+                        break;
+                    case PxVobType.PxVob_oCMobContainer:
+                        CreateMobContainer((PxVobMobContainerData)vob);
+                        break;
+                    case PxVobType.PxVob_zCVobSound:
+                        CreateSound((PxVobSoundData)vob);
+                        break;
+                    case PxVobType.PxVob_zCVobSoundDaytime:
+                        CreateSoundDaytime((PxVobSoundDaytimeData)vob);
+                        break;
+                    case PxVobType.PxVob_oCZoneMusic:
+                        CreateZoneMusic((PxVobZoneMusicData)vob);
+                        break;
+                    case PxVobType.PxVob_zCVobSpot:
+                    case PxVobType.PxVob_zCVobStartpoint:
+                        CreateSpot(vob);
+                        break;
+                    case PxVobType.PxVob_oCMobLadder:
+                        CreateLadder(vob);
+                        break;
+                    case PxVobType.PxVob_oCTriggerChangeLevel:
+                        CreateTriggerChangeLevel((PxVobTriggerChangeLevelData)vob);
+                        break;
+                    case PxVobType.PxVob_zCVobScreenFX:
+                    case PxVobType.PxVob_zCVobAnimate:
+                    case PxVobType.PxVob_zCTriggerWorldStart:
+                    case PxVobType.PxVob_zCTriggerList:
+                    case PxVobType.PxVob_oCCSTrigger:
+                    case PxVobType.PxVob_oCTriggerScript:
+                    case PxVobType.PxVob_zCVobLensFlare:
+                    case PxVobType.PxVob_zCVobLight:
+                    case PxVobType.PxVob_zCMoverController:
+                    case PxVobType.PxVob_zCPFXController:
+                        Debug.LogWarning($"{vob.type} not yet implemented.");
+                        break;
+                    // Do nothing
+                    case PxVobType.PxVob_zCVobLevelCompo:
+                        break;
+                    case PxVobType.PxVob_zCVob:
+                        // if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
+                        // CreateDecal(vob);
+                        // else
+                        CreateDefaultMesh(vob);
+                        break;
+                    default:
+                        CreateDefaultMesh(vob);
+                        break;
+                }
+                // yield return null;
+
+                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / totalVObs);
+                // Load children
+            }
+            if (tcs != null)
+                tcs.SetResult(true);
+        }
+
+        public void Create(GameObject root, WorldData world)
         {
             if (!FeatureFlags.I.CreateVobs)
                 return;
@@ -67,7 +152,7 @@ namespace GVR.Creator
             parentGos = new();
 
             CreateParentVobObject(vobRootObj);
-            await CreateVobs(vobRootObj, world.vobs);
+            CreateVobs(vobRootObj, world.vobs);
         }
 
         private void CreateParentVobObject(GameObject root)
@@ -81,7 +166,7 @@ namespace GVR.Creator
             }
         }
 
-        private async Task CreateVobs(GameObject root, PxVobData[] vobs)
+        private void CreateVobs(GameObject root, PxVobData[] vobs)
         {
             foreach (var vob in vobs)
             {
@@ -131,20 +216,20 @@ namespace GVR.Creator
                         // if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
                         // CreateDecal(vob);
                         // else
-                        await CreateDefaultMesh(vob);
+                        CreateDefaultMesh(vob);
                         break;
                     default:
-                        await CreateDefaultMesh(vob);
+                        CreateDefaultMesh(vob);
                         break;
                 }
 
                 LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / totalVObs);
                 // Load children
-                await CreateVobs(root, vob.childVobs);
+                CreateVobs(root, vob.childVobs);
             }
         }
 
-        private async void CreateItem(PxVobItemData vob)
+        private void CreateItem(PxVobItemData vob)
         {
             string itemName;
 
@@ -171,7 +256,7 @@ namespace GVR.Creator
             }
 
             var prefabInstance = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobItem);
-            var vobObj = await CreateItemMesh(vob, item, prefabInstance);
+            var vobObj = CreateItemMesh(vob, item, prefabInstance);
 
             if (vobObj == null)
             {
@@ -190,9 +275,9 @@ namespace GVR.Creator
             grabComp.selectExited.AddListener(eventComp.SelectExited);
         }
 
-        private async void CreateMobContainer(PxVobMobContainerData vob)
+        private void CreateMobContainer(PxVobMobContainerData vob)
         {
-            var vobObj = await CreateDefaultMesh(vob);
+            var vobObj = CreateDefaultMesh(vob);
 
             if (vobObj == null)
             {
@@ -286,10 +371,10 @@ namespace GVR.Creator
             SetPosAndRot(spot, vob.position, vob.rotation!.Value);
         }
 
-        private async void CreateLadder(PxVobData vob)
+        private void CreateLadder(PxVobData vob)
         {
             // FIXME - use Prefab instead.
-            var go = await CreateDefaultMesh(vob);
+            var go = CreateDefaultMesh(vob);
             var meshGo = go;
             var grabComp = meshGo.AddComponent<XRGrabInteractable>();
             var rigidbodyComp = meshGo.GetComponent<Rigidbody>();
@@ -300,10 +385,10 @@ namespace GVR.Creator
             grabComp.trackRotation = false;
         }
 
-        private async Task<GameObject> CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
+        private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
             var mrm = assetCache.TryGetMrm(item.visual);
-            return await VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
+            return VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
         }
 
         private void CreateDecal(PxVobData vob)
@@ -317,7 +402,7 @@ namespace GVR.Creator
             VobMeshCreator.I.CreateDecal(vob, parent);
         }
 
-        private async Task<GameObject> CreateDefaultMesh(PxVobData vob)
+        private GameObject CreateDefaultMesh(PxVobData vob)
         {
             var parent = parentGos[vob.type];
             var meshName = vob.showVisual ? vob.visualName : vob.vobName;
@@ -329,20 +414,20 @@ namespace GVR.Creator
                 return null;
 
             // MDL
-            var mdl = await assetCache.TryGetMdlAsync(meshName);
+            var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                return await VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value.ToUnityMatrix().rotation, parent);
+                return VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value.ToUnityMatrix().rotation, parent);
             }
 
             // MRM
-            var mrm = await assetCache.TryGetMrmAsync(meshName);
+            var mrm = assetCache.TryGetMrm(meshName);
             if (mrm != null)
             {
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.cdDynamic;
 
-                return await VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
+                return VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
             }
 
             Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");

@@ -34,8 +34,17 @@ namespace GVR.Creator
 
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
 
-            worldMesh = await MeshCreator.I.Create(world, worldGo);
-            await VobCreator.I.Create(worldGo, world);
+            TaskCompletionSource<GameObject> worldTcs = new TaskCompletionSource<GameObject>();
+            StartCoroutine(MeshCreator.I.CreateCoroutineInitial(world, worldGo, 100, worldTcs));
+
+            TaskCompletionSource<Boolean> vobTcs = new TaskCompletionSource<Boolean>();
+            StartCoroutine(VobCreator.I.CreateCoroutineInitial(worldGo, world, 100, vobTcs));
+
+            await Task.WhenAll(worldTcs.Task, vobTcs.Task);
+
+            worldMesh = (GameObject)worldTcs.Task.Result;
+
+            // VobCreator.I.Create(worldGo, world);
             WaynetCreator.I.Create(worldGo, world);
 
             DebugAnimationCreator.I.Create(worldName);
@@ -44,11 +53,14 @@ namespace GVR.Creator
 
             if (FeatureFlags.I.CreateOcNpcs)
                 PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
-            
+
+            // Set the global variable to the result of the coroutine
+
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
 
             return worldGo;
         }
+
 
         /// <summary>
         /// Logic to be called after world is fully loaded.
@@ -196,7 +208,7 @@ namespace GVR.Creator
             sampleScene.GetRootGameObjects().Append(worldGo);
 
             // load only the world mesh
-            await MeshCreator.I.Create(world, worldGo);
+            // await MeshCreator.I.Create(world, worldGo);
 
             // move the world to the correct scene
             EditorSceneManager.MoveGameObjectToScene(worldGo, worldScene);

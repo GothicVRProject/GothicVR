@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace GVR.Creator.Meshes
         protected const float decalOpacity = 0.75f;
 
 
-        public async Task<GameObject> Create(WorldData world, GameObject parent)
+        public GameObject Create(WorldData world, GameObject parent)
         {
             var meshObj = new GameObject("Mesh");
             meshObj.isStatic = true;
@@ -42,7 +43,7 @@ namespace GVR.Creator.Meshes
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
-                await PrepareMeshRenderer(meshRenderer, subMesh);
+                PrepareMeshRenderer(meshRenderer, subMesh);
                 PrepareMeshFilter(meshFilter, subMesh);
                 PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
 
@@ -53,13 +54,60 @@ namespace GVR.Creator.Meshes
 
             return meshObj;
         }
-
-        public async Task<GameObject> Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
+        public IEnumerator CreateCoroutine(WorldData world, GameObject parent, int meshesPerFrame, TaskCompletionSource<GameObject> tcs)
         {
-            return await Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
+            var meshObj = new GameObject("Mesh");
+            meshObj.isStatic = true;
+            meshObj.SetParent(parent);
+
+            // Track the progress of each sub-mesh creation separately
+            int numSubMeshes = world.subMeshes.Values.Count;
+            int meshesCreated = 0;
+
+            foreach (var subMesh in world.subMeshes.Values)
+            {
+                var subMeshObj = new GameObject(subMesh.material.name);
+                subMeshObj.isStatic = true;
+
+                var meshFilter = subMeshObj.AddComponent<MeshFilter>();
+                var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
+
+                PrepareMeshRenderer(meshRenderer, subMesh);
+                PrepareMeshFilter(meshFilter, subMesh);
+                PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
+
+                subMeshObj.SetParent(meshObj);
+
+                meshesCreated++;
+                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
+
+                if (meshesCreated >= meshesPerFrame)
+                {
+                    meshesCreated = 0;
+                    yield return null; // Yield to allow other operations to run in the frame
+                }
+            }
+
+            // yield return meshObj;
+            tcs.SetResult(meshObj);
         }
 
-        public async Task<GameObject> Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null)
+        public IEnumerator CreateCoroutineInitial(WorldData world, GameObject parent, int meshesPerFrame, TaskCompletionSource<GameObject> tcs)
+        {
+            IEnumerator coroutine = CreateCoroutine(world, parent, meshesPerFrame, tcs);
+            while (coroutine.MoveNext())
+            {
+                yield return coroutine.Current;
+            }
+        }
+
+
+        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
+        {
+            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
+        }
+
+        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
             var rootGo = new GameObject(objectName);
             rootGo.SetParent(parent);
@@ -110,7 +158,7 @@ namespace GVR.Creator.Meshes
                 // FIXME - hard coded as it's the right value for BSFire. Need to be more dynamic by using element which has parent=-1.
                 meshRenderer.rootBone = nodeObjects[0].transform;
 
-                await PrepareMeshRenderer(meshRenderer, mesh);
+                PrepareMeshRenderer(meshRenderer, mesh);
                 PrepareMeshFilter(meshFilter, softSkinMesh);
 
                 meshRenderer.sharedMesh = meshFilter.mesh;
@@ -125,7 +173,7 @@ namespace GVR.Creator.Meshes
                 var meshFilter = meshObj.AddComponent<MeshFilter>();
                 var meshRenderer = meshObj.AddComponent<MeshRenderer>();
 
-                await PrepareMeshRenderer(meshRenderer, subMesh.Value);
+                PrepareMeshRenderer(meshRenderer, subMesh.Value);
                 PrepareMeshFilter(meshFilter, subMesh.Value);
             }
 
@@ -139,7 +187,7 @@ namespace GVR.Creator.Meshes
             return rootGo;
         }
 
-        public async Task<GameObject> Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             if (mrm == null)
             {
@@ -155,7 +203,7 @@ namespace GVR.Creator.Meshes
             var meshFilter = rootGo.AddComponent<MeshFilter>();
             var meshRenderer = rootGo.AddComponent<MeshRenderer>();
 
-            await PrepareMeshRenderer(meshRenderer, mrm);
+            PrepareMeshRenderer(meshRenderer, mrm);
             PrepareMeshFilter(meshFilter, mrm);
 
             if (withCollider)
@@ -185,7 +233,7 @@ namespace GVR.Creator.Meshes
             obj.transform.localPosition = position;
         }
 
-        protected async Task PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
+        protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
             var material = GetEmptyMaterial();
             var bMaterial = subMesh.material;
@@ -199,7 +247,7 @@ namespace GVR.Creator.Meshes
                 return;
             }
 
-            var texture = await GetTexture(bMaterial.texture);
+            var texture = GetTexture(bMaterial.texture);
 
             if (null == texture)
             {
@@ -222,7 +270,7 @@ namespace GVR.Creator.Meshes
             mesh.SetUVs(0, subMesh.uvs);
         }
 
-        protected async Task PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
+        protected void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
             // check if mrmData.subMeshes is null
 
@@ -248,7 +296,7 @@ namespace GVR.Creator.Meshes
                     return;
                 }
 
-                var texture = await GetTexture(materialData.texture);
+                var texture = GetTexture(materialData.texture);
                 if (null == texture)
                     if (materialData.texture.EndsWith(".TGA"))
                         Debug.LogError("This is supposed to be a decal: " + materialData.texture);
@@ -499,7 +547,12 @@ namespace GVR.Creator.Meshes
             renderer.bones = meshBones;
         }
 
-        protected virtual async Task<Texture2D> GetTexture(string name)
+        protected virtual Texture2D GetTexture(string name)
+        {
+            return AssetCache.I.TryGetTexture(name);
+        }
+
+        protected virtual async Task<Texture2D> GetTextureAsync(string name)
         {
             return await AssetCache.I.TryGetTextureAsync(name);
         }

@@ -433,7 +433,7 @@ namespace GVR.Creator
         }
         #endregion
 
-        private async void CreateBloodfly()
+        private void CreateBloodfly()
         {
             ///
             /// File names to change
@@ -455,7 +455,7 @@ namespace GVR.Creator
             var mdh = PxModelHierarchy.LoadFromVfs(GameData.I.VfsPtr, mdhName);
             var mdm = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, mdmName);
             var mrm = PxMultiResolutionMesh.GetMRMFromVfs(GameData.I.VfsPtr, mrmName);
-            var obj = await MeshCreator.I.Create(name, mdm, mdh, default, default, debugObj);
+            var obj = MeshCreator.I.Create(name, mdm, mdh, default, default, debugObj);
 
 
 
