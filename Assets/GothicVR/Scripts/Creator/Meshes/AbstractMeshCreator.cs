@@ -552,11 +552,6 @@ namespace GVR.Creator.Meshes
             return AssetCache.I.TryGetTexture(name);
         }
 
-        protected virtual async Task<Texture2D> GetTextureAsync(string name)
-        {
-            return await AssetCache.I.TryGetTextureAsync(name);
-        }
-
         protected Material GetEmptyMaterial()
         {
             var standardShader = Shader.Find(defaultShader);

@@ -67,24 +67,5 @@ namespace GVR.Creator.Meshes
 
             return AssetCache.I.TryGetTexture(formattedTextureName);
         }
-
-        protected override Task<Texture2D> GetTextureAsync(string name)
-        {
-            // FIXME: Dirty hack. Needs to be optimized.
-            if (name.ToUpper().Contains("MOUTH") || name.ToUpper().Contains("TEETH"))
-                return base.GetTextureAsync(name);
-
-            if (!name.ToUpper().EndsWith("V0_C0.TGA"))
-            {
-                Debug.LogError($"The format of body texture isn't right for ${name}");
-                return base.GetTextureAsync(name);
-            }
-
-            // This regex replaces the suffix of V0_C0 with values of corresponding data.
-            // e.g. Some_Texture_V0_C0.TGA --> Some_Texture_V1_C2.TGA
-            var formattedTextureName = Regex.Replace(name, "(?<=.*?)V0_C0", $"V{tmpBodyTexNr}_C{tmpBodyTexColor}");
-
-            return AssetCache.I.TryGetTextureAsync(formattedTextureName);
-        }
     }
 }
