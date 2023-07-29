@@ -24,36 +24,7 @@ namespace GVR.Creator.Meshes
         // until we know how to change specifics to the cutout only. (e.g. bushes)
         protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
         protected const float decalOpacity = 0.75f;
-
-
-        public GameObject Create(WorldData world, GameObject parent)
-        {
-            var meshObj = new GameObject("Mesh");
-            meshObj.isStatic = true;
-            meshObj.SetParent(parent);
-
-            // Track the progress of each sub-mesh creation separately
-            int numSubMeshes = world.subMeshes.Values.Count;
-
-            foreach (var subMesh in world.subMeshes.Values)
-            {
-                var subMeshObj = new GameObject(subMesh.material.name);
-                subMeshObj.isStatic = true;
-
-                var meshFilter = subMeshObj.AddComponent<MeshFilter>();
-                var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
-
-                PrepareMeshRenderer(meshRenderer, subMesh);
-                PrepareMeshFilter(meshFilter, subMesh);
-                PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
-
-                subMeshObj.SetParent(meshObj);
-
-                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
-            }
-
-            return meshObj;
-        }
+        
 
         public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
