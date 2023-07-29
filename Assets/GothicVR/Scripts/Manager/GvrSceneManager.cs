@@ -27,11 +27,11 @@ namespace GVR.Manager
 
         private const int ensureLoadingBarDelayMilliseconds = 5;
 
-        
+
         protected override void Awake()
         {
             base.Awake();
-            
+
             SceneManager.sceneLoaded += OnWorldSceneLoaded;
             SceneManager.sceneUnloaded += OnLoadingSceneUnloaded;
         }
@@ -50,7 +50,7 @@ namespace GVR.Manager
             newWorldName = worldName;
             startVobAfterLoading = startVob;
             var watch = Stopwatch.StartNew();
-            
+
             await ShowLoadingScene(worldName);
             var newWorldScene = await LoadNewWorldScene(newWorldName);
             await WorldCreator.I.CreateAsync(newWorldName);
@@ -68,7 +68,7 @@ namespace GVR.Manager
             // Delay for at least one frame to allow the scene to be set active successfully
             // i.e. created GOs will be automatically put to right scene afterwards.
             await Task.Yield();
-            
+
             // Remove previous scene if it exists
             if (GameData.I.WorldScene.HasValue)
                 SceneManager.UnloadSceneAsync(GameData.I.WorldScene.Value);
@@ -76,7 +76,7 @@ namespace GVR.Manager
             GameData.I.WorldScene = newWorldScene;
             return newWorldScene;
         }
-        
+
         /// <summary>
         /// Create loading scene and wait for a few milliseconds to go on, ensuring loading bar is selectable.
         /// Async: execute in sync, but whole process can be paused for x amount of frames.
@@ -119,13 +119,14 @@ namespace GVR.Manager
 
             LoadingManager.I.ResetProgress();
         }
-        
+
         private void OnWorldSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             if (scene.name == "Loading")
             {
                 LoadingManager.I.SetBarFromScene(scene);
                 LoadingManager.I.SetMaterialForLoading(scene);
+                AudioSourceManager.I.ResetDictionaries();
             }
             else if (scene == generalScene)
             {
