@@ -56,7 +56,7 @@ namespace GVR.Creator
             return count;
         }
 
-        public IEnumerator CreateCoroutineInitial(GameObject root, WorldData world, int meshesPerFrame, TaskCompletionSource<Boolean> tcs)
+        public async Task CreateAsync(GameObject root, WorldData world, int vobsPerFrame)
         {
             totalVObs = GetTotalVobCount(world.vobs);
 
@@ -66,28 +66,11 @@ namespace GVR.Creator
 
             CreateParentVobObject(vobRootObj);
 
-            List<PxVobData> allVobs = new List<PxVobData>();
+            var allVobs = new List<PxVobData>();
             AddVobsToList(world.vobs, allVobs);
 
-            IEnumerator coroutine = CreateCoroutineVobs(root, allVobs.ToArray(), meshesPerFrame, tcs);
-            while (coroutine.MoveNext())
-            {
-                yield return coroutine.Current;
-            }
-        }
-        private void AddVobsToList(PxVobData[] vobs, List<PxVobData> allVobs)
-        {
-            foreach (var vob in vobs)
-            {
-                allVobs.Add(vob);
-                AddVobsToList(vob.childVobs, allVobs);
-            }
-        }
-
-        private IEnumerator CreateCoroutineVobs(GameObject root, PxVobData[] vobs, int meshesPerFrame, TaskCompletionSource<Boolean> tcs)
-        {
-            int count = 0;
-            foreach (var vob in vobs)
+            var count = 0;
+            foreach (var vob in allVobs)
             {
                 switch (vob.type)
                 {
@@ -141,20 +124,21 @@ namespace GVR.Creator
                         CreateDefaultMesh(vob);
                         break;
                 }
-                // yield return null;
-
-                count++;
-                if (count >= meshesPerFrame)
-                {
-                    count = 0;
-                    yield return null; // Wait for the next frame
-                }
 
                 LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / totalVObs);
-                // Load children
+
+                if (++count % vobsPerFrame == 0)
+                    await Task.Yield(); // Wait for the next frame
             }
-            if (tcs != null)
-                tcs.SetResult(true);
+        }
+
+        private void AddVobsToList(PxVobData[] vobs, List<PxVobData> allVobs)
+        {
+            foreach (var vob in vobs)
+            {
+                allVobs.Add(vob);
+                AddVobsToList(vob.childVobs, allVobs);
+            }
         }
 
         public void Create(GameObject root, WorldData world)

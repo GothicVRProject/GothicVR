@@ -54,10 +54,13 @@ namespace GVR.Creator.Meshes
 
             return meshObj;
         }
-        public IEnumerator CreateCoroutine(WorldData world, GameObject parent, int meshesPerFrame, TaskCompletionSource<GameObject> tcs)
+        public async Task CreateAsync(WorldData world, GameObject parent, int meshesPerFrame)
         {
-            var meshObj = new GameObject("Mesh");
-            meshObj.isStatic = true;
+            var meshObj = new GameObject()
+            {
+                name = "Mesh",
+                isStatic = true
+            };
             meshObj.SetParent(parent);
 
             // Track the progress of each sub-mesh creation separately
@@ -66,8 +69,11 @@ namespace GVR.Creator.Meshes
 
             foreach (var subMesh in world.subMeshes.Values)
             {
-                var subMeshObj = new GameObject(subMesh.material.name);
-                subMeshObj.isStatic = true;
+                var subMeshObj = new GameObject()
+                {
+                    name = subMesh.material.name!,
+                    isStatic = true
+                };
 
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
@@ -78,29 +84,12 @@ namespace GVR.Creator.Meshes
 
                 subMeshObj.SetParent(meshObj);
 
-                meshesCreated++;
                 LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
 
-                if (meshesCreated >= meshesPerFrame)
-                {
-                    meshesCreated = 0;
-                    yield return null; // Yield to allow other operations to run in the frame
-                }
-            }
-
-            // yield return meshObj;
-            tcs.SetResult(meshObj);
-        }
-
-        public IEnumerator CreateCoroutineInitial(WorldData world, GameObject parent, int meshesPerFrame, TaskCompletionSource<GameObject> tcs)
-        {
-            IEnumerator coroutine = CreateCoroutine(world, parent, meshesPerFrame, tcs);
-            while (coroutine.MoveNext())
-            {
-                yield return coroutine.Current;
+                if (++meshesCreated % meshesPerFrame == 0)
+                    await Task.Yield(); // Yield to allow other operations to run in the frame
             }
         }
-
 
         public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
         {

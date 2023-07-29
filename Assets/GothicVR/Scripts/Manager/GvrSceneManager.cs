@@ -48,43 +48,35 @@ namespace GVR.Manager
             newWorldName = worldName;
             startVobAfterLoading = startVob;
 
-            LoadNewWorldScene(newWorldName);
-            await CreateWorld();
+            var newWorldScene = await LoadNewWorldScene(newWorldName);
+            await WorldCreator.I.CreateAsync(newWorldName);
+            SetSpawnPoint(newWorldScene);
 
             HideLoadingScene();
             watch.Stop();
             Debug.Log($"Time spent for loading {worldName}: {watch.Elapsed}");
         }
 
-        private void LoadNewWorldScene(string worldName)
+        private async Task<Scene> LoadNewWorldScene(string worldName)
         {
             var newWorldScene = SceneManager.LoadScene(worldName, new LoadSceneParameters(LoadSceneMode.Additive));
 
+            // Delay for at least one frame to allow the scene to be set active successfully
+            // i.e. created GOs will be automatically put to right scene afterwards.
+            await Task.Yield();
+            
             // Remove previous scene if it exists
             if (GameData.I.WorldScene.HasValue)
-            {
                 SceneManager.UnloadSceneAsync(GameData.I.WorldScene.Value);
-            }
 
             GameData.I.WorldScene = newWorldScene;
+            return newWorldScene;
         }
-
-        private async Task CreateWorld()
-        {
-            var newWorldScene = SceneManager.GetSceneByName(newWorldName);
-
-            var worldGo = await WorldCreator.I.Create(newWorldName);
-
-            // Delay for one frame to allow the scene to be set active successfully
-            await Task.Delay(1);
-
-            if (worldGo)
-            {
-                SceneManager.MoveGameObjectToScene(worldGo, newWorldScene);
-                FindSpot(newWorldScene);
-            }
-        }
-
+        
+        /// <summary>
+        /// Create loading scene and wait for a few milliseconds to go on, ensuring loading bar is selectable.
+        /// Async: execute in sync, but whole process can be paused for x amount of frames.
+        /// </summary>
         private async Task ShowLoadingScene(string worldName = null)
         {
             TextureManager.I.LoadLoadingDefaultTextures();
@@ -99,7 +91,7 @@ namespace GVR.Manager
 
             SetLoadingTextureForWorld(worldName);
 
-            var loadingScene = SceneManager.LoadScene("Loading", new LoadSceneParameters(LoadSceneMode.Additive));
+            SceneManager.LoadScene("Loading", new LoadSceneParameters(LoadSceneMode.Additive));
 
             // Delay for magic number amount to make sure that bar can be found
             // 1 and 2 caused issues for the 3rd time showing the loading scene in editor
@@ -163,7 +155,7 @@ namespace GVR.Manager
             }
         }
 
-        private void FindSpot(Scene worldScene)
+        private void SetSpawnPoint(Scene worldScene)
         {
             var spots = GameObject.FindGameObjectsWithTag("PxVob_zCVobSpot");
             for (int i = 0; i < spots.Length; i++)

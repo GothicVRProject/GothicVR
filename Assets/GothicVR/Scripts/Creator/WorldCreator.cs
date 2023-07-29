@@ -24,26 +24,14 @@ namespace GVR.Creator
     {
         private GameObject worldMesh;
 
-        public async Task<GameObject> Create(string worldName)
+        public async Task CreateAsync(string worldName)
         {
             var world = LoadWorld(worldName);
             GameData.I.World = world;
-
             var worldGo = new GameObject("World");
 
-            GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
-
-            TaskCompletionSource<GameObject> worldTcs = new TaskCompletionSource<GameObject>();
-            StartCoroutine(MeshCreator.I.CreateCoroutineInitial(world, worldGo, ConstantsManager.I.MeshPerFrame, worldTcs));
-
-            TaskCompletionSource<Boolean> vobTcs = new TaskCompletionSource<Boolean>();
-            StartCoroutine(VobCreator.I.CreateCoroutineInitial(worldGo, world, ConstantsManager.I.VObPerFrame, vobTcs));
-
-            await Task.WhenAll(worldTcs.Task, vobTcs.Task);
-
-            worldMesh = (GameObject)worldTcs.Task.Result;
-
-            // VobCreator.I.Create(worldGo, world);
+            await MeshCreator.I.CreateAsync(world, worldGo, ConstantsManager.I.MeshPerFrame);
+            await VobCreator.I.CreateAsync(worldGo, world, ConstantsManager.I.VObPerFrame);
             WaynetCreator.I.Create(worldGo, world);
 
             DebugAnimationCreator.I.Create(worldName);
@@ -54,10 +42,7 @@ namespace GVR.Creator
                 PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
 
             // Set the global variable to the result of the coroutine
-
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
-
-            return worldGo;
         }
 
 
