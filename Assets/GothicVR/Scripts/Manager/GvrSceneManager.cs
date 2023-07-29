@@ -25,7 +25,16 @@ namespace GVR.Manager
 
         public GameObject interactionManager;
 
-        private const int EnsureLoadingBarDelayMilliseconds = 5;
+        private const int ensureLoadingBarDelayMilliseconds = 5;
+
+        
+        protected override void Awake()
+        {
+            base.Awake();
+            
+            SceneManager.sceneLoaded += OnWorldSceneLoaded;
+            SceneManager.sceneUnloaded += OnLoadingSceneUnloaded;
+        }
 
         /// <summary>
         /// Called once after bootstrapping scene is done.
@@ -34,20 +43,15 @@ namespace GVR.Manager
         public void LoadStartupScenes()
         {
             LoadWorld("world.zen", "ENTRANCE_SURFACE_OLDMINE");
-            // PxCs.Interface.PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP"); FP_GUARD_A_OC_179
         }
 
         public async void LoadWorld(string worldName, string startVob)
         {
-            var watch = Stopwatch.StartNew();
-
-            SceneManagerActionHandler();
-
-            await ShowLoadingScene(worldName);
-
             newWorldName = worldName;
             startVobAfterLoading = startVob;
-
+            var watch = Stopwatch.StartNew();
+            
+            await ShowLoadingScene(worldName);
             var newWorldScene = await LoadNewWorldScene(newWorldName);
             await WorldCreator.I.CreateAsync(newWorldName);
             SetSpawnPoint(newWorldScene);
@@ -95,7 +99,7 @@ namespace GVR.Manager
 
             // Delay for magic number amount to make sure that bar can be found
             // 1 and 2 caused issues for the 3rd time showing the loading scene in editor
-            await Task.Delay(EnsureLoadingBarDelayMilliseconds);
+            await Task.Delay(ensureLoadingBarDelayMilliseconds);
         }
 
         private void SetLoadingTextureForWorld(string worldName)
@@ -115,13 +119,7 @@ namespace GVR.Manager
 
             LoadingManager.I.ResetProgress();
         }
-
-        private void SceneManagerActionHandler()
-        {
-            SceneManager.sceneLoaded += OnWorldSceneLoaded;
-
-            SceneManager.sceneUnloaded += OnLoadingSceneUnloaded;
-        }
+        
         private void OnWorldSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             if (scene.name == newWorldName)
