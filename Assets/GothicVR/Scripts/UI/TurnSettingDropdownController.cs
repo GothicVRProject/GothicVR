@@ -31,7 +31,7 @@ public class TurnSettingDropdownController : MonoBehaviour
         continuousTurn = locomotionsystem.GetComponent<ActionBasedContinuousTurnProvider>();
 
         dropdown.value = PlayerPrefs.GetInt(ConstantsManager.I.turnSettingPlayerPref);
-        DropdownItemSelected(dropdown);
+        DropdownItemSelected(dropdown.value);
     }
 
     void DropdownItemSelected(int value)
