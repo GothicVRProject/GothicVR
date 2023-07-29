@@ -26,7 +26,7 @@ public class TurnSettingDropdownController : MonoBehaviour
             dropdown.options.Add(new TMP_Dropdown.OptionData() { text = item });
         }
         dropdown.itemText.font = GameData.I.GothicSubtitleFont;
-        dropdown.onValueChanged.AddListener(delegate { DropdownItemSelected(dropdown); });
+        dropdown.onValueChanged.AddListener(DropdownItemSelected);
         snapTurn = locomotionsystem.GetComponent<ActionBasedSnapTurnProvider>();
         continuousTurn = locomotionsystem.GetComponent<ActionBasedContinuousTurnProvider>();
 
@@ -34,9 +34,9 @@ public class TurnSettingDropdownController : MonoBehaviour
         DropdownItemSelected(dropdown);
     }
 
-    void DropdownItemSelected(TMP_Dropdown dropdown)
+    void DropdownItemSelected(int value)
     {
-        switch (dropdown.value)
+        switch (value)
         {
             case 1:
                 EnableContinuousTurn();
