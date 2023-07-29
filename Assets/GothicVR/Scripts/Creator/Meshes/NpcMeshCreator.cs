@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using GVR.Caches;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
@@ -12,7 +13,7 @@ namespace GVR.Creator.Meshes
     {
         private int tmpBodyTexNr;
         private int tmpBodyTexColor;
-        
+
         private VmGothicBridge.Mdl_SetVisualBodyData tempBodyData;
 
         public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
@@ -20,11 +21,11 @@ namespace GVR.Creator.Meshes
         {
             tmpBodyTexNr = bodyData.bodyTexNr;
             tmpBodyTexColor = bodyData.bodyTexColor;
-            
+
             var npcGo = Create(npcName, mdm, mdh, default, default, parent);
 
             AddHead(npcName, npcGo, morphMesh);
-            
+
             return npcGo;
         }
 
@@ -53,7 +54,7 @@ namespace GVR.Creator.Meshes
             // FIXME: Dirty hack. Needs to be optimized.
             if (name.ToUpper().Contains("MOUTH") || name.ToUpper().Contains("TEETH"))
                 return base.GetTexture(name);
-            
+
             if (!name.ToUpper().EndsWith("V0_C0.TGA"))
             {
                 Debug.LogError($"The format of body texture isn't right for ${name}");

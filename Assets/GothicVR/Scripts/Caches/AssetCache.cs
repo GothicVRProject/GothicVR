@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -149,7 +150,7 @@ namespace GVR.Caches
 
             return newData;
         }
-        
+
         /// <summary>
         /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
         /// </summary>
@@ -170,14 +171,12 @@ namespace GVR.Caches
             var preparedKey = GetPreparedKey(key);
             if (soundCache.TryGetValue(preparedKey, out PxSoundData<float> data))
                 return data;
-            
+
             var wavFile = PxSound.GetSoundArrayFromVfs<float>(GameData.I.VfsPtr, $"{preparedKey}.wav");
             soundCache[preparedKey] = wavFile;
 
             return wavFile;
         }
-
-
 
         private string GetPreparedKey(string key)
         {

@@ -57,7 +57,7 @@ namespace GothicVR.Editor
             GameData.I.VfsPtr = _vfsPtr;
             
             // use PhoenixImporter to handle loading the world and setting it to the correct scene.
-            WorldCreator.I.LoadEditorWorld(_vfsPtr, "world");
+            WorldCreator.I.LoadEditorWorld(_vfsPtr, "world.zen");
         }
 
         void OnGUI()

@@ -539,7 +539,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef149701c0a67744b88eaf8a23a75f75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textAsset: {fileID: 8765416009891714543}
   locomotionsystem: {fileID: 3286136462831979470}
   snapTurn: {fileID: 3286136462831979467}
   continuousTurn: {fileID: 3286136462831979465}
@@ -3494,25 +3493,57 @@ MonoBehaviour:
   m_PositionInput:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Position Input
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: 
+      m_Id: 09e78d00-9dc7-453b-9fd0-2fc6b53faa01
       m_Processors: 
       m_Interactions: 
-      m_SingletonActionBindings: []
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: b807e864-19ee-46f8-8440-36c8e1ce3872
+        m_Path: 
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Position Input
+        m_Flags: 0
+      - m_Name: 
+        m_Id: bf65eac4-2923-4bb1-8286-497f4d21e7ae
+        m_Path: 
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Position Input
+        m_Flags: 0
       m_Flags: 0
     m_Reference: {fileID: 0}
   m_RotationInput:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Rotation Input
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: 
+      m_Id: 9e470443-ca39-4578-8fe6-f5f5f408b1e0
       m_Processors: 
       m_Interactions: 
-      m_SingletonActionBindings: []
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 5daeceb7-ac94-4a41-9d01-c6ad7f222507
+        m_Path: 
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Rotation Input
+        m_Flags: 0
+      - m_Name: 
+        m_Id: f2462a6e-4a5d-4074-8a2b-971a511d990e
+        m_Path: 
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Rotation Input
+        m_Flags: 0
       m_Flags: 0
     m_Reference: {fileID: 0}
   m_TrackingStateInput:

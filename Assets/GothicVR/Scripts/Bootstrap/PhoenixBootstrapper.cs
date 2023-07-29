@@ -50,7 +50,6 @@ namespace GVR.Bootstrap
             LoadMusicVM(g1Dir);
             LoadMusic();
             LoadFonts();
-
             watch.Stop();
             Debug.Log($"Time spent for Bootstrapping Phoenix: {watch.Elapsed}");
 

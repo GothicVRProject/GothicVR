@@ -41,7 +41,7 @@ namespace GVR.Creator
             //CreateBloodfly();
         }
 
-#region Chest
+        #region Chest
         private void CreateChest(string worldName)
         {
             var name = "DebugChest";
@@ -70,7 +70,7 @@ namespace GVR.Creator
             rootObj.SetParent(parent);
 
             var bones = new GameObject[mdh.nodes.Length];
-            
+
             // Create empty GameObjects from hierarchy
             {
                 for (var i = 0; i < mdh.nodes.Length; i++)
@@ -318,7 +318,7 @@ namespace GVR.Creator
         }
         #endregion
 
-#region Grindstone
+        #region Grindstone
         private void CreateGrindstone(string worldName)
         {
             var name = "DebugGrindstone";
@@ -431,7 +431,7 @@ namespace GVR.Creator
 
             playableGraph.Play();
         }
-#endregion
+        #endregion
 
         private void CreateBloodfly()
         {
@@ -455,7 +455,6 @@ namespace GVR.Creator
             var mdh = PxModelHierarchy.LoadFromVfs(GameData.I.VfsPtr, mdhName);
             var mdm = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, mdmName);
             var mrm = PxMultiResolutionMesh.GetMRMFromVfs(GameData.I.VfsPtr, mrmName);
-
             var obj = MeshCreator.I.Create(name, mdm, mdh, default, default, debugObj);
 
 
@@ -605,7 +604,7 @@ namespace GVR.Creator
             var stingRotationX = stingEntries[4];
             var stingRotationY = stingEntries[5];
             var stingRotationZ = stingEntries[6];
-            
+
             clip.wrapMode = WrapMode.Loop;
 
             var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
