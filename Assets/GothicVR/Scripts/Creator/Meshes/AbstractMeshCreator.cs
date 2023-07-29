@@ -54,44 +54,6 @@ namespace GVR.Creator.Meshes
 
             return meshObj;
         }
-        public async Task<GameObject> CreateAsync(WorldData world, GameObject parent, int meshesPerFrame)
-        {
-            var meshObj = new GameObject()
-            {
-                name = "Mesh",
-                isStatic = true
-            };
-            meshObj.SetParent(parent);
-
-            // Track the progress of each sub-mesh creation separately
-            int numSubMeshes = world.subMeshes.Values.Count;
-            int meshesCreated = 0;
-
-            foreach (var subMesh in world.subMeshes.Values)
-            {
-                var subMeshObj = new GameObject()
-                {
-                    name = subMesh.material.name!,
-                    isStatic = true
-                };
-
-                var meshFilter = subMeshObj.AddComponent<MeshFilter>();
-                var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
-
-                PrepareMeshRenderer(meshRenderer, subMesh);
-                PrepareMeshFilter(meshFilter, subMesh);
-                PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
-
-                subMeshObj.SetParent(meshObj);
-
-                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
-
-                if (++meshesCreated % meshesPerFrame == 0)
-                    await Task.Yield(); // Yield to allow other operations to run in the frame
-            }
-
-            return meshObj;
-        }
 
         public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
@@ -474,7 +436,7 @@ namespace GVR.Creator.Meshes
             }
         }
 
-        private Collider PrepareMeshCollider(GameObject obj, Mesh mesh)
+        protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh)
         {
             var meshCollider = obj.AddComponent<MeshCollider>();
             meshCollider.sharedMesh = mesh;
@@ -484,7 +446,7 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        private Collider PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
+        protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
         {
             if (materialData.disableCollision ||
                 materialData.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water)
@@ -501,7 +463,7 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        private void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData[] materialDatas)
+        protected void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData[] materialDatas)
         {
             var anythingDisableCollission = materialDatas.Any(i => i.disableCollision);
             var anythingWater = materialDatas.Any(i => i.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water);

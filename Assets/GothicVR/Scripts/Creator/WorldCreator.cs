@@ -30,7 +30,7 @@ namespace GVR.Creator
             GameData.I.World = world;
             var worldGo = new GameObject("World");
 
-            worldMesh = await MeshCreator.I.CreateAsync(world, worldGo, ConstantsManager.I.MeshPerFrame);
+            worldMesh = await WorldMeshCreator.I.CreateAsync(world, worldGo, ConstantsManager.I.MeshPerFrame);
             await VobCreator.I.CreateAsync(worldGo, world, ConstantsManager.I.VObPerFrame);
             WaynetCreator.I.Create(worldGo, world);
 
@@ -190,10 +190,7 @@ namespace GVR.Creator
             var sampleScene = EditorSceneManager.GetSceneByName("Bootstrap");
             EditorSceneManager.SetActiveScene(sampleScene);
             sampleScene.GetRootGameObjects().Append(worldGo);
-
-            // load only the world mesh
-            // await MeshCreator.I.Create(world, worldGo);
-
+            
             // move the world to the correct scene
             EditorSceneManager.MoveGameObjectToScene(worldGo, worldScene);
 
