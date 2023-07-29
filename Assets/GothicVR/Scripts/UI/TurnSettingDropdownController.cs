@@ -34,7 +34,7 @@ public class TurnSettingDropdownController : MonoBehaviour
 
     void DropdownItemSelected(TMP_Dropdown dropdown)
     {
-        switch (dropdown.value)
+        switch (value)
         {
             case 1:
                 EnableContinuousTurn();
