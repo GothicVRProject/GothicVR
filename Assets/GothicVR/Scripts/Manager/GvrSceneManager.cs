@@ -130,7 +130,7 @@ namespace GVR.Manager
             }
             if (scene == generalScene)
             {
-                AudioSourceManager.I.SetAudioListener(Camera.main?.GetComponent<AudioListener>());
+                AudioSourceManager.I.SetAudioListener(Camera.main!.GetComponent<AudioListener>());
 
                 SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
 

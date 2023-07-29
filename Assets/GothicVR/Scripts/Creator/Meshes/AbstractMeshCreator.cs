@@ -54,7 +54,7 @@ namespace GVR.Creator.Meshes
 
             return meshObj;
         }
-        public async Task CreateAsync(WorldData world, GameObject parent, int meshesPerFrame)
+        public async Task<GameObject> CreateAsync(WorldData world, GameObject parent, int meshesPerFrame)
         {
             var meshObj = new GameObject()
             {
@@ -89,6 +89,8 @@ namespace GVR.Creator.Meshes
                 if (++meshesCreated % meshesPerFrame == 0)
                     await Task.Yield(); // Yield to allow other operations to run in the frame
             }
+
+            return meshObj;
         }
 
         public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)

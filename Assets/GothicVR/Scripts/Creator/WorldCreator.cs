@@ -30,7 +30,7 @@ namespace GVR.Creator
             GameData.I.World = world;
             var worldGo = new GameObject("World");
 
-            await MeshCreator.I.CreateAsync(world, worldGo, ConstantsManager.I.MeshPerFrame);
+            worldMesh = await MeshCreator.I.CreateAsync(world, worldGo, ConstantsManager.I.MeshPerFrame);
             await VobCreator.I.CreateAsync(worldGo, world, ConstantsManager.I.VObPerFrame);
             WaynetCreator.I.Create(worldGo, world);
 
