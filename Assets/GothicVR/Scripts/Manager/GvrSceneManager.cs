@@ -122,11 +122,12 @@ namespace GVR.Manager
         
         private void OnWorldSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            if (scene.name == newWorldName)
+            if (scene.name == "Loading")
             {
-                SceneManager.SetActiveScene(scene);
+                LoadingManager.I.SetBarFromScene(scene);
+                LoadingManager.I.SetMaterialForLoading(scene);
             }
-            if (scene == generalScene)
+            else if (scene == generalScene)
             {
                 AudioSourceManager.I.SetAudioListener(Camera.main!.GetComponent<AudioListener>());
 
@@ -135,12 +136,11 @@ namespace GVR.Manager
                 WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
 
                 var playerParent = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
-                playerParent.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
+                playerParent!.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
             }
-            if (scene.name == "Loading")
+            else if (scene.name == newWorldName?.ToLower())
             {
-                LoadingManager.I.SetBarFromScene(scene);
-                LoadingManager.I.SetMaterialForLoading(scene);
+                SceneManager.SetActiveScene(scene);
             }
         }
 
