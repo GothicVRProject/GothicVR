@@ -32,7 +32,7 @@ public class TurnSettingDropdownController : MonoBehaviour
         DropdownItemSelected(dropdown);
     }
 
-    void DropdownItemSelected(TMP_Dropdown dropdown)
+    void DropdownItemSelected(int value)
     {
         switch (value)
         {
