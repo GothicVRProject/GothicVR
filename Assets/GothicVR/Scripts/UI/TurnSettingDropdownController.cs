@@ -3,12 +3,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using GVR.Phoenix.Interface;
+using GVR.Manager;
+
 public class TurnSettingDropdownController : MonoBehaviour
 {
     public GameObject locomotionsystem;
     public ActionBasedSnapTurnProvider snapTurn;
     public ActionBasedContinuousTurnProvider continuousTurn;
-    private const string turnSettingPlayerPref = "TurnSetting";
+   
 
     void Awake()
     {
@@ -28,7 +30,7 @@ public class TurnSettingDropdownController : MonoBehaviour
         snapTurn = locomotionsystem.GetComponent<ActionBasedSnapTurnProvider>();
         continuousTurn = locomotionsystem.GetComponent<ActionBasedContinuousTurnProvider>();
 
-        dropdown.value = PlayerPrefs.GetInt(turnSettingPlayerPref);
+        dropdown.value = PlayerPrefs.GetInt(ConstantsManager.I.turnSettingPlayerPref);
         DropdownItemSelected(dropdown);
     }
 
@@ -50,13 +52,13 @@ public class TurnSettingDropdownController : MonoBehaviour
     {
         snapTurn.enabled = true;
         continuousTurn.enabled = false;
-        PlayerPrefs.SetInt("TurnSetting", 0);
+        PlayerPrefs.SetInt(ConstantsManager.I.turnSettingPlayerPref, 0);
     }
 
     void EnableContinuousTurn()
     {
         snapTurn.enabled = false;
         continuousTurn.enabled = true;
-        PlayerPrefs.SetInt("TurnSetting", 1);
+        PlayerPrefs.SetInt(ConstantsManager.I.turnSettingPlayerPref, 1);
     }
 }
