@@ -8,6 +8,53 @@ on:
 
 jobs:
   #########
+  # TESTS #
+  #########
+  
+  Unit_Tests:
+    if: ${{ github.event.label.name == 'Pipeline' }}
+    name: Test in ${{ matrix.testMode }}
+    runs-on: self-hosted
+    strategy:
+      fail-fast: false
+      matrix:
+        testMode:
+          - playmode
+          - editmode
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+          fetch-depth: 0
+          clean: true
+      - uses: actions/cache@v2
+        with:
+          path: ${{ matrix.projectPath }}/Library
+          key: Library-${{ matrix.projectPath }}
+          restore-keys: |
+            Library-
+      - uses: game-ci/unity-test-runner@v2
+        id: tests
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          testMode: ${{ matrix.testMode }}
+          artifactsPath: ${{ matrix.testMode }}-artifacts
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: ${{ matrix.testMode }} Test Results
+          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+my.assembly.*'
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: Test results for ${{ matrix.testMode }}
+          path: ${{ steps.tests.outputs.artifactsPath }}
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: Coverage results for ${{ matrix.testMode }}
+          path: ${{ steps.tests.outputs.coveragePath }}
+
+  #########
   # BUILD #
   #########
 
@@ -20,10 +67,10 @@ jobs:
         include:
           - targetPlatform: StandaloneWindows64
             targetDevice: Windows64
-#          - targetPlatform: Android
-#            targetDevice: Pico
-#          - targetPlatform: Android
-#            targetDevice: Quest
+          - targetPlatform: Android
+            targetDevice: Pico
+          - targetPlatform: Android
+            targetDevice: Quest
     steps:
       # Checkout
       - name: Checkout repository
@@ -56,8 +103,8 @@ jobs:
       - name: zip
         run: cd build/${{ matrix.targetDevice }} && zip -r ${{ matrix.targetDevice }}.zip *
         
-      - name: ls debug
-        run: pwd && ls -lah && ls -lah build && ls -lah build/${{ matrix.targetDevice }}
+#      - name: ls debug
+#        run: pwd && ls -lah && ls -lah build && ls -lah build/${{ matrix.targetDevice }}
 
       # Release
       - name: Upload Release Asset
@@ -68,7 +115,7 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: build/${{ matrix.targetDevice }}/${{ matrix.targetDevice }}.zip
-          asset_name: ${{ matrix.targetDevice }}.zip
+          asset_name: GothicVR-${{ matrix.targetDevice }}.zip
           asset_content_type: application/zip
 
 
