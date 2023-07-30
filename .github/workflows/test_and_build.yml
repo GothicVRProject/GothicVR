@@ -4,24 +4,24 @@ on:
   pull_request:
     branches:
       - main
-    types: [opened, reopened, synchronize]
-    paths-ignore:
-      - 'docs/**'
-      - "README.md"
-    
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'docs/**'
-      - "README.md"
+    types: [labeled]
+
+# We will reuse it once we define release pipeline
+#  push:
+#    branches:
+#      - main
+#    paths-ignore:
+#      - 'docs/**'
+#      - "README.md"
+
 
 jobs:
-
   #########
   # TESTS #
   #########
+  
   Unit_Tests:
+    if: ${{ github.event.label.name == 'Pipeline' }}
     name: Test in ${{ matrix.testMode }}
     runs-on: self-hosted
     strategy:
@@ -68,6 +68,7 @@ jobs:
   #########
 
   buildForAllPlatforms:
+    if: ${{ github.event.label.name == 'Pipeline' }}
     name: Build GothicVR for ${{ matrix.targetDevice }}
     needs: Unit_Tests
     runs-on: self-hosted
