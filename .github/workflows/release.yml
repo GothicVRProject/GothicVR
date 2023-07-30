@@ -51,8 +51,11 @@ jobs:
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
           buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
+      - name: zip
+        run: zip -r ${{ matrix.targetDevice }}.zip build/{{ matrix.targetDevice }}
       - name: ls
         run: pwd && ls -lah && ls -lah build/ && ls -lah build/Windows64/ && ls -lah build/StandaloneWindows64/
+
       # Release
       - name: Upload Release Asset
         id: upload-release-asset 
@@ -61,7 +64,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: build/${{ matrix.targetDevice }}
+          asset_path: build/${{ matrix.targetDevice }}.zip
           asset_name: Build-${{ matrix.targetDevice }}
           asset_content_type: application/zip
 
