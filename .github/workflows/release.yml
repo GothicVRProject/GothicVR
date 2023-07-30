@@ -20,10 +20,10 @@ jobs:
         include:
           - targetPlatform: StandaloneWindows64
             targetDevice: Windows64
-          - targetPlatform: Android
-            targetDevice: Pico
-          - targetPlatform: Android
-            targetDevice: Quest
+#          - targetPlatform: Android
+#            targetDevice: Pico
+#          - targetPlatform: Android
+#            targetDevice: Quest
     steps:
       # Checkout
       - name: Checkout repository
@@ -55,6 +55,9 @@ jobs:
       # Zip
       - name: zip
         run: cd build/${{ matrix.targetDevice }} && zip -r ${{ matrix.targetDevice }}.zip *
+        
+      - name: ls debug
+        run: pwd && ls -lah && ls -lah build && ls -lah build/${{ matrix.targetDevice }}
 
       # Release
       - name: Upload Release Asset
@@ -64,7 +67,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: build/${{ matrix.targetDevice }}.zip
+          asset_path: build/${{ matrix.targetDevice }}/${{ matrix.targetDevice }}.zip
           asset_name: ${{ matrix.targetDevice }}.zip
           asset_content_type: application/zip
 
