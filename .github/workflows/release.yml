@@ -20,10 +20,10 @@ jobs:
         include:
           - targetPlatform: StandaloneWindows64
             targetDevice: Windows64
-#          - targetPlatform: Android
-#            targetDevice: Pico
-#          - targetPlatform: Android
-#            targetDevice: Quest
+          - targetPlatform: Android
+            targetDevice: Pico
+          - targetPlatform: Android
+            targetDevice: Quest
     steps:
       # Checkout
       - name: Checkout repository
@@ -51,8 +51,10 @@ jobs:
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
           buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
+
+      # Zip
       - name: zip
-        run: cd build/${{ matrix.targetDevice }} zip -r ${{ matrix.targetDevice }}.zip *
+        run: cd build/${{ matrix.targetDevice }} && zip -r ${{ matrix.targetDevice }}.zip *
 
       # Release
       - name: Upload Release Asset
