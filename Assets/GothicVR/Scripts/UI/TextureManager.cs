@@ -1,9 +1,9 @@
 using System;
-using UnityEngine;
+using System.Collections;
 using GVR.Caches;
-using GVR.Util;
 using GVR.Phoenix.Interface;
-using TMPro;
+using UnityEngine;
+
 public class TextureManager : MonoBehaviour
 {
     private Texture2D backgroundtexture;
@@ -29,10 +29,13 @@ public class TextureManager : MonoBehaviour
         if (!textureloaded && GameData.I.VdfsPtr != IntPtr.Zero)
         {
             LoadCustomTextures();
+            
+            // Set Skybox one frame later.
+            StartCoroutine(SetSkyBox());
         }
     }
 
-    public void LoadCustomTextures()
+    private void LoadCustomTextures()
     {
         textureloaded = true;
         backgroundtexture = AssetCache.I.TryGetTexture("LOG_PAPER.TGA");
@@ -57,4 +60,15 @@ public class TextureManager : MonoBehaviour
         skymaterial.mainTexture = skytexture;
     }
 
+    /// <summary>
+    /// For some reason Skybox resets itself to default.
+    /// It might be, as we have no real material set initially. Therefore we set this one now.
+    /// One frame after we set the material.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator SetSkyBox()
+    {
+        yield return null; // Skip 1 frame
+        RenderSettings.skybox = skymaterial;
+    }
 }
