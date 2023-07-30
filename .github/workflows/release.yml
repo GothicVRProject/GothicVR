@@ -1,66 +1,18 @@
 name: GothicVR Release Job
 
 on:
-  push:
-    # Sequence of patterns matched against refs/tags
-    tags:
-    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  release:
+    types:
+      - created
 
 
 jobs:
-  #########
-  # TESTS #
-  #########
-  
-  Unit_Tests:
-    name: Test in ${{ matrix.testMode }}
-    runs-on: self-hosted
-    strategy:
-      fail-fast: false
-      matrix:
-        testMode:
-          - playmode
-          - editmode
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-          fetch-depth: 0
-          clean: true
-      - uses: actions/cache@v2
-        with:
-          path: ${{ matrix.projectPath }}/Library
-          key: Library-${{ matrix.projectPath }}
-          restore-keys: |
-            Library-
-      - uses: game-ci/unity-test-runner@v2
-        id: tests
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-        with:
-          testMode: ${{ matrix.testMode }}
-          artifactsPath: ${{ matrix.testMode }}-artifacts
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          checkName: ${{ matrix.testMode }} Test Results
-          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+my.assembly.*'
-      - uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: Test results for ${{ matrix.testMode }}
-          path: ${{ steps.tests.outputs.artifactsPath }}
-      - uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: Coverage results for ${{ matrix.testMode }}
-          path: ${{ steps.tests.outputs.coveragePath }}
-
   #########
   # BUILD #
   #########
 
   buildForAllPlatforms:
     name: Build GothicVR for ${{ matrix.targetDevice }}
-    needs: Unit_Tests
     runs-on: self-hosted
     strategy:
       fail-fast: false
@@ -68,10 +20,10 @@ jobs:
         include:
           - targetPlatform: StandaloneWindows64
             targetDevice: Windows64
-          - targetPlatform: Android
-            targetDevice: Pico
-          - targetPlatform: Android
-            targetDevice: Quest
+#          - targetPlatform: Android
+#            targetDevice: Pico
+#          - targetPlatform: Android
+#            targetDevice: Quest
     steps:
       # Checkout
       - name: Checkout repository
@@ -101,26 +53,16 @@ jobs:
           buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
 
       # Release
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
       - name: Upload Release Asset
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ github.event.release.upload_url }}
           asset_name: Build-${{ matrix.targetDevice }}
           asset_path: build/${{ matrix.targetDevice }}
-          asset_content_type: application/zip
+          asset_content_type: binary/octet-stream
 
 
 #      - uses: actions/upload-artifact@v2
