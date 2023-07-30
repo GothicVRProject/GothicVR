@@ -61,7 +61,7 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: build/${{ matrix.targetPlatform }}
-          asset_name: Build-${{ matrix.targetPlatform }}.zip
+          asset_name: Build-${{ matrix.targetPlatform }}.exe
           asset_content_type: application/zip
 
 
