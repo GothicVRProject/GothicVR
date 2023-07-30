@@ -52,7 +52,7 @@ jobs:
           allowDirtyBuild: true
           buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
       - name: zip
-        run: zip -r ${{ matrix.targetDevice }}.zip build/{{ matrix.targetDevice }}
+        run: zip -r ${{ matrix.targetDevice }}.zip build/${{ matrix.targetDevice }}
       - name: ls
         run: pwd && ls -lah && ls -lah build/ && ls -lah build/Windows64/ && ls -lah build/StandaloneWindows64/
 
