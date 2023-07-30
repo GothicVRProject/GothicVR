@@ -51,7 +51,8 @@ jobs:
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
           buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
-
+      - name: ls
+        run: pwd && ls -lah && ls -lah build/
       # Release
       - name: Upload Release Asset
         id: upload-release-asset 
