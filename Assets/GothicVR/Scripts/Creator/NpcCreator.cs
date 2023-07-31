@@ -1,23 +1,19 @@
+using System;
+using System.Linq;
 using GVR.Caches;
-using GVR.Demo;
+using GVR.Creator.Meshes;
+using GVR.Debugging;
+using GVR.Manager;
 using GVR.Npc;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
+using PxCs.Data.Model;
 using PxCs.Extensions;
 using PxCs.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using GVR.Creator.Meshes;
-using GVR.Debugging;
-using GVR.Manager;
-using PxCs.Data.Mesh;
-using Unity.XR.CoreUtils;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace GVR.Creator
 {
@@ -146,29 +142,20 @@ namespace GVR.Creator
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
             var npc = lookupCache.npcCache[symbolIndex];
             var mdh = npc.GetComponent<Properties>().mdh;
-            var mdm = assetCache.TryGetMdm(data.body);
             var mmb = assetCache.TryGetMmb(data.head);
-
-
-            // FIXME - DEBUGging right now.
-            if (data.armor >= 0)
+            
+            PxModelMeshData mdm;
+            if (FeatureFlags.I.CreateNpcArmor && data.armor >= 0)
             {
                 var armorData = assetCache.TryGetItemData((uint)data.armor);
-                var armorMdm = assetCache.TryGetMdm(armorData?.visualChange);
-                
-
-                var npcGo = NpcMeshCreator.I.CreateNpc(name, armorMdm, mdh, mmb, data, npc);
+                mdm = assetCache.TryGetMdm(armorData.visualChange);
             }
             else
             {
-                var npcGo = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
+                mdm = assetCache.TryGetMdm(data.body);
             }
-
-
-            // if (!FeatureFlags.I.CreateNpcArmor)
-            //     return;
-
-            // MeshCreator.I.Create($"{name}-{armorData.visual}", armorMrm, default, default, false, npcGo);
+            
+            NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
         }
     }
 }
