@@ -22,15 +22,15 @@ namespace GVR.Creator
 {
     public class WorldCreator : SingletonBehaviour<WorldCreator>
     {
-        private GameObject worldMesh;
+        private GameObject worldGo;
 
         public async Task CreateAsync(string worldName)
         {
             var world = LoadWorld(worldName);
             GameData.I.World = world;
-            var worldGo = new GameObject("World");
+            worldGo = new GameObject("World");
 
-            worldMesh = await WorldMeshCreator.I.CreateAsync(world, worldGo, ConstantsManager.I.MeshPerFrame);
+            await WorldMeshCreator.I.CreateAsync(world, worldGo, ConstantsManager.I.MeshPerFrame);
             await VobCreator.I.CreateAsync(worldGo, world, ConstantsManager.I.VObPerFrame);
             WaynetCreator.I.Create(worldGo, world);
 
@@ -52,11 +52,11 @@ namespace GVR.Creator
         public void PostCreate(XRInteractionManager interactionManager)
         {
             // If we load a new scene, just remove the existing one.
-            if (worldMesh.TryGetComponent(out TeleportationArea teleportArea))
+            if (worldGo.TryGetComponent(out TeleportationArea teleportArea))
                 Destroy(teleportArea);
 
             // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
-            var teleportationArea = worldMesh.AddComponent<TeleportationArea>();
+            var teleportationArea = worldGo.AddComponent<TeleportationArea>();
             if (interactionManager != null)
             {
                 teleportationArea.interactionManager = interactionManager;
