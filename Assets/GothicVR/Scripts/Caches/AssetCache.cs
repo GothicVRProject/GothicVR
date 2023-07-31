@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -24,7 +25,6 @@ namespace GVR.Caches
         private Dictionary<string, PxMorphMeshData> mmbCache = new();
 
         private Dictionary<string, PxVmItemData> itemDataCache = new();
-
         private Dictionary<string, PxVmSfxData> sfxDataCache = new();
 
         private Dictionary<string, PxSoundData<float>> soundCache = new();
@@ -38,8 +38,8 @@ namespace GVR.Caches
 
 
             // FIXME - There might be more textures to load compressed. Please check for sake of performance!
-            var pxTexture = PxTexture.GetTextureFromVdf(
-                GameData.I.VdfsPtr,
+            var pxTexture = PxTexture.GetTextureFromVfs(
+                GameData.I.VfsPtr,
                 key,
                 PxTexture.Format.tex_dxt1, PxTexture.Format.tex_dxt5
             );
@@ -70,7 +70,7 @@ namespace GVR.Caches
             if (mdsCache.TryGetValue(preparedKey, out PxModelScriptData data))
                 return data;
 
-            var newData = PxModelScript.GetModelScriptFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mds");
+            var newData = PxModelScript.GetModelScriptFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mds");
             mdsCache[preparedKey] = newData;
 
             return newData;
@@ -82,7 +82,7 @@ namespace GVR.Caches
             if (mdhCache.TryGetValue(preparedKey, out PxModelHierarchyData data))
                 return data;
 
-            var newData = PxModelHierarchy.LoadFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mdh");
+            var newData = PxModelHierarchy.LoadFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mdh");
             mdhCache[preparedKey] = newData;
 
             return newData;
@@ -94,7 +94,7 @@ namespace GVR.Caches
             if (mdlCache.TryGetValue(preparedKey, out PxModelData data))
                 return data;
 
-            var newData = PxModel.LoadModelFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mdl");
+            var newData = PxModel.LoadModelFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mdl");
             mdlCache[preparedKey] = newData;
 
             return newData;
@@ -106,7 +106,7 @@ namespace GVR.Caches
             if (mdmCache.TryGetValue(preparedKey, out PxModelMeshData data))
                 return data;
 
-            var newData = PxModelMesh.LoadModelMeshFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mdm", attachmentKeys);
+            var newData = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mdm", attachmentKeys);
             mdmCache[preparedKey] = newData;
 
             return newData;
@@ -118,7 +118,7 @@ namespace GVR.Caches
             if (mrmCache.TryGetValue(preparedKey, out PxMultiResolutionMeshData data))
                 return data;
 
-            var newData = PxMultiResolutionMesh.GetMRMFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mrm");
+            var newData = PxMultiResolutionMesh.GetMRMFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mrm");
             mrmCache[preparedKey] = newData;
 
             return newData;
@@ -130,35 +130,20 @@ namespace GVR.Caches
             if (mmbCache.TryGetValue(preparedKey, out PxMorphMeshData data))
                 return data;
 
-            var newData = PxMorphMesh.LoadMorphMeshFromVdf(GameData.I.VdfsPtr, $"{preparedKey}.mmb");
+            var newData = PxMorphMesh.LoadMorphMeshFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mmb");
             mmbCache[preparedKey] = newData;
 
             return newData;
         }
 
         /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix.
-        /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
-        /// </summary>
-        public PxVmItemData TryGetItemData(uint instanceId)
-        {
-            var symbol = PxVm.GetSymbol(GameData.I.VmGothicPtr, instanceId);
-
-            if (symbol == null)
-                return null;
-
-            return TryGetItemData(symbol.name);
-        }
-        
-        /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix.
-        /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
+        /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
         /// </summary>
         public PxVmItemData TryGetItemData(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (itemDataCache.TryGetValue(preparedKey, out PxVmItemData item))
-                return item;
+            if (itemDataCache.TryGetValue(preparedKey, out PxVmItemData data))
+                return data;
 
             var newData = PxVm.InitializeItem(GameData.I.VmGothicPtr, preparedKey);
             itemDataCache[preparedKey] = newData;
@@ -186,13 +171,13 @@ namespace GVR.Caches
             var preparedKey = GetPreparedKey(key);
             if (soundCache.TryGetValue(preparedKey, out PxSoundData<float> data))
                 return data;
-            
-            var wavFile = PxSound.GetSoundArrayFromVDF<float>(GameData.I.VdfsPtr, $"{preparedKey}.wav");
+
+            var wavFile = PxSound.GetSoundArrayFromVfs<float>(GameData.I.VfsPtr, $"{preparedKey}.wav");
             soundCache[preparedKey] = wavFile;
 
             return wavFile;
         }
-        
+
         private string GetPreparedKey(string key)
         {
             var lowerKey = key.ToLower();

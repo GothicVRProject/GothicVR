@@ -144,5 +144,11 @@ namespace GVR.Manager
             float distanceFromPlayer = Vector3.Distance(gameObj.transform.position, audioListener.transform.position);
             return distanceFromPlayer <= maxDistance;
         }
+
+        public void ResetDictionaries()
+        {
+            audioSources = new Dictionary<GameObject, AudioSource>();
+            gridCells = new Dictionary<Vector3Int, List<GameObject>>();
+        }
     }
 }

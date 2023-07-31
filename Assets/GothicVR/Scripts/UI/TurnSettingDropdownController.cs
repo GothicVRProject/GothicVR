@@ -11,6 +11,10 @@ public class TurnSettingDropdownController : MonoBehaviour
 
     void Awake()
     {
+        // FIXME - If we're on Loading scene, there is no locomotionSystem. We should switch it to something like "isLoadingState".
+        if (locomotionsystem == null)
+            return;
+        
         var dropdown = transform.GetComponent<TMP_Dropdown>();
         dropdown.options.Clear();
 
