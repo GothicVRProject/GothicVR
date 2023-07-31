@@ -57,7 +57,7 @@ namespace GVR.Creator.Meshes
 
             if (!name.ToUpper().EndsWith("V0_C0.TGA"))
             {
-                Debug.LogError($"The format of body texture isn't right for ${name}");
+                // Debug.LogError($"The format of body texture isn't right for ${name}");
                 return base.GetTexture(name);
             }
 
