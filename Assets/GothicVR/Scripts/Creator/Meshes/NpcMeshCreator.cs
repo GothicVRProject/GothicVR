@@ -75,9 +75,12 @@ namespace GVR.Creator.Meshes
 
             if (swordGo == null)
                 return;
-            
-            var meshFilter = swordGo.AddComponent<MeshFilter>();
-            var meshRenderer = swordGo.AddComponent<MeshRenderer>();
+
+            // Bugfix: e.g. there's a Buddler who has a NailMace and Club equipped at the same time.
+            if (!swordGo.TryGetComponent<MeshFilter>(out var meshFilter))
+                meshFilter = swordGo.AddComponent<MeshFilter>();
+            if (!swordGo.TryGetComponent<MeshRenderer>(out var meshRenderer))
+                meshRenderer = swordGo.AddComponent<MeshRenderer>();
 
             PrepareMeshRenderer(meshRenderer, mrm);
             PrepareMeshFilter(meshFilter, mrm);
