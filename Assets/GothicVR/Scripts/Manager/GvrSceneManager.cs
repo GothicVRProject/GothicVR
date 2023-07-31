@@ -2,8 +2,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator;
+using GVR.Debugging;
 using GVR.Phoenix.Interface;
 using GVR.Util;
+using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -40,12 +42,16 @@ namespace GVR.Manager
         /// Called once after bootstrapping scene is done.
         /// Then load either menu or a world defined inside DebugSettings.
         /// </summary>
-        public void LoadStartupScenes()
+        public async Task LoadStartupScenes()
         {
-            LoadWorld("world.zen", "ENTRANCE_SURFACE_OLDMINE");
+            await LoadWorld("world.zen", "ENTRANCE_SURFACE_OLDMINE");
+
+            // Debug! Will be removed in the future.
+            if (FeatureFlags.I.CreateOcNpcs)
+                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
         }
 
-        public async void LoadWorld(string worldName, string startVob)
+        public async Task LoadWorld(string worldName, string startVob)
         {
             newWorldName = worldName;
             startVobAfterLoading = startVob;

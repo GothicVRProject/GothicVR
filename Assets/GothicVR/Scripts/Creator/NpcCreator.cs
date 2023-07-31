@@ -33,6 +33,7 @@ namespace GVR.Creator
             VmGothicBridge.PhoenixMdl_SetVisual.AddListener(Mdl_SetVisual);
             VmGothicBridge.PhoenixMdl_ApplyOverlayMds.AddListener(Mdl_ApplyOverlayMds);
             VmGothicBridge.PhoenixMdl_SetVisualBody.AddListener(Mdl_SetVisualBody);
+            VmGothicBridge.PhoenixEquipItem.AddListener(EquipItem);
         }
 
         private static GameObject GetRootGo()
@@ -156,6 +157,22 @@ namespace GVR.Creator
             }
             
             NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
+        }
+
+        private static void EquipItem(VmGothicBridge.EquipItemData data)
+        {
+            var itemData = assetCache.TryGetItemData((uint)data.itemId);
+            var mrm = assetCache.TryGetMrm(itemData.visual);
+
+            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
+            var npc = lookupCache.npcCache[symbolIndex];
+
+            if (itemData.mainFlag != 2) // ITEM_KAT_NF
+                return;
+            
+            // if (itemData.flags == )
+            
+            NpcMeshCreator.I.CreateSword(npc, mrm);
         }
     }
 }

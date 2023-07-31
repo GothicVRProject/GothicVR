@@ -67,5 +67,20 @@ namespace GVR.Creator.Meshes
 
             return AssetCache.I.TryGetTexture(formattedTextureName);
         }
+
+
+        public void CreateSword(GameObject npcGo, PxMultiResolutionMeshData mrm)
+        {
+            var swordGo = npcGo.FindChildRecursively("ZS_SWORD");
+
+            if (swordGo == null)
+                return;
+            
+            var meshFilter = swordGo.AddComponent<MeshFilter>();
+            var meshRenderer = swordGo.AddComponent<MeshRenderer>();
+
+            PrepareMeshRenderer(meshRenderer, mrm);
+            PrepareMeshFilter(meshFilter, mrm);
+        }
     }
 }

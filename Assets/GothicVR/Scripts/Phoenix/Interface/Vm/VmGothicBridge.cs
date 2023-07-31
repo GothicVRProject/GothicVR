@@ -31,9 +31,6 @@ namespace GVR.Phoenix.Interface.Vm
 
 
 
-
-
-
         public static void RegisterExternals(IntPtr vmPtr)
         {
             PxVm.pxVmRegisterExternalDefault(vmPtr, DefaultExternal);
@@ -43,6 +40,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisual", Mdl_SetVisual);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_ApplyOverlayMds", Mdl_ApplyOverlayMds);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisualBody", Mdl_SetVisualBody);
+            PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
             
             PxVm.pxVmRegisterExternal(vmPtr, "ConcatStrings", ConcatStrings);
@@ -54,6 +52,7 @@ namespace GVR.Phoenix.Interface.Vm
         public static UnityEvent<Mdl_SetVisualData> PhoenixMdl_SetVisual = new();
         public static UnityEvent<Mdl_ApplyOverlayMdsData> PhoenixMdl_ApplyOverlayMds = new();
         public static UnityEvent<Mdl_SetVisualBodyData> PhoenixMdl_SetVisualBody = new();
+        public static UnityEvent<EquipItemData> PhoenixEquipItem = new();
         public static UnityEvent<string> PhoenixMdl_AI_OUTPUT = new();
 
 
@@ -211,6 +210,24 @@ namespace GVR.Phoenix.Interface.Vm
             );
         }
 
+        public struct EquipItemData
+        {
+            public IntPtr npcPtr;
+            public int itemId;
+        }
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void EquipItem(IntPtr vmPtr)
+        {
+            var itemId = PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            PhoenixEquipItem.Invoke(new ()
+            {
+                npcPtr = npcPtr,
+                itemId = itemId
+            });
+        }
+        
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void AI_OUTPUT(IntPtr vmPtr)
         {
