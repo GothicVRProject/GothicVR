@@ -1,20 +1,14 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using GVR.Caches;
-using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
-using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 namespace GVR.Creator.Meshes
 {
@@ -23,6 +17,7 @@ namespace GVR.Creator.Meshes
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
         protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        private const string waterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
         protected const float decalOpacity = 0.75f;
 
 
@@ -160,7 +155,17 @@ namespace GVR.Creator.Meshes
 
         protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
-            var material = GetEmptyMaterial();
+            Material material;
+            switch (subMesh.material.group)
+            {
+                case PxMaterial.PxMaterialGroup.PxMaterialGroup_Water:
+                    material = GetWaterMaterial(subMesh.material);
+                    break;
+                default:
+                    material = GetDefaultMaterial();
+                    break;
+            }
+
             var bMaterial = subMesh.material;
 
             rend.material = material;
@@ -209,7 +214,7 @@ namespace GVR.Creator.Meshes
 
             foreach (var subMesh in mrmData.subMeshes)
             {
-                var material = GetEmptyMaterial();
+                var material = GetDefaultMaterial();
                 var materialData = subMesh.material;
 
                 rend.material = material;
@@ -477,13 +482,41 @@ namespace GVR.Creator.Meshes
             return AssetCache.I.TryGetTexture(name);
         }
 
-        protected Material GetEmptyMaterial()
+        protected Material GetDefaultMaterial()
         {
             var standardShader = Shader.Find(defaultShader);
             var material = new Material(standardShader);
 
             // Enable clipping of alpha values.
             material.EnableKeyword("_ALPHATEST_ON");
+
+            return material;
+        }
+
+        private Material GetWaterMaterial(PxMaterialData materialData)
+        {
+            var shader = Shader.Find(waterShader);
+            Material material = new Material(shader);
+
+            // FIXME - Running water speed and direction is hardcoded based on material names
+            // Needs to be improved by a better shader and the implementation of proper water material parameters
+
+            //Jaxtors suggestion for a not so hardcoded running water implementation
+            //material.SetFloat("_ScrollSpeed", -900000 * materialData.animMapDir.ToUnityVector().SqrMagnitude());
+
+            switch (materialData.name)
+            {
+                case "OWODSEA2SWAMP": material.SetFloat("_ScrollSpeed", 0f); break;
+                case "NCWASSER": material.SetFloat("_ScrollSpeed", 0f); break;
+                case "OWODWATSTOP": material.SetFloat("_ScrollSpeed", (materialData.animFps / 75f)); break;
+                case "OWODWFALL": material.SetFloat("_ScrollSpeed", -(materialData.animFps / 10f)); break;
+                default: material.SetFloat("_ScrollSpeed", -(materialData.animFps / 75f)); break;
+            }
+
+            material.SetFloat("_Surface", 0);
+            material.SetInt("_ZWrite", 0);
+            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
 
             return material;
         }

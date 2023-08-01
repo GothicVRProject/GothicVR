@@ -11,7 +11,7 @@ public class TextureManager : SingletonBehaviour<TextureManager>
     public Material sliderpositionmaterial;
     public Material arrowmaterial;
     public Material fillermaterial;
-    // public Material skymaterial;
+    public Material skymaterial;
 
     public Material GothicLoadingMenuMaterial;
     public Material LoadingBarBackgroundMaterial;
@@ -66,6 +66,9 @@ public class TextureManager : SingletonBehaviour<TextureManager>
 
         var arrowtexture = AssetCache.I.TryGetTexture("U.TGA");
         arrowmaterial.mainTexture = arrowtexture;
+
+        var skytexture = AssetCache.I.TryGetTexture("SKYDAY_LAYER1_A0-C.TEX");
+        skymaterial.mainTexture = skytexture;
     }
 
     public void SetTexture(string texture, Material material)

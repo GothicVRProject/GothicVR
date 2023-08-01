@@ -1,19 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using GVR.Creator.Meshes;
+using GVR.Debugging;
 using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
-using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using GVR.Creator.Meshes;
-using GVR.Debugging;
-using System.Threading.Tasks;
 using PxCs.Data.WayNet;
 using PxCs.Interface;
-
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
@@ -61,6 +60,10 @@ namespace GVR.Creator
             {
                 teleportationArea.interactionManager = interactionManager;
             }
+            
+            // TODO - For some reason the referenced skybox in scene is reset to default once game starts.
+            // We therefore need to reset it now again.
+            RenderSettings.skybox = TextureManager.I.skymaterial;
         }
 
         private WorldData LoadWorld(string worldName)
