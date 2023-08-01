@@ -3,11 +3,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using GVR.Phoenix.Interface;
+using GVR.Manager;
+
 public class TurnSettingDropdownController : MonoBehaviour
 {
     public GameObject locomotionsystem;
     public ActionBasedSnapTurnProvider snapTurn;
     public ActionBasedContinuousTurnProvider continuousTurn;
+   
 
     void Awake()
     {
@@ -25,31 +28,41 @@ public class TurnSettingDropdownController : MonoBehaviour
         foreach (var item in items)
         {
             dropdown.options.Add(new TMP_Dropdown.OptionData() { text = item });
-
         }
         dropdown.itemText.font = GameData.I.GothicSubtitleFont;
-
-        dropdown.onValueChanged.AddListener(delegate { DropdownItemSelected(dropdown); });
+        dropdown.onValueChanged.AddListener(DropdownItemSelected);
         snapTurn = locomotionsystem.GetComponent<ActionBasedSnapTurnProvider>();
         continuousTurn = locomotionsystem.GetComponent<ActionBasedContinuousTurnProvider>();
+
+        dropdown.value = PlayerPrefs.GetInt(ConstantsManager.I.turnSettingPlayerPref);
+        DropdownItemSelected(dropdown.value);
     }
 
-    void DropdownItemSelected(TMP_Dropdown dropdown)
+    void DropdownItemSelected(int value)
     {
-        switch (dropdown.value)
+        switch (value)
         {
-            case 0:
-                snapTurn.enabled = true;
-                continuousTurn.enabled = false;
-                break;
             case 1:
-                snapTurn.enabled = false;
-                continuousTurn.enabled = true;
+                EnableContinuousTurn();
                 break;
+            case 0:
             default:
-                snapTurn.enabled = true;
-                continuousTurn.enabled = false;
+                EnableSnapTurn();
                 break;
         }
+    }
+
+    void EnableSnapTurn()
+    {
+        snapTurn.enabled = true;
+        continuousTurn.enabled = false;
+        PlayerPrefs.SetInt(ConstantsManager.I.turnSettingPlayerPref, 0);
+    }
+
+    void EnableContinuousTurn()
+    {
+        snapTurn.enabled = false;
+        continuousTurn.enabled = true;
+        PlayerPrefs.SetInt(ConstantsManager.I.turnSettingPlayerPref, 1);
     }
 }
