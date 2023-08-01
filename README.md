@@ -26,7 +26,7 @@ We're always looking for people with knowledge and/or spirit. Feel free to reach
 
 ## Workflow/Gameflow
 
-![data flow](docs/assets/diagrams/data-flow.png)
+![data flow](docs/development/diagrams/data-flow.png)
 
 
 1. GothicVR requests data from PxCs.dll (.net standard 2.1 shared library which is cross-OS compatibel)

@@ -39,17 +39,17 @@ namespace GVR.Bootstrap
 
             var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
 
+            // FIXME - We currently don't load from within _WORK directory which is required for e.g. mods who use it.
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "Data"));
 
             // Holy grail of everything! If this pointer is zero, we have nothing but a plain empty wormhole.
-            GameData.I.VdfsPtr = VdfsBridge.LoadVdfsInDirectory(fullPath);
+            GameData.I.VfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);
 
             LoadGothicVM(g1Dir);
             LoadSfxVM(g1Dir);
             LoadMusicVM(g1Dir);
             LoadMusic();
             LoadFonts();
-
             watch.Stop();
             Debug.Log($"Time spent for Bootstrapping Phoenix: {watch.Elapsed}");
 
@@ -71,8 +71,8 @@ namespace GVR.Bootstrap
                     Debug.LogWarning(message);
                     break;
                 case PxLogging.Level.error:
-                    var isVdfMessage = message.StartsWith("failed to find vdf entry");
-                    if (isVdfMessage && !FeatureFlags.I.ShowVdfsFileNotFoundErrors)
+                    var isVfsMessage = message.StartsWith("failed to find vfs entry");
+                    if (isVfsMessage && !FeatureFlags.I.ShowVfsFileNotFoundErrors)
                         break;
 
                     Debug.LogError(message);

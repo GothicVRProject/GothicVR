@@ -1,18 +1,9 @@
-name: GothicVR Build Jobs
+name: GothicVR Release Job
 
 on:
-  pull_request:
-    branches:
-      - main
-    types: [labeled]
-
-# We will reuse it once we define release pipeline
-#  push:
-#    branches:
-#      - main
-#    paths-ignore:
-#      - 'docs/**'
-#      - "README.md"
+  release:
+    types:
+      - created
 
 
 jobs:
@@ -21,7 +12,6 @@ jobs:
   #########
   
   Unit_Tests:
-    if: ${{ github.event.label.name == 'Pipeline' }}
     name: Test in ${{ matrix.testMode }}
     runs-on: self-hosted
     strategy:
@@ -68,7 +58,6 @@ jobs:
   #########
 
   buildForAllPlatforms:
-    if: ${{ github.event.label.name == 'Pipeline' }}
     name: Build GothicVR for ${{ matrix.targetDevice }}
     needs: Unit_Tests
     runs-on: self-hosted
@@ -110,8 +99,28 @@ jobs:
           allowDirtyBuild: true
           buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
 
-      - uses: actions/upload-artifact@v2
+      # Zip
+      - name: zip
+        run: cd build/${{ matrix.targetDevice }} && zip -r ${{ matrix.targetDevice }}.zip *
+        
+#      - name: ls debug
+#        run: pwd && ls -lah && ls -lah build && ls -lah build/${{ matrix.targetDevice }}
+
+      # Release
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: Build-${{ matrix.targetDevice }}
-          path: build/${{ matrix.targetDevice }}
-          expire-in: 2 days
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build/${{ matrix.targetDevice }}/${{ matrix.targetDevice }}.zip
+          asset_name: GothicVR-${{ matrix.targetDevice }}.zip
+          asset_content_type: application/zip
+
+
+#      - uses: actions/upload-artifact@v2
+#        with:
+#          name: Build-${{ matrix.targetDevice }}
+#          path: build/${{ matrix.targetDevice }}
+#          expire-in: 2 days

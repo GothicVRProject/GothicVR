@@ -1,7 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using GVR.Caches;
+using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -22,30 +25,6 @@ namespace GVR.Creator.Meshes
         protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
         protected const float decalOpacity = 0.75f;
 
-        
-        public GameObject Create(WorldData world, GameObject parent)
-        {
-            var meshObj = new GameObject("Mesh");
-            meshObj.isStatic = true;
-            meshObj.SetParent(parent);
-
-            foreach (var subMesh in world.subMeshes.Values)
-            {
-                var subMeshObj = new GameObject(subMesh.material.name);
-                subMeshObj.isStatic = true;
-
-                var meshFilter = subMeshObj.AddComponent<MeshFilter>();
-                var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
-
-                PrepareMeshRenderer(meshRenderer, subMesh);
-                PrepareMeshFilter(meshFilter, subMesh);
-                PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
-
-                subMeshObj.SetParent(meshObj);
-            }
-
-            return meshObj;
-        }
 
         public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
@@ -79,8 +58,8 @@ namespace GVR.Creator.Meshes
                     else
                         nodeObj.SetParent(nodeObjects[node.parentIndex]);
                 }
-                
-                for (var i=0; i<nodeObjects.Length; i++)
+
+                for (var i = 0; i < nodeObjects.Length; i++)
                 {
                     if (mdh.nodes[i].parentIndex == -1)
                         nodeObjects[i].transform.localPosition = mdh.rootTranslation.ToUnityVector();
@@ -88,7 +67,7 @@ namespace GVR.Creator.Meshes
                         SetPosAndRot(nodeObjects[i], mdh.nodes[i].transform);
                 }
             }
-            
+
             //// Fill GameObjects with Meshes from "original" Mesh
             foreach (var softSkinMesh in mdm.meshes!)
             {
@@ -102,7 +81,7 @@ namespace GVR.Creator.Meshes
 
                 // FIXME - hard coded as it's the right value for BSFire. Need to be more dynamic by using element which has parent=-1.
                 meshRenderer.rootBone = nodeObjects[0].transform;
-                
+
                 PrepareMeshRenderer(meshRenderer, mesh);
                 PrepareMeshFilter(meshFilter, softSkinMesh);
 
@@ -120,6 +99,7 @@ namespace GVR.Creator.Meshes
 
                 PrepareMeshRenderer(meshRenderer, subMesh.Value);
                 PrepareMeshFilter(meshFilter, subMesh.Value);
+                PrepareMeshCollider(meshObj, meshFilter.mesh, subMesh.Value.materials);
             }
 
             SetPosAndRot(rootGo, position, rotation);
@@ -128,7 +108,7 @@ namespace GVR.Creator.Meshes
             // We need to reset the rootBones position to zero. Otherwise Vobs won't be placed right.
             // Due to Unity's parent-child transformation magic, we need to do it at the end. ╰(*°▽°*)╯
             nodeObjects[0].transform.localPosition = Vector3.zero;
-            
+
             return rootGo;
         }
 
@@ -242,14 +222,11 @@ namespace GVR.Creator.Meshes
                 }
 
                 var texture = GetTexture(materialData.texture);
-
                 if (null == texture)
                     if (materialData.texture.EndsWith(".TGA"))
                         Debug.LogError("This is supposed to be a decal: " + materialData.texture);
                     else
                         Debug.LogError("Couldn't get texture from name: " + materialData.texture);
-
-
 
                 material.mainTexture = texture;
 
@@ -366,7 +343,7 @@ namespace GVR.Creator.Meshes
             var mesh = new Mesh();
             var pxMesh = soft.mesh;
             var weights = soft.weights;
-            
+
             meshFilter.mesh = mesh;
             mesh.subMeshCount = soft!.mesh!.subMeshes!.Length;
 
@@ -409,7 +386,7 @@ namespace GVR.Creator.Meshes
                     preparedUVs.Add(index1.texture.ToUnityVector());
                     preparedUVs.Add(index2.texture.ToUnityVector());
                     preparedUVs.Add(index3.texture.ToUnityVector());
-                    
+
                     preparedBoneWeights.Add(weights[index1.index].ToBoneWeight(soft.nodes));
                     preparedBoneWeights.Add(weights[index2.index].ToBoneWeight(soft.nodes));
                     preparedBoneWeights.Add(weights[index3.index].ToBoneWeight(soft.nodes));
@@ -431,7 +408,7 @@ namespace GVR.Creator.Meshes
             }
         }
 
-        private Collider PrepareMeshCollider(GameObject obj, Mesh mesh)
+        protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh)
         {
             var meshCollider = obj.AddComponent<MeshCollider>();
             meshCollider.sharedMesh = mesh;
@@ -441,7 +418,7 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        private Collider PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
+        protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
         {
             if (materialData.disableCollision ||
                 materialData.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water)
@@ -458,7 +435,7 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        private void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData[] materialDatas)
+        protected void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData[] materialDatas)
         {
             var anythingDisableCollission = materialDatas.Any(i => i.disableCollision);
             var anythingWater = materialDatas.Any(i => i.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water);
@@ -472,7 +449,7 @@ namespace GVR.Creator.Meshes
                 PrepareMeshCollider(obj, mesh);
             }
         }
-        
+
         /// <summary>
         /// We basically only set the values from official Unity documentation. No added sugar for the bingPoses.
         /// @see https://docs.unity3d.com/ScriptReference/Mesh-bindposes.html

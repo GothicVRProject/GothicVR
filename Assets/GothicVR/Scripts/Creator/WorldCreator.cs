@@ -1,15 +1,16 @@
-using GVR.Util;
+using GVR.Manager;
+using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
+using GVR.Phoenix.Util;
+using GVR.Util;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Creator.Meshes;
 using GVR.Debugging;
-using GVR.Phoenix.Data;
-using GVR.Phoenix.Util;
+using System.Threading.Tasks;
 using PxCs.Data.WayNet;
 using PxCs.Interface;
 
@@ -21,19 +22,16 @@ namespace GVR.Creator
 {
     public class WorldCreator : SingletonBehaviour<WorldCreator>
     {
+        private GameObject worldGo;
 
-        private GameObject worldMesh;
-        public void Create(string worldName)
+        public async Task CreateAsync(string worldName)
         {
             var world = LoadWorld(worldName);
             GameData.I.World = world;
+            worldGo = new GameObject("World");
 
-            var worldGo = new GameObject("World");
-
-            GameData.I.WorldScene!.Value.GetRootGameObjects().Append(worldGo);
-
-            worldMesh = MeshCreator.I.Create(world, worldGo);
-            VobCreator.I.Create(worldGo, world);
+            await WorldMeshCreator.I.CreateAsync(world, worldGo, ConstantsManager.I.MeshPerFrame);
+            await VobCreator.I.CreateAsync(worldGo, world, ConstantsManager.I.VObPerFrame);
             WaynetCreator.I.Create(worldGo, world);
 
             DebugAnimationCreator.I.Create(worldName);
@@ -42,9 +40,11 @@ namespace GVR.Creator
 
             if (FeatureFlags.I.CreateOcNpcs)
                 PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
-            
-            SceneManager.MoveGameObjectToScene(worldGo, SceneManager.GetSceneByName(worldName));
+
+            // Set the global variable to the result of the coroutine
+            LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
         }
+
 
         /// <summary>
         /// Logic to be called after world is fully loaded.
@@ -52,11 +52,11 @@ namespace GVR.Creator
         public void PostCreate(XRInteractionManager interactionManager)
         {
             // If we load a new scene, just remove the existing one.
-            if (worldMesh.TryGetComponent(out TeleportationArea teleportArea))
+            if (worldGo.TryGetComponent(out TeleportationArea teleportArea))
                 Destroy(teleportArea);
 
             // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
-            var teleportationArea = worldMesh.AddComponent<TeleportationArea>();
+            var teleportationArea = worldGo.AddComponent<TeleportationArea>();
             if (interactionManager != null)
             {
                 teleportationArea.interactionManager = interactionManager;
@@ -65,7 +65,7 @@ namespace GVR.Creator
 
         private WorldData LoadWorld(string worldName)
         {
-            var worldPtr = PxWorld.pxWorldLoadFromVdf(GameData.I.VdfsPtr, worldName);
+            var worldPtr = PxWorld.pxWorldLoadFromVfs(GameData.I.VfsPtr, worldName);
             if (worldPtr == IntPtr.Zero)
                 throw new ArgumentException($"World >{worldName}< couldn't be found.");
 
@@ -163,9 +163,9 @@ namespace GVR.Creator
         /// <summary>
         /// Loads the world for occlusion culling.
         /// </summary>
-        /// <param name="vdfPtr">The VDF pointer.</param>
+        /// <param name="vfsPtr">The VFS pointer.</param>
         /// <param name="zen">The name of the .zen world to load.</param>
-        public void LoadEditorWorld(IntPtr vdfPtr, string zen)
+        public async void LoadEditorWorld(IntPtr vfsPtr, string zen)
         {
             var worldScene = EditorSceneManager.GetSceneByName(zen);
 
@@ -174,14 +174,14 @@ namespace GVR.Creator
                 // unload the current scene and load the new one
                 if (EditorSceneManager.GetActiveScene().name != "Bootstrap")
                     EditorSceneManager.UnloadSceneAsync(EditorSceneManager.GetActiveScene());
-                EditorSceneManager.LoadScene(zen, LoadSceneMode.Additive);
+                EditorSceneManager.OpenScene(zen);
                 worldScene = EditorSceneManager.GetSceneByName(zen); // we do this to reload the values for the new scene which are no updated for the above cast
             }
 
-            var world = LoadWorld($"{zen}.zen");
+            var world = LoadWorld(zen);
 
             // FIXME - Might not work as we have no context inside Editor mode. Need to test and find alternative.
-            GameData.I.VdfsPtr = vdfPtr;
+            GameData.I.VfsPtr = vfsPtr;
             GameData.I.World = world;
 
             var worldGo = new GameObject("World");
@@ -190,10 +190,7 @@ namespace GVR.Creator
             var sampleScene = EditorSceneManager.GetSceneByName("Bootstrap");
             EditorSceneManager.SetActiveScene(sampleScene);
             sampleScene.GetRootGameObjects().Append(worldGo);
-
-            // load only the world mesh
-            MeshCreator.I.Create(world, worldGo);
-
+            
             // move the world to the correct scene
             EditorSceneManager.MoveGameObjectToScene(worldGo, worldScene);
 
