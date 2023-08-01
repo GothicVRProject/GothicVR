@@ -328,7 +328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12af35efb7c45ea4fb4752d0328ebf2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CreateVobs: 0
+  CreateVobs: 1
   CreateWaypoints: 0
   CreateWaypointEdges: 0
   EnableDayTime: 1
@@ -339,7 +339,7 @@ MonoBehaviour:
   EnableVobFPMeshEditorLabel: 0
   EnableDecals: 0
   CreateOcNpcs: 1
-  EnableNpcRoutines: 0
+  EnableNpcRoutines: 1
   CreateNpcArmor: 1
   CreateExampleAnimation: 0
   ShowVfsFileNotFoundErrors: 0
