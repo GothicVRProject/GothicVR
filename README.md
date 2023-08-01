@@ -1,8 +1,8 @@
 # GothicVR
 
-![Platforms](https://img.shields.io/static/v1?label=Platforms&message=PCVR%20|%20Quest2%20|%20Pico4&color=darkgreen)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-![Build](https://github.com/GothicVRProject/GothicVR/actions/workflows/test_and_build.yml/badge.svg?branch=main)
+![Platforms](https://img.shields.io/static/v1?label=Platforms&message=PCVR%20|%20Quest2%20|%20Pico4&color=darkgreen)
+[![Release](https://img.shields.io/github/release-pre/GothicVRProject/GothicVR)](https://github.com/GothicVRProject/GothicVR/releases/latest)
 
 Fan project recreating the classic Gothic I and II experience in VR.
 
