@@ -505,14 +505,18 @@ namespace GVR.Creator.Meshes
             var shader = Shader.Find(waterShader);
             Material material = new Material(shader);
 
-            // FIXME - Here we need to see if we can change materialData.waveSpeed
+            // FIXME - Running water speed and direction is hardcoded based on material names
+            // Needs to be improved by a better shader and the implementation of proper water material parameters
+
+            //Jaxtors suggestion for a not so hardcoded running water implementation
+            //material.SetFloat("_ScrollSpeed", -900000 * materialData.animMapDir.ToUnityVector().SqrMagnitude());
 
             switch (materialData.name)
             {
                 case "OWODSEA2SWAMP": material.SetFloat("_ScrollSpeed", 0f); break;
                 case "NCWASSER": material.SetFloat("_ScrollSpeed", 0f); break;
                 case "OWODWATSTOP": material.SetFloat("_ScrollSpeed", (materialData.animFps / 75f)); break;
-                case "OWODWFALL": material.SetFloat("_ScrollSpeed", -(materialData.animFps / 25f)); break;
+                case "OWODWFALL": material.SetFloat("_ScrollSpeed", -(materialData.animFps / 10f)); break;
                 default: material.SetFloat("_ScrollSpeed", -(materialData.animFps / 75f)); break;
             }
 
