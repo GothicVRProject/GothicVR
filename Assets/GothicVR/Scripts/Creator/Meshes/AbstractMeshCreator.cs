@@ -10,6 +10,7 @@ using PxCs.Data.Model;
 using PxCs.Data.Struct;
 using PxCs.Data.Vob;
 using PxCs.Interface;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -528,14 +529,14 @@ namespace GVR.Creator.Meshes
             Material material = new Material(shader);
 
             // FIXME - Here we need to see if we can change materialData.waveSpeed
-            //Currently just a static value
-            if (materialData.animFps == 0)
+
+            switch (materialData.name)
             {
-                material.SetFloat("_ScrollSpeed", 0f);
-            }
-            else
-            {
-                material.SetFloat("_ScrollSpeed", -(materialData.animFps / 50f));
+                case "OWODSEA2SWAMP": material.SetFloat("_ScrollSpeed", 0f); break;
+                case "NCWASSER": material.SetFloat("_ScrollSpeed", 0f); break;
+                case "OWODWATSTOP": material.SetFloat("_ScrollSpeed", (materialData.animFps / 75f)); break;
+                case "OWODWFALL": material.SetFloat("_ScrollSpeed", -(materialData.animFps / 25f)); break;
+                default: material.SetFloat("_ScrollSpeed", -(materialData.animFps / 75f)); break;
             }
 
             material.SetFloat("_Surface", 0);
