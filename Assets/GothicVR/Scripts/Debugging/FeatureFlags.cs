@@ -34,6 +34,7 @@ namespace GVR.Debugging
         [Header("__________NPCs__________")]
         public bool CreateOcNpcs;
         public bool EnableNpcRoutines;
+        public bool CreateNpcArmor;
         public bool CreateExampleAnimation;
 
         [Header("__________SPAMmy debug messages__________")]

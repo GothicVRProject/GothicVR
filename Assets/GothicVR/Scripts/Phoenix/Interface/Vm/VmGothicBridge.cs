@@ -44,6 +44,8 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_ApplyOverlayMds", Mdl_ApplyOverlayMds);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisualBody", Mdl_SetVisualBody);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
+            
+            PxVm.pxVmRegisterExternal(vmPtr, "ConcatStrings", ConcatStrings);
         }
 
         public static UnityEvent<IntPtr, string> DefaultExternalCallback = new();
@@ -55,6 +57,8 @@ namespace GVR.Phoenix.Interface.Vm
         public static UnityEvent<string> PhoenixMdl_AI_OUTPUT = new();
 
 
+
+#region Default
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalDefaultCallback))]
         public static void DefaultExternal(IntPtr vmPtr, string missingCallbackName)
         {
@@ -66,6 +70,17 @@ namespace GVR.Phoenix.Interface.Vm
 
             DefaultExternalCallback.Invoke(vmPtr, missingCallbackName);
         }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void ConcatStrings(IntPtr vmPtr)
+        {
+            var str2 = PxVm.VmStackPopString(vmPtr);
+            var str1 = PxVm.VmStackPopString(vmPtr);
+            
+            PxVm.pxVmStackPushString(vmPtr, str1 + str2);
+        }
+#endregion
+
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Wld_InsertNpc(IntPtr vmPtr)

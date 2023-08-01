@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -26,7 +25,6 @@ namespace GVR.Caches
 
         private Dictionary<string, PxVmItemData> itemDataCache = new();
         private Dictionary<string, PxVmSfxData> sfxDataCache = new();
-
         private Dictionary<string, PxSoundData<float>> soundCache = new();
 
 
@@ -137,7 +135,22 @@ namespace GVR.Caches
         }
 
         /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
+        /// Hint: Instances only need to be initialized once on phoenix.
+        /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
+        /// </summary>
+        public PxVmItemData TryGetItemData(uint instanceId)
+        {
+            var symbol = PxVm.GetSymbol(GameData.I.VmGothicPtr, instanceId);
+
+            if (symbol == null)
+                return null;
+
+            return TryGetItemData(symbol.name);
+        }
+        
+        /// <summary>
+        /// Hint: Instances only need to be initialized once on phoenix.
+        /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
         /// </summary>
         public PxVmItemData TryGetItemData(string key)
         {
