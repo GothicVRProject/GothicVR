@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using GVR.Caches;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
+using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
 
@@ -70,33 +70,74 @@ namespace GVR.Creator.Meshes
         }
 
 
-        public void CreateMeleeWeapon(GameObject npcGo, PxMultiResolutionMeshData mrm, PxVm.PxVmItemFlags flags)
+        public void EquipWeapon(GameObject npcGo, PxVmItemData itemData, PxVm.PxVmItemFlags mainFlag, PxVm.PxVmItemFlags flags)
         {
+            switch (mainFlag)
+            {
+                case PxVm.PxVmItemFlags.ITEM_KAT_NF:
+                    EquipMeleeWeapon(npcGo, itemData);
+                    return;
+                case PxVm.PxVmItemFlags.ITEM_KAT_FF:
+                    EquipRangeWeapon(npcGo, itemData);
+                    return;
+            }
+        }
+
+        private void EquipMeleeWeapon(GameObject npcGo, PxVmItemData itemData)
+        {
+            var mrm = AssetCache.I.TryGetMrm(itemData.visual);
+
             string slotName;
-            switch (flags)
+            switch (itemData.flags)
             {
                 case PxVm.PxVmItemFlags.ITEM_2HD_AXE:
                 case PxVm.PxVmItemFlags.ITEM_2HD_SWD:
                     slotName = "ZS_LONGSWORD";
                     break;
                 default:
-                    slotName = "ZS_SWORD";
+                    slotName =  "ZS_SWORD";
                     break;
             }
-            
-            var swordGo = npcGo.FindChildRecursively(slotName);
 
-            if (swordGo == null)
+            var weaponGo = npcGo.FindChildRecursively(slotName);
+            if (weaponGo == null)
                 return;
 
             // Bugfix: e.g. there's a Buddler who has a NailMace and Club equipped at the same time.
-            if (!swordGo.TryGetComponent<MeshFilter>(out var meshFilter))
-                meshFilter = swordGo.AddComponent<MeshFilter>();
-            if (!swordGo.TryGetComponent<MeshRenderer>(out var meshRenderer))
-                meshRenderer = swordGo.AddComponent<MeshRenderer>();
+            // Therefore we need to check if the Components are already there.
+            if (!weaponGo.TryGetComponent<MeshFilter>(out var meshFilter))
+                meshFilter = weaponGo.AddComponent<MeshFilter>();
+            if (!weaponGo.TryGetComponent<MeshRenderer>(out var meshRenderer))
+                meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
             PrepareMeshRenderer(meshRenderer, mrm);
             PrepareMeshFilter(meshFilter, mrm);
+        }
+
+        private void EquipRangeWeapon(GameObject npcGo, PxVmItemData itemData)
+        {
+            string slotName;
+            switch (itemData.flags)
+            {
+                case PxVm.PxVmItemFlags.ITEM_CROSSBOW:
+                    slotName = "ZS_CROSSBOW";
+                    break;
+                default:
+                    slotName =  "ZS_BOW";
+                    break;
+            }
+            
+            var weaponGo = npcGo.FindChildRecursively(slotName);
+            if (weaponGo == null)
+                return;
+
+            var mms = AssetCache.I.TryGetMmb(itemData.visual);
+
+            var meshFilter = weaponGo.AddComponent<MeshFilter>();
+            var meshRenderer = weaponGo.AddComponent<MeshRenderer>();
+
+            PrepareMeshRenderer(meshRenderer, mms.mesh);
+            PrepareMeshFilter(meshFilter, mms.mesh);
         }
     }
 }

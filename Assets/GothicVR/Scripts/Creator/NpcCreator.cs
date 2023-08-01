@@ -162,15 +162,10 @@ namespace GVR.Creator
         private static void EquipItem(VmGothicBridge.EquipItemData data)
         {
             var itemData = assetCache.TryGetItemData((uint)data.itemId);
-            var mrm = assetCache.TryGetMrm(itemData.visual);
-
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
             var npc = lookupCache.npcCache[symbolIndex];
-
-            if (itemData.mainFlag != PxVm.PxVmItemFlags.ITEM_KAT_NF)
-                return;
-
-            NpcMeshCreator.I.CreateMeleeWeapon(npc, mrm, itemData.flags);
+            
+            NpcMeshCreator.I.EquipWeapon(npc, itemData, itemData.mainFlag, itemData.flags);
         }
     }
 }
