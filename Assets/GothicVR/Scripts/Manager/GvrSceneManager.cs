@@ -143,7 +143,9 @@ namespace GVR.Manager
                 WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
 
                 var playerParent = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
-                playerParent!.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
+
+                if (startPoint != null)
+                    playerParent!.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
             }
             else if (scene.name == newWorldName?.ToLower())
             {
