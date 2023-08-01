@@ -13,6 +13,9 @@ namespace GVR.Manager
         public string MenuFontTag = "Title";
         public string SubtitleFontTag = "IngameText";
 
+        public int MeshPerFrame = 10;
+        public int VObPerFrame = 75;
+        
         //Collection of PlayerPref entries for settings
         public string moveSpeedPlayerPref = "MoveSpeed";
         public string turnSettingPlayerPref = "TurnSetting";
