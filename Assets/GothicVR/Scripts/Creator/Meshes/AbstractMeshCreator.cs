@@ -24,7 +24,7 @@ namespace GVR.Creator.Meshes
         // until we know how to change specifics to the cutout only. (e.g. bushes)
         protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
         protected const float decalOpacity = 0.75f;
-        
+
 
         public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
         {
@@ -99,6 +99,7 @@ namespace GVR.Creator.Meshes
 
                 PrepareMeshRenderer(meshRenderer, subMesh.Value);
                 PrepareMeshFilter(meshFilter, subMesh.Value);
+                PrepareMeshCollider(meshObj, meshFilter.mesh, subMesh.Value.materials);
             }
 
             SetPosAndRot(rootGo, position, rotation);
