@@ -5,6 +5,7 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
+using PxCs.Interface;
 using UnityEngine;
 
 namespace GVR.Creator.Meshes
@@ -69,9 +70,21 @@ namespace GVR.Creator.Meshes
         }
 
 
-        public void CreateSword(GameObject npcGo, PxMultiResolutionMeshData mrm)
+        public void CreateMeleeWeapon(GameObject npcGo, PxMultiResolutionMeshData mrm, PxVm.PxVmItemFlags flags)
         {
-            var swordGo = npcGo.FindChildRecursively("ZS_SWORD");
+            string slotName;
+            switch (flags)
+            {
+                case PxVm.PxVmItemFlags.ITEM_2HD_AXE:
+                case PxVm.PxVmItemFlags.ITEM_2HD_SWD:
+                    slotName = "ZS_LONGSWORD";
+                    break;
+                default:
+                    slotName = "ZS_SWORD";
+                    break;
+            }
+            
+            var swordGo = npcGo.FindChildRecursively(slotName);
 
             if (swordGo == null)
                 return;

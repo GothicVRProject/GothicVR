@@ -167,12 +167,10 @@ namespace GVR.Creator
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
             var npc = lookupCache.npcCache[symbolIndex];
 
-            if (itemData.mainFlag != 2) // ITEM_KAT_NF
+            if (itemData.mainFlag != PxVm.PxVmItemFlags.ITEM_KAT_NF)
                 return;
-            
-            // if (itemData.flags == )
-            
-            NpcMeshCreator.I.CreateSword(npc, mrm);
+
+            NpcMeshCreator.I.CreateMeleeWeapon(npc, mrm, itemData.flags);
         }
     }
 }
