@@ -1,10 +1,13 @@
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Phoenix.Interface;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
+using Debug = UnityEngine.Debug;
 
 namespace GVR.Manager
 {
@@ -14,11 +17,24 @@ namespace GVR.Manager
 
         private string newWorldName;
         private string startVobAfterLoading;
-        private Scene generalScene;
 
-        private GameObject player;
+        private Scene generalScene;
+        private bool generalSceneLoaded = false;
+
+        private GameObject startPoint;
 
         public GameObject interactionManager;
+
+        private const int ensureLoadingBarDelayMilliseconds = 5;
+
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            SceneManager.sceneLoaded += OnWorldSceneLoaded;
+            SceneManager.sceneUnloaded += OnLoadingSceneUnloaded;
+        }
 
         /// <summary>
         /// Called once after bootstrapping scene is done.
@@ -26,81 +42,137 @@ namespace GVR.Manager
         /// </summary>
         public void LoadStartupScenes()
         {
-            generalScene = SceneManager.LoadScene(generalSceneName, new LoadSceneParameters(LoadSceneMode.Additive));
-            SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
-
-            LoadWorld("world.zen", "FP_PICKRICE_SWAMP_02");
+            LoadWorld("world.zen", "ENTRANCE_SURFACE_OLDMINE");
         }
 
-        public void LoadWorld(string worldName, string startVob)
+        public async void LoadWorld(string worldName, string startVob)
         {
             newWorldName = worldName;
             startVobAfterLoading = startVob;
+            var watch = Stopwatch.StartNew();
+
+            await ShowLoadingScene(worldName);
+            var newWorldScene = await LoadNewWorldScene(newWorldName);
+            await WorldCreator.I.CreateAsync(newWorldName);
+            SetSpawnPoint(newWorldScene);
+
+            HideLoadingScene();
+            watch.Stop();
+            Debug.Log($"Time spent for loading {worldName}: {watch.Elapsed}");
+        }
+
+        private async Task<Scene> LoadNewWorldScene(string worldName)
+        {
             var newWorldScene = SceneManager.LoadScene(worldName, new LoadSceneParameters(LoadSceneMode.Additive));
 
-            // Remove previous scene.
-            // TODO - it might be, that we need to wait for old map to be removed before loading new one. Let's see...
+            // Delay for at least one frame to allow the scene to be set active successfully
+            // i.e. created GOs will be automatically put to right scene afterwards.
+            await Task.Yield();
+
+            // Remove previous scene if it exists
             if (GameData.I.WorldScene.HasValue)
-            {
                 SceneManager.UnloadSceneAsync(GameData.I.WorldScene.Value);
-            }
 
             GameData.I.WorldScene = newWorldScene;
-
-            WorldCreator.I.Create(newWorldName);
-
-            SceneManager.sceneLoaded += WorldSceneLoaded;
-            SceneManager.activeSceneChanged += ActiveSceneChanged;
+            return newWorldScene;
         }
 
         /// <summary>
-        /// We need to set world scene loaded as active scene. This is the only way OcclusionCulling data is fetched
-        /// for the world in a multi-scene scenario. Also set the player to we have a reference regardless of scene
+        /// Create loading scene and wait for a few milliseconds to go on, ensuring loading bar is selectable.
+        /// Async: execute in sync, but whole process can be paused for x amount of frames.
         /// </summary>
-        private void WorldSceneLoaded(Scene scene, LoadSceneMode mode)
+        private async Task ShowLoadingScene(string worldName = null)
         {
-            if (scene == generalScene)
-            {
-                AudioSourceManager.I.SetAudioListener(Camera.main?.GetComponent<AudioListener>());
+            TextureManager.I.LoadLoadingDefaultTextures();
 
-                var playerParent = generalScene.GetRootGameObjects().FirstOrDefault(o => o.name == "PlayerController");
-                player = playerParent.transform.Find("VRPlayer").gameObject;
-                return;
+            generalScene = SceneManager.GetSceneByName(generalSceneName);
+            if (generalScene.isLoaded)
+            {
+                SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName("Bootstrap"));
+                SceneManager.UnloadSceneAsync(generalScene);
+                generalSceneLoaded = false;
             }
-            SceneManager.SetActiveScene(scene);
+
+            SetLoadingTextureForWorld(worldName);
+
+            SceneManager.LoadScene("Loading", new LoadSceneParameters(LoadSceneMode.Additive));
+
+            // Delay for magic number amount to make sure that bar can be found
+            // 1 and 2 caused issues for the 3rd time showing the loading scene in editor
+            await Task.Delay(ensureLoadingBarDelayMilliseconds);
         }
 
-        /// <summary>
-        /// Subscribe the SetActiveScene method so wen can properly place the player in the correct spot.
-        /// </summary>
-        private void ActiveSceneChanged(Scene oldScene, Scene newScene)
+        private void SetLoadingTextureForWorld(string worldName)
         {
-            if (newScene == GameData.I.WorldScene)
+            if (worldName == null)
+                return;
+
+            // set the loading background texture properly
+            // TODO: for new game we need to load texture "LOADING.TGA"
+            var textureString = "LOADING_" + worldName.Split('.')[0].ToUpper() + ".TGA";
+            TextureManager.I.SetTexture(textureString, TextureManager.I.GothicLoadingMenuMaterial);
+        }
+
+        private void HideLoadingScene()
+        {
+            SceneManager.UnloadSceneAsync("Loading");
+
+            LoadingManager.I.ResetProgress();
+        }
+
+        private void OnWorldSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (scene.name == "Loading")
             {
-                // we set manually the XR Interaction Manager as Unity creates a new one in Bootstrap 
-                // and we don't want to use it since we have one in General scene
+                LoadingManager.I.SetBarFromScene(scene);
+                LoadingManager.I.SetMaterialForLoading(scene);
+                AudioSourceManager.I.ResetDictionaries();
+            }
+            else if (scene == generalScene)
+            {
+                AudioSourceManager.I.SetAudioListener(Camera.main!.GetComponent<AudioListener>());
+
+                SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
+
                 WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
-                GameObject startPoint = null;
-                var spots = GameObject.FindGameObjectsWithTag("PxVob_zCVobSpot");
+
+                var playerParent = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
+                playerParent!.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
+            }
+            else if (scene.name == newWorldName?.ToLower())
+            {
+                SceneManager.SetActiveScene(scene);
+            }
+        }
+
+        private void OnLoadingSceneUnloaded(Scene scene)
+        {
+            if (scene.name == "Loading" && !generalSceneLoaded)
+            {
+                generalScene = SceneManager.LoadScene(generalSceneName, new LoadSceneParameters(LoadSceneMode.Additive));
+                generalSceneLoaded = true;
+            }
+        }
+
+        private void SetSpawnPoint(Scene worldScene)
+        {
+            var spots = GameObject.FindGameObjectsWithTag("PxVob_zCVobSpot");
+            for (int i = 0; i < spots.Length; i++)
+            {
+                if (spots[i].name == startVobAfterLoading)
+                {
+                    startPoint = spots[i];
+                }
+            }
+            if (startPoint == null)
+            {
                 for (int i = 0; i < spots.Length; i++)
                 {
-                    if (spots[i].name == startVobAfterLoading)
+                    if ((spots[i].name == "START" || spots[i].name == "START_GOTHIC2") && spots[i].scene == worldScene)
                     {
                         startPoint = spots[i];
                     }
                 }
-                if (startPoint == null)
-                {
-                    for (int i = 0; i < spots.Length; i++)
-                    {
-                        if ((spots[i].name == "START" || spots[i].name == "START_GOTHIC2") && spots[i].scene == newScene)
-                        {
-                            startPoint = spots[i];
-                        }
-                    }
-                }
-                if (startPoint != null)
-                    player.transform.position = startPoint.transform.position;
             }
         }
 

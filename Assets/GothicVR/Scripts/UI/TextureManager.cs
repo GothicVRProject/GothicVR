@@ -1,74 +1,98 @@
-using System;
-using System.Collections;
-using GVR.Caches;
-using GVR.Phoenix.Interface;
 using UnityEngine;
+using GVR.Caches;
+using GVR.Phoenix.Util;
+using GVR.Util;
 
-public class TextureManager : MonoBehaviour
+public class TextureManager : SingletonBehaviour<TextureManager>
 {
-    private Texture2D backgroundtexture;
     public Material backgroundmaterial;
-    private Texture2D buttontexture;
     public Material buttonmaterial;
-    private Texture2D slidertexture;
     public Material slidermaterial;
-    private Texture2D sliderpositiontexture;
     public Material sliderpositionmaterial;
-    private Texture2D arrowtexture;
     public Material arrowmaterial;
-    private Texture2D fillertexture;
     public Material fillermaterial;
-    private Texture2D skytexture;
     public Material skymaterial;
 
-    private bool textureloaded = false;
+    public Material GothicLoadingMenuMaterial;
+    public Material LoadingBarBackgroundMaterial;
+    public Material LoadingBarMaterial;
+    public Material LoadingSphereMaterial;
 
-    void Update()
+    private const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+
+    private void Start()
     {
-        // FIXME - We should register to a "BootstrapDone" event rather than checking every frame.
-        if (!textureloaded && GameData.I.VdfsPtr != IntPtr.Zero)
-        {
-            LoadCustomTextures();
-            
-            // Set Skybox one frame later.
-            StartCoroutine(SetSkyBox());
-        }
+        GothicLoadingMenuMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        LoadingBarBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        LoadingBarMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+
+        // TODO: remove the middleman materials and use these for settings menu
+        // backgroundmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        // buttonmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+        // slidermaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+        // sliderpositionmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+        // arrowmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+        // fillermaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+
+        LoadingSphereMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        LoadingSphereMaterial.color = new Color(.25f, .25f, .25f, 1f); // dark gray
     }
 
-    private void LoadCustomTextures()
+    public void LoadLoadingDefaultTextures()
     {
-        textureloaded = true;
-        backgroundtexture = AssetCache.I.TryGetTexture("LOG_PAPER.TGA");
+        var loadingBackgroundTexture = AssetCache.I.TryGetTexture("LOADING.TGA");
+        GothicLoadingMenuMaterial.mainTexture = loadingBackgroundTexture;
+
+        var progressBackgroundTexture = AssetCache.I.TryGetTexture("PROGRESS.TGA");
+        LoadingBarBackgroundMaterial.mainTexture = progressBackgroundTexture;
+
+        var progressTexture = AssetCache.I.TryGetTexture("PROGRESS_BAR.TGA");
+        LoadingBarMaterial.mainTexture = progressTexture;
+
+        var backgroundtexture = AssetCache.I.TryGetTexture("LOG_PAPER.TGA");
         backgroundmaterial.mainTexture = backgroundtexture;
 
-        buttontexture = AssetCache.I.TryGetTexture("INV_SLOT.TGA");
+        var buttontexture = AssetCache.I.TryGetTexture("INV_SLOT.TGA");
         buttonmaterial.mainTexture = buttontexture;
 
-        slidertexture = AssetCache.I.TryGetTexture("MENU_SLIDER_BACK.TGA");
+        var slidertexture = AssetCache.I.TryGetTexture("MENU_SLIDER_BACK.TGA");
         slidermaterial.mainTexture = slidertexture;
 
-        sliderpositiontexture = AssetCache.I.TryGetTexture("MENU_SLIDER_POS.TGA");
+        var sliderpositiontexture = AssetCache.I.TryGetTexture("MENU_SLIDER_POS.TGA");
         sliderpositionmaterial.mainTexture = sliderpositiontexture;
 
-        fillertexture = AssetCache.I.TryGetTexture("MENU_BUTTONBACK-C.TEX");
+        var fillertexture = AssetCache.I.TryGetTexture("MENU_BUTTONBACK-C.TEX");
         fillermaterial.mainTexture = fillertexture;
 
-        arrowtexture = AssetCache.I.TryGetTexture("U.TGA");
+        var arrowtexture = AssetCache.I.TryGetTexture("U.TGA");
         arrowmaterial.mainTexture = arrowtexture;
 
-        skytexture = AssetCache.I.TryGetTexture("SKYDAY_LAYER0_A0-C.TEX");
+        var skytexture = AssetCache.I.TryGetTexture("SKYDAY_LAYER1_A0-C.TEX");
         skymaterial.mainTexture = skytexture;
     }
 
-    /// <summary>
-    /// For some reason Skybox resets itself to default.
-    /// It might be, as we have no real material set initially. Therefore we set this one now.
-    /// One frame after we set the material.
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator SetSkyBox()
+    public void SetTexture(string texture, Material material)
     {
-        yield return null; // Skip 1 frame
-        RenderSettings.skybox = skymaterial;
+        material.mainTexture = AssetCache.I.TryGetTexture(texture);
+    }
+
+    private Material GetEmptyMaterial(MaterialExtension.BlendMode blendMode = MaterialExtension.BlendMode.Opaque)
+    {
+        var standardShader = Shader.Find(defaultShader);
+        var material = new Material(standardShader);
+
+        switch (blendMode)
+        {
+            case MaterialExtension.BlendMode.Opaque:
+                material.ToOpaqueMode();
+                break;
+            case MaterialExtension.BlendMode.Transparent:
+                material.ToTransparentMode();
+                break;
+        }
+        // Enable clipping of alpha values.
+        material.EnableKeyword("_ALPHATEST_ON");
+
+        return material;
     }
 }

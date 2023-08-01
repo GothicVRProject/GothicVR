@@ -34,10 +34,11 @@ namespace GVR.Debugging
         [Header("__________NPCs__________")]
         public bool CreateOcNpcs;
         public bool EnableNpcRoutines;
+        public bool CreateNpcArmor;
         public bool CreateExampleAnimation;
 
         [Header("__________SPAMmy debug messages__________")]
-        public bool ShowVdfsFileNotFoundErrors;
+        public bool ShowVfsFileNotFoundErrors;
 
         [Header("__________Audio__________")]
         public bool EnableSounds;

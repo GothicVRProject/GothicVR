@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: 39ac659c922b5b1489714aacd9b952e9, type: 2}
+  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -141,6 +141,7 @@ GameObject:
   - component: {fileID: 124285712}
   - component: {fileID: 124285711}
   - component: {fileID: 124285710}
+  - component: {fileID: 124285713}
   m_Layer: 0
   m_Name: Creator
   m_TagString: Untagged
@@ -271,6 +272,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18a360ddd15d4957bfea04e16733a105, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &124285713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124285697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 290769052b48463e8addfd5b2584b145, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &235819213
 GameObject:
   m_ObjectHideFlags: 0
@@ -327,8 +340,9 @@ MonoBehaviour:
   EnableDecals: 0
   CreateOcNpcs: 1
   EnableNpcRoutines: 1
+  CreateNpcArmor: 1
   CreateExampleAnimation: 0
-  ShowVdfsFileNotFoundErrors: 0
+  ShowVfsFileNotFoundErrors: 0
   EnableSounds: 1
   EnableMusic: 0
 --- !u!1 &379812652
@@ -890,6 +904,7 @@ GameObject:
   - component: {fileID: 1896514218}
   - component: {fileID: 1896514219}
   - component: {fileID: 1896514220}
+  - component: {fileID: 1896514221}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -992,6 +1007,10 @@ MonoBehaviour:
   arrowmaterial: {fileID: 2100000, guid: dc6ce4e18c065d34f9037b5b60259872, type: 2}
   fillermaterial: {fileID: 2100000, guid: 7f15366450c487344a1e66a13b22a847, type: 2}
   skymaterial: {fileID: 2100000, guid: 39ac659c922b5b1489714aacd9b952e9, type: 2}
+  GothicLoadingMenuMaterial: {fileID: 0}
+  LoadingBarBackgroundMaterial: {fileID: 0}
+  LoadingBarMaterial: {fileID: 0}
+  LoadingSphereMaterial: {fileID: 0}
 --- !u!114 &1896514220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1009,3 +1028,17 @@ MonoBehaviour:
     m_Bits: 0
   MenuFontTag: Title
   SubtitleFontTag: IngameText
+  MeshPerFrame: 10
+  VObPerFrame: 75
+--- !u!114 &1896514221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f52da940a06b6c14898752eff5823ea9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

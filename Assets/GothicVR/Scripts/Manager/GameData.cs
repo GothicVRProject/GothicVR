@@ -12,7 +12,7 @@ namespace GVR.Phoenix.Interface
 {
     public class GameData : SingletonBehaviour<GameData>
     {
-        public IntPtr VdfsPtr;
+        public IntPtr VfsPtr;
         public IntPtr VmGothicPtr;
         public IntPtr VmSfxPtr;
         public IntPtr VmMusicPtr;
@@ -32,10 +32,10 @@ namespace GVR.Phoenix.Interface
         // Destroy memory on phoenix DLL when game closes.
         ~GameData()
         {
-            if (VdfsPtr != IntPtr.Zero)
+            if (VfsPtr != IntPtr.Zero)
             {
-                PxVdf.pxVdfDestroy(VdfsPtr);
-                VdfsPtr = IntPtr.Zero;
+                PxVfs.pxVfsDestroy(VfsPtr);
+                VfsPtr = IntPtr.Zero;
             }
 
             if (VmGothicPtr != IntPtr.Zero)
