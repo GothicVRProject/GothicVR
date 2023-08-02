@@ -53,6 +53,7 @@ namespace GVR.Manager
 
         public async Task LoadWorld(string worldName, string startVob)
         {
+            MusicCreator.I.setMusic("SYS_LOADING");
             newWorldName = worldName;
             startVobAfterLoading = startVob;
             var watch = Stopwatch.StartNew();
