@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -343,8 +343,8 @@ MonoBehaviour:
   CreateNpcArmor: 1
   CreateExampleAnimation: 0
   ShowVfsFileNotFoundErrors: 0
-  EnableSounds: 1
-  EnableMusic: 0
+  EnableSounds: 0
+  EnableMusic: 1
 --- !u!1 &379812652
 GameObject:
   m_ObjectHideFlags: 0
@@ -665,6 +665,7 @@ Transform:
   - {fileID: 1280490519}
   - {fileID: 936232198}
   - {fileID: 705507995}
+  - {fileID: 1283201086}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -712,6 +713,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 774a0b82d07f4844fbddfbf8e3ffbc3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1283201085
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1283201086}
+  m_Layer: 0
+  m_Name: BackgroundMusic
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1283201086
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283201085}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1103036566}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1300502570
 GameObject:
   m_ObjectHideFlags: 0
@@ -1032,7 +1064,10 @@ MonoBehaviour:
   VObPerFrame: 75
   moveSpeedPlayerPref: MoveSpeed
   turnSettingPlayerPref: TurnSetting
+<<<<<<< HEAD
   turnAngelPlayerPref: TurnAngelSetting
+=======
+>>>>>>> main
 --- !u!114 &1896514221
 MonoBehaviour:
   m_ObjectHideFlags: 0
