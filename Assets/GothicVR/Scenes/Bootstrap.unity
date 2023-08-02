@@ -1030,6 +1030,9 @@ MonoBehaviour:
   SubtitleFontTag: IngameText
   MeshPerFrame: 10
   VObPerFrame: 75
+  moveSpeedPlayerPref: MoveSpeed
+  turnSettingPlayerPref: TurnSetting
+  turnAngelPlayerPref: TurnAngelSetting
 --- !u!114 &1896514221
 MonoBehaviour:
   m_ObjectHideFlags: 0

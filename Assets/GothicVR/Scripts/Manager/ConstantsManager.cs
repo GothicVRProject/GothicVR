@@ -19,6 +19,7 @@ namespace GVR.Manager
         //Collection of PlayerPref entries for settings
         public string moveSpeedPlayerPref = "MoveSpeed";
         public string turnSettingPlayerPref = "TurnSetting";
+        public string turnAngelPlayerPref = "TurnAngelSetting";
 
         protected override void Awake()
         {

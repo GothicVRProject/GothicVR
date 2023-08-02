@@ -275,6 +275,8 @@ namespace GVR.Creator
             var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
             var colliderComp = vobObj.GetComponent<MeshCollider>();
 
+            vobObj.layer = ConstantsManager.I.ItemLayer;
+
             colliderComp.convex = true;
             grabComp.selectExited.AddListener(eventComp.SelectExited);
         }
