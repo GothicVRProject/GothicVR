@@ -37,9 +37,6 @@ namespace GVR.Creator
             DebugAnimationCreatorBSFire.I.Create(worldName);
             DebugAnimationCreatorVelaya.I.Create(worldName);
 
-            if (FeatureFlags.I.CreateOcNpcs)
-                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
-
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
         }

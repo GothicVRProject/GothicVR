@@ -343,7 +343,7 @@ MonoBehaviour:
   CreateNpcArmor: 1
   CreateExampleAnimation: 0
   ShowVfsFileNotFoundErrors: 0
-  EnableSounds: 1
+  EnableSounds: 0
   EnableMusic: 0
 --- !u!1 &379812652
 GameObject:

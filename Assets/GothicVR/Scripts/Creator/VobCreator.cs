@@ -58,6 +58,9 @@ namespace GVR.Creator
 
         public async Task CreateAsync(GameObject root, WorldData world, int vobsPerFrame)
         {
+            if (!FeatureFlags.I.CreateVobs)
+                return;
+
             totalVObs = GetTotalVobCount(world.vobs);
 
             var vobRootObj = new GameObject("Vobs");
@@ -140,22 +143,7 @@ namespace GVR.Creator
                 AddVobsToList(vob.childVobs, allVobs);
             }
         }
-
-        public void Create(GameObject root, WorldData world)
-        {
-            if (!FeatureFlags.I.CreateVobs)
-                return;
-
-            totalVObs = GetTotalVobCount(world.vobs);
-
-            var vobRootObj = new GameObject("Vobs");
-            vobRootObj.SetParent(root);
-            parentGos = new();
-
-            CreateParentVobObject(vobRootObj);
-            CreateVobs(vobRootObj, world.vobs);
-        }
-
+        
         private void CreateParentVobObject(GameObject root)
         {
             foreach (var type in (PxVobType[])Enum.GetValues(typeof(PxVobType)))
