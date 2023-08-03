@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 using GVR.Manager;
+using GVR.Player;
 
 public class MoveSpeedController : MonoBehaviour
 {
@@ -17,5 +18,6 @@ public class MoveSpeedController : MonoBehaviour
     {
         movecontroller.moveSpeed = movespeed;
         PlayerPrefs.SetFloat(ConstantsManager.I.moveSpeedPlayerPref, movespeed);
+        MovementTypeController.UpdateSpeedVariable(movespeed);
     }
 }
