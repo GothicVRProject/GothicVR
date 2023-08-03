@@ -10,7 +10,6 @@ public class RayTeleportClimb : MonoBehaviour
     [SerializeField] private GameObject player;
 
     private bool isHittingObject = false;
-    private GameObject hitObject;
     private Vector3 zsPos0Position;
     private Vector3 zsPos1Position;
     private float hitTime;
@@ -31,7 +30,7 @@ public class RayTeleportClimb : MonoBehaviour
         if (args.interactableObject != null && args.interactableObject.transform.CompareTag(ConstantsManager.I.ClimbableTag))
         {
             // Show a message in the logs
-            hitObject = args.interactableObject.transform.gameObject;
+            var hitObject = args.interactableObject.transform.gameObject;
 
             // Get the zs_pos0 and zs_pos1 positions
             zsPos0Position = hitObject.FindChildRecursively(zsPos0).transform.position;
