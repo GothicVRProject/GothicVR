@@ -44,11 +44,18 @@ namespace GVR.Manager
         /// </summary>
         public async Task LoadStartupScenes()
         {
-            await LoadWorld("world.zen", "ENTRANCE_SURFACE_OLDMINE");
+            await LoadMainMenu();
+            // await LoadWorld("freemine.zen", "ENTRANCE_SURFACE_OLDMINE");
 
-            // Debug! Will be removed in the future.
-            if (FeatureFlags.I.CreateOcNpcs)
-                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
+            // // Debug! Will be removed in the future.
+            // if (FeatureFlags.I.CreateOcNpcs)
+            //     PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
+        }
+
+        private async Task LoadMainMenu()
+        {
+            TextureManager.I.LoadLoadingDefaultTextures();
+            await LoadNewWorldScene("MainMenu");
         }
 
         public async Task LoadWorld(string worldName, string startVob)
@@ -148,7 +155,13 @@ namespace GVR.Manager
                 if (startPoint != null)
                     playerParent!.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
             }
-            else if (scene.name == newWorldName?.ToLower())
+            else if (scene.name == "MainMenu")
+            {
+                var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
+                sphere.GetComponent<MeshRenderer>().material = TextureManager.I.LoadingSphereMaterial;
+                SceneManager.SetActiveScene(scene);
+            }
+            else
             {
                 SceneManager.SetActiveScene(scene);
             }
