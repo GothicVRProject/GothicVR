@@ -83,7 +83,8 @@ public class RayTeleportClimb : MonoBehaviour
         isHittingObject = false;
 
         // Deactivate the teleport ray
-        interactor.enabled = false;
+        if (interactor.gameObject.name.Contains("Teleport"))
+            interactor.enabled = false;
     }
 
     private void TeleportPlayer(Vector3 targetPosition)
