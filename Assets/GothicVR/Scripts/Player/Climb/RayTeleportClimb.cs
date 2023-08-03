@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using GVR.Phoenix.Util;
+using GVR.Manager;
 
 public class RayTeleportClimb : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class RayTeleportClimb : MonoBehaviour
     private float hitTime;
     private float teleportDelay = 0.5f; // Adjust the delay duration as needed
 
+    private string zsPos0 = "ZS_POS0";
+    private string zsPos1 = "ZS_POS1";
+
     private void Start()
     {
         interactor.selectEntered.AddListener(OnRaycastHit);
@@ -24,14 +28,14 @@ public class RayTeleportClimb : MonoBehaviour
     private void OnRaycastHit(SelectEnterEventArgs args)
     {
         // Check if the interactable GameObject has the tag "Climbable"
-        if (args.interactableObject != null && args.interactableObject.transform.CompareTag("Climbable"))
+        if (args.interactableObject != null && args.interactableObject.transform.CompareTag(ConstantsManager.I.ClimbableTag))
         {
             // Show a message in the logs
             hitObject = args.interactableObject.transform.gameObject;
 
             // Get the zs_pos0 and zs_pos1 positions
-            zsPos0Position = hitObject.FindChildRecursively("ZS_POS0").transform.position;
-            zsPos1Position = hitObject.FindChildRecursively("ZS_POS1").transform.position;
+            zsPos0Position = hitObject.FindChildRecursively(zsPos0).transform.position;
+            zsPos1Position = hitObject.FindChildRecursively(zsPos1).transform.position;
 
             isHittingObject = true;
 
