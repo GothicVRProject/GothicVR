@@ -1,7 +1,6 @@
 using UnityEngine;
 using GVR.Util;
 
-
 namespace GVR.Manager
 {
     public class ConstantsManager : SingletonBehaviour<ConstantsManager>
@@ -15,10 +14,13 @@ namespace GVR.Manager
 
         public int MeshPerFrame = 10;
         public int VObPerFrame = 75;
-        
+
         //Collection of PlayerPref entries for settings
         public string moveSpeedPlayerPref = "MoveSpeed";
         public string turnSettingPlayerPref = "TurnSetting";
+
+        public string selectedWorld = "world.zen";
+        public string selectedWaypoint = "START"; 
 
         protected override void Awake()
         {
