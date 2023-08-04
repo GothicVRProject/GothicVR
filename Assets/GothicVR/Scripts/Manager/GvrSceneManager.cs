@@ -45,11 +45,11 @@ namespace GVR.Manager
         public async Task LoadStartupScenes()
         {
             await LoadMainMenu();
-            // await LoadWorld("freemine.zen", "ENTRANCE_SURFACE_OLDMINE");
+            // await LoadWorld("world.zen", "START");
 
-            // // Debug! Will be removed in the future.
+            // Debug! Will be removed in the future.
             // if (FeatureFlags.I.CreateOcNpcs)
-            //     PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
+                // PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
         }
 
         private async Task LoadMainMenu()
@@ -60,9 +60,15 @@ namespace GVR.Manager
 
         public async Task LoadWorld(string worldName, string startVob)
         {
-            MusicCreator.I.setMusic("SYS_LOADING");
-            newWorldName = worldName;
             startVobAfterLoading = startVob;
+            if (worldName == newWorldName)
+            {
+                SetSpawnPoint(SceneManager.GetSceneByName(newWorldName));
+                TeleportPlayerToSpot();
+                return;
+            }
+            newWorldName = worldName;
+            MusicCreator.I.setMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
             await ShowLoadingScene(worldName);
@@ -150,10 +156,7 @@ namespace GVR.Manager
 
                 WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
 
-                var playerParent = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
-
-                if (startPoint != null)
-                    playerParent!.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
+                TeleportPlayerToSpot();
             }
             else if (scene.name == "MainMenu")
             {
@@ -202,6 +205,14 @@ namespace GVR.Manager
         {
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(go);
             SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.I.WorldScene.Value.name));
+        }
+
+        public void TeleportPlayerToSpot()
+        {
+            var playerParent = generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
+
+            if (startPoint != null)
+                playerParent!.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
         }
     }
 }
