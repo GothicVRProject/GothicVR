@@ -25,6 +25,12 @@ namespace GVR.Manager
             {
                 if (fontDictionary.TryGetValue(textComponent.tag, out var value))
                     textComponent.font = value;
+                
+                // On Main Menu text is very small if 
+                if(textComponent.tag == ConstantsManager.I.MenuFontTag && GameData.I.GothicMenuFont != null)
+                {
+                    textComponent.fontSize = 75;
+                }
             }
         }
     }

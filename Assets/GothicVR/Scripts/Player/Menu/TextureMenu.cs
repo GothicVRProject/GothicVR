@@ -11,6 +11,7 @@ namespace GVR.Player.Menu
         private void Start()
         {
             SetMaterials();
+            FontManager.I.ChangeFont();
         }
 
         public void SetMaterials()
