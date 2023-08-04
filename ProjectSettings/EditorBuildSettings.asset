@@ -29,6 +29,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/GothicVR/Scenes/Worlds/orctempel.zen.unity
     guid: a0523f0754a2426488649326f0f27a7f
+  - enabled: 1
+    path: Assets/GothicVR/Scenes/MainMenu.unity
+    guid: 6e747099bda99cc43bf32dda1d9360e1
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: ea302bef6e5dfab4abc884c353c0926d, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: af3964d8a6279b54a9254cbe6379b9d1, type: 2}
