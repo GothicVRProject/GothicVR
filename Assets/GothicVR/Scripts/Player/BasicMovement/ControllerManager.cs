@@ -1,104 +1,60 @@
-using GVR.Manager;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.XR;
+using UnityEngine.InputSystem;
+using GVR.Manager;
 
 public class ControllerManager : MonoBehaviour
 {
-    // TODO - Thats the empty template of user interaction from the PoC
-    // In case the concept will be reused some functions can be reused as well. Otherwise a major refactor is necessary.
-
-
-    public enum TurnSetting { none, snap, continuous }
-    public TurnSetting turnsetting;
-
     public GameObject raycastLeft;
     public GameObject raycastRight;
     public GameObject directLeft;
     public GameObject directRight;
     public GameObject settingsMenue;
+    public GameObject teleportMenu;
+    public GameObject UIGameObject;
+
     //public GameObject healthBar;
     //public GameObject manaBar;
     //public GameObject inventoryBag; was removed from game
     //public GameObject quickAccessSlots;
-    //public GameObject mainMenue;
+    //public GameObject mainMenu;
     //public GameObject inventory;
     // private InventoryClose inventoryCloseScript;
-    public bool raycastActive = false;
-    private InputDeviceCharacteristics leftControllerCharacteristic = InputDeviceCharacteristics.Left;
-    private InputDeviceCharacteristics rightControllerCharacteristic = InputDeviceCharacteristics.Right;
 
-    private InputDevice leftController;
-    private InputDevice rightController;
+    private InputAction leftPrimaryButtonAction;
+    private InputAction leftSecondaryButtonAction;
 
-    private void Start()
+    private InputAction rightPrimaryButtonAction;
+    private InputAction rightSecondaryButtonAction;
+
+    private void Awake()
     {
-        TryInitialize();
+        leftPrimaryButtonAction = new InputAction("primaryButton", binding: "<XRController>{LeftHand}/primaryButton");
+        leftSecondaryButtonAction = new InputAction("secondaryButton", binding: "<XRController>{LeftHand}/secondaryButton");
+
+        leftPrimaryButtonAction.started += ctx => ShowRayCasts();
+        leftPrimaryButtonAction.canceled += ctx => HideRayCasts();
+
+        leftPrimaryButtonAction.Enable();
+        leftSecondaryButtonAction.Enable();
+
+        rightPrimaryButtonAction = new InputAction("primaryButton", binding: "<XRController>{RightHand}/primaryButton");
+        rightSecondaryButtonAction = new InputAction("secondaryButton", binding: "<XRController>{RightHand}/secondaryButton");
+
+        rightPrimaryButtonAction.started += ctx => ShowSettingsMenu();
+
+        rightSecondaryButtonAction.started += ctx => ShowTeleportMenu();
+
+        rightPrimaryButtonAction.Enable();
+        rightSecondaryButtonAction.Enable();
     }
 
-    private void Update()
+    private void OnDestroy()
     {
-        if (!leftController.isValid && !rightController.isValid)
-        {
-            //Try initializing controllers until they are valid
-            TryInitialize();
-        }
-        else
-        {
-            //Use the first configuration set of controller buttons
-            ButtonManager();
-        }
-    }
+        leftPrimaryButtonAction.Disable();
+        leftSecondaryButtonAction.Disable();
 
-    void ButtonManager()
-    {
-        leftController.TryGetFeatureValue(CommonUsages.primaryButton, out bool leftprimarybuttonvalue);
-        leftController.TryGetFeatureValue(CommonUsages.secondaryButton, out bool leftsecondarybuttonvalue);
-        rightController.TryGetFeatureValue(CommonUsages.primaryButton, out bool rightprimarybuttonvalue);
-        rightController.TryGetFeatureValue(CommonUsages.secondaryButton, out bool rightsecondarybuttonvalue);
-
-        //Left Controller - Primary button
-        if (leftprimarybuttonvalue == true)
-        {
-            ShowRayCasts();
-        }
-        else
-        {
-            HideRayCasts();
-        }
-
-        //Left Controller - Secondary button
-        if (leftsecondarybuttonvalue == true)
-        {
-            ShowUI();
-        }
-        else
-        {
-            HideUI();
-        }
-
-        //Right Controller - Primary button
-        if (rightprimarybuttonvalue == true)
-        {
-            ShowSettingsMenue();
-            //ShowInventory();
-        }
-
-        //Right Controller - Secondary button
-        if (rightsecondarybuttonvalue == true)
-        {
-            ShowMainMenue();
-        }
-    }
-
-    public void ShowUI()
-    {
-    }
-
-    public void HideUI()
-    {
+        rightPrimaryButtonAction.Disable();
+        rightSecondaryButtonAction.Disable();
     }
 
     public void ShowRayCasts()
@@ -117,14 +73,37 @@ public class ControllerManager : MonoBehaviour
         directRight.SetActive(true);
     }
 
-    public void ShowSettingsMenue()
+    public void ShowSettingsMenu()
     {
         if (!settingsMenue.activeSelf)
         {
-            settingsMenue.gameObject.transform.parent = null;
             settingsMenue.SetActive(true);
             FontManager.I.ChangeFont();
         }
+        else
+        {
+            settingsMenue.SetActive(false);
+        }
+    }
+
+    public void ShowTeleportMenu()
+    {
+        if (!teleportMenu.activeSelf)
+        {
+            teleportMenu.SetActive(true);
+            FontManager.I.ChangeFont();
+        }
+        else
+        {
+            teleportMenu.SetActive(false);
+        }
+    }
+    public void ShowUI()
+    {
+    }
+
+    public void HideUI()
+    {
     }
 
     public void ShowMainMenue()
@@ -137,33 +116,9 @@ public class ControllerManager : MonoBehaviour
 
     public void ShowInventory()
     {
-
     }
 
     public void HideInventory()
     {
     }
-
-    //  IEnumerator (float delay)
-    void TryInitialize()
-    {
-        List<InputDevice> leftDevices = new List<InputDevice>();
-        InputDevices.GetDevicesWithCharacteristics(leftControllerCharacteristic, leftDevices);
-        List<InputDevice> rightDevices = new List<InputDevice>();
-        InputDevices.GetDevicesWithCharacteristics(rightControllerCharacteristic, rightDevices);
-
-        if (leftDevices.Count > 0)
-        {
-            leftController = leftDevices[0];
-        }
-
-        if (rightDevices.Count > 0)
-        {
-            rightController = rightDevices[0];
-        }
-    }
-
-
-
 }
-
