@@ -57,12 +57,13 @@ You can confirm the correct file structure by listing it with `adb shell ls /sto
 
 The `GameSettings.json` file can be used to modify some of GothicVR's settings.
 
-| Setting | Location | Required | Description |
-|---|---|---|---|
-| GothicIPath | GameSettings.json | Yes (only PCVR) | GothicVR requires a full Gothic1 installation/file-dump at runtime. Name its location here (Windows users: Escape the backslash with `\\`). <br>This setting gets ignored on Android (e.g. Pico 4/Quest 2). |
-| GothicMenuFontPath | GameSettings.json | No | Font which is used within Gothic Menu. .ttf/.otf supported. Feel free to check (e.g.) on worldofgothic for some cool fonts. If not defined, the game will fallback to a default font. |
-| GothicSubtitleFontPath | GameSettings.json | No | Same like font setting above but for subtitles in game. |
-| LogLevel | GameSettings.json | Yes | Defines the level of logging that will be saved. |
+| Setting                | Location          | Required        | Example                                                   | Description                                                                                                                                                                                                 |
+|------------------------|-------------------|-----------------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| GothicIPath            | GameSettings.json | Yes (PCVR only) | C:\\Program Files (x86)\\Steam\\steamapps\\common\\Gothic | GothicVR requires a full Gothic1 installation/file-dump at runtime. Name its location here (Windows users: Escape the backslash with `\\`). <br>This setting gets ignored on Android (e.g. Pico 4/Quest 2). |
+| GothicILanguage        | GameSettings.json | Yes             | en                                                        | Name of the language, Gothic is installed with: cs/en/de/fr/it/pl/es/ru                                                                                                                                     |
+| LogLevel               | GameSettings.json | No              | Warning                                                   | Defines the level of logging that will be saved. Values are: Debug/Warning/Error/Exception.                                                                                                                 |
+| GothicMenuFontPath     | GameSettings.json | No              | Gothic_Titel_Offiziell.ttf                                | Font which is used within Gothic Menu. .ttf/.otf supported. Feel free to check (e.g.) on worldofgothic for some cool fonts. If not defined, the game will fallback to a default font.                       |
+| GothicSubtitleFontPath | GameSettings.json | No              | Gothic_Ingame_Offiziell.ttf                               | Same like font setting above but for subtitles in game.                                                                                                                                                     |
 
 Where to find the `GameSettings.json`:
 * **PCVR:** Location is inside download/installation directory: `.\GVR_Data\StreamingAssets\GameSettings.json`
