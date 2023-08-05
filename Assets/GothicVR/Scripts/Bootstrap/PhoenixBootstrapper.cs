@@ -88,6 +88,7 @@ namespace GVR.Bootstrap
 
             switch (g1Language?.Trim().ToLower())
             {
+                case "cs":
                 case "pl":
                     PxEncoding.SetEncoding(PxEncoding.SupportedEncodings.CentralEurope);
                     break;
@@ -97,6 +98,8 @@ namespace GVR.Bootstrap
                 case "de":
                 case "en":
                 case "es":
+                case "fr":
+                case "it":
                 default:
                     PxEncoding.SetEncoding(PxEncoding.SupportedEncodings.WestEurope);
                     break;
