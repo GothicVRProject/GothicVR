@@ -10,6 +10,7 @@ using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Util;
+using PxCs.Helper;
 using PxCs.Interface;
 using TMPro;
 using Unity.VisualScripting;
@@ -38,13 +39,15 @@ namespace GVR.Bootstrap
             var watch = Stopwatch.StartNew();
 
             var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
-
+            
             // FIXME - We currently don't load from within _WORK directory which is required for e.g. mods who use it.
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "Data"));
 
             // Holy grail of everything! If this pointer is zero, we have nothing but a plain empty wormhole.
             GameData.I.VfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);
 
+            
+            SetLanguage();
             LoadGothicVM(g1Dir);
             LoadSfxVM(g1Dir);
             LoadMusicVM(g1Dir);
@@ -55,7 +58,6 @@ namespace GVR.Bootstrap
 
             GvrSceneManager.I.LoadStartupScenes();
         }
-
 
         public static void MissingVmExternalCall(IntPtr vmPtr, string missingCallbackName)
         {
@@ -80,6 +82,28 @@ namespace GVR.Bootstrap
             }
         }
 
+        private void SetLanguage()
+        {
+            var g1Language = SettingsManager.I.GameSettings.GothicILanguage;
+
+            switch (g1Language?.Trim().ToLower())
+            {
+                case "pl":
+                    PxEncoding.SetEncoding(PxEncoding.SupportedEncodings.CentralEurope);
+                    break;
+                case "ru":
+                    PxEncoding.SetEncoding(PxEncoding.SupportedEncodings.EastEurope);
+                    break;
+                case "de":
+                case "en":
+                case "es":
+                default:
+                    PxEncoding.SetEncoding(PxEncoding.SupportedEncodings.WestEurope);
+                    break;
+            }
+        }
+
+        
         private void LoadGothicVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));

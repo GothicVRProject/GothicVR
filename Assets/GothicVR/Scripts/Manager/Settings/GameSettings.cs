@@ -4,7 +4,8 @@
     public class GameSettings
     {
         public string GothicIPath;
-
+        public string GothicILanguage;
+        
         public string GothicMenuFontPath;
         public string GothicSubtitleFontPath;
 
