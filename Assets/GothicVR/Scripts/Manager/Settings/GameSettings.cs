@@ -4,10 +4,11 @@
     public class GameSettings
     {
         public string GothicIPath;
-
+        public string GothicILanguage;
+        public string LogLevel;
+        
         public string GothicMenuFontPath;
         public string GothicSubtitleFontPath;
 
-        public int LogLevel;
     }
 }
