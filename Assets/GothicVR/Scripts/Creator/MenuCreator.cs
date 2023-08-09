@@ -159,6 +159,12 @@ namespace GVR.Creator
                     else
                         text.alignment = TextAlignmentOptions.TopLeft;
 
+                    if ((menuItem.flags & (uint)PxVm.PxVmCMenuItemFlags.OnlyIngame) != 0)
+                        text.color = new Color(1, 1, 1, 0.1f);
+                    else
+                    {
+                        text.color = new Color(1, 1, 0, 1);
+                    }
 
                     var defaultDimX = menuItem.dimX != -1 ? menuItem.dimX : scriptDiv;
                     var defaultDimY = menuItem.dimY != -1 ? menuItem.dimY : 750f;
