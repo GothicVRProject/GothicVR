@@ -14,6 +14,7 @@ namespace GVR.Phoenix.Interface
     {
         public IntPtr VfsPtr;
         public IntPtr VmGothicPtr;
+        public IntPtr VmMenuPtr;
         public IntPtr VmSfxPtr;
         public IntPtr VmMusicPtr;
 

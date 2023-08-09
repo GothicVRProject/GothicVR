@@ -39,16 +39,17 @@ namespace GVR.Bootstrap
             var watch = Stopwatch.StartNew();
 
             var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
-            
+
             // FIXME - We currently don't load from within _WORK directory which is required for e.g. mods who use it.
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "Data"));
 
             // Holy grail of everything! If this pointer is zero, we have nothing but a plain empty wormhole.
             GameData.I.VfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);
 
-            
+
             SetLanguage();
             LoadGothicVM(g1Dir);
+            LoadMenuVM(g1Dir);
             LoadSfxVM(g1Dir);
             LoadMusicVM(g1Dir);
             LoadMusic();
@@ -106,7 +107,6 @@ namespace GVR.Bootstrap
             }
         }
 
-        
         private void LoadGothicVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
@@ -115,6 +115,14 @@ namespace GVR.Bootstrap
             VmGothicBridge.RegisterExternals(vmPtr);
 
             GameData.I.VmGothicPtr = vmPtr;
+        }
+
+        private void LoadMenuVM(string G1Dir)
+        {
+            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/MENU.DAT"));
+            var vmPtr = VmGothicBridge.LoadVm(fullPath);
+
+            GameData.I.VmMenuPtr = vmPtr;
         }
 
         private void LoadSfxVM(string G1Dir)
@@ -156,8 +164,8 @@ namespace GVR.Bootstrap
             int samplingPointSize = 100;
             int atlasPadding = 0;
             GlyphRenderMode renderMode = GlyphRenderMode.COLOR;
-            int atlasWidth = 100;
-            int atlasHeight = 100;
+            int atlasWidth = 1024;
+            int atlasHeight = 1024;
 
             if (File.Exists(menuFontPath))
                 GameData.I.GothicMenuFont = TMP_FontAsset.CreateFontAsset(menuFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
