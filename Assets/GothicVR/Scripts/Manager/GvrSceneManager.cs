@@ -49,13 +49,22 @@ namespace GVR.Manager
 
             // Debug! Will be removed in the future.
             // if (FeatureFlags.I.CreateOcNpcs)
-                // PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
+            // PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
         }
 
         private async Task LoadMainMenu()
         {
             TextureManager.I.LoadLoadingDefaultTextures();
-            await LoadNewWorldScene("MainMenu");
+            // await LoadNewWorldScene("MainMenu");
+            MenuCreator.I.Create("MENU_MAIN", 0);
+            MenuCreator.I.Create("MENU_LOG", 10);
+            MenuCreator.I.Create("MENU_LEAVE_GAME", 20);
+            MenuCreator.I.Create("MENU_OPTIONS", 30);
+            MenuCreator.I.Create("MENU_STATUS", 40);
+            MenuCreator.I.Create("MENU_SAVEGAME_LOAD", 50);
+            MenuCreator.I.Create("MENU_SAVEGAME_SAVE", 60);
+            MenuCreator.I.Create("MENU_OPT_AUDIO", 70);
+            MenuCreator.I.Create("MENU_OPT_GAME", 80);
         }
 
         public async Task LoadWorld(string worldName, string startVob)
