@@ -1,26 +1,24 @@
-using GVR.Util;
+using GVR.Caches;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
-using GVR.Caches;
-using GVR.Manager;
+using GVR.Util;
 using PxCs.Interface;
+using PxCs.Data.Vm;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-using PxCs.Data.Vm;
 using TMPro;
-
 
 namespace GVR.Creator
 {
     public class MenuCreator : SingletonBehaviour<MenuCreator>
     {
         private float scriptDiv = 8120f;
-        private float multiplerFactor = 6f;
+        private float multiplierFactor = 6f;
 
         public void Create(string menuName, int xOffset)
         {
-            PxVmMenuData menu = new();
+            PxVmMenuData menu = new PxVmMenuData();
             try
             {
                 menu = PxVm.InitializeMenu(GameData.I.VmMenuPtr, menuName);
@@ -29,6 +27,7 @@ namespace GVR.Creator
             {
                 Debug.LogException(e);
             }
+
             var root = new GameObject($"MenuRoot - {menuName}");
 
             root.transform.position = new Vector3(xOffset, 1501, 5);
@@ -36,65 +35,71 @@ namespace GVR.Creator
 
             var canvasGO = new GameObject("Canvas");
             canvasGO.SetParent(root, true, true);
-            var canvas = canvasGO.AddComponent<Canvas>();
 
+            canvasGO.AddComponent<Canvas>();
             canvasGO.AddComponent<CanvasScaler>();
             canvasGO.AddComponent<GraphicRaycaster>();
-            var back_pic = new GameObject("back_pic");
-            back_pic.SetParent(canvasGO, true, true);
-            var image = back_pic.AddComponent<Image>();
-            var back_picMaterial = TextureManager.I.GetEmptyMaterial();
-            back_picMaterial.mainTexture = AssetCache.I.TryGetTexture(menu.backPic.ToUpper());
 
-            image.material = back_picMaterial;
+            var backPic = new GameObject("BackPic");
+            backPic.SetParent(canvasGO, true, true);
 
-            var dimX = menu.dimX / scriptDiv * multiplerFactor;
-            var dimY = menu.dimY / scriptDiv * multiplerFactor;
+            var image = backPic.AddComponent<Image>();
+            var backPicMaterial = TextureManager.I.GetEmptyMaterial();
+            backPicMaterial.mainTexture = AssetCache.I.TryGetTexture(menu.backPic.ToUpper());
+            image.material = backPicMaterial;
 
+            var dimX = menu.dimX / scriptDiv * multiplierFactor;
+            var dimY = menu.dimY / scriptDiv * multiplierFactor;
             image.rectTransform.sizeDelta = new Vector2(dimX, dimY);
 
             var itemRoot = new GameObject("Items");
             itemRoot.SetParent(root, true, true);
 
-            var menuInfoX = 1000f / scriptDiv * multiplerFactor;
-            var menuInfoY = 7500f / scriptDiv * multiplerFactor;
+            var menuInfoX = 1000f;
+            var menuInfoY = 7500f;
 
             var menuInfoXPtr = PxVm.pxScriptGetSymbolByName(GameData.I.VmMenuPtr, "MENU_INFO_X");
             var menuInfoYPtr = PxVm.pxScriptGetSymbolByName(GameData.I.VmMenuPtr, "MENU_INFO_Y");
 
             if (menuInfoXPtr != IntPtr.Zero && menuInfoYPtr != IntPtr.Zero)
             {
-                menuInfoX = PxVm.pxScriptSymbolGetInt(menuInfoXPtr, 0) / scriptDiv * multiplerFactor;
-                menuInfoY = PxVm.pxScriptSymbolGetInt(menuInfoYPtr, 0) / scriptDiv * multiplerFactor;
-
+                menuInfoX = PxVm.pxScriptSymbolGetInt(menuInfoXPtr, 0);
+                menuInfoY = PxVm.pxScriptSymbolGetInt(menuInfoYPtr, 0);
             }
 
-            var extraText = new GameObject("ExtraText");
-            extraText.SetParent(root, true);
+            menuInfoX = menuInfoX / scriptDiv * multiplierFactor;
+            menuInfoY = menuInfoY / scriptDiv * multiplierFactor;
 
-            var text = extraText.AddComponent<TextMeshPro>();
+            if ((menu.flags & 1 << 6) != 0) //show info
+            {
 
-            text.fontSizeMin = 1;
-            text.enableAutoSizing = true;
-            text.alignment = TextAlignmentOptions.Center;
-            text.font = GameData.I.GothicMenuFont;
+                var extraText = new GameObject("ExtraText");
+                extraText.SetParent(root, true);
+                var text = extraText.AddComponent<TextMeshPro>();
 
-            text.rectTransform.localPosition = new Vector3(0, (dimY / 2 - menuInfoX), 0.02f);
-            text.rectTransform.sizeDelta = new Vector2(dimX, (menuInfoX));
+                text.fontSizeMin = 1;
+                text.enableAutoSizing = true;
+                text.alignment = TextAlignmentOptions.Center;
+                text.font = GameData.I.GothicMenuFont;
 
-            // Debug.Log($"menuInfoX {menuInfoX} menuInfoY {menuInfoY} dimX {dimX} dimY {dimY}");
+                text.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit";
+
+                text.rectTransform.localPosition = new Vector3(0, (dimY / 2 - menuInfoX), 0.02f);
+                text.rectTransform.sizeDelta = new Vector2(dimX, (menuInfoX));
+            }
+
             itemRoot.transform.localPosition = new Vector3(-(dimX / 2), -(dimY / 2), 0.02f);
 
             foreach (var item in menu.items)
             {
-                if (item != string.Empty)
+                if (!string.IsNullOrEmpty(item))
                     CreateMenuItem(itemRoot, item);
             }
         }
 
         public void CreateMenuItem(GameObject root, string name)
         {
-            PxVmMenuItemData menuItem = new();
+            PxVmMenuItemData menuItem = new PxVmMenuItemData();
             try
             {
                 menuItem = PxVm.InitializeMenuItem(GameData.I.VmMenuPtr, name);
@@ -107,66 +112,68 @@ namespace GVR.Creator
             var itemRoot = new GameObject($"ItemRoot - {name}");
             itemRoot.SetParent(root, true, true);
 
-            var dimX = menuItem.dimX / scriptDiv * multiplerFactor;
-            var dimY = menuItem.dimY / scriptDiv * multiplerFactor;
-            var posX = menuItem.posX / scriptDiv * multiplerFactor;
-            var posY = menuItem.posY / scriptDiv * multiplerFactor;
+            var dimX = menuItem.dimX / scriptDiv * multiplierFactor;
+            var dimY = menuItem.dimY / scriptDiv * multiplierFactor;
+            var posX = menuItem.posX / scriptDiv * multiplierFactor;
+            var posY = menuItem.posY / scriptDiv * multiplierFactor;
 
-            if (menuItem.backpic != string.Empty)
+            if (!string.IsNullOrEmpty(menuItem.backpic))
             {
-
-                Debug.Log($"Creating {name} of type {menuItem.type}");
-
                 var canvasGO = new GameObject("Canvas");
                 canvasGO.SetParent(itemRoot, true, true);
-                var canvas = canvasGO.AddComponent<Canvas>();
-                var back_pic = new GameObject("back_pic");
-                back_pic.SetParent(canvasGO, true, true);
-                var image = back_pic.AddComponent<Image>();
-                var back_picMaterial = TextureManager.I.GetEmptyMaterial();
-                back_picMaterial.mainTexture = AssetCache.I.TryGetTexture(menuItem.backpic.ToUpper());
+                canvasGO.AddComponent<Canvas>();
 
-                image.material = back_picMaterial;
+                var backPic = new GameObject("BackPic");
+                backPic.SetParent(canvasGO, true, true);
+
+                var image = backPic.AddComponent<Image>();
+                var backPicMaterial = TextureManager.I.GetEmptyMaterial();
+                backPicMaterial.mainTexture = AssetCache.I.TryGetTexture(menuItem.backpic.ToUpper());
+                image.material = backPicMaterial;
 
                 image.rectTransform.sizeDelta = new Vector2(dimX, dimY);
-                if (name.EndsWith("2"))
+
+                if (name.EndsWith("2")) // the secong heading is the actual logo, the first is just the shadow
                 {
-                    image.rectTransform.localPosition = new Vector3((posX + dimX) / 2, (posY + dimY * 1.25f) / 2, 0.01f);
+                    image.rectTransform.localPosition = new Vector3((menuItem.posX + menuItem.dimX) / scriptDiv * multiplierFactor / 2, (menuItem.posY + menuItem.dimY * 1.25f) / scriptDiv * multiplierFactor / 2, 0.01f);
                 }
                 else
                 {
-                    image.rectTransform.localPosition = new Vector3((posX + dimX) / 2, (posY + dimY * 1.25f) / 2, 0);
+                    image.rectTransform.localPosition = new Vector3((menuItem.posX + menuItem.dimX) / scriptDiv * multiplierFactor / 2, (menuItem.posY + menuItem.dimY * 1.25f) / scriptDiv * multiplierFactor / 2, 0);
                 }
             }
             else
             {
+                Debug.Log($"Menu item {name} has flags {menuItem.flags}");
                 if (menuItem.type == (int)PxVm.PxVmCMenuItemType.PxVmCMenuItemTypeText)
                 {
                     var label = new GameObject("Label");
                     label.SetParent(itemRoot, true);
 
                     var text = label.AddComponent<TextMeshPro>();
-                    text.text = menuItem.text[0] != string.Empty ? menuItem.text[0] : "---";
-
+                    text.text = !string.IsNullOrEmpty(menuItem.text[0]) ? menuItem.text[0] : "---";
                     text.font = GameData.I.GothicMenuFont;
 
                     if ((menuItem.flags & (uint)PxVm.PxVmCMenuItemFlags.Centered) != 0)
                         text.alignment = TextAlignmentOptions.BaselineGeoAligned;
                     else
-                    {
                         text.alignment = TextAlignmentOptions.TopLeft;
-                    }
+
 
                     var defaultDimX = menuItem.dimX != -1 ? menuItem.dimX : scriptDiv;
                     var defaultDimY = menuItem.dimY != -1 ? menuItem.dimY : 750f;
 
-                    text.rectTransform.sizeDelta = new Vector2(defaultDimX / scriptDiv * multiplerFactor, defaultDimY / scriptDiv * multiplerFactor);
-                    text.rectTransform.localPosition = new Vector3((posX + (defaultDimX / scriptDiv * multiplerFactor)) / 2, posY + (defaultDimY / scriptDiv * multiplerFactor), 0);
+                    // defaultDimX = defaultDimX / scriptDiv * multiplierFactor;
+                    // defaultDimY = defaultDimY / scriptDiv * multiplierFactor;
+
+                    Debug.Log($"Text for {name} has posX {menuItem.posX} posY {menuItem.posY} defaultDimX {defaultDimX} defaultDimY {defaultDimY}");
+
+                    text.rectTransform.sizeDelta = new Vector2(defaultDimX / scriptDiv * multiplierFactor, defaultDimY / scriptDiv * multiplierFactor);
+                    text.rectTransform.localPosition = new Vector3(((menuItem.posX + defaultDimX) / scriptDiv * multiplierFactor) / 2, (menuItem.posY + defaultDimY) / scriptDiv * multiplierFactor, 0);
 
                     text.fontSizeMin = 1;
                     text.enableAutoSizing = true;
                 }
-                // text.autoSizeTextContainer = true;
             }
         }
     }
