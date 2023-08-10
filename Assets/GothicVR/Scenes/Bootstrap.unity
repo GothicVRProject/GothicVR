@@ -297,6 +297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bac1ac90c03aa544b80557933eae109b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  emptyFont: {fileID: 11400000, guid: ed34b05229166f3469c21b7208879736, type: 2}
 --- !u!1 &235819213
 GameObject:
   m_ObjectHideFlags: 0
@@ -1101,7 +1102,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 354f53e468562f34da62c8c144374eb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  font: {fileID: 12800000, guid: 239c42970e1901b448972b41ad2202a8, type: 2}
 --- !u!114 &1896514219
 MonoBehaviour:
   m_ObjectHideFlags: 0
