@@ -24,6 +24,7 @@ namespace GVR.Manager
         private bool generalSceneLoaded = false;
 
         private GameObject startPoint;
+        private GameObject player;
 
         public GameObject interactionManager;
 
@@ -202,12 +203,18 @@ namespace GVR.Manager
             SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.I.WorldScene.Value.name));
         }
 
+        private void SetPlayer()
+        {
+            player = generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController").transform.Find("VRPlayer").gameObject;
+        }
+
         public void TeleportPlayerToSpot()
         {
-            var playerParent = generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
+            if (player == null)
+                SetPlayer();
 
             if (startPoint != null)
-                playerParent!.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
+                player.transform.position = startPoint.transform.position;
         }
     }
 }
