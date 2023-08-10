@@ -45,11 +45,6 @@ namespace GVR.Manager
         public async Task LoadStartupScenes()
         {
             await LoadMainMenu();
-            // await LoadWorld("world.zen", "START");
-
-            // Debug! Will be removed in the future.
-            // if (FeatureFlags.I.CreateOcNpcs)
-                // PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
         }
 
         private async Task LoadMainMenu()
