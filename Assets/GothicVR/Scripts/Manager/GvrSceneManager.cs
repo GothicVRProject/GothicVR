@@ -214,7 +214,10 @@ namespace GVR.Manager
                 SetPlayer();
 
             if (startPoint != null)
+            {
                 player.transform.position = startPoint.transform.position;
+                player.transform.rotation = startPoint.transform.rotation;
+            }
         }
     }
 }
