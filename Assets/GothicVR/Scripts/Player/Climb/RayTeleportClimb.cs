@@ -19,7 +19,7 @@ public class RayTeleportClimb : MonoBehaviour
     private GameObject zsPos0GO;
     private GameObject zsPos1GO;
     private float hitTime;
-    private float teleportDelay = 0.5f; // Adjust the delay duration as needed
+    private float teleportDelay = 1f; // Adjust the delay duration as needed
 
     private string zsPos0 = "ZS_POS0";
     private string zsPos1 = "ZS_POS1";
