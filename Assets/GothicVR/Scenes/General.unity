@@ -1406,14 +1406,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1353668847}
     m_Modifications:
-    - target: {fileID: 315931346503809127, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_Type
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 315931346503809127, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 100025301, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: UIGameObject
       value: 
