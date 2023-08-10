@@ -12,10 +12,11 @@ namespace GVR.Manager
         //Tags for components to exchange the default font with custom Gothic title and subtitle / ingame fonts
         public string MenuFontTag = "Title";
         public string SubtitleFontTag = "IngameText";
+        public string ClimbableTag = "Climbable";
 
         public int MeshPerFrame = 10;
         public int VObPerFrame = 75;
-        
+
         //Collection of PlayerPref entries for settings
         public string moveSpeedPlayerPref = "MoveSpeed";
         public string turnSettingPlayerPref = "TurnSetting";
