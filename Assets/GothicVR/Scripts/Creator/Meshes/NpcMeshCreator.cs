@@ -18,9 +18,9 @@ namespace GVR.Creator.Meshes
         public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
             PxMorphMeshData morphMesh, VmGothicBridge.Mdl_SetVisualBodyData bodyData, GameObject parent)
         {
+            tempBodyData = bodyData;
             var npcGo = Create(npcName, mdm, mdh, default, default, parent);
 
-            tempBodyData = bodyData;
             AddHead(npcName, npcGo, morphMesh);
 
             return npcGo;
