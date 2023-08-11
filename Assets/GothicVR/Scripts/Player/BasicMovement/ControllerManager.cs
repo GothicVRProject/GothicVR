@@ -12,14 +12,6 @@ public class ControllerManager : MonoBehaviour
     public GameObject teleportMenu;
     public GameObject UIGameObject;
 
-    //public GameObject healthBar;
-    //public GameObject manaBar;
-    //public GameObject inventoryBag; was removed from game
-    //public GameObject quickAccessSlots;
-    //public GameObject mainMenu;
-    //public GameObject inventory;
-    // private InventoryClose inventoryCloseScript;
-
     private InputAction leftPrimaryButtonAction;
     private InputAction leftSecondaryButtonAction;
 
