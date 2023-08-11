@@ -17,6 +17,7 @@ namespace GVR.Debugging
         public bool CreateVobs;
         public bool CreateWaypoints;
         public bool CreateWaypointEdges;
+        public bool SkipMainMenu;
 
         [Header("__________DayTime__________")]
         public bool EnableDayTime;

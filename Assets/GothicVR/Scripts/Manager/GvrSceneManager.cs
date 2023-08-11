@@ -45,7 +45,10 @@ namespace GVR.Manager
         /// </summary>
         public async Task LoadStartupScenes()
         {
-            await LoadMainMenu();
+            if (FeatureFlags.I.SkipMainMenu)
+                await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
+            else
+                await LoadMainMenu();
         }
 
         private async Task LoadMainMenu()
