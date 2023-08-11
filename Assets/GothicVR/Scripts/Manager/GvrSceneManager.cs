@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
+using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
+using GVR.Phoenix.Interface.Vm;
 using GVR.Util;
 using PxCs.Interface;
 using UnityEngine;
@@ -45,7 +47,10 @@ namespace GVR.Manager
         /// </summary>
         public async Task LoadStartupScenes()
         {
-            await LoadMainMenu();
+            if (FeatureFlags.I.SkipMainMenu)
+                await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
+            else
+                await LoadMainMenu();
         }
 
         private async Task LoadMainMenu()
@@ -64,6 +69,7 @@ namespace GVR.Manager
                 return;
             }
             newWorldName = worldName;
+
             MusicCreator.I.setMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
@@ -72,6 +78,9 @@ namespace GVR.Manager
             await WorldCreator.I.CreateAsync(newWorldName);
             SetSpawnPoint(newWorldScene);
 
+            if (FeatureFlags.I.CreateOcNpcs)
+                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
+            
             HideLoadingScene();
             watch.Stop();
             Debug.Log($"Time spent for loading {worldName}: {watch.Elapsed}");
