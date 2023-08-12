@@ -40,6 +40,7 @@ namespace GVR.Debugging
 
         [Header("__________SPAMmy debug messages__________")]
         public bool ShowVfsFileNotFoundErrors;
+        public bool ShowZspyLogs;
 
         [Header("__________Audio__________")]
         public bool EnableSounds;

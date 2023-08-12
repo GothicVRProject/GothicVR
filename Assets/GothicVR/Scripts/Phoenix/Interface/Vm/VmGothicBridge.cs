@@ -1,6 +1,8 @@
 ﻿using AOT;
 using PxCs.Interface;
 using System;
+using GVR.Debugging;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace GVR.Phoenix.Interface.Vm
@@ -34,6 +36,11 @@ namespace GVR.Phoenix.Interface.Vm
         public static void RegisterExternals(IntPtr vmPtr)
         {
             PxVm.pxVmRegisterExternalDefault(vmPtr, DefaultExternal);
+            PxVm.pxVmRegisterExternal(vmPtr, "ConcatStrings", ConcatStrings);
+            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebug", PrintDebug);
+            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugCh", PrintDebugCh);
+            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInst", PrintDebugInst);
+            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInstCh", PrintDebugInstCh); 
 
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "TA_MIN", TA_MIN);
@@ -43,7 +50,6 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
             
-            PxVm.pxVmRegisterExternal(vmPtr, "ConcatStrings", ConcatStrings);
         }
 
         public static UnityEvent<IntPtr, string> DefaultExternalCallback = new();
@@ -58,6 +64,7 @@ namespace GVR.Phoenix.Interface.Vm
 
 
 #region Default
+
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalDefaultCallback))]
         public static void DefaultExternal(IntPtr vmPtr, string missingCallbackName)
         {
@@ -78,6 +85,51 @@ namespace GVR.Phoenix.Interface.Vm
             
             PxVm.pxVmStackPushString(vmPtr, str1 + str2);
         }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void PrintDebug(IntPtr vmPtr)
+        {
+            if (!FeatureFlags.I.ShowZspyLogs)
+                return;
+            
+            var message = PxVm.VmStackPopString(vmPtr);
+            Debug.Log($"[zspy]: {message}");
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void PrintDebugCh(IntPtr vmPtr)
+        {
+            if (!FeatureFlags.I.ShowZspyLogs)
+                return;
+            
+            var message = PxVm.VmStackPopString(vmPtr);
+            var channel = PxVm.pxVmStackPopInt(vmPtr);
+            
+            Debug.Log($"[zspy,{channel}]: {message}");
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void PrintDebugInst(IntPtr vmPtr)
+        {
+            if (!FeatureFlags.I.ShowZspyLogs)
+                return;
+
+            var message = PxVm.VmStackPopString(vmPtr);
+            Debug.Log($"[zspy]: {message}");
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void PrintDebugInstCh(IntPtr vmPtr)
+        {
+            if (!FeatureFlags.I.ShowZspyLogs)
+                return;
+            
+            var message = PxVm.VmStackPopString(vmPtr);
+            var channel = PxVm.pxVmStackPopInt(vmPtr);
+            
+            Debug.Log($"[zspy,{channel}]: {message}");
+        }
+        
 #endregion
 
 

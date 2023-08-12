@@ -344,6 +344,7 @@ MonoBehaviour:
   CreateNpcArmor: 1
   CreateExampleAnimation: 0
   ShowVfsFileNotFoundErrors: 0
+  ShowZspyLogs: 0
   EnableSounds: 0
   EnableMusic: 1
 --- !u!1 &379812652
