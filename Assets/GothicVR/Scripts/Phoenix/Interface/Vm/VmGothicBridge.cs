@@ -54,6 +54,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_ApplyOverlayMds", Mdl_ApplyOverlayMds);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisualBody", Mdl_SetVisualBody);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetModelScale", Mdl_SetModelScale);
+            PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetModelFatness", Mdl_SetModelFatness);
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
         }
@@ -65,6 +66,7 @@ namespace GVR.Phoenix.Interface.Vm
         public static UnityEvent<Mdl_ApplyOverlayMdsData> PhoenixMdl_ApplyOverlayMds = new();
         public static UnityEvent<Mdl_SetVisualBodyData> PhoenixMdl_SetVisualBody = new();
         public static UnityEvent<Mdl_SetModelScaleData> PhoenixMdl_SetModelScale = new();
+        public static UnityEvent<Mdl_SetModelFatnessData> PhoenixMdl_SetModelFatness = new();
         public static UnityEvent<EquipItemData> PhoenixEquipItem = new();
         public static UnityEvent<string> PhoenixMdl_AI_OUTPUT = new();
 
@@ -315,6 +317,25 @@ namespace GVR.Phoenix.Interface.Vm
                 {
                     npcPtr = npcPtr,
                     scale = new (x, y, z)
+                });
+        }
+
+        public struct Mdl_SetModelFatnessData
+        {
+            public IntPtr npcPtr;
+            public float fatness;
+        }
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Mdl_SetModelFatness(IntPtr vmPtr)
+        {
+            var fatness = PxVm.pxVmStackPopFloat(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            PhoenixMdl_SetModelFatness.Invoke(
+                new Mdl_SetModelFatnessData()
+                {
+                    npcPtr = npcPtr,
+                    fatness = fatness
                 });
         }
 

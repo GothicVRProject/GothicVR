@@ -23,6 +23,9 @@ namespace GVR.Creator
         private static AssetCache assetCache;
         private static GameObject npcRootGo;
 
+        // Hint - If this scale ratio isn't looking well, feel free to change it.
+        private const float fatnessScale = 0.1f;
+
         void Start()
         {
             lookupCache = LookupCache.I;
@@ -33,6 +36,7 @@ namespace GVR.Creator
             VmGothicBridge.PhoenixMdl_ApplyOverlayMds.AddListener(Mdl_ApplyOverlayMds);
             VmGothicBridge.PhoenixMdl_SetVisualBody.AddListener(Mdl_SetVisualBody);
             VmGothicBridge.PhoenixMdl_SetModelScale.AddListener(Mdl_SetModelScale);
+            VmGothicBridge.PhoenixMdl_SetModelFatness.AddListener(Mdl_SetModelFatness);
             VmGothicBridge.PhoenixEquipItem.AddListener(EquipItem);
             VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
         }
@@ -166,6 +170,16 @@ namespace GVR.Creator
             var npc = lookupCache.npcCache[symbolIndex];
 
             npc.transform.localScale = data.scale;
+        }
+
+        private static void Mdl_SetModelFatness(VmGothicBridge.Mdl_SetModelFatnessData data)
+        {
+            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
+            var npc = lookupCache.npcCache[symbolIndex];
+            var oldScale = npc.transform.localScale;
+            var bonusFat = data.fatness * fatnessScale;
+            
+            npc.transform.localScale = new(oldScale.x + bonusFat, oldScale.y, oldScale.z + bonusFat);
         }
 
         private static void EquipItem(VmGothicBridge.EquipItemData data)
