@@ -1,7 +1,8 @@
-﻿using AOT;
-using PxCs.Interface;
-using System;
+﻿using System;
+using System.Globalization;
+using AOT;
 using GVR.Debugging;
+using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -37,6 +38,11 @@ namespace GVR.Phoenix.Interface.Vm
         {
             PxVm.pxVmRegisterExternalDefault(vmPtr, DefaultExternal);
             PxVm.pxVmRegisterExternal(vmPtr, "ConcatStrings", ConcatStrings);
+            PxVm.pxVmRegisterExternal(vmPtr, "IntToString", IntToString);
+            PxVm.pxVmRegisterExternal(vmPtr, "FloatToString", FloatToString);
+            PxVm.pxVmRegisterExternal(vmPtr, "FloatToInt", FloatToInt);
+            PxVm.pxVmRegisterExternal(vmPtr, "IntToFloat", IntToFloat);
+
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebug", PrintDebug);
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugCh", PrintDebugCh);
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInst", PrintDebugInst);
@@ -84,6 +90,34 @@ namespace GVR.Phoenix.Interface.Vm
             var str1 = PxVm.VmStackPopString(vmPtr);
             
             PxVm.pxVmStackPushString(vmPtr, str1 + str2);
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void IntToString(IntPtr vmPtr)
+        {
+            var val = PxVm.pxVmStackPopInt(vmPtr);
+            PxVm.pxVmStackPushString(vmPtr, val.ToString());
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void FloatToString(IntPtr vmPtr)
+        {
+            var val = PxVm.pxVmStackPopFloat(vmPtr);
+            PxVm.pxVmStackPushString(vmPtr, val.ToString(CultureInfo.InvariantCulture));
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void FloatToInt(IntPtr vmPtr)
+        {
+            var val = PxVm.pxVmStackPopFloat(vmPtr);
+            PxVm.pxVmStackPushInt(vmPtr, (int)val);
+        }
+            
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void IntToFloat(IntPtr vmPtr)
+        {
+            var val = PxVm.pxVmStackPopInt(vmPtr);
+            PxVm.pxVmStackPushFloat(vmPtr, val);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
