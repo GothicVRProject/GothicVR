@@ -53,9 +53,9 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisual", Mdl_SetVisual);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_ApplyOverlayMds", Mdl_ApplyOverlayMds);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisualBody", Mdl_SetVisualBody);
+            PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetModelScale", Mdl_SetModelScale);
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
-            
         }
 
         public static UnityEvent<IntPtr, string> DefaultExternalCallback = new();
@@ -64,6 +64,7 @@ namespace GVR.Phoenix.Interface.Vm
         public static UnityEvent<Mdl_SetVisualData> PhoenixMdl_SetVisual = new();
         public static UnityEvent<Mdl_ApplyOverlayMdsData> PhoenixMdl_ApplyOverlayMds = new();
         public static UnityEvent<Mdl_SetVisualBodyData> PhoenixMdl_SetVisualBody = new();
+        public static UnityEvent<Mdl_SetModelScaleData> PhoenixMdl_SetModelScale = new();
         public static UnityEvent<EquipItemData> PhoenixEquipItem = new();
         public static UnityEvent<string> PhoenixMdl_AI_OUTPUT = new();
 
@@ -294,6 +295,27 @@ namespace GVR.Phoenix.Interface.Vm
                     armor = armor
                 }
             );
+        }
+
+        public struct Mdl_SetModelScaleData
+        {
+            public IntPtr npcPtr;
+            public Vector3 scale;
+        }
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Mdl_SetModelScale(IntPtr vmPtr)
+        {
+            var z = PxVm.pxVmStackPopFloat(vmPtr);
+            var y = PxVm.pxVmStackPopFloat(vmPtr);
+            var x = PxVm.pxVmStackPopFloat(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            PhoenixMdl_SetModelScale.Invoke(
+                new Mdl_SetModelScaleData()
+                {
+                    npcPtr = npcPtr,
+                    scale = new (x, y, z)
+                });
         }
 
         public struct EquipItemData

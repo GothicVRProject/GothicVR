@@ -29,11 +29,12 @@ namespace GVR.Creator
             assetCache = AssetCache.I;
             
             VmGothicBridge.PhoenixWld_InsertNpc.AddListener(Wld_InsertNpc);
-            VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
             VmGothicBridge.PhoenixMdl_SetVisual.AddListener(Mdl_SetVisual);
             VmGothicBridge.PhoenixMdl_ApplyOverlayMds.AddListener(Mdl_ApplyOverlayMds);
             VmGothicBridge.PhoenixMdl_SetVisualBody.AddListener(Mdl_SetVisualBody);
+            VmGothicBridge.PhoenixMdl_SetModelScale.AddListener(Mdl_SetModelScale);
             VmGothicBridge.PhoenixEquipItem.AddListener(EquipItem);
+            VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
         }
 
         private static GameObject GetRootGo()
@@ -157,6 +158,14 @@ namespace GVR.Creator
             }
             
             NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
+        }
+
+        private static void Mdl_SetModelScale(VmGothicBridge.Mdl_SetModelScaleData data)
+        {
+            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
+            var npc = lookupCache.npcCache[symbolIndex];
+
+            npc.transform.localScale = data.scale;
         }
 
         private static void EquipItem(VmGothicBridge.EquipItemData data)
