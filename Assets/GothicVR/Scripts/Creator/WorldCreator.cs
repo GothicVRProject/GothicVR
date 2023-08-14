@@ -36,7 +36,7 @@ namespace GVR.Creator
             DebugAnimationCreator.I.Create(worldName);
             DebugAnimationCreatorBSFire.I.Create(worldName);
             DebugAnimationCreatorVelaya.I.Create(worldName);
-            DebugAnimationCreatorBloodwyn.I.Create(worldName);
+            DebugAnimationCreatorBloodwyn.I.Create();
 
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);

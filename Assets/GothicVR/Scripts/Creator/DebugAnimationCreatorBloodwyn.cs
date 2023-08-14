@@ -24,15 +24,30 @@ namespace GVR.Creator
 {
     public class DebugAnimationCreatorBloodwyn: SingletonBehaviour<DebugAnimationCreatorBloodwyn>
     {
-        public void Create(string worldName)
+        private const string worldName = "world.zen";
+        
+        public void Create()
         {
             if (!FeatureFlags.I.CreateExampleAnimation)
                 return;
-            
+
+            CreateNaked();
+            CreateCrawler();
+            CreateShadow();
+            CreateGuard();
+
+            var mdmBroken = AssetCache.I.TryGetMdm("Hum_GRDM_ARMOR");
+            var mdmWorking = AssetCache.I.TryGetMdm("Hum_STTS_ARMOR");
+            var mdmWorkingCrawler = AssetCache.I.TryGetMdm("Hum_CRAWLER_ARMOR");
+            var mdmWorkingNaked = AssetCache.I.TryGetMdm("Hum_Body_Naked0.ASC");
+        }
+
+        private void CreateNaked()
+        {
             var name = "DebugBloodwyn";
             var mdhName = "HUMANS.mdh";
             var head = "Hum_Head_Bald"; // B - Hum_Head_Bald --- D - Hum_Head_Thief
-            var armor = "Hum_GRDM_ARMOR"; // B - Hum_GRDM_ARMOR --- D - Hum_STTS_ARMOR --- N - hum_body_Naked0
+            var armor = "hum_body_Naked0"; // B - Hum_GRDM_ARMOR --- D - Hum_STTS_ARMOR --- N - hum_body_Naked0 --- C - Hum_CRAWLER_ARMOR
             var variant = new VmGothicBridge.Mdl_SetVisualBodyData()
             {
                 bodyTexNr = 0, // B=0, D=0
@@ -57,13 +72,129 @@ namespace GVR.Creator
 
             try
             {
-                PlayAnimationBloodwyn(obj, mds, mdh, mdsName, animationName);
+                // PlayAnimationBloodwyn(obj, mds, mdh, mdsName, animationName);
             }
             catch (Exception e)
             {
                 var x = e.StackTrace;
             }
         }
+
+        private void CreateCrawler()
+        {
+            var name = "DebugBloodwyn";
+            var mdhName = "HUMANS.mdh";
+            var head = "Hum_Head_Bald"; // B - Hum_Head_Bald --- D - Hum_Head_Thief
+            var armor = "Hum_CRAWLER_ARMOR"; // B - Hum_GRDM_ARMOR --- D - Hum_STTS_ARMOR --- N - hum_body_Naked0 --- C - Hum_CRAWLER_ARMOR
+            var variant = new VmGothicBridge.Mdl_SetVisualBodyData()
+            {
+                bodyTexNr = 0, // B=0, D=0
+                bodyTexColor = 1, // B=1, D=2
+                headTexNr = 18, // B=18, D=15
+                teethTexNr = 1, // B=1, D=4
+            };
+
+            var mdh = AssetCache.I.TryGetMdh(mdhName);
+            var mmb = AssetCache.I.TryGetMmb(head);
+            var mdm = AssetCache.I.TryGetMdm(armor);
+            var obj = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, variant, null);
+
+            SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
+
+            obj.transform.localPosition = new(-36f, 10f, 0);
+
+            
+            var mdsName = "HUMANS.mds";
+            var animationName = "t_Stand_2_Jump";
+            var mds = AssetCache.I.TryGetMds(mdsName);
+
+            try
+            {
+                // PlayAnimationBloodwyn(obj, mds, mdh, mdsName, animationName);
+            }
+            catch (Exception e)
+            {
+                var x = e.StackTrace;
+            }
+        }
+
+        private void CreateShadow()
+        {
+            var name = "DebugBloodwyn";
+            var mdhName = "HUMANS.mdh";
+            var head = "Hum_Head_Bald"; // B - Hum_Head_Bald --- D - Hum_Head_Thief
+            var armor = "Hum_STTS_ARMOR"; // B - Hum_GRDM_ARMOR --- D - Hum_STTS_ARMOR --- N - hum_body_Naked0 --- C - Hum_CRAWLER_ARMOR
+            var variant = new VmGothicBridge.Mdl_SetVisualBodyData()
+            {
+                bodyTexNr = 0, // B=0, D=0
+                bodyTexColor = 1, // B=1, D=2
+                headTexNr = 18, // B=18, D=15
+                teethTexNr = 1, // B=1, D=4
+            };
+
+            var mdh = AssetCache.I.TryGetMdh(mdhName);
+            var mmb = AssetCache.I.TryGetMmb(head);
+            var mdm = AssetCache.I.TryGetMdm(armor);
+            var obj = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, variant, null);
+
+            SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
+
+            obj.transform.localPosition = new(-37f, 10f, 0);
+
+            
+            var mdsName = "HUMANS.mds";
+            var animationName = "t_Stand_2_Jump";
+            var mds = AssetCache.I.TryGetMds(mdsName);
+
+            try
+            {
+                // PlayAnimationBloodwyn(obj, mds, mdh, mdsName, animationName);
+            }
+            catch (Exception e)
+            {
+                var x = e.StackTrace;
+            }
+        }
+
+        private void CreateGuard()
+        {
+            var name = "DebugBloodwyn";
+            var mdhName = "HUMANS.mdh";
+            var head = "Hum_Head_Bald"; // B - Hum_Head_Bald --- D - Hum_Head_Thief
+            var armor = "Hum_GRDM_ARMOR"; // B - Hum_GRDM_ARMOR --- D - Hum_STTS_ARMOR --- N - hum_body_Naked0 --- C - Hum_CRAWLER_ARMOR
+            var variant = new VmGothicBridge.Mdl_SetVisualBodyData()
+            {
+                bodyTexNr = 0, // B=0, D=0
+                bodyTexColor = 1, // B=1, D=2
+                headTexNr = 18, // B=18, D=15
+                teethTexNr = 1, // B=1, D=4
+            };
+
+            var mdh = AssetCache.I.TryGetMdh(mdhName);
+            var mmb = AssetCache.I.TryGetMmb(head);
+            var mdm = AssetCache.I.TryGetMdm(armor);
+            var obj = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, variant, null);
+
+            SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
+
+            obj.transform.localPosition = new(-38f, 10f, 0);
+
+            
+            var mdsName = "HUMANS.mds";
+            var animationName = "t_Stand_2_Jump";
+            var mds = AssetCache.I.TryGetMds(mdsName);
+
+            try
+            {
+                // PlayAnimationBloodwyn(obj, mds, mdh, mdsName, animationName);
+            }
+            catch (Exception e)
+            {
+                var x = e.StackTrace;
+            }
+        }
+
+        
         
         private void PlayAnimationBloodwyn(GameObject rootObj, PxModelScriptData mds, PxModelHierarchyData mdh, string mdsName, string animationName)
         {
