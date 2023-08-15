@@ -43,7 +43,6 @@ namespace GVR.Creator
                 return npcRootGo;
             
             npcRootGo = new GameObject("NPCs");
-            GvrSceneManager.I.MoveToWorldScene(npcRootGo);
             
             return npcRootGo;
         }
