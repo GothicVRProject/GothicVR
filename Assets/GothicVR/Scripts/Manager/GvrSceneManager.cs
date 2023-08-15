@@ -52,6 +52,9 @@ namespace GVR.Manager
 
             if (FeatureFlags.I.CreateOcNpcs)
                 PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
+
+            if (FeatureFlags.I.CreateDebugIdleAnimations)
+                NpcCreator.I.DebugAddIdleAnimationToAllNpc();
         }
 
         private async Task LoadMainMenu()

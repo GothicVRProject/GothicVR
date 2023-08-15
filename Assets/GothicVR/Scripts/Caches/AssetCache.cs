@@ -3,6 +3,7 @@ using System.IO;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
+using PxCs.Data.Animation;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Sound;
@@ -17,6 +18,7 @@ namespace GVR.Caches
         private Dictionary<string, Texture2D> textureCache = new();
 
         private Dictionary<string, PxModelScriptData> mdsCache = new();
+        private Dictionary<string, PxAnimationData> animCache = new();
         private Dictionary<string, PxModelHierarchyData> mdhCache = new();
         private Dictionary<string, PxModelData> mdlCache = new();
         private Dictionary<string, PxModelMeshData> mdmCache = new();
@@ -70,6 +72,20 @@ namespace GVR.Caches
 
             var newData = PxModelScript.GetModelScriptFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mds");
             mdsCache[preparedKey] = newData;
+
+            return newData;
+        }
+        
+        public PxAnimationData TryGetAnimation(string mdsKey, string animKey)
+        {
+            var preparedMdsKey = GetPreparedKey(mdsKey);
+            var preparedAnimKey = GetPreparedKey(animKey);
+            var preparedKey = preparedMdsKey + "-" + preparedAnimKey;
+            if (animCache.TryGetValue(preparedKey, out PxAnimationData data))
+                return data;
+
+            var newData = PxAnimation.LoadFromVfs(GameData.I.VfsPtr, $"{preparedKey}.man");
+            animCache[preparedKey] = newData;
 
             return newData;
         }

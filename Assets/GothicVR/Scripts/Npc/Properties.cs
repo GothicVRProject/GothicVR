@@ -10,5 +10,11 @@ namespace GVR.Npc
         public PxVmNpcData npc;
 
         public PxModelHierarchyData mdh;
+        
+        public string baseMdsName;
+        public PxModelScriptData baseMds;
+
+        public string overlayMdsName;
+        public PxModelScriptData overlayMds;
     }
 }

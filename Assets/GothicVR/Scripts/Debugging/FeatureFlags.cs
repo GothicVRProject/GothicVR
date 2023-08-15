@@ -37,6 +37,7 @@ namespace GVR.Debugging
         public bool EnableNpcRoutines;
         public bool CreateNpcArmor;
         public bool CreateExampleAnimation;
+        public bool CreateDebugIdleAnimations;
 
         [Header("__________SPAMmy debug messages__________")]
         public bool ShowVfsFileNotFoundErrors;

@@ -48,6 +48,15 @@ namespace GVR.Creator
         }
 
         /// <summary>
+        /// Return cached GameObject based on lookup through IntPtr
+        /// </summary>
+        private static GameObject GetNpcGo(IntPtr npcPtr)
+        {
+            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
+            return lookupCache.npcCache[symbolIndex];
+        }
+
+        /// <summary>
         /// Original Gothic uses this function to spawn an NPC instance into the world.
         /// 
         /// The startpoint to walk isn't neccessarily the spawnpoint mentioned here.
@@ -113,9 +122,11 @@ namespace GVR.Creator
 
         private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
         {
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
-            var npc = lookupCache.npcCache[symbolIndex];
+            var npc = GetNpcGo(data.npcPtr);
             var mds = assetCache.TryGetMds(data.visual);
+
+            npc.GetComponent<Properties>().baseMdsName = data.visual;
+            npc.GetComponent<Properties>().baseMds = mds;
 
             // This is something used from OpenGothic. But what is it doing actually? ;-)
             if (mds.skeleton.disableMesh)
@@ -133,16 +144,17 @@ namespace GVR.Creator
 
         private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
         {
-            // TBD
+            var npc = GetNpcGo(data.npcPtr);
+            npc.GetComponent<Properties>().overlayMdsName = data.overlayname;
+            npc.GetComponent<Properties>().overlayMds = assetCache.TryGetMds(data.overlayname);
         }
 
         private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
         {
-            var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
-            var npc = lookupCache.npcCache[symbolIndex];
+            var npc = GetNpcGo(data.npcPtr);
             var mdh = npc.GetComponent<Properties>().mdh;
             var mmb = assetCache.TryGetMmb(data.head);
+            var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
             
             PxModelMeshData mdm;
             if (FeatureFlags.I.CreateNpcArmor && data.armor >= 0)
@@ -160,11 +172,25 @@ namespace GVR.Creator
 
         private static void EquipItem(VmGothicBridge.EquipItemData data)
         {
+            var npc = GetNpcGo(data.npcPtr);
             var itemData = assetCache.TryGetItemData((uint)data.itemId);
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
-            var npc = lookupCache.npcCache[symbolIndex];
             
             NpcMeshCreator.I.EquipWeapon(npc, itemData, itemData.mainFlag, itemData.flags);
+        }
+
+
+        public void DebugAddIdleAnimationToAllNpc()
+        {
+            foreach (var npcGo in lookupCache.npcCache.Values)
+            {
+                var mdsName = npcGo.GetComponent<Properties>().baseMdsName;
+                var mdh = npcGo.GetComponent<Properties>().mdh;
+
+                var animationName = mdsName.ToLower() == "humans.mds" ? "T_STAND_2_LGUARD" : "S_DANCE1";
+                
+                AnimationCreator.I.PlayAnimation(mdsName, animationName, mdh, npcGo);
+                
+            }
         }
     }
 }

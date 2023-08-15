@@ -20,5 +20,13 @@ namespace GVR.Caches
         /// [symbolIndex] = GameObject
         /// </summary>
         public Dictionary<uint, GameObject> npcCache = new();
+        
+        /// <summary>
+        /// Already created AnimationClips can be reused.
+        ///
+        /// For creation of AnimationClip and it's curves, we need to have GameObject
+        /// </summary>
+        public Dictionary<string, AnimationClip> animClipCache = new();
+
     }
 }
