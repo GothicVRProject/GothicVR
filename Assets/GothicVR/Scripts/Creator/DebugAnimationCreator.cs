@@ -423,6 +423,7 @@ namespace GVR.Creator
             var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
             var playableOutput = AnimationPlayableOutput.Create(playableGraph, animation.name, animator);
 
+            clip.EnsureQuaternionContinuity();
             playableOutput.SetSourcePlayable(clipPlayable);
             clipPlayable.SetDuration(animation.frameCount / animation.fps);
             clipPlayable.SetSpeed(0.1);
