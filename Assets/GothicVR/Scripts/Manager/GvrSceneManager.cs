@@ -49,6 +49,9 @@ namespace GVR.Manager
                 await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
             else
                 await LoadMainMenu();
+
+            if (FeatureFlags.I.CreateOcNpcs)
+                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
         }
 
         private async Task LoadMainMenu()
