@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 using GVR.Manager;
 
-public class TurnAngelController : MonoBehaviour
+public class TurnAngleController : MonoBehaviour
 {
     public ActionBasedSnapTurnProvider snapturnprovider;
     public ActionBasedContinuousTurnProvider continuousturnprovider;
