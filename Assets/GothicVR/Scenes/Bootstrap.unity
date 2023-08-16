@@ -344,7 +344,8 @@ MonoBehaviour:
   CreateNpcArmor: 1
   CreateExampleAnimation: 0
   ShowVfsFileNotFoundErrors: 0
-  EnableSounds: 0
+  ShowZspyLogs: 0
+  EnableSounds: 1
   EnableMusic: 1
 --- !u!1 &379812652
 GameObject:
@@ -358,6 +359,7 @@ GameObject:
   - component: {fileID: 379812656}
   - component: {fileID: 379812655}
   - component: {fileID: 379812654}
+  - component: {fileID: 379812657}
   m_Layer: 0
   m_Name: Debug
   m_TagString: Untagged
@@ -414,6 +416,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b80be53895ae2a84f99e59be8a469a22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &379812657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379812652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84321b2cd63e458bac4b85790c9d0f79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &705507993
