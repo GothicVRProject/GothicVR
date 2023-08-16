@@ -26,9 +26,9 @@ namespace GVR.Creator.Meshes
             return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
         }
 
-        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null)
+        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            var rootGo = new GameObject(objectName);
+            rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
             rootGo.SetParent(parent);
 
             var nodeObjects = new GameObject[mdh.nodes!.Length];
