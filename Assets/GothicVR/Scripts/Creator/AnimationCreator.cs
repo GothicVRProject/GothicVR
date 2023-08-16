@@ -16,18 +16,17 @@ namespace GVR.Creator
     {
         public void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go)
         {
-            var rootBone = go.transform.GetChild(0).gameObject;
             var animationKeyName = GetPreparedAnimationKey(mdsName, animationName);
             var pxAnimation = AssetCache.I.TryGetAnimation(mdsName, animationName);
 
             // Try to load from cache
             if (!LookupCache.I.animClipCache.TryGetValue(animationKeyName, out var clip))
             {
-                clip = LoadAnimationClip(pxAnimation, mdh, rootBone);
+                clip = LoadAnimationClip(pxAnimation, mdh, go);
                 LookupCache.I.animClipCache[animationKeyName] = clip;
             }
             
-            var animator = rootBone.AddComponent<Animator>();
+            var animator = go.AddComponent<Animator>();
             var playableGraph = PlayableGraph.Create(go.name);
 
             playableGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
@@ -39,6 +38,8 @@ namespace GVR.Creator
             clipPlayable.SetDuration(pxAnimation.frameCount / pxAnimation.fps);
             // clipPlayable.SetSpeed(0.1);
 
+            clip.wrapMode = WrapMode.Loop;
+            
             GraphVisualizerClient.Show(playableGraph);
             
             playableGraph.Play();

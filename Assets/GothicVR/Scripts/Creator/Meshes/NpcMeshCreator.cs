@@ -18,12 +18,12 @@ namespace GVR.Creator.Meshes
         private VmGothicBridge.Mdl_SetVisualBodyData tempBodyData;
 
         public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
-            PxMorphMeshData morphMesh, VmGothicBridge.Mdl_SetVisualBodyData bodyData, GameObject parent)
+            PxMorphMeshData morphMesh, VmGothicBridge.Mdl_SetVisualBodyData bodyData, GameObject root)
         {
             tmpBodyTexNr = bodyData.bodyTexNr;
             tmpBodyTexColor = bodyData.bodyTexColor;
 
-            var npcGo = Create(npcName, mdm, mdh, default, default, parent);
+            var npcGo = Create(npcName, mdm, mdh, default, default, null, root);
 
             AddHead(npcName, npcGo, morphMesh);
 

@@ -65,10 +65,10 @@ namespace GVR.Creator
         /// </summary>
         public static void Wld_InsertNpc(int npcInstance, string spawnpoint)
         {
-            var initialSpawnpoint = GameData.I.World.waypoints
+            var initialSpawnPoint = GameData.I.World.waypoints
                 .FirstOrDefault(item => item.name.ToLower() == spawnpoint.ToLower());
 
-            if (initialSpawnpoint == null)
+            if (initialSpawnPoint == null)
             {
                 Debug.LogWarning(string.Format("spawnpoint={0} couldn't be found.", spawnpoint));
                 return;
@@ -79,7 +79,7 @@ namespace GVR.Creator
 
             var pxNpc = PxVm.InitializeNpc(GameData.I.VmGothicPtr, (uint)npcInstance);
 
-            newNpc.name = string.Format("{0}-{1}", string.Concat(pxNpc.names), spawnpoint);
+            newNpc.name = pxNpc!.names[0];
             var npcRoutine = pxNpc.routine;
 
             PxVm.CallFunction(GameData.I.VmGothicPtr, (uint)npcRoutine, pxNpc.instancePtr);
@@ -88,12 +88,12 @@ namespace GVR.Creator
 
             if (newNpc.GetComponent<Routine>().routines.Any())
             {
-                var initialSpawnpointName = newNpc.GetComponent<Routine>().routines.First().waypoint;
-                initialSpawnpoint = GameData.I.World.waypointsDict[initialSpawnpointName];
+                var initialSpawnPointName = newNpc.GetComponent<Routine>().routines.First().waypoint;
+                initialSpawnPoint = GameData.I.World.waypointsDict[initialSpawnPointName];
             }
             
-            newNpc.transform.position = initialSpawnpoint.position.ToUnityVector();
-            newNpc.transform.parent = GetRootGo().transform;
+            newNpc.transform.position = initialSpawnPoint.position.ToUnityVector();
+            newNpc.transform!.parent = GetRootGo().transform;
         }
 
         private static void TA_MIN(VmGothicBridge.TA_MINData data)
