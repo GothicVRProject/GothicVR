@@ -1,6 +1,9 @@
-﻿using AOT;
+﻿using System;
+using System.Globalization;
+using AOT;
+using GVR.Debugging;
 using PxCs.Interface;
-using System;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace GVR.Phoenix.Interface.Vm
@@ -34,16 +37,26 @@ namespace GVR.Phoenix.Interface.Vm
         public static void RegisterExternals(IntPtr vmPtr)
         {
             PxVm.pxVmRegisterExternalDefault(vmPtr, DefaultExternal);
+            PxVm.pxVmRegisterExternal(vmPtr, "ConcatStrings", ConcatStrings);
+            PxVm.pxVmRegisterExternal(vmPtr, "IntToString", IntToString);
+            PxVm.pxVmRegisterExternal(vmPtr, "FloatToString", FloatToString);
+            PxVm.pxVmRegisterExternal(vmPtr, "FloatToInt", FloatToInt);
+            PxVm.pxVmRegisterExternal(vmPtr, "IntToFloat", IntToFloat);
+
+            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebug", PrintDebug);
+            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugCh", PrintDebugCh);
+            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInst", PrintDebugInst);
+            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInstCh", PrintDebugInstCh); 
 
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "TA_MIN", TA_MIN);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisual", Mdl_SetVisual);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_ApplyOverlayMds", Mdl_ApplyOverlayMds);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisualBody", Mdl_SetVisualBody);
+            PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetModelScale", Mdl_SetModelScale);
+            PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetModelFatness", Mdl_SetModelFatness);
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
-            
-            PxVm.pxVmRegisterExternal(vmPtr, "ConcatStrings", ConcatStrings);
         }
 
         public static UnityEvent<IntPtr, string> DefaultExternalCallback = new();
@@ -52,12 +65,15 @@ namespace GVR.Phoenix.Interface.Vm
         public static UnityEvent<Mdl_SetVisualData> PhoenixMdl_SetVisual = new();
         public static UnityEvent<Mdl_ApplyOverlayMdsData> PhoenixMdl_ApplyOverlayMds = new();
         public static UnityEvent<Mdl_SetVisualBodyData> PhoenixMdl_SetVisualBody = new();
+        public static UnityEvent<Mdl_SetModelScaleData> PhoenixMdl_SetModelScale = new();
+        public static UnityEvent<Mdl_SetModelFatnessData> PhoenixMdl_SetModelFatness = new();
         public static UnityEvent<EquipItemData> PhoenixEquipItem = new();
         public static UnityEvent<string> PhoenixMdl_AI_OUTPUT = new();
 
 
 
 #region Default
+
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalDefaultCallback))]
         public static void DefaultExternal(IntPtr vmPtr, string missingCallbackName)
         {
@@ -78,6 +94,79 @@ namespace GVR.Phoenix.Interface.Vm
             
             PxVm.pxVmStackPushString(vmPtr, str1 + str2);
         }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void IntToString(IntPtr vmPtr)
+        {
+            var val = PxVm.pxVmStackPopInt(vmPtr);
+            PxVm.pxVmStackPushString(vmPtr, val.ToString());
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void FloatToString(IntPtr vmPtr)
+        {
+            var val = PxVm.pxVmStackPopFloat(vmPtr);
+            PxVm.pxVmStackPushString(vmPtr, val.ToString(CultureInfo.InvariantCulture));
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void FloatToInt(IntPtr vmPtr)
+        {
+            var val = PxVm.pxVmStackPopFloat(vmPtr);
+            PxVm.pxVmStackPushInt(vmPtr, (int)val);
+        }
+            
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void IntToFloat(IntPtr vmPtr)
+        {
+            var val = PxVm.pxVmStackPopInt(vmPtr);
+            PxVm.pxVmStackPushFloat(vmPtr, val);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void PrintDebug(IntPtr vmPtr)
+        {
+            if (!FeatureFlags.I.ShowZspyLogs)
+                return;
+            
+            var message = PxVm.VmStackPopString(vmPtr);
+            Debug.Log($"[zspy]: {message}");
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void PrintDebugCh(IntPtr vmPtr)
+        {
+            if (!FeatureFlags.I.ShowZspyLogs)
+                return;
+            
+            var message = PxVm.VmStackPopString(vmPtr);
+            var channel = PxVm.pxVmStackPopInt(vmPtr);
+            
+            Debug.Log($"[zspy,{channel}]: {message}");
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void PrintDebugInst(IntPtr vmPtr)
+        {
+            if (!FeatureFlags.I.ShowZspyLogs)
+                return;
+
+            var message = PxVm.VmStackPopString(vmPtr);
+            Debug.Log($"[zspy]: {message}");
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void PrintDebugInstCh(IntPtr vmPtr)
+        {
+            if (!FeatureFlags.I.ShowZspyLogs)
+                return;
+            
+            var message = PxVm.VmStackPopString(vmPtr);
+            var channel = PxVm.pxVmStackPopInt(vmPtr);
+            
+            Debug.Log($"[zspy,{channel}]: {message}");
+        }
+        
 #endregion
 
 
@@ -208,6 +297,46 @@ namespace GVR.Phoenix.Interface.Vm
                     armor = armor
                 }
             );
+        }
+
+        public struct Mdl_SetModelScaleData
+        {
+            public IntPtr npcPtr;
+            public Vector3 scale;
+        }
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Mdl_SetModelScale(IntPtr vmPtr)
+        {
+            var z = PxVm.pxVmStackPopFloat(vmPtr);
+            var y = PxVm.pxVmStackPopFloat(vmPtr);
+            var x = PxVm.pxVmStackPopFloat(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            PhoenixMdl_SetModelScale.Invoke(
+                new Mdl_SetModelScaleData()
+                {
+                    npcPtr = npcPtr,
+                    scale = new (x, y, z)
+                });
+        }
+
+        public struct Mdl_SetModelFatnessData
+        {
+            public IntPtr npcPtr;
+            public float fatness;
+        }
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Mdl_SetModelFatness(IntPtr vmPtr)
+        {
+            var fatness = PxVm.pxVmStackPopFloat(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            PhoenixMdl_SetModelFatness.Invoke(
+                new Mdl_SetModelFatnessData()
+                {
+                    npcPtr = npcPtr,
+                    fatness = fatness
+                });
         }
 
         public struct EquipItemData

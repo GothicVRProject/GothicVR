@@ -7,22 +7,18 @@ using PxCs.Data.Model;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Experimental.AI;
 
 namespace GVR.Creator.Meshes
 {
     public class NpcMeshCreator : AbstractMeshCreator<NpcMeshCreator>
     {
-        private int tmpBodyTexNr;
-        private int tmpBodyTexColor;
-
         private VmGothicBridge.Mdl_SetVisualBodyData tempBodyData;
 
         public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
             PxMorphMeshData morphMesh, VmGothicBridge.Mdl_SetVisualBodyData bodyData, GameObject root)
         {
-            tmpBodyTexNr = bodyData.bodyTexNr;
-            tmpBodyTexColor = bodyData.bodyTexColor;
-
+            tempBodyData = bodyData;
             var npcGo = Create(npcName, mdm, mdh, default, default, null, root);
 
             AddHead(npcName, npcGo, morphMesh);
@@ -52,21 +48,27 @@ namespace GVR.Creator.Meshes
         /// </summary>
         protected override Texture2D GetTexture(string name)
         {
-            // FIXME: Dirty hack. Needs to be optimized.
-            if (name.ToUpper().Contains("MOUTH") || name.ToUpper().Contains("TEETH"))
-                return base.GetTexture(name);
+            string finalTextureName;
+            
+            // FIXME - We don't have different mouths in Gothic1. Need to recheck it in Gothic2.
+            if (name.ToUpper().EndsWith("MOUTH_V0.TGA"))
+                finalTextureName = name;
+            else if (name.ToUpper().EndsWith("TEETH_V0.TGA"))
+                // e.g. Some_Texture_V0.TGA --> Some_Texture_V1.TGA
+                finalTextureName = Regex.Replace(name, "(?<=.*?)V0", $"V{tempBodyData.teethTexNr}");
+            else if (name.ToUpper().Contains("BODY") && name.ToUpper().EndsWith("V0_C0.TGA"))
+                // This regex replaces the suffix of V0_C0 with values of corresponding data.
+                // e.g. Some_Texture_V0_C0.TGA --> Some_Texture_V1_C2.TGA
+                finalTextureName = Regex.Replace(name, "(?<=.*?)V0_C0",
+                    $"V{tempBodyData.bodyTexNr}_C{tempBodyData.bodyTexColor}");
+            else if (name.ToUpper().Contains("HEAD") && name.ToUpper().EndsWith("V0_C0.TGA"))
+                finalTextureName = Regex.Replace(name, "(?<=.*?)V0_C0",
+                    $"V{tempBodyData.headTexNr}_C{tempBodyData.bodyTexColor}");
+            else
+                // No changeable texture needed? Skip updating texture name.
+                finalTextureName = name;
 
-            if (!name.ToUpper().EndsWith("V0_C0.TGA"))
-            {
-                // Debug.LogError($"The format of body texture isn't right for ${name}");
-                return base.GetTexture(name);
-            }
-
-            // This regex replaces the suffix of V0_C0 with values of corresponding data.
-            // e.g. Some_Texture_V0_C0.TGA --> Some_Texture_V1_C2.TGA
-            var formattedTextureName = Regex.Replace(name, "(?<=.*?)V0_C0", $"V{tmpBodyTexNr}_C{tmpBodyTexColor}");
-
-            return AssetCache.I.TryGetTexture(formattedTextureName);
+            return base.GetTexture(finalTextureName);
         }
 
 

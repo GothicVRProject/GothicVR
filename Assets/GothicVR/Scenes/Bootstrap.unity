@@ -358,7 +358,8 @@ MonoBehaviour:
   CreateExampleAnimation: 0
   CreateDebugIdleAnimations: 1
   ShowVfsFileNotFoundErrors: 0
-  EnableSounds: 0
+  ShowZspyLogs: 0
+  EnableSounds: 1
   EnableMusic: 1
 --- !u!1 &379812652
 GameObject:
@@ -440,7 +441,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 379812652}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6aa694a206dc489398119c1686a2da25, type: 3}
+  m_Script: {fileID: 11500000, guid: 84321b2cd63e458bac4b85790c9d0f79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &705507993
