@@ -26,7 +26,7 @@ namespace GVR.Creator
                 LookupCache.I.animClipCache[animationKeyName] = clip;
             }
             
-            var animator = go.AddComponent<Animator>();
+            var animator = go.GetComponent<Animator>();
             var playableGraph = PlayableGraph.Create(go.name);
 
             playableGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
@@ -36,9 +36,6 @@ namespace GVR.Creator
 
             playableOutput.SetSourcePlayable(clipPlayable);
             clipPlayable.SetDuration(pxAnimation.frameCount / pxAnimation.fps);
-            // clipPlayable.SetSpeed(0.1);
-
-            clip.wrapMode = WrapMode.Loop;
             
             GraphVisualizerClient.Show(playableGraph);
             
@@ -101,7 +98,6 @@ namespace GVR.Creator
 
             // Add some final settings
             clip.EnsureQuaternionContinuity();
-            clip.wrapMode = WrapMode.Loop;
             
             return clip;
         }

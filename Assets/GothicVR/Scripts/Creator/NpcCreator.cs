@@ -186,7 +186,7 @@ namespace GVR.Creator
                 var mdsName = npcGo.GetComponent<Properties>().baseMdsName;
                 var mdh = npcGo.GetComponent<Properties>().mdh;
 
-                var animationName = mdsName.ToLower() == "humans.mds" ? "T_STAND_2_LGUARD" : "S_DANCE1";
+                var animationName = mdsName.ToLower() == "humans.mds" ? "T_STAND_2_LGUARD" : "S_DANCE1";  // T_1HSFREE
                 
                 AnimationCreator.I.PlayAnimation(mdsName, animationName, mdh, npcGo);
                 
