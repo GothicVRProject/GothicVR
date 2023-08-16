@@ -38,7 +38,8 @@ namespace GVR.Caches
             "Hum_GrdL_Armor",
             "Hum_NovM_Armor",
             "Hum_Body_Cooksmith",
-            "Hum_VlkL_Armor"
+            "Hum_VlkL_Armor",
+            "Hum_KdfS_Armor"
         };
 
         public Texture2D TryGetTexture(string key)
