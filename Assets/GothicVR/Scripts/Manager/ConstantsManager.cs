@@ -15,12 +15,17 @@ namespace GVR.Manager
 
         public int MeshPerFrame = 10;
         public int VObPerFrame = 75;
-        
+
+        //Default / Start values
+        public float turnAngleDefault = 45;
+        public float moveSpeedDefault = 8;
+
+
         //Collection of PlayerPref entries for settings
         public string moveSpeedPlayerPref = "MoveSpeed";
         public string turnSettingPlayerPref = "TurnSetting";
         public string turnAnglePlayerPref = "TurnAngleSetting";
-
+        
         protected override void Awake()
         {
             base.Awake();
