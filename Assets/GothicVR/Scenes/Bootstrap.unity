@@ -1064,10 +1064,7 @@ MonoBehaviour:
   VObPerFrame: 75
   moveSpeedPlayerPref: MoveSpeed
   turnSettingPlayerPref: TurnSetting
-<<<<<<< HEAD
   turnAngelPlayerPref: TurnAngelSetting
-=======
->>>>>>> main
 --- !u!114 &1896514221
 MonoBehaviour:
   m_ObjectHideFlags: 0
