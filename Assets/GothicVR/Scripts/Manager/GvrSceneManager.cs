@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,10 +48,17 @@ namespace GVR.Manager
         /// </summary>
         public async Task LoadStartupScenes()
         {
-            if (FeatureFlags.I.SkipMainMenu)
-                await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
-            else
-                await LoadMainMenu();
+            try
+            {
+                if (FeatureFlags.I.SkipMainMenu)
+                    await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
+                else
+                    await LoadMainMenu();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
         }
 
         private async Task LoadMainMenu()
