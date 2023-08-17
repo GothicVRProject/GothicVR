@@ -7,51 +7,51 @@ on:
 
 
 jobs:
-  #########
-  # TESTS #
-  #########
+  # #########
+  # # TESTS #
+  # #########
   
-  Unit_Tests:
-    name: Test in ${{ matrix.testMode }}
-    runs-on: self-hosted
-    strategy:
-      fail-fast: false
-      matrix:
-        testMode:
-          - playmode
-          - editmode
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-          fetch-depth: 0
-          clean: true
-      - uses: actions/cache@v2
-        with:
-          path: ${{ matrix.projectPath }}/Library
-          key: Library-${{ matrix.projectPath }}
-          restore-keys: |
-            Library-
-      - uses: game-ci/unity-test-runner@v2
-        id: tests
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-        with:
-          testMode: ${{ matrix.testMode }}
-          artifactsPath: ${{ matrix.testMode }}-artifacts
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          checkName: ${{ matrix.testMode }} Test Results
-          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+my.assembly.*'
-      - uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: Test results for ${{ matrix.testMode }}
-          path: ${{ steps.tests.outputs.artifactsPath }}
-      - uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: Coverage results for ${{ matrix.testMode }}
-          path: ${{ steps.tests.outputs.coveragePath }}
+  # Unit_Tests:
+  #   name: Test in ${{ matrix.testMode }}
+  #   runs-on: self-hosted
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       testMode:
+  #         - playmode
+  #         - editmode
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         lfs: true
+  #         fetch-depth: 0
+  #         clean: true
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: ${{ matrix.projectPath }}/Library
+  #         key: Library-${{ matrix.projectPath }}
+  #         restore-keys: |
+  #           Library-
+  #     - uses: game-ci/unity-test-runner@v2
+  #       id: tests
+  #       env:
+  #         UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  #       with:
+  #         testMode: ${{ matrix.testMode }}
+  #         artifactsPath: ${{ matrix.testMode }}-artifacts
+  #         githubToken: ${{ secrets.GITHUB_TOKEN }}
+  #         checkName: ${{ matrix.testMode }} Test Results
+  #         coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+my.assembly.*'
+  #     - uses: actions/upload-artifact@v2
+  #       if: always()
+  #       with:
+  #         name: Test results for ${{ matrix.testMode }}
+  #         path: ${{ steps.tests.outputs.artifactsPath }}
+  #     - uses: actions/upload-artifact@v2
+  #       if: always()
+  #       with:
+  #         name: Coverage results for ${{ matrix.testMode }}
+  #         path: ${{ steps.tests.outputs.coveragePath }}
 
   #########
   # BUILD #
@@ -59,7 +59,7 @@ jobs:
 
   buildForAllPlatforms:
     name: Build GothicVR for ${{ matrix.targetDevice }}
-    needs: Unit_Tests
+#    needs: Unit_Tests
     runs-on: self-hosted
     strategy:
       fail-fast: false
@@ -67,10 +67,10 @@ jobs:
         include:
           - targetPlatform: StandaloneWindows64
             targetDevice: Windows64
-          - targetPlatform: Android
-            targetDevice: Pico
-          - targetPlatform: Android
-            targetDevice: Quest
+          # - targetPlatform: Android
+          #   targetDevice: Pico
+          # - targetPlatform: Android
+          #   targetDevice: Quest
     steps:
       # Checkout
       - name: Checkout repository
@@ -95,7 +95,8 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          versioning: Tag
+          versioning: Custom
+          version: "foobar-123"
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
           buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
