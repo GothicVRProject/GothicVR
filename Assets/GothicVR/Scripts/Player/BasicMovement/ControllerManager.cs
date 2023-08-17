@@ -71,6 +71,11 @@ public class ControllerManager : MonoBehaviour
         {
             settingsMenue.SetActive(true);
             FontManager.I.ChangeFont();
+
+            if (teleportMenu.activeSelf)
+            {
+                teleportMenu.SetActive(false);
+            }
         }
         else
         {
@@ -84,6 +89,11 @@ public class ControllerManager : MonoBehaviour
         {
             teleportMenu.SetActive(true);
             FontManager.I.ChangeFont();
+
+            if (settingsMenue.activeSelf)
+            {
+                settingsMenue.SetActive(false);
+            }
         }
         else
         {

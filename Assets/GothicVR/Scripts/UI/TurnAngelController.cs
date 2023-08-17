@@ -10,11 +10,11 @@ public class TurnAngleController : MonoBehaviour
     void Start()
     {
         Slider turnangelslider = transform.GetComponent<Slider>();
-        turnangelslider.onValueChanged.AddListener(ChangeTurnAngel);
+        turnangelslider.onValueChanged.AddListener(ChangeTurnAngle);
         turnangelslider.value = PlayerPrefs.GetFloat(ConstantsManager.I.turnAnglePlayerPref, ConstantsManager.I.turnAngleDefault);
     }
 
-    void ChangeTurnAngel(float turn_angel)
+    void ChangeTurnAngle(float turn_angel)
     {
         snapturnprovider.turnAmount = turn_angel;
         continuousturnprovider.turnSpeed = turn_angel;
