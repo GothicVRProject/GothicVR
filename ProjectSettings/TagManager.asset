@@ -8,6 +8,7 @@ TagManager:
   - Climbable
   - Title
   - IngameText
+  - Subtitle
   layers:
   - Default
   - TransparentFX
@@ -17,7 +18,7 @@ TagManager:
   - UI
   - Item
   - Player
-  - 
+  - Hands
   - 
   - 
   - 

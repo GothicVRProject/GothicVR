@@ -1522,6 +1522,22 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3286136461704158093, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_AllowAnchorControl
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136461704158093, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_RaycastMask.m_Bits
+      value: 96
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136461704158093, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_RaycastTriggerInteraction
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136461704158093, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_RaycastSnapVolumeInteraction
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483594, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_Name
       value: VRPlayer
@@ -1569,6 +1585,14 @@ PrefabInstance:
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136462967229782, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136463048429806, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_RaycastMask.m_Bits
+      value: 96
       objectReference: {fileID: 0}
     - target: {fileID: 3286136463054414637, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_PositionInput.m_Action.m_Id

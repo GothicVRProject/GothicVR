@@ -628,7 +628,7 @@ GameObject:
   - component: {fileID: 3286136461689514587}
   - component: {fileID: 3286136461689514589}
   - component: {fileID: 7127237056583641875}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: LeftHandBaseController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -949,7 +949,7 @@ GameObject:
   - component: {fileID: 3286136461704158095}
   - component: {fileID: 3286136461704158080}
   - component: {fileID: 3079599746988100942}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: RightHandRayController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1276,9 +1276,9 @@ MonoBehaviour:
   m_SphereCastRadius: 0.1
   m_RaycastMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 96
   m_RaycastTriggerInteraction: 1
-  m_RaycastSnapVolumeInteraction: 1
+  m_RaycastSnapVolumeInteraction: 0
   m_HitClosestOnly: 0
   m_HoverToSelect: 0
   m_HoverTimeToSelect: 0.5
@@ -1570,7 +1570,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3286136461704158082}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c625e0e97af8b547b71c1ff774aab52, type: 3}
   m_Name: 
@@ -1578,6 +1578,7 @@ MonoBehaviour:
   lineVisual: {fileID: 3286136461704158095}
   interactor: {fileID: 3286136461704158093}
   player: {fileID: 3286136461781483594}
+  sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!1 &3286136461781483594
 GameObject:
   m_ObjectHideFlags: 0
@@ -1794,7 +1795,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3286136462172449749}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Hands
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1827,7 +1828,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3286136462477416103}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: LeftHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1861,7 +1862,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3286136462517919273}
   - component: {fileID: 4574803525266435527}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: RightHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2247,7 +2248,7 @@ GameObject:
   - component: {fileID: 3286136462967229779}
   - component: {fileID: 3286136462967229780}
   - component: {fileID: 8235888942484577916}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: RightHandTeleportController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2831,6 +2832,7 @@ MonoBehaviour:
   lineVisual: {fileID: 3286136462967229780}
   interactor: {fileID: 3286136462967229778}
   player: {fileID: 3286136461781483594}
+  sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!1 &3286136463048429795
 GameObject:
   m_ObjectHideFlags: 0
@@ -2845,7 +2847,7 @@ GameObject:
   - component: {fileID: 3286136463048429807}
   - component: {fileID: 3286136463048429792}
   - component: {fileID: 3286136463048429793}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: LeftHandRayController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3172,7 +3174,7 @@ MonoBehaviour:
   m_SphereCastRadius: 0.1
   m_RaycastMask:
     serializedVersion: 2
-    m_Bits: 32
+    m_Bits: 96
   m_RaycastTriggerInteraction: 2
   m_RaycastSnapVolumeInteraction: 1
   m_HitClosestOnly: 0
@@ -3563,56 +3565,56 @@ MonoBehaviour:
   m_PositionInput:
     m_UseReference: 0
     m_Action:
-      m_Name: Position Input
+      m_Name: Position
       m_Type: 0
-      m_ExpectedControlType: 
-      m_Id: 09e78d00-9dc7-453b-9fd0-2fc6b53faa01
+      m_ExpectedControlType: Vector3
+      m_Id: 2775a29b-b69e-4792-86ed-092596b734ad
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 
-        m_Id: b807e864-19ee-46f8-8440-36c8e1ce3872
-        m_Path: 
+        m_Id: ccdec020-8317-4f2e-a903-78972dde8404
+        m_Path: <XRHMD>/centerEyePosition
         m_Interactions: 
         m_Processors: 
         m_Groups: 
-        m_Action: Position Input
+        m_Action: Position
         m_Flags: 0
       - m_Name: 
-        m_Id: bf65eac4-2923-4bb1-8286-497f4d21e7ae
-        m_Path: 
+        m_Id: abbccc6f-4adf-490a-a4f8-94d174e36ca6
+        m_Path: <HandheldARInputDevice>/devicePosition
         m_Interactions: 
         m_Processors: 
         m_Groups: 
-        m_Action: Position Input
+        m_Action: Position
         m_Flags: 0
       m_Flags: 0
     m_Reference: {fileID: 0}
   m_RotationInput:
     m_UseReference: 0
     m_Action:
-      m_Name: Rotation Input
+      m_Name: Rotation
       m_Type: 0
-      m_ExpectedControlType: 
-      m_Id: 9e470443-ca39-4578-8fe6-f5f5f408b1e0
+      m_ExpectedControlType: Quaternion
+      m_Id: f89a5beb-0947-4dee-87b0-1976dbf8c78e
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings:
       - m_Name: 
-        m_Id: 5daeceb7-ac94-4a41-9d01-c6ad7f222507
-        m_Path: 
+        m_Id: 9db4ea54-e6b7-401f-afff-de2af6720a90
+        m_Path: <XRHMD>/centerEyeRotation
         m_Interactions: 
         m_Processors: 
         m_Groups: 
-        m_Action: Rotation Input
+        m_Action: Rotation
         m_Flags: 0
       - m_Name: 
-        m_Id: f2462a6e-4a5d-4074-8a2b-971a511d990e
-        m_Path: 
+        m_Id: 3f93e030-9465-4abe-a0e7-a4315f2bc435
+        m_Path: <HandheldARInputDevice>/deviceRotation
         m_Interactions: 
         m_Processors: 
         m_Groups: 
-        m_Action: Rotation Input
+        m_Action: Rotation
         m_Flags: 0
       m_Flags: 0
     m_Reference: {fileID: 0}
@@ -3710,7 +3712,7 @@ GameObject:
   - component: {fileID: 3286136463242076557}
   - component: {fileID: 3286136463242076559}
   - component: {fileID: 743334861056572778}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: RightHandBaseController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4227,13 +4229,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bffdd595b98b434cad5e6bbbb2a0bed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnsetting: 0
   raycastLeft: {fileID: 3286136463048429795}
   raycastRight: {fileID: 3286136461704158082}
   directLeft: {fileID: 3286136461689514591}
   directRight: {fileID: 3286136463242076545}
   settingsMenue: {fileID: 249270987561295610}
-  raycastActive: 0
+  teleportMenu: {fileID: 8564476606117498420}
+  UIGameObject: {fileID: 2954308419536233872}
 --- !u!1 &5086955422694840730
 GameObject:
   m_ObjectHideFlags: 0
