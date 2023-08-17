@@ -1035,6 +1035,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 354f53e468562f34da62c8c144374eb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  emptyFont: {fileID: 11400000, guid: ed34b05229166f3469c21b7208879736, type: 2}
 --- !u!114 &1896514219
 MonoBehaviour:
   m_ObjectHideFlags: 0
