@@ -39,6 +39,7 @@ namespace GVR.Caches
             "Hum_NovM_Armor",
             "Hum_Body_Cooksmith",
             "Hum_VlkL_Armor",
+            "Hum_VlkM_Armor",
             "Hum_KdfS_Armor"
         };
 
