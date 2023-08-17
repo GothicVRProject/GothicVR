@@ -14,12 +14,11 @@ namespace GVR.Manager
     public class FontManager : SingletonBehaviour<FontManager>
     {
 
-        public TMP_FontAsset emptyFont;
 
         public void Create()
         {
             TMP_Settings.defaultSpriteAsset = LoadFont("font_old_20_white.FNT");
-            TMP_Settings.defaultFontAsset = emptyFont;
+            TMP_Settings.defaultFontAsset = GameData.I.EmptyFont;
         }
 
         public void ChangeFont()
@@ -29,7 +28,7 @@ namespace GVR.Manager
 
             foreach (TMP_Text textComponent in textComponents)
             {
-                textComponent.font = emptyFont;
+                textComponent.font = GameData.I.EmptyFont;
 
                 // texture is rotated 180 degrees
                 textComponent.rectTransform.localRotation = Quaternion.Euler(180, 0, 0);

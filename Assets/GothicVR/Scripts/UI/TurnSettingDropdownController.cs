@@ -29,7 +29,7 @@ public class TurnSettingDropdownController : MonoBehaviour
         {
             dropdown.options.Add(new TMP_Dropdown.OptionData() { text = item });
         }
-        dropdown.itemText.font = GameData.I.GothicSubtitleFont;
+        dropdown.itemText.font = GameData.I.EmptyFont;
         dropdown.onValueChanged.AddListener(DropdownItemSelected);
         snapTurn = locomotionsystem.GetComponent<ActionBasedSnapTurnProvider>();
         continuousTurn = locomotionsystem.GetComponent<ActionBasedContinuousTurnProvider>();
