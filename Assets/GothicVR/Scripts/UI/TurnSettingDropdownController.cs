@@ -10,14 +10,14 @@ public class TurnSettingDropdownController : MonoBehaviour
     public GameObject locomotionsystem;
     public ActionBasedSnapTurnProvider snapTurn;
     public ActionBasedContinuousTurnProvider continuousTurn;
-   
+
 
     void Awake()
     {
         // FIXME - If we're on Loading scene, there is no locomotionSystem. We should switch it to something like "isLoadingState".
         if (locomotionsystem == null)
             return;
-        
+
         var dropdown = transform.GetComponent<TMP_Dropdown>();
         dropdown.options.Clear();
 
@@ -29,6 +29,7 @@ public class TurnSettingDropdownController : MonoBehaviour
         {
             dropdown.options.Add(new TMP_Dropdown.OptionData() { text = item });
         }
+        // We use an empty font so we can force TMP to use spriteAsset for each character
         dropdown.itemText.font = GameData.I.EmptyFont;
         dropdown.onValueChanged.AddListener(DropdownItemSelected);
         snapTurn = locomotionsystem.GetComponent<ActionBasedSnapTurnProvider>();

@@ -93,6 +93,7 @@ namespace GVR.Player.Menu
 
             WaypointSetDropdownValues();
 
+            // We use an empty font so we can force TMP to use spriteAsset for each character
             waypointDropdown.itemText.font = GameData.I.EmptyFont;
             waypointDropdown.onValueChanged.AddListener(WaypointDropdownItemSelected);
 
@@ -101,6 +102,7 @@ namespace GVR.Player.Menu
         void WorldDropdownItemSelected(int value)
         {
             var item = worldDropdown.options[value].text;
+            // We use an empty font so we can force TMP to use spriteAsset for each character
             worldDropdown.itemText.font = GameData.I.EmptyFont;
             ConstantsManager.I.selectedWorld = worlds[item];
             WaypointSetDropdownValues();
@@ -120,6 +122,7 @@ namespace GVR.Player.Menu
         {
             var item = waypointDropdown.options[value].text;
 
+            // We use an empty font so we can force TMP to use spriteAsset for each character
             waypointDropdown.itemText.font = GameData.I.EmptyFont;
 
 
