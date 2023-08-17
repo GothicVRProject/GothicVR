@@ -14,7 +14,6 @@ namespace GVR.Manager
     public class FontManager : SingletonBehaviour<FontManager>
     {
 
-
         public void Create()
         {
             TMP_Settings.defaultSpriteAsset = LoadFont("font_old_20_white.FNT");
@@ -37,6 +36,8 @@ namespace GVR.Manager
 
         public TMP_SpriteAsset LoadFont(string fontName)
         {
+            if (LookupCache.I.fontCache.TryGetValue(fontName.ToUpper(), out TMP_SpriteAsset data))
+                return data;
             var fontData = AssetCache.I.TryGetFont(fontName.ToUpper());
 
             var format = fontData.texture.format.AsUnityTextureFormat();
@@ -96,6 +97,8 @@ namespace GVR.Manager
             versionField.SetValue(spriteAsset, "1.0.0"); // setting this as to skip "UpgradeSpriteAsset"
 
             spriteAsset.UpdateLookupTables();
+
+            LookupCache.I.fontCache[fontName.ToUpper()] = spriteAsset;
 
             return spriteAsset;
         }
