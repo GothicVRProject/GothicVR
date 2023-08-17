@@ -1205,6 +1205,7 @@ GameObject:
   - component: {fileID: 3286136461704158094}
   - component: {fileID: 3286136461704158095}
   - component: {fileID: 3286136461704158080}
+  - component: {fileID: 3079599746988100942}
   m_Layer: 7
   m_Name: RightHandRayController
   m_TagString: Untagged
@@ -1819,6 +1820,21 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3079599746988100942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3286136461704158082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c625e0e97af8b547b71c1ff774aab52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineVisual: {fileID: 3286136461704158095}
+  interactor: {fileID: 3286136461704158093}
+  player: {fileID: 3286136461781483594}
 --- !u!1 &3286136461781483594
 GameObject:
   m_ObjectHideFlags: 0
@@ -2487,6 +2503,7 @@ GameObject:
   - component: {fileID: 3286136462967229778}
   - component: {fileID: 3286136462967229779}
   - component: {fileID: 3286136462967229780}
+  - component: {fileID: 8235888942484577916}
   m_Layer: 7
   m_Name: RightHandTeleportController
   m_TagString: Untagged
@@ -3056,6 +3073,21 @@ MonoBehaviour:
   m_StopLineAtFirstRaycastHit: 1
   m_StopLineAtSelection: 0
   m_SnapEndpointIfAvailable: 1
+--- !u!114 &8235888942484577916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3286136462967229782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c625e0e97af8b547b71c1ff774aab52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineVisual: {fileID: 3286136462967229780}
+  interactor: {fileID: 3286136462967229778}
+  player: {fileID: 3286136461781483594}
 --- !u!1 &3286136463048429795
 GameObject:
   m_ObjectHideFlags: 0

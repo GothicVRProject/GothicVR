@@ -8,9 +8,8 @@ namespace GVR.Phoenix.Interface
     {
         public static IntPtr LoadVfsInDirectory(string vfsDir)
         {
-            var vfsPaths = Directory.GetFiles(vfsDir, "*.VDF");
-            return PxVfs.LoadVfs(vfsPaths);
+            var vfsPaths = Directory.GetFiles(vfsDir, "*.VDF", SearchOption.AllDirectories);
+            return PxVfs.LoadVfs(vfsPaths, PxVfs.PxVfsOverwriteBehavior.PxVfsOverwrite_Older);
         }
     }
-
 }

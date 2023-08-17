@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -142,6 +142,7 @@ GameObject:
   - component: {fileID: 124285711}
   - component: {fileID: 124285710}
   - component: {fileID: 124285713}
+  - component: {fileID: 124285714}
   m_Layer: 0
   m_Name: Creator
   m_TagString: Untagged
@@ -284,6 +285,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 290769052b48463e8addfd5b2584b145, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &124285714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124285697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b9840276fb943c19fb86b5a258822cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &235819213
 GameObject:
   m_ObjectHideFlags: 0
@@ -331,6 +344,7 @@ MonoBehaviour:
   CreateVobs: 1
   CreateWaypoints: 0
   CreateWaypointEdges: 0
+  SkipMainMenu: 1
   EnableDayTime: 1
   SunMovementPerformanceValue: 0
   StartHour: 17
@@ -342,8 +356,10 @@ MonoBehaviour:
   EnableNpcRoutines: 1
   CreateNpcArmor: 1
   CreateExampleAnimation: 0
+  CreateDebugIdleAnimations: 1
   ShowVfsFileNotFoundErrors: 0
-  EnableSounds: 0
+  ShowZspyLogs: 0
+  EnableSounds: 1
   EnableMusic: 1
 --- !u!1 &379812652
 GameObject:
@@ -357,6 +373,7 @@ GameObject:
   - component: {fileID: 379812656}
   - component: {fileID: 379812655}
   - component: {fileID: 379812654}
+  - component: {fileID: 379812657}
   m_Layer: 0
   m_Name: Debug
   m_TagString: Untagged
@@ -413,6 +430,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b80be53895ae2a84f99e59be8a469a22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &379812657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379812652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84321b2cd63e458bac4b85790c9d0f79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &705507993
@@ -1032,6 +1061,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d06cd27c7d627aa499a0430dd39b8238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MainMenuImageBackgroundMaterial: {fileID: 0}
+  MainMenuBackgroundMaterial: {fileID: 0}
+  MainMenuTextImageMaterial: {fileID: 0}
   backgroundmaterial: {fileID: 2100000, guid: 1e349bd46543d684da0fd00dfcc78b72, type: 2}
   buttonmaterial: {fileID: 2100000, guid: 731db01b086aeb94582b82a16a95775b, type: 2}
   slidermaterial: {fileID: 2100000, guid: 9edb2534304dae240937e63c8a079e58, type: 2}
@@ -1060,11 +1092,14 @@ MonoBehaviour:
     m_Bits: 0
   MenuFontTag: Title
   SubtitleFontTag: IngameText
+  ClimbableTag: Climbable
   MeshPerFrame: 10
   VObPerFrame: 75
   moveSpeedPlayerPref: MoveSpeed
   turnSettingPlayerPref: TurnSetting
   turnAngelPlayerPref: TurnAngelSetting
+  selectedWorld: world.zen
+  selectedWaypoint: START
 --- !u!114 &1896514221
 MonoBehaviour:
   m_ObjectHideFlags: 0

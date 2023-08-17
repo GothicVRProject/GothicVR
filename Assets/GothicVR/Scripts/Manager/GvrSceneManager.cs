@@ -24,6 +24,7 @@ namespace GVR.Manager
         private bool generalSceneLoaded = false;
 
         private GameObject startPoint;
+        private GameObject player;
 
         public GameObject interactionManager;
 
@@ -44,18 +45,35 @@ namespace GVR.Manager
         /// </summary>
         public async Task LoadStartupScenes()
         {
-            await LoadWorld("world.zen", "ENTRANCE_SURFACE_OLDMINE");
+            if (FeatureFlags.I.SkipMainMenu)
+                await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
+            else
+                await LoadMainMenu();
 
-            // Debug! Will be removed in the future.
             if (FeatureFlags.I.CreateOcNpcs)
-                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
+                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
+
+            if (FeatureFlags.I.CreateDebugIdleAnimations)
+                NpcCreator.I.DebugAddIdleAnimationToAllNpc();
+        }
+
+        private async Task LoadMainMenu()
+        {
+            TextureManager.I.LoadLoadingDefaultTextures();
+            await LoadNewWorldScene("MainMenu");
         }
 
         public async Task LoadWorld(string worldName, string startVob)
         {
-            MusicCreator.I.setMusic("SYS_LOADING");
-            newWorldName = worldName;
             startVobAfterLoading = startVob;
+            if (worldName == newWorldName)
+            {
+                SetSpawnPoint(SceneManager.GetSceneByName(newWorldName));
+                TeleportPlayerToSpot();
+                return;
+            }
+            newWorldName = worldName;
+            MusicCreator.I.setMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
             await ShowLoadingScene(worldName);
@@ -143,12 +161,15 @@ namespace GVR.Manager
 
                 WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
 
-                var playerParent = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
-
-                if (startPoint != null)
-                    playerParent!.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
+                TeleportPlayerToSpot();
             }
-            else if (scene.name == newWorldName?.ToLower())
+            else if (scene.name == "MainMenu")
+            {
+                var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
+                sphere.GetComponent<MeshRenderer>().material = TextureManager.I.LoadingSphereMaterial;
+                SceneManager.SetActiveScene(scene);
+            }
+            else
             {
                 SceneManager.SetActiveScene(scene);
             }
@@ -189,6 +210,23 @@ namespace GVR.Manager
         {
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(go);
             SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.I.WorldScene.Value.name));
+        }
+
+        private void SetPlayer()
+        {
+            player = generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController").transform.Find("VRPlayer").gameObject;
+        }
+
+        public void TeleportPlayerToSpot()
+        {
+            if (player == null)
+                SetPlayer();
+
+            if (startPoint != null)
+            {
+                player.transform.position = startPoint.transform.position;
+                player.transform.rotation = startPoint.transform.rotation;
+            }
         }
     }
 }

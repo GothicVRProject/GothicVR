@@ -17,6 +17,7 @@ namespace GVR.Debugging
         public bool CreateVobs;
         public bool CreateWaypoints;
         public bool CreateWaypointEdges;
+        public bool SkipMainMenu;
 
         [Header("__________DayTime__________")]
         public bool EnableDayTime;
@@ -36,9 +37,11 @@ namespace GVR.Debugging
         public bool EnableNpcRoutines;
         public bool CreateNpcArmor;
         public bool CreateExampleAnimation;
+        public bool CreateDebugIdleAnimations;
 
         [Header("__________SPAMmy debug messages__________")]
         public bool ShowVfsFileNotFoundErrors;
+        public bool ShowZspyLogs;
 
         [Header("__________Audio__________")]
         public bool EnableSounds;

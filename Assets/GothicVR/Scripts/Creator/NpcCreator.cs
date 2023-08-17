@@ -23,17 +23,22 @@ namespace GVR.Creator
         private static AssetCache assetCache;
         private static GameObject npcRootGo;
 
+        // Hint - If this scale ratio isn't looking well, feel free to change it.
+        private const float fatnessScale = 0.1f;
+
         void Start()
         {
             lookupCache = LookupCache.I;
             assetCache = AssetCache.I;
             
             VmGothicBridge.PhoenixWld_InsertNpc.AddListener(Wld_InsertNpc);
-            VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
             VmGothicBridge.PhoenixMdl_SetVisual.AddListener(Mdl_SetVisual);
             VmGothicBridge.PhoenixMdl_ApplyOverlayMds.AddListener(Mdl_ApplyOverlayMds);
             VmGothicBridge.PhoenixMdl_SetVisualBody.AddListener(Mdl_SetVisualBody);
+            VmGothicBridge.PhoenixMdl_SetModelScale.AddListener(Mdl_SetModelScale);
+            VmGothicBridge.PhoenixMdl_SetModelFatness.AddListener(Mdl_SetModelFatness);
             VmGothicBridge.PhoenixEquipItem.AddListener(EquipItem);
+            VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
         }
 
         private static GameObject GetRootGo()
@@ -43,9 +48,17 @@ namespace GVR.Creator
                 return npcRootGo;
             
             npcRootGo = new GameObject("NPCs");
-            GvrSceneManager.I.MoveToWorldScene(npcRootGo);
             
             return npcRootGo;
+        }
+
+        /// <summary>
+        /// Return cached GameObject based on lookup through IntPtr
+        /// </summary>
+        private static GameObject GetNpcGo(IntPtr npcPtr)
+        {
+            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
+            return lookupCache.npcCache[symbolIndex];
         }
 
         /// <summary>
@@ -57,10 +70,10 @@ namespace GVR.Creator
         /// </summary>
         public static void Wld_InsertNpc(int npcInstance, string spawnpoint)
         {
-            var initialSpawnpoint = GameData.I.World.waypoints
+            var initialSpawnPoint = GameData.I.World.waypoints
                 .FirstOrDefault(item => item.name.ToLower() == spawnpoint.ToLower());
 
-            if (initialSpawnpoint == null)
+            if (initialSpawnPoint == null)
             {
                 Debug.LogWarning(string.Format("spawnpoint={0} couldn't be found.", spawnpoint));
                 return;
@@ -71,7 +84,7 @@ namespace GVR.Creator
 
             var pxNpc = PxVm.InitializeNpc(GameData.I.VmGothicPtr, (uint)npcInstance);
 
-            newNpc.name = string.Format("{0}-{1}", string.Concat(pxNpc.names), spawnpoint);
+            newNpc.name = pxNpc!.names[0];
             var npcRoutine = pxNpc.routine;
 
             PxVm.CallFunction(GameData.I.VmGothicPtr, (uint)npcRoutine, pxNpc.instancePtr);
@@ -80,12 +93,12 @@ namespace GVR.Creator
 
             if (newNpc.GetComponent<Routine>().routines.Any())
             {
-                var initialSpawnpointName = newNpc.GetComponent<Routine>().routines.First().waypoint;
-                initialSpawnpoint = GameData.I.World.waypointsDict[initialSpawnpointName];
+                var initialSpawnPointName = newNpc.GetComponent<Routine>().routines.First().waypoint;
+                initialSpawnPoint = GameData.I.World.waypointsDict[initialSpawnPointName];
             }
             
-            newNpc.transform.position = initialSpawnpoint.position.ToUnityVector();
-            newNpc.transform.parent = GetRootGo().transform;
+            newNpc.transform.position = initialSpawnPoint.position.ToUnityVector();
+            newNpc.transform!.parent = GetRootGo().transform;
         }
 
         private static void TA_MIN(VmGothicBridge.TA_MINData data)
@@ -114,9 +127,11 @@ namespace GVR.Creator
 
         private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
         {
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
-            var npc = lookupCache.npcCache[symbolIndex];
+            var npc = GetNpcGo(data.npcPtr);
             var mds = assetCache.TryGetMds(data.visual);
+
+            npc.GetComponent<Properties>().baseMdsName = data.visual;
+            npc.GetComponent<Properties>().baseMds = mds;
 
             // This is something used from OpenGothic. But what is it doing actually? ;-)
             if (mds.skeleton.disableMesh)
@@ -134,16 +149,17 @@ namespace GVR.Creator
 
         private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
         {
-            // TBD
+            var npc = GetNpcGo(data.npcPtr);
+            npc.GetComponent<Properties>().overlayMdsName = data.overlayname;
+            npc.GetComponent<Properties>().overlayMds = assetCache.TryGetMds(data.overlayname);
         }
 
         private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
         {
-            var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
-            var npc = lookupCache.npcCache[symbolIndex];
+            var npc = GetNpcGo(data.npcPtr);
             var mdh = npc.GetComponent<Properties>().mdh;
             var mmb = assetCache.TryGetMmb(data.head);
+            var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
             
             PxModelMeshData mdm;
             if (FeatureFlags.I.CreateNpcArmor && data.armor >= 0)
@@ -159,13 +175,45 @@ namespace GVR.Creator
             NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
         }
 
-        private static void EquipItem(VmGothicBridge.EquipItemData data)
+        private static void Mdl_SetModelScale(VmGothicBridge.Mdl_SetModelScaleData data)
         {
-            var itemData = assetCache.TryGetItemData((uint)data.itemId);
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
             var npc = lookupCache.npcCache[symbolIndex];
+
+            npc.transform.localScale = data.scale;
+        }
+
+        private static void Mdl_SetModelFatness(VmGothicBridge.Mdl_SetModelFatnessData data)
+        {
+            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
+            var npc = lookupCache.npcCache[symbolIndex];
+            var oldScale = npc.transform.localScale;
+            var bonusFat = data.fatness * fatnessScale;
+            
+            npc.transform.localScale = new(oldScale.x + bonusFat, oldScale.y, oldScale.z + bonusFat);
+        }
+
+        private static void EquipItem(VmGothicBridge.EquipItemData data)
+        {
+            var npc = GetNpcGo(data.npcPtr);
+            var itemData = assetCache.TryGetItemData((uint)data.itemId);
             
             NpcMeshCreator.I.EquipWeapon(npc, itemData, itemData.mainFlag, itemData.flags);
+        }
+
+
+        public void DebugAddIdleAnimationToAllNpc()
+        {
+            foreach (var npcGo in lookupCache.npcCache.Values)
+            {
+                var mdsName = npcGo.GetComponent<Properties>().baseMdsName;
+                var mdh = npcGo.GetComponent<Properties>().mdh;
+
+                var animationName = mdsName.ToLower() == "humans.mds" ? "T_1HSFREE" : "S_DANCE1";
+                
+                AnimationCreator.I.PlayAnimation(mdsName, animationName, mdh, npcGo);
+                
+            }
         }
     }
 }
