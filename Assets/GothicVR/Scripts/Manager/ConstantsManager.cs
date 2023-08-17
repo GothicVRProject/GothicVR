@@ -23,11 +23,11 @@ namespace GVR.Manager
         //Collection of PlayerPref entries for settings
         public string moveSpeedPlayerPref = "MoveSpeed";
         public string turnSettingPlayerPref = "TurnSetting";
+        public string uiBehaviourPlayerPref = "UIBehaviour";
 
         public string selectedWorld = "world.zen";
         public string selectedWaypoint = "START"; 
         public string turnAnglePlayerPref = "TurnAngleSetting";
-        
         protected override void Awake()
         {
             base.Awake();

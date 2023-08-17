@@ -14,10 +14,10 @@ public class TurnAngleController : MonoBehaviour
         turnangelslider.value = PlayerPrefs.GetFloat(ConstantsManager.I.turnAnglePlayerPref, ConstantsManager.I.turnAngleDefault);
     }
 
-    void ChangeTurnAngle(float turn_angel)
+    void ChangeTurnAngle(float turn_angle)
     {
-        snapturnprovider.turnAmount = turn_angel;
-        continuousturnprovider.turnSpeed = turn_angel;
-        PlayerPrefs.SetFloat(ConstantsManager.I.turnAnglePlayerPref, turn_angel);
+        snapturnprovider.turnAmount = turn_angle;
+        continuousturnprovider.turnSpeed = turn_angle;
+        PlayerPrefs.SetFloat(ConstantsManager.I.turnAnglePlayerPref, turn_angle);
     }
 }

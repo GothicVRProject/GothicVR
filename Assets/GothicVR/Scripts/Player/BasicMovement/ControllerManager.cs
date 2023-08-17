@@ -10,13 +10,17 @@ public class ControllerManager : MonoBehaviour
     public GameObject directRight;
     public GameObject settingsMenue;
     public GameObject teleportMenu;
-    public GameObject UIGameObject;
+
+    public bool uiFollowsMe;
 
     private InputAction leftPrimaryButtonAction;
     private InputAction leftSecondaryButtonAction;
 
     private InputAction rightPrimaryButtonAction;
     private InputAction rightSecondaryButtonAction;
+
+    private CloseMenueScript settingsMenuCloseScript;
+    private CloseMenueScript teleportMenuCloseScript;
 
     private void Awake()
     {
@@ -38,6 +42,9 @@ public class ControllerManager : MonoBehaviour
 
         rightPrimaryButtonAction.Enable();
         rightSecondaryButtonAction.Enable();
+
+        settingsMenuCloseScript = (CloseMenueScript)settingsMenue.GetComponent(typeof(CloseMenueScript));
+        teleportMenuCloseScript = (CloseMenueScript)teleportMenu.GetComponent(typeof(CloseMenueScript));
     }
 
     private void OnDestroy()
@@ -69,17 +76,35 @@ public class ControllerManager : MonoBehaviour
     {
         if (!settingsMenue.activeSelf)
         {
+            if (!uiFollowsMe)
+            {
+                settingsMenue.transform.parent = null;
+            }
             settingsMenue.SetActive(true);
             FontManager.I.ChangeFont();
 
             if (teleportMenu.activeSelf)
             {
-                teleportMenu.SetActive(false);
+                if (!uiFollowsMe)
+                {
+                    teleportMenuCloseScript.CloseFunction();
+                }
+                else
+                {
+                    teleportMenu.SetActive(false);
+                }
             }
         }
         else
         {
-            settingsMenue.SetActive(false);
+            if (!uiFollowsMe)
+            {
+                settingsMenuCloseScript.CloseFunction();
+            }
+            else
+            {
+                settingsMenue.SetActive(false);
+            }
         }
     }
 
@@ -87,17 +112,35 @@ public class ControllerManager : MonoBehaviour
     {
         if (!teleportMenu.activeSelf)
         {
+            if (!uiFollowsMe)
+            {
+                teleportMenu.transform.parent = null;
+            }
             teleportMenu.SetActive(true);
             FontManager.I.ChangeFont();
 
             if (settingsMenue.activeSelf)
             {
-                settingsMenue.SetActive(false);
+                if (!uiFollowsMe)
+                {
+                    settingsMenuCloseScript.CloseFunction();
+                }
+                else
+                {
+                    settingsMenue.SetActive(false);
+                }
             }
         }
         else
         {
-            teleportMenu.SetActive(false);
+            if (!uiFollowsMe)
+            {
+                teleportMenuCloseScript.CloseFunction();
+            }
+            else
+            {
+                teleportMenu.SetActive(false);
+            }
         }
     }
     public void ShowUI()
