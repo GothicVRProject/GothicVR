@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
@@ -29,6 +31,16 @@ namespace GVR.Caches
         private Dictionary<string, PxVmSfxData> sfxDataCache = new();
         private Dictionary<string, PxSoundData<float>> soundCache = new();
 
+        private readonly string[] misplacedMdmArmors =
+        {
+            "Hum_GrdS_Armor",
+            "Hum_GrdM_Armor",
+            "Hum_GrdL_Armor",
+            "Hum_NovM_Armor",
+            "Hum_Body_Cooksmith",
+            "Hum_VlkL_Armor",
+            "Hum_KdfS_Armor"
+        };
 
         public Texture2D TryGetTexture(string key)
         {
@@ -123,7 +135,27 @@ namespace GVR.Caches
             var newData = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mdm", attachmentKeys);
             mdmCache[preparedKey] = newData;
 
+            FixArmorTriangles(preparedKey, newData);
+            
             return newData;
+        }
+        
+        /// <summary>
+        /// Some armor mdm's have wrong triangles. This function corrects them hard coded until we find a proper solution.
+        /// </summary>
+        private void FixArmorTriangles(string key, PxModelMeshData mdm)
+        {
+            if (!misplacedMdmArmors.Contains(key, StringComparer.OrdinalIgnoreCase))
+                return;
+            
+            foreach (var mesh in mdm.meshes!)
+            {
+                for (var i = 0; i < mesh.mesh!.positions!.Length; i++)
+                {
+                    var curPos = mesh.mesh.positions[i];
+                    mesh.mesh.positions[i] = new(curPos.X + 0.5f, curPos.Y - 0.5f, curPos.Z + 13f);
+                }
+            }
         }
 
         public PxMultiResolutionMeshData TryGetMrm(string key)
