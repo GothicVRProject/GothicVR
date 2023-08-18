@@ -307,6 +307,7 @@ GameObject:
   m_Component:
   - component: {fileID: 235819214}
   - component: {fileID: 235819215}
+  - component: {fileID: 235819216}
   m_Layer: 0
   m_Name: FeatureFlags
   m_TagString: Untagged
@@ -361,6 +362,19 @@ MonoBehaviour:
   ShowZspyLogs: 0
   EnableSounds: 1
   EnableMusic: 1
+--- !u!114 &235819216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 235819213}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30c704a6fc8f0304bbb2970d8430e508, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiFollowsPlayer: 1
 --- !u!1 &379812652
 GameObject:
   m_ObjectHideFlags: 0
@@ -1095,11 +1109,14 @@ MonoBehaviour:
   ClimbableTag: Climbable
   MeshPerFrame: 10
   VObPerFrame: 75
+  turnAngleDefault: 45
+  moveSpeedDefault: 8
   moveSpeedPlayerPref: MoveSpeed
   turnSettingPlayerPref: TurnSetting
-  turnAngelPlayerPref: TurnAngelSetting
+  uiBehaviourPlayerPref: UIBehaviour
   selectedWorld: world.zen
   selectedWaypoint: START
+  turnAnglePlayerPref: TurnAngleSetting
 --- !u!114 &1896514221
 MonoBehaviour:
   m_ObjectHideFlags: 0

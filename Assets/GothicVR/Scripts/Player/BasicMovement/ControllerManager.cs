@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using GVR.Debugging;
 using GVR.Manager;
 
 public class ControllerManager : MonoBehaviour
@@ -10,8 +11,6 @@ public class ControllerManager : MonoBehaviour
     public GameObject directRight;
     public GameObject settingsMenue;
     public GameObject teleportMenu;
-
-    public bool uiFollowsMe;
 
     private InputAction leftPrimaryButtonAction;
     private InputAction leftSecondaryButtonAction;
@@ -76,7 +75,7 @@ public class ControllerManager : MonoBehaviour
     {
         if (!settingsMenue.activeSelf)
         {
-            if (!uiFollowsMe)
+            if (!GameOptions.I.uiFollowsPlayer)
             {
                 settingsMenue.transform.parent = null;
             }
@@ -85,7 +84,7 @@ public class ControllerManager : MonoBehaviour
 
             if (teleportMenu.activeSelf)
             {
-                if (!uiFollowsMe)
+                if (!GameOptions.I.uiFollowsPlayer)
                 {
                     teleportMenuCloseScript.CloseFunction();
                 }
@@ -97,7 +96,7 @@ public class ControllerManager : MonoBehaviour
         }
         else
         {
-            if (!uiFollowsMe)
+            if (!GameOptions.I.uiFollowsPlayer)
             {
                 settingsMenuCloseScript.CloseFunction();
             }
@@ -112,7 +111,7 @@ public class ControllerManager : MonoBehaviour
     {
         if (!teleportMenu.activeSelf)
         {
-            if (!uiFollowsMe)
+            if (!GameOptions.I.uiFollowsPlayer)
             {
                 teleportMenu.transform.parent = null;
             }
@@ -121,7 +120,7 @@ public class ControllerManager : MonoBehaviour
 
             if (settingsMenue.activeSelf)
             {
-                if (!uiFollowsMe)
+                if (!GameOptions.I.uiFollowsPlayer)
                 {
                     settingsMenuCloseScript.CloseFunction();
                 }
@@ -133,7 +132,7 @@ public class ControllerManager : MonoBehaviour
         }
         else
         {
-            if (!uiFollowsMe)
+            if (!GameOptions.I.uiFollowsPlayer)
             {
                 teleportMenuCloseScript.CloseFunction();
             }

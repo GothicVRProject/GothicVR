@@ -392,6 +392,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2861914027622119191, guid: 4d1df628cb049924dab92fac25cbb6dc, type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4145975805982683287, guid: 4d1df628cb049924dab92fac25cbb6dc, type: 3}
       propertyPath: m_Name
       value: TeleportMenu
