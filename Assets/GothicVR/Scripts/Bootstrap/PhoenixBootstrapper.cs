@@ -104,9 +104,9 @@ namespace GVR.Bootstrap
         private void LoadGothicVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
-            var vmPtr = VmGothicBridge.LoadVm(fullPath);
+            var vmPtr = VmGothicExternals.LoadVm(fullPath);
 
-            VmGothicBridge.RegisterExternals(vmPtr);
+            VmGothicExternals.RegisterExternals(vmPtr);
 
             GameData.I.VmGothicPtr = vmPtr;
         }
@@ -114,14 +114,14 @@ namespace GVR.Bootstrap
         private void LoadSfxVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
-            var vmPtr = VmGothicBridge.LoadVm(fullPath);
+            var vmPtr = VmGothicExternals.LoadVm(fullPath);
             GameData.I.VmSfxPtr = vmPtr;
         }
 
         private void LoadMusicVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
-            var vmPtr = VmGothicBridge.LoadVm(fullPath);
+            var vmPtr = VmGothicExternals.LoadVm(fullPath);
             GameData.I.VmMusicPtr = vmPtr;
         }
 

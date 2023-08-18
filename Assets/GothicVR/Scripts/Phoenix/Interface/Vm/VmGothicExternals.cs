@@ -12,7 +12,7 @@ namespace GVR.Phoenix.Interface.Vm
     /// <summary>
     /// Contains basic methods only available in Gothic Daedalus module.
     /// </summary>
-    public static class VmGothicBridge
+    public static class VmGothicExternals
     {
         public static IntPtr LoadVm(string fullDatFilePath)
         {

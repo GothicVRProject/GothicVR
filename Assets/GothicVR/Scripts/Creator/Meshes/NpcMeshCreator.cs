@@ -13,10 +13,10 @@ namespace GVR.Creator.Meshes
 {
     public class NpcMeshCreator : AbstractMeshCreator<NpcMeshCreator>
     {
-        private VmGothicBridge.ExtSetVisualBodyData tempBodyData;
+        private VmGothicExternals.ExtSetVisualBodyData tempBodyData;
 
         public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
-            PxMorphMeshData morphMesh, VmGothicBridge.ExtSetVisualBodyData bodyData, GameObject root)
+            PxMorphMeshData morphMesh, VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
         {
             tempBodyData = bodyData;
             var npcGo = Create(npcName, mdm, mdh, default, default, null, root);

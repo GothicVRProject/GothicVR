@@ -91,7 +91,7 @@ namespace GVR.Creator
             newNpc.transform!.parent = GetRootGo().transform;
         }
 
-        public void ExtTaMin(VmGothicBridge.ExtTaMinData data)
+        public void ExtTaMin(VmGothicExternals.ExtTaMinData data)
         {
             // If we put h=24, DateTime will throw an error instead of rolling.
             var stop_hFormatted = data.StopH == 24 ? 0 : data.StopH;
@@ -145,7 +145,7 @@ namespace GVR.Creator
             props.overlayMdh = assetCache.TryGetMdh(overlayName);
         }
 
-        public void ExtSetVisualBody(VmGothicBridge.ExtSetVisualBodyData data)
+        public void ExtSetVisualBody(VmGothicExternals.ExtSetVisualBodyData data)
         {
             var npc = GetNpcGo(data.NpcPtr);
             var props = npc.GetComponent<Properties>();
