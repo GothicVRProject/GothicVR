@@ -29,16 +29,6 @@ namespace GVR.Creator
         {
             lookupCache = LookupCache.I;
             assetCache = AssetCache.I;
-            
-            VmGothicBridge.PhoenixWld_InsertNpc.AddListener(Wld_InsertNpc);
-            VmGothicBridge.PhoenixMdl_SetVisual.AddListener(Mdl_SetVisual);
-            VmGothicBridge.PhoenixMdl_ApplyOverlayMds.AddListener(Mdl_ApplyOverlayMds);
-            VmGothicBridge.PhoenixMdl_SetVisualBody.AddListener(Mdl_SetVisualBody);
-            VmGothicBridge.PhoenixMdl_SetModelScale.AddListener(Mdl_SetModelScale);
-            VmGothicBridge.PhoenixMdl_SetModelFatness.AddListener(Mdl_SetModelFatness);
-            VmGothicBridge.PhoenixNpc_SetTalentSkill.AddListener(Npc_SetTalentSkill);
-            VmGothicBridge.PhoenixEquipItem.AddListener(EquipItem);
-            VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
         }
 
         private static GameObject GetRootGo()
@@ -68,7 +58,7 @@ namespace GVR.Creator
         /// It can also be the currently active routine point to walk to.
         /// We therefore execute the daily routines to collect current location and use this as spawn location.
         /// </summary>
-        public static void Wld_InsertNpc(int npcInstance, string spawnpoint)
+        public void ExtWldInsertNpc(int npcInstance, string spawnpoint)
         {
             var initialSpawnPoint = GameData.I.World.waypoints
                 .FirstOrDefault(item => item.name.ToLower() == spawnpoint.ToLower());
@@ -101,114 +91,113 @@ namespace GVR.Creator
             newNpc.transform!.parent = GetRootGo().transform;
         }
 
-        private static void TA_MIN(VmGothicBridge.TA_MINData data)
+        public void ExtTaMin(VmGothicBridge.ExtTaMinData data)
         {
             // If we put h=24, DateTime will throw an error instead of rolling.
-            var stop_hFormatted = data.stop_h == 24 ? 0 : data.stop_h;
+            var stop_hFormatted = data.StopH == 24 ? 0 : data.StopH;
 
             RoutineData routine = new()
             {
-                start_h = data.start_h,
-                start_m = data.start_m,
-                start = new(1, 1, 1, data.start_h, data.start_m, 0),
-                stop_h = data.stop_h,
-                stop_m = data.stop_m,
-                stop = new(1, 1, 1, stop_hFormatted, data.stop_m, 0),
-                action = data.action,
-                waypoint = data.waypoint
+                start_h = data.StartH,
+                start_m = data.StartM,
+                start = new(1, 1, 1, data.StartH, data.StartM, 0),
+                stop_h = data.StopH,
+                stop_m = data.StopM,
+                stop = new(1, 1, 1, stop_hFormatted, data.StopM, 0),
+                action = data.Action,
+                waypoint = data.Waypoint
             };
 
-            var npcId = PxVm.pxVmInstanceGetSymbolIndex(data.npc);
+            var npcId = PxVm.pxVmInstanceGetSymbolIndex(data.Npc);
             LookupCache.I.npcCache[npcId].GetComponent<Routine>().routines.Add(routine);
             // Add element if key not yet exists.
-            GameData.I.npcRoutines.TryAdd(data.npc, new());
-            GameData.I.npcRoutines[data.npc].Add(routine);
+            GameData.I.npcRoutines.TryAdd(data.Npc, new());
+            GameData.I.npcRoutines[data.Npc].Add(routine);
         }
 
-        private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
+        public void ExtMdlSetVisual(IntPtr npcPtr, string visual)
         {
-            var npc = GetNpcGo(data.npcPtr);
+            var npc = GetNpcGo(npcPtr);
             var props = npc.GetComponent<Properties>();
-            var mds = assetCache.TryGetMds(data.visual);
+            var mds = assetCache.TryGetMds(visual);
 
-            props.baseMdsName = data.visual;
+            props.baseMdsName = visual;
             props.baseMds = mds;
 
             // This is something used from OpenGothic. But what is it doing actually? ;-)
             if (mds.skeleton!.disableMesh)
             {
-                var mdh = assetCache.TryGetMdh(data.visual);
+                var mdh = assetCache.TryGetMdh(visual);
                 props.baseMdh = mdh;
             }
             else
             {
-                throw new Exception("Not yet implemented");
-                //var skeletonName = mds.skeleton.name.Replace(".ASC", ".MDM");
-                //var mdm = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, skeletonName); // --> if null
+                throw new Exception("Not (yet) implemented");
             }
         }
 
-        private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
+        public void ExtApplyOverlayMds(IntPtr npcPtr, string overlayName)
         {
-            var npc = GetNpcGo(data.npcPtr);
+            var npc = GetNpcGo(npcPtr);
             var props = npc.GetComponent<Properties>();
-            props.overlayMdsName = data.overlayname;
-            props.overlayMds = assetCache.TryGetMds(data.overlayname);
-            props.overlayMdh = assetCache.TryGetMdh(data.overlayname);
+            props.overlayMdsName = overlayName;
+            props.overlayMds = assetCache.TryGetMds(overlayName);
+            props.overlayMdh = assetCache.TryGetMdh(overlayName);
         }
 
-        private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
+        public void ExtSetVisualBody(VmGothicBridge.ExtSetVisualBodyData data)
         {
-            var npc = GetNpcGo(data.npcPtr);
+            var npc = GetNpcGo(data.NpcPtr);
             var props = npc.GetComponent<Properties>();
-            var mmb = assetCache.TryGetMmb(data.head);
-            var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
+            var mmb = assetCache.TryGetMmb(data.Head);
+            var name = PxVm.pxVmInstanceNpcGetName(data.NpcPtr, 0).MarshalAsString();
 
             var mdh = props.overlayMdh ?? props.baseMdh;
             
             PxModelMeshData mdm;
-            if (FeatureFlags.I.CreateNpcArmor && data.armor >= 0)
+            if (FeatureFlags.I.CreateNpcArmor && data.Armor >= 0)
             {
-                var armorData = assetCache.TryGetItemData((uint)data.armor);
+                var armorData = assetCache.TryGetItemData((uint)data.Armor);
                 mdm = assetCache.TryGetMdm(armorData.visualChange);
             }
             else
             {
-                mdm = assetCache.TryGetMdm(data.body);
+                mdm = assetCache.TryGetMdm(data.Body);
             }
             
             NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
         }
 
-        private static void Mdl_SetModelScale(VmGothicBridge.Mdl_SetModelScaleData data)
+        public void ExtMdlSetModelScale(IntPtr npcPtr, Vector3 scale)
         {
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
+            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
             var npc = lookupCache.npcCache[symbolIndex];
 
-            npc.transform.localScale = data.scale;
+            // FIXME - If fatness is applied before, we reset it here. We need to do proper Vector multiplication here.
+            npc.transform.localScale = scale;
         }
 
-        private static void Mdl_SetModelFatness(VmGothicBridge.Mdl_SetModelFatnessData data)
+        public void ExtSetModelFatness(IntPtr npcPtr, float fatness)
         {
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(data.npcPtr);
+            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
             var npc = lookupCache.npcCache[symbolIndex];
             var oldScale = npc.transform.localScale;
-            var bonusFat = data.fatness * fatnessScale;
+            var bonusFat = fatness * fatnessScale;
             
             npc.transform.localScale = new(oldScale.x + bonusFat, oldScale.y, oldScale.z + bonusFat);
         }
 
-        private static void Npc_SetTalentSkill(VmGothicBridge.Npc_SetTalentSkillData data)
+        public void ExtNpcSetTalentSkill(IntPtr npcPtr, VmGothicEnums.Talent talent, int level)
         {
-            var npc = GetNpcGo(data.npcPtr);
+            var npc = GetNpcGo(npcPtr);
             var props = npc.GetComponent<Properties>();
-            props.Talents[data.talent] = data.level;
+            props.Talents[talent] = level;
         }
         
-        private static void EquipItem(VmGothicBridge.EquipItemData data)
+        public void ExtEquipItem(IntPtr npcPtr, int itemId)
         {
-            var npc = GetNpcGo(data.npcPtr);
-            var itemData = assetCache.TryGetItemData((uint)data.itemId);
+            var npc = GetNpcGo(npcPtr);
+            var itemData = assetCache.TryGetItemData((uint)itemId);
 
             npc.GetComponent<Properties>().EquippedItem = itemData;
             

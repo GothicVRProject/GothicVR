@@ -13,10 +13,10 @@ namespace GVR.Creator.Meshes
 {
     public class NpcMeshCreator : AbstractMeshCreator<NpcMeshCreator>
     {
-        private VmGothicBridge.Mdl_SetVisualBodyData tempBodyData;
+        private VmGothicBridge.ExtSetVisualBodyData tempBodyData;
 
         public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
-            PxMorphMeshData morphMesh, VmGothicBridge.Mdl_SetVisualBodyData bodyData, GameObject root)
+            PxMorphMeshData morphMesh, VmGothicBridge.ExtSetVisualBodyData bodyData, GameObject root)
         {
             tempBodyData = bodyData;
             var npcGo = Create(npcName, mdm, mdh, default, default, null, root);
@@ -55,15 +55,15 @@ namespace GVR.Creator.Meshes
                 finalTextureName = name;
             else if (name.ToUpper().EndsWith("TEETH_V0.TGA"))
                 // e.g. Some_Texture_V0.TGA --> Some_Texture_V1.TGA
-                finalTextureName = Regex.Replace(name, "(?<=.*?)V0", $"V{tempBodyData.teethTexNr}");
+                finalTextureName = Regex.Replace(name, "(?<=.*?)V0", $"V{tempBodyData.TeethTexNr}");
             else if (name.ToUpper().Contains("BODY") && name.ToUpper().EndsWith("V0_C0.TGA"))
                 // This regex replaces the suffix of V0_C0 with values of corresponding data.
                 // e.g. Some_Texture_V0_C0.TGA --> Some_Texture_V1_C2.TGA
                 finalTextureName = Regex.Replace(name, "(?<=.*?)V0_C0",
-                    $"V{tempBodyData.bodyTexNr}_C{tempBodyData.bodyTexColor}");
+                    $"V{tempBodyData.BodyTexNr}_C{tempBodyData.BodyTexColor}");
             else if (name.ToUpper().Contains("HEAD") && name.ToUpper().EndsWith("V0_C0.TGA"))
                 finalTextureName = Regex.Replace(name, "(?<=.*?)V0_C0",
-                    $"V{tempBodyData.headTexNr}_C{tempBodyData.bodyTexColor}");
+                    $"V{tempBodyData.HeadTexNr}_C{tempBodyData.BodyTexColor}");
             else
                 // No changeable texture needed? Skip updating texture name.
                 finalTextureName = name;

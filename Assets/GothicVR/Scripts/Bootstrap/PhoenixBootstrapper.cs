@@ -25,7 +25,6 @@ namespace GVR.Bootstrap
 
         private void Start()
         {
-            VmGothicBridge.DefaultExternalCallback.AddListener(MissingVmExternalCall);
             PxLogging.pxLoggerSet(PxLoggerCallback);
         }
 
@@ -57,11 +56,6 @@ namespace GVR.Bootstrap
             Debug.Log($"Time spent for Bootstrapping Phoenix: {watch.Elapsed}");
 
             GvrSceneManager.I.LoadStartupScenes();
-        }
-
-        public static void MissingVmExternalCall(IntPtr vmPtr, string missingCallbackName)
-        {
-            Debug.LogWarning($"Method >{missingCallbackName}< not yet implemented in DaedalusVM.");
         }
 
         [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]

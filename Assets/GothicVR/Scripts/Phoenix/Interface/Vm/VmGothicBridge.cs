@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using AOT;
+using GVR.Creator;
 using GVR.Debugging;
 using PxCs.Interface;
 using UnityEngine;
@@ -71,33 +72,14 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
         }
 
-        public static UnityEvent<IntPtr, string> DefaultExternalCallback = new();
-        public static UnityEvent<int, string> PhoenixWld_InsertNpc = new();
-        public static UnityEvent<TA_MINData> PhoenixTA_MIN = new();
-        public static UnityEvent<Mdl_SetVisualData> PhoenixMdl_SetVisual = new();
-        public static UnityEvent<Mdl_ApplyOverlayMdsData> PhoenixMdl_ApplyOverlayMds = new();
-        public static UnityEvent<Mdl_SetVisualBodyData> PhoenixMdl_SetVisualBody = new();
-        public static UnityEvent<Mdl_SetModelScaleData> PhoenixMdl_SetModelScale = new();
-        public static UnityEvent<Mdl_SetModelFatnessData> PhoenixMdl_SetModelFatness = new();
-
-        public static UnityEvent<Npc_SetTalentSkillData> PhoenixNpc_SetTalentSkill = new ();
-        public static UnityEvent<EquipItemData> PhoenixEquipItem = new();
-        public static UnityEvent<string> PhoenixMdl_AI_OUTPUT = new();
-
-
-
 #region Default
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalDefaultCallback))]
         public static void DefaultExternal(IntPtr vmPtr, string missingCallbackName)
         {
-            // FIXME: Once solution is released, we can safely throw an exception as it tells us: Brace yourself! The game will not work until you implement it.
+            // FIXME: Once solution is released, we can safely throw an exception as it tells us: The game will not work until you implement this missing function.
             //throw new NotImplementedException("External >" + value + "< not registered but required by DaedalusVM.");
-
-            // DEBUG During development
-            // Debug.LogError("External >" + value + "< not registered but required by DaedalusVM.");
-
-            DefaultExternalCallback.Invoke(vmPtr, missingCallbackName);
+            Debug.LogWarning($"Method >{missingCallbackName}< not yet implemented in DaedalusVM.");
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -189,51 +171,41 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var spawnpoint = PxVm.VmStackPopString(vmPtr);
             var npcInstance = PxVm.pxVmStackPopInt(vmPtr);
-
-            PhoenixWld_InsertNpc.Invoke(npcInstance, spawnpoint);
+            
+            NpcCreator.I.ExtWldInsertNpc(npcInstance, spawnpoint);
         }
 
-        public struct TA_MINData
+        public struct ExtTaMinData
         {
-            public IntPtr npc;
-            public int start_h;
-            public int start_m;
-            public int stop_h;
-            public int stop_m;
-            public int action;
-            public string waypoint;
+            public IntPtr Npc;
+            public int StartH;
+            public int StartM;
+            public int StopH;
+            public int StopM;
+            public int Action;
+            public string Waypoint;
         }
-
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void TA_MIN(IntPtr vmPtr)
         {
             var waypoint = PxVm.VmStackPopString(vmPtr);
             var action = PxVm.pxVmStackPopInt(vmPtr);
-            var stop_m = PxVm.pxVmStackPopInt(vmPtr);
-            var stop_h = PxVm.pxVmStackPopInt(vmPtr);
-            var start_m = PxVm.pxVmStackPopInt(vmPtr);
-            var start_h = PxVm.pxVmStackPopInt(vmPtr);
+            var stopM = PxVm.pxVmStackPopInt(vmPtr);
+            var stopH = PxVm.pxVmStackPopInt(vmPtr);
+            var startM = PxVm.pxVmStackPopInt(vmPtr);
+            var startH = PxVm.pxVmStackPopInt(vmPtr);
             var npc = PxVm.pxVmStackPopInstance(vmPtr);
 
-            PhoenixTA_MIN.Invoke(
-                new TA_MINData
-                {
-                    npc = npc,
-                    start_h = start_h,
-                    start_m = start_m,
-                    stop_h = stop_h,
-                    stop_m = stop_m,
-                    action = action,
-                    waypoint = waypoint
-                }
-            );
-        }
-
-
-        public struct Mdl_SetVisualData
-        {
-            public IntPtr npcPtr;
-            public string visual;
+            NpcCreator.I.ExtTaMin(new()
+            {
+                Npc = npc,
+                StartH = startH,
+                StartM = startM,
+                StopH = stopH,
+                StopM = stopM,
+                Action = action,
+                Waypoint = waypoint
+            });
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -242,50 +214,29 @@ namespace GVR.Phoenix.Interface.Vm
             var visual = PxVm.VmStackPopString(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            PhoenixMdl_SetVisual.Invoke(
-                new()
-                {
-                    npcPtr = npcPtr,
-                    visual = visual
-                }
-            );
+            NpcCreator.I.ExtMdlSetVisual(npcPtr, visual);
         }
-
-
-        public struct Mdl_ApplyOverlayMdsData
-        {
-            public IntPtr npcPtr;
-            public string overlayname;
-        }
-
+        
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Mdl_ApplyOverlayMds(IntPtr vmPtr)
         {
-            var overlayname = PxVm.VmStackPopString(vmPtr);
+            var overlayName = PxVm.VmStackPopString(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            PhoenixMdl_ApplyOverlayMds.Invoke(
-                new()
-                {
-                    npcPtr = npcPtr,
-                    overlayname = overlayname
-                }
-            );
+            NpcCreator.I.ExtApplyOverlayMds(npcPtr, overlayName);
         }
-
-
-        public struct Mdl_SetVisualBodyData
+        
+        public struct ExtSetVisualBodyData
         {
-            public IntPtr npcPtr;
-            public string body;
-            public int bodyTexNr;
-            public int bodyTexColor;
-            public string head;
-            public int headTexNr;
-            public int teethTexNr;
-            public int armor;
+            public IntPtr NpcPtr;
+            public string Body;
+            public int BodyTexNr;
+            public int BodyTexColor;
+            public string Head;
+            public int HeadTexNr;
+            public int TeethTexNr;
+            public int Armor;
         }
-
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Mdl_SetVisualBody(IntPtr vmPtr)
         {
@@ -298,26 +249,20 @@ namespace GVR.Phoenix.Interface.Vm
             var body = PxVm.VmStackPopString(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            PhoenixMdl_SetVisualBody.Invoke(
-                new Mdl_SetVisualBodyData()
+            NpcCreator.I.ExtSetVisualBody(new ()
                 {
-                    npcPtr = npcPtr,
-                    body = body,
-                    bodyTexNr = bodyTexNr,
-                    bodyTexColor = bodyTexColor,
-                    head = head,
-                    headTexNr = headTexNr,
-                    teethTexNr = teethTexNr,
-                    armor = armor
+                    NpcPtr = npcPtr,
+                    Body = body,
+                    BodyTexNr = bodyTexNr,
+                    BodyTexColor = bodyTexColor,
+                    Head = head,
+                    HeadTexNr = headTexNr,
+                    TeethTexNr = teethTexNr,
+                    Armor = armor
                 }
             );
         }
 
-        public struct Mdl_SetModelScaleData
-        {
-            public IntPtr npcPtr;
-            public Vector3 scale;
-        }
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Mdl_SetModelScale(IntPtr vmPtr)
         {
@@ -326,48 +271,26 @@ namespace GVR.Phoenix.Interface.Vm
             var x = PxVm.pxVmStackPopFloat(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            PhoenixMdl_SetModelScale.Invoke(
-                new Mdl_SetModelScaleData()
-                {
-                    npcPtr = npcPtr,
-                    scale = new (x, y, z)
-                });
+            NpcCreator.I.ExtMdlSetModelScale(npcPtr, new(x, y, z));
         }
-
-        public struct Mdl_SetModelFatnessData
-        {
-            public IntPtr npcPtr;
-            public float fatness;
-        }
+        
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Mdl_SetModelFatness(IntPtr vmPtr)
         {
             var fatness = PxVm.pxVmStackPopFloat(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            PhoenixMdl_SetModelFatness.Invoke(
-                new Mdl_SetModelFatnessData()
-                {
-                    npcPtr = npcPtr,
-                    fatness = fatness
-                });
+            NpcCreator.I.ExtSetModelFatness(npcPtr, fatness);
         }
-
-        public struct Npc_SetTalentSkillData
-        {
-            public IntPtr npcPtr;
-            public VmGothicEnums.Talent talent;
-            public int level;
-        }
+        
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_SetTalentSkill(IntPtr vmPtr)
         {
-            PhoenixNpc_SetTalentSkill.Invoke(new ()
-            {
-                level = PxVm.pxVmStackPopInt(vmPtr),
-                talent = (VmGothicEnums.Talent)PxVm.pxVmStackPopInt(vmPtr),
-                npcPtr = PxVm.pxVmStackPopInstance(vmPtr),
-            });
+            var level = PxVm.pxVmStackPopInt(vmPtr);
+            var talent = (VmGothicEnums.Talent)PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            
+            NpcCreator.I.ExtNpcSetTalentSkill(npcPtr, talent, level);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -406,22 +329,13 @@ namespace GVR.Phoenix.Interface.Vm
             
         }
         
-        public struct EquipItemData
-        {
-            public IntPtr npcPtr;
-            public int itemId;
-        }
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void EquipItem(IntPtr vmPtr)
         {
             var itemId = PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            PhoenixEquipItem.Invoke(new ()
-            {
-                npcPtr = npcPtr,
-                itemId = itemId
-            });
+            NpcCreator.I.ExtEquipItem(npcPtr, itemId);
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -429,7 +343,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var soundString = PxVm.VmStackPopString(vmPtr);
 
-            PhoenixMdl_AI_OUTPUT.Invoke(soundString);
+            SoundCreator.I.ExtAiOutput(soundString);
         }
     }
 }

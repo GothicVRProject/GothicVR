@@ -43,12 +43,12 @@ namespace GVR.Creator
             var mdhName = "HUMANS.mdh";
             var head = "Hum_Head_Bald"; // B - Hum_Head_Bald --- D - Hum_Head_Thief
             var armor = "hum_body_Naked0"; // B - Hum_GRDM_ARMOR --- D - Hum_STTS_ARMOR --- N - hum_body_Naked0 --- C - Hum_CRAWLER_ARMOR
-            var variant = new VmGothicBridge.Mdl_SetVisualBodyData()
+            var variant = new VmGothicBridge.ExtSetVisualBodyData()
             {
-                bodyTexNr = 0, // B=0, D=0
-                bodyTexColor = 1, // B=1, D=2
-                headTexNr = 18, // B=18, D=15
-                teethTexNr = 1, // B=1, D=4
+                BodyTexNr = 0, // B=0, D=0
+                BodyTexColor = 1, // B=1, D=2
+                HeadTexNr = 18, // B=18, D=15
+                TeethTexNr = 1, // B=1, D=4
             };
 
             var mdh = AssetCache.I.TryGetMdh(mdhName);
@@ -81,12 +81,12 @@ namespace GVR.Creator
             var mdhName = "HUMANS.mdh";
             var head = "Hum_Head_Bald"; // B - Hum_Head_Bald --- D - Hum_Head_Thief
             var armor = "Hum_CRAWLER_ARMOR"; // B - Hum_GRDM_ARMOR --- D - Hum_STTS_ARMOR --- N - hum_body_Naked0 --- C - Hum_CRAWLER_ARMOR
-            var variant = new VmGothicBridge.Mdl_SetVisualBodyData()
+            var variant = new VmGothicBridge.ExtSetVisualBodyData()
             {
-                bodyTexNr = 0, // B=0, D=0
-                bodyTexColor = 1, // B=1, D=2
-                headTexNr = 18, // B=18, D=15
-                teethTexNr = 1, // B=1, D=4
+                BodyTexNr = 0, // B=0, D=0
+                BodyTexColor = 1, // B=1, D=2
+                HeadTexNr = 18, // B=18, D=15
+                TeethTexNr = 1, // B=1, D=4
             };
 
             var mdh = AssetCache.I.TryGetMdh(mdhName);
@@ -119,12 +119,12 @@ namespace GVR.Creator
             var mdhName = "HUMANS.mdh";
             var head = "Hum_Head_Bald"; // B - Hum_Head_Bald --- D - Hum_Head_Thief
             var armor = "Hum_STTS_ARMOR"; // B - Hum_GRDM_ARMOR --- D - Hum_STTS_ARMOR --- N - hum_body_Naked0 --- C - Hum_CRAWLER_ARMOR
-            var variant = new VmGothicBridge.Mdl_SetVisualBodyData()
+            var variant = new VmGothicBridge.ExtSetVisualBodyData()
             {
-                bodyTexNr = 0, // B=0, D=0
-                bodyTexColor = 1, // B=1, D=2
-                headTexNr = 18, // B=18, D=15
-                teethTexNr = 1, // B=1, D=4
+                BodyTexNr = 0, // B=0, D=0
+                BodyTexColor = 1, // B=1, D=2
+                HeadTexNr = 18, // B=18, D=15
+                TeethTexNr = 1, // B=1, D=4
             };
 
             var mdh = AssetCache.I.TryGetMdh(mdhName);
@@ -157,12 +157,12 @@ namespace GVR.Creator
             var mdhName = "HUMANS.mdh";
             var head = "Hum_Head_Bald"; // B - Hum_Head_Bald --- D - Hum_Head_Thief
             var armor = "Hum_GRDM_ARMOR"; // B - Hum_GRDM_ARMOR --- D - Hum_STTS_ARMOR --- N - hum_body_Naked0 --- C - Hum_CRAWLER_ARMOR
-            var variant = new VmGothicBridge.Mdl_SetVisualBodyData()
+            var variant = new VmGothicBridge.ExtSetVisualBodyData()
             {
-                bodyTexNr = 0, // B=0, D=0
-                bodyTexColor = 1, // B=1, D=2
-                headTexNr = 18, // B=18, D=15
-                teethTexNr = 1, // B=1, D=4
+                BodyTexNr = 0, // B=0, D=0
+                BodyTexColor = 1, // B=1, D=2
+                HeadTexNr = 18, // B=18, D=15
+                TeethTexNr = 1, // B=1, D=4
             };
 
             var mdh = AssetCache.I.TryGetMdh(mdhName);
