@@ -241,12 +241,9 @@ namespace GVR.Creator
             }
             var animation = animations.First(i => i.name == animationName);
 
-            var animator = rootObj.gameObject.AddComponent<Animator>();
+            var animationComp = rootObj.gameObject.AddComponent<Animation>();
             var clip = new AnimationClip();
-            var playableGraph = PlayableGraph.Create(rootObj.name);
-
-            playableGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
-
+            clip.legacy = true;
             var curves = new Dictionary<string, List<AnimationCurve>>((int)animation.nodeCount);
             var boneNames = animation.node_indices.Select(nodeIndex => mdh.nodes[nodeIndex].name).ToArray();
 
@@ -304,17 +301,9 @@ namespace GVR.Creator
             }
 
             clip.wrapMode = WrapMode.Loop;
-
-            var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
-            var playableOutput = AnimationPlayableOutput.Create(playableGraph, animation.name, animator);
-
-            playableOutput.SetSourcePlayable(clipPlayable);
-            clipPlayable.SetDuration(animation.frameCount / animation.fps);
-            clipPlayable.SetSpeed(0.1);
-
-            GraphVisualizerClient.Show(playableGraph);
-
-            playableGraph.Play();
+            
+            animationComp.AddClip(clip, "debug");
+            animationComp.Play("debug");
         }
         #endregion
 
@@ -350,11 +339,9 @@ namespace GVR.Creator
             }
             var animation = animations.First(i => i.name == animationName);
 
-            var animator = rootObj.gameObject.AddComponent<Animator>();
+            var animationComp = rootObj.gameObject.AddComponent<Animation>();
             var clip = new AnimationClip();
-            var playableGraph = PlayableGraph.Create(rootObj.name);
-
-            playableGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+            clip.legacy = true;
 
             var curves = new Dictionary<string, List<AnimationCurve>>((int)animation.nodeCount);
             var boneNames = animation.node_indices.Select(nodeIndex => mdh.nodes[nodeIndex].name).ToArray();
@@ -420,17 +407,10 @@ namespace GVR.Creator
 
             clip.wrapMode = WrapMode.Loop;
 
-            var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
-            var playableOutput = AnimationPlayableOutput.Create(playableGraph, animation.name, animator);
-
             clip.EnsureQuaternionContinuity();
-            playableOutput.SetSourcePlayable(clipPlayable);
-            clipPlayable.SetDuration(animation.frameCount / animation.fps);
-            clipPlayable.SetSpeed(0.1);
 
-            GraphVisualizerClient.Show(playableGraph);
-
-            playableGraph.Play();
+            animationComp.AddClip(clip, "debug");
+            animationComp.Play("debug");
         }
         #endregion
 
@@ -483,11 +463,9 @@ namespace GVR.Creator
             /// Animations
             ///
 
-            var animator = obj.transform.GetChild(0).gameObject.AddComponent<Animator>();
-            AnimationClip clip = new AnimationClip();
-            var playableGraph = PlayableGraph.Create("foobar");
-
-            playableGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+            var animationComp = obj.transform.GetChild(0).gameObject.AddComponent<Animation>();
+            var clip = new AnimationClip();
+            clip.legacy = true;
 
             var curves = new Dictionary<string, List<AnimationCurve>>((int)anim.nodeCount);
             var boneNames = anim.node_indices.Select(nodeIndex => mdh.nodes[nodeIndex].name).ToArray();
@@ -605,19 +583,11 @@ namespace GVR.Creator
             var stingRotationX = stingEntries[4];
             var stingRotationY = stingEntries[5];
             var stingRotationZ = stingEntries[6];
-
+            
             clip.wrapMode = WrapMode.Loop;
-
-            var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
-            var playableOutput = AnimationPlayableOutput.Create(playableGraph, anim.name, animator);
-
-            playableOutput.SetSourcePlayable(clipPlayable);
-            clipPlayable.SetDuration(anim.frameCount / anim.fps);
-            clipPlayable.SetSpeed(0.5);
-
-            GraphVisualizerClient.Show(playableGraph);
-
-            playableGraph.Play();
+            
+            animationComp.AddClip(clip, "debug");
+            animationComp.Play("debug");
 
 
 

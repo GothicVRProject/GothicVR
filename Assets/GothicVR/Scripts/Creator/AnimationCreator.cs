@@ -26,25 +26,19 @@ namespace GVR.Creator
                 LookupCache.I.animClipCache[animationKeyName] = clip;
             }
             
-            var animator = go.GetComponent<Animator>();
-            var playableGraph = PlayableGraph.Create(go.name);
-
-            playableGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+            var animationComp = go.GetComponent<Animation>();
             
-            var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
-            var playableOutput = AnimationPlayableOutput.Create(playableGraph, pxAnimation.name, animator);
-
-            playableOutput.SetSourcePlayable(clipPlayable);
-            clipPlayable.SetDuration(pxAnimation.frameCount / pxAnimation.fps);
-            
-            GraphVisualizerClient.Show(playableGraph);
-            
-            playableGraph.Play();
+            animationComp.AddClip(clip, "debugIdle");
+            animationComp.Play("debugIdle");
         }
 
         private AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone)
         {
-            var clip = new AnimationClip();
+            var clip = new AnimationClip
+            {
+                legacy = true,
+                wrapMode = WrapMode.Loop
+            };
             
             var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.nodeCount);
             var boneNames = pxAnimation.node_indices!.Select(nodeIndex => mdh.nodes![nodeIndex].name).ToArray();
@@ -98,7 +92,7 @@ namespace GVR.Creator
 
             // Add some final settings
             clip.EnsureQuaternionContinuity();
-            
+
             return clip;
         }
     

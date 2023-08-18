@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -45,16 +46,23 @@ namespace GVR.Manager
         /// </summary>
         public async Task LoadStartupScenes()
         {
-            if (FeatureFlags.I.SkipMainMenu)
-                await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
-            else
-                await LoadMainMenu();
+            try
+            {
+                if (FeatureFlags.I.SkipMainMenu)
+                    await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
+                else
+                    await LoadMainMenu();
 
             if (FeatureFlags.I.CreateOcNpcs)
                 PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
 
-            if (FeatureFlags.I.CreateDebugIdleAnimations)
-                NpcCreator.I.DebugAddIdleAnimationToAllNpc();
+                if (FeatureFlags.I.CreateDebugIdleAnimations)
+                    NpcCreator.I.DebugAddIdleAnimationToAllNpc();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
         }
 
         private async Task LoadMainMenu()

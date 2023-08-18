@@ -1,22 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using GVR.Caches;
 using GVR.Creator.Meshes;
 using GVR.Debugging;
-using GVR.Demo;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Animation;
-using PxCs.Data.Mesh;
 using PxCs.Data.Model;
-using PxCs.Data.Struct;
 using PxCs.Interface;
 using UnityEngine;
-using UnityEngine.Animations;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 
@@ -207,11 +202,9 @@ namespace GVR.Creator
             
             var animation = animations.First(i => i.name.ToUpper() == animationName.ToUpper());
 
-            var animator = rootObj.gameObject.AddComponent<Animator>();
+            var animationComp = rootObj.gameObject.AddComponent<Animation>();
             var clip = new AnimationClip();
-            var playableGraph = PlayableGraph.Create(rootObj.name);
-
-            playableGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+            clip.legacy = true;
 
             var curves = new Dictionary<string, List<AnimationCurve>>((int)animation.nodeCount);
             var boneNames = animation.node_indices.Select(nodeIndex => mdh.nodes[nodeIndex].name).ToArray();
@@ -265,16 +258,8 @@ namespace GVR.Creator
 
             clip.wrapMode = WrapMode.Loop;
 
-            var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
-            var playableOutput = AnimationPlayableOutput.Create(playableGraph, animation.name, animator);
-
-            playableOutput.SetSourcePlayable(clipPlayable);
-            clipPlayable.SetDuration(animation.frameCount / animation.fps);
-            clipPlayable.SetSpeed(0.1);
-
-            GraphVisualizerClient.Show(playableGraph);
-
-            playableGraph.Play();
+            animationComp.AddClip(clip, "debug");
+            animationComp.Play("debug");
         }
         string FindDeepChild(Transform parent, string name, string currentPath = "")
         {
