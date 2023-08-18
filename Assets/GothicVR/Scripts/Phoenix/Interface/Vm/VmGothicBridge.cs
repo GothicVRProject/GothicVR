@@ -61,6 +61,12 @@ namespace GVR.Phoenix.Interface.Vm
 
             // NPC items/talents/...
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentSkill", Npc_SetTalentSkill);
+            PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItem", CreateInvItem);
+            PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItems", CreateInvItems);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetInvItem", Npc_GetInvItem);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetInvItemBySlot", Npc_GetInvItemBySlot);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItem", Npc_RemoveInvItem);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItems", Npc_RemoveInvItems);
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
         }
@@ -362,6 +368,42 @@ namespace GVR.Phoenix.Interface.Vm
                 talent = (VmGothicEnums.Talent)PxVm.pxVmStackPopInt(vmPtr),
                 npcPtr = PxVm.pxVmStackPopInstance(vmPtr),
             });
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void CreateInvItem(IntPtr vmPtr)
+        {
+            
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void CreateInvItems(IntPtr vmPtr)
+        {
+            
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_GetInvItem(IntPtr vmPtr)
+        {
+            
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_GetInvItemBySlot(IntPtr vmPtr)
+        {
+            
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_RemoveInvItem(IntPtr vmPtr)
+        {
+            
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_RemoveInvItems(IntPtr vmPtr)
+        {
+            
         }
         
         public struct EquipItemData
