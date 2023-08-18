@@ -68,12 +68,15 @@ namespace GVR.Bootstrap
                     break;
                 case PxLogging.Level.error:
                     var isVfsMessage = message.StartsWith("failed to find vfs entry");
-                    if (isVfsMessage && !FeatureFlags.I.ShowVfsFileNotFoundErrors)
+                    if (isVfsMessage && !FeatureFlags.I.ShowPhoenixVfsFileNotFoundErrors)
                         break;
 
                     Debug.LogError(message);
                     break;
                 default:
+                    if (!FeatureFlags.I.ShowPhoenixDebugMessages)
+                        break;
+
                     Debug.Log(message);
                     break;
             }
