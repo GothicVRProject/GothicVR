@@ -128,16 +128,17 @@ namespace GVR.Creator
         private static void Mdl_SetVisual(VmGothicBridge.Mdl_SetVisualData data)
         {
             var npc = GetNpcGo(data.npcPtr);
+            var props = npc.GetComponent<Properties>();
             var mds = assetCache.TryGetMds(data.visual);
 
-            npc.GetComponent<Properties>().baseMdsName = data.visual;
-            npc.GetComponent<Properties>().baseMds = mds;
+            props.baseMdsName = data.visual;
+            props.baseMds = mds;
 
             // This is something used from OpenGothic. But what is it doing actually? ;-)
-            if (mds.skeleton.disableMesh)
+            if (mds.skeleton!.disableMesh)
             {
                 var mdh = assetCache.TryGetMdh(data.visual);
-                npc.GetComponent<Properties>().mdh = mdh;
+                props.baseMdh = mdh;
             }
             else
             {
@@ -150,16 +151,20 @@ namespace GVR.Creator
         private static void Mdl_ApplyOverlayMds(VmGothicBridge.Mdl_ApplyOverlayMdsData data)
         {
             var npc = GetNpcGo(data.npcPtr);
-            npc.GetComponent<Properties>().overlayMdsName = data.overlayname;
-            npc.GetComponent<Properties>().overlayMds = assetCache.TryGetMds(data.overlayname);
+            var props = npc.GetComponent<Properties>();
+            props.overlayMdsName = data.overlayname;
+            props.overlayMds = assetCache.TryGetMds(data.overlayname);
+            props.overlayMdh = assetCache.TryGetMdh(data.overlayname);
         }
 
         private static void Mdl_SetVisualBody(VmGothicBridge.Mdl_SetVisualBodyData data)
         {
             var npc = GetNpcGo(data.npcPtr);
-            var mdh = npc.GetComponent<Properties>().mdh;
+            var props = npc.GetComponent<Properties>();
             var mmb = assetCache.TryGetMmb(data.head);
             var name = PxVm.pxVmInstanceNpcGetName(data.npcPtr, 0).MarshalAsString();
+
+            var mdh = props.overlayMdh ?? props.baseMdh;
             
             PxModelMeshData mdm;
             if (FeatureFlags.I.CreateNpcArmor && data.armor >= 0)
@@ -207,7 +212,7 @@ namespace GVR.Creator
             foreach (var npcGo in lookupCache.npcCache.Values)
             {
                 var mdsName = npcGo.GetComponent<Properties>().baseMdsName;
-                var mdh = npcGo.GetComponent<Properties>().mdh;
+                var mdh = npcGo.GetComponent<Properties>().baseMdh;
 
                 var animationName = mdsName.ToLower() == "humans.mds" ? "T_1HSFREE" : "S_DANCE1";
                 

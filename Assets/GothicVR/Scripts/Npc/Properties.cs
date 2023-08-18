@@ -1,6 +1,5 @@
 ﻿using PxCs.Data.Model;
 using PxCs.Data.Vm;
-using System;
 using UnityEngine;
 
 namespace GVR.Npc
@@ -9,12 +8,13 @@ namespace GVR.Npc
     {
         public PxVmNpcData npc;
 
-        public PxModelHierarchyData mdh;
-        
+       
         public string baseMdsName;
         public PxModelScriptData baseMds;
+        public PxModelHierarchyData baseMdh;
 
         public string overlayMdsName;
         public PxModelScriptData overlayMds;
+        public PxModelHierarchyData overlayMdh;
     }
 }
