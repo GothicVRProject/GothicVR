@@ -6,6 +6,14 @@ using UnityEngine.UI;
 
 public class RayTeleportClimb : MonoBehaviour
 {
+    public enum RecticleImage
+    {
+        GeneralArrow,
+        GothicArrow,
+        ProgressWheel
+    };
+    public RecticleImage ladderRecticle;
+
     [SerializeField] private XRInteractorLineVisual lineVisual;
     [SerializeField] private XRBaseInteractor interactor;
     [SerializeField] private GameObject player;
@@ -138,12 +146,24 @@ public class RayTeleportClimb : MonoBehaviour
         var image = new GameObject("Image");
         image.SetParent(canvas);
 
-
         reticleImage = image.AddComponent<Image>();
-
         reticleImage.sprite = sprite;
         reticleImage.rectTransform.sizeDelta = new Vector2(1f, 1f);
-        reticleImage.material = TextureManager.I.arrowmaterial;
+
+        switch ((int)ladderRecticle)
+        {
+            case 1:
+                reticleImage.material = TextureManager.I.arrowmaterial;
+                break;
+            case 2:
+                reticleImage.material = TextureManager.I.arrowupmaterial;
+                break;
+            case 0:
+            default:
+                reticleImage.material = TextureManager.I.arrowupmaterial;
+                break;
+        }
+
         reticleImage.type = Image.Type.Filled;
         reticleImage.fillMethod = Image.FillMethod.Vertical;
         Destroy(reticle.GetComponent<Collider>());

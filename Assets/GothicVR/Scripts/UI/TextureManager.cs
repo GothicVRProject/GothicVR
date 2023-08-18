@@ -14,6 +14,7 @@ public class TextureManager : SingletonBehaviour<TextureManager>
     public Material slidermaterial;
     public Material sliderpositionmaterial;
     public Material arrowmaterial;
+    public Material arrowupmaterial;
     public Material fillermaterial;
     public Material skymaterial;
 

@@ -1698,6 +1698,10 @@ PrefabInstance:
       propertyPath: sprite
       value: 
       objectReference: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+    - target: {fileID: 8235888942484577916, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: ladderRecticle
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

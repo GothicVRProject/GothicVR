@@ -1069,6 +1069,7 @@ MonoBehaviour:
   slidermaterial: {fileID: 2100000, guid: 9edb2534304dae240937e63c8a079e58, type: 2}
   sliderpositionmaterial: {fileID: 2100000, guid: ef75494119d9122438ca7408644d2e66, type: 2}
   arrowmaterial: {fileID: 2100000, guid: dc6ce4e18c065d34f9037b5b60259872, type: 2}
+  arrowupmaterial: {fileID: 2100000, guid: aae635245569a2945ac28d9824f47fd9, type: 2}
   fillermaterial: {fileID: 2100000, guid: 7f15366450c487344a1e66a13b22a847, type: 2}
   skymaterial: {fileID: 2100000, guid: 39ac659c922b5b1489714aacd9b952e9, type: 2}
   GothicLoadingMenuMaterial: {fileID: 0}
