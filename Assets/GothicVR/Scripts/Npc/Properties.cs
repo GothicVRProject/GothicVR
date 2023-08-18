@@ -9,6 +9,7 @@ namespace GVR.Npc
 {    
     public class Properties: MonoBehaviour
     {
+        public IntPtr npcPtr;
         public PxVmNpcData npc;
         
         // Visual
@@ -19,10 +20,13 @@ namespace GVR.Npc
         public string overlayMdsName;
         public PxModelScriptData overlayMds;
         public PxModelHierarchyData overlayMdh;
-
+        
         public PxVmItemData EquippedItem;
         
         // Talent
         public Dictionary<VmGothicEnums.Talent, int> Talents = new();
+        
+        // Items
+        public Dictionary<int, int> Items = new();
     }
 }

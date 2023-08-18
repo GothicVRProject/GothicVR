@@ -5,7 +5,6 @@ using GVR.Creator;
 using GVR.Debugging;
 using PxCs.Interface;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace GVR.Phoenix.Interface.Vm
 {
@@ -32,9 +31,7 @@ namespace GVR.Phoenix.Interface.Vm
 
             return bufferPtr;
         }
-
-
-
+        
         public static void RegisterExternals(IntPtr vmPtr)
         {
             // Basic
@@ -61,14 +58,16 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetModelFatness", Mdl_SetModelFatness);
 
             // NPC items/talents/...
+            PxVm.pxVmRegisterExternal(vmPtr, "Hlp_GetNpc", Hlp_GetNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentSkill", Npc_SetTalentSkill);
             PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItem", CreateInvItem);
             PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItems", CreateInvItems);
-            PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetInvItem", Npc_GetInvItem);
-            PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetInvItemBySlot", Npc_GetInvItemBySlot);
-            PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItem", Npc_RemoveInvItem);
-            PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItems", Npc_RemoveInvItems);
+            // PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetInvItem", Npc_GetInvItem);
+            // PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetInvItemBySlot", Npc_GetInvItemBySlot);
+            // PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItem", Npc_RemoveInvItem);
+            // PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItems", Npc_RemoveInvItems);
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentValue", Npc_SetTalentValue);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
         }
 
@@ -282,6 +281,16 @@ namespace GVR.Phoenix.Interface.Vm
 
             NpcCreator.I.ExtSetModelFatness(npcPtr, fatness);
         }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Hlp_GetNpc(IntPtr vmPtr)
+        {
+            var instanceId = PxVm.pxVmStackPopInt(vmPtr);
+
+            var npcPtr = NpcCreator.I.ExtHlpGetNpc(instanceId);
+            
+            PxVm.pxVmStackPushInstance(vmPtr, npcPtr);
+        }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_SetTalentSkill(IntPtr vmPtr)
@@ -290,43 +299,61 @@ namespace GVR.Phoenix.Interface.Vm
             var talent = (VmGothicEnums.Talent)PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             
-            NpcCreator.I.ExtNpcSetTalentSkill(npcPtr, talent, level);
+            // FIXME - In OpenGothic it adds MDS overlays based on skill level.
+            // NpcCreator.I.ExtNpcSetTalentSkill(npcPtr, talent, level);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_SetTalentValue(IntPtr vmPtr)
+        {
+            var level = PxVm.pxVmStackPopInt(vmPtr);
+            var talent = (VmGothicEnums.Talent)PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            
+            NpcCreator.I.ExtNpcSetTalentValue(npcPtr, talent, level);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void CreateInvItem(IntPtr vmPtr)
         {
+            var itemId = PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             
+            NpcCreator.I.ExtCreateInvItems(npcPtr, itemId, 1);
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void CreateInvItems(IntPtr vmPtr)
         {
+            var amount = PxVm.pxVmStackPopInt(vmPtr);
+            var itemId = PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             
+            NpcCreator.I.ExtCreateInvItems(npcPtr, itemId, amount);
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_GetInvItem(IntPtr vmPtr)
         {
-            
+            // NpcCreator.I.ExtGetInvItem();
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_GetInvItemBySlot(IntPtr vmPtr)
         {
-            
+            // NpcCreator.I.ExtGetInvItemBySlot();
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_RemoveInvItem(IntPtr vmPtr)
         {
-            
+            // NpcCreator.I.ExtRemoveInvItem();
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_RemoveInvItems(IntPtr vmPtr)
         {
-            
+            // NpcCreator.I.ExtRemoveInvItems();
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]

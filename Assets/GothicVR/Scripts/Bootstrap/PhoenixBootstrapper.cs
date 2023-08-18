@@ -73,6 +73,9 @@ namespace GVR.Bootstrap
 
                     Debug.LogError(message);
                     break;
+                default:
+                    Debug.Log(message);
+                    break;
             }
         }
 
