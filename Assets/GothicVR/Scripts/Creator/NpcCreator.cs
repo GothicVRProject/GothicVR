@@ -3,7 +3,6 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Creator.Meshes;
 using GVR.Debugging;
-using GVR.Manager;
 using GVR.Npc;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
@@ -37,6 +36,7 @@ namespace GVR.Creator
             VmGothicBridge.PhoenixMdl_SetVisualBody.AddListener(Mdl_SetVisualBody);
             VmGothicBridge.PhoenixMdl_SetModelScale.AddListener(Mdl_SetModelScale);
             VmGothicBridge.PhoenixMdl_SetModelFatness.AddListener(Mdl_SetModelFatness);
+            VmGothicBridge.PhoenixNpc_SetTalentSkill.AddListener(Npc_SetTalentSkill);
             VmGothicBridge.PhoenixEquipItem.AddListener(EquipItem);
             VmGothicBridge.PhoenixTA_MIN.AddListener(TA_MIN);
         }
@@ -198,6 +198,13 @@ namespace GVR.Creator
             npc.transform.localScale = new(oldScale.x + bonusFat, oldScale.y, oldScale.z + bonusFat);
         }
 
+        private static void Npc_SetTalentSkill(VmGothicBridge.Npc_SetTalentSkillData data)
+        {
+            var npc = GetNpcGo(data.npcPtr);
+            var props = npc.GetComponent<Properties>();
+            props.Talents[data.talent] = data.level;
+        }
+        
         private static void EquipItem(VmGothicBridge.EquipItemData data)
         {
             var npc = GetNpcGo(data.npcPtr);

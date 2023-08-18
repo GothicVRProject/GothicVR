@@ -36,6 +36,7 @@ namespace GVR.Phoenix.Interface.Vm
 
         public static void RegisterExternals(IntPtr vmPtr)
         {
+            // Basic
             PxVm.pxVmRegisterExternalDefault(vmPtr, DefaultExternal);
             PxVm.pxVmRegisterExternal(vmPtr, "ConcatStrings", ConcatStrings);
             PxVm.pxVmRegisterExternal(vmPtr, "IntToString", IntToString);
@@ -43,11 +44,13 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "FloatToInt", FloatToInt);
             PxVm.pxVmRegisterExternal(vmPtr, "IntToFloat", IntToFloat);
 
+            // Debug
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebug", PrintDebug);
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugCh", PrintDebugCh);
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInst", PrintDebugInst);
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInstCh", PrintDebugInstCh); 
 
+            // NPC visuals
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "TA_MIN", TA_MIN);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisual", Mdl_SetVisual);
@@ -55,6 +58,9 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisualBody", Mdl_SetVisualBody);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetModelScale", Mdl_SetModelScale);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetModelFatness", Mdl_SetModelFatness);
+
+            // NPC items/talents/...
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentSkill", Npc_SetTalentSkill);
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
         }
@@ -67,6 +73,8 @@ namespace GVR.Phoenix.Interface.Vm
         public static UnityEvent<Mdl_SetVisualBodyData> PhoenixMdl_SetVisualBody = new();
         public static UnityEvent<Mdl_SetModelScaleData> PhoenixMdl_SetModelScale = new();
         public static UnityEvent<Mdl_SetModelFatnessData> PhoenixMdl_SetModelFatness = new();
+
+        public static UnityEvent<Npc_SetTalentSkillData> PhoenixNpc_SetTalentSkill = new ();
         public static UnityEvent<EquipItemData> PhoenixEquipItem = new();
         public static UnityEvent<string> PhoenixMdl_AI_OUTPUT = new();
 
@@ -339,6 +347,23 @@ namespace GVR.Phoenix.Interface.Vm
                 });
         }
 
+        public struct Npc_SetTalentSkillData
+        {
+            public IntPtr npcPtr;
+            public VmGothicEnums.Talent talent;
+            public int level;
+        }
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_SetTalentSkill(IntPtr vmPtr)
+        {
+            PhoenixNpc_SetTalentSkill.Invoke(new ()
+            {
+                level = PxVm.pxVmStackPopInt(vmPtr),
+                talent = (VmGothicEnums.Talent)PxVm.pxVmStackPopInt(vmPtr),
+                npcPtr = PxVm.pxVmStackPopInstance(vmPtr),
+            });
+        }
+        
         public struct EquipItemData
         {
             public IntPtr npcPtr;
