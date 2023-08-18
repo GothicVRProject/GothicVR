@@ -19,6 +19,8 @@ namespace GVR.Npc
         public string overlayMdsName;
         public PxModelScriptData overlayMds;
         public PxModelHierarchyData overlayMdh;
+
+        public PxVmItemData EquippedItem;
         
         // Talent
         public Dictionary<VmGothicEnums.Talent, int> Talents = new();

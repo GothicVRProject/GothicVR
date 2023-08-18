@@ -209,6 +209,8 @@ namespace GVR.Creator
         {
             var npc = GetNpcGo(data.npcPtr);
             var itemData = assetCache.TryGetItemData((uint)data.itemId);
+
+            npc.GetComponent<Properties>().EquippedItem = itemData;
             
             NpcMeshCreator.I.EquipWeapon(npc, itemData, itemData.mainFlag, itemData.flags);
         }
