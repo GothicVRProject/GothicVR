@@ -19,6 +19,7 @@ using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
 using System.Threading.Tasks;
 using System.Collections;
+using GVR.Vob;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -359,9 +360,16 @@ namespace GVR.Creator
                 Destroy(spot.GetComponent<MeshRenderer>());
             }
 
-            spot.name = vob.vobName != string.Empty ? vob.vobName : "START";
+            var fpName = vob.vobName != string.Empty ? vob.vobName : "START";
+            spot.name = fpName;
             spot.SetParent(parentGos[vob.type]);
 
+            WayNetManager.I.FreePoints.Add(fpName, new FreePoint()
+            {
+                Name = fpName,
+                Position = vob.position.ToUnityVector()
+            });
+            
             SetPosAndRot(spot, vob.position, vob.rotation!.Value);
         }
 

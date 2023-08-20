@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GVR.Phoenix.Interface.Vm;
+using GVR.Vob;
 using PxCs.Data.Model;
 using PxCs.Data.Vm;
 using UnityEngine;
@@ -11,6 +12,8 @@ namespace GVR.Npc
     {
         public IntPtr npcPtr;
         public PxVmNpcData npc;
+
+        public FreePoint CurrentFreePoint;
         
         // Visual
         public string baseMdsName;

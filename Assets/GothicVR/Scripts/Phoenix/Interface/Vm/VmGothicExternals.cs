@@ -51,9 +51,10 @@ namespace GVR.Phoenix.Interface.Vm
 
             PxVm.pxVmRegisterExternal(vmPtr, "AI_StandUp", AI_StandUp); 
             
-            
-            // NPC visuals
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
+            PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
+
+            // NPC visuals
             PxVm.pxVmRegisterExternal(vmPtr, "TA_MIN", TA_MIN);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisual", Mdl_SetVisual);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_ApplyOverlayMds", Mdl_ApplyOverlayMds);
@@ -182,6 +183,15 @@ namespace GVR.Phoenix.Interface.Vm
             var npcInstance = PxVm.pxVmStackPopInt(vmPtr);
             
             NpcCreator.I.ExtWldInsertNpc(npcInstance, spawnpoint);
+        }
+
+        public static void Wld_IsFPAvailable(IntPtr vmPtr)
+        {
+            var fpName = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            var response = NpcCreator.I.ExtWldIsFPAvailable(npcPtr, fpName);
+            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(response));
         }
 
         public struct ExtTaMinData

@@ -3,6 +3,7 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Creator.Meshes;
 using GVR.Debugging;
+using GVR.Manager;
 using GVR.Npc;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
@@ -24,7 +25,8 @@ namespace GVR.Creator
 
         // Hint - If this scale ratio isn't looking well, feel free to change it.
         private const float fatnessScale = 0.1f;
-
+        private const float fplookupDistance = 20f;
+        
         void Start()
         {
             lookupCache = LookupCache.I;
@@ -105,6 +107,23 @@ namespace GVR.Creator
             newNpc.transform!.parent = GetRootGo().transform;
         }
 
+        public bool ExtWldIsFPAvailable(IntPtr npcPtr, string fpNamePart)
+        {
+            var npcGo = GetNpcGo(npcPtr);
+            var props = npcGo.GetComponent<Properties>();
+            var freePoints = WayNetManager.I.FindFreePointsWithName(npcGo.transform.position, fpNamePart, fplookupDistance);
+
+            foreach (var fp in freePoints)
+            {
+                if (props.CurrentFreePoint == fp)
+                    return true;
+                if (!fp.IsLocked)
+                    return true;
+            }
+
+            return false;
+        }
+        
         public void ExtTaMin(VmGothicExternals.ExtTaMinData data)
         {
             var npc = GetNpcGo(data.Npc);
