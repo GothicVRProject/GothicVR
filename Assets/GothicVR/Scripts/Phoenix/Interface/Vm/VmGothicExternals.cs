@@ -3,6 +3,7 @@ using System.Globalization;
 using AOT;
 using GVR.Creator;
 using GVR.Debugging;
+using PxCs.Extensions;
 using PxCs.Interface;
 using UnityEngine;
 
@@ -74,7 +75,10 @@ namespace GVR.Phoenix.Interface.Vm
             // PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItems", Npc_RemoveInvItems);
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentValue", Npc_SetTalentValue);
+
             PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_SetWalkMode", AI_SetWalkMode);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_GotoWP", AI_GotoWP);
         }
 
 #region Default
@@ -227,7 +231,14 @@ namespace GVR.Phoenix.Interface.Vm
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             NpcCreator.I.ExtAiSetWalkMode(npcPtr, walkMode);
         }
-        
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void AI_GotoWP(IntPtr vmPtr)
+        {
+            var spawnPoint = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            NpcCreator.I.ExtAiGotoWP(npcPtr, spawnPoint);
+        }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Mdl_SetVisual(IntPtr vmPtr)

@@ -55,7 +55,9 @@ namespace GVR.Bootstrap
             watch.Stop();
             Debug.Log($"Time spent for Bootstrapping Phoenix: {watch.Elapsed}");
 
+#pragma warning disable CS4014 // It's intended, that this async call is not awaited.
             GvrSceneManager.I.LoadStartupScenes();
+#pragma warning restore CS4014
         }
 
         [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]

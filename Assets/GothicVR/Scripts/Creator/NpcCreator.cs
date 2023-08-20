@@ -142,6 +142,13 @@ namespace GVR.Creator
         {
             GetProperties(npcPtr).walkMode = walkMode;
         }
+
+        public void ExtAiGotoWP(IntPtr npcPtr, string spawnPoint)
+        {
+            // FIXME implement
+            // FIXME - e.g. for Thorus there's initially no string value for TA_Boss() self.wp - Intended or a bug on our side?
+        }
+
         
         public void ExtMdlSetVisual(IntPtr npcPtr, string visual)
         {
