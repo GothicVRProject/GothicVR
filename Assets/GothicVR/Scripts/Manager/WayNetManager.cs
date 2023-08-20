@@ -9,6 +9,16 @@ namespace GVR.Manager
     public class WayNetManager : SingletonBehaviour<WayNetManager>
     {
         public Dictionary<string, FreePoint> FreePoints = new();
+
+        protected override void Awake()
+        {
+            base.Awake();
+            
+            GvrSceneManager.StartWorldLoading.AddListener(delegate
+            {
+                FreePoints.Clear();
+            });
+        }
         
         public List<FreePoint> FindFreePointsWithName(Vector3 lookupPosition, string namePart, float maxDistance)
         {

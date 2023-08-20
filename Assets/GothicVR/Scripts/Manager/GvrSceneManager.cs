@@ -8,6 +8,7 @@ using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using Debug = UnityEngine.Debug;
@@ -16,22 +17,21 @@ namespace GVR.Manager
 {
     public class GvrSceneManager : SingletonBehaviour<GvrSceneManager>
     {
+        public static UnityEvent StartWorldLoading = new(); // Basically to clear caches etc.
+
+        public GameObject interactionManager;
+        
         private const string generalSceneName = "General";
+        private const int ensureLoadingBarDelayMilliseconds = 5;
 
         private string newWorldName;
         private string startVobAfterLoading;
-
         private Scene generalScene;
-        private bool generalSceneLoaded = false;
-
+        private bool generalSceneLoaded;
         private GameObject startPoint;
         private GameObject player;
-
-        public GameObject interactionManager;
-
-        private const int ensureLoadingBarDelayMilliseconds = 5;
-
-
+        
+        
         protected override void Awake()
         {
             base.Awake();
@@ -53,8 +53,8 @@ namespace GVR.Manager
                 else
                     await LoadMainMenu();
 
-            if (FeatureFlags.I.CreateOcNpcs)
-                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
+                if (FeatureFlags.I.CreateOcNpcs)
+                    PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
 
                 if (FeatureFlags.I.CreateDebugIdleAnimations)
                     NpcCreator.I.DebugAddIdleAnimationToAllNpc();
@@ -74,16 +74,20 @@ namespace GVR.Manager
         public async Task LoadWorld(string worldName, string startVob)
         {
             startVobAfterLoading = startVob;
+            
             if (worldName == newWorldName)
             {
                 SetSpawnPoint(SceneManager.GetSceneByName(newWorldName));
                 TeleportPlayerToSpot();
                 return;
             }
+            
             newWorldName = worldName;
             MusicCreator.I.setMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
+            StartWorldLoading.Invoke();
+            
             await ShowLoadingScene(worldName);
             var newWorldScene = await LoadNewWorldScene(newWorldName);
             await WorldCreator.I.CreateAsync(newWorldName);
