@@ -45,7 +45,7 @@ namespace GVR.Creator
         /// <summary>
         /// Return cached GameObject based on lookup through IntPtr
         /// </summary>
-        private static GameObject GetNpcGo(IntPtr npcPtr)
+        private GameObject GetNpcGo(IntPtr npcPtr)
         {
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
             var npcGo = lookupCache.npcCache[symbolIndex];
@@ -59,6 +59,11 @@ namespace GVR.Creator
                 props.npcPtr = npcPtr;
 
             return npcGo;
+        }
+
+        private Properties GetProperties(IntPtr npcPtr)
+        {
+            return GetNpcGo(npcPtr).GetComponent<Properties>();
         }
 
         /// <summary>
@@ -126,6 +131,18 @@ namespace GVR.Creator
             GameData.I.npcRoutines[data.Npc].Add(routine);
         }
 
+        public void ExtAiStandUp(IntPtr npcPtr)
+        {
+            // FIXME - from docu:
+            // * Ist der Nsc in einem Animatinsstate, wird die passende Rücktransition abgespielt.
+            // * Benutzt der NSC gerade ein MOBSI, poppt er ins stehen.
+        }
+        
+        public void ExtAiSetWalkMode(IntPtr npcPtr, VmGothicEnums.WalkMode walkMode)
+        {
+            GetProperties(npcPtr).walkMode = walkMode;
+        }
+        
         public void ExtMdlSetVisual(IntPtr npcPtr, string visual)
         {
             var npc = GetNpcGo(npcPtr);
@@ -206,7 +223,21 @@ namespace GVR.Creator
 
             return npcGo.GetComponent<Properties>().npcPtr;
         }
-        
+
+        public void ExtNpcPerceptionEnable(IntPtr npcPtr, VmGothicEnums.PerceptionType perception, int function)
+        {
+            var npc = GetNpcGo(npcPtr);
+            var props = npc.GetComponent<Properties>();
+            props.Perceptions[perception] = function;
+        }
+
+        public void ExtNpcSetPerceptionTime(IntPtr npcPtr, float time)
+        {
+            var npc = GetNpcGo(npcPtr);
+            var props = npc.GetComponent<Properties>();
+            props.perceptionTime = time;
+        }
+
         public void ExtNpcSetTalentValue(IntPtr npcPtr, VmGothicEnums.Talent talent, int level)
         {
             var npc = GetNpcGo(npcPtr);
@@ -247,10 +278,18 @@ namespace GVR.Creator
                 var mdsName = npcGo.GetComponent<Properties>().baseMdsName;
                 var mdh = npcGo.GetComponent<Properties>().baseMdh;
 
-                var animationName = mdsName.ToLower() == "humans.mds" ? "T_1HSFREE" : "S_DANCE1";
+                if (npcGo.name != "Thorus")
+                    continue;
+
+                var props = npcGo.GetComponent<Properties>();
+                var routineComp = npcGo.GetComponent<Routine>();
+                var firstRoutine = routineComp.routines.FirstOrDefault();
                 
-                AnimationCreator.I.PlayAnimation(mdsName, animationName, mdh, npcGo);
+                PxVm.CallFunction(GameData.I.VmGothicPtr, (uint)firstRoutine.action, props.npcPtr);
                 
+
+                // var animationName = mdsName.ToLower() == "humans.mds" ? "T_1HSFREE" : "S_DANCE1";
+                // AnimationCreator.I.PlayAnimation(mdsName, animationName, mdh, npcGo);
             }
         }
     }

@@ -48,6 +48,9 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInst", PrintDebugInst);
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInstCh", PrintDebugInstCh); 
 
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_StandUp", AI_StandUp); 
+            
+            
             // NPC visuals
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "TA_MIN", TA_MIN);
@@ -59,6 +62,9 @@ namespace GVR.Phoenix.Interface.Vm
 
             // NPC items/talents/...
             PxVm.pxVmRegisterExternal(vmPtr, "Hlp_GetNpc", Hlp_GetNpc);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_PercEnable", Npc_PercEnable);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetPercTime", Npc_SetPercTime);
+
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentSkill", Npc_SetTalentSkill);
             PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItem", CreateInvItem);
             PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItems", CreateInvItems);
@@ -208,6 +214,22 @@ namespace GVR.Phoenix.Interface.Vm
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void AI_StandUp(IntPtr vmPtr)
+        {
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            NpcCreator.I.ExtAiStandUp(npcPtr);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void AI_SetWalkMode(IntPtr vmPtr)
+        {
+            var walkMode = (VmGothicEnums.WalkMode)PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            NpcCreator.I.ExtAiSetWalkMode(npcPtr, walkMode);
+        }
+        
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Mdl_SetVisual(IntPtr vmPtr)
         {
             var visual = PxVm.VmStackPopString(vmPtr);
@@ -290,6 +312,25 @@ namespace GVR.Phoenix.Interface.Vm
             var npcPtr = NpcCreator.I.ExtHlpGetNpc(instanceId);
             
             PxVm.pxVmStackPushInstance(vmPtr, npcPtr);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_PercEnable(IntPtr vmPtr)
+        {
+            var function = PxVm.pxVmStackPopInt(vmPtr);
+            var perception = (VmGothicEnums.PerceptionType)PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            
+            NpcCreator.I.ExtNpcPerceptionEnable(npcPtr, perception, function);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_SetPercTime(IntPtr vmPtr)
+        {
+            var time = PxVm.pxVmStackPopFloat(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            
+            NpcCreator.I.ExtNpcSetPerceptionTime(npcPtr, time);
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]

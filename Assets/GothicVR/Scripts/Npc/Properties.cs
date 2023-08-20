@@ -23,10 +23,13 @@ namespace GVR.Npc
         
         public PxVmItemData EquippedItem;
         
-        // Talent
+        // Perceptions
+        public Dictionary<VmGothicEnums.PerceptionType, int> Perceptions = new();
+        public float perceptionTime;
+            
+        // NPC items/talents/...
+        public VmGothicEnums.WalkMode walkMode;
         public Dictionary<VmGothicEnums.Talent, int> Talents = new();
-        
-        // Items
         public Dictionary<int, int> Items = new();
     }
 }
