@@ -20,10 +20,10 @@ jobs:
         include:
           - targetPlatform: StandaloneWindows64
             targetDevice: Windows64
-          - targetPlatform: Android
-            targetDevice: Pico
-          - targetPlatform: Android
-            targetDevice: Quest
+          #- targetPlatform: Android
+          #  targetDevice: Pico
+          #- targetPlatform: Android
+          #  targetDevice: Quest
     steps:
       # Checkout
       - name: Checkout repository
@@ -39,6 +39,15 @@ jobs:
           path: Library
           key: Library-${{ matrix.targetPlatform }}
           restore-keys: Library-
+
+      # Set Version
+      - name: set Version
+        run: |
+          ref="${{ github.ref }}"
+          tag="${ref#refs/tags/}"
+          echo "Version: $tag"
+          sed -i "s/bundleVersion: 0.1/bundleVersion: $tag/"  ProjectSettings/ProjectSettings.asset
+
 
       # Build
       - name: Build project
