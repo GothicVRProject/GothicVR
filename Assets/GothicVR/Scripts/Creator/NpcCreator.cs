@@ -10,7 +10,9 @@ using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
+using GVR.Vob.WayNet;
 using PxCs.Data.Model;
+using PxCs.Data.Vm;
 using PxCs.Extensions;
 using PxCs.Interface;
 using UnityEngine;
@@ -75,36 +77,48 @@ namespace GVR.Creator
         /// It can also be the currently active routine point to walk to.
         /// We therefore execute the daily routines to collect current location and use this as spawn location.
         /// </summary>
-        public void ExtWldInsertNpc(int npcInstance, string spawnpoint)
+        public void ExtWldInsertNpc(int npcInstance, string spawnPoint)
         {
-            var initialSpawnPoint = GameData.I.World.waypoints
-                .FirstOrDefault(item => item.name.ToLower() == spawnpoint.ToLower());
-
-            if (initialSpawnPoint == null)
-            {
-                Debug.LogWarning(string.Format("spawnpoint={0} couldn't be found.", spawnpoint));
-                return;
-            }
-
             var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
-            lookupCache.npcCache.Add((uint)npcInstance, newNpc);
 
-            var pxNpc = PxVm.InitializeNpc(GameData.I.VmGothicPtr, (uint)npcInstance);
+            PxVmNpcData pxNpc;
+            // Humans are singletons.
+            if (lookupCache.npcCache.TryAdd((uint)npcInstance, newNpc))
+                pxNpc = PxVm.InitializeNpc(GameData.I.VmGothicPtr, (uint)npcInstance);
+            // Monsters are used multiple times.
+            else
+                pxNpc = lookupCache.npcCache[(uint)npcInstance].GetComponent<Properties>().npc;
             newNpc.GetComponent<Properties>().npc = pxNpc;
 
             newNpc.name = pxNpc!.names[0];
-            
+         
+            SetSpawnPoint(newNpc, spawnPoint, pxNpc);
+            newNpc.SetParent(GetRootGo());
+        }
+
+        private void SetSpawnPoint(GameObject npcGo, string spawnPoint, PxVmNpcData pxNpc)
+        {
             var npcRoutine = pxNpc.routine;
             PxVm.CallFunction(GameData.I.VmGothicPtr, (uint)npcRoutine, pxNpc.instancePtr);
-
-            if (newNpc.GetComponent<Routine>().routines.Any())
+            
+            WayNetPoint initialSpawnPoint;
+            if (npcGo.GetComponent<Routine>().routines.Any())
             {
-                var initialSpawnPointName = newNpc.GetComponent<Routine>().routines.First().waypoint;
-                initialSpawnPoint = GameData.I.World.waypointsDict[initialSpawnPointName];
+                var routineSpawnPointName = npcGo.GetComponent<Routine>().routines.First().waypoint;
+                initialSpawnPoint = WayNetManager.I.GetWayNetPoint(routineSpawnPointName);
+            }
+            else
+            {
+                initialSpawnPoint = WayNetManager.I.GetWayNetPoint(spawnPoint);
+            }
+
+            if (initialSpawnPoint == null)
+            {
+                Debug.LogWarning(string.Format("spawnpoint={0} couldn't be found.", spawnPoint));
+                return;
             }
             
-            newNpc.transform.position = initialSpawnPoint.position.ToUnityVector();
-            newNpc.transform!.parent = GetRootGo().transform;
+            npcGo.transform.position = initialSpawnPoint.Position;
         }
 
         public bool ExtWldIsFPAvailable(IntPtr npcPtr, string fpNamePart)

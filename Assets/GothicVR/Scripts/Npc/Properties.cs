@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GVR.Phoenix.Interface.Vm;
-using GVR.Vob;
+using GVR.Vob.WayNet;
 using PxCs.Data.Model;
 using PxCs.Data.Vm;
 using UnityEngine;

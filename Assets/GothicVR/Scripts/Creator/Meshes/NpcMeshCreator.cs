@@ -21,7 +21,8 @@ namespace GVR.Creator.Meshes
             tempBodyData = bodyData;
             var npcGo = Create(npcName, mdm, mdh, default, default, null, root);
 
-            AddHead(npcName, npcGo, morphMesh);
+            if (morphMesh != null)
+                AddHead(npcName, npcGo, morphMesh);
 
             return npcGo;
         }

@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using GVR.Manager;
 using TMPro;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Data.Vm.Gothic;
+using GVR.Phoenix.Util;
 using GVR.Util;
+using GVR.Vob;
+using GVR.Vob.WayNet;
 using PxCs.Data.WayNet;
 using PxCs.Interface;
 using UnityEngine.SceneManagement;
@@ -17,7 +22,20 @@ namespace GVR.Phoenix.Interface
         public IntPtr VmSfxPtr;
         public IntPtr VmMusicPtr;
 
-        public WorldData World;
+        private WorldData worldInternal;
+        public WorldData World
+        {
+            get => worldInternal;
+            set
+            {
+                worldInternal = value;
+                if (value != null)
+                    SetWayPointData(value.waypoints);
+            }
+        }
+
+        public readonly Dictionary<string, WayPoint> WayPoints = new();
+        public readonly Dictionary<string, FreePoint> FreePoints = new();
 
         public TMP_FontAsset GothicMenuFont;
         public TMP_FontAsset GothicSubtitleFont;
@@ -27,6 +45,31 @@ namespace GVR.Phoenix.Interface
 
         public Scene? WorldScene;
 
+
+        protected override void Awake()
+        {
+            base.Awake();
+            
+            GvrSceneManager.StartWorldLoading.AddListener(delegate
+            {
+                World = null;
+                WayPoints.Clear();
+                FreePoints.Clear();
+            });
+        }
+
+        private void SetWayPointData(PxWayPointData[] wayPoints)
+        {
+            foreach (var wp in wayPoints)
+            {
+                WayPoints.Add(wp.name, new ()
+                {
+                    Name = wp.name,
+                    Position = wp.position.ToUnityVector()
+                });
+            }
+        }
+        
         // FIXME: This destructor is called multiple times when starting Unity game (Also during start of game)
         // FIXME: We need to check why and improve!
         // Destroy memory on phoenix DLL when game closes.
