@@ -20,10 +20,10 @@ jobs:
         include:
           - targetPlatform: StandaloneWindows64
             targetDevice: Windows64
-          #- targetPlatform: Android
-          #  targetDevice: Pico
-          #- targetPlatform: Android
-          #  targetDevice: Quest
+          - targetPlatform: Android
+            targetDevice: Pico
+          - targetPlatform: Android
+            targetDevice: Quest
     steps:
       # Checkout
       - name: Checkout repository
