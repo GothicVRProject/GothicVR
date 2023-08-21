@@ -13,7 +13,6 @@ jobs:
 
   buildForAllPlatforms:
     name: Build GothicVR for ${{ matrix.targetDevice }}
-    needs: Unit_Tests
     runs-on: self-hosted
     strategy:
       fail-fast: false
