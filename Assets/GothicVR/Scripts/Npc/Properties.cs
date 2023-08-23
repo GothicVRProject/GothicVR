@@ -4,7 +4,9 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Vob.WayNet;
 using PxCs.Data.Model;
 using PxCs.Data.Vm;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.Universal.Internal;
 
 namespace GVR.Npc
 {    
@@ -16,23 +18,40 @@ namespace GVR.Npc
         public FreePoint CurrentFreePoint;
         
         // Visual
+        public string mdmName;
+        
         public string baseMdsName;
-        public PxModelScriptData baseMds;
-        public PxModelHierarchyData baseMdh;
+        public string baseMdhName => baseMdsName;
 
         public string overlayMdsName;
-        public PxModelScriptData overlayMds;
-        public PxModelHierarchyData overlayMdh;
+        public string overlayMdhName => overlayMdsName;
         
         public PxVmItemData EquippedItem;
+        public VmGothicExternals.ExtSetVisualBodyData BodyData;
         
         // Perceptions
         public Dictionary<VmGothicEnums.PerceptionType, int> Perceptions = new();
         public float perceptionTime;
-            
+        
         // NPC items/talents/...
         public VmGothicEnums.WalkMode walkMode;
         public Dictionary<VmGothicEnums.Talent, int> Talents = new();
         public Dictionary<int, int> Items = new();
+
+
+        private bool isClonedFromAnother; // Just a debug flag for easier debugging if we missed to copy something in the future.
+        public void Copy(Properties other)
+        {
+            isClonedFromAnother = true;
+            npcPtr = other.npcPtr;
+            npc = other.npc;
+
+            mdmName = other.mdmName;
+            baseMdsName = other.baseMdsName;
+            overlayMdsName = other.overlayMdsName;
+            BodyData = other.BodyData;
+            Perceptions = other.Perceptions;
+            perceptionTime = other.perceptionTime;
+        }
     }
 }

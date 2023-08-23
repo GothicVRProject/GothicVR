@@ -30,7 +30,8 @@ namespace GVR.Manager
         private bool generalSceneLoaded;
         private GameObject startPoint;
         private GameObject player;
-        
+
+        private bool debugFreshlyDoneLoading;
         
         protected override void Awake()
         {
@@ -53,16 +54,28 @@ namespace GVR.Manager
                 else
                     await LoadMainMenu();
 
-                if (FeatureFlags.I.CreateOcNpcs)
-                    PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
-
-                if (FeatureFlags.I.CreateDebugIdleAnimations)
-                    NpcCreator.I.DebugAddIdleAnimationToAllNpc();
+                debugFreshlyDoneLoading = true;
             }
             catch (Exception e)
             {
                 Debug.LogError(e);
             }
+        }
+
+        // Outsourced after async Task LoadStartupScenes() as async makes Debugging way harder
+        // (Breakpoints won't be catched during exceptions)
+        private void Update()
+        {
+            if (!debugFreshlyDoneLoading)
+                return;
+            else
+                debugFreshlyDoneLoading = false;
+            
+            if (FeatureFlags.I.CreateOcNpcs)
+                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
+
+            if (FeatureFlags.I.CreateDebugIdleAnimations)
+                NpcCreator.I.DebugAddIdleAnimationToAllNpc();
         }
 
         private async Task LoadMainMenu()

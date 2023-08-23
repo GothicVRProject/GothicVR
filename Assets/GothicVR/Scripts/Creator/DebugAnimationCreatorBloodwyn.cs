@@ -52,9 +52,8 @@ namespace GVR.Creator
             };
 
             var mdh = AssetCache.I.TryGetMdh(mdhName);
-            var mmb = AssetCache.I.TryGetMmb(head);
             var mdm = AssetCache.I.TryGetMdm(armor);
-            var obj = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, variant, null);
+            var obj = NpcMeshCreator.I.CreateNpc(name, armor, mdhName, head, variant, null);
 
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
 
@@ -90,9 +89,8 @@ namespace GVR.Creator
             };
 
             var mdh = AssetCache.I.TryGetMdh(mdhName);
-            var mmb = AssetCache.I.TryGetMmb(head);
             var mdm = AssetCache.I.TryGetMdm(armor);
-            var obj = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, variant, null);
+            var obj = NpcMeshCreator.I.CreateNpc(name, armor, mdhName, head, variant, null);
 
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
 
@@ -128,9 +126,8 @@ namespace GVR.Creator
             };
 
             var mdh = AssetCache.I.TryGetMdh(mdhName);
-            var mmb = AssetCache.I.TryGetMmb(head);
             var mdm = AssetCache.I.TryGetMdm(armor);
-            var obj = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, variant, null);
+            var obj = NpcMeshCreator.I.CreateNpc(name, armor, mdhName, head, variant, null);
 
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
 
@@ -166,9 +163,8 @@ namespace GVR.Creator
             };
 
             var mdh = AssetCache.I.TryGetMdh(mdhName);
-            var mmb = AssetCache.I.TryGetMmb(head);
             var mdm = AssetCache.I.TryGetMdm(armor);
-            var obj = NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, variant, null);
+            var obj = NpcMeshCreator.I.CreateNpc(name, armor, mdhName, head, variant, null);
 
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
 

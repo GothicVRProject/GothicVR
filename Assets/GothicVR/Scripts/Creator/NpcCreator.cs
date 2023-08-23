@@ -11,9 +11,7 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using GVR.Vob.WayNet;
-using PxCs.Data.Model;
 using PxCs.Data.Vm;
-using PxCs.Extensions;
 using PxCs.Interface;
 using UnityEngine;
 
@@ -78,20 +76,33 @@ namespace GVR.Creator
         public void ExtWldInsertNpc(int npcInstance, string spawnPoint)
         {
             var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
-
-            PxVmNpcData pxNpc;
+            var props = newNpc.GetComponent<Properties>();
+            newNpc.SetParent(GetRootGo());
+            
             // Humans are singletons.
             if (lookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<Properties>()))
-                pxNpc = PxVm.InitializeNpc(GameData.I.VmGothicPtr, (uint)npcInstance);
+            {
+                var pxNpc = PxVm.InitializeNpc(GameData.I.VmGothicPtr, (uint)npcInstance);
+                props.npc = pxNpc;
+            }
             // Monsters are used multiple times.
             else
-                pxNpc = lookupCache.NpcCache[(uint)npcInstance].npc;
-            newNpc.GetComponent<Properties>().npc = pxNpc;
+            {
+                var origNpc = lookupCache.NpcCache[(uint)npcInstance];
+                var origProps = origNpc.GetComponent<Properties>();
+                // clone Properties as they're required from the first instance.
 
-            newNpc.name = pxNpc!.names[0];
+                // CLone values from first/original Instance.
+                props.Copy(origProps);
+            }
+
+            newNpc.name = props.npc!.names[0];
          
-            SetSpawnPoint(newNpc, spawnPoint, pxNpc);
-            newNpc.SetParent(GetRootGo());
+
+            var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
+            NpcMeshCreator.I.CreateNpc(name, props.mdmName, mdhName, props.BodyData.Head, props.BodyData, newNpc);
+            
+            SetSpawnPoint(newNpc, spawnPoint, props.npc);
         }
 
         private void SetSpawnPoint(GameObject npcGo, string spawnPoint, PxVmNpcData pxNpc)
@@ -184,21 +195,8 @@ namespace GVR.Creator
         public void ExtMdlSetVisual(IntPtr npcPtr, string visual)
         {
             var props = GetProperties(npcPtr);
-            var mds = assetCache.TryGetMds(visual);
 
             props.baseMdsName = visual;
-            props.baseMds = mds;
-
-            // This is something used from OpenGothic. But what is it doing actually? ;-)
-            if (mds.skeleton!.disableMesh)
-            {
-                var mdh = assetCache.TryGetMdh(visual);
-                props.baseMdh = mdh;
-            }
-            else
-            {
-                throw new Exception("Not (yet) implemented");
-            }
         }
 
         public void ExtApplyOverlayMds(IntPtr npcPtr, string overlayName)
@@ -206,32 +204,23 @@ namespace GVR.Creator
             var props = GetProperties(npcPtr);
 
             props.overlayMdsName = overlayName;
-            props.overlayMds = assetCache.TryGetMds(overlayName);
-            props.overlayMdh = assetCache.TryGetMdh(overlayName);
         }
 
         public void ExtSetVisualBody(VmGothicExternals.ExtSetVisualBodyData data)
         {
             var props = GetProperties(data.NpcPtr);
-            var npc = props.gameObject;
 
-            var mmb = assetCache.TryGetMmb(data.Head);
-            var name = PxVm.pxVmInstanceNpcGetName(data.NpcPtr, 0).MarshalAsString();
-
-            var mdh = props.overlayMdh ?? props.baseMdh;
+            props.BodyData = data;
             
-            PxModelMeshData mdm;
             if (FeatureFlags.I.CreateNpcArmor && data.Armor >= 0)
             {
                 var armorData = assetCache.TryGetItemData((uint)data.Armor);
-                mdm = assetCache.TryGetMdm(armorData.visualChange);
+                props.mdmName = armorData.visualChange;
             }
             else
             {
-                mdm = assetCache.TryGetMdm(data.Body);
+                props.mdmName = data.Body;
             }
-            
-            NpcMeshCreator.I.CreateNpc(name, mdm, mdh, mmb, data, npc);
         }
 
         public void ExtMdlSetModelScale(IntPtr npcPtr, Vector3 scale)
@@ -309,9 +298,6 @@ namespace GVR.Creator
         {
             foreach (var props in lookupCache.NpcCache.Values)
             {
-                var mdsName = props.baseMdsName;
-                var mdh = props.baseMdh;
-
                 if (props.name != "Thorus")
                     continue;
 

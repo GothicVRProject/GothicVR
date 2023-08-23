@@ -30,7 +30,7 @@ namespace GVR.Creator.Meshes
         {
             rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
             rootGo.SetParent(parent);
-
+            
             var nodeObjects = new GameObject[mdh.nodes!.Length];
 
             // Create empty GameObjects from hierarchy

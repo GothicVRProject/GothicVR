@@ -7,7 +7,6 @@ using PxCs.Data.Model;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
-using UnityEngine.Experimental.AI;
 
 namespace GVR.Creator.Meshes
 {
@@ -15,14 +14,32 @@ namespace GVR.Creator.Meshes
     {
         private VmGothicExternals.ExtSetVisualBodyData tempBodyData;
 
-        public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
-            PxMorphMeshData morphMesh, VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
+        public GameObject CreateNpc(string npcName, string mdmName, string mdhName,
+            string headName, VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
         {
             tempBodyData = bodyData;
+            var mdm = AssetCache.I.TryGetMdm(mdmName);
+            var mdh = AssetCache.I.TryGetMdh(mdhName);
+            
+            if (mdm == null)
+            {
+                Debug.LogError($"MDH from name >{mdmName}< for object >{root.name}< not found.");
+                return null;
+            }
+            if (mdh == null)
+            {
+                Debug.LogError($"MDH from name >{mdhName}< for object >{root.name}< not found.");
+                return null;
+            }
+
+            
             var npcGo = Create(npcName, mdm, mdh, default, default, null, root);
 
-            if (morphMesh != null)
-                AddHead(npcName, npcGo, morphMesh);
+            if (!string.IsNullOrEmpty(headName))
+            {
+                var mmb = AssetCache.I.TryGetMmb(headName);   
+                AddHead(npcName, npcGo, mmb);
+            }
 
             return npcGo;
         }
