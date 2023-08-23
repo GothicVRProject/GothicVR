@@ -46,15 +46,10 @@ namespace GVR.Creator
             return npcRootGo;
         }
 
-        /// <summary>
-        /// Return cached GameObject based on lookup through IntPtr
-        /// </summary>
-        private GameObject GetNpcGo(IntPtr npcPtr)
+        private Properties GetProperties(IntPtr npcPtr)
         {
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
-            var npcGo = lookupCache.npcCache[symbolIndex];
-
-            var props = npcGo.GetComponent<Properties>();
+            var props = lookupCache.NpcCache[symbolIndex];
 
             // Workaround: When calling PxVm.InitializeNpc(), phoenix will start executing all of the INSTANCEs methods.
             // But some of them like Hlp_GetNpc() need the IntPtr before it's being returned by InitializeNpc().
@@ -62,12 +57,15 @@ namespace GVR.Creator
             if (props.npcPtr == IntPtr.Zero)
                 props.npcPtr = npcPtr;
 
-            return npcGo;
+            return props;
         }
-
-        private Properties GetProperties(IntPtr npcPtr)
+        
+        /// <summary>
+        /// Return cached GameObject based on lookup through IntPtr
+        /// </summary>
+        private GameObject GetNpcGo(IntPtr npcPtr)
         {
-            return GetNpcGo(npcPtr).GetComponent<Properties>();
+            return GetProperties(npcPtr).gameObject;
         }
 
         /// <summary>
@@ -83,11 +81,11 @@ namespace GVR.Creator
 
             PxVmNpcData pxNpc;
             // Humans are singletons.
-            if (lookupCache.npcCache.TryAdd((uint)npcInstance, newNpc))
+            if (lookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<Properties>()))
                 pxNpc = PxVm.InitializeNpc(GameData.I.VmGothicPtr, (uint)npcInstance);
             // Monsters are used multiple times.
             else
-                pxNpc = lookupCache.npcCache[(uint)npcInstance].GetComponent<Properties>().npc;
+                pxNpc = lookupCache.NpcCache[(uint)npcInstance].npc;
             newNpc.GetComponent<Properties>().npc = pxNpc;
 
             newNpc.name = pxNpc!.names[0];
@@ -123,8 +121,8 @@ namespace GVR.Creator
 
         public bool ExtWldIsFPAvailable(IntPtr npcPtr, string fpNamePart)
         {
-            var npcGo = GetNpcGo(npcPtr);
-            var props = npcGo.GetComponent<Properties>();
+            var props = GetProperties(npcPtr);
+            var npcGo = props.gameObject;
             var freePoints = WayNetManager.I.FindFreePointsWithName(npcGo.transform.position, fpNamePart, fplookupDistance);
 
             foreach (var fp in freePoints)
@@ -185,8 +183,7 @@ namespace GVR.Creator
         
         public void ExtMdlSetVisual(IntPtr npcPtr, string visual)
         {
-            var npc = GetNpcGo(npcPtr);
-            var props = npc.GetComponent<Properties>();
+            var props = GetProperties(npcPtr);
             var mds = assetCache.TryGetMds(visual);
 
             props.baseMdsName = visual;
@@ -206,8 +203,8 @@ namespace GVR.Creator
 
         public void ExtApplyOverlayMds(IntPtr npcPtr, string overlayName)
         {
-            var npc = GetNpcGo(npcPtr);
-            var props = npc.GetComponent<Properties>();
+            var props = GetProperties(npcPtr);
+
             props.overlayMdsName = overlayName;
             props.overlayMds = assetCache.TryGetMds(overlayName);
             props.overlayMdh = assetCache.TryGetMdh(overlayName);
@@ -215,8 +212,9 @@ namespace GVR.Creator
 
         public void ExtSetVisualBody(VmGothicExternals.ExtSetVisualBodyData data)
         {
-            var npc = GetNpcGo(data.NpcPtr);
-            var props = npc.GetComponent<Properties>();
+            var props = GetProperties(data.NpcPtr);
+            var npc = props.gameObject;
+
             var mmb = assetCache.TryGetMmb(data.Head);
             var name = PxVm.pxVmInstanceNpcGetName(data.NpcPtr, 0).MarshalAsString();
 
@@ -255,40 +253,36 @@ namespace GVR.Creator
 
         public IntPtr ExtHlpGetNpc(int instanceId)
         {
-            if (!lookupCache.npcCache.TryGetValue((uint)instanceId, out GameObject npcGo))
+            if (!lookupCache.NpcCache.TryGetValue((uint)instanceId, out Properties properties))
             {
                 Debug.LogError($"Couldn't find NPC {instanceId} inside cache.");
                 return IntPtr.Zero;
             }
 
-            return npcGo.GetComponent<Properties>().npcPtr;
+            return properties.npcPtr;
         }
 
         public void ExtNpcPerceptionEnable(IntPtr npcPtr, VmGothicEnums.PerceptionType perception, int function)
         {
-            var npc = GetNpcGo(npcPtr);
-            var props = npc.GetComponent<Properties>();
+            var props = GetProperties(npcPtr);
             props.Perceptions[perception] = function;
         }
 
         public void ExtNpcSetPerceptionTime(IntPtr npcPtr, float time)
         {
-            var npc = GetNpcGo(npcPtr);
-            var props = npc.GetComponent<Properties>();
+            var props = GetProperties(npcPtr);
             props.perceptionTime = time;
         }
 
         public void ExtNpcSetTalentValue(IntPtr npcPtr, VmGothicEnums.Talent talent, int level)
         {
-            var npc = GetNpcGo(npcPtr);
-            var props = npc.GetComponent<Properties>();
+            var props = GetProperties(npcPtr);
             props.Talents[talent] = level;
         }
 
         public void ExtCreateInvItems(IntPtr npcPtr, int itemId, int amount)
         {
-            var npc = GetNpcGo(npcPtr);
-            var props = npc.GetComponent<Properties>();
+            var props = GetProperties(npcPtr);
             
             if (!props.Items.TryGetValue(itemId, out _))
             {
@@ -302,27 +296,26 @@ namespace GVR.Creator
         
         public void ExtEquipItem(IntPtr npcPtr, int itemId)
         {
-            var npc = GetNpcGo(npcPtr);
+            var props = GetProperties(npcPtr);
+            var npc = props.gameObject;
             var itemData = assetCache.TryGetItemData((uint)itemId);
 
-            npc.GetComponent<Properties>().EquippedItem = itemData;
+            props.EquippedItem = itemData;
             
             NpcMeshCreator.I.EquipWeapon(npc, itemData, itemData.mainFlag, itemData.flags);
         }
-
-
+        
         public void DebugAddIdleAnimationToAllNpc()
         {
-            foreach (var npcGo in lookupCache.npcCache.Values)
+            foreach (var props in lookupCache.NpcCache.Values)
             {
-                var mdsName = npcGo.GetComponent<Properties>().baseMdsName;
-                var mdh = npcGo.GetComponent<Properties>().baseMdh;
+                var mdsName = props.baseMdsName;
+                var mdh = props.baseMdh;
 
-                if (npcGo.name != "Thorus")
+                if (props.name != "Thorus")
                     continue;
 
-                var props = npcGo.GetComponent<Properties>();
-                var routineComp = npcGo.GetComponent<Routine>();
+                var routineComp = props.GetComponent<Routine>();
                 var firstRoutine = routineComp.routines.FirstOrDefault();
                 
                 PxVm.CallFunction(GameData.I.VmGothicPtr, (uint)firstRoutine.action, props.npcPtr);
