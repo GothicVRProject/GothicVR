@@ -60,15 +60,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Eye Gaze Is Tracked",
-                    "type": "Button",
-                    "id": "ea26ba43-844b-4585-817a-2f124b571813",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "Eye Gaze Tracking State",
                     "type": "Value",
                     "id": "73053154-2fbc-4d78-9cac-000282b64f79",
@@ -254,50 +245,6 @@
                     "action": "Is Tracked",
                     "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "Button Fallback",
-                    "id": "c262df21-2ffb-4295-93cc-8fdb5649da7e",
-                    "path": "ButtonFallback",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Eye Gaze Is Tracked",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "first",
-                    "id": "f77492f8-09ee-49d0-b821-7c31cb5c2a16",
-                    "path": "<EyeGaze>/pose/isTracked",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Generic XR Controller",
-                    "action": "Eye Gaze Is Tracked",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "second",
-                    "id": "960252ae-88e8-427a-ac9f-ecac6fb3c7d1",
-                    "path": "<XRHMD>/isTracked",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Generic XR Controller",
-                    "action": "Eye Gaze Is Tracked",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "third",
-                    "id": "dfc94c22-a115-471f-9f17-8cb6bc7f6637",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Generic XR Controller",
-                    "action": "Eye Gaze Is Tracked",
-                    "isComposite": false,
-                    "isPartOfComposite": true
                 }
             ]
         },
@@ -400,6 +347,15 @@
                     "type": "Value",
                     "id": "0565b7f7-f841-4395-98df-a77f4dd6d9c9",
                     "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Velocity",
+                    "type": "Value",
+                    "id": "5441a253-14a6-41f4-9fd8-afd119360793",
+                    "expectedControlType": "Vector3",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -614,6 +570,83 @@
                     "action": "Aim Flags",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "68e73811-64cc-40c9-8615-9b351e72f368",
+                    "path": "<ValveIndexController>{LeftHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "185416e0-3314-4a38-bcb8-2fa3602ed22d",
+                    "path": "<ViveController>{LeftHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "71576936-37dd-41d8-b063-a7343b65e6a8",
+                    "path": "<HololensHand>{LeftHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7747b3aa-65ff-4903-a261-943e7aee5848",
+                    "path": "<KHRSimpleController>{LeftHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "76382aa4-c411-4205-8381-a3c8f0b47afc",
+                    "path": "<OculusTouchController>{LeftHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "400e1b75-a9b0-4767-95fd-1133b9aadf49",
+                    "path": "<PICOTouchController>{LeftHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0b48f1d4-8e65-4176-878e-a4627257192c",
+                    "path": "<WMRSpatialController>{LeftHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -672,15 +705,6 @@
                     "id": "f241c1aa-1050-4338-b2bf-a4a47776693d",
                     "expectedControlType": "Axis",
                     "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "UI Scroll",
-                    "type": "Value",
-                    "id": "a5372626-7022-4ba7-b152-6f26318fd8a8",
-                    "expectedControlType": "Vector2",
-                    "processors": "InvertVector2(invertY=false)",
                     "interactions": "",
                     "initialStateCheck": true
                 },
@@ -833,17 +857,6 @@
                     "processors": "ScaleVector2(x=0),StickDeadzone",
                     "groups": "Generic XR Controller",
                     "action": "Translate Anchor",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "7b30ca4b-9f98-4a44-9af5-a89412d5cdc8",
-                    "path": "<XRController>{LeftHand}/Primary2DAxis",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Generic XR Controller",
-                    "action": "UI Scroll",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -1119,6 +1132,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Velocity",
+                    "type": "Value",
+                    "id": "c365b3c1-74dd-4234-8e0f-d32b4eedc4e2",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -1330,6 +1352,83 @@
                     "action": "Aim Flags",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "de4b56a3-0894-4809-b1cc-374a1a2695ee",
+                    "path": "<HololensHand>{RightHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "032f7331-9b16-4d15-9c15-799ef1f5cad7",
+                    "path": "<ViveController>{RightHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0ccb9458-2bba-404c-a5ac-1f7e7a40b5f3",
+                    "path": "<ValveIndexController>{RightHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4aedc9dd-62b2-4be0-bc6c-02f28954affe",
+                    "path": "<KHRSimpleController>{RightHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0ee3b8e9-f0df-4b4d-9084-d60e2ebeb6f4",
+                    "path": "<OculusTouchController>{RightHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cc98e7b5-e7c2-4afe-8005-59cb75299b06",
+                    "path": "<PICOTouchController>{RightHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7517decb-af0a-4989-8bb8-f39c066c22e3",
+                    "path": "<WMRSpatialController>{RightHand}/devicePose/velocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Velocity",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -1388,15 +1487,6 @@
                     "id": "962ac033-ec42-4981-88a4-551ad9be6ecb",
                     "expectedControlType": "Axis",
                     "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "UI Scroll",
-                    "type": "Value",
-                    "id": "c283b939-751f-426e-8462-142a529993e3",
-                    "expectedControlType": "Vector2",
-                    "processors": "InvertVector2(invertY=false)",
                     "interactions": "",
                     "initialStateCheck": true
                 },
@@ -1549,17 +1639,6 @@
                     "processors": "ScaleVector2(x=0),StickDeadzone",
                     "groups": "Generic XR Controller",
                     "action": "Translate Anchor",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "af6fd279-2f48-4f51-8e9d-29b0b9d926f8",
-                    "path": "<XRController>{RightHand}/Primary2DAxis",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Generic XR Controller",
-                    "action": "UI Scroll",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
