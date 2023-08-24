@@ -191,6 +191,15 @@ namespace GVR.Creator
             // FIXME - e.g. for Thorus there's initially no string value for TA_Boss() self.wp - Intended or a bug on our side?
         }
 
+        public void ExtAiAlignToWP(IntPtr npcPtr)
+        {
+            // FIXME implement
+        }
+        
+        public void ExtAiPlayAni(IntPtr npcPtr, string name)
+        {
+            // FIXME implement
+        }
         
         public void ExtMdlSetVisual(IntPtr npcPtr, string visual)
         {

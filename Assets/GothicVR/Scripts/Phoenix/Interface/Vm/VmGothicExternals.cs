@@ -50,6 +50,11 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInstCh", PrintDebugInstCh); 
 
             PxVm.pxVmRegisterExternal(vmPtr, "AI_StandUp", AI_StandUp); 
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_SetWalkMode", AI_SetWalkMode);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_GotoWP", AI_GotoWP);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_AlignToWP", AI_AlignToWP);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_PlayAni", AI_PlayAni);
             
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
@@ -76,10 +81,6 @@ namespace GVR.Phoenix.Interface.Vm
             // PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItems", Npc_RemoveInvItems);
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentValue", Npc_SetTalentValue);
-
-            PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
-            PxVm.pxVmRegisterExternal(vmPtr, "AI_SetWalkMode", AI_SetWalkMode);
-            PxVm.pxVmRegisterExternal(vmPtr, "AI_GotoWP", AI_GotoWP);
         }
 
 #region Default
@@ -248,6 +249,23 @@ namespace GVR.Phoenix.Interface.Vm
             var spawnPoint = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             NpcCreator.I.ExtAiGotoWP(npcPtr, spawnPoint);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void AI_AlignToWP(IntPtr vmPtr)
+        {
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            NpcCreator.I.ExtAiAlignToWP(npcPtr);
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void AI_PlayAni(IntPtr vmPtr)
+        {
+            var name = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            
+            NpcCreator.I.ExtAiPlayAni(npcPtr, name);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]

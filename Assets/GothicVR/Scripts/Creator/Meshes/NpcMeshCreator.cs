@@ -3,7 +3,6 @@ using GVR.Caches;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using PxCs.Data.Mesh;
-using PxCs.Data.Model;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
@@ -26,12 +25,12 @@ namespace GVR.Creator.Meshes
                 Debug.LogError($"MDH from name >{mdmName}< for object >{root.name}< not found.");
                 return null;
             }
+            
             if (mdh == null)
             {
                 Debug.LogError($"MDH from name >{mdhName}< for object >{root.name}< not found.");
                 return null;
             }
-
             
             var npcGo = Create(npcName, mdm, mdh, default, default, null, root);
 
