@@ -1,3 +1,9 @@
+## Unity setup hints
+
+* For locla Gothic installation directory, please create file _GameSettings.dev.json_ next inside _Assets/StreamingAssets_. This file is ignored by git and you need to set its values to make the game run in Unity.
+* Load scene "Bootstrap" in your Editor. Hit play and you're good to go.
+* You can (de)activate features with the Component "FeatureFlags". It changes features at Editor time and won't change elements during runtime. (change values first, hit play second).
+
 ## Gothic assets loading
 
 We fully rely on phoenix and phoenix-shared-interface to import gothic assets. To consume data within Unity (C#) we leverage phoenix-csharp-interface as C -> C# interface.
