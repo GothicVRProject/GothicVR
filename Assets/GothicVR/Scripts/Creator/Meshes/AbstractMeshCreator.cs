@@ -85,8 +85,10 @@ namespace GVR.Creator.Meshes
                 CreateBonesData(rootGo, nodeObjects, meshRenderer, softSkinMesh);
             }
 
+            var attachments = GetFilteredAttachments(mdm.attachments);
+            
             // Fill GameObjects with Meshes from attachments
-            foreach (var subMesh in mdm.attachments!)
+            foreach (var subMesh in attachments)
             {
                 var meshObj = nodeObjects.First(bone => bone.name == subMesh.Key);
                 var meshFilter = meshObj.AddComponent<MeshFilter>();
@@ -105,6 +107,14 @@ namespace GVR.Creator.Meshes
             nodeObjects[0].transform.localPosition = Vector3.zero;
 
             return rootGo;
+        }
+
+        /// <summary>
+        /// There are some objects (e.g. NPCs) where we want to skip specific attachments. This method can be overridden for this feature.
+        /// </summary>
+        protected virtual Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
+        {
+            return attachments;
         }
 
         public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)

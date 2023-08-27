@@ -349,7 +349,7 @@ MonoBehaviour:
   SunMovementPerformanceValue: 0
   StartHour: 17
   StartMinute: 59
-  EnableVobFPMesh: 1
+  EnableVobFPMesh: 0
   EnableVobFPMeshEditorLabel: 0
   EnableDecals: 0
   CreateOcNpcs: 1

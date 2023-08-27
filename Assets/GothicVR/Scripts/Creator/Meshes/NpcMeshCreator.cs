@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using GVR.Caches;
 using GVR.Phoenix.Interface.Vm;
@@ -87,6 +88,18 @@ namespace GVR.Creator.Meshes
 
             return base.GetTexture(finalTextureName);
         }
+        
+        protected override Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
+        {
+            Dictionary<string, PxMultiResolutionMeshData> newAttachments = new(attachments);
+
+            // Remove head as it will be loaded later.
+            if (newAttachments.Remove("BIP01 HEAD"))
+                Debug.Log("Removed default >BIP01 HEAD< attachment mesh from NPC.");
+            
+            return newAttachments;
+        }
+
 
 
         public void EquipWeapon(GameObject npcGo, PxVmItemData itemData, PxVm.PxVmItemFlags mainFlag, PxVm.PxVmItemFlags flags)
