@@ -8,9 +8,9 @@ Fan project recreating the classic Gothic I and II experience in VR.
 
 
 ## Usage
-For instructions on playing the game or adding contributions, please check our [docs](docs).
+For instructions on playing the game or adding contributions, please check our [Docs](Docs).
 
-(🤫 Shortcut to the installation instructions: [here](docs/setup/player.md). Thank me later. 😉) 
+(🤫 Shortcut to the installation instructions: [here](Docs/setup/player.md). Thank me later. 😉) 
 
 
 ## Our Tenets (until you know better ones)
@@ -26,7 +26,7 @@ We're always looking for people with knowledge and/or spirit. Feel free to reach
 
 ## Workflow/Gameflow
 
-![data flow](docs/development/diagrams/data-flow.png)
+![data flow](Docs/development/diagrams/data-flow.png)
 
 
 1. GothicVR requests data from PxCs.dll (.net standard 2.1 shared library which is cross-OS compatibel)
