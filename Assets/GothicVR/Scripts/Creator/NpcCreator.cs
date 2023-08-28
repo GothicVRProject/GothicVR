@@ -305,11 +305,15 @@ namespace GVR.Creator
         
         public void DebugAddIdleAnimationToAllNpc()
         {
-            foreach (var props in lookupCache.NpcCache.Values)
-            {
-                if (props.name != "Thorus")
-                    continue;
+            DebugThorus();
+            DebugMeatBug();
 
+        }
+
+        private void DebugThorus()
+        {
+            foreach (var props in lookupCache.NpcCache.Values.Where(i => i.name == "Thorus"))
+            {
                 var routineComp = props.GetComponent<Routine>();
                 var firstRoutine = routineComp.routines.FirstOrDefault();
                 
@@ -318,6 +322,21 @@ namespace GVR.Creator
 
                 // var animationName = mdsName.ToLower() == "humans.mds" ? "T_1HSFREE" : "S_DANCE1";
                 // AnimationCreator.I.PlayAnimation(mdsName, animationName, mdh, npcGo);
+            }
+        }
+
+        private void DebugMeatBug()
+        {
+            var x = lookupCache.NpcCache.Values.Where(i => i.name == "Fleischwanze").Count();
+            
+            foreach (var props in lookupCache.NpcCache.Values.Where(i => i.name == "Fleischwanze"))
+            {
+                var mds = assetCache.TryGetMds(props.baseMdsName);
+                var mdh = assetCache.TryGetMdh(props.baseMdhName);
+                
+                var animNames = mds.animations.Select(i => i.name).ToArray();
+                
+                AnimationCreator.I.PlayAnimation(props.baseMdsName, "s_FistRunL", mdh, props.gameObject);
             }
         }
     }
