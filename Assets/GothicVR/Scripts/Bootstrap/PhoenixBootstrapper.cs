@@ -142,29 +142,8 @@ namespace GVR.Bootstrap
             Debug.Log("Loading music");
         }
 
-        /// <summary>
-        /// If there are Gothic ttf fonts stored on the current system, we will use them.
-        /// If not, we will stick with a default font.
-        /// </summary>
         private void LoadFonts()
         {
-            var menuFontPath = SettingsManager.I.GameSettings.GothicMenuFontPath;
-            var subtitleFontPath = SettingsManager.I.GameSettings.GothicSubtitleFontPath;
-
-            // FIXME: These values are debug values. They need to be adjusted for optimized results.
-            int faceIndex = 0;
-            int samplingPointSize = 100;
-            int atlasPadding = 0;
-            GlyphRenderMode renderMode = GlyphRenderMode.COLOR;
-            int atlasWidth = 100;
-            int atlasHeight = 100;
-
-            if (File.Exists(menuFontPath))
-                GameData.I.GothicMenuFont = TMP_FontAsset.CreateFontAsset(menuFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
-
-            if (File.Exists(subtitleFontPath))
-                GameData.I.GothicSubtitleFont = TMP_FontAsset.CreateFontAsset(subtitleFontPath, faceIndex, samplingPointSize, atlasPadding, renderMode, atlasWidth, atlasHeight);
-
             FontManager.I.Create();
         }
     }
