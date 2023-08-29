@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator.Meshes;
-using GVR.Debugging;
 using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
@@ -22,6 +21,8 @@ namespace GVR.Creator
     public class WorldCreator : SingletonBehaviour<WorldCreator>
     {
         private GameObject worldGo;
+        private GameObject teleportGo;
+        private GameObject nonTeleportGo;
 
         public async Task CreateAsync(string worldName)
         {
@@ -29,8 +30,15 @@ namespace GVR.Creator
             GameData.I.World = world;
             worldGo = new GameObject("World");
 
-            await WorldMeshCreator.I.CreateAsync(world, worldGo, ConstantsManager.I.MeshPerFrame);
-            await VobCreator.I.CreateAsync(worldGo, world, ConstantsManager.I.VObPerFrame);
+            // Interactable Vobs (item, ladder, ...) have their own collider Components
+            // AND we don't want to teleport on top of them. We therefore exclude them from being added to teleport.
+            teleportGo = new GameObject("Teleport");
+            nonTeleportGo = new GameObject("NonTeleport");
+            teleportGo.SetParent(worldGo);
+            nonTeleportGo.SetParent(worldGo);
+
+            await WorldMeshCreator.I.CreateAsync(world, teleportGo, ConstantsManager.I.MeshPerFrame);
+            await VobCreator.I.CreateAsync(teleportGo, nonTeleportGo, world, ConstantsManager.I.VObPerFrame);
             WaynetCreator.I.Create(worldGo, world);
 
             DebugAnimationCreator.I.Create(worldName);
@@ -53,7 +61,7 @@ namespace GVR.Creator
                 Destroy(teleportArea);
 
             // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
-            var teleportationArea = worldGo.AddComponent<TeleportationArea>();
+            var teleportationArea = teleportGo.AddComponent<TeleportationArea>();
             if (interactionManager != null)
             {
                 teleportationArea.interactionManager = interactionManager;
