@@ -61,7 +61,7 @@ namespace GVR.Creator
 
             
             var mdsName = "HUMANS.mds";
-            var animationName = "t_Stand_2_Jump";
+            // var animationName = "t_Stand_2_Jump";
             var mds = AssetCache.I.TryGetMds(mdsName);
 
             try
@@ -98,7 +98,7 @@ namespace GVR.Creator
 
             
             var mdsName = "HUMANS.mds";
-            var animationName = "t_Stand_2_Jump";
+            // var animationName = "t_Stand_2_Jump";
             var mds = AssetCache.I.TryGetMds(mdsName);
 
             try
@@ -135,7 +135,7 @@ namespace GVR.Creator
 
             
             var mdsName = "HUMANS.mds";
-            var animationName = "t_Stand_2_Jump";
+            // var animationName = "t_Stand_2_Jump";
             var mds = AssetCache.I.TryGetMds(mdsName);
 
             try
@@ -172,7 +172,7 @@ namespace GVR.Creator
 
             
             var mdsName = "HUMANS.mds";
-            var animationName = "t_Stand_2_Jump";
+            // var animationName = "t_Stand_2_Jump";
             var mds = AssetCache.I.TryGetMds(mdsName);
 
             try

@@ -39,7 +39,9 @@ namespace GVR.Npc
         public Dictionary<int, int> Items = new();
 
 
-        private bool isClonedFromAnother; // Just a debug flag for easier debugging if we missed to copy something in the future.
+#pragma warning disable CS0414 // Just a debug flag for easier debugging if we missed to copy something in the future. 
+        private bool isClonedFromAnother;
+#pragma warning restore CS0414
         public void Copy(Properties other)
         {
             isClonedFromAnother = true;
