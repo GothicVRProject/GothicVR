@@ -8,6 +8,7 @@ using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using Debug = UnityEngine.Debug;
@@ -27,6 +28,10 @@ namespace GVR.Manager
         private GameObject startPoint;
         private GameObject player;
 
+        // Hint: Scene general is always loaded >after< world is fully filled with vobs etc.
+        [HideInInspector]
+        public UnityEvent sceneGeneralLoaded = new();
+
         public GameObject interactionManager;
 
         private const int ensureLoadingBarDelayMilliseconds = 5;
@@ -36,8 +41,8 @@ namespace GVR.Manager
         {
             base.Awake();
 
-            SceneManager.sceneLoaded += OnWorldSceneLoaded;
-            SceneManager.sceneUnloaded += OnLoadingSceneUnloaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
         }
 
         /// <summary>
@@ -153,7 +158,7 @@ namespace GVR.Manager
             LoadingManager.I.ResetProgress();
         }
 
-        private void OnWorldSceneLoaded(Scene scene, LoadSceneMode mode)
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             if (scene.name == "Loading")
             {
@@ -161,14 +166,12 @@ namespace GVR.Manager
                 LoadingManager.I.SetMaterialForLoading(scene);
                 AudioSourceManager.I.ResetDictionaries();
             }
+            // hint: General scene is loaded >after< a world scene is filled with vobs etc.
             else if (scene == generalScene)
             {
-                AudioSourceManager.I.SetAudioListener(Camera.main!.GetComponent<AudioListener>());
-
                 SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
-
-                WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
-
+                
+                sceneGeneralLoaded.Invoke();
                 TeleportPlayerToSpot();
             }
             else if (scene.name == "MainMenu")
@@ -177,13 +180,14 @@ namespace GVR.Manager
                 sphere.GetComponent<MeshRenderer>().material = TextureManager.I.LoadingSphereMaterial;
                 SceneManager.SetActiveScene(scene);
             }
+            // Any world scene
             else
             {
                 SceneManager.SetActiveScene(scene);
             }
         }
 
-        private void OnLoadingSceneUnloaded(Scene scene)
+        private void OnSceneUnloaded(Scene scene)
         {
             if (scene.name == "Loading" && !generalSceneLoaded)
             {

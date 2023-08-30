@@ -1,6 +1,7 @@
 ﻿using System;
 using GVR.Util;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace GVR.Debugging
 {
@@ -46,6 +47,8 @@ namespace GVR.Debugging
         [Header("__________Audio__________")]
         public bool EnableSounds;
         public bool EnableMusic;
-
+        
+        [Header("__________Performance__________")]
+        public bool VobCulling;
     }
 }

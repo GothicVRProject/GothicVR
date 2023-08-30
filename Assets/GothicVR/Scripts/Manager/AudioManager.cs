@@ -32,8 +32,15 @@ namespace GVR.Manager
 
         private void Start()
         {
+            GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostWorldCreate);
+
             // run the function every half a second
             InvokeRepeating("UpdateAudioSourcesAroundPlayer", 1f, 0.5f);
+        }
+
+        private void PostWorldCreate()
+        {
+            audioListener = Camera.main!.GetComponent<AudioListener>();
         }
 
         private void UpdateAudioSourcesAroundPlayer()
@@ -78,11 +85,6 @@ namespace GVR.Manager
         public void SetAudible(GameObject gameObj, bool isAudible)
         {
             gameObj.SetActive(isAudible);
-        }
-
-        public void SetAudioListener(AudioListener audioListener)
-        {
-            this.audioListener = audioListener;
         }
 
         /// <summary>
