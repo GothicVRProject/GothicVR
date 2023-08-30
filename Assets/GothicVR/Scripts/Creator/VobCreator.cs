@@ -86,7 +86,8 @@ namespace GVR.Creator
                 {
                     case PxVobType.PxVob_oCItem:
                     {
-                        CreateItem((PxVobItemData)vob);
+                        var obj = CreateItem((PxVobItemData)vob);
+                        cullingGroupObjects.Add(obj);
                         break;
                     }
                     case PxVobType.PxVob_oCMobContainer:
