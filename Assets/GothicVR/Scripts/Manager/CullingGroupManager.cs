@@ -5,6 +5,11 @@ using UnityEngine;
 
 namespace GVR.Manager
 {
+    /// <summary>
+    /// CullingGroups are a way for objects inside a scene to be handled by frustum culling and occlusion culling.
+    /// With this set up, VOBs are handled by camera's view and culling behaviour, so that the StateChanged() event disables/enables VOB GameObjects.
+    /// @see https://docs.unity3d.com/Manual/CullingGroupAPI.html
+    /// </summary>
     public class CullingGroupManager : SingletonBehaviour<CullingGroupManager>
     {
         private const float vobBoundingSphereRadius = 1f;
