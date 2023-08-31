@@ -26,6 +26,10 @@ namespace GVR.Manager
         {
             // Debug.LogWarning($"CullingGroup StateChange: i={evt.index}, go={vobObjects[evt.index]}, isVisible={evt.isVisible}, hasBecomeVisible={evt.hasBecomeVisible}");
             vobObjects[evt.index].SetActive(evt.hasBecomeVisible);
+
+            // If the Vob is now within first range 0...x meter, then activate GameObject
+            // vobObjects[evt.index].SetActive(evt.currentDistance == 0);
+            // Debug.Log(evt.currentDistance);
         }
 
         public void SetVobObjects(GameObject[] objects)
@@ -40,6 +44,7 @@ namespace GVR.Manager
             
             vobCullingGroup = new();
             vobCullingGroup.onStateChanged += OnVobCullingGroupStateChanged;
+            vobCullingGroup.SetBoundingDistances(new[]{10f});
             
             var spheres = objects
                 .Select(obj => new BoundingSphere(obj.transform.position, vobBoundingSphereRadius))
@@ -54,7 +59,10 @@ namespace GVR.Manager
         public void PostWorldCreate()
         {
             if (vobCullingGroup != null)
+            {
                 vobCullingGroup.targetCamera = Camera.main;
+                vobCullingGroup.SetDistanceReferencePoint(Camera.main.transform);
+            }
         }
         
         private void OnDestroy()
