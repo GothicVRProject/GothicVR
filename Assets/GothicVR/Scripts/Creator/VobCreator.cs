@@ -138,11 +138,15 @@ namespace GVR.Creator
                     case PxVobType.PxVob_zCVobLight:
                     case PxVobType.PxVob_zCMoverController:
                     case PxVobType.PxVob_zCPFXController:
+                    {
                         Debug.LogWarning($"{vob.type} not yet implemented.");
                         break;
+                    }
                     // Do nothing
                     case PxVobType.PxVob_zCVobLevelCompo:
+                    {
                         break;
+                    }
                     case PxVobType.PxVob_zCVob:
                     {
                         // if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
@@ -207,7 +211,7 @@ namespace GVR.Creator
             }
         }
 
-        private void CreateItem(PxVobItemData vob)
+        private GameObject CreateItem(PxVobItemData vob)
         {
             string itemName;
 
@@ -224,16 +228,16 @@ namespace GVR.Creator
             {
                 // eItMiCello is commented out on misc.d file. No need for an error log entry.
                 if ("itmicello".Equals(itemName.ToLower()))
-                    return;
+                    return null;
                 
                 Debug.LogError($"Item {itemName} not found.");
-                return;
+                return null;
             }
 
             if (item.visual!.ToLower().EndsWith(".mms"))
             {
                 Debug.LogError($"Item {item.visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
-                return;
+                return null;
             }
 
             var prefabInstance = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobItem);
@@ -243,7 +247,7 @@ namespace GVR.Creator
             {
                 Destroy(prefabInstance); // No mesh created. Delete the prefab instance again.
                 Debug.LogError($"There should be no! object which can't be found n:{vob.vobName} i:{vob.instance}. We need to use >PxVobItem.instance< to do it right!");
-                return;
+                return null;
             }
 
             // It will set some default values for collider and grabbing now.
@@ -256,6 +260,8 @@ namespace GVR.Creator
 
             colliderComp.convex = true;
             grabComp.selectExited.AddListener(eventComp.SelectExited);
+
+            return vobObj;
         }
 
         private GameObject CreateMobContainer(PxVobMobContainerData vob)
