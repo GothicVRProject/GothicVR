@@ -19,6 +19,7 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -34,8 +35,10 @@ namespace GVR.Creator
 
         private const string editorLabelColor = "sv_label4";
 
-        private Dictionary<PxVobType, GameObject> parentGos = new();
-
+        private Dictionary<PxVobType, GameObject> parentGosTeleport = new();
+        private Dictionary<PxVobType, GameObject> parentGosNonTeleport = new();
+        private PxVobType[] nonTeleportTypes = { PxVobType.PxVob_oCItem , PxVobType.PxVob_oCMobLadder };
+        
         private int totalVObs;
 
         private void Start()
@@ -56,18 +59,22 @@ namespace GVR.Creator
             return count;
         }
 
-        public async Task CreateAsync(GameObject root, WorldData world, int vobsPerFrame)
+        public async Task CreateAsync(GameObject rootTeleport, GameObject rootNonTeleport, WorldData world, int vobsPerFrame)
         {
             if (!FeatureFlags.I.CreateVobs)
                 return;
 
             totalVObs = GetTotalVobCount(world.vobs);
 
-            var vobRootObj = new GameObject("Vobs");
-            vobRootObj.SetParent(root);
-            parentGos = new();
+            var vobRootTeleport = new GameObject("Vobs");
+            var vobRootNonTeleport = new GameObject("Vobs");
+            vobRootTeleport.SetParent(rootTeleport);
+            vobRootNonTeleport.SetParent(rootNonTeleport);
+            
+            parentGosTeleport = new();
 
-            CreateParentVobObject(vobRootObj);
+            CreateParentVobObjectTeleport(vobRootTeleport);
+            CreateParentVobObjectNonTeleport(vobRootNonTeleport);
 
             var allVobs = new List<PxVobData>();
             AddVobsToList(world.vobs, allVobs);
@@ -144,14 +151,31 @@ namespace GVR.Creator
             }
         }
         
-        private void CreateParentVobObject(GameObject root)
+        private void CreateParentVobObjectTeleport(GameObject root)
         {
-            foreach (var type in (PxVobType[])Enum.GetValues(typeof(PxVobType)))
+            var allTypes = (PxVobType[])Enum.GetValues(typeof(PxVobType));
+            foreach (var type in allTypes.Except(nonTeleportTypes))
             {
                 var newGo = new GameObject(type.ToString());
                 newGo.SetParent(root);
 
-                parentGos.Add(type, newGo);
+                parentGosTeleport.Add(type, newGo);
+            }
+        }
+        
+        /// <summary>
+        /// As PxVobType.PxVob_oCItem get Grabbable Component, they already own a Collider
+        /// AND we don't want to teleport on top of them. We therefore exclude them from being added to Teleporter.
+        /// </summary>
+        private void CreateParentVobObjectNonTeleport(GameObject root)
+        {
+            var allTypes = (PxVobType[])Enum.GetValues(typeof(PxVobType));
+            foreach (var type in allTypes.Intersect(nonTeleportTypes))
+            {
+                var newGo = new GameObject(type.ToString());
+                newGo.SetParent(root);
+
+                parentGosNonTeleport.Add(type, newGo);
             }
         }
 
@@ -289,7 +313,7 @@ namespace GVR.Creator
             if (!FeatureFlags.I.EnableSounds)
                 return;
 
-            var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
+            var vobObj = soundCreator.Create(vob, parentGosTeleport[vob.type]);
             SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
         }
 
@@ -299,20 +323,20 @@ namespace GVR.Creator
             if (!FeatureFlags.I.EnableSounds)
                 return;
 
-            var vobObj = soundCreator.Create(vob, parentGos[vob.type]);
+            var vobObj = soundCreator.Create(vob, parentGosTeleport[vob.type]);
             SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
         }
 
         private void CreateZoneMusic(PxVobZoneMusicData vob)
         {
-            soundCreator.Create(vob, parentGos[vob.type]);
+            soundCreator.Create(vob, parentGosTeleport[vob.type]);
         }
 
         private void CreateTriggerChangeLevel(PxVobTriggerChangeLevelData vob)
         {
 
             var gameObject = new GameObject(vob.vobName);
-            gameObject.SetParent(parentGos[vob.type]);
+            gameObject.SetParent(parentGosTeleport[vob.type]);
 
             var trigger = gameObject.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
@@ -361,7 +385,7 @@ namespace GVR.Creator
 
             var fpName = vob.vobName != string.Empty ? vob.vobName : "START";
             spot.name = fpName;
-            spot.SetParent(parentGos[vob.type]);
+            spot.SetParent(parentGosTeleport[vob.type]);
 
             GameData.I.FreePoints.Add(fpName, new()
             {
@@ -375,7 +399,7 @@ namespace GVR.Creator
         private void CreateLadder(PxVobData vob)
         {
             // FIXME - use Prefab instead.
-            var go = CreateDefaultMesh(vob);
+            var go = CreateDefaultMesh(vob, true);
             var meshGo = go;
             var grabComp = meshGo.AddComponent<XRGrabInteractable>();
             var rigidbodyComp = meshGo.GetComponent<Rigidbody>();
@@ -389,7 +413,7 @@ namespace GVR.Creator
         private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
             var mrm = assetCache.TryGetMrm(item.visual);
-            return VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGos[vob.type], go);
+            return VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGosNonTeleport[vob.type], go);
         }
 
         private void CreateDecal(PxVobData vob)
@@ -398,14 +422,14 @@ namespace GVR.Creator
             {
                 return;
             }
-            var parent = parentGos[vob.type];
+            var parent = parentGosTeleport[vob.type];
 
             VobMeshCreator.I.CreateDecal(vob, parent);
         }
 
-        private GameObject CreateDefaultMesh(PxVobData vob)
+        private GameObject CreateDefaultMesh(PxVobData vob, bool nonTeleport = false)
         {
-            var parent = parentGos[vob.type];
+            var parent = nonTeleport ? parentGosNonTeleport[vob.type] : parentGosTeleport[vob.type];
             var meshName = vob.showVisual ? vob.visualName : vob.vobName;
 
             if (meshName == string.Empty)

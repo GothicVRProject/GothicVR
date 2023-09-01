@@ -904,8 +904,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885aa1f171f8e3248b8a9eba04046f65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GothicMenuFont: {fileID: 0}
-  GothicSubtitleFont: {fileID: 0}
+  EmptyFont: {fileID: 11400000, guid: ed34b05229166f3469c21b7208879736, type: 2}
 --- !u!1 &1892061892
 GameObject:
   m_ObjectHideFlags: 0
