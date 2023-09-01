@@ -344,7 +344,7 @@ MonoBehaviour:
   CreateVobs: 1
   CreateWaypoints: 0
   CreateWaypointEdges: 0
-  SkipMainMenu: 1
+  SkipMainMenu: 0
   EnableDayTime: 1
   SunMovementPerformanceValue: 0
   StartHour: 17

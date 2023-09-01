@@ -305,11 +305,28 @@ namespace GVR.Creator
         
         public void DebugAddIdleAnimationToAllNpc()
         {
+            DebugDanceAll();
             DebugThorus();
             DebugMeatBug();
 
         }
 
+        private void DebugDanceAll()
+        {
+            var npcs = lookupCache.NpcCache.Values
+                .Where(i => i.name != "Thorus")
+                .Where(i => i.name != "Fleischwanze")
+                .Where(i => i.name != "Meatbug");
+            
+            foreach (var props in npcs)
+            {
+                var mdsName = props.baseMdsName;
+                var mdh = assetCache.TryGetMdh(props.baseMdhName);
+                var animationName = mdsName.ToLower() == "humans.mds" ? "T_1HSFREE" : "S_DANCE1";
+                AnimationCreator.I.PlayAnimation(mdsName, animationName, mdh, props.gameObject);
+            }
+        }
+        
         private void DebugThorus()
         {
             foreach (var props in lookupCache.NpcCache.Values.Where(i => i.name == "Thorus"))
@@ -318,10 +335,6 @@ namespace GVR.Creator
                 var firstRoutine = routineComp.routines.FirstOrDefault();
                 
                 PxVm.CallFunction(GameData.I.VmGothicPtr, (uint)firstRoutine.action, props.npcPtr);
-                
-
-                // var animationName = mdsName.ToLower() == "humans.mds" ? "T_1HSFREE" : "S_DANCE1";
-                // AnimationCreator.I.PlayAnimation(mdsName, animationName, mdh, npcGo);
             }
         }
 
