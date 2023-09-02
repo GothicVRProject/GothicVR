@@ -39,6 +39,7 @@ namespace GVR.Caches
             "Hum_GrdM_Armor",
             "Hum_GrdL_Armor",
             "Hum_NovM_Armor",
+            "Hum_TplL_Armor",
             "Hum_Body_Cooksmith",
             "Hum_VlkL_Armor",
             "Hum_VlkM_Armor",
@@ -129,13 +130,13 @@ namespace GVR.Caches
             return newData;
         }
 
-        public PxModelMeshData TryGetMdm(string key, params string[] attachmentKeys)
+        public PxModelMeshData TryGetMdm(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (mdmCache.TryGetValue(preparedKey, out PxModelMeshData data))
                 return data;
 
-            var newData = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mdm", attachmentKeys);
+            var newData = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mdm");
             mdmCache[preparedKey] = newData;
 
             FixArmorTriangles(preparedKey, newData);

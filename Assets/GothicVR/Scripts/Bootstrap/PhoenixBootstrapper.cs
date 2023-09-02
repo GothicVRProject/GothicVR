@@ -25,7 +25,6 @@ namespace GVR.Bootstrap
 
         private void Start()
         {
-            VmGothicBridge.DefaultExternalCallback.AddListener(MissingVmExternalCall);
             PxLogging.pxLoggerSet(PxLoggerCallback);
         }
 
@@ -56,12 +55,9 @@ namespace GVR.Bootstrap
             watch.Stop();
             Debug.Log($"Time spent for Bootstrapping Phoenix: {watch.Elapsed}");
 
+#pragma warning disable CS4014 // It's intended, that this async call is not awaited.
             GvrSceneManager.I.LoadStartupScenes();
-        }
-
-        public static void MissingVmExternalCall(IntPtr vmPtr, string missingCallbackName)
-        {
-            Debug.LogWarning($"Method >{missingCallbackName}< not yet implemented in DaedalusVM.");
+#pragma warning restore CS4014
         }
 
         [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]
@@ -74,10 +70,16 @@ namespace GVR.Bootstrap
                     break;
                 case PxLogging.Level.error:
                     var isVfsMessage = message.StartsWith("failed to find vfs entry");
-                    if (isVfsMessage && !FeatureFlags.I.ShowVfsFileNotFoundErrors)
+                    if (isVfsMessage && !FeatureFlags.I.ShowPhoenixVfsFileNotFoundErrors)
                         break;
 
                     Debug.LogError(message);
+                    break;
+                default:
+                    if (!FeatureFlags.I.ShowPhoenixDebugMessages)
+                        break;
+
+                    Debug.Log(message);
                     break;
             }
         }
@@ -110,9 +112,9 @@ namespace GVR.Bootstrap
         private void LoadGothicVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
-            var vmPtr = VmGothicBridge.LoadVm(fullPath);
+            var vmPtr = VmGothicExternals.LoadVm(fullPath);
 
-            VmGothicBridge.RegisterExternals(vmPtr);
+            VmGothicExternals.RegisterExternals(vmPtr);
 
             GameData.I.VmGothicPtr = vmPtr;
         }
@@ -120,14 +122,14 @@ namespace GVR.Bootstrap
         private void LoadSfxVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
-            var vmPtr = VmGothicBridge.LoadVm(fullPath);
+            var vmPtr = VmGothicExternals.LoadVm(fullPath);
             GameData.I.VmSfxPtr = vmPtr;
         }
 
         private void LoadMusicVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
-            var vmPtr = VmGothicBridge.LoadVm(fullPath);
+            var vmPtr = VmGothicExternals.LoadVm(fullPath);
             GameData.I.VmMusicPtr = vmPtr;
         }
 

@@ -23,17 +23,14 @@ namespace GVR.Creator
         private void Start()
         {
             assetCache = AssetCache.I;
-
-            VmGothicBridge.PhoenixMdl_AI_OUTPUT.AddListener(AI_OUTPUT);
         }
 
         // ! NOT TESTED YET !
         /// <summary>
         /// Original Gothic uses this function to play dialogue.
         /// </summary>
-        public static void AI_OUTPUT(string name)
+        public void ExtAiOutput(string name)
         {
-
             // The body of this function can also be used to play sound effects, not just dialogue
             // According to this document `Sound effects are defined in multiple places, 
             // in .mds files as part of the animation EventBlocks, or in the SFX Daeduls scripts.`

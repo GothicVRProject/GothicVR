@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GothicVR.Vob;
 using GVR.Caches;
 using GVR.Creator.Meshes;
@@ -7,18 +8,17 @@ using GVR.Debugging;
 using GVR.Demo;
 using GVR.Manager;
 using GVR.Phoenix.Data;
+using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
+using GVR.Vob.WayNet;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
-using System.Threading.Tasks;
-using System.Collections;
 using System.Linq;
 
 #if UNITY_EDITOR
@@ -383,9 +383,16 @@ namespace GVR.Creator
                 Destroy(spot.GetComponent<MeshRenderer>());
             }
 
-            spot.name = vob.vobName != string.Empty ? vob.vobName : "START";
+            var fpName = vob.vobName != string.Empty ? vob.vobName : "START";
+            spot.name = fpName;
             spot.SetParent(parentGosTeleport[vob.type]);
 
+            GameData.I.FreePoints.Add(fpName, new()
+            {
+                Name = fpName,
+                Position = vob.position.ToUnityVector()
+            });
+            
             SetPosAndRot(spot, vob.position, vob.rotation!.Value);
         }
 
