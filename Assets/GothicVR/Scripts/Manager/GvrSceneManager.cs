@@ -53,8 +53,6 @@ namespace GVR.Manager
                     await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
                 else
                     await LoadMainMenu();
-
-                debugFreshlyDoneLoading = true;
             }
             catch (Exception e)
             {
@@ -109,6 +107,8 @@ namespace GVR.Manager
             HideLoadingScene();
             watch.Stop();
             Debug.Log($"Time spent for loading {worldName}: {watch.Elapsed}");
+            
+            debugFreshlyDoneLoading = true;
         }
 
         private async Task<Scene> LoadNewWorldScene(string worldName)

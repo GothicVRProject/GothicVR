@@ -186,6 +186,7 @@ namespace GVR.Phoenix.Interface.Vm
             NpcCreator.I.ExtWldInsertNpc(npcInstance, spawnpoint);
         }
 
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Wld_IsFPAvailable(IntPtr vmPtr)
         {
             var fpName = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
