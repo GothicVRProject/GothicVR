@@ -171,7 +171,7 @@ namespace GVR.Creator
             }
 
             var nonNullCullingGroupItems = cullingGroupObjects.Where(i => i != null).ToArray();
-            CullingGroupManager.I.SetVobObjects(nonNullCullingGroupItems);
+            CullingGroupManager.I.PrepareVobCulling(nonNullCullingGroupItems);
         }
 
         private void AddVobsToList(PxVobData[] vobs, List<PxVobData> allVobs)

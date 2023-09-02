@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -361,7 +361,24 @@ MonoBehaviour:
   ShowZspyLogs: 0
   EnableSounds: 1
   EnableMusic: 1
-  VobCulling: 1
+  worldCulling: 0
+  worldCullingSetting:
+    maxObjectSize: 0
+    cullingDistance: 0
+  vobCulling: 1
+  vobCullingSmall:
+    maxObjectSize: 0
+    cullingDistance: 50
+  vobCullingMedium:
+    maxObjectSize: 5
+    cullingDistance: 100
+  vobCullingLarge:
+    maxObjectSize: 1000
+    cullingDistance: 200
+  npcCulling: 0
+  npcCullingSetting:
+    maxObjectSize: 0
+    cullingDistance: 0
 --- !u!1 &379812652
 GameObject:
   m_ObjectHideFlags: 0

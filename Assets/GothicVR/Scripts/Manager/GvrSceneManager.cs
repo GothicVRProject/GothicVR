@@ -10,7 +10,6 @@ using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-using UnityEngine.XR.Interaction.Toolkit;
 using Debug = UnityEngine.Debug;
 
 namespace GVR.Manager
@@ -23,14 +22,17 @@ namespace GVR.Manager
         private string startVobAfterLoading;
 
         private Scene generalScene;
-        private bool generalSceneLoaded = false;
+        private bool generalSceneLoaded;
 
         private GameObject startPoint;
         private GameObject player;
 
+
         // Hint: Scene general is always loaded >after< world is fully filled with vobs etc.
-        [HideInInspector]
-        public UnityEvent sceneGeneralLoaded = new();
+        [NonSerialized]
+        public readonly UnityEvent sceneGeneralLoaded = new();
+        [NonSerialized]
+        public readonly UnityEvent sceneGeneralUnloaded = new();
 
         public GameObject interactionManager;
 
@@ -128,6 +130,8 @@ namespace GVR.Manager
             {
                 SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName("Bootstrap"));
                 SceneManager.UnloadSceneAsync(generalScene);
+                
+                sceneGeneralUnloaded.Invoke();
                 generalSceneLoaded = false;
             }
 

@@ -47,8 +47,24 @@ namespace GVR.Debugging
         [Header("__________Audio__________")]
         public bool EnableSounds;
         public bool EnableMusic;
+
         
-        [Header("__________Performance__________")]
-        public bool VobCulling;
+        [Serializable]
+        public class CullingGroupSetting
+        {
+            [Range(1f, 1000f)] public float maxObjectSize;
+            [Range(1f, 1000f)] public float cullingDistance;
+        }
+        [Header("__________Performance: World Culling__________")]
+        public bool worldCulling;
+        public CullingGroupSetting worldCullingSetting;
+        [Header("__________Performance: Vob Culling__________")]
+        public bool vobCulling;
+        public CullingGroupSetting vobCullingSmall;
+        public CullingGroupSetting vobCullingMedium;
+        public CullingGroupSetting vobCullingLarge;
+        [Header("__________Performance: NPC Culling__________")]
+        public bool npcCulling;
+        public CullingGroupSetting npcCullingSetting;
     }
 }
