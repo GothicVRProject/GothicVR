@@ -9,20 +9,17 @@ using GVR.Debugging;
 using GVR.Demo;
 using GVR.Manager;
 using GVR.Phoenix.Data;
+using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
+using PxCs.Interface;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 
 namespace GVR.Creator
 {
@@ -33,9 +30,9 @@ namespace GVR.Creator
 
         private const string editorLabelColor = "sv_label4";
 
-        private Dictionary<PxVobType, GameObject> parentGosTeleport = new();
-        private Dictionary<PxVobType, GameObject> parentGosNonTeleport = new();
-        private PxVobType[] nonTeleportTypes = { PxVobType.PxVob_oCItem , PxVobType.PxVob_oCMobLadder };
+        private Dictionary<PxWorld.PxVobType, GameObject> parentGosTeleport = new();
+        private Dictionary<PxWorld.PxVobType, GameObject> parentGosNonTeleport = new();
+        private PxWorld.PxVobType[] nonTeleportTypes = { PxWorld.PxVobType.PxVob_oCItem , PxWorld.PxVobType.PxVob_oCMobLadder };
         
         private int totalVObs;
 
@@ -84,70 +81,70 @@ namespace GVR.Creator
             {
                 switch (vob.type)
                 {
-                    case PxVobType.PxVob_oCItem:
+                    case PxWorld.PxVobType.PxVob_oCItem:
                     {
                         var obj = CreateItem((PxVobItemData)vob);
                         cullingGroupObjects.Add(obj);
                         break;
                     }
-                    case PxVobType.PxVob_oCMobContainer:
+                    case PxWorld.PxVobType.PxVob_oCMobContainer:
                     {
                         var obj = CreateMobContainer((PxVobMobContainerData)vob);
                         cullingGroupObjects.Add(obj);
                         break;
                     }
-                    case PxVobType.PxVob_zCVobSound:
+                    case PxWorld.PxVobType.PxVob_zCVobSound:
                     {
                         CreateSound((PxVobSoundData)vob);
                         break;
                     }
-                    case PxVobType.PxVob_zCVobSoundDaytime:
+                    case PxWorld.PxVobType.PxVob_zCVobSoundDaytime:
                     {
                         CreateSoundDaytime((PxVobSoundDaytimeData)vob);
                         break;
                     }
-                    case PxVobType.PxVob_oCZoneMusic:
+                    case PxWorld.PxVobType.PxVob_oCZoneMusic:
                     {
                         CreateZoneMusic((PxVobZoneMusicData)vob);
                         break;
                     }
-                    case PxVobType.PxVob_zCVobSpot:
-                    case PxVobType.PxVob_zCVobStartpoint:
+                    case PxWorld.PxVobType.PxVob_zCVobSpot:
+                    case PxWorld.PxVobType.PxVob_zCVobStartpoint:
                     {
                         CreateSpot(vob);
                         break;
                     }
-                    case PxVobType.PxVob_oCMobLadder:
+                    case PxWorld.PxVobType.PxVob_oCMobLadder:
                     {
                         var obj = CreateLadder(vob);
                         cullingGroupObjects.Add(obj);
                         break;
                     }
-                    case PxVobType.PxVob_oCTriggerChangeLevel:
+                    case PxWorld.PxVobType.PxVob_oCTriggerChangeLevel:
                     {
                         CreateTriggerChangeLevel((PxVobTriggerChangeLevelData)vob);
                         break;
                     }
-                    case PxVobType.PxVob_zCVobScreenFX:
-                    case PxVobType.PxVob_zCVobAnimate:
-                    case PxVobType.PxVob_zCTriggerWorldStart:
-                    case PxVobType.PxVob_zCTriggerList:
-                    case PxVobType.PxVob_oCCSTrigger:
-                    case PxVobType.PxVob_oCTriggerScript:
-                    case PxVobType.PxVob_zCVobLensFlare:
-                    case PxVobType.PxVob_zCVobLight:
-                    case PxVobType.PxVob_zCMoverController:
-                    case PxVobType.PxVob_zCPFXController:
+                    case PxWorld.PxVobType.PxVob_zCVobScreenFX:
+                    case PxWorld.PxVobType.PxVob_zCVobAnimate:
+                    case PxWorld.PxVobType.PxVob_zCTriggerWorldStart:
+                    case PxWorld.PxVobType.PxVob_zCTriggerList:
+                    case PxWorld.PxVobType.PxVob_oCCSTrigger:
+                    case PxWorld.PxVobType.PxVob_oCTriggerScript:
+                    case PxWorld.PxVobType.PxVob_zCVobLensFlare:
+                    case PxWorld.PxVobType.PxVob_zCVobLight:
+                    case PxWorld.PxVobType.PxVob_zCMoverController:
+                    case PxWorld.PxVobType.PxVob_zCPFXController:
                     {
                         Debug.LogWarning($"{vob.type} not yet implemented.");
                         break;
                     }
                     // Do nothing
-                    case PxVobType.PxVob_zCVobLevelCompo:
+                    case PxWorld.PxVobType.PxVob_zCVobLevelCompo:
                     {
                         break;
                     }
-                    case PxVobType.PxVob_zCVob:
+                    case PxWorld.PxVobType.PxVob_zCVob:
                     {
                         // if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
                         // CreateDecal(vob);
@@ -185,7 +182,7 @@ namespace GVR.Creator
         
         private void CreateParentVobObjectTeleport(GameObject root)
         {
-            var allTypes = (PxVobType[])Enum.GetValues(typeof(PxVobType));
+            var allTypes = (PxWorld.PxVobType[])Enum.GetValues(typeof(PxWorld.PxVobType));
             foreach (var type in allTypes.Except(nonTeleportTypes))
             {
                 var newGo = new GameObject(type.ToString());
@@ -201,7 +198,7 @@ namespace GVR.Creator
         /// </summary>
         private void CreateParentVobObjectNonTeleport(GameObject root)
         {
-            var allTypes = (PxVobType[])Enum.GetValues(typeof(PxVobType));
+            var allTypes = (PxWorld.PxVobType[])Enum.GetValues(typeof(PxWorld.PxVobType));
             foreach (var type in allTypes.Intersect(nonTeleportTypes))
             {
                 var newGo = new GameObject(type.ToString());
@@ -356,9 +353,16 @@ namespace GVR.Creator
                 Destroy(spot.GetComponent<MeshRenderer>());
             }
 
-            spot.name = vob.vobName != string.Empty ? vob.vobName : "START";
+            var fpName = vob.vobName != string.Empty ? vob.vobName : "START";
+            spot.name = fpName;
             spot.SetParent(parentGosTeleport[vob.type]);
 
+            GameData.I.FreePoints.Add(fpName, new()
+            {
+                Name = fpName,
+                Position = vob.position.ToUnityVector()
+            });
+            
             SetPosAndRot(spot, vob.position, vob.rotation!.Value);
         }
 

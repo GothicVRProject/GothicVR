@@ -1,5 +1,4 @@
-﻿using System;
-using GVR.Util;
+﻿using GVR.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -41,8 +40,9 @@ namespace GVR.Debugging
         public bool CreateDebugIdleAnimations;
 
         [Header("__________SPAMmy debug messages__________")]
-        public bool ShowVfsFileNotFoundErrors;
+        public bool ShowPhoenixDebugMessages;
         public bool ShowZspyLogs;
+        public bool ShowPhoenixVfsFileNotFoundErrors;
 
         [Header("__________Audio__________")]
         public bool EnableSounds;

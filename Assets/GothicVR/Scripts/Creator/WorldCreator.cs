@@ -179,9 +179,7 @@ namespace GVR.Creator
         /// <summary>
         /// Loads the world for occlusion culling.
         /// </summary>
-        /// <param name="vfsPtr">The VFS pointer.</param>
-        /// <param name="zen">The name of the .zen world to load.</param>
-        public async void LoadEditorWorld(IntPtr vfsPtr, string zen)
+        public void LoadEditorWorld(IntPtr vfsPtr, string zen)
         {
             var worldScene = EditorSceneManager.GetSceneByName(zen);
 

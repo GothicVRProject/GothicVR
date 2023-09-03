@@ -16,11 +16,15 @@ namespace GVR.Manager
 {
     public class GvrSceneManager : SingletonBehaviour<GvrSceneManager>
     {
+        public static UnityEvent StartWorldLoading = new(); // Basically to clear caches etc.
+
+        public GameObject interactionManager;
+        
         private const string generalSceneName = "General";
+        private const int ensureLoadingBarDelayMilliseconds = 5;
 
         private string newWorldName;
         private string startVobAfterLoading;
-
         private Scene generalScene;
         private bool generalSceneLoaded;
 
@@ -34,11 +38,8 @@ namespace GVR.Manager
         [NonSerialized]
         public readonly UnityEvent sceneGeneralUnloaded = new();
 
-        public GameObject interactionManager;
-
-        private const int ensureLoadingBarDelayMilliseconds = 5;
-
-
+        private bool debugFreshlyDoneLoading;
+        
         protected override void Awake()
         {
             base.Awake();
@@ -59,17 +60,27 @@ namespace GVR.Manager
                     await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
                 else
                     await LoadMainMenu();
-
-            if (FeatureFlags.I.CreateOcNpcs)
-                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
-
-                if (FeatureFlags.I.CreateDebugIdleAnimations)
-                    NpcCreator.I.DebugAddIdleAnimationToAllNpc();
             }
             catch (Exception e)
             {
                 Debug.LogError(e);
             }
+        }
+
+        // Outsourced after async Task LoadStartupScenes() as async makes Debugging way harder
+        // (Breakpoints won't be catched during exceptions)
+        private void Update()
+        {
+            if (!debugFreshlyDoneLoading)
+                return;
+            else
+                debugFreshlyDoneLoading = false;
+            
+            if (FeatureFlags.I.CreateOcNpcs)
+                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
+
+            if (FeatureFlags.I.CreateDebugIdleAnimations)
+                NpcCreator.I.DebugAddIdleAnimationToAllNpc();
         }
 
         private async Task LoadMainMenu()
@@ -81,16 +92,20 @@ namespace GVR.Manager
         public async Task LoadWorld(string worldName, string startVob)
         {
             startVobAfterLoading = startVob;
+            
             if (worldName == newWorldName)
             {
                 SetSpawnPoint(SceneManager.GetSceneByName(newWorldName));
                 TeleportPlayerToSpot();
                 return;
             }
+            
             newWorldName = worldName;
             MusicCreator.I.setMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
+            StartWorldLoading.Invoke();
+            
             await ShowLoadingScene(worldName);
             var newWorldScene = await LoadNewWorldScene(newWorldName);
             await WorldCreator.I.CreateAsync(newWorldName);
@@ -99,6 +114,8 @@ namespace GVR.Manager
             HideLoadingScene();
             watch.Stop();
             Debug.Log($"Time spent for loading {worldName}: {watch.Elapsed}");
+            
+            debugFreshlyDoneLoading = true;
         }
 
         private async Task<Scene> LoadNewWorldScene(string worldName)
