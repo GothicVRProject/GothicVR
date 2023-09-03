@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -344,7 +344,7 @@ MonoBehaviour:
   CreateVobs: 1
   CreateWaypoints: 0
   CreateWaypointEdges: 0
-  SkipMainMenu: 0
+  SkipMainMenu: 1
   EnableDayTime: 1
   SunMovementPerformanceValue: 0
   StartHour: 17
@@ -360,9 +360,9 @@ MonoBehaviour:
   ShowPhoenixDebugMessages: 0
   ShowZspyLogs: 0
   ShowPhoenixVfsFileNotFoundErrors: 0
-  EnableSounds: 1
-  EnableMusic: 1
-  worldCulling: 1
+  EnableSounds: 0
+  EnableMusic: 0
+  worldCulling: 0
   cullingDistance: 300
   vobCulling: 1
   vobCullingSmall:

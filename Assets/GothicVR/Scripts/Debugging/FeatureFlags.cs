@@ -50,7 +50,8 @@ namespace GVR.Debugging
         public bool EnableMusic;
 
         
-        [Header("__________Performance: World Culling__________")]
+        [Header("__________Performance: World Culling (do no use)__________")]
+        [Tooltip("Doesn't add measurable performance and Mesh tiles are gone which looks awkward. Flag is only for future reference.")]
         public bool worldCulling;
         [Range(1f, 1000f)] public float cullingDistance;
         
