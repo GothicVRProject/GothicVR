@@ -14,27 +14,40 @@ namespace GVR.Manager
     /// </summary>
     public class CullingGroupManager : SingletonBehaviour<CullingGroupManager>
     {
+        private CullingGroup worldCullingGroup;
+        private List<GameObject> worldObjects = new();
+        
         private CullingGroup vobCullingGroupSmall;
         private CullingGroup vobCullingGroupMedium;
         private CullingGroup vobCullingGroupLarge;
-
         private List<GameObject> vobObjectsSmall = new();
         private List<GameObject> vobObjectsMedium = new();
         private List<GameObject> vobObjectsLarge = new();
 
         private void Start()
         {
-            // Unity demands it to be here.
+            GvrSceneManager.I.sceneGeneralUnloaded.AddListener(PreWorldCreate);
+            GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostWorldCreate);
+
+            // Unity demands CullingGroups to be created in Awake() or Start() earliest.
+            // World
+            worldCullingGroup = new();
+            
+            // Vobs
             vobCullingGroupSmall = new();
             vobCullingGroupMedium = new();
             vobCullingGroupLarge = new();
             
-            GvrSceneManager.I.sceneGeneralUnloaded.AddListener(PreWorldCreate);
-            GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostWorldCreate);
         }
 
         private void PreWorldCreate()
         {
+            // World
+            worldCullingGroup.Dispose();
+            worldCullingGroup = new();
+            worldObjects.Clear();
+
+            // Vobs
             vobCullingGroupSmall.Dispose();
             vobCullingGroupMedium.Dispose();
             vobCullingGroupLarge.Dispose();
@@ -46,6 +59,37 @@ namespace GVR.Manager
             vobObjectsSmall.Clear();
             vobObjectsMedium.Clear();
             vobObjectsLarge.Clear();
+        }
+
+                
+        private void WorldChanged(CullingGroupEvent evt)
+        {
+            worldObjects[evt.index].SetActive(evt.hasBecomeVisible);
+        }
+
+        public void PrepareWorldCulling(List<GameObject> objects)
+        {
+            if (!FeatureFlags.I.worldCulling)
+                return;
+            
+            var spheres = new List<BoundingSphere>();
+            
+            foreach (var obj in objects)
+            {
+                var mesh = GetMesh(obj);
+                if (mesh == null)
+                {
+                    Debug.LogError($"Couldn't find mesh for >{obj}< to be used for CullingGroup. Skipping...");
+                    continue;
+                }
+                
+                worldObjects.Add(obj);
+                spheres.Add(GetSphere(obj, mesh));
+            }
+
+            worldCullingGroup.onStateChanged = WorldChanged;
+            worldCullingGroup.SetBoundingDistances(new[]{FeatureFlags.I.cullingDistance});
+            worldCullingGroup.SetBoundingSpheres(spheres.ToArray());
         }
         
         private void VobSmallChanged(CullingGroupEvent evt)
@@ -84,17 +128,16 @@ namespace GVR.Manager
     
                     continue;
                 }
-                var bboxSize = mesh.bounds.size;
+
+                var sphere = GetSphere(obj, mesh);
+                var size = sphere.radius * 2;
                 
-                var maxDimension = Mathf.Max(bboxSize.x, bboxSize.y, bboxSize.z); // Get biggest dim for calculation of object size group.
-                var sphere = new BoundingSphere(obj.transform.position, maxDimension / 2); // Radius is half the size.
-                
-                if (maxDimension <= smallDim)
+                if (size <= smallDim)
                 {
                     vobObjectsSmall.Add(obj);
                     spheresSmall.Add(sphere);
                 }
-                else if (maxDimension <= mediumDim)
+                else if (size <= mediumDim)
                 {
                     vobObjectsMedium.Add(obj);
                     spheresMedium.Add(sphere);
@@ -119,6 +162,16 @@ namespace GVR.Manager
             vobCullingGroupLarge.SetBoundingSpheres(spheresLarge.ToArray());
         }
 
+        private BoundingSphere GetSphere(GameObject go, Mesh mesh)
+        {
+            var bboxSize = mesh.bounds.size;
+                
+            var maxDimension = Mathf.Max(bboxSize.x, bboxSize.y, bboxSize.z); // Get biggest dim for calculation of object size group.
+            var sphere = new BoundingSphere(go.transform.position, maxDimension / 2); // Radius is half the size.
+
+            return sphere;
+        }
+        
         /// <summary>
         /// TODO If performance allows it, we could also look dynamically for all the existing meshes inside GO
         /// TODO and look for maximum value for largest mesh. For now it should be fine.
@@ -145,10 +198,9 @@ namespace GVR.Manager
         /// </summary>
         private void PostWorldCreate()
         {
-            foreach (var group in new[] {vobCullingGroupSmall, vobCullingGroupMedium, vobCullingGroupLarge})
+            foreach (var group in new[] {worldCullingGroup, vobCullingGroupSmall, vobCullingGroupMedium, vobCullingGroupLarge})
             {
                 var mainCamera = Camera.main!;
-
                 group.targetCamera = mainCamera; // Needed for FrustumCulling and OcclusionCulling to work.
                 group.SetDistanceReferencePoint(mainCamera.transform); // Needed for BoundingDistances to work.
             }
@@ -156,6 +208,7 @@ namespace GVR.Manager
         
         private void OnDestroy()
         {
+            worldCullingGroup.Dispose();
             vobCullingGroupSmall.Dispose();
             vobCullingGroupMedium.Dispose();
             vobCullingGroupLarge.Dispose();

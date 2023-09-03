@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GVR.Manager;
 using GVR.Phoenix.Data;
@@ -21,6 +22,8 @@ namespace GVR.Creator.Meshes
             int numSubMeshes = world.subMeshes.Values.Count;
             int meshesCreated = 0;
 
+            var cullingGroupObjects = new List<GameObject>();
+            
             foreach (var subMesh in world.subMeshes.Values)
             {
                 var subMeshObj = new GameObject()
@@ -37,12 +40,15 @@ namespace GVR.Creator.Meshes
                 PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
 
                 subMeshObj.SetParent(meshObj);
+                cullingGroupObjects.Add(subMeshObj);
 
                 LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
 
                 if (++meshesCreated % meshesPerFrame == 0)
                     await Task.Yield(); // Yield to allow other operations to run in the frame
             }
+            
+            CullingGroupManager.I.PrepareWorldCulling(cullingGroupObjects);
 
             return meshObj;
         }
