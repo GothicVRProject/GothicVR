@@ -65,9 +65,10 @@ namespace GVR.Debugging
         public VobCullingGroupSetting vobCullingSmall;
         public VobCullingGroupSetting vobCullingMedium;
         public VobCullingGroupSetting vobCullingLarge;
-        
-        [Header("__________Performance: NPC Culling__________")]
-        public bool npcCulling;
-        public VobCullingGroupSetting npcVobCullingSetting;
+
+        // Not yet implemented.
+        // [Header("__________Performance: NPC Culling__________")]
+        // public bool npcCulling;
+        // public VobCullingGroupSetting npcVobCullingSetting;
     }
 }
