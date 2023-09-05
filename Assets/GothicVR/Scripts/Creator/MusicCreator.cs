@@ -42,12 +42,40 @@ namespace GVR.Creator
 
         private static GameObject backgroundMusic;
 
+        private float updateInterval = 5f; // Update music every 5 seconds
+        private float timer = 0f;
+
+        // This multiplier is used to increase the buffer size and reduce the number timess PrepareData is called
+        // also affects the delay of the music, it doesnt sound so harsh when switching
+        private int bufferSizeMultiplier = 16;
+
         void Start()
         {
             if (!FeatureFlags.I.EnableMusic)
                 return;
             backgroundMusic = GameObject.Find("BackgroundMusic");
             musicSource = backgroundMusic.AddComponent<AudioSource>();
+        }
+
+        /// <summary>
+        /// Called once every 0.20 seconds to update the music once the timer is bigger than the updateInterval
+        /// </summary>
+        void FixedUpdate()
+        {
+            if (!FeatureFlags.I.EnableMusic)
+                return;
+
+            if (!WorldCreator.I.IsWorldLoaded)
+            {
+                UpdateMusic();
+                return;
+            }
+            timer += Time.fixedDeltaTime;
+            if (timer >= updateInterval)
+            {
+                timer = 0f;
+                UpdateMusic();
+            }
         }
 
         public void Create()
@@ -75,7 +103,7 @@ namespace GVR.Creator
             AddMusicPath(fullPath, "AddonWorld");
 
             // Create audio clip with, 4 times the bufferSize so we have enough room, 2 channels and 44100Hz
-            var audioClip = AudioClip.Create("Music", bufferSize * 4, 2, 44100, true, PrepareData);
+            var audioClip = AudioClip.Create("Music", bufferSize * 4 * bufferSizeMultiplier, 2, 44100, true, PrepareData);
 
             musicSource.priority = 0;
             musicSource.clip = audioClip;
@@ -90,9 +118,7 @@ namespace GVR.Creator
 
         private void PrepareData(float[] data)
         {
-            UpdateMusic();
-
-            shortBuffer = new short[bufferSize * 2];
+            shortBuffer = new short[bufferSize * 2 * bufferSizeMultiplier];
 
             DMMixer.DMusicMix(mixer, shortBuffer, (uint)data.Length / 2);
 
