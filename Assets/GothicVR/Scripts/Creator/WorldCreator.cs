@@ -24,8 +24,12 @@ namespace GVR.Creator
         private GameObject teleportGo;
         private GameObject nonTeleportGo;
 
+        public bool IsWorldLoaded { get; private set; }
+
         public async Task CreateAsync(string worldName)
         {
+            IsWorldLoaded = false;
+            
             var world = LoadWorld(worldName);
             GameData.I.World = world;
             worldGo = new GameObject("World");
@@ -70,6 +74,8 @@ namespace GVR.Creator
             // TODO - For some reason the referenced skybox in scene is reset to default once game starts.
             // We therefore need to reset it now again.
             RenderSettings.skybox = TextureManager.I.skymaterial;
+
+            IsWorldLoaded = true;
         }
 
         private WorldData LoadWorld(string worldName)
