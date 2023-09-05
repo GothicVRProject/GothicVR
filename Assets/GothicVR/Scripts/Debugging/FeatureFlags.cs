@@ -48,12 +48,6 @@ namespace GVR.Debugging
         [Header("__________Audio__________")]
         public bool EnableSounds;
         public bool EnableMusic;
-
-        
-        [Header("__________Performance: World Culling (do no use)__________")]
-        [Tooltip("Doesn't add measurable performance and Mesh tiles are gone which looks awkward. Flag is only for future reference.")]
-        public bool worldCulling;
-        [Range(1f, 1000f)] public float cullingDistance;
         
         [Serializable]
         public class VobCullingGroupSetting
@@ -61,7 +55,7 @@ namespace GVR.Debugging
             [Range(1f, 100f)] public float maxObjectSize;
             [Range(1f, 1000f)] public float cullingDistance;
         }
-        [Header("__________Performance: Vob Culling__________")]
+        [Header("__________Performance__________")]
         public bool vobCulling;
         public VobCullingGroupSetting vobCullingSmall;
         public VobCullingGroupSetting vobCullingMedium;

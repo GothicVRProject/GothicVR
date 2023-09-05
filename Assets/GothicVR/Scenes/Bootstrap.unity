@@ -362,8 +362,6 @@ MonoBehaviour:
   ShowPhoenixVfsFileNotFoundErrors: 0
   EnableSounds: 0
   EnableMusic: 0
-  worldCulling: 0
-  cullingDistance: 300
   vobCulling: 1
   vobCullingSmall:
     maxObjectSize: 0

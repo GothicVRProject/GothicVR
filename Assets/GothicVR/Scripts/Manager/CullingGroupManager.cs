@@ -14,9 +14,6 @@ namespace GVR.Manager
     /// </summary>
     public class CullingGroupManager : SingletonBehaviour<CullingGroupManager>
     {
-        private CullingGroup worldCullingGroup;
-        private List<GameObject> worldObjects = new();
-        
         private CullingGroup vobCullingGroupSmall;
         private CullingGroup vobCullingGroupMedium;
         private CullingGroup vobCullingGroupLarge;
@@ -30,9 +27,6 @@ namespace GVR.Manager
             GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostWorldCreate);
 
             // Unity demands CullingGroups to be created in Awake() or Start() earliest.
-            // World
-            worldCullingGroup = new();
-            
             // Vobs
             vobCullingGroupSmall = new();
             vobCullingGroupMedium = new();
@@ -42,11 +36,6 @@ namespace GVR.Manager
 
         private void PreWorldCreate()
         {
-            // World
-            worldCullingGroup.Dispose();
-            worldCullingGroup = new();
-            worldObjects.Clear();
-
             // Vobs
             vobCullingGroupSmall.Dispose();
             vobCullingGroupMedium.Dispose();
@@ -59,37 +48,6 @@ namespace GVR.Manager
             vobObjectsSmall.Clear();
             vobObjectsMedium.Clear();
             vobObjectsLarge.Clear();
-        }
-
-                
-        private void WorldChanged(CullingGroupEvent evt)
-        {
-            worldObjects[evt.index].SetActive(evt.hasBecomeVisible);
-        }
-
-        public void PrepareWorldCulling(List<GameObject> objects)
-        {
-            if (!FeatureFlags.I.worldCulling)
-                return;
-            
-            var spheres = new List<BoundingSphere>();
-            
-            foreach (var obj in objects)
-            {
-                var mesh = GetMesh(obj);
-                if (mesh == null)
-                {
-                    Debug.LogError($"Couldn't find mesh for >{obj}< to be used for CullingGroup. Skipping...");
-                    continue;
-                }
-                
-                worldObjects.Add(obj);
-                spheres.Add(GetSphere(obj, mesh));
-            }
-
-            worldCullingGroup.onStateChanged = WorldChanged;
-            worldCullingGroup.SetBoundingDistances(new[]{FeatureFlags.I.cullingDistance});
-            worldCullingGroup.SetBoundingSpheres(spheres.ToArray());
         }
         
         private void VobSmallChanged(CullingGroupEvent evt)
@@ -198,7 +156,7 @@ namespace GVR.Manager
         /// </summary>
         private void PostWorldCreate()
         {
-            foreach (var group in new[] {worldCullingGroup, vobCullingGroupSmall, vobCullingGroupMedium, vobCullingGroupLarge})
+            foreach (var group in new[] {vobCullingGroupSmall, vobCullingGroupMedium, vobCullingGroupLarge})
             {
                 var mainCamera = Camera.main!;
                 group.targetCamera = mainCamera; // Needed for FrustumCulling and OcclusionCulling to work.
@@ -208,7 +166,6 @@ namespace GVR.Manager
         
         private void OnDestroy()
         {
-            worldCullingGroup.Dispose();
             vobCullingGroupSmall.Dispose();
             vobCullingGroupMedium.Dispose();
             vobCullingGroupLarge.Dispose();

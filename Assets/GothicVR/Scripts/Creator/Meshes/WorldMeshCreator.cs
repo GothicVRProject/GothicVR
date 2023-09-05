@@ -21,8 +21,6 @@ namespace GVR.Creator.Meshes
             // Track the progress of each sub-mesh creation separately
             int numSubMeshes = world.subMeshes.Values.Count;
             int meshesCreated = 0;
-
-            var cullingGroupObjects = new List<GameObject>();
             
             foreach (var subMesh in world.subMeshes.Values)
             {
@@ -40,7 +38,6 @@ namespace GVR.Creator.Meshes
                 PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
 
                 subMeshObj.SetParent(meshObj);
-                cullingGroupObjects.Add(subMeshObj);
 
                 LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
 
@@ -48,8 +45,6 @@ namespace GVR.Creator.Meshes
                     await Task.Yield(); // Yield to allow other operations to run in the frame
             }
             
-            CullingGroupManager.I.PrepareWorldCulling(cullingGroupObjects);
-
             return meshObj;
         }
     }
