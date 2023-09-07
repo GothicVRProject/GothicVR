@@ -2,6 +2,7 @@
 using System.IO;
 using UnityEngine;
 using GVR.Util;
+using System.Xml.Linq;
 
 namespace GVR.Manager.Settings
 {
@@ -17,6 +18,17 @@ namespace GVR.Manager.Settings
         {
             base.Awake();
             LoadGameSettings();
+        }
+
+        public bool SaveGameSettings(GameSettings updatedGameSettings)
+        {
+            // if(Application.platform == RuntimePlatform.WindowsPlayer) 
+            //{
+            //var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
+            //var settingsJson = File.ReadAllText(settingsFilePath);
+            //JsonUtility.FromJsonOverwrite(settingsJson, updatedGameSettings);
+            //  }
+            return true;
         }
 
 
