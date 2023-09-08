@@ -7,6 +7,8 @@ using PxCs.Interface;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using GVR.Npc;
+using TMPro;
 using UnityEngine;
 
 namespace GVR.Caches
@@ -17,16 +19,22 @@ namespace GVR.Caches
     public class LookupCache : SingletonBehaviour<LookupCache>
     {
         /// <summary>
-        /// [symbolIndex] = GameObject
+        /// [symbolIndex] = Properties-Component
         /// </summary>
-        public Dictionary<uint, GameObject> npcCache = new();
-        
+        public readonly Dictionary<uint, Properties> NpcCache = new();
+
         /// <summary>
         /// Already created AnimationClips can be reused.
         ///
         /// For creation of AnimationClip and it's curves, we need to have GameObject
         /// </summary>
-        public Dictionary<string, AnimationClip> animClipCache = new();
+        public Dictionary<string, AnimationClip> AnimClipCache = new();
+
+
+        /// <summary>
+        /// This dictionary caches the sprite assets for fonts.
+        /// </summary>
+        public Dictionary<string, TMP_SpriteAsset> fontCache = new();
 
     }
 }

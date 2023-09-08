@@ -20,10 +20,10 @@ namespace GVR.Creator
             var pxAnimation = AssetCache.I.TryGetAnimation(mdsName, animationName);
 
             // Try to load from cache
-            if (!LookupCache.I.animClipCache.TryGetValue(animationKeyName, out var clip))
+            if (!LookupCache.I.AnimClipCache.TryGetValue(animationKeyName, out var clip))
             {
                 clip = LoadAnimationClip(pxAnimation, mdh, go);
-                LookupCache.I.animClipCache[animationKeyName] = clip;
+                LookupCache.I.AnimClipCache[animationKeyName] = clip;
             }
             
             var animationComp = go.GetComponent<Animation>();

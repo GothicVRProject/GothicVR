@@ -6,6 +6,7 @@ using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Animation;
+using PxCs.Data.Font;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Sound;
@@ -30,6 +31,7 @@ namespace GVR.Caches
         private Dictionary<string, PxVmItemData> itemDataCache = new();
         private Dictionary<string, PxVmSfxData> sfxDataCache = new();
         private Dictionary<string, PxSoundData<float>> soundCache = new();
+        private Dictionary<string, PxFontData> fontCache = new();
 
         private readonly string[] misplacedMdmArmors =
         {
@@ -37,8 +39,10 @@ namespace GVR.Caches
             "Hum_GrdM_Armor",
             "Hum_GrdL_Armor",
             "Hum_NovM_Armor",
+            "Hum_TplL_Armor",
             "Hum_Body_Cooksmith",
             "Hum_VlkL_Armor",
+            "Hum_VlkM_Armor",
             "Hum_KdfS_Armor"
         };
 
@@ -126,13 +130,13 @@ namespace GVR.Caches
             return newData;
         }
 
-        public PxModelMeshData TryGetMdm(string key, params string[] attachmentKeys)
+        public PxModelMeshData TryGetMdm(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (mdmCache.TryGetValue(preparedKey, out PxModelMeshData data))
                 return data;
 
-            var newData = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mdm", attachmentKeys);
+            var newData = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, $"{preparedKey}.mdm");
             mdmCache[preparedKey] = newData;
 
             FixArmorTriangles(preparedKey, newData);
@@ -195,7 +199,7 @@ namespace GVR.Caches
 
             return TryGetItemData(symbol.name);
         }
-        
+
         /// <summary>
         /// Hint: Instances only need to be initialized once on phoenix.
         /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
@@ -237,6 +241,18 @@ namespace GVR.Caches
             soundCache[preparedKey] = wavFile;
 
             return wavFile;
+        }
+
+        public PxFontData TryGetFont(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (fontCache.TryGetValue(preparedKey, out PxFontData data))
+                return data;
+
+            var fontData = PxFont.LoadFont(GameData.I.VfsPtr, $"{preparedKey}.fnt");
+            fontCache[preparedKey] = fontData;
+
+            return fontData;
         }
 
         private string GetPreparedKey(string key)

@@ -33,7 +33,7 @@ namespace GVR.Player.Menu
             worlds.Add("Orc Temple", "orctempel.zen");
             worlds.Add("Free Mine", "freemine.zen");
 
-            worldDropdown.itemText.font = GameData.I.GothicSubtitleFont;
+            worldDropdown.itemText.font = GameData.I.EmptyFont;
             worldDropdown.onValueChanged.AddListener(WorldDropdownItemSelected);
             foreach (var item in worlds)
             {
@@ -93,7 +93,8 @@ namespace GVR.Player.Menu
 
             WaypointSetDropdownValues();
 
-            waypointDropdown.itemText.font = GameData.I.GothicSubtitleFont;
+            // We use an empty font so we can force TMP to use spriteAsset for each character
+            waypointDropdown.itemText.font = GameData.I.EmptyFont;
             waypointDropdown.onValueChanged.AddListener(WaypointDropdownItemSelected);
 
         }
@@ -101,7 +102,8 @@ namespace GVR.Player.Menu
         void WorldDropdownItemSelected(int value)
         {
             var item = worldDropdown.options[value].text;
-            worldDropdown.itemText.font = GameData.I.GothicSubtitleFont;
+            // We use an empty font so we can force TMP to use spriteAsset for each character
+            worldDropdown.itemText.font = GameData.I.EmptyFont;
             ConstantsManager.I.selectedWorld = worlds[item];
             WaypointSetDropdownValues();
         }
@@ -120,7 +122,8 @@ namespace GVR.Player.Menu
         {
             var item = waypointDropdown.options[value].text;
 
-            waypointDropdown.itemText.font = GameData.I.GothicSubtitleFont;
+            // We use an empty font so we can force TMP to use spriteAsset for each character
+            waypointDropdown.itemText.font = GameData.I.EmptyFont;
 
 
             Debug.Log($"Waypoint DropdownItemSelected: {item} with value: {value}");
