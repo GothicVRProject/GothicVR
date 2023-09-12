@@ -20,19 +20,17 @@ namespace GVR.Manager.Settings
             LoadGameSettings();
         }
 
-        public bool SaveGameSettings(GameSettings updatedGameSettings)
+        public void SaveGameSettings(GameSettings gameSettings)
         {
-            // if(Application.platform == RuntimePlatform.WindowsPlayer) 
-            //{
-            //var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
-            //var settingsJson = File.ReadAllText(settingsFilePath);
-            //JsonUtility.FromJsonOverwrite(settingsJson, updatedGameSettings);
-            //  }
-            return true;
+            if(Application.platform != RuntimePlatform.Android)
+            {
+                var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
+                var settingsJson = JsonUtility.ToJson(gameSettings, true);
+                File.WriteAllText(settingsFilePath,settingsJson);
+            }
         }
 
-
-        private void LoadGameSettings()
+        public GameSettings LoadGameSettings()
         {
             var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
             if (!File.Exists(settingsFilePath))
@@ -45,6 +43,7 @@ namespace GVR.Manager.Settings
 
             var settingsJson = File.ReadAllText(settingsFilePath);
             GameSettings = JsonUtility.FromJson<GameSettings>(settingsJson);
+            return GameSettings;
 
             // We ignore the "GothicIPath" field which is found in GameSettings for Android
             if (Application.platform == RuntimePlatform.Android)
@@ -55,9 +54,9 @@ namespace GVR.Manager.Settings
             {
                 var devJson = File.ReadAllText(settingsDevFilePath);
                 JsonUtility.FromJsonOverwrite(devJson, GameSettings);
+                return GameSettings;
             }
 
-            CheckIfGothicIDirectoryExists();
         }
 
         /// <summary>
@@ -79,13 +78,16 @@ namespace GVR.Manager.Settings
                 return Application.streamingAssetsPath;
         }
 
-        private void CheckIfGothicIDirectoryExists()
+        public bool CheckIfGothic1InstallationExists()
         {
-            if (!Directory.Exists(GameSettings.GothicIPath))
-                throw new ArgumentException(
-                    $"GothicI installation path wasn't found at >{GameSettings.GothicIPath}<." +
-                    $"Please put in the right absolute path to your local installation.");
-        }
+            bool isValid = false;
+            if (Directory.Exists(GameSettings.GothicIPath))
+            {
+                var pathGothicExe = GameSettings.GothicIPath + "\\system\\Gothic.exe";
+                isValid = File.Exists(pathGothicExe);
+            }
+            return isValid;
+         }
 
         /// <summary>
         /// Import the settings file from streamingAssetPath to persistentDataPath.

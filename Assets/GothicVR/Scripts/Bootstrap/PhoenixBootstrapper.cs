@@ -1,10 +1,8 @@
-using System;
 using System.Diagnostics;
 using System.IO;
 using AOT;
 using GVR.Creator;
 using GVR.Debugging;
-using GVR.Demo;
 using GVR.Manager;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
@@ -12,9 +10,8 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Util;
 using PxCs.Helper;
 using PxCs.Interface;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEngine.TextCore.LowLevel;
+using UnityEngine.XR;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace GVR.Bootstrap
@@ -22,10 +19,15 @@ namespace GVR.Bootstrap
     public class PhoenixBootstrapper : SingletonBehaviour<PhoenixBootstrapper>
     {
         private bool _loaded = false;
+        private GameObject installationFilePicker;
 
         private void Start()
         {
             PxLogging.pxLoggerSet(PxLoggerCallback);
+
+            //Initialize and switch off FilepickerUI
+            installationFilePicker = GameObject.Find("InstallationFilePicker");
+            installationFilePicker.SetActive(false);
         }
 
         private void Update()
@@ -35,17 +37,30 @@ namespace GVR.Bootstrap
                 return;
             _loaded = true;
 
+            var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
+
+            //Check if Installation exists, start the game if true, show the installation filepicker if false
+            if(SettingsManager.I.CheckIfGothic1InstallationExists())
+            {
+                BootGothicVR(g1Dir);
+            }
+            else
+            {
+                installationFilePicker.SetActive(true);
+            }
+        }
+
+        public void BootGothicVR(string g1Dir)
+        {
             var watch = Stopwatch.StartNew();
 
-            var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
-            
             // FIXME - We currently don't load from within _WORK directory which is required for e.g. mods who use it.
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "Data"));
 
             // Holy grail of everything! If this pointer is zero, we have nothing but a plain empty wormhole.
             GameData.I.VfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);
 
-            
+
             SetLanguage();
             LoadGothicVM(g1Dir);
             LoadSfxVM(g1Dir);
@@ -58,6 +73,7 @@ namespace GVR.Bootstrap
 #pragma warning disable CS4014 // It's intended, that this async call is not awaited.
             GvrSceneManager.I.LoadStartupScenes();
 #pragma warning restore CS4014
+
         }
 
         [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]
