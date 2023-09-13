@@ -29,8 +29,10 @@ namespace GVR.Creator
 
             foreach (var waypoint in world.waypoints)
             {
-                var wpobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                // var wpobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                var wpobject = new GameObject();
 
+                wpobject.tag = "PxVob_zCVobSpot";
                 wpobject.name = waypoint.name;
                 wpobject.transform.position = waypoint.position.ToUnityVector();
 
