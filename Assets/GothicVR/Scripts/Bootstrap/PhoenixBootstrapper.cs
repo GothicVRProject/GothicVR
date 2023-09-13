@@ -19,14 +19,15 @@ namespace GVR.Bootstrap
     public class PhoenixBootstrapper : SingletonBehaviour<PhoenixBootstrapper>
     {
         private bool _loaded = false;
-        public GameObject installationFilePicker;
+        public GameObject configurationMessage;
+        public GameObject filePickerButton;
 
         private void Start()
         {
             PxLogging.pxLoggerSet(PxLoggerCallback);
 
             // Just in case we forgot to disable it in scene view. ;-)
-            installationFilePicker.SetActive(false);
+            configurationMessage.SetActive(false);
         }
 
         private void Update()
@@ -38,10 +39,19 @@ namespace GVR.Bootstrap
 
             var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
 
-            if(SettingsManager.I.CheckIfGothic1InstallationExists())
+            if (SettingsManager.I.CheckIfGothic1InstallationExists())
+            {
                 BootGothicVR(g1Dir);
+            }
             else
-                installationFilePicker.SetActive(true);
+            {
+                //Show the startup config message, show filepicker for PCVR but not for Android standalone
+                configurationMessage.SetActive(true);
+                if (Application.platform == RuntimePlatform.Android)
+                    filePickerButton.SetActive(false);
+                else
+                    filePickerButton.SetActive(false);
+            }
         }
 
         public void BootGothicVR(string g1Dir)
