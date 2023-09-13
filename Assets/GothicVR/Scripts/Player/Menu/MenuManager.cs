@@ -1,16 +1,31 @@
+using GVR.Creator;
 using GVR.Manager;
+using GVR.Phoenix.Util;
 using UnityEngine;
 
 namespace GVR.Player.Menu
 {
-    public class MenuButtonScript : MonoBehaviour
+    public class MenuManager : MonoBehaviour
     {
-
         public GameObject MainMenu;
         public GameObject SettingsMenu;
         public GameObject TeleportMenu;
         public GameObject MovementMenu;
         public GameObject UIMenu;
+
+        void Awake()
+        {
+            SetSettingsValues();
+        }
+
+        public void SetSettingsValues()
+        {
+            var moveSetting = MovementMenu.FindChildRecursively("MoveSpeedSlider").GetComponent<MoveSpeedController>();
+            moveSetting.ChangeMoveSpeed(PlayerPrefs.GetFloat(ConstantsManager.I.moveSpeedPlayerPref));
+
+            var turnSetting = MovementMenu.FindChildRecursively("TurnSettingDropdown").GetComponent<TurnSettingDropdownController>();
+            turnSetting.DropdownItemSelected(PlayerPrefs.GetInt(ConstantsManager.I.turnSettingPlayerPref));
+        }
 
         public void PlayFunction()
         {
@@ -69,5 +84,4 @@ namespace GVR.Player.Menu
             Application.Quit();
         }
     }
-
 }
