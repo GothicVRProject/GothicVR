@@ -8,9 +8,7 @@ public class ControllerManager : MonoBehaviour
     public GameObject raycastRight;
     public GameObject directLeft;
     public GameObject directRight;
-    public GameObject settingsMenue;
-    public GameObject teleportMenu;
-    public GameObject UIGameObject;
+    public GameObject MenuGameObject;
 
     private InputAction leftPrimaryButtonAction;
     private InputAction leftSecondaryButtonAction;
@@ -32,9 +30,8 @@ public class ControllerManager : MonoBehaviour
         rightPrimaryButtonAction = new InputAction("primaryButton", binding: "<XRController>{RightHand}/primaryButton");
         rightSecondaryButtonAction = new InputAction("secondaryButton", binding: "<XRController>{RightHand}/secondaryButton");
 
-        rightPrimaryButtonAction.started += ctx => ShowSettingsMenu();
 
-        rightSecondaryButtonAction.started += ctx => ShowTeleportMenu();
+        rightPrimaryButtonAction.started += ctx => ShowMainMenu();
 
         rightPrimaryButtonAction.Enable();
         rightSecondaryButtonAction.Enable();
@@ -65,52 +62,15 @@ public class ControllerManager : MonoBehaviour
         directRight.SetActive(true);
     }
 
-    public void ShowSettingsMenu()
+    public void ShowMainMenu()
     {
-        if (!settingsMenue.activeSelf)
-        {
-            settingsMenue.SetActive(true);
-            FontManager.I.ChangeFont();
-        }
+        if (!MenuGameObject.activeSelf)
+            MenuGameObject.SetActive(true);
         else
-        {
-            settingsMenue.SetActive(false);
-        }
-    }
-
-    public void ShowTeleportMenu()
-    {
-        if (!teleportMenu.activeSelf)
-        {
-            teleportMenu.SetActive(true);
-            FontManager.I.ChangeFont();
-        }
-        else
-        {
-            teleportMenu.SetActive(false);
-        }
-    }
-    public void ShowUI()
-    {
-    }
-
-    public void HideUI()
-    {
-    }
-
-    public void ShowMainMenue()
-    {
-    }
-
-    public void HideMainMenue()
-    {
+            MenuGameObject.SetActive(false);
     }
 
     public void ShowInventory()
-    {
-    }
-
-    public void HideInventory()
     {
     }
 }
