@@ -11,15 +11,17 @@ namespace GVR
         {
             var paths = StandaloneFileBrowser.OpenFolderPanel("Select Gothic installation","", false);
 
-            if (paths != null && paths.Length > 0)
+            if (paths == null || paths.Length == 0)
+                return;
+            
+            GameSettings gameSettings = SettingsManager.I.LoadGameSettings();
+            gameSettings.GothicIPath = paths[0];
+            SettingsManager.I.SaveGameSettings(gameSettings);
+            
+            if (SettingsManager.I.CheckIfGothic1InstallationExists())
             {
-                GameSettings gameSettings = SettingsManager.I.LoadGameSettings();
-                gameSettings.GothicIPath = paths[0];
-                SettingsManager.I.SaveGameSettings(gameSettings);
-                if (SettingsManager.I.CheckIfGothic1InstallationExists())
-                {
-                    PhoenixBootstrapper.I.BootGothicVR(SettingsManager.I.GameSettings.GothicIPath);
-                }
+                PhoenixBootstrapper.I.installationFilePicker.SetActive(false);
+                PhoenixBootstrapper.I.BootGothicVR(SettingsManager.I.GameSettings.GothicIPath);
             }
         }
     }

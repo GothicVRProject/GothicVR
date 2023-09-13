@@ -43,8 +43,6 @@ namespace GVR.Manager.Settings
 
             var settingsJson = File.ReadAllText(settingsFilePath);
             GameSettings = JsonUtility.FromJson<GameSettings>(settingsJson);
-            return GameSettings;
-
             // We ignore the "GothicIPath" field which is found in GameSettings for Android
             if (Application.platform == RuntimePlatform.Android)
                 GameSettings.GothicIPath = GetRootPath();
@@ -54,9 +52,9 @@ namespace GVR.Manager.Settings
             {
                 var devJson = File.ReadAllText(settingsDevFilePath);
                 JsonUtility.FromJsonOverwrite(devJson, GameSettings);
-                return GameSettings;
             }
 
+            return GameSettings;
         }
 
         /// <summary>

@@ -19,14 +19,13 @@ namespace GVR.Bootstrap
     public class PhoenixBootstrapper : SingletonBehaviour<PhoenixBootstrapper>
     {
         private bool _loaded = false;
-        private GameObject installationFilePicker;
+        public GameObject installationFilePicker;
 
         private void Start()
         {
             PxLogging.pxLoggerSet(PxLoggerCallback);
 
-            //Initialize and switch off FilepickerUI
-            installationFilePicker = GameObject.Find("InstallationFilePicker");
+            // Just in case we forgot to disable it in scene view. ;-)
             installationFilePicker.SetActive(false);
         }
 
@@ -39,15 +38,10 @@ namespace GVR.Bootstrap
 
             var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
 
-            //Check if Installation exists, start the game if true, show the installation filepicker if false
             if(SettingsManager.I.CheckIfGothic1InstallationExists())
-            {
                 BootGothicVR(g1Dir);
-            }
             else
-            {
                 installationFilePicker.SetActive(true);
-            }
         }
 
         public void BootGothicVR(string g1Dir)
