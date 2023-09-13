@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using Debug = UnityEngine.Debug;
@@ -15,21 +17,22 @@ namespace GVR.Manager
 {
     public class GvrSceneManager : SingletonBehaviour<GvrSceneManager>
     {
+        public static UnityEvent StartWorldLoading = new(); // Basically to clear caches etc.
+
+        public GameObject interactionManager;
+        
         private const string generalSceneName = "General";
+        private const int ensureLoadingBarDelayMilliseconds = 5;
 
         private string newWorldName;
         private string startVobAfterLoading;
-
         private Scene generalScene;
-        private bool generalSceneLoaded = false;
-
+        private bool generalSceneLoaded;
         private GameObject startPoint;
+        private GameObject player;
 
-        public GameObject interactionManager;
-
-        private const int ensureLoadingBarDelayMilliseconds = 5;
-
-
+        private bool debugFreshlyDoneLoading;
+        
         protected override void Awake()
         {
             base.Awake();
@@ -44,20 +47,58 @@ namespace GVR.Manager
         /// </summary>
         public async Task LoadStartupScenes()
         {
-            await LoadWorld("world.zen", "ENTRANCE_SURFACE_OLDMINE");
+            try
+            {
+                if (FeatureFlags.I.SkipMainMenu)
+                    await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
+                else
+                    await LoadMainMenu();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
 
-            // Debug! Will be removed in the future.
+        // Outsourced after async Task LoadStartupScenes() as async makes Debugging way harder
+        // (Breakpoints won't be catched during exceptions)
+        private void Update()
+        {
+            if (!debugFreshlyDoneLoading)
+                return;
+            else
+                debugFreshlyDoneLoading = false;
+            
             if (FeatureFlags.I.CreateOcNpcs)
-                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_OLDCAMP");
+                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
+
+            if (FeatureFlags.I.CreateDebugIdleAnimations)
+                NpcCreator.I.DebugAddIdleAnimationToAllNpc();
+        }
+
+        private async Task LoadMainMenu()
+        {
+            TextureManager.I.LoadLoadingDefaultTextures();
+            await LoadNewWorldScene("MainMenu");
         }
 
         public async Task LoadWorld(string worldName, string startVob)
         {
-            MusicCreator.I.setMusic("SYS_LOADING");
-            newWorldName = worldName;
             startVobAfterLoading = startVob;
+            
+            if (worldName == newWorldName)
+            {
+                SetSpawnPoint(SceneManager.GetSceneByName(newWorldName));
+                TeleportPlayerToSpot();
+                return;
+            }
+            
+            newWorldName = worldName;
+            MusicCreator.I.setMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
+            StartWorldLoading.Invoke();
+            
             await ShowLoadingScene(worldName);
             var newWorldScene = await LoadNewWorldScene(newWorldName);
             await WorldCreator.I.CreateAsync(newWorldName);
@@ -66,6 +107,8 @@ namespace GVR.Manager
             HideLoadingScene();
             watch.Stop();
             Debug.Log($"Time spent for loading {worldName}: {watch.Elapsed}");
+            
+            debugFreshlyDoneLoading = true;
         }
 
         private async Task<Scene> LoadNewWorldScene(string worldName)
@@ -143,12 +186,15 @@ namespace GVR.Manager
 
                 WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
 
-                var playerParent = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController");
-
-                if (startPoint != null)
-                    playerParent!.transform.Find("VRPlayer").transform.position = startPoint.transform.position;
+                TeleportPlayerToSpot();
             }
-            else if (scene.name == newWorldName?.ToLower())
+            else if (scene.name == "MainMenu")
+            {
+                var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
+                sphere.GetComponent<MeshRenderer>().material = TextureManager.I.LoadingSphereMaterial;
+                SceneManager.SetActiveScene(scene);
+            }
+            else
             {
                 SceneManager.SetActiveScene(scene);
             }
@@ -189,6 +235,23 @@ namespace GVR.Manager
         {
             GameData.I.WorldScene!.Value.GetRootGameObjects().Append(go);
             SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.I.WorldScene.Value.name));
+        }
+
+        private void SetPlayer()
+        {
+            player = generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController").transform.Find("VRPlayer").gameObject;
+        }
+
+        public void TeleportPlayerToSpot()
+        {
+            if (player == null)
+                SetPlayer();
+
+            if (startPoint != null)
+            {
+                player.transform.position = startPoint.transform.position;
+                player.transform.rotation = startPoint.transform.rotation;
+            }
         }
     }
 }

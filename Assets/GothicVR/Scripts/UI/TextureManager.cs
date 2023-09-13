@@ -5,6 +5,10 @@ using GVR.Util;
 
 public class TextureManager : SingletonBehaviour<TextureManager>
 {
+    public Material MainMenuImageBackgroundMaterial;
+    public Material MainMenuBackgroundMaterial;
+    public Material MainMenuTextImageMaterial;
+
     public Material backgroundmaterial;
     public Material buttonmaterial;
     public Material slidermaterial;
@@ -22,6 +26,11 @@ public class TextureManager : SingletonBehaviour<TextureManager>
 
     private void Start()
     {
+
+        MainMenuImageBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        MainMenuBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        MainMenuTextImageMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+
         GothicLoadingMenuMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
         LoadingBarBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
         LoadingBarMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
@@ -40,6 +49,16 @@ public class TextureManager : SingletonBehaviour<TextureManager>
 
     public void LoadLoadingDefaultTextures()
     {
+
+        var mainMenuImageBackgroundTexture = AssetCache.I.TryGetTexture("STARTSCREEN.TGA");
+        MainMenuImageBackgroundMaterial.mainTexture = mainMenuImageBackgroundTexture;
+
+        var mainMenuImageTexture = AssetCache.I.TryGetTexture("MENU_INGAME.TGA");
+        MainMenuBackgroundMaterial.mainTexture = mainMenuImageTexture;
+
+        var mainMenuTextImageTexture = AssetCache.I.TryGetTexture("MENU_GOTHIC.TGA");
+        MainMenuTextImageMaterial.mainTexture = mainMenuTextImageTexture;
+
         var loadingBackgroundTexture = AssetCache.I.TryGetTexture("LOADING.TGA");
         GothicLoadingMenuMaterial.mainTexture = loadingBackgroundTexture;
 

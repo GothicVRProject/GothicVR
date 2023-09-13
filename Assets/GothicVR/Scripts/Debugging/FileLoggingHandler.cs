@@ -1,4 +1,5 @@
 using System.IO;
+using GVR.Manager.Settings;
 using UnityEngine;
 
 namespace GVR.Debugging
@@ -6,14 +7,22 @@ namespace GVR.Debugging
     public class FileLoggingHandler : MonoBehaviour
     {
         private StreamWriter fileWriter;
-        int currLogLevel = 0;
+        private LogLevel logLevel;
 
+        // Levels are aligned with Unity's levels: UnityEngine.LogType
+        private enum LogLevel
+        {
+	        Debug = 0,
+	        Warning = 1,
+	        Error = 2,
+	        Exception = 3
+        }
 
 		private void Awake()
         {
-			//currLogLevel = SingletonBehaviour<SettingsManager>.GetOrCreate().GameSettings.LogLevel;
+			Application.logMessageReceived += HandleLog;
 
-			fileWriter = new StreamWriter(Application.persistentDataPath + "/gothicvr_log.txt", false);
+			fileWriter = new(Application.persistentDataPath + "/gothicvr_log.txt", false);
 			fileWriter.WriteLine("DeviceModel: " + SystemInfo.deviceModel);
 			fileWriter.WriteLine("DeviceType: " + SystemInfo.deviceType);
 			fileWriter.WriteLine("OperatingSystem: " + SystemInfo.operatingSystem);
@@ -21,8 +30,24 @@ namespace GVR.Debugging
 			fileWriter.WriteLine("MemorySize: " + SystemInfo.systemMemorySize);
 			fileWriter.WriteLine("GVR Version: " + Application.version);
             fileWriter.WriteLine();
-			Application.logMessageReceived += HandleLog;
-            Debug.Log("Init file logging handler done");
+            fileWriter.Flush();
+		}
+
+		/// <summary>
+		/// We need to set LogLevel at this stage to ensure we have SettingsManager initialized.
+		/// </summary>
+		private void Start()
+		{
+			if (LogLevel.TryParse(SettingsManager.I.GameSettings.LogLevel, true, out LogLevel value))
+			{
+				fileWriter.WriteLine("LogLevel Setting found: " + SettingsManager.I.GameSettings.LogLevel);
+				logLevel = value;
+			}
+			else
+			{
+				fileWriter.WriteLine("LogLevel Setting not found. Setting Default to >Warning<.");
+				logLevel = LogLevel.Warning;
+			}
 			fileWriter.Flush();
 		}
 
@@ -34,46 +59,28 @@ namespace GVR.Debugging
 
         private void HandleLog(string logString, string stackTrace, LogType type)
         {
-            var level = (int)type;
+	        if (!ShallBeLogged(type))
+		        return;
+	        
+	        fileWriter.WriteLine(type + ": " + logString);
+	        fileWriter.Flush();
+        }
 
-			if (level >= currLogLevel)
-			{
-				switch (level)
-				{
-					case (int)LogLevel.Debug:
-						fileWriter.WriteLine(type + ": " + logString);
-						fileWriter.Flush();
-						break;
-					case (int)LogLevel.Info:
-						fileWriter.WriteLine(type + ": " + logString);
-						fileWriter.Flush();
-						break;
-					case (int)LogLevel.Warn:
-						fileWriter.WriteLine(type + ": " + logString);
-						fileWriter.Flush();
-						break;
-					case (int)LogLevel.Error:
-						fileWriter.WriteLine(type + ": " + logString);
-						fileWriter.WriteLine(stackTrace);
-						fileWriter.Flush();
-						break;
-					case (int)LogLevel.Fatal:
-						fileWriter.WriteLine(type + ": " + logString);
-						fileWriter.WriteLine(stackTrace);
-						fileWriter.Flush();
-						break;
-				}
-			}
-
-		}
-    }
-
-    public enum LogLevel
-    {
-        Debug = 0,
-        Info = 1,
-        Warn = 2,
-        Error = 3,
-        Fatal = 4,
+        private bool ShallBeLogged(LogType type)
+        {
+	        switch (logLevel)
+	        {
+		        case LogLevel.Debug:
+					return true; // Log everything
+			    case LogLevel.Warning:
+				    return type != LogType.Log; // includes Assert, Warning, Error, Exception
+			    case LogLevel.Error:
+				    return type == LogType.Error || type == LogType.Exception;
+			    case LogLevel.Exception:
+				    return type == LogType.Exception;
+			    default:
+				    return true; // never reached, but compiler demands it.
+	        }
+        }
     }
 }

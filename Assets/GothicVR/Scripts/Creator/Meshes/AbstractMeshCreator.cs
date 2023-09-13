@@ -26,11 +26,11 @@ namespace GVR.Creator.Meshes
             return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
         }
 
-        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null)
+        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            var rootGo = new GameObject(objectName);
+            rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
             rootGo.SetParent(parent);
-
+            
             var nodeObjects = new GameObject[mdh.nodes!.Length];
 
             // Create empty GameObjects from hierarchy
@@ -85,8 +85,10 @@ namespace GVR.Creator.Meshes
                 CreateBonesData(rootGo, nodeObjects, meshRenderer, softSkinMesh);
             }
 
+            var attachments = GetFilteredAttachments(mdm.attachments);
+            
             // Fill GameObjects with Meshes from attachments
-            foreach (var subMesh in mdm.attachments!)
+            foreach (var subMesh in attachments)
             {
                 var meshObj = nodeObjects.First(bone => bone.name == subMesh.Key);
                 var meshFilter = meshObj.AddComponent<MeshFilter>();
@@ -105,6 +107,14 @@ namespace GVR.Creator.Meshes
             nodeObjects[0].transform.localPosition = Vector3.zero;
 
             return rootGo;
+        }
+
+        /// <summary>
+        /// There are some objects (e.g. NPCs) where we want to skip specific attachments. This method can be overridden for this feature.
+        /// </summary>
+        protected virtual Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
+        {
+            return attachments;
         }
 
         public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)

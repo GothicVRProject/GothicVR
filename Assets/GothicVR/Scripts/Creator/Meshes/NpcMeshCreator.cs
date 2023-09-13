@@ -1,9 +1,9 @@
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using GVR.Caches;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using PxCs.Data.Mesh;
-using PxCs.Data.Model;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
@@ -12,20 +12,34 @@ namespace GVR.Creator.Meshes
 {
     public class NpcMeshCreator : AbstractMeshCreator<NpcMeshCreator>
     {
-        private int tmpBodyTexNr;
-        private int tmpBodyTexColor;
+        private VmGothicExternals.ExtSetVisualBodyData tempBodyData;
 
-        private VmGothicBridge.Mdl_SetVisualBodyData tempBodyData;
-
-        public GameObject CreateNpc(string npcName, PxModelMeshData mdm, PxModelHierarchyData mdh,
-            PxMorphMeshData morphMesh, VmGothicBridge.Mdl_SetVisualBodyData bodyData, GameObject parent)
+        public GameObject CreateNpc(string npcName, string mdmName, string mdhName,
+            string headName, VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
         {
-            tmpBodyTexNr = bodyData.bodyTexNr;
-            tmpBodyTexColor = bodyData.bodyTexColor;
+            tempBodyData = bodyData;
+            var mdm = AssetCache.I.TryGetMdm(mdmName);
+            var mdh = AssetCache.I.TryGetMdh(mdhName);
+            
+            if (mdm == null)
+            {
+                Debug.LogError($"MDH from name >{mdmName}< for object >{root.name}< not found.");
+                return null;
+            }
+            
+            if (mdh == null)
+            {
+                Debug.LogError($"MDH from name >{mdhName}< for object >{root.name}< not found.");
+                return null;
+            }
+            
+            var npcGo = Create(npcName, mdm, mdh, default, default, null, root);
 
-            var npcGo = Create(npcName, mdm, mdh, default, default, parent);
-
-            AddHead(npcName, npcGo, morphMesh);
+            if (!string.IsNullOrEmpty(headName))
+            {
+                var mmb = AssetCache.I.TryGetMmb(headName);   
+                AddHead(npcName, npcGo, mmb);
+            }
 
             return npcGo;
         }
@@ -52,22 +66,40 @@ namespace GVR.Creator.Meshes
         /// </summary>
         protected override Texture2D GetTexture(string name)
         {
-            // FIXME: Dirty hack. Needs to be optimized.
-            if (name.ToUpper().Contains("MOUTH") || name.ToUpper().Contains("TEETH"))
-                return base.GetTexture(name);
+            string finalTextureName;
+            
+            // FIXME - We don't have different mouths in Gothic1. Need to recheck it in Gothic2.
+            if (name.ToUpper().EndsWith("MOUTH_V0.TGA"))
+                finalTextureName = name;
+            else if (name.ToUpper().EndsWith("TEETH_V0.TGA"))
+                // e.g. Some_Texture_V0.TGA --> Some_Texture_V1.TGA
+                finalTextureName = Regex.Replace(name, "(?<=.*?)V0", $"V{tempBodyData.TeethTexNr}");
+            else if (name.ToUpper().Contains("BODY") && name.ToUpper().EndsWith("V0_C0.TGA"))
+                // This regex replaces the suffix of V0_C0 with values of corresponding data.
+                // e.g. Some_Texture_V0_C0.TGA --> Some_Texture_V1_C2.TGA
+                finalTextureName = Regex.Replace(name, "(?<=.*?)V0_C0",
+                    $"V{tempBodyData.BodyTexNr}_C{tempBodyData.BodyTexColor}");
+            else if (name.ToUpper().Contains("HEAD") && name.ToUpper().EndsWith("V0_C0.TGA"))
+                finalTextureName = Regex.Replace(name, "(?<=.*?)V0_C0",
+                    $"V{tempBodyData.HeadTexNr}_C{tempBodyData.BodyTexColor}");
+            else
+                // No changeable texture needed? Skip updating texture name.
+                finalTextureName = name;
 
-            if (!name.ToUpper().EndsWith("V0_C0.TGA"))
-            {
-                // Debug.LogError($"The format of body texture isn't right for ${name}");
-                return base.GetTexture(name);
-            }
-
-            // This regex replaces the suffix of V0_C0 with values of corresponding data.
-            // e.g. Some_Texture_V0_C0.TGA --> Some_Texture_V1_C2.TGA
-            var formattedTextureName = Regex.Replace(name, "(?<=.*?)V0_C0", $"V{tmpBodyTexNr}_C{tmpBodyTexColor}");
-
-            return AssetCache.I.TryGetTexture(formattedTextureName);
+            return base.GetTexture(finalTextureName);
         }
+        
+        protected override Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
+        {
+            Dictionary<string, PxMultiResolutionMeshData> newAttachments = new(attachments);
+
+            // Remove head as it will be loaded later.
+            if (newAttachments.Remove("BIP01 HEAD"))
+                Debug.Log("Removed default >BIP01 HEAD< attachment mesh from NPC.");
+            
+            return newAttachments;
+        }
+
 
 
         public void EquipWeapon(GameObject npcGo, PxVmItemData itemData, PxVm.PxVmItemFlags mainFlag, PxVm.PxVmItemFlags flags)

@@ -385,11 +385,9 @@ namespace GVR.Creator
             }
             var animation = animations.First(i => i.name == animationName);
 
-            var animator = rootObj.gameObject.AddComponent<Animator>();
+            var animationComp = rootObj.gameObject.AddComponent<Animation>();
             var clip = new AnimationClip();
-            var playableGraph = PlayableGraph.Create(rootObj.name);
-
-            playableGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+            clip.legacy = true;
 
             var curves = new Dictionary<string, List<AnimationCurve>>((int)animation.nodeCount);
             var boneNames = animation.node_indices.Select(nodeIndex => mdh.nodes[nodeIndex].name).ToArray();
@@ -450,16 +448,8 @@ namespace GVR.Creator
 
             clip.wrapMode = WrapMode.Loop;
 
-            var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
-            var playableOutput = AnimationPlayableOutput.Create(playableGraph, animation.name, animator);
-
-            playableOutput.SetSourcePlayable(clipPlayable);
-            clipPlayable.SetDuration(animation.frameCount / animation.fps);
-            clipPlayable.SetSpeed(0.1);
-
-            GraphVisualizerClient.Show(playableGraph);
-
-            playableGraph.Play();
+            animationComp.AddClip(clip, "debug");
+            animationComp.Play("debug");
         }
     }
 }
