@@ -18,7 +18,10 @@ namespace GVR.Manager
 
         //Collection of PlayerPref entries for settings
         public string moveSpeedPlayerPref = "MoveSpeed";
+
         public string turnSettingPlayerPref = "TurnSetting";
+
+        public float moveSpeed = 8f;
 
         public string selectedWorld = "world.zen";
         public string selectedWaypoint = "START"; 
