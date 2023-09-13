@@ -81,8 +81,8 @@ namespace GVR.Manager.Settings
             bool isValid = false;
             if (Directory.Exists(GameSettings.GothicIPath))
             {
-                var pathGothicExe = GameSettings.GothicIPath + "\\system\\Gothic.exe";
-                isValid = File.Exists(pathGothicExe);
+                var pathGothicExe = GameSettings.GothicIPath + "\\Data";
+                isValid = Directory.Exists(pathGothicExe);
             }
             return isValid;
          }
