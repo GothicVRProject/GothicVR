@@ -14,7 +14,8 @@ namespace GVR.Caches
 
         public enum PrefabType
         {
-            VobItem
+            VobItem,
+            XRDeviceSimulator
         }
 
         private string GetPath(PrefabType type)
@@ -23,6 +24,8 @@ namespace GVR.Caches
             {
                 case PrefabType.VobItem:
                     return "Prefabs/Vobs/oCItem";
+                case PrefabType.XRDeviceSimulator:
+                    return "Prefabs/XR Device Simulator";
                 default:
                     throw new Exception($"Enum value {type} not yet defined.");
             }

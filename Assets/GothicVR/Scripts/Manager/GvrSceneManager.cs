@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
+using GVR.GothicVR.Scripts.Manager;
 using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
@@ -193,10 +194,16 @@ namespace GVR.Manager
                 var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
                 sphere.GetComponent<MeshRenderer>().material = TextureManager.I.LoadingSphereMaterial;
                 SceneManager.SetActiveScene(scene);
+                
+                // FIXME - Move to UnityEvent once existing
+                XRDeviceSimulatorManager.I.PrepareForScene(scene);
             }
             else
             {
                 SceneManager.SetActiveScene(scene);
+
+                // FIXME - Move to UnityEvent once existing
+                XRDeviceSimulatorManager.I.PrepareForScene(scene);
             }
         }
 
