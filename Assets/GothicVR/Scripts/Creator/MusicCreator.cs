@@ -42,8 +42,8 @@ namespace GVR.Creator
 
         private static GameObject backgroundMusic;
 
-        private float updateInterval = 5f; // Update music every 5 seconds
-        private float timer = 0f;
+        private float musicUpdateInterval = 5f; // Update music every 5 seconds
+        private float musicUpdateTimer = 0f;
 
         // This multiplier is used to increase the buffer size and reduce the number times PrepareData is called
         // also affects the delay of the music, it doesn't sound so harsh when switching
@@ -70,10 +70,10 @@ namespace GVR.Creator
                 UpdateMusic();
                 return;
             }
-            timer += Time.fixedDeltaTime;
-            if (timer >= updateInterval)
+            musicUpdateTimer += Time.fixedDeltaTime;
+            if (musicUpdateTimer >= musicUpdateInterval)
             {
-                timer = 0f;
+                musicUpdateTimer = 0f;
                 UpdateMusic();
             }
         }
