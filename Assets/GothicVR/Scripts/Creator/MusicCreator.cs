@@ -45,8 +45,8 @@ namespace GVR.Creator
         private float updateInterval = 5f; // Update music every 5 seconds
         private float timer = 0f;
 
-        // This multiplier is used to increase the buffer size and reduce the number timess PrepareData is called
-        // also affects the delay of the music, it doesnt sound so harsh when switching
+        // This multiplier is used to increase the buffer size and reduce the number times PrepareData is called
+        // also affects the delay of the music, it doesn't sound so harsh when switching
         private int bufferSizeMultiplier = 16;
 
         void Start()
