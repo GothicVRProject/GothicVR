@@ -1,9 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using GVR.Debugging;
 using GVR.Util;
 using UnityEngine;
+using UnityEngine.XR;
 
 namespace GVR.Manager
 {
@@ -21,6 +22,23 @@ namespace GVR.Manager
         private List<GameObject> vobObjectsMedium = new();
         private List<GameObject> vobObjectsLarge = new();
 
+        // Need to be stored for later update of values for Vobs which are moved.
+        private BoundingSphere[] vobSpheresSmall;
+        private BoundingSphere[] vobSpheresMedium;
+        private BoundingSphere[] vobSpheresLarge;
+
+
+        private enum VobList
+        {
+            Small,
+            Medium,
+            Large
+        }
+
+        private Tuple<GameObject, VobList, int> grabbedObjectLeftHand;
+        private Tuple<GameObject, VobList, int> grabbedObjectRightHand;
+        private Coroutine grabbedVobsUpdate;
+        
         private void Start()
         {
             GvrSceneManager.I.sceneGeneralUnloaded.AddListener(PreWorldCreate);
@@ -31,7 +49,6 @@ namespace GVR.Manager
             vobCullingGroupSmall = new();
             vobCullingGroupMedium = new();
             vobCullingGroupLarge = new();
-            
         }
 
         private void PreWorldCreate()
@@ -115,9 +132,13 @@ namespace GVR.Manager
             vobCullingGroupMedium.SetBoundingDistances(new[]{FeatureFlags.I.vobCullingMedium.cullingDistance});
             vobCullingGroupLarge.SetBoundingDistances(new[]{FeatureFlags.I.vobCullingLarge.cullingDistance});
 
-            vobCullingGroupSmall.SetBoundingSpheres(spheresSmall.ToArray());
-            vobCullingGroupMedium.SetBoundingSpheres(spheresMedium.ToArray());
-            vobCullingGroupLarge.SetBoundingSpheres(spheresLarge.ToArray());
+            vobSpheresSmall = spheresSmall.ToArray();
+            vobSpheresMedium = spheresMedium.ToArray();
+            vobSpheresLarge = spheresLarge.ToArray();
+            
+            vobCullingGroupSmall.SetBoundingSpheres(vobSpheresSmall);
+            vobCullingGroupMedium.SetBoundingSpheres(vobSpheresMedium);
+            vobCullingGroupLarge.SetBoundingSpheres(vobSpheresLarge);
         }
 
         private BoundingSphere GetSphere(GameObject go, Mesh mesh)
@@ -162,6 +183,75 @@ namespace GVR.Manager
                 group.targetCamera = mainCamera; // Needed for FrustumCulling and OcclusionCulling to work.
                 group.SetDistanceReferencePoint(mainCamera.transform); // Needed for BoundingDistances to work.
             }
+        }
+
+        public void StartTrackVobPositionUpdates(GameObject go, InputDeviceCharacteristics leftRight)
+        {
+            // Check Small list
+            var index = Array.IndexOf(vobObjectsSmall.ToArray(), go);
+            var vobType = VobList.Small;
+            // Check Medium list
+            if (index == -1)
+            {
+                index = Array.IndexOf(vobObjectsMedium.ToArray(), go);
+                vobType = VobList.Medium;
+            }
+            // Check Large list
+            if (index == -1)
+            {
+                index = Array.IndexOf(vobObjectsLarge.ToArray(), go);
+                vobType = VobList.Large;
+            }
+            
+            switch (leftRight)
+            {
+                case InputDeviceCharacteristics.Left:
+                    grabbedObjectLeftHand = new(go, vobType, index);
+                    break;
+                case InputDeviceCharacteristics.Right:
+                    grabbedObjectRightHand = new(go, vobType, index);
+                    break;
+            }
+
+            // If there is no Coroutine started so far, then do it now!
+            grabbedVobsUpdate ??= StartCoroutine(GrabbedVobsUpdate());
+        }
+
+        private IEnumerator GrabbedVobsUpdate()
+        {
+            foreach (var grabbed in new[]{grabbedObjectLeftHand, grabbedObjectRightHand})
+            {
+                if (grabbed == null)
+                    continue;
+
+                var go = grabbed.Item1;
+                var vobType = grabbed.Item2;
+                var index = grabbed.Item3;
+                
+                // We need to find the GO's correlated Sphere in the right VobArray.
+                BoundingSphere sphere = vobType switch
+                {
+                    VobList.Small => vobSpheresSmall[index],
+                    VobList.Medium => vobSpheresMedium[index],
+                    VobList.Large => vobSpheresLarge[index],
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                sphere.position = go.transform.position;
+            }
+
+            yield return new WaitForSeconds(0.25f); // Just a good guess for performance and efficiency.
+        }
+        
+        public void StopTrackVobPositionUpdates(GameObject go)
+        {
+            if (grabbedObjectLeftHand != null && grabbedObjectLeftHand.Item1 == go)
+                grabbedObjectLeftHand = null;
+            if (grabbedObjectRightHand != null && grabbedObjectRightHand.Item1 == go)
+                grabbedObjectRightHand = null;
+            
+            if (grabbedObjectLeftHand == null && grabbedObjectRightHand == null)
+                StopCoroutine(grabbedVobsUpdate);
         }
         
         private void OnDestroy()

@@ -256,6 +256,7 @@ namespace GVR.Creator
             vobObj.layer = ConstantsManager.I.ItemLayer;
 
             colliderComp.convex = true;
+            grabComp.selectEntered.AddListener(eventComp.SelectEntered);
             grabComp.selectExited.AddListener(eventComp.SelectExited);
 
             return vobObj;
