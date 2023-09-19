@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
-using GVR.GothicVR.Scripts.Manager;
 using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
@@ -194,6 +193,8 @@ namespace GVR.Manager
                 case ConstantsManager.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
                     TeleportPlayerToSpot();
+                    
+                    sceneGeneralLoaded.Invoke();
                     
                     // FIXME - Move to UnityEvent once existing
                     XRDeviceSimulatorManager.I.PrepareForScene(scene);
