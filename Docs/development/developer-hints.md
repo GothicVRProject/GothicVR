@@ -40,3 +40,20 @@ We work with async-await for scene loading. It provides us a way to skip frames 
 Hint: async is _*not!*_ async. The way we use it, it's nearly the same as Coroutine. i.e. we just define synchronously when to skip to the next frame.
 
 ![SceneLoading](./diagrams/SceneLoading.drawio.png)
+
+## XRDeviceSimulator
+
+You can play the game with [OpenXR's control simulator](https://docs.unity3d.com/Packages/com.unity.xr.interaction.toolkit@2.4/manual/xr-device-simulator-overview.html).
+This enables you to test without setting up your HMD.
+It needs to be activated via FeatureFlag _UseXRDeviceSimulator_ and is implemented to run in Editor mode only.
+
+We're using the default controls which are:
+
+**HMD (No specific controller activated)**  
+![HMD](./images/XRDeviceSimulator-controls-HMD.png)
+
+**Left controller**  
+![Left Controller](./images/XRDeviceSimulator-controls-Left.png)
+
+**Right controller**  
+![Right Controller](./images/XRDeviceSimulator-controls-Right.png)

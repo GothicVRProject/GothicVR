@@ -14,6 +14,10 @@ namespace GVR.Debugging
             EveryIngameHour
         };
 
+        [Header("__________Developer__________")]
+        [Tooltip("This will be used within Editor mode only. No effect for Standalone.")]
+        public bool useXRDeviceSimulator;
+        
         [Header("__________World__________")]
         public bool CreateVobs;
         public bool CreateWaypoints;
