@@ -1,9 +1,8 @@
 using GVR.Manager;
 using UnityEngine;
-using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace GothicVR.Vob
+namespace GVR.Vob
 {
     [RequireComponent(typeof(Rigidbody))]
     public class ItemGrabInteractable : MonoBehaviour
@@ -12,8 +11,7 @@ namespace GothicVR.Vob
         
         public void SelectEntered(SelectEnterEventArgs args)
         {
-            // FIXME - We need to debug how we can get Left/Right controller information from the args.
-            CullingGroupManager.I.StartTrackVobPositionUpdates(gameObject, InputDeviceCharacteristics.Left);
+            CullingGroupManager.I.StartTrackVobPositionUpdates(gameObject);
         }
         
         /// <summary>

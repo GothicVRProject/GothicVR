@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using GVR.Debugging;
 using GVR.Util;
 using UnityEngine;
@@ -26,8 +27,7 @@ namespace GVR.Manager
         private BoundingSphere[] vobSpheresSmall;
         private BoundingSphere[] vobSpheresMedium;
         private BoundingSphere[] vobSpheresLarge;
-
-
+        
         private enum VobList
         {
             Small,
@@ -35,8 +35,7 @@ namespace GVR.Manager
             Large
         }
 
-        private Tuple<GameObject, VobList, int> grabbedObjectLeftHand;
-        private Tuple<GameObject, VobList, int> grabbedObjectRightHand;
+        private Dictionary<GameObject, Tuple<VobList, int>> grabbedObjects = new();
         private Coroutine grabbedVobsUpdate;
         
         private void Start()
@@ -65,6 +64,11 @@ namespace GVR.Manager
             vobObjectsSmall.Clear();
             vobObjectsMedium.Clear();
             vobObjectsLarge.Clear();
+
+            vobSpheresSmall = null;
+            vobSpheresMedium = null;
+            vobSpheresLarge = null;
+            grabbedObjects.Clear();
         }
         
         private void VobSmallChanged(CullingGroupEvent evt)
@@ -185,7 +189,7 @@ namespace GVR.Manager
             }
         }
 
-        public void StartTrackVobPositionUpdates(GameObject go, InputDeviceCharacteristics leftRight)
+        public void StartTrackVobPositionUpdates(GameObject go)
         {
             // Check Small list
             var index = Array.IndexOf(vobObjectsSmall.ToArray(), go);
@@ -203,15 +207,7 @@ namespace GVR.Manager
                 vobType = VobList.Large;
             }
             
-            switch (leftRight)
-            {
-                case InputDeviceCharacteristics.Left:
-                    grabbedObjectLeftHand = new(go, vobType, index);
-                    break;
-                case InputDeviceCharacteristics.Right:
-                    grabbedObjectRightHand = new(go, vobType, index);
-                    break;
-            }
+            grabbedObjects.Add(go, new(vobType, index));
 
             // If there is no Coroutine started so far, then do it now!
             grabbedVobsUpdate ??= StartCoroutine(GrabbedVobsUpdate());
@@ -219,14 +215,11 @@ namespace GVR.Manager
 
         private IEnumerator GrabbedVobsUpdate()
         {
-            foreach (var grabbed in new[]{grabbedObjectLeftHand, grabbedObjectRightHand})
+            foreach (var grabbed in grabbedObjects)
             {
-                if (grabbed == null)
-                    continue;
-
-                var go = grabbed.Item1;
-                var vobType = grabbed.Item2;
-                var index = grabbed.Item3;
+                var go = grabbed.Key;
+                var vobType = grabbed.Value.Item1;
+                var index = grabbed.Value.Item2;
                 
                 // We need to find the GO's correlated Sphere in the right VobArray.
                 BoundingSphere sphere = vobType switch
@@ -245,12 +238,9 @@ namespace GVR.Manager
         
         public void StopTrackVobPositionUpdates(GameObject go)
         {
-            if (grabbedObjectLeftHand != null && grabbedObjectLeftHand.Item1 == go)
-                grabbedObjectLeftHand = null;
-            if (grabbedObjectRightHand != null && grabbedObjectRightHand.Item1 == go)
-                grabbedObjectRightHand = null;
-            
-            if (grabbedObjectLeftHand == null && grabbedObjectRightHand == null)
+            grabbedObjects.Remove(go);
+
+            if (!grabbedObjects.Any())
                 StopCoroutine(grabbedVobsUpdate);
         }
         
