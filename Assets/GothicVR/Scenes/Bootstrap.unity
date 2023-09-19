@@ -365,7 +365,7 @@ MonoBehaviour:
   EnableMusic: 0
   vobCulling: 1
   vobCullingSmall:
-    maxObjectSize: 0
+    maxObjectSize: 1.2
     cullingDistance: 50
   vobCullingMedium:
     maxObjectSize: 5

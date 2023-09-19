@@ -5,7 +5,6 @@ using System.Linq;
 using GVR.Debugging;
 using GVR.Util;
 using UnityEngine;
-using UnityEngine.XR;
 
 namespace GVR.Manager
 {
@@ -44,7 +43,6 @@ namespace GVR.Manager
             GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostWorldCreate);
 
             // Unity demands CullingGroups to be created in Awake() or Start() earliest.
-            // Vobs
             vobCullingGroupSmall = new();
             vobCullingGroupMedium = new();
             vobCullingGroupLarge = new();
@@ -52,7 +50,6 @@ namespace GVR.Manager
 
         private void PreWorldCreate()
         {
-            // Vobs
             vobCullingGroupSmall.Dispose();
             vobCullingGroupMedium.Dispose();
             vobCullingGroupLarge.Dispose();
@@ -208,32 +205,36 @@ namespace GVR.Manager
             }
             
             grabbedObjects.Add(go, new(vobType, index));
-
+            
             // If there is no Coroutine started so far, then do it now!
             grabbedVobsUpdate ??= StartCoroutine(GrabbedVobsUpdate());
         }
 
         private IEnumerator GrabbedVobsUpdate()
         {
-            foreach (var grabbed in grabbedObjects)
+            while (true)
             {
-                var go = grabbed.Key;
-                var vobType = grabbed.Value.Item1;
-                var index = grabbed.Value.Item2;
-                
-                // We need to find the GO's correlated Sphere in the right VobArray.
-                BoundingSphere sphere = vobType switch
+                foreach (var grabbed in grabbedObjects)
                 {
-                    VobList.Small => vobSpheresSmall[index],
-                    VobList.Medium => vobSpheresMedium[index],
-                    VobList.Large => vobSpheresLarge[index],
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                    var go = grabbed.Key;
+                    var vobType = grabbed.Value.Item1;
+                    var index = grabbed.Value.Item2;
 
-                sphere.position = go.transform.position;
+                    // We need to find the GO's correlated Sphere in the right VobArray.
+                    BoundingSphere[] sphereList = vobType switch
+                    {
+                        VobList.Small => vobSpheresSmall,
+                        VobList.Medium => vobSpheresMedium,
+                        VobList.Large => vobSpheresLarge,
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+
+                    // As BoundingSphere is a Struct, we can only get it as call-by-value and need to re-create it inside array.
+                    sphereList[index].position = go.transform.position;
+                }
+
+                yield return null;
             }
-
-            yield return new WaitForSeconds(0.25f); // Just a good guess for performance and efficiency.
         }
         
         public void StopTrackVobPositionUpdates(GameObject go)
@@ -241,7 +242,10 @@ namespace GVR.Manager
             grabbedObjects.Remove(go);
 
             if (!grabbedObjects.Any())
+            {
                 StopCoroutine(grabbedVobsUpdate);
+                grabbedVobsUpdate = null;
+            }
         }
         
         private void OnDestroy()
