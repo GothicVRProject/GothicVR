@@ -341,6 +341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12af35efb7c45ea4fb4752d0328ebf2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useXRDeviceSimulator: 0
   CreateVobs: 1
   CreateWaypoints: 0
   CreateWaypointEdges: 0
@@ -967,6 +968,7 @@ GameObject:
   - component: {fileID: 1896514220}
   - component: {fileID: 1896514221}
   - component: {fileID: 1896514222}
+  - component: {fileID: 1896514223}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1122,6 +1124,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e99072fc3725432ababedd7c44fb1d43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9af6bda13a014da48ee7a934228cefe9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
