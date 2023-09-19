@@ -192,9 +192,7 @@ namespace GVR.Manager
                     AudioSourceManager.I.ResetDictionaries();
                     break;
                 case ConstantsManager.SceneGeneral:
-                    AudioSourceManager.I.SetAudioListener(Camera.main!.GetComponent<AudioListener>());
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
-                    WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
                     TeleportPlayerToSpot();
                     
                     // FIXME - Move to UnityEvent once existing
