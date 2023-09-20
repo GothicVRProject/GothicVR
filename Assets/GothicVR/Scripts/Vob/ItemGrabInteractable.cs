@@ -19,15 +19,13 @@ namespace GVR.Vob
         /// </summary>
         public void SelectExited(SelectExitEventArgs args)
         {
-            // FIXME - move this to another method which is checking "If grabbed before and now moveVector is 0, then stop positioning."
             CullingGroupManager.I.StopTrackVobPositionUpdates(gameObject);
-
+            
             if (alreadyGrabbedOnce)
                 return;
 
             GetComponent<Rigidbody>().isKinematic = false;
             alreadyGrabbedOnce = true;
-            
         }
     }
 }

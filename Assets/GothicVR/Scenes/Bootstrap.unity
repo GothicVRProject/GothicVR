@@ -361,8 +361,8 @@ MonoBehaviour:
   ShowPhoenixDebugMessages: 0
   ShowZspyLogs: 0
   ShowPhoenixVfsFileNotFoundErrors: 0
-  EnableSounds: 0
-  EnableMusic: 0
+  EnableSounds: 1
+  EnableMusic: 1
   vobCulling: 1
   vobCullingSmall:
     maxObjectSize: 1.2

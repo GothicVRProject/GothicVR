@@ -15,14 +15,17 @@ namespace GVR.Manager
     /// </summary>
     public class CullingGroupManager : SingletonBehaviour<CullingGroupManager>
     {
+        // Stored for resetting after world switch
         private CullingGroup vobCullingGroupSmall;
         private CullingGroup vobCullingGroupMedium;
         private CullingGroup vobCullingGroupLarge;
-        private List<GameObject> vobObjectsSmall = new();
-        private List<GameObject> vobObjectsMedium = new();
-        private List<GameObject> vobObjectsLarge = new();
+        
+        // Stored for later index mapping SphereIndex => GOIndex
+        private readonly List<GameObject> vobObjectsSmall = new();
+        private readonly List<GameObject> vobObjectsMedium = new();
+        private readonly List<GameObject> vobObjectsLarge = new();
 
-        // Need to be stored for later update of values for Vobs which are moved.
+        // Stored for later position updates for moved Vobs
         private BoundingSphere[] vobSpheresSmall;
         private BoundingSphere[] vobSpheresMedium;
         private BoundingSphere[] vobSpheresLarge;
@@ -34,8 +37,9 @@ namespace GVR.Manager
             Large
         }
 
-        private Dictionary<GameObject, Tuple<VobList, int>> grabbedObjects = new();
-        private Coroutine grabbedVobsUpdate;
+        // Grabbed Vobs will be ignored from Culling until Grabbing stopped and velocity = 0
+        private readonly Dictionary<GameObject, Tuple<VobList, int>> pausedVobs = new();
+        private readonly List<Rigidbody> pausedVobsToReenable = new();
         
         private void Start()
         {
@@ -46,6 +50,8 @@ namespace GVR.Manager
             vobCullingGroupSmall = new();
             vobCullingGroupMedium = new();
             vobCullingGroupLarge = new();
+
+            StartCoroutine(StopVobTrackingBasedOnVelocity());
         }
 
         private void PreWorldCreate()
@@ -65,24 +71,50 @@ namespace GVR.Manager
             vobSpheresSmall = null;
             vobSpheresMedium = null;
             vobSpheresLarge = null;
-            grabbedObjects.Clear();
+            
+            pausedVobs.Clear();
+            pausedVobsToReenable.Clear();
         }
         
         private void VobSmallChanged(CullingGroupEvent evt)
         {
+            var smallPaused = pausedVobs
+                .Where(i => i.Value.Item1 == VobList.Small)
+                .Select(i => i.Value.Item2);
+
+            if (smallPaused.Contains(evt.index))
+                return;
+
             vobObjectsSmall[evt.index].SetActive(evt.hasBecomeVisible);
         }
         
         private void VobMediumChanged(CullingGroupEvent evt)
         {
+            var mediumPaused = pausedVobs
+                .Where(i => i.Value.Item1 == VobList.Medium)
+                .Select(i => i.Value.Item2);
+
+            if (mediumPaused.Contains(evt.index))
+                return;
+            
             vobObjectsMedium[evt.index].SetActive(evt.hasBecomeVisible);
         }
         
         private void VobLargeChanged(CullingGroupEvent evt)
         {
+            var largePaused = pausedVobs
+                .Where(i => i.Value.Item1 == VobList.Large)
+                .Select(i => i.Value.Item2);
+            
+            if (largePaused.Contains(evt.index))
+                return;
+            
             vobObjectsLarge[evt.index].SetActive(evt.hasBecomeVisible);
         }
 
+        /// <summary>
+        /// Fill CullingGroups with GOs based on size (radius), position, and object size (small/medium/large)
+        /// </summary>
         public void PrepareVobCulling(GameObject[] objects)
         {
             if (!FeatureFlags.I.vobCulling)
@@ -154,7 +186,7 @@ namespace GVR.Manager
         
         /// <summary>
         /// TODO If performance allows it, we could also look dynamically for all the existing meshes inside GO
-        /// TODO and look for maximum value for largest mesh. For now it should be fine.
+        /// TODO and look for maximum value for largest mesh. But it should be fine for now.
         /// </summary>
         private Mesh GetMesh(GameObject go)
         {
@@ -204,48 +236,61 @@ namespace GVR.Manager
                 vobType = VobList.Large;
             }
             
-            grabbedObjects.Add(go, new(vobType, index));
-            
-            // If there is no Coroutine started so far, then do it now!
-            grabbedVobsUpdate ??= StartCoroutine(GrabbedVobsUpdate());
-        }
-
-        private IEnumerator GrabbedVobsUpdate()
-        {
-            while (true)
-            {
-                foreach (var grabbed in grabbedObjects)
-                {
-                    var go = grabbed.Key;
-                    var vobType = grabbed.Value.Item1;
-                    var index = grabbed.Value.Item2;
-
-                    // We need to find the GO's correlated Sphere in the right VobArray.
-                    BoundingSphere[] sphereList = vobType switch
-                    {
-                        VobList.Small => vobSpheresSmall,
-                        VobList.Medium => vobSpheresMedium,
-                        VobList.Large => vobSpheresLarge,
-                        _ => throw new ArgumentOutOfRangeException()
-                    };
-
-                    // As BoundingSphere is a Struct, we can only get it as call-by-value and need to re-create it inside array.
-                    sphereList[index].position = go.transform.position;
-                }
-
-                yield return null;
-            }
+            pausedVobs.Add(go, new(vobType, index));
         }
         
         public void StopTrackVobPositionUpdates(GameObject go)
         {
-            grabbedObjects.Remove(go);
+            StartCoroutine(nameof(StopTrackVobPositionUpdatesDelayed), go);
+        }
 
-            if (!grabbedObjects.Any())
+        /// <summary>
+        /// We need to wait a few frames before the velocity of object is != 0.
+        /// Therefore we put the object into the list delayed.
+        /// </summary>
+        private IEnumerator StopTrackVobPositionUpdatesDelayed(GameObject go)
+        {
+            yield return new WaitForSeconds(1f);
+            
+            pausedVobsToReenable.Add(go.GetComponent<Rigidbody>());
+        }
+
+        private IEnumerator StopVobTrackingBasedOnVelocity()
+        {
+            while (true)
             {
-                StopCoroutine(grabbedVobsUpdate);
-                grabbedVobsUpdate = null;
+                foreach (var obj in pausedVobsToReenable.ToArray()) // Clone to remove elements within foreach
+                {
+                    var velocity = obj.velocity;
+                    if (velocity != Vector3.zero)
+                        continue;
+                    
+                    UpdateSpherePosition(obj.gameObject);
+                    
+                    pausedVobs.Remove(obj.gameObject);
+                    pausedVobsToReenable.Remove(obj);
+                }
+                
+                yield return null;
             }
+        }
+
+        private void UpdateSpherePosition(GameObject go)
+        {
+            var grabbed = pausedVobs[go];
+            var vobType = grabbed.Item1;
+            var index = grabbed.Item2;
+
+            // We need to find the GO's correlated Sphere in the right VobArray.
+            BoundingSphere[] sphereList = vobType switch
+            {
+                VobList.Small => vobSpheresSmall,
+                VobList.Medium => vobSpheresMedium,
+                VobList.Large => vobSpheresLarge,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            sphereList[index].position = go.transform.position;
         }
         
         private void OnDestroy()
