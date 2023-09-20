@@ -20,20 +20,6 @@ namespace GVR.Manager
             TMP_Settings.defaultFontAsset = GameData.I.EmptyFont;
         }
 
-        public void ChangeFont()
-        {
-            // Get all the TextMeshPro components in the scene
-            TMP_Text[] textComponents = FindObjectsOfType<TextMeshProUGUI>();
-
-            foreach (TMP_Text textComponent in textComponents)
-            {
-                textComponent.font = GameData.I.EmptyFont;
-
-                // texture is rotated 180 degrees
-                textComponent.rectTransform.localRotation = Quaternion.Euler(180, 0, 0);
-            }
-        }
-
         public TMP_SpriteAsset LoadFont(string fontName)
         {
             if (LookupCache.I.fontCache.TryGetValue(fontName.ToUpper(), out TMP_SpriteAsset data))
