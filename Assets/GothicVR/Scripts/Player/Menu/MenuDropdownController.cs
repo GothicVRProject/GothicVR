@@ -25,7 +25,7 @@ namespace GVR.Player.Menu
                 { "ENTRANCE_SURFACE_OLDMINE", "Entrance Old Mine" },
                 { "ENTRANCE_FREEMINECAMP_FREEMINE", "Entrance Free Mine" },
                 { "ENTRANCE_SURFACE_ORCGRAVEYARD", "Entrance Orc Graveyard" },
-                { "ENTRANCE_SURFACE_ORCTEMPLE", "Entrance  Orc Temple" },
+                { "ENTRANCE_SURFACE_ORCTEMPLE", "Entrance Orc Temple" },
                 { "OCC_CHAPEL_UPSTAIRS", "Old Camp" },
                 { "NC_KDW_CAVE_CENTER", "New Camp" },
                 { "PSI_TEMPLE_COURT_GURU", "Sect Camp" },
