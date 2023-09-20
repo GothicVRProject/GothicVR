@@ -17,6 +17,7 @@ namespace GVR.Manager
         public string MenuFontTag = "Title";
         public string SubtitleFontTag = "IngameText";
         public string ClimbableTag = "Climbable";
+        public string SpotTag = "PxVob_zCVobSpot";
 
         public int MeshPerFrame = 10;
         public int VObPerFrame = 75;

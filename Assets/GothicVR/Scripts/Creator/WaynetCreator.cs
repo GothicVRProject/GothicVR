@@ -1,9 +1,9 @@
 ﻿using GVR.Debugging;
 using UnityEngine;
-using GVR.Demo;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Util;
 using GVR.Util;
+using GVR.Manager;
 
 namespace GVR.Creator
 {
@@ -32,7 +32,7 @@ namespace GVR.Creator
                 // var wpobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 var wpobject = new GameObject();
 
-                wpobject.tag = "PxVob_zCVobSpot";
+                wpobject.tag = ConstantsManager.I.SpotTag;
                 wpobject.name = waypoint.name;
                 wpobject.transform.position = waypoint.position.ToUnityVector();
 
