@@ -1,6 +1,4 @@
-using GVR.Creator;
 using GVR.Manager;
-using GVR.Phoenix.Util;
 using UnityEngine;
 
 namespace GVR.Player.Menu
@@ -13,6 +11,12 @@ namespace GVR.Player.Menu
         public GameObject MovementMenu;
         public GameObject UIMenu;
 
+        [SerializeField]
+        private MoveSpeedController moveSpeedController;
+
+        [SerializeField]
+        private TurnSettingDropdownController turnSettingDropdownController;
+
         void Awake()
         {
             SetSettingsValues();
@@ -20,11 +24,11 @@ namespace GVR.Player.Menu
 
         public void SetSettingsValues()
         {
-            var moveSetting = MovementMenu.FindChildRecursively("MoveSpeedSlider").GetComponent<MoveSpeedController>();
-            moveSetting.ChangeMoveSpeed(PlayerPrefs.GetFloat(ConstantsManager.I.moveSpeedPlayerPref));
+            if (moveSpeedController == null || turnSettingDropdownController == null)
+                return;
 
-            var turnSetting = MovementMenu.FindChildRecursively("TurnSettingDropdown").GetComponent<TurnSettingDropdownController>();
-            turnSetting.DropdownItemSelected(PlayerPrefs.GetInt(ConstantsManager.I.turnSettingPlayerPref));
+            moveSpeedController.ChangeMoveSpeed(PlayerPrefs.GetFloat(ConstantsManager.I.moveSpeedPlayerPref));
+            turnSettingDropdownController.DropdownItemSelected(PlayerPrefs.GetInt(ConstantsManager.I.turnSettingPlayerPref));
         }
 
         public void PlayFunction()

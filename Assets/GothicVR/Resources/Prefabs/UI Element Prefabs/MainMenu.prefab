@@ -5533,6 +5533,8 @@ MonoBehaviour:
   TeleportMenu: {fileID: 5529594201402357507}
   MovementMenu: {fileID: 2970808030810714954}
   UIMenu: {fileID: 330079844024664551}
+  moveSpeedController: {fileID: 5718367256005164722}
+  turnSettingDropdownController: {fileID: 6969592086016783357}
 --- !u!1 &5909829140847279542
 GameObject:
   m_ObjectHideFlags: 0
