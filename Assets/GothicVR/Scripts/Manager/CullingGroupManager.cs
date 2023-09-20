@@ -220,6 +220,9 @@ namespace GVR.Manager
 
         public void StartTrackVobPositionUpdates(GameObject go)
         {
+            if (pausedVobs.ContainsKey(go))
+                return;
+            
             // Check Small list
             var index = Array.IndexOf(vobObjectsSmall.ToArray(), go);
             var vobType = VobList.Small;
@@ -241,6 +244,9 @@ namespace GVR.Manager
         
         public void StopTrackVobPositionUpdates(GameObject go)
         {
+            if (pausedVobsToReenable.Contains(go.GetComponent<Rigidbody>()))
+                return;
+            
             StartCoroutine(nameof(StopTrackVobPositionUpdatesDelayed), go);
         }
 
