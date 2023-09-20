@@ -515,10 +515,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 693207647070375787, guid: b2f7ec490b212544e97a98adc4cb9d50, type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5683023942457062724, guid: b2f7ec490b212544e97a98adc4cb9d50, type: 3}
       propertyPath: m_Camera
       value: 
@@ -526,26 +522,6 @@ PrefabInstance:
     - target: {fileID: 5827635276208223651, guid: b2f7ec490b212544e97a98adc4cb9d50, type: 3}
       propertyPath: m_Name
       value: MainMenu
-      objectReference: {fileID: 0}
-    - target: {fileID: 5926781011531876610, guid: b2f7ec490b212544e97a98adc4cb9d50, type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7619538523816096787, guid: b2f7ec490b212544e97a98adc4cb9d50, type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8429023734518346575, guid: b2f7ec490b212544e97a98adc4cb9d50, type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8599644895172805635, guid: b2f7ec490b212544e97a98adc4cb9d50, type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8733354738594159905, guid: b2f7ec490b212544e97a98adc4cb9d50, type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

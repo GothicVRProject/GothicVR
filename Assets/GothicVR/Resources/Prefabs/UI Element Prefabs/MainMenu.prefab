@@ -427,12 +427,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2544490654052458057}
-        m_TargetAssemblyTypeName: GVR.Player.Menu.MenuButtonScript, Assembly-CSharp
-        m_MethodName: ShowMovementMenu
-        m_Mode: 1
+        m_TargetAssemblyTypeName: GVR.Player.Menu.MenuManager, Assembly-CSharp
+        m_MethodName: SwitchMenu
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 2970808030810714954}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -894,7 +894,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &1350333576334028896
@@ -1153,11 +1153,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2544490654052458057}
         m_TargetAssemblyTypeName: GVR.Player.Menu.MenuManager, Assembly-CSharp
-        m_MethodName: ShowSettingsMenu
-        m_Mode: 1
+        m_MethodName: SwitchMenu
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1157635153384266114}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1421,12 +1421,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2544490654052458057}
-        m_TargetAssemblyTypeName: GVR.Player.Menu.MenuButtonScript, Assembly-CSharp
-        m_MethodName: ShowTeleportMenu
-        m_Mode: 1
+        m_TargetAssemblyTypeName: GVR.Player.Menu.MenuManager, Assembly-CSharp
+        m_MethodName: SwitchMenu
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 5529594201402357507}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1565,7 +1565,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &1909790724742960838
@@ -2839,12 +2839,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2544490654052458057}
-        m_TargetAssemblyTypeName: GVR.Player.Menu.MenuButtonScript, Assembly-CSharp
-        m_MethodName: ShowSettingsMenu
-        m_Mode: 1
+        m_TargetAssemblyTypeName: GVR.Player.Menu.MenuManager, Assembly-CSharp
+        m_MethodName: SwitchMenu
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1157635153384266114}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -4689,12 +4689,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2544490654052458057}
-        m_TargetAssemblyTypeName: GVR.Player.Menu.MenuButtonScript, Assembly-CSharp
-        m_MethodName: ShowMainMenu
-        m_Mode: 1
+        m_TargetAssemblyTypeName: GVR.Player.Menu.MenuManager, Assembly-CSharp
+        m_MethodName: SwitchMenu
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 4860330748303639356}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -4863,11 +4863,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2544490654052458057}
         m_TargetAssemblyTypeName: GVR.Player.Menu.MenuManager, Assembly-CSharp
-        m_MethodName: ShowUIMenu
-        m_Mode: 1
+        m_MethodName: SwitchMenu
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 330079844024664551}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -5142,7 +5142,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &5529594201402357507
@@ -5666,7 +5666,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &5923466190928591074
@@ -5938,7 +5938,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &6127533591070308652
@@ -6473,11 +6473,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2544490654052458057}
         m_TargetAssemblyTypeName: GVR.Player.Menu.MenuManager, Assembly-CSharp
-        m_MethodName: ShowSettingsMenu
-        m_Mode: 1
+        m_MethodName: SwitchMenu
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1157635153384266114}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -6605,12 +6605,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2544490654052458057}
-        m_TargetAssemblyTypeName: GVR.Player.Menu.MenuButtonScript, Assembly-CSharp
-        m_MethodName: ShowSettingsMenu
-        m_Mode: 1
+        m_TargetAssemblyTypeName: GVR.Player.Menu.MenuManager, Assembly-CSharp
+        m_MethodName: SwitchMenu
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1157635153384266114}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -8529,7 +8529,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &8838838859991828927

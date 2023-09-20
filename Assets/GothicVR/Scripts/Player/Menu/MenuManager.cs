@@ -34,49 +34,13 @@ namespace GVR.Player.Menu
 #pragma warning restore CS4014
         }
 
-        public void ShowMainMenu()
+        public void SwitchMenu(GameObject menu)
         {
-            MainMenu.SetActive(true);
-            SettingsMenu.SetActive(false);
-            TeleportMenu.SetActive(false);
-            MovementMenu.SetActive(false);
-            UIMenu.SetActive(false);
-        }
-
-        public void ShowSettingsMenu()
-        {
-            SettingsMenu.SetActive(true);
-            MainMenu.SetActive(false);
-            TeleportMenu.SetActive(false);
-            MovementMenu.SetActive(false);
-            UIMenu.SetActive(false);
-        }
-
-        public void ShowTeleportMenu()
-        {
-            TeleportMenu.SetActive(true);
-            MainMenu.SetActive(false);
-            SettingsMenu.SetActive(false);
-            MovementMenu.SetActive(false);
-            UIMenu.SetActive(false);
-        }
-
-        public void ShowMovementMenu()
-        {
-            MovementMenu.SetActive(true);
-            MainMenu.SetActive(false);
-            SettingsMenu.SetActive(false);
-            TeleportMenu.SetActive(false);
-            UIMenu.SetActive(false);
-        }
-
-        public void ShowUIMenu()
-        {
-            UIMenu.SetActive(true);
-            MainMenu.SetActive(false);
-            SettingsMenu.SetActive(false);
-            TeleportMenu.SetActive(false);
-            MovementMenu.SetActive(false);
+            MainMenu.SetActive(menu == MainMenu);
+            SettingsMenu.SetActive(menu == SettingsMenu);
+            TeleportMenu.SetActive(menu == TeleportMenu);
+            MovementMenu.SetActive(menu == MovementMenu);
+            UIMenu.SetActive(menu == UIMenu);
         }
 
         public void QuitGameFunction()
