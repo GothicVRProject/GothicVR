@@ -65,6 +65,7 @@ namespace GVR.Creator
         {
             var soundObject = new GameObject(vobSound.vobName);
             soundObject.SetParent(parent);
+            soundObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 
             var soundObjectCollider = soundObject.AddComponent<BoxCollider>();
 
