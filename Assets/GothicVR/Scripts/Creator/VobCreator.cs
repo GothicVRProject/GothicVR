@@ -37,8 +37,19 @@ namespace GVR.Creator
 
         private Dictionary<PxVobType, GameObject> parentGosTeleport = new();
         private Dictionary<PxVobType, GameObject> parentGosNonTeleport = new();
-        private PxVobType[] nonTeleportTypes = { PxVobType.PxVob_oCItem , PxVobType.PxVob_oCMobLadder };
-        
+
+        private PxVobType[] nonTeleportTypes =
+        {
+            PxVobType.PxVob_oCItem,
+            PxVobType.PxVob_oCMobLadder,
+            PxVobType.PxVob_zCTrigger,
+            PxVobType.PxVob_zCTriggerUntouch,
+            PxVobType.PxVob_oCTriggerScript,
+            PxVobType.PxVob_zCTriggerList,
+            PxVobType.PxVob_zCTriggerWorldStart,
+            PxVobType.PxVob_oCTriggerChangeLevel
+        };
+
         private int totalVObs;
 
         private void Start()
@@ -110,12 +121,22 @@ namespace GVR.Creator
                     case PxVobType.PxVob_oCTriggerChangeLevel:
                         CreateTriggerChangeLevel((PxVobTriggerChangeLevelData)vob);
                         break;
+                    case PxVobType.PxVob_zCTriggerList:
+                        CreateTriggerList((PxVobTriggerListData)vob);
+                        break;
+                    case PxVobType.PxVob_zCTriggerWorldStart:
+                        CreateTriggerWorldStart((PxVobTriggerWorldStartData)vob);
+                        break;
+                    case PxVobType.PxVob_oCTriggerScript:
+                        CreateTriggerScript((PxVobTriggerScriptData)vob);
+                        break;
+                    case PxVobType.PxVob_zCTrigger:
+                    case PxVobType.PxVob_zCTriggerUntouch:
+                        CreateTrigger((PxVobTriggerData)vob);
+                        break;
                     case PxVobType.PxVob_zCVobScreenFX:
                     case PxVobType.PxVob_zCVobAnimate:
-                    case PxVobType.PxVob_zCTriggerWorldStart:
-                    case PxVobType.PxVob_zCTriggerList:
                     case PxVobType.PxVob_oCCSTrigger:
-                    case PxVobType.PxVob_oCTriggerScript:
                     case PxVobType.PxVob_zCVobLensFlare:
                     case PxVobType.PxVob_zCVobLight:
                     case PxVobType.PxVob_zCMoverController:
@@ -337,7 +358,8 @@ namespace GVR.Creator
         {
 
             var gameObject = new GameObject(vob.vobName);
-            gameObject.SetParent(parentGosTeleport[vob.type]);
+            gameObject.SetParent(parentGosNonTeleport[vob.type]);
+            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 
             var trigger = gameObject.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
@@ -354,6 +376,70 @@ namespace GVR.Creator
                 triggerHandler.levelName = vob.levelName;
                 triggerHandler.startVob = vob.startVob;
             }
+        }
+
+        private void CreateTriggerList(PxVobTriggerListData vob)
+        {
+            var gameObject = new GameObject(vob.vobName);
+            gameObject.SetParent(parentGosNonTeleport[vob.type]);
+            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+
+            var trigger = gameObject.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            gameObject.transform.position = (min + max) / 2f;
+
+            gameObject.transform.localScale = (max - min);
+        }
+
+        private void CreateTriggerWorldStart(PxVobTriggerWorldStartData vob)
+        {
+            var gameObject = new GameObject(vob.vobName);
+            gameObject.SetParent(parentGosNonTeleport[vob.type]);
+            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+
+            var trigger = gameObject.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            gameObject.transform.position = (min + max) / 2f;
+
+            gameObject.transform.localScale = (max - min);
+        }
+
+        private void CreateTriggerScript(PxVobTriggerScriptData vob)
+        {
+            var gameObject = new GameObject(vob.vobName);
+            gameObject.SetParent(parentGosNonTeleport[vob.type]);
+            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+
+            var trigger = gameObject.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            gameObject.transform.position = (min + max) / 2f;
+
+            gameObject.transform.localScale = (max - min);
+        }
+
+        private void CreateTrigger(PxVobTriggerData vob)
+        {
+            var gameObject = new GameObject(vob.vobName);
+            gameObject.SetParent(parentGosNonTeleport[vob.type]);
+            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+
+            var trigger = gameObject.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            gameObject.transform.position = (min + max) / 2f;
+
+            gameObject.transform.localScale = (max - min);
         }
 
         /// <summary>
