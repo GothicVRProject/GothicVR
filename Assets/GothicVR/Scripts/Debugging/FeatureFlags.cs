@@ -46,6 +46,7 @@ namespace GVR.Debugging
         public bool ShowPhoenixDebugMessages;
         public bool ShowZspyLogs;
         public bool ShowPhoenixVfsFileNotFoundErrors;
+        public bool ShowMusicLogs;
 
         [Header("__________Audio__________")]
         public bool EnableSounds;

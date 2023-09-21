@@ -226,6 +226,11 @@ namespace GVR.Creator
             pendingTheme = theme;
             pendingTags = tags;
             hasPending = true;
+
+            if (FeatureFlags.I.ShowMusicLogs)
+            {
+                Debug.Log("Music: theme - " + name + "from file " + theme.file);
+            }
         }
 
         public void setMusic(string name)
@@ -234,6 +239,11 @@ namespace GVR.Creator
             reloadTheme = true;
             pendingTheme = theme;
             hasPending = true;
+
+            if (FeatureFlags.I.ShowMusicLogs)
+            {
+                Debug.Log("Music: theme - " + name + "from file " + theme.file);
+            }
         }
 
         private void StopMusic()
