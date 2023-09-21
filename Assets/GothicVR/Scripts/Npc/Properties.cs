@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Vob.WayNet;
-using PxCs.Data.Model;
 using PxCs.Data.Vm;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering.Universal.Internal;
 
 namespace GVR.Npc
 {    
@@ -37,7 +34,6 @@ namespace GVR.Npc
         public VmGothicEnums.WalkMode walkMode;
         public Dictionary<VmGothicEnums.Talent, int> Talents = new();
         public Dictionary<int, int> Items = new();
-
 
 #pragma warning disable CS0414 // Just a debug flag for easier debugging if we missed to copy something in the future. 
         private bool isClonedFromAnother;

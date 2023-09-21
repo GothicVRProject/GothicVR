@@ -57,6 +57,14 @@ namespace GVR.Creator
 
             return props;
         }
+
+        private Ai GetAi(IntPtr npcPtr)
+        {
+            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
+            var props = lookupCache.NpcCache[symbolIndex];
+
+            return props.GetComponent<Ai>();
+        }
         
         /// <summary>
         /// Return cached GameObject based on lookup through IntPtr
@@ -181,6 +189,7 @@ namespace GVR.Creator
             // FIXME - from docu:
             // * Ist der Nsc in einem Animatinsstate, wird die passende Rücktransition abgespielt.
             // * Benutzt der NSC gerade ein MOBSI, poppt er ins stehen.
+            GetAi(npcPtr).Queue.Enqueue(new(Ai.Action.Type.AIStandUp));
         }
         
         public void ExtAiSetWalkMode(IntPtr npcPtr, VmGothicEnums.WalkMode walkMode)
@@ -188,20 +197,20 @@ namespace GVR.Creator
             GetProperties(npcPtr).walkMode = walkMode;
         }
 
-        public void ExtAiGotoWP(IntPtr npcPtr, string spawnPoint)
+        public void ExtAiGotoWP(IntPtr npcPtr, string point)
         {
-            // FIXME implement
             // FIXME - e.g. for Thorus there's initially no string value for TA_Boss() self.wp - Intended or a bug on our side?
+            GetAi(npcPtr).Queue.Enqueue(new(Ai.Action.Type.AIGoToWP, point));
         }
 
         public void ExtAiAlignToWP(IntPtr npcPtr)
         {
-            // FIXME implement
+            GetAi(npcPtr).Queue.Enqueue(new(Ai.Action.Type.AIAlignToWp));
         }
         
         public void ExtAiPlayAni(IntPtr npcPtr, string name)
         {
-            // FIXME implement
+            GetAi(npcPtr).Queue.Enqueue(new(Ai.Action.Type.AIPlayAnim, name));
         }
         
         public void ExtMdlSetVisual(IntPtr npcPtr, string visual)

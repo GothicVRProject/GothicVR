@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GVR.Caches;
+using GVR.Npc;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Animation;
@@ -27,9 +28,11 @@ namespace GVR.Creator
             }
             
             var animationComp = go.GetComponent<Animation>();
+
+            AddClipEndEvent(clip);
             
-            animationComp.AddClip(clip, "debugIdle");
-            animationComp.Play("debugIdle");
+            animationComp.AddClip(clip, animationName);
+            animationComp.Play(animationName);
         }
 
         private AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone)
@@ -37,7 +40,7 @@ namespace GVR.Creator
             var clip = new AnimationClip
             {
                 legacy = true,
-                wrapMode = WrapMode.Loop
+                wrapMode = WrapMode.Once
             };
             
             var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.nodeCount);
@@ -126,6 +129,26 @@ namespace GVR.Creator
                 // The child object was not found
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Adds event at the end of animation.
+        /// The event is called on every MonoBehaviour on GameObject where Clip is played.
+        /// @see: https://docs.unity3d.com/ScriptReference/AnimationEvent.html
+        /// @see: https://docs.unity3d.com/ScriptReference/GameObject.SendMessage.html
+        /// </summary>
+        private void AddClipEndEvent(AnimationClip clip)
+        {
+            List<AnimationEvent> events = new(clip.events);
+
+            AnimationEvent finalEvent = new()
+            {
+                time = clip.length,
+                functionName = nameof(IAnimationCallbackEnd.AnimationEndCallback),
+            };
+            
+            events.Add(finalEvent);
+            clip.events = events.ToArray();
         }
         
         private string GetPreparedAnimationKey(string mdsKey, string animKey)
