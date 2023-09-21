@@ -26,7 +26,7 @@ namespace GVR.Npc
         public string overlayMdsName;
         public string overlayMdhName => overlayMdsName;
         
-        public PxVmItemData EquippedItem;
+        public List<PxVmItemData> EquippedItems = new();
         public VmGothicExternals.ExtSetVisualBodyData BodyData;
         
         // Perceptions

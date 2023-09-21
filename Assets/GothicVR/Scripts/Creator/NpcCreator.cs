@@ -101,6 +101,9 @@ namespace GVR.Creator
 
             var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
             NpcMeshCreator.I.CreateNpc(name, props.mdmName, mdhName, props.BodyData.Head, props.BodyData, newNpc);
+
+            foreach (var equippedItem in props.EquippedItems)
+                NpcMeshCreator.I.EquipWeapon(newNpc, equippedItem, equippedItem.mainFlag, equippedItem.flags);
             
             SetSpawnPoint(newNpc, spawnPoint, props.npc);
         }
@@ -298,9 +301,7 @@ namespace GVR.Creator
             var npc = props.gameObject;
             var itemData = assetCache.TryGetItemData((uint)itemId);
 
-            props.EquippedItem = itemData;
-            
-            NpcMeshCreator.I.EquipWeapon(npc, itemData, itemData.mainFlag, itemData.flags);
+            props.EquippedItems.Add(itemData);
         }
         
         public void DebugAddIdleAnimationToAllNpc()
