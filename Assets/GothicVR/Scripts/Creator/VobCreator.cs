@@ -159,12 +159,22 @@ namespace GVR.Creator
                         go = CreateTriggerChangeLevel((PxVobTriggerChangeLevelData)vob);
                         break;
                     }
+                    case PxWorld.PxVobType.PxVob_zCTriggerList:
+                        CreateTriggerList((PxVobTriggerListData)vob);
+                        break;
+                    case PxWorld.PxVobType.PxVob_zCTriggerWorldStart:
+                        CreateTriggerWorldStart((PxVobTriggerWorldStartData)vob);
+                        break;
+                    case PxWorld.PxVobType.PxVob_oCTriggerScript:
+                        CreateTriggerScript((PxVobTriggerScriptData)vob);
+                        break;
+                    case PxWorld.PxVobType.PxVob_zCTrigger:
+                    case PxWorld.PxVobType.PxVob_zCTriggerUntouch:
+                        CreateTrigger((PxVobTriggerData)vob);
+                        break;
                     case PxWorld.PxVobType.PxVob_zCVobScreenFX:
                     case PxWorld.PxVobType.PxVob_zCVobAnimate:
-                    case PxWorld.PxVobType.PxVob_zCTriggerWorldStart:
-                    case PxWorld.PxVobType.PxVob_zCTriggerList:
                     case PxWorld.PxVobType.PxVob_oCCSTrigger:
-                    case PxWorld.PxVobType.PxVob_oCTriggerScript:
                     case PxWorld.PxVobType.PxVob_zCVobLensFlare:
                     case PxWorld.PxVobType.PxVob_zCVobLight:
                     case PxWorld.PxVobType.PxVob_zCMoverController:
@@ -530,6 +540,70 @@ namespace GVR.Creator
             }
 
             return vobObj;
+        }
+
+        private void CreateTriggerList(PxVobTriggerListData vob)
+        {
+            var gameObject = new GameObject(vob.vobName);
+            gameObject.SetParent(parentGosNonTeleport[vob.type]);
+            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+
+            var trigger = gameObject.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            gameObject.transform.position = (min + max) / 2f;
+
+            gameObject.transform.localScale = (max - min);
+        }
+
+        private void CreateTriggerWorldStart(PxVobTriggerWorldStartData vob)
+        {
+            var gameObject = new GameObject(vob.vobName);
+            gameObject.SetParent(parentGosNonTeleport[vob.type]);
+            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+
+            var trigger = gameObject.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            gameObject.transform.position = (min + max) / 2f;
+
+            gameObject.transform.localScale = (max - min);
+        }
+
+        private void CreateTriggerScript(PxVobTriggerScriptData vob)
+        {
+            var gameObject = new GameObject(vob.vobName);
+            gameObject.SetParent(parentGosNonTeleport[vob.type]);
+            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+
+            var trigger = gameObject.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            gameObject.transform.position = (min + max) / 2f;
+
+            gameObject.transform.localScale = (max - min);
+        }
+
+        private void CreateTrigger(PxVobTriggerData vob)
+        {
+            var gameObject = new GameObject(vob.vobName);
+            gameObject.SetParent(parentGosNonTeleport[vob.type]);
+            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+
+            var trigger = gameObject.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            gameObject.transform.position = (min + max) / 2f;
+
+            gameObject.transform.localScale = (max - min);
         }
 
         /// <summary>
