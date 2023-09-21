@@ -217,7 +217,7 @@ namespace GVR.Manager
 
         private void SetSpawnPoint(Scene worldScene)
         {
-            var spots = GameObject.FindGameObjectsWithTag("PxVob_zCVobSpot");
+            var spots = GameObject.FindGameObjectsWithTag(ConstantsManager.I.SpotTag);
             for (int i = 0; i < spots.Length; i++)
             {
                 if (spots[i].name == startVobAfterLoading)
