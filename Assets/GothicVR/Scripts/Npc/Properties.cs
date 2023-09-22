@@ -31,7 +31,6 @@ namespace GVR.Npc
         public float perceptionTime;
         
         // NPC items/talents/...
-        public VmGothicEnums.WalkMode walkMode;
         public Dictionary<VmGothicEnums.Talent, int> Talents = new();
         public Dictionary<int, int> Items = new();
 

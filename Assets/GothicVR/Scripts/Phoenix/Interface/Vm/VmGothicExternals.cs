@@ -3,6 +3,7 @@ using System.Globalization;
 using AOT;
 using GVR.Creator;
 using GVR.Debugging;
+using GVR.Npc;
 using PxCs.Extensions;
 using PxCs.Interface;
 using UnityEngine;
@@ -233,7 +234,7 @@ namespace GVR.Phoenix.Interface.Vm
         public static void AI_StandUp(IntPtr vmPtr)
         {
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-            NpcCreator.I.ExtAiStandUp(npcPtr);
+            Ai.ExtAiStandUp(npcPtr);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -241,7 +242,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var walkMode = (VmGothicEnums.WalkMode)PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-            NpcCreator.I.ExtAiSetWalkMode(npcPtr, walkMode);
+            Ai.ExtAiSetWalkMode(npcPtr, walkMode);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -249,7 +250,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var spawnPoint = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-            NpcCreator.I.ExtAiGotoWP(npcPtr, spawnPoint);
+            Ai.ExtAiGotoWP(npcPtr, spawnPoint);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -257,7 +258,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            NpcCreator.I.ExtAiAlignToWP(npcPtr);
+            Ai.ExtAiAlignToWP(npcPtr);
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -266,7 +267,7 @@ namespace GVR.Phoenix.Interface.Vm
             var name = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             
-            NpcCreator.I.ExtAiPlayAni(npcPtr, name);
+            Ai.ExtAiPlayAni(npcPtr, name);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
