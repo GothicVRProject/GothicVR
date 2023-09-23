@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GVR.Caches;
 using GVR.Creator;
+using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using PxCs.Interface;
 using UnityEngine;
@@ -15,13 +16,49 @@ namespace GVR.Npc
 
         private bool isPlayingAnimation;
 
-
+        private uint routineStart;
+        private uint routineLoop;
+        private uint routineEnd;
+        
+        private RoutineState routineState = RoutineState.None;
+        private enum RoutineState
+        {
+            None,
+            Start,
+            Loop,
+            End
+        }
+        
         private void Update()
         {
-            if (Queue.Count == 0 || isPlayingAnimation)
+            if (isPlayingAnimation)
                 return;
 
-            PlayNextAnimation(Queue.Dequeue());
+            // Queue is empty. Check if we want to start Looping
+            if (Queue.Count == 0)
+            {
+                if (routineState == RoutineState.Start && routineLoop != 0)
+                {
+                    PxVm.CallFunction(GameData.I.VmGothicPtr, routineLoop, GetComponent<Properties>().npcPtr);
+                }
+            }
+            // Go on
+            else
+            {
+                PlayNextAnimation(Queue.Dequeue());
+            }
+        }
+
+        public void StartRoutine(uint action)
+        {
+            routineStart = action;
+
+            var routineSymbol = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, action);
+            routineLoop = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, $"{routineSymbol.name}_Loop").id;
+            routineEnd = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, $"{routineSymbol.name}_End").id;
+            
+            routineState = RoutineState.Start;
+            PxVm.CallFunction(GameData.I.VmGothicPtr, action, GetComponent<Properties>().npcPtr);
         }
 
         public static void ExtAiStandUp(IntPtr npcPtr)

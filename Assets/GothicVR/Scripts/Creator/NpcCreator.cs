@@ -306,8 +306,8 @@ namespace GVR.Creator
             {
                 var routineComp = props.GetComponent<Routine>();
                 var firstRoutine = routineComp.routines.FirstOrDefault();
-                
-                PxVm.CallFunction(GameData.I.VmGothicPtr, (uint)firstRoutine.action, props.npcPtr);
+
+                props.GetComponent<Ai>().StartRoutine((uint)firstRoutine.action);
             }
         }
 

@@ -315,7 +315,7 @@ namespace GVR.Creator
                 return;
 
             var vobObj = soundCreator.Create(vob, parentGosTeleport[vob.type]);
-            SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
+            SetPosAndRot(vobObj, vob.position, vob.rotation);
         }
 
         // FIXME - add specific daytime logic!
@@ -325,7 +325,7 @@ namespace GVR.Creator
                 return;
 
             var vobObj = soundCreator.Create(vob, parentGosTeleport[vob.type]);
-            SetPosAndRot(vobObj, vob.position, vob.rotation!.Value);
+            SetPosAndRot(vobObj, vob.position, vob.rotation);
         }
 
         private void CreateZoneMusic(PxVobZoneMusicData vob)
@@ -394,7 +394,7 @@ namespace GVR.Creator
                 Position = vob.position.ToUnityVector()
             });
             
-            SetPosAndRot(spot, vob.position, vob.rotation!.Value);
+            SetPosAndRot(spot, vob.position, vob.rotation);
         }
 
         private void CreateLadder(PxVobData vob)
@@ -414,7 +414,7 @@ namespace GVR.Creator
         private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
             var mrm = assetCache.TryGetMrm(item.visual);
-            return VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGosNonTeleport[vob.type], go);
+            return VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation, true, parentGosNonTeleport[vob.type], go);
         }
 
         private void CreateDecal(PxVobData vob)
@@ -443,7 +443,7 @@ namespace GVR.Creator
             var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                return VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value.ToUnityMatrix().rotation, parent);
+                return VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation, parent);
             }
 
             // MRM
@@ -453,7 +453,7 @@ namespace GVR.Creator
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.cdDynamic;
 
-                return VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, withCollider, parent);
+                return VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation, withCollider, parent);
             }
 
             Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");

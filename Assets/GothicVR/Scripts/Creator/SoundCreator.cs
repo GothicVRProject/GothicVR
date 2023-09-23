@@ -44,7 +44,7 @@ namespace GVR.Creator
         {
             var soundObject = new GameObject(vobSound.soundName);
             soundObject.SetParent(parent);
-            SetPosAndRot(soundObject, vobSound.position, vobSound.rotation!.Value);
+            SetPosAndRot(soundObject, vobSound.position, vobSound.rotation);
 
 
             var audioSource = CreateAndAddAudioSource(soundObject, vobSound.soundName, vobSound);
@@ -90,7 +90,7 @@ namespace GVR.Creator
             var soundObject = new GameObject($"{vobSoundDaytime.soundName}-{vobSoundDaytime.soundName2}");
             soundObject.SetParent(parent);
 
-            SetPosAndRot(soundObject, vobSoundDaytime.position, vobSoundDaytime.rotation!.Value);
+            SetPosAndRot(soundObject, vobSoundDaytime.position, vobSoundDaytime.rotation);
 
             // TODO - Is it right to have two AudioSources on one GO? Or would it be more Unity like to have two separate sub-GOs with one Source each?
             var audioSource1 = CreateAndAddAudioSource(soundObject, vobSoundDaytime.soundName, vobSoundDaytime);
