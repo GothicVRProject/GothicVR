@@ -89,24 +89,20 @@ namespace GVR.Creator
             {
                 var origNpc = lookupCache.NpcCache[(uint)npcInstance];
                 var origProps = origNpc.GetComponent<Properties>();
-                // clone Properties as they're required from the first instance.
-
-                // CLone values from first/original Instance.
+                // Clone Properties as they're required from the first instance.
                 props.Copy(origProps);
             }
 
             newNpc.name = props.npc!.names[0];
-         
-
+            
             var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
             NpcMeshCreator.I.CreateNpc(name, props.mdmName, mdhName, props.BodyData.Head, props.BodyData, newNpc);
+            newNpc.SetParent(GetRootGo());
 
             foreach (var equippedItem in props.EquippedItems)
                 NpcMeshCreator.I.EquipWeapon(newNpc, equippedItem, equippedItem.mainFlag, equippedItem.flags);
             
             SetSpawnPoint(newNpc, spawnPoint, props.npc);
-            
-            newNpc.SetParent(GetRootGo());
         }
 
         private void SetSpawnPoint(GameObject npcGo, string spawnPoint, PxVmNpcData pxNpc)
