@@ -179,70 +179,7 @@ namespace GVR.Creator
                 parentGosNonTeleport.Add(type, newGo);
             }
         }
-
-        private void CreateVobs(GameObject root, PxVobData[] vobs)
-        {
-            foreach (var vob in vobs)
-            {
-                switch (vob.type)
-                {
-                    case PxVobType.PxVob_oCItem:
-                        CreateItem((PxVobItemData)vob);
-                        break;
-                    case PxVobType.PxVob_oCMobContainer:
-                        CreateMobContainer((PxVobMobContainerData)vob);
-                        break;
-                    case PxVobType.PxVob_zCVobSound:
-                        CreateSound((PxVobSoundData)vob);
-                        break;
-                    case PxVobType.PxVob_zCVobSoundDaytime:
-                        CreateSoundDaytime((PxVobSoundDaytimeData)vob);
-                        break;
-                    case PxVobType.PxVob_oCZoneMusic:
-                        CreateZoneMusic((PxVobZoneMusicData)vob);
-                        break;
-                    case PxVobType.PxVob_zCVobSpot:
-                    case PxVobType.PxVob_zCVobStartpoint:
-                        CreateSpot(vob);
-                        break;
-                    case PxVobType.PxVob_oCMobLadder:
-                        CreateLadder(vob);
-                        break;
-                    case PxVobType.PxVob_oCTriggerChangeLevel:
-                        CreateTriggerChangeLevel((PxVobTriggerChangeLevelData)vob);
-                        break;
-                    case PxVobType.PxVob_zCVobScreenFX:
-                    case PxVobType.PxVob_zCVobAnimate:
-                    case PxVobType.PxVob_zCTriggerWorldStart:
-                    case PxVobType.PxVob_zCTriggerList:
-                    case PxVobType.PxVob_oCCSTrigger:
-                    case PxVobType.PxVob_oCTriggerScript:
-                    case PxVobType.PxVob_zCVobLensFlare:
-                    case PxVobType.PxVob_zCVobLight:
-                    case PxVobType.PxVob_zCMoverController:
-                    case PxVobType.PxVob_zCPFXController:
-                        Debug.LogWarning($"{vob.type} not yet implemented.");
-                        break;
-                    // Do nothing
-                    case PxVobType.PxVob_zCVobLevelCompo:
-                        break;
-                    case PxVobType.PxVob_zCVob:
-                        // if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
-                        // CreateDecal(vob);
-                        // else
-                        CreateDefaultMesh(vob);
-                        break;
-                    default:
-                        CreateDefaultMesh(vob);
-                        break;
-                }
-
-                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / totalVObs);
-                // Load children
-                CreateVobs(root, vob.childVobs);
-            }
-        }
-
+        
         private void CreateItem(PxVobItemData vob)
         {
             string itemName;
