@@ -13,15 +13,20 @@ namespace GVR.Npc
     {
         public readonly Queue<Action> Queue = new();
         private VmGothicEnums.WalkMode walkMode;
-
+        
+        // HINT: These information aren't set within Daedalus. We need to define them manually.
+        // HINT: i.e. every animation might have a BS. E.g. when AI_TakeItem() is called, we set BS.BS_TAKEITEM
+        private VmGothicEnums.BodyState bodyState;
+        
         private bool isPlayingAnimation;
 
-        private uint routineStart;
-        private uint routineLoop;
-        private uint routineEnd;
+        private uint prevStateStart;
+        private uint stateStart;
+        private uint stateLoop;
+        private uint stateEnd;
         
-        private RoutineState routineState = RoutineState.None;
-        private enum RoutineState
+        private State currentState = State.None;
+        private enum State
         {
             None,
             Start,
@@ -37,9 +42,10 @@ namespace GVR.Npc
             // Queue is empty. Check if we want to start Looping
             if (Queue.Count == 0)
             {
-                if (routineState == RoutineState.Start && routineLoop != 0)
+                if (currentState == State.Start && stateLoop != 0)
                 {
-                    PxVm.CallFunction(GameData.I.VmGothicPtr, routineLoop, GetComponent<Properties>().npcPtr);
+                    currentState = State.Loop;
+                    PxVm.CallFunction(GameData.I.VmGothicPtr, stateLoop, GetComponent<Properties>().npcPtr);
                 }
             }
             // Go on
@@ -51,14 +57,42 @@ namespace GVR.Npc
 
         public void StartRoutine(uint action)
         {
-            routineStart = action;
+            stateStart = action;
 
             var routineSymbol = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, action);
-            routineLoop = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, $"{routineSymbol.name}_Loop").id;
-            routineEnd = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, $"{routineSymbol.name}_End").id;
+            Debug.Log($"Starting Routine {routineSymbol!.name}");
             
-            routineState = RoutineState.Start;
+            var symbolLoop = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, $"{routineSymbol.name}_Loop");
+            if (symbolLoop != null)
+                stateLoop = symbolLoop.id;
+            
+            var symbolEnd = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, $"{routineSymbol.name}_End");
+            if (symbolEnd != null)
+                stateEnd = symbolEnd.id;
+            
+            currentState = State.Start;
             PxVm.CallFunction(GameData.I.VmGothicPtr, action, GetComponent<Properties>().npcPtr);
+        }
+
+        /// <summary>
+        /// Clear ZS functions. If stopCurrentState=true, then stop current animation and don't execute with ZS_*_End()
+        /// </summary>
+        private void ClearState(bool stopCurrentState)
+        {
+            Queue.Clear();
+
+            if (stopCurrentState)
+            {
+                currentState = State.None;
+                // FIXME - Also stop current animation immediately!
+            }
+            else
+            {
+                currentState = State.End;
+                
+                if (stateEnd != 0)
+                    PxVm.CallFunction(GameData.I.VmGothicPtr, stateEnd, GetComponent<Properties>().npcPtr);
+            }
         }
 
         public static void ExtAiStandUp(IntPtr npcPtr)
@@ -88,6 +122,31 @@ namespace GVR.Npc
         public static void ExtAiPlayAni(IntPtr npcPtr, string name)
         {
             GetAi(npcPtr).Queue.Enqueue(new(Action.Type.AIPlayAnim, name));
+        }
+
+        public static void ExtStartState(IntPtr npcPtr, uint action, bool stopCurrentState, string wayPointName)
+        {
+            var self = GetAi(npcPtr);
+
+            if (stopCurrentState)
+                self.ClearState(stopCurrentState);
+            
+            if (wayPointName != "")
+                Debug.LogError("FIXME - Waypoint unused so far.");
+            
+            self.StartRoutine(action);
+        }
+
+        public static bool ExtNpcWasInState(IntPtr npcPtr, uint action)
+        {
+            var self = GetAi(npcPtr);
+
+            return self.prevStateStart == action;
+        }
+
+        public static VmGothicEnums.BodyState ExtGetBodyState(IntPtr npcPtr)
+        {
+            return GetAi(npcPtr).bodyState;
         }
         
         private static Ai GetAi(IntPtr npcPtr)

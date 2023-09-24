@@ -45,6 +45,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "FloatToInt", FloatToInt);
             PxVm.pxVmRegisterExternal(vmPtr, "IntToFloat", IntToFloat);
             PxVm.pxVmRegisterExternal(vmPtr, "Hlp_Random", Hlp_Random);
+            PxVm.pxVmRegisterExternal(vmPtr, "Hlp_StrCmp", Hlp_StrCmp);
 
             // Debug
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebug", PrintDebug);
@@ -58,6 +59,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "AI_GotoWP", AI_GotoWP);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_AlignToWP", AI_AlignToWP);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_PlayAni", AI_PlayAni);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_StartState", AI_StartState);
             
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
@@ -74,7 +76,8 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Hlp_GetNpc", Hlp_GetNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_PercEnable", Npc_PercEnable);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetPercTime", Npc_SetPercTime);
-
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetBodyState", Npc_GetBodyState);
+            
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentSkill", Npc_SetTalentSkill);
             PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItem", CreateInvItem);
             PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItems", CreateInvItems);
@@ -84,6 +87,8 @@ namespace GVR.Phoenix.Interface.Vm
             // PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItems", Npc_RemoveInvItems);
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentValue", Npc_SetTalentValue);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetNearestWP", Npc_GetNearestWP);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_WasInState", Npc_WasInState);
         }
 
 #region Default
@@ -140,6 +145,17 @@ namespace GVR.Phoenix.Interface.Vm
             var rand = Random.Range(0, max - 1);
             
             PxVm.pxVmStackPushInt(vmPtr, rand);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Hlp_StrCmp(IntPtr vmPtr)
+        {
+            var str2 = PxVm.pxVmStackPopString(vmPtr);
+            var str1 = PxVm.pxVmStackPopString(vmPtr);
+
+            var equal = (str1 == str2) ? 1 : 0;
+            
+            PxVm.pxVmStackPushInt(vmPtr, equal);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -280,6 +296,17 @@ namespace GVR.Phoenix.Interface.Vm
             
             Ai.ExtAiPlayAni(npcPtr, name);
         }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void AI_StartState(IntPtr vmPtr)
+        {
+            var wayPointName = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
+            var stateBehaviour = PxVm.pxVmStackPopInt(vmPtr);
+            var function = PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            
+            Ai.ExtStartState(npcPtr, (uint)function, Convert.ToBoolean(stateBehaviour), wayPointName);
+        }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Mdl_SetVisual(IntPtr vmPtr)
@@ -384,6 +411,16 @@ namespace GVR.Phoenix.Interface.Vm
             
             NpcCreator.I.ExtNpcSetPerceptionTime(npcPtr, time);
         }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_GetBodyState(IntPtr vmPtr)
+        {
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            var bodyState = Ai.ExtGetBodyState(npcPtr);
+            
+            PxVm.pxVmStackPushInt(vmPtr, (int)bodyState);
+        }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_SetTalentSkill(IntPtr vmPtr)
@@ -404,6 +441,26 @@ namespace GVR.Phoenix.Interface.Vm
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             
             NpcCreator.I.ExtNpcSetTalentValue(npcPtr, talent, level);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_GetNearestWP(IntPtr vmPtr)
+        {
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            var name = NpcCreator.ExtGetNearestWayPoint(npcPtr);
+
+            PxVm.pxVmStackPushString(vmPtr, name);
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_WasInState(IntPtr vmPtr)
+        {
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            var action = PxVm.pxVmStackPopInt(vmPtr);
+
+            var result = Ai.ExtNpcWasInState(npcPtr, (uint)action);
+            
+            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(result));
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]

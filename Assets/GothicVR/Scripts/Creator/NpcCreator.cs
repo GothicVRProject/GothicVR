@@ -44,7 +44,12 @@ namespace GVR.Creator
             return npcRootGo;
         }
 
-        private Properties GetProperties(IntPtr npcPtr)
+        private static GameObject GetNpc(IntPtr npcPtr)
+        {
+            return GetProperties(npcPtr).gameObject;
+        }
+        
+        private static Properties GetProperties(IntPtr npcPtr)
         {
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
             var props = lookupCache.NpcCache[symbolIndex];
@@ -66,6 +71,9 @@ namespace GVR.Creator
             return GetProperties(npcPtr).gameObject;
         }
 
+        private const int DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY = 1;
+        private int debugNpcsSpawned;
+        
         /// <summary>
         /// Original Gothic uses this function to spawn an NPC instance into the world.
         /// 
@@ -75,6 +83,9 @@ namespace GVR.Creator
         /// </summary>
         public void ExtWldInsertNpc(int npcInstance, string spawnPoint)
         {
+            if (++debugNpcsSpawned > DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY)
+                return;
+            
             var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
             var props = newNpc.GetComponent<Properties>();
             
@@ -103,6 +114,7 @@ namespace GVR.Creator
                 NpcMeshCreator.I.EquipWeapon(newNpc, equippedItem, equippedItem.mainFlag, equippedItem.flags);
             
             SetSpawnPoint(newNpc, spawnPoint, props.npc);
+            StartRoutine(newNpc);
         }
 
         private void SetSpawnPoint(GameObject npcGo, string spawnPoint, PxVmNpcData pxNpc)
@@ -272,10 +284,25 @@ namespace GVR.Creator
 
             props.EquippedItems.Add(itemData);
         }
+
+        public static string ExtGetNearestWayPoint(IntPtr npcPtr)
+        {
+            var pos = GetNpc(npcPtr).transform.position;
+
+            return WayNetManager.I.FindNearestWayPoint(pos).Name;
+        }
+
+        private static void StartRoutine(GameObject npc)
+        {
+            var routineComp = npc.GetComponent<Routine>();
+            var firstRoutine = routineComp.routines.FirstOrDefault();
+
+            npc.GetComponent<Ai>().StartRoutine((uint)firstRoutine.action);
+        }
         
         public void DebugAddIdleAnimationToAllNpc()
         {
-            DebugDanceAll();
+            // DebugDanceAll();
             DebugThorus();
             DebugMeatBug();
 

@@ -11,6 +11,11 @@ namespace GVR.Manager
 {
     public class WayNetManager : SingletonBehaviour<WayNetManager>
     {
+        /// <summary>
+        /// Check within WayPoints and FreePoints if an entry exists.
+        /// </summary>
+        /// <param name="pointName"></param>
+        /// <returns></returns>
         [CanBeNull]
         public WayNetPoint GetWayNetPoint(string pointName)
         {
@@ -35,6 +40,15 @@ namespace GVR.Manager
                 .Select(pair => pair.Value);
             
             return matchingFreePoints.ToList();
+        }
+
+        public WayPoint FindNearestWayPoint(Vector3 lookupPosition)
+        {
+            var nearestWayPoint = GameData.I.WayPoints
+                .OrderBy(pair => Vector3.Distance(pair.Value.Position, lookupPosition))
+                .First();
+
+            return nearestWayPoint.Value;
         }
     }
 }
