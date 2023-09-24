@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Npc;
+using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
 using UnityEngine;
@@ -47,6 +49,29 @@ namespace GVR.Manager
 
             return freePoint.Name.StartsWithIgnoreCase(vobNamePrefix);
         }
+
+        public bool ExtWldDetectNpcEx(IntPtr npcPtr, int npcInstance, int aiState, int guild, bool ignorePlayer)
+        {
+            var npc = GetNpc(npcPtr);
+            var npcPos = npc.transform.position;
+            
+            // FIXME - currently hard coded with 20m, but needs to be imported from Phoenix: daedalus_classes.h::c_npc::senses and senses_range
+            float distance = 20f; // 20m
+            
+            // FIXME - Add Guild check
+            // FIXME - Add Hero check
+            // FIXME - Add AiState check
+            // FIXME - Add NpcCinstance check (only look for specific NPC)
+            
+            var foundNpc = LookupCache.I.NpcCache.Values
+                .Where(i => Vector3.Distance(i.gameObject.transform.position, npcPos) <= distance)
+                .Where(i => i.gameObject != npc)
+                .OrderBy(i => Vector3.Distance(i.gameObject.transform.position, npcPos))
+                .FirstOrDefault();
+
+            return (foundNpc != null);
+        }
+        
         
         private GameObject GetNpc(IntPtr npcPtr)
         {

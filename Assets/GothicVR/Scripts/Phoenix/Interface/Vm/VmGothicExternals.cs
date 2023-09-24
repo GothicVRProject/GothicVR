@@ -65,6 +65,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsMobAvailable", Wld_IsMobAvailable);
+            PxVm.pxVmRegisterExternal(vmPtr, "Wld_DetectNpcEx", Wld_DetectNpcEx);
                 
             // NPC visuals
             PxVm.pxVmRegisterExternal(vmPtr, "TA_MIN", TA_MIN);
@@ -238,7 +239,24 @@ namespace GVR.Phoenix.Interface.Vm
 
             PxVm.pxVmStackPushInt(vmPtr , Convert.ToInt32(res));
         }
-        
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Wld_DetectNpcEx(IntPtr vmPtr)
+        {
+            var detectPlayer = PxVm.pxVmStackPopInt(vmPtr);
+            var guild = PxVm.pxVmStackPopInt(vmPtr);
+            var aiState = PxVm.pxVmStackPopInt(vmPtr);
+            var npcInstance = PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            // Logic from Daedalus mentions, that the player will be ignored if 0. Not "detect" if 1.
+            var ignorePlayer = !Convert.ToBoolean(detectPlayer);
+            
+            var res = NpcManager.I.ExtWldDetectNpcEx(npcPtr, npcInstance, aiState, guild, ignorePlayer);
+            
+            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(res));
+        }
+
         public struct ExtTaMinData
         {
             public IntPtr Npc;
@@ -441,7 +459,9 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            // FIXME - Add logic to "load" all Items and NPCs and reference them later within Wld_DetectNpc() and Wld_DetectItem().
+            // Do nothing!
+            // Gothic loads all the necessary items into memory to reference them later via Wld_DetectNpc() and Wld_DetectItem().
+            // But we don't need to pre-load them and can just load the necessary elements when really needed.
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
