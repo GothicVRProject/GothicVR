@@ -3,6 +3,8 @@ using System.Globalization;
 using AOT;
 using GVR.Creator;
 using GVR.Debugging;
+using GVR.GothicVR.Scripts.Manager;
+using GVR.Manager;
 using GVR.Npc;
 using PxCs.Extensions;
 using PxCs.Interface;
@@ -63,7 +65,8 @@ namespace GVR.Phoenix.Interface.Vm
             
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
-
+            PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsMobAvailable", Wld_IsMobAvailable);
+                
             // NPC visuals
             PxVm.pxVmRegisterExternal(vmPtr, "TA_MIN", TA_MIN);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisual", Mdl_SetVisual);
@@ -224,6 +227,17 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(response));
         }
 
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Wld_IsMobAvailable(IntPtr vmPtr)
+        {
+            var vobName = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            var res = NpcManager.I.ExtIsMobAvailable(npcPtr, vobName);
+
+            PxVm.pxVmStackPushInt(vmPtr , Convert.ToInt32(res));
+        }
+        
         public struct ExtTaMinData
         {
             public IntPtr Npc;

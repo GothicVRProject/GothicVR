@@ -1,9 +1,8 @@
 using GothicVR.Vob;
 using GVR.Caches;
 using GVR.Debugging;
-using GVR.Demo;
+using GVR.Extensions;
 using GVR.Manager;
-using GVR.Phoenix.Interface.Vm;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Sound;
@@ -12,7 +11,6 @@ using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
 using Vector3 = System.Numerics.Vector3;
-
 
 namespace GVR.Creator
 {

@@ -1,13 +1,12 @@
+using System;
+using System.Reflection;
+using GVR.Caches;
+using GVR.Extensions;
 using GVR.Phoenix.Interface;
 using GVR.Util;
-using System.Collections.Generic;
 using TMPro;
-using GVR.Caches;
-using GVR.Phoenix.Util;
 using UnityEngine;
-using System;
 using UnityEngine.TextCore;
-using System.Reflection;
 
 namespace GVR.Manager
 {

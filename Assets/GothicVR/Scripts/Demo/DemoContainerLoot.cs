@@ -1,12 +1,8 @@
-using GVR.Caches;
-using GVR.Creator;
-using GVR.Phoenix.Interface;
-using GVR.Util;
-using PxCs.Interface;
 using System;
 using System.Collections.Generic;
+using GVR.Caches;
 using GVR.Creator.Meshes;
-using GVR.Phoenix.Util;
+using GVR.Extensions;
 using UnityEngine;
 
 namespace GVR.Demo

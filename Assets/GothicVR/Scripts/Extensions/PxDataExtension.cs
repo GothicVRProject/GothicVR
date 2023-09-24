@@ -2,7 +2,7 @@ using PxCs.Data.Mesh;
 using System;
 using UnityEngine;
 
-namespace GVR.Phoenix.Util
+namespace GVR.Extensions
 {
     public static class PxDataExtension
     {

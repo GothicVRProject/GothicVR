@@ -2,14 +2,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GVR.Caches;
+using GVR.Extensions;
 using GVR.Npc;
-using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Animation;
 using PxCs.Data.Model;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Playables;
 
 namespace GVR.Creator
 {

@@ -1,9 +1,9 @@
 ﻿using GVR.Debugging;
-using UnityEngine;
-using GVR.Phoenix.Data;
-using GVR.Phoenix.Util;
-using GVR.Util;
+using GVR.Extensions;
 using GVR.Manager;
+using GVR.Phoenix.Data;
+using GVR.Util;
+using UnityEngine;
 
 namespace GVR.Creator
 {

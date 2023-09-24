@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GVR.Phoenix.Util
+namespace GVR.Extensions
 {
     public static class MaterialExtension
     {

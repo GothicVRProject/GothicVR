@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
+using GVR.Extensions;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace GVR.Creator.Meshes
 {
@@ -525,8 +526,8 @@ namespace GVR.Creator.Meshes
 
             material.SetFloat("_Surface", 0);
             material.SetInt("_ZWrite", 0);
-            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
 
             return material;
         }

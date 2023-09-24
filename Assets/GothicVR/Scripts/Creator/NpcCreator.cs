@@ -3,12 +3,12 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Creator.Meshes;
 using GVR.Debugging;
+using GVR.Extensions;
 using GVR.Manager;
 using GVR.Npc;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
-using GVR.Phoenix.Util;
 using GVR.Util;
 using GVR.Vob.WayNet;
 using PxCs.Data.Vm;
@@ -279,7 +279,6 @@ namespace GVR.Creator
         public void ExtEquipItem(IntPtr npcPtr, int itemId)
         {
             var props = GetProperties(npcPtr);
-            var npc = props.gameObject;
             var itemData = assetCache.TryGetItemData((uint)itemId);
 
             props.EquippedItems.Add(itemData);

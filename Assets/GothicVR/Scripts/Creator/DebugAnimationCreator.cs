@@ -1,21 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using GVR.Caches;
-using GVR.Demo;
+using GVR.Creator.Meshes;
+using GVR.Debugging;
+using GVR.Extensions;
 using GVR.Phoenix.Interface;
-using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Animation;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
 using PxCs.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using GVR.Creator.Meshes;
-using GVR.Debugging;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 
 namespace GVR.Creator
@@ -443,7 +440,7 @@ namespace GVR.Creator
             PxAnimationData[] animations = new PxAnimationData[mds.animations.Length];
             for (int i = 0; i < animations.Length; i++)
             {
-                var animName = mdsName.Replace(".MDS", $"-{mds.animations[i].name}.MAN", System.StringComparison.OrdinalIgnoreCase);
+                var animName = mdsName.Replace(".MDS", $"-{mds.animations[i].name}.MAN", StringComparison.OrdinalIgnoreCase);
                 animations[i] = PxAnimation.LoadFromVfs(GameData.I.VfsPtr, animName);
             }
             var debugAnimationNames = animations.Select(i => i.name).ToArray();
