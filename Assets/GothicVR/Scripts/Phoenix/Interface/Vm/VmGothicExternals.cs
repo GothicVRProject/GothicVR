@@ -469,6 +469,7 @@ namespace GVR.Phoenix.Interface.Vm
         public static void Npc_GetNearestWP(IntPtr vmPtr)
         {
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
             var name = NpcCreator.ExtGetNearestWayPoint(npcPtr);
 
             PxVm.pxVmStackPushString(vmPtr, name);
@@ -477,8 +478,8 @@ namespace GVR.Phoenix.Interface.Vm
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_IsOnFP(IntPtr vmPtr)
         {
+            var vobNamePrefix = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-            var vobNamePrefix = PxVm.pxVmStackPopString(npcPtr).MarshalAsString();
 
             var res = NpcManager.I.ExtIsNpcOnFp(npcPtr, vobNamePrefix);
 
@@ -488,8 +489,8 @@ namespace GVR.Phoenix.Interface.Vm
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_WasInState(IntPtr vmPtr)
         {
-            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             var action = PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
             var result = Ai.ExtNpcWasInState(npcPtr, (uint)action);
             
