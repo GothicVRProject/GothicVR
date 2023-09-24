@@ -4,7 +4,6 @@ using GVR.Caches;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Npc;
-using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
 using UnityEngine;
@@ -70,6 +69,18 @@ namespace GVR.Manager
                 .FirstOrDefault();
 
             return (foundNpc != null);
+        }
+
+        public bool ExtNpcHasItems(IntPtr npcPtr, uint itemId)
+        {
+            if (GetProperties(npcPtr).Items.TryGetValue(itemId, out int amount))
+            {
+                return Convert.ToBoolean(amount);
+            }
+            else
+            {
+                return false;
+            }
         }
         
         

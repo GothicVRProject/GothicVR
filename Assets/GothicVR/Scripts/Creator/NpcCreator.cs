@@ -244,7 +244,7 @@ namespace GVR.Creator
             props.Talents[talent] = level;
         }
 
-        public void ExtCreateInvItems(IntPtr npcPtr, int itemId, int amount)
+        public void ExtCreateInvItems(IntPtr npcPtr, uint itemId, int amount)
         {
             var props = GetProperties(npcPtr);
             

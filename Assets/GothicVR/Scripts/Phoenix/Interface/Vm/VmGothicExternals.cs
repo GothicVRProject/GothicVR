@@ -81,6 +81,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetPercTime", Npc_SetPercTime);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetBodyState", Npc_GetBodyState);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_PerceiveAll", Npc_PerceiveAll);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_HasItems", Npc_HasItems);
             
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentSkill", Npc_SetTalentSkill);
             PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItem", CreateInvItem);
@@ -458,10 +459,20 @@ namespace GVR.Phoenix.Interface.Vm
         public static void Npc_PerceiveAll(IntPtr vmPtr)
         {
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-
+            
             // Do nothing!
             // Gothic loads all the necessary items into memory to reference them later via Wld_DetectNpc() and Wld_DetectItem().
             // But we don't need to pre-load them and can just load the necessary elements when really needed.
+        }
+
+        public static void Npc_HasItems(IntPtr vmPtr)
+        {
+            var itemId = PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            var hasItems = NpcManager.I.ExtNpcHasItems(npcPtr, (uint)itemId);
+            
+            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(hasItems));
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -523,7 +534,7 @@ namespace GVR.Phoenix.Interface.Vm
             var itemId = PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             
-            NpcCreator.I.ExtCreateInvItems(npcPtr, itemId, 1);
+            NpcCreator.I.ExtCreateInvItems(npcPtr, (uint)itemId, 1);
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -533,7 +544,7 @@ namespace GVR.Phoenix.Interface.Vm
             var itemId = PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             
-            NpcCreator.I.ExtCreateInvItems(npcPtr, itemId, amount);
+            NpcCreator.I.ExtCreateInvItems(npcPtr, (uint)itemId, amount);
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]

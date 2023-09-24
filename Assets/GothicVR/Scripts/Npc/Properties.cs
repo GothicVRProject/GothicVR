@@ -30,7 +30,7 @@ namespace GVR.Npc
         
         // NPC items/talents/...
         public Dictionary<VmGothicEnums.Talent, int> Talents = new();
-        public Dictionary<int, int> Items = new();
+        public Dictionary<uint, int> Items = new(); // itemId => amount
 
 #pragma warning disable CS0414 // Just a debug flag for easier debugging if we missed to copy something in the future. 
         public bool isClonedFromAnother;
