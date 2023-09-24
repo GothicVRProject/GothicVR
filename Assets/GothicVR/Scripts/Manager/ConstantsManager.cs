@@ -5,6 +5,11 @@ namespace GVR.Manager
 {
     public class ConstantsManager : SingletonBehaviour<ConstantsManager>
     {
+        public const string SceneBootstrap = "Bootstrap";
+        public const string SceneGeneral = "General";
+        public const string SceneMainMenu = "MainMenu";
+        public const string SceneLoading = "Loading";
+        
         //Layer for all Items, specifically to disable collision physics between player and items
         public LayerMask ItemLayer;
 

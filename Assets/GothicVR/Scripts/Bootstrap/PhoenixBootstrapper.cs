@@ -50,7 +50,7 @@ namespace GVR.Bootstrap
                 if (Application.platform == RuntimePlatform.Android)
                     filePickerButton.SetActive(false);
                 else
-                    filePickerButton.SetActive(false);
+                    filePickerButton.SetActive(true);
             }
         }
 

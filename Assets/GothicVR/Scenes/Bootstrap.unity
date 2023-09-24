@@ -311,7 +311,7 @@ GameObject:
   - component: {fileID: 185791145}
   - component: {fileID: 185791148}
   m_Layer: 5
-  m_Name: Button
+  m_Name: FilePickerButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -487,6 +487,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12af35efb7c45ea4fb4752d0328ebf2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useXRDeviceSimulator: 0
   CreateVobs: 1
   CreateWaypoints: 0
   CreateWaypointEdges: 0
@@ -1676,12 +1677,12 @@ GameObject:
   - component: {fileID: 1623647997}
   - component: {fileID: 1623647996}
   m_Layer: 5
-  m_Name: InstallationFilePicker
+  m_Name: ConfigurationMessage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1623647996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1800,6 +1801,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a9bc266eaeba904b874cccfe887cf92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  configurationMessage: {fileID: 1623647995}
+  filePickerButton: {fileID: 185791143}
 --- !u!4 &1892061894
 Transform:
   m_ObjectHideFlags: 0
@@ -1833,6 +1836,7 @@ GameObject:
   - component: {fileID: 1896514220}
   - component: {fileID: 1896514221}
   - component: {fileID: 1896514222}
+  - component: {fileID: 1896514223}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1988,6 +1992,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e99072fc3725432ababedd7c44fb1d43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9af6bda13a014da48ee7a934228cefe9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &2044949334

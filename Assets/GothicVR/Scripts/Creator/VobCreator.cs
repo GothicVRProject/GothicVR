@@ -72,6 +72,7 @@ namespace GVR.Creator
             vobRootNonTeleport.SetParent(rootNonTeleport);
             
             parentGosTeleport = new();
+            parentGosNonTeleport = new();
 
             CreateParentVobObjectTeleport(vobRootTeleport);
             CreateParentVobObjectNonTeleport(vobRootNonTeleport);
