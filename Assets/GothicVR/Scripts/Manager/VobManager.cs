@@ -12,11 +12,11 @@ namespace GVR.GothicVR.Scripts.Manager
         private const float lookupDistance = 10f; // meter
         
         [CanBeNull]
-        public GameObject GetFreeInteractableWithin10m(Vector3 position, string name)
+        public GameObject GetFreeInteractableWithin10M(Vector3 position, string vobName)
         {
             return GameData.I.VobsInteractable
                 .Where(i => Vector3.Distance(i.transform.position, position) < lookupDistance)
-                .Where(i => gameObject.name.EqualsIgnoreCase(name))
+                .Where(i => gameObject.name.EqualsIgnoreCase(vobName))
                 .OrderBy(i => Vector3.Distance(i.transform.position, position))
                 .FirstOrDefault();
         }

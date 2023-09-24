@@ -25,7 +25,6 @@ namespace GVR.Creator
 
         // Hint - If this scale ratio isn't looking well, feel free to change it.
         private const float fatnessScale = 0.1f;
-        private const float fplookupDistance = 20f;
         
         void Start()
         {
@@ -140,23 +139,6 @@ namespace GVR.Creator
             }
             
             npcGo.transform.position = initialSpawnPoint.Position;
-        }
-
-        public bool ExtWldIsFPAvailable(IntPtr npcPtr, string fpNamePart)
-        {
-            var props = GetProperties(npcPtr);
-            var npcGo = props.gameObject;
-            var freePoints = WayNetManager.I.FindFreePointsWithName(npcGo.transform.position, fpNamePart, fplookupDistance);
-
-            foreach (var fp in freePoints)
-            {
-                if (props.CurrentFreePoint == fp)
-                    return true;
-                if (!fp.IsLocked)
-                    return true;
-            }
-
-            return false;
         }
         
         public void ExtTaMin(VmGothicExternals.ExtTaMinData data)

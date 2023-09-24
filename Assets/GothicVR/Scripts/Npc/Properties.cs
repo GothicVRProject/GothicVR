@@ -16,10 +16,8 @@ namespace GVR.Npc
         
         // Visual
         public string mdmName;
-        
         public string baseMdsName;
         public string baseMdhName => baseMdsName;
-
         public string overlayMdsName;
         public string overlayMdhName => overlayMdsName;
         

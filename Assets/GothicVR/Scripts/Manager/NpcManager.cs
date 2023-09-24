@@ -1,5 +1,6 @@
 using System;
 using GVR.Caches;
+using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Npc;
 using GVR.Util;
@@ -10,12 +11,41 @@ namespace GVR.Manager
 {
     public class NpcManager : SingletonBehaviour<NpcManager>
     {
+        private const float fpLookupDistance = 20f; // meter
+
         public bool ExtIsMobAvailable(IntPtr npcPtr, string vobName)
         {
             var npc = GetNpc(npcPtr);
-            var vob = VobManager.I.GetFreeInteractableWithin10m(npc.transform.position, vobName);
+            var vob = VobManager.I.GetFreeInteractableWithin10M(npc.transform.position, vobName);
 
             return (vob != null);
+        }
+        
+        public bool ExtWldIsFPAvailable(IntPtr npcPtr, string fpNamePart)
+        {
+            var props = GetProperties(npcPtr);
+            var npcGo = props.gameObject;
+            var freePoints = WayNetManager.I.FindFreePointsWithName(npcGo.transform.position, fpNamePart, fpLookupDistance);
+
+            foreach (var fp in freePoints)
+            {
+                if (props.CurrentFreePoint == fp)
+                    return true;
+                if (!fp.IsLocked)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool ExtIsNpcOnFp(IntPtr npcPtr, string vobNamePrefix)
+        {
+            var freePoint = GetProperties(npcPtr).CurrentFreePoint;
+
+            if (freePoint == null)
+                return false;
+
+            return freePoint.Name.StartsWithIgnoreCase(vobNamePrefix);
         }
         
         private GameObject GetNpc(IntPtr npcPtr)

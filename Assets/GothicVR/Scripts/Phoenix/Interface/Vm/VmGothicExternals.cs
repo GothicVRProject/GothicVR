@@ -91,6 +91,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentValue", Npc_SetTalentValue);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetNearestWP", Npc_GetNearestWP);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_IsOnFP", Npc_IsOnFP);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_WasInState", Npc_WasInState);
         }
 
@@ -223,7 +224,7 @@ namespace GVR.Phoenix.Interface.Vm
             var fpName = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            var response = NpcCreator.I.ExtWldIsFPAvailable(npcPtr, fpName);
+            var response = NpcManager.I.ExtWldIsFPAvailable(npcPtr, fpName);
             PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(response));
         }
 
@@ -464,6 +465,17 @@ namespace GVR.Phoenix.Interface.Vm
             var name = NpcCreator.ExtGetNearestWayPoint(npcPtr);
 
             PxVm.pxVmStackPushString(vmPtr, name);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_IsOnFP(IntPtr vmPtr)
+        {
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            var vobNamePrefix = PxVm.pxVmStackPopString(npcPtr).MarshalAsString();
+
+            var res = NpcManager.I.ExtIsNpcOnFp(npcPtr, vobNamePrefix);
+
+            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(res));
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
