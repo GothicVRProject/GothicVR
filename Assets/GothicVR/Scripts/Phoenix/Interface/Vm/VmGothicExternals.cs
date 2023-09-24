@@ -7,6 +7,7 @@ using GVR.Npc;
 using PxCs.Extensions;
 using PxCs.Interface;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace GVR.Phoenix.Interface.Vm
 {
@@ -43,6 +44,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "FloatToString", FloatToString);
             PxVm.pxVmRegisterExternal(vmPtr, "FloatToInt", FloatToInt);
             PxVm.pxVmRegisterExternal(vmPtr, "IntToFloat", IntToFloat);
+            PxVm.pxVmRegisterExternal(vmPtr, "Hlp_Random", Hlp_Random);
 
             // Debug
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebug", PrintDebug);
@@ -123,12 +125,21 @@ namespace GVR.Phoenix.Interface.Vm
             var val = PxVm.pxVmStackPopFloat(vmPtr);
             PxVm.pxVmStackPushInt(vmPtr, (int)val);
         }
-            
+
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void IntToFloat(IntPtr vmPtr)
         {
             var val = PxVm.pxVmStackPopInt(vmPtr);
             PxVm.pxVmStackPushFloat(vmPtr, val);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Hlp_Random(IntPtr vmPtr)
+        {
+            var max = PxVm.pxVmStackPopInt(vmPtr);
+            var rand = Random.Range(0, max - 1);
+            
+            PxVm.pxVmStackPushInt(vmPtr, rand);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
