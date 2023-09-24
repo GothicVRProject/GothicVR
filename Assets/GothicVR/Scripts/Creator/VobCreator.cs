@@ -72,6 +72,7 @@ namespace GVR.Creator
             vobRootNonTeleport.SetParent(rootNonTeleport);
             
             parentGosTeleport = new();
+            parentGosNonTeleport = new();
 
             CreateParentVobObjectTeleport(vobRootTeleport);
             CreateParentVobObjectNonTeleport(vobRootNonTeleport);
@@ -363,7 +364,7 @@ namespace GVR.Creator
         {
             // FIXME - change to a Prefab in the future.
             var spot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            spot.tag = "PxVob_zCVobSpot";
+            spot.tag = ConstantsManager.I.SpotTag;
             Destroy(spot.GetComponent<SphereCollider>()); // No need for collider here!
 
             if (FeatureFlags.I.EnableVobFPMesh)
