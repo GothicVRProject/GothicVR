@@ -77,7 +77,6 @@ namespace GVR.Creator
         {
             var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
             var props = newNpc.GetComponent<Properties>();
-            newNpc.SetParent(GetRootGo());
             
             // Humans are singletons.
             if (lookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<Properties>()))
@@ -106,6 +105,8 @@ namespace GVR.Creator
                 NpcMeshCreator.I.EquipWeapon(newNpc, equippedItem, equippedItem.mainFlag, equippedItem.flags);
             
             SetSpawnPoint(newNpc, spawnPoint, props.npc);
+            
+            newNpc.SetParent(GetRootGo());
         }
 
         private void SetSpawnPoint(GameObject npcGo, string spawnPoint, PxVmNpcData pxNpc)
