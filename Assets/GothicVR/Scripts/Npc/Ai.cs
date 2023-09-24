@@ -60,7 +60,6 @@ namespace GVR.Npc
             stateStart = action;
 
             var routineSymbol = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, action);
-            Debug.Log($"Starting Routine {routineSymbol!.name}");
             
             var symbolLoop = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, $"{routineSymbol.name}_Loop");
             if (symbolLoop != null)

@@ -3,7 +3,6 @@ using System.Globalization;
 using AOT;
 using GVR.Creator;
 using GVR.Debugging;
-using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Npc;
 using PxCs.Extensions;
@@ -80,6 +79,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_PercEnable", Npc_PercEnable);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetPercTime", Npc_SetPercTime);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetBodyState", Npc_GetBodyState);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_PerceiveAll", Npc_PerceiveAll);
             
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentSkill", Npc_SetTalentSkill);
             PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItem", CreateInvItem);
@@ -435,6 +435,13 @@ namespace GVR.Phoenix.Interface.Vm
             var bodyState = Ai.ExtGetBodyState(npcPtr);
             
             PxVm.pxVmStackPushInt(vmPtr, (int)bodyState);
+        }
+
+        public static void Npc_PerceiveAll(IntPtr vmPtr)
+        {
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            // FIXME - Add logic to "load" all Items and NPCs and reference them later within Wld_DetectNpc() and Wld_DetectItem().
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]

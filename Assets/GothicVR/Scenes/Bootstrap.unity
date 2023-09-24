@@ -967,6 +967,8 @@ GameObject:
   - component: {fileID: 1896514219}
   - component: {fileID: 1896514220}
   - component: {fileID: 1896514221}
+  - component: {fileID: 1896514225}
+  - component: {fileID: 1896514224}
   - component: {fileID: 1896514222}
   - component: {fileID: 1896514223}
   m_Layer: 0
@@ -1096,6 +1098,7 @@ MonoBehaviour:
   MenuFontTag: Title
   SubtitleFontTag: IngameText
   ClimbableTag: Climbable
+  SpotTag: PxVob_zCVobSpot
   MeshPerFrame: 10
   VObPerFrame: 75
   moveSpeedPlayerPref: MoveSpeed
@@ -1137,6 +1140,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9af6bda13a014da48ee7a934228cefe9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c302eb8c3a44a1da137e49fb5e78677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b59e485fb4d4b61be1623c4ef3b43f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
