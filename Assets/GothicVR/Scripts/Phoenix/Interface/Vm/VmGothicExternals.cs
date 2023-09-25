@@ -62,6 +62,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "AI_PlayAni", AI_PlayAni);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_StartState", AI_StartState);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_UseItemToState", AI_UseItemToState);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_Wait", AI_Wait);
             
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
@@ -353,6 +354,15 @@ namespace GVR.Phoenix.Interface.Vm
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
             Ai.ExtAiUseItemToState(npcPtr, (uint)itemId, expectedInventoryCount);
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void AI_Wait(IntPtr vmPtr)
+        {
+            var seconds = PxVm.pxVmStackPopFloat(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            Ai.ExtAiWait(npcPtr, seconds);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]

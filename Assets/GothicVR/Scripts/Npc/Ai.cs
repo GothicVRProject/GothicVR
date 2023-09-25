@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GVR.Caches;
 using GVR.Creator;
+using GVR.Creator.Meshes;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using PxCs.Interface;
@@ -31,6 +32,10 @@ namespace GVR.Npc
         private float stateTime;
         
         private State currentState = State.None;
+        private Action.Type curAnimationAction = Action.Type.AINone;
+        private bool isAiWait;
+        private float aiWaitSeconds;
+
         private enum State
         {
             None,
@@ -44,6 +49,17 @@ namespace GVR.Npc
             // Add new milliseconds when stateTime shall be measured.
             if (isStateTimeActive)
                 stateTime += Time.deltaTime;
+
+            // If state is AiWait, then we need to check if time is over and "stop" fake animation flag.
+            if (isAiWait)
+            {
+                aiWaitSeconds -= Time.deltaTime;
+                if (aiWaitSeconds <= 0f)
+                {
+                    isAiWait = false;
+                    isPlayingAnimation = false;
+                }
+            }
             
             if (isPlayingAnimation)
                 return;
@@ -110,6 +126,11 @@ namespace GVR.Npc
             }
         }
 
+        public static void ExtAiWait(IntPtr npcPtr, float seconds)
+        {
+            GetAi(npcPtr).Queue.Enqueue(new(Action.Type.AIWait, f0: seconds));
+        }
+        
         public static void ExtAiStandUp(IntPtr npcPtr)
         {
             // FIXME - from docu:
@@ -195,14 +216,24 @@ namespace GVR.Npc
         {
             var props = GetComponent<Properties>();
             var npc = props.gameObject;
-            
-            switch (action.ActionType)
+
+            curAnimationAction = action.ActionType;
+            switch (curAnimationAction)
             {
                 case Action.Type.AIPlayAnim:
                     var mdh = AssetCache.I.TryGetMdh(props.overlayMdhName);
                     // FIXME - We need to handle both mds and mdh options! (base vs overlay)
                     AnimationCreator.I.PlayAnimation(props.baseMdsName, action.str0, mdh, gameObject);
                     isPlayingAnimation = true;
+                    break;
+                case Action.Type.AIUseItemToState:
+                    var slotGo = NpcMeshCreator.I.GetSlot(npc, NpcMeshCreator.ItemSlot.RightHand);
+                    VobCreator.I.CreateItem(action.ui0, slotGo);
+                    break;
+                case Action.Type.AIWait:
+                    isPlayingAnimation = true;
+                    isAiWait = true;
+                    aiWaitSeconds = action.f0;
                     break;
                 default:
                     Debug.LogError($"ActionType {action.ActionType} not yet handled.");
@@ -272,18 +303,20 @@ namespace GVR.Npc
                     AILookAt
                 }
         
-                public Action(Type actionType, string str0 = null, int i0 = 0, uint ui0 = 0)
+                public Action(Type actionType, string str0 = null, int i0 = 0, uint ui0 = 0, float f0 = 0f)
                 {
                     this.ActionType = actionType;
                     this.str0 = str0;
                     this.i0 = i0;
                     this.ui0 = ui0;
+                    this.f0 = f0;
                 }
                 
                 public readonly Type ActionType;
                 public readonly string str0;
                 public readonly int i0;
                 public readonly uint ui0;
+                public readonly float f0;
             }
     }
 }
