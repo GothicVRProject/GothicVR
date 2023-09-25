@@ -24,6 +24,11 @@ namespace GVR.Npc
         private uint stateStart;
         private uint stateLoop;
         private uint stateEnd;
+
+        // State time is activated within AI_StartState()
+        // e.g. used to handle random wait loops for idle eating animations (eat a cheese only every n-m seconds)
+        private bool isStateTimeActive;
+        private float stateTime;
         
         private State currentState = State.None;
         private enum State
@@ -36,16 +41,27 @@ namespace GVR.Npc
         
         private void Update()
         {
+            // Add new milliseconds when stateTime shall be measured.
+            if (isStateTimeActive)
+                stateTime += Time.deltaTime;
+            
             if (isPlayingAnimation)
                 return;
 
             // Queue is empty. Check if we want to start Looping
             if (Queue.Count == 0)
             {
-                if (currentState == State.Start && stateLoop != 0)
+                switch (currentState)
                 {
-                    currentState = State.Loop;
-                    PxVm.CallFunction(GameData.I.VmGothicPtr, stateLoop, GetComponent<Properties>().npcPtr);
+                    case State.Start:
+                        if (stateLoop == 0)
+                            return;
+                        currentState = State.Loop;
+                        PxVm.CallFunction(GameData.I.VmGothicPtr, stateLoop, GetComponent<Properties>().npcPtr);
+                        break;
+                    case State.Loop:
+                        PxVm.CallFunction(GameData.I.VmGothicPtr, stateLoop, GetComponent<Properties>().npcPtr);
+                        break;
                 }
             }
             // Go on
@@ -99,7 +115,7 @@ namespace GVR.Npc
             // FIXME - from docu:
             // * Ist der Nsc in einem Animatinsstate, wird die passende Rücktransition abgespielt.
             // * Benutzt der NSC gerade ein MOBSI, poppt er ins stehen.
-            GetAi(npcPtr).Queue.Enqueue(new(Ai.Action.Type.AIStandUp));
+            GetAi(npcPtr).Queue.Enqueue(new(Action.Type.AIStandUp));
         }
         
         public static void ExtAiSetWalkMode(IntPtr npcPtr, VmGothicEnums.WalkMode walkMode)
@@ -123,7 +139,7 @@ namespace GVR.Npc
             GetAi(npcPtr).Queue.Enqueue(new(Action.Type.AIPlayAnim, name));
         }
 
-        public static void ExtStartState(IntPtr npcPtr, uint action, bool stopCurrentState, string wayPointName)
+        public static void ExtAiStartState(IntPtr npcPtr, uint action, bool stopCurrentState, string wayPointName)
         {
             var self = GetAi(npcPtr);
 
@@ -133,7 +149,26 @@ namespace GVR.Npc
             if (wayPointName != "")
                 Debug.LogError("FIXME - Waypoint unused so far.");
             
+            self.isStateTimeActive = true;
+            self.stateTime = 0;
+            
             self.StartRoutine(action);
+        }
+
+        public static float ExtNpcGetStateTime(IntPtr npcPtr)
+        {
+            return GetAi(npcPtr).stateTime;
+        }
+
+        public static void ExtNpcSetStateTime(IntPtr npcPtr, int seconds)
+        {
+            GetAi(npcPtr).stateTime = seconds;
+        }
+        
+        public static void ExtAiUseItemToState(IntPtr npcPtr, uint itemId, int expectedInventoryCount)
+        {
+            // FIXME - Hier weitermachen!
+            // GetAi(npcPtr).Queue.Enqueue(new(Action.Type.AIUseItemToState, ui0: itemId, i0: expectedInventoryCount));
         }
 
         public static bool ExtNpcWasInState(IntPtr npcPtr, uint action)
@@ -159,20 +194,26 @@ namespace GVR.Npc
         private void PlayNextAnimation(Action action)
         {
             var props = GetComponent<Properties>();
+            var npc = props.gameObject;
             
             switch (action.ActionType)
             {
                 case Action.Type.AIPlayAnim:
                     var mdh = AssetCache.I.TryGetMdh(props.overlayMdhName);
                     // FIXME - We need to handle both mds and mdh options! (base vs overlay)
-                    AnimationCreator.I.PlayAnimation(props.baseMdsName, action.Data, mdh, gameObject);
+                    AnimationCreator.I.PlayAnimation(props.baseMdsName, action.str0, mdh, gameObject);
                     isPlayingAnimation = true;
                     break;
                 default:
+                    Debug.LogError($"ActionType {action.ActionType} not yet handled.");
                     break;
             }
         }
         
+        public void AnimationEndCallback(string name)
+        {
+            isPlayingAnimation = false;
+        }
         
         
         public class Action
@@ -231,19 +272,18 @@ namespace GVR.Npc
                     AILookAt
                 }
         
-                public Action(Type actionType, string data = null)
+                public Action(Type actionType, string str0 = null, int i0 = 0, uint ui0 = 0)
                 {
                     this.ActionType = actionType;
-                    this.Data = data;
+                    this.str0 = str0;
+                    this.i0 = i0;
+                    this.ui0 = ui0;
                 }
                 
                 public readonly Type ActionType;
-                public readonly string Data;
+                public readonly string str0;
+                public readonly int i0;
+                public readonly uint ui0;
             }
-
-        public void AnimationEndCallback(string name)
-        {
-            isPlayingAnimation = false;
-        }
     }
 }

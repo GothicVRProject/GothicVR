@@ -61,6 +61,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "AI_AlignToWP", AI_AlignToWP);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_PlayAni", AI_PlayAni);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_StartState", AI_StartState);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_UseItemToState", AI_UseItemToState);
             
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
@@ -82,7 +83,9 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetBodyState", Npc_GetBodyState);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_PerceiveAll", Npc_PerceiveAll);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_HasItems", Npc_HasItems);
-            
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetStateTime", Npc_GetStateTime);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetStateTime", Npc_SetStateTime);
+
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentSkill", Npc_SetTalentSkill);
             PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItem", CreateInvItem);
             PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItems", CreateInvItems);
@@ -339,7 +342,17 @@ namespace GVR.Phoenix.Interface.Vm
             var function = PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             
-            Ai.ExtStartState(npcPtr, (uint)function, Convert.ToBoolean(stateBehaviour), wayPointName);
+            Ai.ExtAiStartState(npcPtr, (uint)function, Convert.ToBoolean(stateBehaviour), wayPointName);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void AI_UseItemToState(IntPtr vmPtr)
+        {
+            var expectedInventoryCount = PxVm.pxVmStackPopInt(vmPtr);
+            var itemId = PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            Ai.ExtAiUseItemToState(npcPtr, (uint)itemId, expectedInventoryCount);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -456,6 +469,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmStackPushInt(vmPtr, (int)bodyState);
         }
 
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_PerceiveAll(IntPtr vmPtr)
         {
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
@@ -465,6 +479,7 @@ namespace GVR.Phoenix.Interface.Vm
             // But we don't need to pre-load them and can just load the necessary elements when really needed.
         }
 
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_HasItems(IntPtr vmPtr)
         {
             var itemId = PxVm.pxVmStackPopInt(vmPtr);
@@ -473,6 +488,25 @@ namespace GVR.Phoenix.Interface.Vm
             var hasItems = NpcManager.I.ExtNpcHasItems(npcPtr, (uint)itemId);
             
             PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(hasItems));
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_GetStateTime(IntPtr vmPtr)
+        {
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            var stateTime = Ai.ExtNpcGetStateTime(npcPtr);
+            
+            PxVm.pxVmStackPushInt(vmPtr, (int)stateTime);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_SetStateTime(IntPtr vmPtr)
+        {
+            var seconds = PxVm.pxVmStackPopInt(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            Ai.ExtNpcSetStateTime(npcPtr, seconds);
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
