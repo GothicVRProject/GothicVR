@@ -9,6 +9,7 @@ using GVR.Phoenix.Interface.Vm;
 using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 
 namespace GVR.Npc
 {
@@ -35,7 +36,7 @@ namespace GVR.Npc
         private AbstractAnimationAction currentAction;
         
         public uint currentItem;
-        public int currentItemExpectedInventoryCount;
+        public int itemAnimationState = -1; // We need to start with an "invalid" value as >0< is an allowed state value like in >t_Potion_Stand_2_S0<
 
         private enum State
         {
@@ -197,13 +198,20 @@ namespace GVR.Npc
             GetAi(npcPtr).stateTime = seconds;
         }
         
-        public static void ExtAiUseItemToState(IntPtr npcPtr, uint itemId, int expectedInventoryCount)
+        /// <summary>
+        /// State means the final state where the animation shall go to.
+        /// example:
+        /// * itemId=xyz (ItFoBeer)
+        /// * animationState = 0
+        /// * ItFoBeer is of visual_scheme = Potion
+        /// * expected state is t_Potion_Stand_2_S0 --> s_Potion_S0
+        /// </summary>
+        public static void ExtAiUseItemToState(IntPtr npcPtr, uint itemId, int animationState)
         {
-            // FIXME - Hier weitermachen!
             var self = GetAi(npcPtr);
-
-            self.currentItem = itemId;
-            self.currentItemExpectedInventoryCount = expectedInventoryCount;
+            self.AnimationQueue.Enqueue(new UseItemToState(
+                new(Action.Type.AIUseItemToState, ui0: itemId, i0: animationState),
+                self.gameObject));
         }
 
         public static bool ExtNpcWasInState(IntPtr npcPtr, uint action)

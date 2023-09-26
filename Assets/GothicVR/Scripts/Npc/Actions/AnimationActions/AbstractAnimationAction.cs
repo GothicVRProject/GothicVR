@@ -1,3 +1,5 @@
+using System;
+using PxCs.Data.Animation;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -35,6 +37,11 @@ namespace GVR.Npc.Actions.AnimationActions
         public virtual void AnimationEventEndCallback()
         {
             animationEndCallbackDone = true;
+        }
+
+        public virtual void AnimationEventCallback(PxAnimationEventData data)
+        {
+            Debug.Log($"Animation for {action.ActionType} is not yet implemented.");
         }
     }
 }
