@@ -7,7 +7,7 @@ using GVR.Manager;
 
 namespace GVR.Player
 {
-    public class MovementTypeController : MonoBehaviour
+    public class RunningProvider : MonoBehaviour
     {
         //No UI icon for now 
         //public Canvas runningCanvas;

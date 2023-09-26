@@ -23,6 +23,6 @@ public class MoveSpeedController : MonoBehaviour
             return;
 
         movecontroller.moveSpeed = moveSpeed;
-        MovementTypeController.UpdateSpeedVariable(movespeed);
+        RunningProvider.UpdateSpeedVariable(moveSpeed);
     }
 }
