@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
-using GVR.Npc;
+using GVR.Npc.Actions;
 using GVR.Util;
 using PxCs.Data.Animation;
 using PxCs.Data.Model;
@@ -15,6 +15,7 @@ namespace GVR.Creator
     {
         public void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go)
         {
+            var mds = AssetCache.I.TryGetMds(mdsName);
             var animationKeyName = GetPreparedAnimationKey(mdsName, animationName);
             var pxAnimation = AssetCache.I.TryGetAnimation(mdsName, animationName);
 
@@ -27,10 +28,11 @@ namespace GVR.Creator
             
             var animationComp = go.GetComponent<Animation>();
 
+            AddClipEvents(clip, mds, animationName);
             AddClipEndEvent(clip);
             
-            animationComp.AddClip(clip, animationName);
-            animationComp.Play(animationName);
+            animationComp.AddClip(clip, animationKeyName);
+            animationComp.Play(animationKeyName);
         }
 
         private AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone)
@@ -129,6 +131,23 @@ namespace GVR.Creator
             }
         }
 
+        private void AddClipEvents(AnimationClip clip, PxModelScriptData mds, string animationName)
+        {
+            var anim = mds.animations.First(i => i.name.EqualsIgnoreCase(animationName));
+
+            foreach (var pxEvent in anim.events)
+            {
+                AnimationEvent animEvent = new()
+                {
+                    time = pxEvent.frame / clip.frameRate,
+                    functionName = nameof(IAnimationCallbacks.AnimationCallback),
+                    stringParameter = JsonUtility.ToJson(pxEvent) // As we can't add a custom object, we serialize data.
+                 };
+                
+                clip.AddEvent(animEvent);
+            }
+        }
+        
         /// <summary>
         /// Adds event at the end of animation.
         /// The event is called on every MonoBehaviour on GameObject where Clip is played.
@@ -137,16 +156,13 @@ namespace GVR.Creator
         /// </summary>
         private void AddClipEndEvent(AnimationClip clip)
         {
-            List<AnimationEvent> events = new(clip.events);
-
             AnimationEvent finalEvent = new()
             {
                 time = clip.length,
-                functionName = nameof(IAnimationCallbackEnd.AnimationEndCallback),
+                functionName = nameof(IAnimationCallbacks.AnimationEndCallback),
             };
             
-            events.Add(finalEvent);
-            clip.events = events.ToArray();
+            clip.AddEvent(finalEvent);
         }
         
         private string GetPreparedAnimationKey(string mdsKey, string animKey)

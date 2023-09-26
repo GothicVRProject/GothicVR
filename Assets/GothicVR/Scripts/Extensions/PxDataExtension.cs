@@ -1,5 +1,5 @@
-using PxCs.Data.Mesh;
 using System;
+using PxCs.Data.Mesh;
 using UnityEngine;
 
 namespace GVR.Extensions

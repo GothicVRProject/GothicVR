@@ -1,6 +1,9 @@
 using GVR.Caches;
 using GVR.Creator;
 using GVR.Creator.Meshes;
+using GVR.Extensions;
+using PxCs.Data.Event;
+using PxCs.Interface;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -18,12 +21,19 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             // Nothing in hand && new item shall be put into hand
             if (aiProps.itemAnimationState < 0 && action.i0 >= 0)
+            {
                 StartItemStateAnimation(action.i0);
+                aiProps.hasItemEquipped = true;
+            }
             // Something in hand && item shall be removed
             else if (aiProps.itemAnimationState >= 0 && action.i0 < 0)
+            {
                 EndItemStateAnimation(aiProps.itemAnimationState);
+                aiProps.hasItemEquipped = false;
+            }
 
             aiProps.itemAnimationState = action.i0;
+            aiProps.currentItem = action.ui0;
         }
 
         private void StartItemStateAnimation(int itemAnimationState)
@@ -48,18 +58,35 @@ namespace GVR.Npc.Actions.AnimationActions
             AnimationCreator.I.PlayAnimation(props.baseMdsName, animationName, mdh, npcGo);
         }
 
-        private void SpawnItem()
+        public override void AnimationEventCallback(PxEventTagData data)
         {
-            var slotGo = NpcMeshCreator.I.GetSlot(npcGo, NpcMeshCreator.ItemSlot.LeftHand);
+            switch (data.type)
+            {
+                case PxModelScript.PxEventTagType.insert_item:
+                    InsertItem(data.slot);
+                    break;
+                case PxModelScript.PxEventTagType.destroy_item:
+                    DestroyItem();
+                    break;
+                default:
+                    Debug.LogError($"PxEventTagData.type {data.type} not yet supported.");
+                    break;
+            }
+        }
+        
+        private void InsertItem(string slot)
+        {
+            var slotGo = npcGo.FindChildRecursively(slot);
             VobCreator.I.CreateItem(aiProps.currentItem, slotGo);
+
+            aiProps.usedItemSlot = slot;
         }
 
         private void DestroyItem()
         {
-            if (aiProps.currentItem == 0)
-                return;
-
-            var slotGo = NpcMeshCreator.I.GetSlot(npcGo, NpcMeshCreator.ItemSlot.LeftHand);
+            // FIXME - This is called to late. Feels like the animation for T_*_S0_2_Stand is glued with another.
+            // FIXME - So that frame y is more like frame x+y, where y is the frames count from previous call.
+            var slotGo = npcGo.FindChildRecursively(aiProps.usedItemSlot);
             var item = slotGo!.transform.GetChild(0);
             Object.Destroy(item.gameObject);
         }

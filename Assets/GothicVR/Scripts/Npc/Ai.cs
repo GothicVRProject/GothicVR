@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using GVR.Caches;
-using GVR.Creator;
-using GVR.Creator.Meshes;
+using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
+using PxCs.Data.Event;
 using PxCs.Interface;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Serialization;
 
 namespace GVR.Npc
 {
-    public class Ai : MonoBehaviour, IAnimationCallbackEnd
+    public class Ai : MonoBehaviour, IAnimationCallbacks
     {
         public readonly Queue<AbstractAnimationAction> AnimationQueue = new();
         private VmGothicEnums.WalkMode walkMode;
@@ -34,8 +32,10 @@ namespace GVR.Npc
         
         private State currentState = State.None;
         private AbstractAnimationAction currentAction;
-        
+
+        public bool hasItemEquipped;
         public uint currentItem;
+        public string usedItemSlot;
         public int itemAnimationState = -1; // We need to start with an "invalid" value as >0< is an allowed state value like in >t_Potion_Stand_2_S0<
 
         private enum State
@@ -239,11 +239,17 @@ namespace GVR.Npc
             currentAction = action;
             action.Start();
         }
+
+        public void AnimationCallback(string pxEventTagDataParam)
+        {
+            var eventData = JsonUtility.FromJson<PxEventTagData>(pxEventTagDataParam);
+            currentAction.AnimationEventCallback(eventData);
+        }
         
         /// <summary>
         /// As all Components on a GameObject get called, we need to feed this information into current AnimationAction instance.
         /// </summary>
-        public void AnimationEndCallback(string name)
+        public void AnimationEndCallback()
         {
             currentAction.AnimationEventEndCallback();
         }
