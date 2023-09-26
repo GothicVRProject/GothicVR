@@ -14,7 +14,7 @@ namespace GVR.Npc
 {
     public class Ai : MonoBehaviour, IAnimationCallbackEnd
     {
-        public readonly Queue<AnimationAction> AnimationQueue = new();
+        public readonly Queue<AbstractAnimationAction> AnimationQueue = new();
         private VmGothicEnums.WalkMode walkMode;
         
         // HINT: These information aren't set within Daedalus. We need to define them manually.
@@ -32,7 +32,7 @@ namespace GVR.Npc
         private float stateTime;
         
         private State currentState = State.None;
-        private AnimationAction currentAction;
+        private AbstractAnimationAction currentAction;
 
         private enum State
         {
@@ -223,7 +223,7 @@ namespace GVR.Npc
             return props.GetComponent<Ai>();
         }
         
-        private void PlayNextAnimation(AnimationAction action)
+        private void PlayNextAnimation(AbstractAnimationAction action)
         {
             currentAction = action;
             action.Start();

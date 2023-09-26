@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
-    public class StandUp : AnimationAction
+    public class StandUp : AbstractAnimationAction
     {
         public StandUp(Ai.Action action, GameObject npcGo) : base(action, npcGo)
         { }

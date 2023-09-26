@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
-    public class GoToWp : AnimationAction
+    public class GoToWp : AbstractAnimationAction
     {
         public GoToWp(Ai.Action action, GameObject npcGo) : base(action, npcGo)
         { }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
-    public class Wait : AnimationAction
+    public class Wait : AbstractAnimationAction
 
     {
         private float waitSeconds;

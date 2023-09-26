@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
-    public class PlayAni : AnimationAction
+    public class PlayAni : AbstractAnimationAction
     {
         public PlayAni(Ai.Action action, GameObject npcGo) : base(action, npcGo)
         { }

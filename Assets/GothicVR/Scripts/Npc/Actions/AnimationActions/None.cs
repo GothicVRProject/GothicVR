@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
-    public class None : AnimationAction
+    public class None : AbstractAnimationAction
     {
         public None(Ai.Action action, GameObject npcGo) : base(action, npcGo)
         { }

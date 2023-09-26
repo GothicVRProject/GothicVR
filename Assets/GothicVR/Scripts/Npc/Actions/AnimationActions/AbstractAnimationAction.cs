@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
-    public abstract class AnimationAction
+    public abstract class AbstractAnimationAction
     {
         protected readonly Ai.Action action;
         protected readonly GameObject npcGo;
@@ -10,7 +10,7 @@ namespace GVR.Npc.Actions.AnimationActions
 
         protected bool animationEndCallbackDone;
         
-        public AnimationAction(Ai.Action action, GameObject npcGo)
+        public AbstractAnimationAction(Ai.Action action, GameObject npcGo)
         {
             this.action = action;
             this.npcGo = npcGo;

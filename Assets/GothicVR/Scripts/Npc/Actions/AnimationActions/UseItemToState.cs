@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
-    public class UseItemToState : AnimationAction
+    public class UseItemToState : AbstractAnimationAction
     {
         public UseItemToState(Ai.Action action, GameObject go) : base(action, go)
         { }
