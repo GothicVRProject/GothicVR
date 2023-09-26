@@ -33,6 +33,9 @@ namespace GVR.Npc
         
         private State currentState = State.None;
         private AbstractAnimationAction currentAction;
+        
+        public uint currentItem;
+        public int currentItemExpectedInventoryCount;
 
         private enum State
         {
@@ -198,9 +201,9 @@ namespace GVR.Npc
         {
             // FIXME - Hier weitermachen!
             var self = GetAi(npcPtr);
-            self.AnimationQueue.Enqueue(new UseItemToState(
-                new(Action.Type.AIUseItemToState, ui0: itemId, i0: expectedInventoryCount),
-                self.gameObject));
+
+            self.currentItem = itemId;
+            self.currentItemExpectedInventoryCount = expectedInventoryCount;
         }
 
         public static bool ExtNpcWasInState(IntPtr npcPtr, uint action)

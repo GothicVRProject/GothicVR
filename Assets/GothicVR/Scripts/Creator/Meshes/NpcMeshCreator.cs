@@ -133,7 +133,6 @@ namespace GVR.Creator.Meshes
             {
                 case ItemSlot.RightHand:
                     return npc.FindChildRecursively(zsRightHand);
-                    break;
                 case ItemSlot.LeftHand:
                     return npc.FindChildRecursively(zsLeftHand);
                 default:

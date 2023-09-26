@@ -409,7 +409,7 @@ namespace GVR.Creator
         private GameObject CreateItemMesh(PxVmItemData item, GameObject go)
         {
             var mrm = assetCache.TryGetMrm(item.visual);
-            return VobMeshCreator.I.Create(go.name, mrm, default, default, false, rootGo: go);
+            return VobMeshCreator.I.Create(item.visual, mrm, default, default, false, parent: go);
         }
 
         private void CreateDecal(PxVobData vob)
