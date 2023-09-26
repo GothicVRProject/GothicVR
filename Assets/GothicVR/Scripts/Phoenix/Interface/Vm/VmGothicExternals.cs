@@ -495,9 +495,9 @@ namespace GVR.Phoenix.Interface.Vm
             var itemId = PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            var hasItems = NpcManager.I.ExtNpcHasItems(npcPtr, (uint)itemId);
+            var count = NpcManager.I.ExtNpcHasItems(npcPtr, (uint)itemId);
             
-            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(hasItems));
+            PxVm.pxVmStackPushInt(vmPtr, count);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]

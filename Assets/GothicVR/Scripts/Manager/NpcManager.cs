@@ -71,12 +71,12 @@ namespace GVR.Manager
             return (foundNpc != null);
         }
 
-        public bool ExtNpcHasItems(IntPtr npcPtr, uint itemId)
+        public int ExtNpcHasItems(IntPtr npcPtr, uint itemId)
         {
             if (GetProperties(npcPtr).Items.TryGetValue(itemId, out var amount))
-                return Convert.ToBoolean(amount);
+                return amount;
             else
-                return false;
+                return 0;
         }
         
         
