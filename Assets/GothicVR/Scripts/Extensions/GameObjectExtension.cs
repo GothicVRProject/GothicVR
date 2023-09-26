@@ -6,9 +6,7 @@ namespace GVR.Extensions
     {
         public static void SetParent(this GameObject obj, GameObject parent, bool resetLocation = false, bool resetRotation = false)
         {
-            if (parent == null)
-                obj.transform.parent = null;
-            else
+            if (parent != null)
                 obj.transform.parent = parent.transform;
 
             // FIXME - I don't know why, but Unity adds location, rotation, and scale to newly attached sub elements.

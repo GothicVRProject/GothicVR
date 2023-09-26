@@ -17,6 +17,7 @@ using JetBrains.Annotations;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
+using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
@@ -203,6 +204,16 @@ namespace GVR.Creator
 
                 parentGosNonTeleport.Add(type, newGo);
             }
+        }
+
+        /// <summary>
+        /// Render item inside GameObject
+        /// </summary>
+        public GameObject CreateItem(uint itemId, GameObject go)
+        {
+            var item = assetCache.TryGetItemData(itemId);
+
+            return CreateItemMesh(item, go);
         }
         
         [CanBeNull]
@@ -393,6 +404,12 @@ namespace GVR.Creator
         {
             var mrm = assetCache.TryGetMrm(item.visual);
             return VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation, true, parentGosNonTeleport[vob.type], go);
+        }
+        
+        private GameObject CreateItemMesh(PxVmItemData item, GameObject go)
+        {
+            var mrm = assetCache.TryGetMrm(item.visual);
+            return VobMeshCreator.I.Create(go.name, mrm, default, default, false, rootGo: go);
         }
 
         private void CreateDecal(PxVobData vob)

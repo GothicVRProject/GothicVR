@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using GVR.Caches;
 using GVR.Creator;
 using GVR.Creator.Meshes;
+using GVR.Npc.Actions.AnimationActions;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace GVR.Npc
 {
     public class Ai : MonoBehaviour, IAnimationCallbackEnd
     {
-        public readonly Queue<Action> Queue = new();
+        public readonly Queue<AnimationAction> AnimationQueue = new();
         private VmGothicEnums.WalkMode walkMode;
         
         // HINT: These information aren't set within Daedalus. We need to define them manually.
         // HINT: i.e. every animation might have a BS. E.g. when AI_TakeItem() is called, we set BS.BS_TAKEITEM
         private VmGothicEnums.BodyState bodyState;
         
-        private bool isPlayingAnimation;
-
         private uint prevStateStart;
         private uint stateStart;
         private uint stateLoop;
@@ -32,9 +32,7 @@ namespace GVR.Npc
         private float stateTime;
         
         private State currentState = State.None;
-        private Action.Type curAnimationAction = Action.Type.AINone;
-        private bool isAiWait;
-        private float aiWaitSeconds;
+        private AnimationAction currentAction;
 
         private enum State
         {
@@ -43,29 +41,23 @@ namespace GVR.Npc
             Loop,
             End
         }
+
+        private void Start()
+        {
+            currentAction = new None(new(Action.Type.AINone), gameObject);
+        }
         
         private void Update()
         {
             // Add new milliseconds when stateTime shall be measured.
             if (isStateTimeActive)
                 stateTime += Time.deltaTime;
-
-            // If state is AiWait, then we need to check if time is over and "stop" fake animation flag.
-            if (isAiWait)
-            {
-                aiWaitSeconds -= Time.deltaTime;
-                if (aiWaitSeconds <= 0f)
-                {
-                    isAiWait = false;
-                    isPlayingAnimation = false;
-                }
-            }
             
-            if (isPlayingAnimation)
+            if (!currentAction.IsFinished())
                 return;
-
+            
             // Queue is empty. Check if we want to start Looping
-            if (Queue.Count == 0)
+            if (AnimationQueue.Count == 0)
             {
                 switch (currentState)
                 {
@@ -83,7 +75,8 @@ namespace GVR.Npc
             // Go on
             else
             {
-                PlayNextAnimation(Queue.Dequeue());
+                Debug.Log($"Start playing {AnimationQueue.Peek().GetType()}");
+                PlayNextAnimation(AnimationQueue.Dequeue());
             }
         }
 
@@ -110,7 +103,7 @@ namespace GVR.Npc
         /// </summary>
         private void ClearState(bool stopCurrentState)
         {
-            Queue.Clear();
+            AnimationQueue.Clear();
 
             if (stopCurrentState)
             {
@@ -128,7 +121,10 @@ namespace GVR.Npc
 
         public static void ExtAiWait(IntPtr npcPtr, float seconds)
         {
-            GetAi(npcPtr).Queue.Enqueue(new(Action.Type.AIWait, f0: seconds));
+            var self = GetAi(npcPtr);
+            self.AnimationQueue.Enqueue(new Wait(
+                new(Action.Type.AIWait, f0: seconds),
+                self.gameObject));
         }
         
         public static void ExtAiStandUp(IntPtr npcPtr)
@@ -136,7 +132,10 @@ namespace GVR.Npc
             // FIXME - from docu:
             // * Ist der Nsc in einem Animatinsstate, wird die passende Rücktransition abgespielt.
             // * Benutzt der NSC gerade ein MOBSI, poppt er ins stehen.
-            GetAi(npcPtr).Queue.Enqueue(new(Action.Type.AIStandUp));
+            var self = GetAi(npcPtr);
+            self.AnimationQueue.Enqueue(new StandUp(
+                new(Action.Type.AIStandUp),
+                self.gameObject));
         }
         
         public static void ExtAiSetWalkMode(IntPtr npcPtr, VmGothicEnums.WalkMode walkMode)
@@ -147,17 +146,26 @@ namespace GVR.Npc
         public static void ExtAiGotoWP(IntPtr npcPtr, string point)
         {
             // FIXME - e.g. for Thorus there's initially no string value for TA_Boss() self.wp - Intended or a bug on our side?
-            GetAi(npcPtr).Queue.Enqueue(new(Action.Type.AIGoToWP, point));
+            var self = GetAi(npcPtr);
+            self.AnimationQueue.Enqueue(new GoToWp(
+                new(Action.Type.AIGoToWP),
+                self.gameObject));
         }
 
         public static void ExtAiAlignToWP(IntPtr npcPtr)
         {
-            GetAi(npcPtr).Queue.Enqueue(new(Action.Type.AIAlignToWp));
+            var self = GetAi(npcPtr);
+            self.AnimationQueue.Enqueue(new AlignToWp(
+                new(Action.Type.AIAlignToWp),
+                self.gameObject));
         }
         
         public static void ExtAiPlayAni(IntPtr npcPtr, string name)
         {
-            GetAi(npcPtr).Queue.Enqueue(new(Action.Type.AIPlayAnim, name));
+            var self = GetAi(npcPtr);
+            self.AnimationQueue.Enqueue(new PlayAni(
+                new(Action.Type.AIPlayAni, str0: name),
+                self.gameObject));
         }
 
         public static void ExtAiStartState(IntPtr npcPtr, uint action, bool stopCurrentState, string wayPointName)
@@ -189,7 +197,10 @@ namespace GVR.Npc
         public static void ExtAiUseItemToState(IntPtr npcPtr, uint itemId, int expectedInventoryCount)
         {
             // FIXME - Hier weitermachen!
-            // GetAi(npcPtr).Queue.Enqueue(new(Action.Type.AIUseItemToState, ui0: itemId, i0: expectedInventoryCount));
+            var self = GetAi(npcPtr);
+            self.AnimationQueue.Enqueue(new UseItemToState(
+                new(Action.Type.AIUseItemToState, ui0: itemId, i0: expectedInventoryCount),
+                self.gameObject));
         }
 
         public static bool ExtNpcWasInState(IntPtr npcPtr, uint action)
@@ -212,38 +223,18 @@ namespace GVR.Npc
             return props.GetComponent<Ai>();
         }
         
-        private void PlayNextAnimation(Action action)
+        private void PlayNextAnimation(AnimationAction action)
         {
-            var props = GetComponent<Properties>();
-            var npc = props.gameObject;
-
-            curAnimationAction = action.ActionType;
-            switch (curAnimationAction)
-            {
-                case Action.Type.AIPlayAnim:
-                    var mdh = AssetCache.I.TryGetMdh(props.overlayMdhName);
-                    // FIXME - We need to handle both mds and mdh options! (base vs overlay)
-                    AnimationCreator.I.PlayAnimation(props.baseMdsName, action.str0, mdh, gameObject);
-                    isPlayingAnimation = true;
-                    break;
-                case Action.Type.AIUseItemToState:
-                    var slotGo = NpcMeshCreator.I.GetSlot(npc, NpcMeshCreator.ItemSlot.RightHand);
-                    VobCreator.I.CreateItem(action.ui0, slotGo);
-                    break;
-                case Action.Type.AIWait:
-                    isPlayingAnimation = true;
-                    isAiWait = true;
-                    aiWaitSeconds = action.f0;
-                    break;
-                default:
-                    Debug.LogError($"ActionType {action.ActionType} not yet handled.");
-                    break;
-            }
+            currentAction = action;
+            action.Start();
         }
         
+        /// <summary>
+        /// As all Components on a GameObject get called, we need to feed this information into current AnimationAction instance.
+        /// </summary>
         public void AnimationEndCallback(string name)
         {
-            isPlayingAnimation = false;
+            currentAction.AnimationEventEndCallback();
         }
         
         
@@ -261,7 +252,7 @@ namespace GVR.Npc
                     AIGoToFP,
                     AIGoToWP,
                     AIStartState,
-                    AIPlayAnim,
+                    AIPlayAni,
                     AIPlayAnimBs,
                     AIWait,
                     AIStandUp,

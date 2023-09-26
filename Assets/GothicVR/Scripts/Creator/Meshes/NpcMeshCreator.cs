@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.Phoenix.Interface.Vm;
+using JetBrains.Annotations;
 using PxCs.Data.Mesh;
 using PxCs.Data.Vm;
 using PxCs.Interface;
@@ -12,6 +13,16 @@ namespace GVR.Creator.Meshes
 {
     public class NpcMeshCreator : AbstractMeshCreator<NpcMeshCreator>
     {
+        private const string zsRightHand = "ZS_RIGHTHAND";
+        private const string zsLeftHand = "ZS_LEFTHAND";
+
+        
+        public enum ItemSlot
+        {
+            RightHand,
+            LeftHand
+        }
+        
         private VmGothicExternals.ExtSetVisualBodyData tempBodyData;
 
         public GameObject CreateNpc(string npcName, string mdmName, string mdhName,
@@ -113,6 +124,24 @@ namespace GVR.Creator.Meshes
                     EquipRangeWeapon(npcGo, itemData);
                     return;
             }
+        }
+
+        [CanBeNull]
+        public GameObject GetSlot(GameObject npc, ItemSlot slot)
+        {
+            switch (slot)
+            {
+                case ItemSlot.RightHand:
+                    return npc.FindChildRecursively(zsRightHand);
+                    break;
+                case ItemSlot.LeftHand:
+                    return npc.FindChildRecursively(zsLeftHand);
+                default:
+                    Debug.LogError($"ItemSlot {slot} not yet defined.");
+                    break;
+            }
+
+            return null;
         }
 
         private void EquipMeleeWeapon(GameObject npcGo, PxVmItemData itemData)
