@@ -103,7 +103,6 @@ namespace GVR.Creator
 
             return clip;
         }
-    
         
         // TODO - If we have a performance bottleneck while loading animations, then we could cache these results.
         private string GetChildPathRecursively(Transform parent, string curName, string currentPath)
@@ -152,6 +151,24 @@ namespace GVR.Creator
                  };
                 
                 clip.AddEvent(animEvent);
+            }
+
+            foreach (var sfxEvent in anim.sfx)
+            {
+                var clampedFrame = ClampFrame(sfxEvent.frame, anim.firstFrame, (int)pxAnimation.frameCount, anim.lastFrame);
+                AnimationEvent animEvent = new()
+                {
+                    time = clampedFrame / clip.frameRate,
+                    functionName = nameof(IAnimationCallbacks.AnimationSfxCallback),
+                    stringParameter = JsonUtility.ToJson(sfxEvent) // As we can't add a custom object, we serialize data.
+                };
+                
+                clip.AddEvent(animEvent);
+            }
+
+            foreach (var sfxEvent in anim.sfx)
+            {
+                Debug.LogWarning($"SFX events not yet implemented: {sfxEvent.name}");
             }
         }
 

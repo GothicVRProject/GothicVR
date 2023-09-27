@@ -11,6 +11,7 @@ namespace GVR.Npc
     {
         public IntPtr npcPtr;
         public PxVmNpcData npc;
+        public AudioSource npcSound;
 
         public FreePoint CurrentFreePoint;
         

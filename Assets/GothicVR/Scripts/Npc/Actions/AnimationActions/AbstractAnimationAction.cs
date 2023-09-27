@@ -1,7 +1,13 @@
 using System;
+using System.Diagnostics;
+using GVR.Caches;
+using GVR.Creator;
+using GVR.Extensions;
+using GVR.Manager;
 using PxCs.Data.Animation;
 using PxCs.Data.Event;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
@@ -25,13 +31,16 @@ namespace GVR.Npc.Actions.AnimationActions
         public abstract void Start();
 
         /// <summary>
-        /// Most of our animations are fine if we just set this flag and return it via IsFinished()
+        /// We just set the audio by default.
         /// </summary>
-        public virtual bool IsFinished()
+        public virtual void AnimationSfxEventCallback(PxEventSfxData sfxData)
         {
-            return animationEndCallbackDone;
+            SoundCreator.I.SetSound(props.npcSound, sfxData.name, sfxData.range.ToMeter());
+            props.npcSound.Play();
+            if (sfxData.emptySlot)
+                Debug.LogWarning($"PxEventSfxData.emptySlot not yet implemented: {sfxData.name}");
         }
-
+        
         public virtual void AnimationEventCallback(PxEventTagData data)
         {
             Debug.LogError($"Animation for {action.ActionType} is not yet implemented.");
@@ -43,6 +52,14 @@ namespace GVR.Npc.Actions.AnimationActions
         public virtual void AnimationEventEndCallback()
         {
             animationEndCallbackDone = true;
+        }
+        
+        /// <summary>
+        /// Most of our animations are fine if we just set this flag and return it via IsFinished()
+        /// </summary>
+        public virtual bool IsFinished()
+        {
+            return animationEndCallbackDone;
         }
     }
 }

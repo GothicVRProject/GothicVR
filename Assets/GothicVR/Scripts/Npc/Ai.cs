@@ -245,6 +245,12 @@ namespace GVR.Npc
             var eventData = JsonUtility.FromJson<PxEventTagData>(pxEventTagDataParam);
             currentAction.AnimationEventCallback(eventData);
         }
+
+        public void AnimationSfxCallback(string pxEventSfxDataParam)
+        {
+            var eventData = JsonUtility.FromJson<PxEventSfxData>(pxEventSfxDataParam);
+            currentAction.AnimationSfxEventCallback(eventData);
+        }
         
         /// <summary>
         /// As all Components on a GameObject get called, we need to feed this information into current AnimationAction instance.

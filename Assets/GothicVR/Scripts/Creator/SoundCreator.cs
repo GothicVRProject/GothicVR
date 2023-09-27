@@ -162,6 +162,15 @@ namespace GVR.Creator
             return source;
         }
 
+        public void SetSound(AudioSource source, string soundName, float maxDistance)
+        {
+            var wavFile = assetCache.TryGetSound(soundName);
+            var clip = SoundConverter.ToAudioClip(wavFile.sound);
+
+            source.maxDistance = maxDistance;
+            source.clip = clip;
+        }
+
         private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
         {
             SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityMatrix().rotation);
