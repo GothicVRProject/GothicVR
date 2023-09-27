@@ -16,23 +16,27 @@ namespace GVR.Creator
         public void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go)
         {
             var mds = AssetCache.I.TryGetMds(mdsName);
-            var animationKeyName = GetPreparedAnimationKey(mdsName, animationName);
+            var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var pxAnimation = AssetCache.I.TryGetAnimation(mdsName, animationName);
 
             // Try to load from cache
-            if (!LookupCache.I.AnimClipCache.TryGetValue(animationKeyName, out var clip))
+            if (!LookupCache.I.AnimClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
             {
                 clip = LoadAnimationClip(pxAnimation, mdh, go);
-                LookupCache.I.AnimClipCache[animationKeyName] = clip;
+                LookupCache.I.AnimClipCache[mdsAnimationKeyName] = clip;
             }
             
             var animationComp = go.GetComponent<Animation>();
 
-            AddClipEvents(clip, mds, animationName);
-            AddClipEndEvent(clip);
+            // Not yet attached to this GO
+            if (animationComp.GetClip(mdsAnimationKeyName) == null)
+            {
+                AddClipEvents(clip, mds, animationName);
+                AddClipEndEvent(clip);
+                animationComp.AddClip(clip, mdsAnimationKeyName);
+            }
             
-            animationComp.AddClip(clip, animationKeyName);
-            animationComp.Play(animationKeyName);
+            animationComp.Play(mdsAnimationKeyName);
         }
 
         private AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone)
@@ -165,7 +169,10 @@ namespace GVR.Creator
             clip.AddEvent(finalEvent);
         }
         
-        private string GetPreparedAnimationKey(string mdsKey, string animKey)
+        /// <summary>
+        /// .man files are combined of MDSNAME-ANIMATIONNAME.man
+        /// </summary>
+        private string GetCombinedAnimationKey(string mdsKey, string animKey)
         {
             var preparedMdsKey = GetPreparedKey(mdsKey);
             var preparedAnimKey = GetPreparedKey(animKey);
@@ -173,6 +180,9 @@ namespace GVR.Creator
             return preparedMdsKey + "-" + preparedAnimKey;
         }
         
+        /// <summary>
+        /// Basically extract file ending and lower names.
+        /// </summary>
         private string GetPreparedKey(string key)
         {
             var lowerKey = key.ToLower();
