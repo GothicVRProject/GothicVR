@@ -31,7 +31,7 @@ namespace GVR.Creator
             // Not yet attached to this GO
             if (animationComp.GetClip(mdsAnimationKeyName) == null)
             {
-                AddClipEvents(clip, mds, animationName);
+                AddClipEvents(clip, mds, pxAnimation, animationName);
                 AddClipEndEvent(clip);
                 animationComp.AddClip(clip, mdsAnimationKeyName);
             }
@@ -99,6 +99,7 @@ namespace GVR.Creator
 
             // Add some final settings
             clip.EnsureQuaternionContinuity();
+            clip.frameRate = pxAnimation.fps;
 
             return clip;
         }
@@ -135,21 +136,37 @@ namespace GVR.Creator
             }
         }
 
-        private void AddClipEvents(AnimationClip clip, PxModelScriptData mds, string animationName)
+        private void AddClipEvents(AnimationClip clip, PxModelScriptData mds, PxAnimationData pxAnimation, string animationName)
         {
             var anim = mds.animations.First(i => i.name.EqualsIgnoreCase(animationName));
 
             foreach (var pxEvent in anim.events)
             {
+                var clampedFrame = ClampFrame(pxEvent.frame, anim.firstFrame, (int)pxAnimation.frameCount, anim.lastFrame);
+                
                 AnimationEvent animEvent = new()
                 {
-                    time = pxEvent.frame / clip.frameRate,
+                    time = clampedFrame / clip.frameRate,
                     functionName = nameof(IAnimationCallbacks.AnimationCallback),
                     stringParameter = JsonUtility.ToJson(pxEvent) // As we can't add a custom object, we serialize data.
                  };
                 
                 clip.AddEvent(animEvent);
             }
+        }
+
+        /// <summary>
+        /// Bugfix: There are events which would happen after the animation is done.
+        /// </summary>
+        private float ClampFrame(int expectedFrame, int firstFrame, int frameCount, int lastFrame)
+        {
+            if (expectedFrame < firstFrame)
+                return 0;
+            // e.g. beer-in-hand destroy animation would be triggered after animation itself.
+            if (expectedFrame >= (firstFrame + frameCount))
+                return frameCount - 1;
+            else
+                return expectedFrame - firstFrame;
         }
         
         /// <summary>
