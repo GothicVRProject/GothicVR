@@ -177,7 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e3f687c21ad6c4449c905c236a22ebc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioSource: {fileID: 1118880304771858134}
+  npcSound: {fileID: 1118880304771858134}
   mdmName: 
   baseMdsName: 
   overlayMdsName: 
