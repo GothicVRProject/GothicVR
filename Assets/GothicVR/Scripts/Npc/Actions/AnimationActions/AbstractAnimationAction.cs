@@ -6,6 +6,7 @@ using GVR.Extensions;
 using GVR.Manager;
 using PxCs.Data.Animation;
 using PxCs.Data.Event;
+using Unity.VisualScripting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -35,8 +36,11 @@ namespace GVR.Npc.Actions.AnimationActions
         /// </summary>
         public virtual void AnimationSfxEventCallback(PxEventSfxData sfxData)
         {
-            SoundCreator.I.SetSound(props.npcSound, sfxData.name, sfxData.range.ToMeter());
+            var clip = SoundCreator.I.CreateAudioClip(sfxData.name);
+            props.npcSound.clip = clip;
+            props.npcSound.maxDistance = sfxData.range.ToMeter();
             props.npcSound.Play();
+
             if (sfxData.emptySlot)
                 Debug.LogWarning($"PxEventSfxData.emptySlot not yet implemented: {sfxData.name}");
         }

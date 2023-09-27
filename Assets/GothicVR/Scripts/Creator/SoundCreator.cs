@@ -5,6 +5,7 @@ using GVR.Extensions;
 using GVR.Manager;
 using GVR.Phoenix.Util;
 using GVR.Util;
+using JetBrains.Annotations;
 using PxCs.Data.Sound;
 using PxCs.Data.Struct;
 using PxCs.Data.Vob;
@@ -111,39 +112,13 @@ namespace GVR.Creator
 
         private AudioSource CreateAndAddAudioSource(GameObject soundObject, string soundName, PxVobSoundData soundData)
         {
-            PxSoundData<float> wavFile;
-
-            if (soundName.ToLower() == "nosound.wav")
-            {
-                //instead of decoding nosound.wav which might be decoded incorrectly, just return null
+            // Instead of decoding nosound.wav which might be decoded incorrectly, just return null.
+            if (soundName.EqualsIgnoreCase("nosound.wav"))
                 return null;
-            }
-            // Bugfix - Normally the data is to get C_SFX_DEF entries from VM. But sometimes there might be the real .wav file stored.
-            if (soundName.ToLower().EndsWith(".wav"))
-            {
-                wavFile = assetCache.TryGetSound(soundData.soundName);
-            }
-            else
-            {
-                var sfxData = assetCache.TryGetSfxData(soundData.soundName);
-
-                if (sfxData == null)
-                {
-                    Debug.LogError($"No sfx data returned for {soundData.soundName}");
-                    return null;
-                }
-
-                wavFile = assetCache.TryGetSound(sfxData.file);
-            }
-
-            if (wavFile == null)
-            {
-                Debug.LogError($"No .wav data returned for {soundData.soundName}");
-                return null;
-            }
-
-            AudioSource source = soundObject.AddComponent<AudioSource>();
-            source.clip = SoundConverter.ToAudioClip(wavFile.sound);
+            
+            var clip = CreateAudioClip(soundName);
+            var source = soundObject.AddComponent<AudioSource>();
+            source.clip = clip;
 
             AudioSourceManager.I.AddAudioSource(soundObject, source);
 
@@ -162,13 +137,24 @@ namespace GVR.Creator
             return source;
         }
 
-        public void SetSound(AudioSource source, string soundName, float maxDistance)
+        [CanBeNull]
+        public AudioClip CreateAudioClip(string soundName)
         {
             var wavFile = assetCache.TryGetSound(soundName);
-            var clip = SoundConverter.ToAudioClip(wavFile.sound);
+            if (wavFile != null)
+            {
+                return SoundConverter.ToAudioClip(wavFile.sound);
+            }
+            
+            var sfxData = assetCache.TryGetSfxData(soundName);
+            if (sfxData != null)
+            {
+                var sfxWavFile = assetCache.TryGetSound(sfxData.file);
+                return SoundConverter.ToAudioClip(sfxWavFile.sound);
+            }
 
-            source.maxDistance = maxDistance;
-            source.clip = clip;
+            Debug.LogWarning($"Sound >{soundName}< couldn't be found. Neither as wavName nor as pfxData.soundName.");
+            return null;
         }
 
         private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
