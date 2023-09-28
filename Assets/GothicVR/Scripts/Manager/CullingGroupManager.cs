@@ -39,7 +39,8 @@ namespace GVR.Manager
 
         // Grabbed Vobs will be ignored from Culling until Grabbing stopped and velocity = 0
         private readonly Dictionary<GameObject, Tuple<VobList, int>> pausedVobs = new();
-        private readonly List<Rigidbody> pausedVobsToReenable = new();
+        private readonly Dictionary<GameObject, Rigidbody> pausedVobsToReenable = new();
+        private readonly Dictionary<GameObject, Coroutine> pausedVobsToReenableCoroutine = new();
         
         private void Start()
         {
@@ -74,6 +75,7 @@ namespace GVR.Manager
             
             pausedVobs.Clear();
             pausedVobsToReenable.Clear();
+            pausedVobsToReenableCoroutine.Clear();
         }
         
         private void VobSmallChanged(CullingGroupEvent evt)
@@ -220,6 +222,9 @@ namespace GVR.Manager
 
         public void StartTrackVobPositionUpdates(GameObject go)
         {
+            CancelStopTrackVobPositionUpdates(go);
+            
+            // Entry is already in list
             if (pausedVobs.ContainsKey(go))
                 return;
             
@@ -244,10 +249,29 @@ namespace GVR.Manager
         
         public void StopTrackVobPositionUpdates(GameObject go)
         {
-            if (pausedVobsToReenable.Contains(go.GetComponent<Rigidbody>()))
+            if (pausedVobsToReenable.ContainsKey(go))
                 return;
             
-            StartCoroutine(nameof(StopTrackVobPositionUpdatesDelayed), go);
+            pausedVobsToReenableCoroutine.Add(go, StartCoroutine(nameof(StopTrackVobPositionUpdatesDelayed), go));
+        }
+
+        /// <summary>
+        /// If we execute Start() and Stop() during a short time frame, we need to cancel all the "stop" features.
+        /// e.g. If we start grabbing it while it's still in release-stop mode, we cancel delay Coroutine and loop itself.
+        /// </summary>
+        private void CancelStopTrackVobPositionUpdates(GameObject go)
+        {
+            if (pausedVobsToReenableCoroutine.ContainsKey(go))
+            {
+                StopCoroutine(pausedVobsToReenableCoroutine[go]);
+                pausedVobsToReenableCoroutine.Remove(go);
+            }
+
+            if (pausedVobsToReenable.ContainsKey(go))
+            {
+                pausedVobsToReenable.Remove(go);
+            }
+
         }
 
         /// <summary>
@@ -257,8 +281,9 @@ namespace GVR.Manager
         private IEnumerator StopTrackVobPositionUpdatesDelayed(GameObject go)
         {
             yield return new WaitForSeconds(1f);
+            pausedVobsToReenableCoroutine.Remove(go);
             
-            pausedVobsToReenable.Add(go.GetComponent<Rigidbody>());
+            pausedVobsToReenable.Add(go, go.GetComponent<Rigidbody>());
         }
 
         private IEnumerator StopVobTrackingBasedOnVelocity()
@@ -267,14 +292,14 @@ namespace GVR.Manager
             {
                 foreach (var obj in pausedVobsToReenable.ToArray()) // Clone to remove elements within foreach
                 {
-                    var velocity = obj.velocity;
+                    var velocity = obj.Value.velocity;
                     if (velocity != Vector3.zero)
                         continue;
                     
-                    UpdateSpherePosition(obj.gameObject);
+                    UpdateSpherePosition(obj.Key);
                     
-                    pausedVobs.Remove(obj.gameObject);
-                    pausedVobsToReenable.Remove(obj);
+                    pausedVobs.Remove(obj.Key);
+                    pausedVobsToReenable.Remove(obj.Key);
                 }
                 
                 yield return null;
