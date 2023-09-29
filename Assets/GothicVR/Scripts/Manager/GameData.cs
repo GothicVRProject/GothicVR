@@ -4,6 +4,7 @@ using GVR.Extensions;
 using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Data.Vm.Gothic;
+using GVR.Properties;
 using GVR.Util;
 using GVR.Vob.WayNet;
 using PxCs.Data.WayNet;
@@ -35,7 +36,7 @@ namespace GVR.Phoenix.Interface
 
         public readonly Dictionary<string, WayPoint> WayPoints = new();
         public readonly Dictionary<string, FreePoint> FreePoints = new();
-        public readonly List<GameObject> VobsInteractable = new(); 
+        public readonly List<VobProperties> VobsInteractable = new(); 
         
         public TMP_FontAsset EmptyFont;
 

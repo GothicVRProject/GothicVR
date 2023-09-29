@@ -22,15 +22,15 @@ namespace GVR.Creator.Meshes
         protected const float decalOpacity = 0.75f;
 
 
-        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
+        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
+            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
         }
 
         public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
-            rootGo.SetParent(parent);
+            rootGo.SetParent(parent, true, true);
             
             var nodeObjects = new GameObject[mdh.nodes!.Length];
 

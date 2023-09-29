@@ -12,12 +12,14 @@ using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
+using GVR.Properties;
 using GVR.Util;
 using JetBrains.Annotations;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
 using PxCs.Interface;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
@@ -149,6 +151,39 @@ namespace GVR.Creator
             }
         }
 
+        private GameObject GetPrefab(PxVobData vob)
+        {
+            GameObject go;
+            string name = vob.vobName;
+            
+            switch (vob.type)
+            {
+                case PxVobType.PxVob_oCItem:
+                    go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobItem);
+                    break;
+                case PxVobType.PxVob_oCMOB:
+                case PxVobType.PxVob_oCMobFire:
+                case PxVobType.PxVob_oCMobInter:
+                case PxVobType.PxVob_oCMobBed:
+                case PxVobType.PxVob_oCMobDoor:
+                case PxVobType.PxVob_oCMobContainer:
+                case PxVobType.PxVob_oCMobSwitch:
+                case PxVobType.PxVob_oCMobWheel:
+                    go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobInteractable);
+                    break;
+                default:
+                    return new GameObject(name);
+            }
+            
+            go.name = name;
+            
+            // Fill Property data into prefab here
+            // Can also be outsourced to a proper method if it becomes a lot.
+            go.GetComponent<VobProperties>().SetVisual(vob.visualName);
+            
+            return go;
+        }
+
         private void AddToMobInteractableList(PxVobData vob, GameObject go)
         {
             if (go == null)
@@ -164,7 +199,7 @@ namespace GVR.Creator
                 case PxVobType.PxVob_oCMobContainer:
                 case PxVobType.PxVob_oCMobSwitch:
                 case PxVobType.PxVob_oCMobWheel:
-                    GameData.I.VobsInteractable.Add(go);
+                    GameData.I.VobsInteractable.Add(go.GetComponent<VobProperties>());
                     break;
             }
         }
@@ -246,7 +281,7 @@ namespace GVR.Creator
                 return null;
             }
 
-            var prefabInstance = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobItem);
+            var prefabInstance = GetPrefab(vob);
             var vobObj = CreateItemMesh(vob, item, prefabInstance);
 
             if (vobObj == null)
@@ -320,7 +355,7 @@ namespace GVR.Creator
 
         private GameObject CreateTriggerChangeLevel(PxVobTriggerChangeLevelData vob)
         {
-            var vobObj = new GameObject(vob.vobName);
+            var vobObj = GetPrefab(vob);
             vobObj.SetParent(parentGosTeleport[vob.type]);
 
             var trigger = vobObj.AddComponent<BoxCollider>();
@@ -438,7 +473,9 @@ namespace GVR.Creator
             var mdl = assetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                return VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation, parent);
+                var go = GetPrefab(vob);
+                VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation, parent, go);
+                return go;
             }
 
             // MRM
@@ -448,7 +485,9 @@ namespace GVR.Creator
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.cdDynamic;
 
-                return VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation, withCollider, parent);
+                var go = GetPrefab(vob);
+                VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation, withCollider, parent, go);
+                return go;
             }
 
             Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");

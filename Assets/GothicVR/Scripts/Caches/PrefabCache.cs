@@ -36,7 +36,7 @@ namespace GVR.Caches
 
         public GameObject TryGetObject(PrefabType type)
         {
-            if (prefabCache.TryGetValue(type, out GameObject prefab))
+            if (prefabCache.TryGetValue(type, out var prefab))
                 return Instantiate(prefab);
             
             var path = GetPath(type);
