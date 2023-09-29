@@ -69,7 +69,7 @@ namespace GVR.Creator.Meshes
             {
                 var mesh = softSkinMesh.mesh;
 
-                var meshObj = new GameObject("JaX_ZM_0");
+                var meshObj = new GameObject("ZM_0");
                 meshObj.SetParent(rootGo);
 
                 var meshFilter = meshObj.AddComponent<MeshFilter>();

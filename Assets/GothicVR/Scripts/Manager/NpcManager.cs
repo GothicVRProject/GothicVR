@@ -4,6 +4,7 @@ using GVR.Caches;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Npc;
+using GVR.Properties;
 using GVR.Util;
 using PxCs.Interface;
 using UnityEngine;
@@ -85,7 +86,7 @@ namespace GVR.Manager
             return GetProperties(npcPtr).gameObject;
         }
         
-        private static Properties GetProperties(IntPtr npcPtr)
+        private static NpcProperties GetProperties(IntPtr npcPtr)
         {
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
             var props = LookupCache.I.NpcCache[symbolIndex];

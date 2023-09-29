@@ -9,6 +9,7 @@ using GVR.Npc;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
+using GVR.Properties;
 using GVR.Util;
 using GVR.Vob.WayNet;
 using PxCs.Data.Vm;
@@ -48,7 +49,7 @@ namespace GVR.Creator
             return GetProperties(npcPtr).gameObject;
         }
         
-        private static Properties GetProperties(IntPtr npcPtr)
+        private static NpcProperties GetProperties(IntPtr npcPtr)
         {
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
             var props = lookupCache.NpcCache[symbolIndex];
@@ -86,10 +87,10 @@ namespace GVR.Creator
                 return;
             
             var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
-            var props = newNpc.GetComponent<Properties>();
+            var props = newNpc.GetComponent<NpcProperties>();
             
             // Humans are singletons.
-            if (lookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<Properties>()))
+            if (lookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<NpcProperties>()))
             {
                 var pxNpc = PxVm.InitializeNpc(GameData.I.VmGothicPtr, (uint)npcInstance);
                 props.npc = pxNpc;
@@ -98,7 +99,7 @@ namespace GVR.Creator
             else
             {
                 var origNpc = lookupCache.NpcCache[(uint)npcInstance];
-                var origProps = origNpc.GetComponent<Properties>();
+                var origProps = origNpc.GetComponent<NpcProperties>();
                 // Clone Properties as they're required from the first instance.
                 props.Copy(origProps);
             }
@@ -217,7 +218,7 @@ namespace GVR.Creator
 
         public IntPtr ExtHlpGetNpc(int instanceId)
         {
-            if (!lookupCache.NpcCache.TryGetValue((uint)instanceId, out Properties properties))
+            if (!lookupCache.NpcCache.TryGetValue((uint)instanceId, out var properties))
             {
                 Debug.LogError($"Couldn't find NPC {instanceId} inside cache.");
                 return IntPtr.Zero;

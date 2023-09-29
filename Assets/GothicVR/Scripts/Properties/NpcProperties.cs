@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Vob.WayNet;
 using PxCs.Data.Vm;
 using UnityEngine;
 
-namespace GVR.Npc
-{    
-    public class Properties: MonoBehaviour
+namespace GVR.Properties
+{
+    public class NpcProperties : AbstractProperties
     {
         public IntPtr npcPtr;
         public PxVmNpcData npc;
@@ -36,7 +36,7 @@ namespace GVR.Npc
 #pragma warning disable CS0414 // Just a debug flag for easier debugging if we missed to copy something in the future. 
         public bool isClonedFromAnother;
 #pragma warning restore CS0414
-        public void Copy(Properties other)
+        public void Copy(NpcProperties other)
         {
             isClonedFromAnother = true;
             npcPtr = other.npcPtr;

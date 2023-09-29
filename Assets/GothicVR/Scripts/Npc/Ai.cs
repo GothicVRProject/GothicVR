@@ -5,6 +5,7 @@ using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
+using GVR.Properties;
 using PxCs.Data.Event;
 using PxCs.Interface;
 using UnityEngine;
@@ -69,10 +70,10 @@ namespace GVR.Npc
                         if (stateLoop == 0)
                             return;
                         currentState = State.Loop;
-                        PxVm.CallFunction(GameData.I.VmGothicPtr, stateLoop, GetComponent<Properties>().npcPtr);
+                        PxVm.CallFunction(GameData.I.VmGothicPtr, stateLoop, GetComponent<NpcProperties>().npcPtr);
                         break;
                     case State.Loop:
-                        PxVm.CallFunction(GameData.I.VmGothicPtr, stateLoop, GetComponent<Properties>().npcPtr);
+                        PxVm.CallFunction(GameData.I.VmGothicPtr, stateLoop, GetComponent<NpcProperties>().npcPtr);
                         break;
                 }
             }
@@ -99,7 +100,7 @@ namespace GVR.Npc
                 stateEnd = symbolEnd.id;
             
             currentState = State.Start;
-            PxVm.CallFunction(GameData.I.VmGothicPtr, action, GetComponent<Properties>().npcPtr);
+            PxVm.CallFunction(GameData.I.VmGothicPtr, action, GetComponent<NpcProperties>().npcPtr);
         }
 
         /// <summary>
@@ -119,7 +120,7 @@ namespace GVR.Npc
                 currentState = State.End;
                 
                 if (stateEnd != 0)
-                    PxVm.CallFunction(GameData.I.VmGothicPtr, stateEnd, GetComponent<Properties>().npcPtr);
+                    PxVm.CallFunction(GameData.I.VmGothicPtr, stateEnd, GetComponent<NpcProperties>().npcPtr);
             }
         }
 

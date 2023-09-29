@@ -1,4 +1,5 @@
 ﻿using GVR.Phoenix.Interface;
+using GVR.Properties;
 using GVR.Util;
 using PxCs.Interface;
 
@@ -10,7 +11,7 @@ namespace GVR.Npc.Hero
         private void Start()
         {
             var hero = PxVm.InitializeNpc(GameData.I.VmGothicPtr, "hero");
-            GetComponent<Properties>().npc = hero;
+            GetComponent<NpcProperties>().npc = hero;
         }
     }
 }

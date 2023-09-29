@@ -4,6 +4,7 @@ using GVR.Caches;
 using GVR.Creator;
 using GVR.Extensions;
 using GVR.Manager;
+using GVR.Properties;
 using PxCs.Data.Animation;
 using PxCs.Data.Event;
 using Unity.VisualScripting;
@@ -16,7 +17,7 @@ namespace GVR.Npc.Actions.AnimationActions
     {
         protected readonly Ai.Action action;
         protected readonly GameObject npcGo;
-        protected readonly Properties props;
+        protected readonly NpcProperties props;
         protected readonly Ai aiProps;
 
         protected bool animationEndCallbackDone;
@@ -25,7 +26,7 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             this.action = action;
             this.npcGo = npcGo;
-            this.props = npcGo.GetComponent<Properties>();
+            this.props = npcGo.GetComponent<NpcProperties>();
             this.aiProps = npcGo.GetComponent<Ai>();
         }
             
