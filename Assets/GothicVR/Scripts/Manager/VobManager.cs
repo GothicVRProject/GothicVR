@@ -21,5 +21,21 @@ namespace GVR.GothicVR.Scripts.Manager
                 .OrderBy(i => Vector3.Distance(i.transform.position, position))
                 .FirstOrDefault();
         }
+
+        [CanBeNull]
+        public GameObject GetNearestSlot(GameObject go, Vector3 position)
+        {
+            var goTransform = go.transform;
+
+            if (goTransform.childCount == 0)
+                return null;
+            
+            var zm = go.transform.GetChild(0);
+            
+            return zm.gameObject.GetAllDirectChildren()
+                .Where(i => i.name.ContainsIgnoreCase("ZS"))
+                .OrderBy(i => Vector3.Distance(i.transform.position, position))
+                .FirstOrDefault();
+        }
     }
 }

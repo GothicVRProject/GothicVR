@@ -14,6 +14,16 @@ namespace GVR.Extensions
             return self.StartsWith(other, StringComparison.OrdinalIgnoreCase);
         }
 
+        public static bool ContainsIgnoreCase(this string self, string other)
+        {
+            return self.Contains(other, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool EndsWithIgnoreCase(this string self, string other)
+        {
+            return self.EndsWith(other, StringComparison.OrdinalIgnoreCase);
+        }
+
         /// <summary>
         /// Phoenix delivers values mostly in cm. Convenient method to move to Meter.
         /// </summary>

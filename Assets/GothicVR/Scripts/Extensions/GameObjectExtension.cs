@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 namespace GVR.Extensions
@@ -38,5 +39,17 @@ namespace GVR.Extensions
             // The child object was not found
             return null;
         }
+
+        /// <summary>
+        /// Returns direct Children of a GameObject. Non-recursive! 
+        /// </summary>
+        public static GameObject[] GetAllDirectChildren(this GameObject go)
+        {
+            return Enumerable
+                .Range(0, go.transform.childCount)
+                .Select(i => go.transform.GetChild(i).gameObject)
+                .ToArray();
+        }
+        
     }
 }

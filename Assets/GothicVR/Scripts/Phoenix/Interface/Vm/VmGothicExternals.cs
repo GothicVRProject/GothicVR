@@ -63,6 +63,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "AI_StartState", AI_StartState);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_UseItemToState", AI_UseItemToState);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_Wait", AI_Wait);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_UseMob", AI_UseMob);
             
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
@@ -363,6 +364,19 @@ namespace GVR.Phoenix.Interface.Vm
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
             Ai.ExtAiWait(npcPtr, seconds);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void AI_UseMob(IntPtr vmPtr)
+        {
+            var state = PxVm.pxVmStackPopInt(vmPtr);
+            var target = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            Ai.ExtAiUseMob(npcPtr, target, state);
+            
+            // Hint: It seems the int value is a bug as no G1 Daedalus usage needs it.
+            PxVm.pxVmStackPushInt(vmPtr, 0);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]

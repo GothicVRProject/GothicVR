@@ -8,6 +8,7 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Properties;
 using PxCs.Data.Event;
 using PxCs.Interface;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace GVR.Npc
@@ -15,7 +16,7 @@ namespace GVR.Npc
     public class Ai : MonoBehaviour, IAnimationCallbacks
     {
         public readonly Queue<AbstractAnimationAction> AnimationQueue = new();
-        private VmGothicEnums.WalkMode walkMode;
+        public VmGothicEnums.WalkMode walkMode;
         
         // HINT: These information aren't set within Daedalus. We need to define them manually.
         // HINT: i.e. every animation might have a BS. E.g. when AI_TakeItem() is called, we set BS.BS_TAKEITEM
@@ -39,6 +40,9 @@ namespace GVR.Npc
         public string usedItemSlot;
         public int itemAnimationState = -1; // We need to start with an "invalid" value as >0< is an allowed state value like in >t_Potion_Stand_2_S0<
 
+        public bool isMoving;
+        public Vector3 movingLocation;
+        
         private enum State
         {
             None,
@@ -54,10 +58,14 @@ namespace GVR.Npc
         
         private void Update()
         {
+            currentAction.Tick();
+
+            HandleMovement();
+            
             // Add new milliseconds when stateTime shall be measured.
             if (isStateTimeActive)
                 stateTime += Time.deltaTime;
-            
+
             if (!currentAction.IsFinished())
                 return;
             
@@ -124,11 +132,38 @@ namespace GVR.Npc
             }
         }
 
+        /// <summary>
+        /// As we use legacy animations, we can't use RootMotion. We therefore need to rebuild it.
+        /// </summary>
+        private void HandleMovement()
+        {
+            if (!isMoving)
+                return;
+            
+            var step =  1f * Time.deltaTime; // calculate distance to move
+            var newPos = Vector3.MoveTowards(transform.position, movingLocation, step);
+
+            transform.position = newPos;
+        }
+        
+        private void OnCollisionEnter(Collision collision)
+        {
+            Debug.Log($"Collission with {collision.gameObject}");
+        }
+
         public static void ExtAiWait(IntPtr npcPtr, float seconds)
         {
             var self = GetAi(npcPtr);
             self.AnimationQueue.Enqueue(new Wait(
                 new(Action.Type.AIWait, f0: seconds),
+                self.gameObject));
+        }
+
+        public static void ExtAiUseMob(IntPtr npcPtr, string target, int state)
+        {
+            var self = GetAi(npcPtr);
+            self.AnimationQueue.Enqueue(new UseMob(
+                new(Action.Type.AIUseMob, str0: target, i0: state),
                 self.gameObject));
         }
         

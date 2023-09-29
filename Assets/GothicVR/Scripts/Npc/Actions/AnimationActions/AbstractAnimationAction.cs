@@ -58,6 +58,13 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             animationEndCallbackDone = true;
         }
+
+        /// <summary>
+        /// Called every update cycle.
+        /// Can be used to handle frequent things internally.
+        /// </summary>
+        public virtual void Tick()
+        { }
         
         /// <summary>
         /// Most of our animations are fine if we just set this flag and return it via IsFinished()

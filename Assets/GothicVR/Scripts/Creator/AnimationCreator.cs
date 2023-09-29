@@ -13,29 +13,34 @@ namespace GVR.Creator
 {
     public class AnimationCreator : SingletonBehaviour<AnimationCreator>
     {
-        public void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go)
+        public void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
         {
-            var mds = AssetCache.I.TryGetMds(mdsName);
             var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
-            var pxAnimation = AssetCache.I.TryGetAnimation(mdsName, animationName);
+            var animationComp = go.GetComponent<Animation>();
+            
+            //Shortcut: Animation is already set at GO.
+            if (animationComp.GetClip(mdsAnimationKeyName) != null)
+            {
+                animationComp.Play(mdsAnimationKeyName);
+                return;
+            }
 
+            var mds = AssetCache.I.TryGetMds(mdsName);
+            var pxAnimation = AssetCache.I.TryGetAnimation(mdsName, animationName);
+            
             // Try to load from cache
             if (!LookupCache.I.AnimClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
             {
                 clip = LoadAnimationClip(pxAnimation, mdh, go);
                 LookupCache.I.AnimClipCache[mdsAnimationKeyName] = clip;
+                clip.wrapMode = repeat ? WrapMode.Loop : WrapMode.Once;
             }
             
-            var animationComp = go.GetComponent<Animation>();
+            AddClipEvents(clip, mds, pxAnimation, animationName);
+            AddClipEndEvent(clip);
+            
+            animationComp.AddClip(clip, mdsAnimationKeyName);
 
-            // Not yet attached to this GO
-            if (animationComp.GetClip(mdsAnimationKeyName) == null)
-            {
-                AddClipEvents(clip, mds, pxAnimation, animationName);
-                AddClipEndEvent(clip);
-                animationComp.AddClip(clip, mdsAnimationKeyName);
-            }
-            
             animationComp.Play(mdsAnimationKeyName);
         }
 
@@ -43,8 +48,7 @@ namespace GVR.Creator
         {
             var clip = new AnimationClip
             {
-                legacy = true,
-                wrapMode = WrapMode.Once
+                legacy = true
             };
             
             var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.nodeCount);
