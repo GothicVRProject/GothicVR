@@ -15,11 +15,12 @@ namespace GVR.Debugging
         [Header("__________Developer__________")]
         [Tooltip("This will be used within Editor mode only. No effect for Standalone.")]
         public bool useXRDeviceSimulator;
-        
+        public bool createWayPointMeshes;
+        public bool createWaypointEdgeMeshes;
+
         [Header("__________World__________")]
         public bool CreateVobs;
         public bool CreateWaypoints;
-        public bool CreateWaypointEdges;
         public bool SkipMainMenu;
 
         [Header("__________DayTime__________")]

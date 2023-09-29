@@ -68,8 +68,11 @@ namespace GVR.Npc.Actions.AnimationActions
                 case PxModelScript.PxEventTagType.destroy_item:
                     DestroyItem();
                     break;
+                case PxModelScript.PxEventTagType.inventory_torch:
+                    Debug.Log("I assume this means: if torhc is in inventory, then put it out. But not really sure. Need a NPC with real usage of it to predict right.");
+                    break;
                 default:
-                    Debug.LogError($"PxEventTagData.type {data.type} not yet supported.");
+                    Debug.LogWarning($"PxEventTagData.type {data.type} not yet supported.");
                     break;
             }
         }

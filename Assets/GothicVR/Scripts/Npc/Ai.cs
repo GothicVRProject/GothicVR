@@ -149,10 +149,9 @@ namespace GVR.Npc
 
         public static void ExtAiGotoWP(IntPtr npcPtr, string point)
         {
-            // FIXME - e.g. for Thorus there's initially no string value for TA_Boss() self.wp - Intended or a bug on our side?
             var self = GetAi(npcPtr);
             self.AnimationQueue.Enqueue(new GoToWp(
-                new(Action.Type.AIGoToWP),
+                new(Action.Type.AIGoToWP, str0: point),
                 self.gameObject));
         }
 

@@ -25,24 +25,31 @@ namespace GVR.Creator
                 return;
 
             var waypointsObj = new GameObject(string.Format("Waypoints"));
-            waypointsObj.transform.parent = parent.transform;
+            waypointsObj.SetParent(parent);
 
             foreach (var waypoint in world.waypoints)
             {
-                // var wpobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                var wpobject = new GameObject();
+                GameObject wpObject;
+                if (FeatureFlags.I.createWayPointMeshes)
+                {
+                    wpObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    wpObject.transform.localScale = new(0.5f, 0.5f, 0.5f);
+                    Destroy(wpObject.GetComponent<Collider>());
+                }
+                else
+                    wpObject = new GameObject();
 
-                wpobject.tag = ConstantsManager.I.SpotTag;
-                wpobject.name = waypoint.name;
-                wpobject.transform.position = waypoint.position.ToUnityVector();
+                wpObject.tag = ConstantsManager.I.SpotTag;
+                wpObject.name = waypoint.name;
+                wpObject.transform.position = waypoint.position.ToUnityVector();
 
-                wpobject.transform.parent = waypointsObj.transform;
+                wpObject.SetParent(waypointsObj);
             }
         }
 
         private void CreateWaypointEdges(GameObject parent, WorldData world)
         {
-            if (!FeatureFlags.I.CreateWaypointEdges)
+            if (!FeatureFlags.I.createWaypointEdgeMeshes)
                 return;
 
             var waypointEdgesObj = new GameObject(string.Format("Edges"));
