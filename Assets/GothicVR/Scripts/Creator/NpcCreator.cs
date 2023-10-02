@@ -71,8 +71,9 @@ namespace GVR.Creator
             return GetProperties(npcPtr).gameObject;
         }
 
-        private const int DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY = 1;
-        private int debugNpcsSpawned;
+        // private const int DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY = 1;
+        // private int debugNpcsSpawned;
+        private const int DEBUG_BLOODWYN_INSTANCE_ID = 6596;
         
         /// <summary>
         /// Original Gothic uses this function to spawn an NPC instance into the world.
@@ -83,8 +84,12 @@ namespace GVR.Creator
         /// </summary>
         public void ExtWldInsertNpc(int npcInstance, string spawnPoint)
         {
-            if (++debugNpcsSpawned > DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY)
+            // if (++debugNpcsSpawned > DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY)
+            //     return;
+
+            if (npcInstance != DEBUG_BLOODWYN_INSTANCE_ID)
                 return;
+            
             
             var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
             var props = newNpc.GetComponent<NpcProperties>();
@@ -191,6 +196,7 @@ namespace GVR.Creator
             if (FeatureFlags.I.CreateNpcArmor && data.Armor >= 0)
             {
                 var armorData = assetCache.TryGetItemData((uint)data.Armor);
+                props.EquippedItems.Add(assetCache.TryGetItemData((uint)data.Armor));
                 props.mdmName = armorData.visualChange;
             }
             else
@@ -266,14 +272,7 @@ namespace GVR.Creator
 
             props.EquippedItems.Add(itemData);
         }
-
-        public static string ExtGetNearestWayPoint(IntPtr npcPtr)
-        {
-            var pos = GetNpc(npcPtr).transform.position;
-
-            return WayNetManager.I.FindNearestWayPoint(pos).Name;
-        }
-
+        
         private static void StartRoutine(GameObject npc)
         {
             var routineComp = npc.GetComponent<Routine>();

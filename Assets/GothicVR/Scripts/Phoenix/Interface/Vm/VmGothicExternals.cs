@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using AOT;
+using GVR.Caches;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Manager;
@@ -47,6 +48,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "IntToFloat", IntToFloat);
             PxVm.pxVmRegisterExternal(vmPtr, "Hlp_Random", Hlp_Random);
             PxVm.pxVmRegisterExternal(vmPtr, "Hlp_StrCmp", Hlp_StrCmp);
+            PxVm.pxVmRegisterExternal(vmPtr, "Hlp_IsItem", Hlp_IsItem);
 
             // Debug
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebug", PrintDebug);
@@ -87,6 +89,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_HasItems", Npc_HasItems);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetStateTime", Npc_GetStateTime);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetStateTime", Npc_SetStateTime);
+            PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetEquippedArmor", Npc_GetEquippedArmor);
 
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentSkill", Npc_SetTalentSkill);
             PxVm.pxVmRegisterExternal(vmPtr, "CreateInvItem", CreateInvItem);
@@ -167,6 +170,23 @@ namespace GVR.Phoenix.Interface.Vm
             var equal = (str1 == str2) ? 1 : 0;
             
             PxVm.pxVmStackPushInt(vmPtr, equal);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Hlp_IsItem(IntPtr vmPtr)
+        {
+            var compareItemSymbol = PxVm.pxVmStackPopInt(vmPtr);
+            var itemRef = PxVm.pxVmStackPopInstance(vmPtr);
+
+            var compareItemRef = AssetCache.I.TryGetItemData((uint)compareItemSymbol);
+
+            bool result;
+            if (compareItemRef == null)
+                result = false;
+            else
+                result = compareItemRef.instancePtr == itemRef;
+            
+            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(result));
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -532,6 +552,16 @@ namespace GVR.Phoenix.Interface.Vm
 
             Ai.ExtNpcSetStateTime(npcPtr, seconds);
         }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Npc_GetEquippedArmor(IntPtr vmPtr)
+        {
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+            
+            var itemPtr = NpcManager.ExtGetEquippedArmor(npcPtr);
+            
+            PxVm.pxVmStackPushInstance(vmPtr, itemPtr);
+        }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_SetTalentSkill(IntPtr vmPtr)
@@ -559,7 +589,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            var name = NpcCreator.ExtGetNearestWayPoint(npcPtr);
+            var name = NpcManager.ExtGetNearestWayPoint(npcPtr);
 
             PxVm.pxVmStackPushString(vmPtr, name);
         }

@@ -40,6 +40,22 @@ namespace GVR.Manager
             return false;
         }
 
+        public static string ExtGetNearestWayPoint(IntPtr npcPtr)
+        {
+            var pos = GetProperties(npcPtr).transform.position;
+
+            return WayNetManager.I.FindNearestWayPoint(pos).Name;
+        }
+
+        public static IntPtr ExtGetEquippedArmor(IntPtr npcPtr)
+        {
+            var armor = GetProperties(npcPtr).EquippedItems
+                .FirstOrDefault(i => i.mainFlag == PxVm.PxVmItemFlags.ITEM_KAT_ARMOR);
+
+            return armor?.instancePtr ?? IntPtr.Zero;
+        }
+
+        
         public bool ExtIsNpcOnFp(IntPtr npcPtr, string vobNamePrefix)
         {
             var freePoint = GetProperties(npcPtr).CurrentFreePoint;
