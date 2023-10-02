@@ -45,8 +45,11 @@ namespace GVR.Creator.Meshes
             for (var i = 0; i < zm.childCount; i++)
             {
                 var child = zm.GetChild(i);
-                if (child.name.StartsWithIgnoreCase("ZS"))
-                    child.AddComponent<SphereCollider>();
+                if (!child.name.StartsWithIgnoreCase("ZS"))
+                    continue;
+                
+                var sphereCollider = child.AddComponent<SphereCollider>();
+                sphereCollider.isTrigger = true;
             }
         }
 

@@ -47,9 +47,13 @@ namespace GVR.Npc.Actions.AnimationActions
 
         private void StartWalkAnimation()
         {
+            // 1. Turn around (optional)
+            // 2. Walk towards Mob
+            // 3. if Collider hit, then start animation
+            
             var animName = GetWalkModeAnimationString();
             var mdh = AssetCache.I.TryGetMdh(props.overlayMdhName);
-            AnimationCreator.I.PlayAnimation(props.baseMdsName, animName, mdh, npcGo, true);
+            // AnimationCreator.I.PlayAnimation(props.baseMdsName, animName, mdh, npcGo, true);
         }
 
         private string GetWalkModeAnimationString()
@@ -57,7 +61,7 @@ namespace GVR.Npc.Actions.AnimationActions
             switch (aiProps.walkMode)
             {
                 case VmGothicEnums.WalkMode.Walk:
-                    return "S_WALK";
+                    return "S_WALKL";
                 default:
                     Debug.LogWarning($"Animation of type {aiProps.walkMode} not yet implemented.");
                     return "";

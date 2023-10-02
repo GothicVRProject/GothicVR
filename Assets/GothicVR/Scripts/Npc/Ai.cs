@@ -42,6 +42,15 @@ namespace GVR.Npc
 
         public bool isMoving;
         public Vector3 movingLocation;
+        private MovementState movementState;
+
+
+            private enum MovementState
+        {
+            None,
+            Rotation,
+            Walk
+        }
         
         private enum State
         {
@@ -50,7 +59,7 @@ namespace GVR.Npc
             Loop,
             End
         }
-
+        
         private void Start()
         {
             currentAction = new None(new(Action.Type.AINone), gameObject);
@@ -139,16 +148,58 @@ namespace GVR.Npc
         {
             if (!isMoving)
                 return;
-            
+
+            switch (movementState)
+            {
+                case MovementState.None:
+                    movementState = MovementState.Rotation;
+                    return;
+                case MovementState.Rotation:
+                    HandleRotation();
+                    return;
+                case MovementState.Walk:
+                    HandleWalk();
+                    return;
+                default:
+                    Debug.Log($"MovementState {movementState} not yet implemented.");
+                    return;
+            }
+        }
+
+        private void HandleRotation()
+        {
+            var singleStep = 1.0f * Time.deltaTime;
+            var targetDirection = movingLocation - transform.position;
+
+            // If we set TargetDirection of >y< to 0, then we rotate left/right only.
+            targetDirection.y = 0;
+            var newDirection = Vector3.RotateTowards(transform.forward, targetDirection, singleStep, 0.0f);
+            var newRotation = Quaternion.LookRotation(newDirection);
+
+            // Rotation is done.
+            if (transform.rotation == newRotation)
+            {
+                movementState = MovementState.Walk;
+                return;
+            }
+
+            transform.rotation = newRotation;
+        }
+        
+        private void HandleWalk()
+        {
             var step =  1f * Time.deltaTime; // calculate distance to move
             var newPos = Vector3.MoveTowards(transform.position, movingLocation, step);
-
+            
             transform.position = newPos;
         }
         
         private void OnCollisionEnter(Collision collision)
         {
-            Debug.Log($"Collission with {collision.gameObject}");
+            foreach (ContactPoint contact in collision.contacts)
+            {
+                Debug.Log($"{contact.thisCollider.name} got Collider contact with {contact.otherCollider.name}");
+            }
         }
 
         public static void ExtAiWait(IntPtr npcPtr, float seconds)
