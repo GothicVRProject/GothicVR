@@ -19,7 +19,7 @@ namespace GVR.Npc
         
         // HINT: These information aren't set within Daedalus. We need to define them manually.
         // HINT: i.e. every animation might have a BS. E.g. when AI_TakeItem() is called, we set BS.BS_TAKEITEM
-        private VmGothicEnums.BodyState bodyState;
+        public VmGothicEnums.BodyState bodyState;
         
         private uint prevStateStart;
         private uint stateStart;

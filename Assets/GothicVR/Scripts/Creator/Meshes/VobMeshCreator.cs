@@ -48,8 +48,8 @@ namespace GVR.Creator.Meshes
                 if (!child.name.StartsWithIgnoreCase("ZS"))
                     continue;
                 
-                var sphereCollider = child.AddComponent<SphereCollider>();
-                sphereCollider.isTrigger = true;
+                // Used for event triggers with NPCs.
+                child.AddComponent<SphereCollider>();
             }
         }
 

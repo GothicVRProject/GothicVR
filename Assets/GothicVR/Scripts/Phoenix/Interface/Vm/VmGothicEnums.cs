@@ -117,7 +117,7 @@ namespace GVR.Phoenix.Interface.Vm
             BS_DEAD = 23,
 
             BS_AIMNEAR = 24, // wird z.Zt nicht benutzt
-            BS_AIMFAR = 25, // d.h. Bogensch�tze kann weiterschie�en, auch wenn er geschlagen wird
+            BS_AIMFAR = 25, // d.h. Bogenschütze kann weiterschießen, auch wenn er geschlagen wird
             BS_HIT = 26 | BS_FLAG_INTERRUPTABLE,
             BS_PARADE = 27,
 

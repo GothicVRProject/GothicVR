@@ -7,6 +7,7 @@ using GVR.Manager;
 using GVR.Properties;
 using PxCs.Data.Animation;
 using PxCs.Data.Event;
+using PxCs.Interface;
 using Unity.VisualScripting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -48,6 +49,10 @@ namespace GVR.Npc.Actions.AnimationActions
         
         public virtual void AnimationEventCallback(PxEventTagData data)
         {
+            // FIXME - I have no clue about this inventory_torch event, but it gets called quite often.
+            if (data.type == PxModelScript.PxEventTagType.inventory_torch)
+                return;
+            
             Debug.LogError($"Animation for {action.ActionType} is not yet implemented.");
         }
         
@@ -62,7 +67,7 @@ namespace GVR.Npc.Actions.AnimationActions
         /// <summary>
         /// Only needed for walking or other movement related animations.
         /// </summary>
-        public virtual void OnCollisionEnter(Collision colision)
+        public virtual void OnCollisionEnter(Collision collision)
         { }
         
         /// <summary>

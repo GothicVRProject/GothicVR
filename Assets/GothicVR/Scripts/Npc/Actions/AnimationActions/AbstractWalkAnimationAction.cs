@@ -1,5 +1,7 @@
+using System.Linq;
 using GVR.Caches;
 using GVR.Creator;
+using GVR.Extensions;
 using GVR.Phoenix.Interface.Vm;
 using UnityEngine;
 
@@ -9,13 +11,16 @@ namespace GVR.Npc.Actions.AnimationActions
     {
         protected enum WalkState
         {
-            None,
+            Initial,
             Rotate,
-            Walk
+            Walk,
+            Done
         }
 
+        protected GameObject mobGo;
+        protected GameObject slotGo;
         protected Vector3 movingLocation;
-        protected WalkState walkState = WalkState.None;
+        protected WalkState walkState = WalkState.Initial;
         
         protected AbstractWalkAnimationAction(Ai.Action action, GameObject npcGo) : base(action, npcGo)
         { }
@@ -28,8 +33,8 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             switch (walkState)
             {
-                case WalkState.None:
-                    walkState = WalkState.Rotate;
+                case WalkState.Initial:
+                    StartRotation(transform);
                     return;
                 case WalkState.Rotate:
                     HandleRotation(transform);
@@ -37,10 +42,21 @@ namespace GVR.Npc.Actions.AnimationActions
                 case WalkState.Walk:
                     HandleWalk(transform);
                     return;
+                case WalkState.Done:
+                    return;
                 default:
                     Debug.Log($"MovementState {walkState} not yet implemented.");
                     return;
             }
+        }
+
+        private void StartRotation(Transform transform)
+        {
+            // FIXME - we need to evaluate if we turn right or left. Then choose TurnR/TurnL properly.
+            var mdh = AssetCache.I.TryGetMdh(props.overlayMdhName);
+            AnimationCreator.I.PlayAnimation(props.baseMdsName, "t_WalkWTurnR", mdh, npcGo, true);
+            
+            walkState = WalkState.Rotate;
         }
         
         private void HandleRotation(Transform transform)
@@ -94,14 +110,6 @@ namespace GVR.Npc.Actions.AnimationActions
             var newPos = Vector3.MoveTowards(transform.position, movingLocation, step);
             
             transform.position = newPos;
-        }
-
-        public override void OnCollisionEnter(Collision collision)
-        {
-            foreach (ContactPoint contact in collision.contacts)
-            {
-                Debug.Log($"{contact.thisCollider.name} got Collider contact with {contact.otherCollider.name}");
-            }
         }
     }
 }
