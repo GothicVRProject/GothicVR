@@ -13,7 +13,9 @@ namespace GVR.Npc.Actions.AnimationActions
     public class UseMob : AbstractWalkAnimationAction
     {
         private const string mobUseString = "T_{0}_{1}_{2}_2_{3}";
-        
+        private GameObject mobGo;
+        private GameObject slotGo;
+
         public UseMob(Ai.Action action, GameObject npcGo) : base(action, npcGo)
         { }
 
@@ -86,15 +88,6 @@ namespace GVR.Npc.Actions.AnimationActions
                 return "BACK";
             else
                 return "";
-        }
-        
-        /// <summary>
-        /// Only after the Mob is reached and final animation is done, we will close the loop.
-        /// </summary>
-        public override void AnimationEventEndCallback()
-        {
-            if (walkState == WalkState.Done)
-                animationEndCallbackDone = true;
         }
     }
 }

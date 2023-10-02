@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GVR.Caches;
+using GVR.Manager;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Phoenix.Interface;
@@ -8,6 +9,7 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Properties;
 using PxCs.Data.Event;
 using PxCs.Interface;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace GVR.Npc
@@ -169,6 +171,14 @@ namespace GVR.Npc
             var self = GetAi(npcPtr);
             self.AnimationQueue.Enqueue(new GoToWp(
                 new(Action.Type.AIGoToWP, str0: point),
+                self.gameObject));
+        }
+
+        public static void ExtAiGoToNextFp(IntPtr npcPtr, string fpNamePart)
+        {
+            var self = GetAi(npcPtr);
+            self.AnimationQueue.Enqueue(new GoToNextFp(
+                new(Action.Type.AIGoToNextFp, str0: fpNamePart),
                 self.gameObject));
         }
 

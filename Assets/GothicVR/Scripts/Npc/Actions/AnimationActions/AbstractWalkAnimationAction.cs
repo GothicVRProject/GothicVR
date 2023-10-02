@@ -17,8 +17,6 @@ namespace GVR.Npc.Actions.AnimationActions
             Done
         }
 
-        protected GameObject mobGo;
-        protected GameObject slotGo;
         protected Vector3 movingLocation;
         protected WalkState walkState = WalkState.Initial;
         
@@ -43,7 +41,7 @@ namespace GVR.Npc.Actions.AnimationActions
                     HandleWalk(transform);
                     return;
                 case WalkState.Done:
-                    return;
+                    return; // NOP
                 default:
                     Debug.Log($"MovementState {walkState} not yet implemented.");
                     return;
@@ -110,6 +108,15 @@ namespace GVR.Npc.Actions.AnimationActions
             var newPos = Vector3.MoveTowards(transform.position, movingLocation, step);
             
             transform.position = newPos;
+        }
+        
+        /// <summary>
+        /// Only after the Mob is reached and final animation is done, we will close the loop.
+        /// </summary>
+        public override void AnimationEventEndCallback()
+        {
+            if (walkState == WalkState.Done)
+                animationEndCallbackDone = true;
         }
     }
 }

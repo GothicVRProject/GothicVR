@@ -66,6 +66,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "AI_UseItemToState", AI_UseItemToState);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_Wait", AI_Wait);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_UseMob", AI_UseMob);
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_GoToNextFP", AI_GoToNextFP);
             
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
@@ -409,6 +410,15 @@ namespace GVR.Phoenix.Interface.Vm
             
             // Hint: It seems the int value is a bug as no G1 Daedalus usage needs it.
             PxVm.pxVmStackPushInt(vmPtr, 0);
+        }
+
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void AI_GoToNextFP(IntPtr vmPtr)
+        {
+            var fpNamePart = PxVm.VmStackPopString(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            Ai.ExtAiGoToNextFp(npcPtr, fpNamePart);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
