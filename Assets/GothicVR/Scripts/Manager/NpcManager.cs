@@ -47,6 +47,21 @@ namespace GVR.Manager
             return WayNetManager.I.FindNearestWayPoint(pos).Name;
         }
 
+        public static bool ExtIsNextFpAvailable(IntPtr npcPtr, string fpNamePart)
+        {
+            var props = GetProperties(npcPtr);
+            var pos = props.transform.position;
+            var fp = WayNetManager.I.FindNearestFreePoint(pos, fpNamePart);
+
+            // Ignore if we're already on this FP.
+            if (fp == props.CurrentFreePoint)
+                return false;
+            else if (fp.IsLocked)
+                return false;
+            else
+                return true;
+        }
+
         public static IntPtr ExtGetEquippedArmor(IntPtr npcPtr)
         {
             var armor = GetProperties(npcPtr).EquippedItems
@@ -54,7 +69,6 @@ namespace GVR.Manager
 
             return armor?.instancePtr ?? IntPtr.Zero;
         }
-
         
         public bool ExtIsNpcOnFp(IntPtr npcPtr, string vobNamePrefix)
         {

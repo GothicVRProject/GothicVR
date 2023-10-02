@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Extensions;
 using GVR.Phoenix.Interface;
 using GVR.Util;
 using GVR.Vob.WayNet;
@@ -49,6 +50,15 @@ namespace GVR.Manager
                 .First();
 
             return nearestWayPoint.Value;
+        }
+
+        public FreePoint FindNearestFreePoint(Vector3 lookupPosition, string fpNamePart)
+        {
+            return GameData.I.FreePoints
+                .Where(pair => pair.Value.Name.ContainsIgnoreCase(fpNamePart))
+                .OrderBy(pair => Vector3.Distance(pair.Value.Position, lookupPosition))
+                .Select(pair => pair.Value)
+                .FirstOrDefault();
         }
     }
 }

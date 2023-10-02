@@ -71,6 +71,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsMobAvailable", Wld_IsMobAvailable);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_DetectNpcEx", Wld_DetectNpcEx);
+            PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsNextFPAvailable", Wld_IsNextFPAvailable);
                 
             // NPC visuals
             PxVm.pxVmRegisterExternal(vmPtr, "TA_MIN", TA_MIN);
@@ -281,6 +282,17 @@ namespace GVR.Phoenix.Interface.Vm
             var res = NpcManager.I.ExtWldDetectNpcEx(npcPtr, npcInstance, aiState, guild, ignorePlayer);
             
             PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(res));
+        }
+        
+        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
+        public static void Wld_IsNextFPAvailable(IntPtr vmPtr)
+        {
+            var fpNamePart = PxVm.VmStackPopString(vmPtr);
+            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
+
+            var result = NpcManager.ExtIsNextFpAvailable(npcPtr, fpNamePart);
+            
+            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(result));
         }
 
         public struct ExtTaMinData
