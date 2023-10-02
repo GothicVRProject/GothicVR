@@ -386,7 +386,6 @@ namespace GVR.Creator
             // FIXME - change to a Prefab in the future.
             var vobObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             vobObj.tag = ConstantsManager.I.SpotTag;
-            Destroy(vobObj.GetComponent<SphereCollider>()); // No need for collider here!
 
             if (FeatureFlags.I.EnableVobFPMesh)
             {
@@ -401,7 +400,6 @@ namespace GVR.Creator
             else
             {
                 // Quick win: If we don't want to render the spots, we just remove the Renderer.
-                // FIXME - Loading can be optimized with a proper Prefab
                 Destroy(vobObj.GetComponent<MeshRenderer>());
             }
 

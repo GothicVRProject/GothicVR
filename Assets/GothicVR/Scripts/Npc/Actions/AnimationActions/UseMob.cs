@@ -89,5 +89,14 @@ namespace GVR.Npc.Actions.AnimationActions
             else
                 return "";
         }
+        
+        /// <summary>
+        /// Only after the Mob is reached and final animation is done, we will close the loop.
+        /// </summary>
+        public override void AnimationEventEndCallback()
+        {
+            if (walkState == WalkState.Done)
+                isFinished = true;
+        }
     }
 }

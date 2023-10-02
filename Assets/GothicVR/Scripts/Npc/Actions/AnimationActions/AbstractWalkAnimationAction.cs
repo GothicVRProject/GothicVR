@@ -1,7 +1,5 @@
-using System.Linq;
 using GVR.Caches;
 using GVR.Creator;
-using GVR.Extensions;
 using GVR.Phoenix.Interface.Vm;
 using UnityEngine;
 
@@ -91,10 +89,6 @@ namespace GVR.Npc.Actions.AnimationActions
         
         private void StartWalkAnimation()
         {
-            // 1. Turn around (optional)
-            // 2. Walk towards Mob
-            // 3. if Collider hit, then start animation
-            
             var animName = GetWalkModeAnimationString();
             var mdh = AssetCache.I.TryGetMdh(props.overlayMdhName);
             AnimationCreator.I.PlayAnimation(props.baseMdsName, animName, mdh, npcGo, true);
@@ -108,15 +102,6 @@ namespace GVR.Npc.Actions.AnimationActions
             var newPos = Vector3.MoveTowards(transform.position, movingLocation, step);
             
             transform.position = newPos;
-        }
-        
-        /// <summary>
-        /// Only after the Mob is reached and final animation is done, we will close the loop.
-        /// </summary>
-        public override void AnimationEventEndCallback()
-        {
-            if (walkState == WalkState.Done)
-                animationEndCallbackDone = true;
         }
     }
 }

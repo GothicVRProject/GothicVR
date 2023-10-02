@@ -21,7 +21,7 @@ namespace GVR.Npc.Actions.AnimationActions
         protected readonly NpcProperties props;
         protected readonly Ai aiProps;
 
-        protected bool animationEndCallbackDone;
+        protected bool isFinished;
 
         public AbstractAnimationAction(Ai.Action action, GameObject npcGo)
         {
@@ -61,7 +61,7 @@ namespace GVR.Npc.Actions.AnimationActions
         /// </summary>
         public virtual void AnimationEventEndCallback()
         {
-            animationEndCallbackDone = true;
+            isFinished = true;
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace GVR.Npc.Actions.AnimationActions
         /// </summary>
         public virtual bool IsFinished()
         {
-            return animationEndCallbackDone;
+            return isFinished;
         }
     }
 }
