@@ -8,7 +8,6 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Properties;
 using PxCs.Data.Event;
 using PxCs.Interface;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace GVR.Npc
@@ -40,17 +39,6 @@ namespace GVR.Npc
         public string usedItemSlot;
         public int itemAnimationState = -1; // We need to start with an "invalid" value as >0< is an allowed state value like in >t_Potion_Stand_2_S0<
 
-        public bool isMoving;
-        public Vector3 movingLocation;
-        private MovementState movementState;
-
-
-            private enum MovementState
-        {
-            None,
-            Rotation,
-            Walk
-        }
         
         private enum State
         {
@@ -67,10 +55,8 @@ namespace GVR.Npc
         
         private void Update()
         {
-            currentAction.Tick();
-
-            HandleMovement();
-            
+            currentAction.Tick(transform);
+          
             // Add new milliseconds when stateTime shall be measured.
             if (isStateTimeActive)
                 stateTime += Time.deltaTime;
@@ -140,66 +126,10 @@ namespace GVR.Npc
                     PxVm.CallFunction(GameData.I.VmGothicPtr, stateEnd, GetComponent<NpcProperties>().npcPtr);
             }
         }
-
-        /// <summary>
-        /// As we use legacy animations, we can't use RootMotion. We therefore need to rebuild it.
-        /// </summary>
-        private void HandleMovement()
-        {
-            if (!isMoving)
-                return;
-
-            switch (movementState)
-            {
-                case MovementState.None:
-                    movementState = MovementState.Rotation;
-                    return;
-                case MovementState.Rotation:
-                    HandleRotation();
-                    return;
-                case MovementState.Walk:
-                    HandleWalk();
-                    return;
-                default:
-                    Debug.Log($"MovementState {movementState} not yet implemented.");
-                    return;
-            }
-        }
-
-        private void HandleRotation()
-        {
-            var singleStep = 1.0f * Time.deltaTime;
-            var targetDirection = movingLocation - transform.position;
-
-            // If we set TargetDirection of >y< to 0, then we rotate left/right only.
-            targetDirection.y = 0;
-            var newDirection = Vector3.RotateTowards(transform.forward, targetDirection, singleStep, 0.0f);
-            var newRotation = Quaternion.LookRotation(newDirection);
-
-            // Rotation is done.
-            if (transform.rotation == newRotation)
-            {
-                movementState = MovementState.Walk;
-                return;
-            }
-
-            transform.rotation = newRotation;
-        }
-        
-        private void HandleWalk()
-        {
-            var step =  1f * Time.deltaTime; // calculate distance to move
-            var newPos = Vector3.MoveTowards(transform.position, movingLocation, step);
-            
-            transform.position = newPos;
-        }
         
         private void OnCollisionEnter(Collision collision)
         {
-            foreach (ContactPoint contact in collision.contacts)
-            {
-                Debug.Log($"{contact.thisCollider.name} got Collider contact with {contact.otherCollider.name}");
-            }
+            currentAction?.OnCollisionEnter(collision);
         }
 
         public static void ExtAiWait(IntPtr npcPtr, float seconds)

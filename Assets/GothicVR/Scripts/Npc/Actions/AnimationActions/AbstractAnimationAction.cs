@@ -60,10 +60,16 @@ namespace GVR.Npc.Actions.AnimationActions
         }
 
         /// <summary>
+        /// Only needed for walking or other movement related animations.
+        /// </summary>
+        public virtual void OnCollisionEnter(Collision colision)
+        { }
+        
+        /// <summary>
         /// Called every update cycle.
         /// Can be used to handle frequent things internally.
         /// </summary>
-        public virtual void Tick()
+        public virtual void Tick(Transform transform)
         { }
         
         /// <summary>
