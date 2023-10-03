@@ -19,17 +19,10 @@ using JetBrains.Annotations;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
-using PxCs.Interface;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 
 namespace GVR.Creator
 {
@@ -37,8 +30,6 @@ namespace GVR.Creator
     {
         private SoundCreator soundCreator;
         private AssetCache assetCache;
-
-        private const string editorLabelColor = "sv_label4";
 
         private Dictionary<PxVobType, GameObject> parentGosTeleport = new();
         private Dictionary<PxVobType, GameObject> parentGosNonTeleport = new();
