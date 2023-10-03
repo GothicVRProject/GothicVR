@@ -4,7 +4,7 @@ namespace GVR.Npc.Actions.AnimationActions
 {
     public class AlignToWp : AbstractAnimationAction
     {
-        public AlignToWp(Ai.Action action, GameObject npcGo) : base(action, npcGo)
+        public AlignToWp(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
         public override void Start()

@@ -16,7 +16,7 @@ namespace GVR.Npc.Actions.AnimationActions
         private GameObject mobGo;
         private GameObject slotGo;
 
-        public UseMob(Ai.Action action, GameObject npcGo) : base(action, npcGo)
+        public UseMob(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
         public override void Start()
@@ -65,7 +65,7 @@ namespace GVR.Npc.Actions.AnimationActions
                 return;
 
             walkState = WalkState.Done;
-            aiProps.bodyState = VmGothicEnums.BodyState.BS_MOBINTERACT;
+            props.bodyState = VmGothicEnums.BodyState.BS_MOBINTERACT;
             
             npcGo.transform.position = mobGo.transform.position;
             npcGo.transform.rotation = mobGo.transform.rotation;

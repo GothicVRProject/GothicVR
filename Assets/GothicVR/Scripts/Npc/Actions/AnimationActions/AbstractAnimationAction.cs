@@ -16,19 +16,17 @@ namespace GVR.Npc.Actions.AnimationActions
 {
     public abstract class AbstractAnimationAction
     {
-        protected readonly Ai.Action action;
+        protected readonly AnimationAction action;
         protected readonly GameObject npcGo;
         protected readonly NpcProperties props;
-        protected readonly Ai aiProps;
 
         protected bool isFinished;
 
-        public AbstractAnimationAction(Ai.Action action, GameObject npcGo)
+        public AbstractAnimationAction(AnimationAction action, GameObject npcGo)
         {
             this.action = action;
             this.npcGo = npcGo;
             this.props = npcGo.GetComponent<NpcProperties>();
-            this.aiProps = npcGo.GetComponent<Ai>();
         }
             
         public abstract void Start();

@@ -8,7 +8,7 @@ namespace GVR.Npc.Actions.AnimationActions
     {
         private float waitSeconds;
 
-        public Wait(Ai.Action action, GameObject npcGo) : base(action, npcGo)
+        public Wait(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
         public override void Start()

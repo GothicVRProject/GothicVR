@@ -406,7 +406,7 @@ namespace GVR.Creator
                 Name = fpName,
                 Position = vob.position.ToUnityVector()
             };
-            vobObj.GetComponent<SpotProperties>().fp = freePointData;
+            vobObj.GetComponent<VobSpotProperties>().fp = freePointData;
             GameData.I.FreePoints.Add(fpName, freePointData);
             
             SetPosAndRot(vobObj, vob.position, vob.rotation);

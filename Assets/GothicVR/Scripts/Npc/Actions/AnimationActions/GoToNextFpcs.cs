@@ -9,7 +9,7 @@ namespace GVR.Npc.Actions.AnimationActions
     {
         private FreePoint fp;
         
-        public GoToNextFp(Ai.Action action, GameObject npcGo) : base(action, npcGo)
+        public GoToNextFp(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
         
         public override void Start()

@@ -5,7 +5,7 @@ namespace GVR.Npc.Actions.AnimationActions
 {
     public class None : AbstractAnimationAction
     {
-        public None(Ai.Action action, GameObject npcGo) : base(action, npcGo)
+        public None(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
         public override void Start()

@@ -333,7 +333,7 @@ namespace GVR.Phoenix.Interface.Vm
         public static void AI_StandUp(IntPtr vmPtr)
         {
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-            Ai.ExtAiStandUp(npcPtr);
+            NpcManager.ExtAiStandUp(npcPtr);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -341,7 +341,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var walkMode = (VmGothicEnums.WalkMode)PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-            Ai.ExtAiSetWalkMode(npcPtr, walkMode);
+            NpcManager.ExtAiSetWalkMode(npcPtr, walkMode);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -349,7 +349,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var spawnPoint = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-            Ai.ExtAiGotoWP(npcPtr, spawnPoint);
+            NpcManager.ExtAiGotoWP(npcPtr, spawnPoint);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -357,7 +357,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            Ai.ExtAiAlignToWP(npcPtr);
+            NpcManager.ExtAiAlignToWP(npcPtr);
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -366,7 +366,7 @@ namespace GVR.Phoenix.Interface.Vm
             var name = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             
-            Ai.ExtAiPlayAni(npcPtr, name);
+            NpcManager.ExtAiPlayAni(npcPtr, name);
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -377,7 +377,7 @@ namespace GVR.Phoenix.Interface.Vm
             var function = PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
             
-            Ai.ExtAiStartState(npcPtr, (uint)function, Convert.ToBoolean(stateBehaviour), wayPointName);
+            NpcManager.ExtAiStartState(npcPtr, (uint)function, Convert.ToBoolean(stateBehaviour), wayPointName);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -387,7 +387,7 @@ namespace GVR.Phoenix.Interface.Vm
             var itemId = PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            Ai.ExtAiUseItemToState(npcPtr, (uint)itemId, expectedInventoryCount);
+            NpcManager.ExtAiUseItemToState(npcPtr, (uint)itemId, expectedInventoryCount);
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -396,7 +396,7 @@ namespace GVR.Phoenix.Interface.Vm
             var seconds = PxVm.pxVmStackPopFloat(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            Ai.ExtAiWait(npcPtr, seconds);
+            NpcManager.ExtAiWait(npcPtr, seconds);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -406,7 +406,7 @@ namespace GVR.Phoenix.Interface.Vm
             var target = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            Ai.ExtAiUseMob(npcPtr, target, state);
+            NpcManager.ExtAiUseMob(npcPtr, target, state);
             
             // Hint: It seems the int value is a bug as no G1 Daedalus usage needs it.
             PxVm.pxVmStackPushInt(vmPtr, 0);
@@ -418,7 +418,7 @@ namespace GVR.Phoenix.Interface.Vm
             var fpNamePart = PxVm.VmStackPopString(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            Ai.ExtAiGoToNextFp(npcPtr, fpNamePart);
+            NpcManager.ExtAiGoToNextFp(npcPtr, fpNamePart);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -530,7 +530,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            var bodyState = Ai.ExtGetBodyState(npcPtr);
+            var bodyState = NpcManager.ExtGetBodyState(npcPtr);
             
             PxVm.pxVmStackPushInt(vmPtr, (int)bodyState);
         }
@@ -561,7 +561,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            var stateTime = Ai.ExtNpcGetStateTime(npcPtr);
+            var stateTime = NpcManager.ExtNpcGetStateTime(npcPtr);
             
             PxVm.pxVmStackPushInt(vmPtr, (int)stateTime);
         }
@@ -572,7 +572,7 @@ namespace GVR.Phoenix.Interface.Vm
             var seconds = PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            Ai.ExtNpcSetStateTime(npcPtr, seconds);
+            NpcManager.ExtNpcSetStateTime(npcPtr, seconds);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
@@ -633,7 +633,7 @@ namespace GVR.Phoenix.Interface.Vm
             var action = PxVm.pxVmStackPopInt(vmPtr);
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            var result = Ai.ExtNpcWasInState(npcPtr, (uint)action);
+            var result = NpcManager.ExtNpcWasInState(npcPtr, (uint)action);
             
             PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(result));
         }

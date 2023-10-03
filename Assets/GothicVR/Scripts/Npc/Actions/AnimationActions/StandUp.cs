@@ -4,7 +4,7 @@ namespace GVR.Npc.Actions.AnimationActions
 {
     public class StandUp : AbstractAnimationAction
     {
-        public StandUp(Ai.Action action, GameObject npcGo) : base(action, npcGo)
+        public StandUp(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
         public override void Start()

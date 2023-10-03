@@ -7,7 +7,7 @@ namespace GVR.Npc.Actions.AnimationActions
 {
     public class PlayAni : AbstractAnimationAction
     {
-        public PlayAni(Ai.Action action, GameObject npcGo) : base(action, npcGo)
+        public PlayAni(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
         public override void Start()

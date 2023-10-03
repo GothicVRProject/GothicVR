@@ -4,7 +4,7 @@ namespace GVR.Npc.Actions.AnimationActions
 {
     public class GoToWp : AbstractAnimationAction
     {
-        public GoToWp(Ai.Action action, GameObject npcGo) : base(action, npcGo)
+        public GoToWp(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
         public override void Start()

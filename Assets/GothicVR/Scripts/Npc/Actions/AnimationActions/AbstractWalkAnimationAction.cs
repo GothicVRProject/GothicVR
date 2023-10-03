@@ -18,7 +18,7 @@ namespace GVR.Npc.Actions.AnimationActions
         protected Vector3 movingLocation;
         protected WalkState walkState = WalkState.Initial;
         
-        protected AbstractWalkAnimationAction(Ai.Action action, GameObject npcGo) : base(action, npcGo)
+        protected AbstractWalkAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
         
         
@@ -77,12 +77,12 @@ namespace GVR.Npc.Actions.AnimationActions
         
         private string GetWalkModeAnimationString()
         {
-            switch (aiProps.walkMode)
+            switch (props.walkMode)
             {
                 case VmGothicEnums.WalkMode.Walk:
                     return "S_WALKL";
                 default:
-                    Debug.LogWarning($"Animation of type {aiProps.walkMode} not yet implemented.");
+                    Debug.LogWarning($"Animation of type {props.walkMode} not yet implemented.");
                     return "";
             }
         }

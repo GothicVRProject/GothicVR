@@ -2,7 +2,7 @@ using GVR.Vob.WayNet;
 
 namespace GVR.Properties
 {
-    public class SpotProperties : VobProperties
+    public class VobSpotProperties : VobProperties
     {
         public FreePoint fp;
     }

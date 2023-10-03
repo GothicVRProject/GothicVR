@@ -278,7 +278,7 @@ namespace GVR.Creator
             var routineComp = npc.GetComponent<Routine>();
             var firstRoutine = routineComp.routines.FirstOrDefault();
 
-            npc.GetComponent<Ai>().StartRoutine((uint)firstRoutine.action);
+            npc.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action);
         }
         
         public void DebugAddIdleAnimationToAllNpc()
@@ -312,7 +312,7 @@ namespace GVR.Creator
                 var routineComp = props.GetComponent<Routine>();
                 var firstRoutine = routineComp.routines.FirstOrDefault();
 
-                props.GetComponent<Ai>().StartRoutine((uint)firstRoutine.action);
+                props.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action);
             }
         }
 

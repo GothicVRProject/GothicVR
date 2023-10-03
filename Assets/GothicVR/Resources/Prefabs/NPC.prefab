@@ -180,10 +180,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcSound: {fileID: 1118880304771858134}
+  CurrentFreePoint:
+    Name: 
+    Position: {x: 0, y: 0, z: 0}
+    IsLocked: 0
   mdmName: 
   baseMdsName: 
   overlayMdsName: 
   perceptionTime: 0
+  walkMode: 0
+  bodyState: 0
+  prevStateStart: 0
+  stateStart: 0
+  stateLoop: 0
+  stateEnd: 0
+  isStateTimeActive: 0
+  stateTime: 0
+  currentLoopState: 0
+  hasItemEquipped: 0
+  currentItem: 0
+  usedItemSlot: 
+  itemAnimationState: -1
   isClonedFromAnother: 0
 --- !u!114 &3046509075852218844
 MonoBehaviour:
@@ -197,13 +214,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1843bf3f157d495d89f708f6cba8ed49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkMode: 0
-  hasItemEquipped: 0
-  currentItem: 0
-  usedItemSlot: 
-  itemAnimationState: -1
-  isMoving: 0
-  movingLocation: {x: 0, y: 0, z: 0}
+  properties: {fileID: 4778879049934742964}
 --- !u!114 &418615690
 MonoBehaviour:
   m_ObjectHideFlags: 0
