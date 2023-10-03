@@ -15,6 +15,7 @@ namespace GVR.Caches
         public enum PrefabType
         {
             VobItem,
+            VobSpot,
             VobInteractable,
             XRDeviceSimulator
         }
@@ -25,6 +26,8 @@ namespace GVR.Caches
             {
                 case PrefabType.VobItem:
                     return "Prefabs/Vobs/oCItem";
+                case PrefabType.VobSpot:
+                    return "Prefabs/Vobs/zCVobSpot";
                 case PrefabType.VobInteractable:
                     return "Prefabs/Vobs/Interactable";
                 case PrefabType.XRDeviceSimulator:

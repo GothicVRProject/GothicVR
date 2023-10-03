@@ -70,6 +70,9 @@ namespace GVR.Npc.Actions.AnimationActions
         public virtual void OnCollisionEnter(Collision collision)
         { }
         
+        public virtual void OnCollisionExit(Collision collision)
+        { }
+        
         /// <summary>
         /// Called every update cycle.
         /// Can be used to handle frequent things internally.

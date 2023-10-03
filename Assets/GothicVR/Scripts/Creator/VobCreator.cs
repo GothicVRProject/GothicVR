@@ -14,6 +14,7 @@ using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Properties;
 using GVR.Util;
+using GVR.Vob.WayNet;
 using JetBrains.Annotations;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
@@ -160,6 +161,10 @@ namespace GVR.Creator
             {
                 case PxVobType.PxVob_oCItem:
                     go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobItem);
+                    break;
+                case PxVobType.PxVob_zCVobSpot:
+                case PxVobType.PxVob_zCVobStartpoint:
+                    go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobSpot);
                     break;
                 case PxVobType.PxVob_oCMOB:
                 case PxVobType.PxVob_oCMobFire:
@@ -384,20 +389,9 @@ namespace GVR.Creator
         private GameObject CreateSpot(PxVobData vob)
         {
             // FIXME - change to a Prefab in the future.
-            var vobObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            vobObj.tag = ConstantsManager.I.SpotTag;
+            var vobObj = GetPrefab(vob);
 
-            if (FeatureFlags.I.EnableVobFPMesh)
-            {
-#if UNITY_EDITOR
-                if (FeatureFlags.I.EnableVobFPMeshEditorLabel)
-                {
-                    var iconContent = EditorGUIUtility.IconContent(editorLabelColor);
-                    EditorGUIUtility.SetIconForObject(vobObj, (Texture2D)iconContent.image);
-                }
-#endif
-            }
-            else
+            if (!FeatureFlags.I.EnableVobFPMesh)
             {
                 // Quick win: If we don't want to render the spots, we just remove the Renderer.
                 Destroy(vobObj.GetComponent<MeshRenderer>());
@@ -407,11 +401,13 @@ namespace GVR.Creator
             vobObj.name = fpName;
             vobObj.SetParent(parentGosTeleport[vob.type]);
 
-            GameData.I.FreePoints.Add(fpName, new()
+            var freePointData = new FreePoint()
             {
                 Name = fpName,
                 Position = vob.position.ToUnityVector()
-            });
+            };
+            vobObj.GetComponent<SpotProperties>().fp = freePointData;
+            GameData.I.FreePoints.Add(fpName, freePointData);
             
             SetPosAndRot(vobObj, vob.position, vob.rotation);
             return vobObj;

@@ -32,8 +32,6 @@ namespace GVR.Debugging
         [Header("__________VOBs__________")]
         [Tooltip("Only for Debug purposes. It'll not change functionality itself.")]
         public bool EnableVobFPMesh;
-        [Tooltip("For Debug purposes within Scene view in Editor only. Might imply some performance issues in Editor mode.")]
-        public bool EnableVobFPMeshEditorLabel;
         public bool EnableDecals;
         
         [Header("__________NPCs__________")]

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GVR.Caches;
+using GVR.Extensions;
 using GVR.Manager;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
@@ -132,6 +134,21 @@ namespace GVR.Npc
         private void OnCollisionEnter(Collision collision)
         {
             currentAction?.OnCollisionEnter(collision);
+        }
+
+        /// <summary>
+        /// Sometimes a currentAnimation needs this information. Sometimes it's just for a FreePoint to clear up.
+        /// </summary>
+        private void OnCollisionExit(Collision collision)
+        {
+            currentAction?.OnCollisionExit(collision);
+
+            // If NPC walks out of a FreePoint, it gets freed.
+            collision.contacts
+                .Where(i => i.otherCollider.name.StartsWithIgnoreCase("FP_"))
+                .Select(i => i.otherCollider.gameObject.GetComponent<SpotProperties>())
+                .ToList()
+                .ForEach(i => i.fp.IsLocked = false);
         }
 
         public static void ExtAiWait(IntPtr npcPtr, float seconds)

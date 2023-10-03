@@ -33,9 +33,9 @@ namespace GVR.Npc.Actions.AnimationActions
             if (expectedGo == null)
                 return;
 
-            // FIXME - We also need to set a "blocked"/"locked" state on the FP itself, so that other NPCs ignore it for now.
             props.CurrentFreePoint = fp;
-            
+            fp.IsLocked = true;
+
             var animationComp = npcGo.GetComponent<Animation>();
             animationComp.Stop();
 
