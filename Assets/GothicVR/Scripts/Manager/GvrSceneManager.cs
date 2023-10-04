@@ -95,7 +95,7 @@ namespace GVR.Manager
             }
             
             newWorldName = worldName;
-            MusicCreator.I.SetMusic("SYS_LOADING");
+            MusicManager.I.SetMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
             StartWorldLoading.Invoke();

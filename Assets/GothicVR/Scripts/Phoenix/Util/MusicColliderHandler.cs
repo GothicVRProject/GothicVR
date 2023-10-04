@@ -20,7 +20,7 @@ namespace GVR.Phoenix.Util
 
             musicZones.Add(gameObject.name);
 
-            MusicCreator.I.SetMusic(gameObject.name, MusicCreator.Tags.Std);
+            MusicManager.I.SetMusic(gameObject.name, MusicManager.Tags.Std);
         }
 
         private void OnTriggerExit(Collider other)
@@ -38,7 +38,7 @@ namespace GVR.Phoenix.Util
                 return;
 
             // Play default music.
-            MusicCreator.I.SetMusic("MUSICZONE_DEF", MusicCreator.Tags.Std);
+            MusicManager.I.SetMusic("MUSICZONE_DEF", MusicManager.Tags.Std);
         }
     }
 }

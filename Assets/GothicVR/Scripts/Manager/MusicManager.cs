@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using DMCs.Interface;
 using GVR.Caches;
+using GVR.Creator;
 using GVR.Debugging;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
@@ -10,9 +11,9 @@ using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
 
-namespace GVR.Creator
+namespace GVR.Manager
 {
-    public class MusicCreator : SingletonBehaviour<MusicCreator>
+    public class MusicManager : SingletonBehaviour<MusicManager>
     {
         private IntPtr mixer;
         private IntPtr music;
