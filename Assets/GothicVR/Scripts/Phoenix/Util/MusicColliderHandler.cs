@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GVR.Creator;
+using GVR.Debugging;
 using GVR.Manager;
 using UnityEngine;
 
@@ -9,8 +10,11 @@ namespace GVR.Phoenix.Util
     {
         private static List<string> musicZones = new();
 
-        void OnTriggerEnter(Collider other)
+        private void OnTriggerEnter(Collider other)
         {
+            if (!FeatureFlags.I.EnableMusic)
+                return;
+
             if (!other.CompareTag(ConstantsManager.PlayerTag))
                 return;
 
@@ -19,16 +23,21 @@ namespace GVR.Phoenix.Util
             MusicCreator.I.SetMusic(gameObject.name, MusicCreator.Tags.Std);
         }
 
-        void OnTriggerExit(Collider other)
+        private void OnTriggerExit(Collider other)
         {
-            if (!other.CompareTag("Player"))
+            if (!FeatureFlags.I.EnableMusic)
+                return;
+            
+            if (!other.CompareTag(ConstantsManager.PlayerTag))
                 return;
 
             musicZones.Remove(gameObject.name);
 
+            // Other music will play now.
             if (musicZones.Count > 0)
                 return;
 
+            // Play default music.
             MusicCreator.I.SetMusic("MUSICZONE_DEF", MusicCreator.Tags.Std);
         }
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GothicVR.Vob;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace GVR.Caches
         public enum PrefabType
         {
             VobItem,
+            VobMusic,
             XRDeviceSimulator
         }
 
@@ -24,6 +26,8 @@ namespace GVR.Caches
             {
                 case PrefabType.VobItem:
                     return "Prefabs/Vobs/oCItem";
+                case PrefabType.VobMusic:
+                    return "Prefabs/Vobs/oCZoneMusic";
                 case PrefabType.XRDeviceSimulator:
                     return "Prefabs/XR Device Simulator";
                 default:

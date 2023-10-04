@@ -61,25 +61,6 @@ namespace GVR.Creator
             return soundObject;
         }
 
-        public void Create(PxVobZoneMusicData vobMusic, GameObject parent = null)
-        {
-            // FIXME - Move to VobCreator and add it to Prefab
-            var soundObject = new GameObject(vobMusic.vobName);
-            soundObject.SetParent(parent);
-
-            var soundObjectCollider = soundObject.AddComponent<BoxCollider>();
-
-            var min = vobMusic.boundingBox.min.ToUnityVector();
-            var max = vobMusic.boundingBox.max.ToUnityVector();
-
-            soundObject.transform.position = (min + max) / 2f; // Center of bounding box
-            soundObject.transform.localScale = (max - min);
-            soundObjectCollider.isTrigger = true;
-
-            if (FeatureFlags.I.EnableMusic)
-                soundObject.AddComponent<MusicCollisionHandler>();
-        }
-
         /// <summary>
         /// Creating AudioSource from PxVobSoundDaytimeData is very similar to PxVobSoundData one.
         /// There are only two differences:

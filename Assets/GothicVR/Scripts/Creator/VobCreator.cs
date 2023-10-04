@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GothicVR.Vob;
 using GVR.Caches;
@@ -11,7 +12,6 @@ using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
-using GVR.Vob.WayNet;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
@@ -19,7 +19,6 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
 using Vector3 = System.Numerics.Vector3;
-using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -37,7 +36,12 @@ namespace GVR.Creator
 
         private Dictionary<PxVobType, GameObject> parentGosTeleport = new();
         private Dictionary<PxVobType, GameObject> parentGosNonTeleport = new();
-        private PxVobType[] nonTeleportTypes = { PxVobType.PxVob_oCItem , PxVobType.PxVob_oCMobLadder };
+        private readonly PxVobType[] nonTeleportTypes =
+        {
+            PxVobType.PxVob_oCItem ,
+            PxVobType.PxVob_oCMobLadder,
+            PxVobType.PxVob_oCZoneMusic
+        };
         
         private int totalVObs;
 
@@ -330,7 +334,17 @@ namespace GVR.Creator
 
         private void CreateZoneMusic(PxVobZoneMusicData vob)
         {
-            soundCreator.Create(vob, parentGosTeleport[vob.type]);
+            var go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobMusic);
+            go.SetParent(parentGosNonTeleport[vob.type], true, true);
+            go.name = vob.vobName;
+            
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+
+            go.transform.position = (min + max) / 2f;
+            go.transform.localScale = (max - min);
+
+            go.GetComponent<VobMusicProperties>().musicData = vob;
         }
 
         private void CreateTriggerChangeLevel(PxVobTriggerChangeLevelData vob)
