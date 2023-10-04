@@ -344,7 +344,7 @@ namespace GVR.Creator
             go.transform.position = (min + max) / 2f;
             go.transform.localScale = (max - min);
 
-            go.GetComponent<VobMusicProperties>().musicData = vob;
+            go.GetComponent<VobMusicProperties>().SetMusicData(vob);
         }
 
         private void CreateTriggerChangeLevel(PxVobTriggerChangeLevelData vob)
