@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using DMCs.Interface;
+using GVR.Caches;
 using GVR.Debugging;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
@@ -214,9 +215,9 @@ namespace GVR.Creator
             if ((tags & Tags.Thr) != 0)
                 musicTag = "THR";
 
-            string name = result + "_" + (isDay ? "DAY" : "NGT") + "_" + musicTag;
+            var musicName = $"{result}_{(isDay ? "DAY" : "NGT")}_{musicTag}";
 
-            var theme = PxVm.InitializeMusic(GameData.I.VmMusicPtr, name);
+            var theme = AssetCache.I.TryGetMusic(musicName);
 
             reloadTheme = pendingTheme.file != theme.file;
             pendingTheme = theme;
@@ -224,18 +225,18 @@ namespace GVR.Creator
             hasPending = true;
 
             if (FeatureFlags.I.ShowMusicLogs)
-                Debug.Log("Music: theme - " + name + "from file " + theme.file);
+                Debug.Log($"Playing music: theme >{musicName}< from file >{theme.file}<");
         }
 
-        public void SetMusic(string name)
+        public void SetMusic(string musicName)
         {
-            var theme = PxVm.InitializeMusic(GameData.I.VmMusicPtr, name);
+            var theme = AssetCache.I.TryGetMusic(musicName);
             reloadTheme = true;
             pendingTheme = theme;
             hasPending = true;
 
             if (FeatureFlags.I.ShowMusicLogs)
-                Debug.Log("Music: theme - " + name + "from file " + theme.file);
+                Debug.Log($"Playing music: theme >{musicName}< from file >{theme.file}<");
         }
 
         private void StopMusic()
