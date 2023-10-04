@@ -30,8 +30,8 @@ namespace GVR.Creator
         private Tags pendingTags = Tags.Day;
         private Tags currentTags = Tags.Day;
 
-        private bool hasPending = false;
-        private bool reloadTheme = false;
+        private bool hasPending;
+        private bool reloadTheme;
 
         private PxVmMusicData pendingTheme;
 
@@ -49,7 +49,7 @@ namespace GVR.Creator
         // also affects the delay of the music, it doesn't sound so harsh when switching
         private int bufferSizeMultiplier = 16;
 
-        void Start()
+        private void Start()
         {
             if (!FeatureFlags.I.EnableMusic)
                 return;
@@ -60,7 +60,7 @@ namespace GVR.Creator
         /// <summary>
         /// Called once every 0.20 seconds to update the music once the timer is bigger than the updateInterval
         /// </summary>
-        void FixedUpdate()
+        private void FixedUpdate()
         {
             if (!FeatureFlags.I.EnableMusic)
                 return;
@@ -132,9 +132,7 @@ namespace GVR.Creator
         private void UpdateMusic()
         {
             if (!hasPending)
-            {
                 return;
-            }
 
             hasPending = false;
             PxVmMusicData theme = pendingTheme;
@@ -143,9 +141,7 @@ namespace GVR.Creator
             DMMixer.DMusicSetMusicVolume(mixer, pendingTheme.vol);
 
             if (!reloadTheme)
-            {
                 return;
-            }
 
             var pattern = DMDirectMusic.DMusicLoadFile(directmusic, theme.file, theme.file.Length);
 
@@ -228,12 +224,10 @@ namespace GVR.Creator
             hasPending = true;
 
             if (FeatureFlags.I.ShowMusicLogs)
-            {
                 Debug.Log("Music: theme - " + name + "from file " + theme.file);
-            }
         }
 
-        public void setMusic(string name)
+        public void SetMusic(string name)
         {
             var theme = PxVm.InitializeMusic(GameData.I.VmMusicPtr, name);
             reloadTheme = true;
@@ -241,9 +235,7 @@ namespace GVR.Creator
             hasPending = true;
 
             if (FeatureFlags.I.ShowMusicLogs)
-            {
                 Debug.Log("Music: theme - " + name + "from file " + theme.file);
-            }
         }
 
         private void StopMusic()
@@ -264,7 +256,7 @@ namespace GVR.Creator
             reloadTheme = true;
         }
 
-        public void setEnabled(bool enable)
+        public void SetEnabled(bool enable)
         {
             var isPlaying = musicSource.isPlaying;
             if (isPlaying == enable)

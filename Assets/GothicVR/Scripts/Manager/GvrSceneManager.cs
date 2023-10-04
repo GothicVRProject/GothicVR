@@ -95,7 +95,7 @@ namespace GVR.Manager
             }
             
             newWorldName = worldName;
-            MusicCreator.I.setMusic("SYS_LOADING");
+            MusicCreator.I.SetMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
             StartWorldLoading.Invoke();
@@ -217,7 +217,7 @@ namespace GVR.Manager
 
         private void SetSpawnPoint(Scene worldScene)
         {
-            var spots = GameObject.FindGameObjectsWithTag(ConstantsManager.I.SpotTag);
+            var spots = GameObject.FindGameObjectsWithTag(ConstantsManager.SpotTag);
             for (int i = 0; i < spots.Length; i++)
             {
                 if (spots[i].name == startVobAfterLoading)

@@ -139,8 +139,8 @@ namespace GVR.Bootstrap
                 return;
             var music = MusicCreator.I;
             music.Create();
-            music.setEnabled(true);
-            music.setMusic("SYS_MENU");
+            music.SetEnabled(true);
+            music.SetMusic("SYS_MENU");
             Debug.Log("Loading music");
         }
 

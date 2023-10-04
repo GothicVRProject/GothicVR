@@ -61,17 +61,18 @@ namespace GVR.Creator
             return soundObject;
         }
 
-        public void Create(PxVobZoneMusicData vobSound, GameObject parent = null)
+        public void Create(PxVobZoneMusicData vobMusic, GameObject parent = null)
         {
-            var soundObject = new GameObject(vobSound.vobName);
+            // FIXME - Move to VobCreator and add it to Prefab
+            var soundObject = new GameObject(vobMusic.vobName);
             soundObject.SetParent(parent);
 
             var soundObjectCollider = soundObject.AddComponent<BoxCollider>();
 
-            var min = vobSound.boundingBox.min.ToUnityVector();
-            var max = vobSound.boundingBox.max.ToUnityVector();
+            var min = vobMusic.boundingBox.min.ToUnityVector();
+            var max = vobMusic.boundingBox.max.ToUnityVector();
 
-            soundObject.transform.position = (min + max) / 2f;
+            soundObject.transform.position = (min + max) / 2f; // Center of bounding box
             soundObject.transform.localScale = (max - min);
             soundObjectCollider.isTrigger = true;
 
