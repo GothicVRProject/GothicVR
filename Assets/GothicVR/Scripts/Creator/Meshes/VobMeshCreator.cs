@@ -26,7 +26,7 @@ namespace GVR.Creator.Meshes
             // z - value is close to what we see in Gothic spacer.
             decalProj.size = new(decalData.dimension.X * 2 / 100, decalData.dimension.Y * 2 / 100, 0.5f);
             decalProjectorGo.SetParent(parent);
-            SetPosAndRot(decalProjectorGo, vob.position.ToUnityVector(), vob.rotation!.Value);
+            SetPosAndRot(decalProjectorGo, vob.position.ToUnityVector(), vob.rotation);
 
             decalProj.pivot = Vector3.zero;
             decalProj.fadeFactor = decalOpacity;

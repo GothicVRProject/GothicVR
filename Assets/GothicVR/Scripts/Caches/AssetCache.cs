@@ -205,7 +205,7 @@ namespace GVR.Caches
         /// </summary>
         public PxVmItemData TryGetItemData(uint instanceId)
         {
-            var symbol = PxVm.GetSymbol(GameData.I.VmGothicPtr, instanceId);
+            var symbol = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, instanceId);
 
             if (symbol == null)
                 return null;
