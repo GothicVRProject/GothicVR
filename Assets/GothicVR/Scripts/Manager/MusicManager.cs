@@ -237,7 +237,7 @@ namespace GVR.Manager
             hasPending = true;
 
             if (FeatureFlags.I.ShowMusicLogs)
-                Debug.Log($"Playing music: theme >{musicName}< from file >{theme.file}<");
+                Debug.Log($"[Music] Playing music: theme >{musicName}< from file >{theme.file}<");
         }
 
         private void StopMusic()

@@ -60,9 +60,8 @@ namespace GVR.Manager
         public void AddAudioSource(GameObject gameObj, AudioSource audioSource)
         {
             if (audioSources.ContainsKey(gameObj))
-            {
                 return;
-            }
+
             audioSources.Add(gameObj, audioSource);
 
             // Add the audio source to the appropriate grid cell
@@ -73,6 +72,10 @@ namespace GVR.Manager
                 gridCells.Add(gridCell, audioSourcesInCell);
             }
             audioSourcesInCell.Add(gameObj);
+            
+            // Deactivate the GameObject to prevent audio from being played and CPU usage.
+            // This manager will handle reactivation next frame.
+            gameObj.SetActive(false);
         }
 
         public void SetAudible(GameObject gameObj, bool isAudible)

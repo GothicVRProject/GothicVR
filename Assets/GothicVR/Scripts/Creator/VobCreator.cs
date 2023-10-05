@@ -12,9 +12,11 @@ using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Util;
+using PxCs.Data.Sound;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
+using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
@@ -29,7 +31,6 @@ namespace GVR.Creator
 {
     public class VobCreator : SingletonBehaviour<VobCreator>
     {
-        private SoundCreator soundCreator;
         private AssetCache assetCache;
 
         private const string editorLabelColor = "sv_label4";
@@ -40,14 +41,15 @@ namespace GVR.Creator
         {
             PxVobType.PxVob_oCItem ,
             PxVobType.PxVob_oCMobLadder,
-            PxVobType.PxVob_oCZoneMusic
+            PxVobType.PxVob_oCZoneMusic,
+            PxVobType.PxVob_zCVobSound,
+            PxVobType.PxVob_zCVobSoundDaytime
         };
         
         private int totalVObs;
 
         private void Start()
         {
-            soundCreator = SoundCreator.I;
             assetCache = AssetCache.I;
         }
 
@@ -318,20 +320,98 @@ namespace GVR.Creator
             if (!FeatureFlags.I.EnableSounds)
                 return;
 
-            var vobObj = soundCreator.Create(vob, parentGosTeleport[vob.type]);
-            SetPosAndRot(vobObj, vob.position, vob.rotation);
+            var go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobSoundDaytime);
+            go.name = $"{vob.soundName}";
+            go.SetParent(parentGosNonTeleport[vob.type]);
+            SetPosAndRot(go, vob.position, vob.rotation);
+            
+            var source = go.GetComponent<AudioSource>();
+
+            PrepareAudioSource(source, vob);
+            source.clip = GetSoundClip(vob.soundName);
+            AudioSourceManager.I.AddAudioSource(go, source);
         }
 
-        // FIXME - add specific daytime logic!
+        /// <summary>
+        /// FIXME - add specific daytime logic!
+        /// Creating AudioSource from PxVobSoundDaytimeData is very similar to PxVobSoundData one.
+        /// There are only two differences:
+        ///     1. This one has two AudioSources
+        ///     2. The sources will be toggled during gameplay when start/end time is reached.
+        /// </summary>
         private void CreateSoundDaytime(PxVobSoundDaytimeData vob)
         {
             if (!FeatureFlags.I.EnableSounds)
                 return;
 
-            var vobObj = soundCreator.Create(vob, parentGosTeleport[vob.type]);
-            SetPosAndRot(vobObj, vob.position, vob.rotation);
+            var go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobSoundDaytime);
+            go.name = $"{vob.soundName}-{vob.soundName2}";
+            go.SetParent(parentGosNonTeleport[vob.type]);
+            SetPosAndRot(go, vob.position, vob.rotation);
+            
+            var sources = go.GetComponents<AudioSource>();
+
+            PrepareAudioSource(sources[0], vob);
+            sources[0].clip = GetSoundClip(vob.soundName);
+            AudioSourceManager.I.AddAudioSource(go, sources[0]);
+
+            PrepareAudioSource(sources[1], vob);
+            sources[1].clip = GetSoundClip(vob.soundName2);
+            AudioSourceManager.I.AddAudioSource(go, sources[1]);
+            
+            go.GetComponent<SoundDaytimeHandler>()
+                .SetAudioTimeSwitch(vob.startTime, vob.endTime, sources[0], sources[1]);
         }
 
+        private void PrepareAudioSource(AudioSource source, PxVobSoundData soundData)
+        {
+            source.maxDistance = soundData.radius / 100; // Gothic's values are in cm, Unity's in m.
+            source.volume = soundData.volume / 100; // Gothic's volume is 0...100, Unity's is 0...1. 
+
+            source.loop = soundData.mode == PxVobSoundMode.PxVobSoundModeLoop;
+            
+            // FIXME - Random play isn't implemented yet.
+        }
+
+        private AudioClip GetSoundClip(string soundName)
+        {
+            PxSoundData<float> wavFile;
+
+            // FIXME - move to EqualsIgnoreCase()
+            if (soundName.ToLower() == "nosound.wav")
+            {
+                //instead of decoding nosound.wav which might be decoded incorrectly, just return null
+                return null;
+            }
+            
+            // Bugfix - Normally the data is to get C_SFX_DEF entries from VM. But sometimes there might be the real .wav file stored.
+            // FIXME - Move to EndsWithIgnoreCase()
+            if (soundName.ToLower().EndsWith(".wav"))
+            {
+                wavFile = assetCache.TryGetSound(soundName);
+            }
+            else
+            {
+                var sfxData = assetCache.TryGetSfxData(soundName);
+
+                if (sfxData == null)
+                {
+                    Debug.LogError($"No sfx data returned for {soundName}");
+                    return null;
+                }
+
+                wavFile = assetCache.TryGetSound(sfxData.file);
+            }
+
+            if (wavFile == null)
+            {
+                Debug.LogError($"No .wav data returned for {soundName}");
+                return null;
+            }
+            
+            return SoundConverter.ToAudioClip(wavFile.sound);
+        }
+        
         private void CreateZoneMusic(PxVobZoneMusicData vob)
         {
             var go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobMusic);
@@ -473,7 +553,7 @@ namespace GVR.Creator
             Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");
             return null;
         }
-
+        
         private void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
         {
             SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityMatrix().rotation);

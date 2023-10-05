@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GothicVR.Vob
 {
-    public class SoundDaytime : MonoBehaviour
+    public class SoundDaytimeHandler : MonoBehaviour
     {
         // Cache for performance reasons.
         private AudioSource audioSource1;
