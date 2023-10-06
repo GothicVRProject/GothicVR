@@ -40,7 +40,8 @@ namespace GothicVR.Vob
                 return;
             }
 
-            StartCoroutine();
+            if (gameObject.activeSelf)
+                StartCoroutine();
         }
 
         private void StartCoroutine()
