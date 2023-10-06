@@ -320,7 +320,7 @@ namespace GVR.Creator
             if (!FeatureFlags.I.EnableSounds)
                 return;
 
-            var go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobSoundDaytime);
+            var go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobSound);
             go.name = $"{vob.soundName}";
             go.SetParent(parentGosNonTeleport[vob.type]);
             SetPosAndRot(go, vob.position, vob.rotation);
@@ -330,6 +330,9 @@ namespace GVR.Creator
             PrepareAudioSource(source, vob);
             source.clip = GetSoundClip(vob.soundName);
             AudioSourceManager.I.AddAudioSource(go, source);
+
+            go.GetComponent<VobSoundProperties>().soundData = vob;
+            go.GetComponent<SoundHandler>().PrepareSoundHandling();
         }
 
         /// <summary>
@@ -359,6 +362,7 @@ namespace GVR.Creator
             sources[1].clip = GetSoundClip(vob.soundName2);
             AudioSourceManager.I.AddAudioSource(go, sources[1]);
             
+            go.GetComponent<VobSoundDaytimeProperties>().soundDaytimeData = vob;
             go.GetComponent<SoundDaytimeHandler>()
                 .SetAudioTimeSwitch(vob.startTime, vob.endTime, sources[0], sources[1]);
         }
@@ -369,8 +373,8 @@ namespace GVR.Creator
             source.volume = soundData.volume / 100; // Gothic's volume is 0...100, Unity's is 0...1. 
 
             source.loop = soundData.mode == PxVobSoundMode.PxVobSoundModeLoop;
-            
-            // FIXME - Random play isn't implemented yet.
+            // If a sound is looping, we play it continuously. If not, we will handle it within a Component.
+            source.playOnAwake = source.loop;
         }
 
         private AudioClip GetSoundClip(string soundName)
