@@ -218,6 +218,21 @@ namespace GVR.Manager
         private void SetSpawnPoint(Scene worldScene)
         {
             var spots = GameObject.FindGameObjectsWithTag(ConstantsManager.SpotTag);
+
+            // Spawn at specifically named point.
+            if (!string.IsNullOrWhiteSpace(FeatureFlags.I.spawnAtSpecificFreePoint))
+            {
+                // FIXME - Move to EqualsIgnoreCase() in the future
+                var fp = spots.FirstOrDefault(i =>
+                    i.name.Equals(FeatureFlags.I.spawnAtSpecificFreePoint, StringComparison.OrdinalIgnoreCase));
+
+                if (fp != null)
+                {
+                    startPoint = fp;
+                    return;
+                }
+            }
+            
             for (int i = 0; i < spots.Length; i++)
             {
                 if (spots[i].name == startVobAfterLoading)

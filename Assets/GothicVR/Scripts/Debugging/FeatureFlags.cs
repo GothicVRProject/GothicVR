@@ -21,6 +21,8 @@ namespace GVR.Debugging
         public bool CreateWaypoints;
         public bool CreateWaypointEdges;
         public bool SkipMainMenu;
+        [Tooltip("Leave blank if you want to spawn normal.")]
+        public string spawnAtSpecificFreePoint;
 
         [Header("__________DayTime__________")]
         public bool EnableDayTime;
