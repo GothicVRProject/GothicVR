@@ -8,6 +8,7 @@ using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Demo;
 using GVR.Manager;
+using GVR.Manager.Culling;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
@@ -16,7 +17,6 @@ using PxCs.Data.Sound;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
-using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using static PxCs.Interface.PxWorld;
@@ -70,6 +70,7 @@ namespace GVR.Creator
             if (!FeatureFlags.I.CreateVobs)
                 return;
 
+            var cullingSoundObjects = new List<GameObject>();
             totalVObs = GetTotalVobCount(world.vobs);
 
             var vobRootTeleport = new GameObject("Vobs");
@@ -98,11 +99,17 @@ namespace GVR.Creator
                         CreateMobContainer((PxVobMobContainerData)vob);
                         break;
                     case PxVobType.PxVob_zCVobSound:
-                        CreateSound((PxVobSoundData)vob);
+                    {
+                        var obj = CreateSound((PxVobSoundData)vob);
+                        cullingSoundObjects.Add(obj);
                         break;
+                    }
                     case PxVobType.PxVob_zCVobSoundDaytime:
-                        CreateSoundDaytime((PxVobSoundDaytimeData)vob);
+                    {
+                        var obj = CreateSoundDaytime((PxVobSoundDaytimeData)vob);
+                        cullingSoundObjects.Add(obj);
                         break;
+                    }
                     case PxVobType.PxVob_oCZoneMusic:
                         CreateZoneMusic((PxVobZoneMusicData)vob);
                         break;
@@ -147,6 +154,8 @@ namespace GVR.Creator
                 if (++count % vobsPerFrame == 0)
                     await Task.Yield(); // Wait for the next frame
             }
+            
+            VobSoundCullingManager.I.PrepareSoundCulling(cullingSoundObjects);
         }
 
         private void AddVobsToList(PxVobData[] vobs, List<PxVobData> allVobs)
@@ -315,12 +324,12 @@ namespace GVR.Creator
         }
 
         // FIXME - change values for AudioClip based on Sfx and vob value (value overloads itself)
-        private void CreateSound(PxVobSoundData vob)
+        private GameObject CreateSound(PxVobSoundData vob)
         {
             if (!FeatureFlags.I.EnableSounds)
-                return;
+                return null;
 
-            var go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobSoundDaytime);
+            var go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobSound);
             go.name = $"{vob.soundName}";
             go.SetParent(parentGosNonTeleport[vob.type]);
             SetPosAndRot(go, vob.position, vob.rotation);
@@ -329,7 +338,11 @@ namespace GVR.Creator
 
             PrepareAudioSource(source, vob);
             source.clip = GetSoundClip(vob.soundName);
-            AudioSourceManager.I.AddAudioSource(go, source);
+
+            go.GetComponent<VobSoundProperties>().soundData = vob;
+            go.GetComponent<SoundHandler>().PrepareSoundHandling();
+
+            return go;
         }
 
         /// <summary>
@@ -339,10 +352,10 @@ namespace GVR.Creator
         ///     1. This one has two AudioSources
         ///     2. The sources will be toggled during gameplay when start/end time is reached.
         /// </summary>
-        private void CreateSoundDaytime(PxVobSoundDaytimeData vob)
+        private GameObject CreateSoundDaytime(PxVobSoundDaytimeData vob)
         {
             if (!FeatureFlags.I.EnableSounds)
-                return;
+                return null;
 
             var go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobSoundDaytime);
             go.name = $"{vob.soundName}-{vob.soundName2}";
@@ -353,24 +366,24 @@ namespace GVR.Creator
 
             PrepareAudioSource(sources[0], vob);
             sources[0].clip = GetSoundClip(vob.soundName);
-            AudioSourceManager.I.AddAudioSource(go, sources[0]);
 
             PrepareAudioSource(sources[1], vob);
             sources[1].clip = GetSoundClip(vob.soundName2);
-            AudioSourceManager.I.AddAudioSource(go, sources[1]);
             
-            go.GetComponent<SoundDaytimeHandler>()
-                .SetAudioTimeSwitch(vob.startTime, vob.endTime, sources[0], sources[1]);
+            go.GetComponent<VobSoundDaytimeProperties>().soundDaytimeData = vob;
+            go.GetComponent<SoundDaytimeHandler>().PrepareSoundHandling();
+
+            return go;
         }
 
         private void PrepareAudioSource(AudioSource source, PxVobSoundData soundData)
         {
-            source.maxDistance = soundData.radius / 100; // Gothic's values are in cm, Unity's in m.
-            source.volume = soundData.volume / 100; // Gothic's volume is 0...100, Unity's is 0...1. 
+            source.maxDistance = soundData.radius / 100f; // Gothic's values are in cm, Unity's in m.
+            source.volume = soundData.volume / 100f; // Gothic's volume is 0...100, Unity's is 0...1. 
 
-            source.loop = soundData.mode == PxVobSoundMode.PxVobSoundModeLoop;
-            
-            // FIXME - Random play isn't implemented yet.
+            source.loop = (soundData.mode == PxVobSoundMode.PxVobSoundModeLoop);
+            // If a sound is looping, we play it continuously. If not, we will handle it within a Component.
+            source.playOnAwake = source.loop;
         }
 
         private AudioClip GetSoundClip(string soundName)

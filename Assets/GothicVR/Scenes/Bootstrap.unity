@@ -320,6 +320,7 @@ MonoBehaviour:
   CreateWaypoints: 1
   CreateWaypointEdges: 0
   SkipMainMenu: 0
+  spawnAtSpecificFreePoint: 
   EnableDayTime: 1
   SunMovementPerformanceValue: 0
   StartHour: 17
@@ -338,6 +339,7 @@ MonoBehaviour:
   ShowMusicLogs: 0
   EnableSounds: 1
   EnableMusic: 1
+  enableSoundCulling: 1
 --- !u!1 &379812652
 GameObject:
   m_ObjectHideFlags: 0
@@ -936,7 +938,6 @@ GameObject:
   - component: {fileID: 1896514214}
   - component: {fileID: 1896514213}
   - component: {fileID: 1896514215}
-  - component: {fileID: 1896514216}
   - component: {fileID: 1896514224}
   - component: {fileID: 1896514217}
   - component: {fileID: 1896514218}
@@ -944,6 +945,7 @@ GameObject:
   - component: {fileID: 1896514220}
   - component: {fileID: 1896514221}
   - component: {fileID: 1896514222}
+  - component: {fileID: 1896514225}
   - component: {fileID: 1896514223}
   m_Layer: 0
   m_Name: Manager
@@ -992,18 +994,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 1300502570}
---- !u!114 &1896514216
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1896514212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6e066dc57a010048b3bf267b7ba35cf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1896514217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1122,6 +1112,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a2b6d5503112494f89b3a4c775c37d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2762f7e8908f4fd7aa4f957deabdb262, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807

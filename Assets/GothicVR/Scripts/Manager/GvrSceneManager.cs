@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.GothicVR.Scripts.Manager;
+using GVR.Manager.Culling;
 using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
@@ -141,6 +142,10 @@ namespace GVR.Manager
             {
                 SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName(ConstantsManager.SceneBootstrap));
                 SceneManager.UnloadSceneAsync(generalScene);
+                
+                // FIXME - move to event once vobCulling branch is merged
+                VobSoundCullingManager.I.PreWorldCreate();
+                
                 generalSceneLoaded = false;
             }
 
@@ -180,14 +185,14 @@ namespace GVR.Manager
                 case ConstantsManager.SceneLoading:
                     LoadingManager.I.SetBarFromScene(scene);
                     LoadingManager.I.SetMaterialForLoading(scene);
-                    AudioSourceManager.I.ResetDictionaries();
                     break;
                 case ConstantsManager.SceneGeneral:
-                    AudioSourceManager.I.SetAudioListener(Camera.main!.GetComponent<AudioListener>());
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
                     WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
                     TeleportPlayerToSpot();
                     
+                    // FIXME - Move to UnityEvent once existing
+                    VobSoundCullingManager.I.PostWorldCreate();
                     // FIXME - Move to UnityEvent once existing
                     XRDeviceSimulatorManager.I.PrepareForScene(scene);
                     break;
@@ -218,6 +223,21 @@ namespace GVR.Manager
         private void SetSpawnPoint(Scene worldScene)
         {
             var spots = GameObject.FindGameObjectsWithTag(ConstantsManager.SpotTag);
+
+            // Spawn at specifically named point.
+            if (!string.IsNullOrWhiteSpace(FeatureFlags.I.spawnAtSpecificFreePoint))
+            {
+                // FIXME - Move to EqualsIgnoreCase() in the future
+                var fp = spots.FirstOrDefault(i =>
+                    i.name.Equals(FeatureFlags.I.spawnAtSpecificFreePoint, StringComparison.OrdinalIgnoreCase));
+
+                if (fp != null)
+                {
+                    startPoint = fp;
+                    return;
+                }
+            }
+            
             for (int i = 0; i < spots.Length; i++)
             {
                 if (spots[i].name == startVobAfterLoading)
