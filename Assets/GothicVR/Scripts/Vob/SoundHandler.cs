@@ -23,7 +23,7 @@ namespace GothicVR.Vob
 
         private void OnDisable()
         {
-            // Coroutines are stopped when gameobject gets disabled. But we need to restart during OnEnable() manually.
+            // Coroutines are stopped when GameObject gets disabled. But we need to restart during OnEnable() manually.
             isCoroutineRunning = false;
         }
 

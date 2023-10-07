@@ -371,8 +371,7 @@ namespace GVR.Creator
             sources[1].clip = GetSoundClip(vob.soundName2);
             
             go.GetComponent<VobSoundDaytimeProperties>().soundDaytimeData = vob;
-            go.GetComponent<SoundDaytimeHandler>()
-                .SetAudioTimeSwitch(vob.startTime, vob.endTime, sources[0], sources[1]);
+            go.GetComponent<SoundDaytimeHandler>().PrepareSoundHandling();
 
             return go;
         }
