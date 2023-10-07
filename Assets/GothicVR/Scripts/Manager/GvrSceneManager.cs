@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.GothicVR.Scripts.Manager;
+using GVR.Manager.Culling;
 using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
@@ -141,6 +142,10 @@ namespace GVR.Manager
             {
                 SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName(ConstantsManager.SceneBootstrap));
                 SceneManager.UnloadSceneAsync(generalScene);
+                
+                // FIXME - move to event once vobCulling branch is merged
+                VobSoundCullingManager.I.PreWorldCreate();
+                
                 generalSceneLoaded = false;
             }
 
@@ -188,6 +193,8 @@ namespace GVR.Manager
                     WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
                     TeleportPlayerToSpot();
                     
+                    // FIXME - Move to UnityEvent once existing
+                    VobSoundCullingManager.I.PostWorldCreate();
                     // FIXME - Move to UnityEvent once existing
                     XRDeviceSimulatorManager.I.PrepareForScene(scene);
                     break;

@@ -53,6 +53,6 @@ namespace GVR.Debugging
         [Header("__________Audio__________")]
         public bool EnableSounds;
         public bool EnableMusic;
-
+        public bool enableSoundCulling;
     }
 }
