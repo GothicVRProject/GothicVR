@@ -22,6 +22,8 @@ namespace GothicVR.Vob
         
         private void OnEnable()
         {
+            HourEventCallback(GameTime.I.GetCurrentDateTime());
+
             StartCoroutine();
             GameTime.I.hourChangeCallback.AddListener(HourEventCallback);
         }
@@ -52,7 +54,7 @@ namespace GothicVR.Vob
             audioSource1.Stop();
             audioSource2.Stop();
             
-            // Now set active sound initially
+            // Set active sound initially
             HourEventCallback(GameTime.I.GetCurrentDateTime());
             
             if (gameObject.activeSelf)
@@ -74,7 +76,6 @@ namespace GothicVR.Vob
 
         private void HourEventCallback(DateTime currentTime)
         {
-            Debug.LogError("HourEventCallback");
             if (currentTime >= startSound1 && currentTime < endSound1)
                 SwitchToSound1();
             else

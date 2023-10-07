@@ -378,10 +378,10 @@ namespace GVR.Creator
 
         private void PrepareAudioSource(AudioSource source, PxVobSoundData soundData)
         {
-            source.maxDistance = soundData.radius / 100; // Gothic's values are in cm, Unity's in m.
-            source.volume = soundData.volume / 100; // Gothic's volume is 0...100, Unity's is 0...1. 
+            source.maxDistance = soundData.radius / 100f; // Gothic's values are in cm, Unity's in m.
+            source.volume = soundData.volume / 100f; // Gothic's volume is 0...100, Unity's is 0...1. 
 
-            source.loop = soundData.mode == PxVobSoundMode.PxVobSoundModeLoop;
+            source.loop = (soundData.mode == PxVobSoundMode.PxVobSoundModeLoop);
             // If a sound is looping, we play it continuously. If not, we will handle it within a Component.
             source.playOnAwake = source.loop;
         }
