@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator.Meshes;
@@ -116,17 +117,17 @@ namespace GVR.Creator
                 waypointEdges = waypointEdges
             };
 
-            var subMeshes = CreateSubmeshesForUnity(world);
+            var subMeshes = CreateSubmeshesForUnity_New(world);
             world.subMeshes = subMeshes;
 
             PxWorld.pxWorldDestroy(worldPtr);
 
             return world;
         }
-
-        private Dictionary<int, WorldData.SubMeshData> CreateSubmeshesForUnity(WorldData world)
+        
+        private Dictionary<int, List<WorldData.SubMeshData>> CreateSubmeshesForUnity_Old(WorldData world)
         {
-            Dictionary<int, WorldData.SubMeshData> subMeshes = new(world.materials.Length);
+            Dictionary<int, List<WorldData.SubMeshData>> subMeshes = new(world.materials.Length);
             var vertices = world.vertices;
             var vertexIndices = world.vertexIndices;
             var featureIndices = world.featureIndices;
@@ -134,37 +135,223 @@ namespace GVR.Creator
 
             // We need to put vertex_indices (aka triangles) in reversed order
             // to make Unity draw mesh elements right (instead of upside down)
-            for (var loopVertexIndexId = vertexIndices.LongLength - 1; loopVertexIndexId >= 0; loopVertexIndexId--)
+            for (var loopVertexIndexId = vertexIndices.LongLength - 1; loopVertexIndexId >= 0; loopVertexIndexId-=3)
             {
                 // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
                 var materialIndex = world.materialIndices[loopVertexIndexId / 3];
-
+                
+                if (materialIndex != 60)
+                    continue;
+                
                 // The materialIndex was never used before.
                 if (!subMeshes.ContainsKey(materialIndex))
                 {
-                    var newSubMesh = new WorldData.SubMeshData()
+                    var newSubMesh = new List<WorldData.SubMeshData>()
                     {
-                        materialIndex = materialIndex,
-                        material = world.materials[materialIndex]
+                        new WorldData.SubMeshData()
+                        {
+                            materialIndex = materialIndex,
+                            material = world.materials[materialIndex]
+                        }
                     };
 
                     subMeshes.Add(materialIndex, newSubMesh);
                 }
-
+                
                 var currentSubMesh = subMeshes[materialIndex];
-                var origVertexIndex = vertexIndices[loopVertexIndexId];
+                var currentSubMeshFirstListItem = currentSubMesh.First();
 
-                // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
-                currentSubMesh.vertices.Add(vertices[origVertexIndex].ToUnityVector());
+                for (var subVertexIndexId = loopVertexIndexId; subVertexIndexId > loopVertexIndexId - 3; subVertexIndexId--)
+                {
+                    var origVertexIndex = vertexIndices[subVertexIndexId];
+                    
+                    // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
+                    currentSubMeshFirstListItem.vertices.Add(vertices[origVertexIndex].ToUnityVector());
+                    
+                    var featureIndex = featureIndices[subVertexIndexId];
+                    currentSubMeshFirstListItem.uvs.Add(features[featureIndex].texture.ToUnityVector());
+                    currentSubMeshFirstListItem.normals.Add(features[featureIndex].normal.ToUnityVector());
 
-                var featureIndex = featureIndices[loopVertexIndexId];
-                currentSubMesh.uvs.Add(features[featureIndex].texture.ToUnityVector());
-                currentSubMesh.normals.Add(features[featureIndex].normal.ToUnityVector());
-
-                currentSubMesh.triangles.Add(currentSubMesh.vertices.Count - 1);
+                    currentSubMeshFirstListItem.triangles.Add(currentSubMeshFirstListItem.vertices.Count - 1);
+                }
             }
 
-            return subMeshes;
+            // return subMeshes;
+            
+            // ca. 10 elements which should be glued together only.
+            var someWall = subMeshes.First(i => i.Key == 60); // 60, 48, 1395);
+
+            return new()
+            {
+                { someWall.Key, someWall.Value }
+            };
+        }
+        
+        // FIXME - uvs (and most likely normals) are set wrong for submeshes so far.
+        // FIXME - Find a faster algorithm to create and fill the submeshes.
+        // FIXME - submeshing isn't finished yet. e.g. materialIndex=4 (grass) is too segregated.
+        private Dictionary<int, List<WorldData.SubMeshData>> CreateSubmeshesForUnity_New(WorldData world)
+        {
+
+            Dictionary<int, List<List<int>>> subSubMeshTempArrangement = new();
+            
+            Dictionary<int, List<WorldData.SubMeshData>> returnMeshes = new(world.materials.Length);
+            var vertices = world.vertices;
+            var vertexIndices = world.vertexIndices;
+            var featureIndices = world.featureIndices;
+            var features = world.features;
+
+            // We need to put vertex_indices (aka triangles) in reversed order
+            // to make Unity draw mesh elements right (instead of upside down)
+            for (var loopVertexIndexId = vertexIndices.LongLength - 1; loopVertexIndexId >= 0; loopVertexIndexId-=3)
+            {
+                // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
+                var materialIndex = world.materialIndices[loopVertexIndexId / 3];
+
+                // DEBUG! SomeWall
+                if (materialIndex != 60)
+                    continue;
+                
+                // The materialIndex was never used before.
+                if (!subSubMeshTempArrangement.ContainsKey(materialIndex))
+                {
+                    subSubMeshTempArrangement.Add(materialIndex, new List<List<int>>());
+                }
+
+                var currentSubMesh = subSubMeshTempArrangement[materialIndex];
+
+                var vertexIndex0 = vertexIndices[loopVertexIndexId];
+                var vertexIndex1 = vertexIndices[loopVertexIndexId - 1];
+                var vertexIndex2 = vertexIndices[loopVertexIndexId - 2];
+
+                var addedToSubSubMesh = false;
+                for (var indexSearch = 0; indexSearch < currentSubMesh.Count; indexSearch++)
+                {
+                    var currentSubSubMesh = currentSubMesh[indexSearch];
+                    
+                    if (Array.IndexOf(currentSubSubMesh.ToArray(), vertexIndex0) >= 0
+                        || Array.IndexOf(currentSubSubMesh.ToArray(), vertexIndex1)  >= 0
+                        || Array.IndexOf(currentSubSubMesh.ToArray(), vertexIndex2)  >= 0)
+                    {
+                        currentSubSubMesh.Add(vertexIndex0);
+                        currentSubSubMesh.Add(vertexIndex1);
+                        currentSubSubMesh.Add(vertexIndex2);
+                        
+                        addedToSubSubMesh = true;
+                        break;
+                    }
+                }
+
+                if (addedToSubSubMesh)
+                    continue;
+                else
+                    currentSubMesh.Add(new List<int>{ vertexIndex0, vertexIndex1, vertexIndex2 });
+            }
+
+            //
+            // Merge submeshes which share borders
+            //
+            foreach (var subMeshes in subSubMeshTempArrangement)
+            {
+                // Every internal list is checked back and forth with all other list items to see if there are matching elements.
+                for (var subSubIndex1 = 0; subSubIndex1 < subMeshes.Value.Count - 1; subSubIndex1++)
+                {
+                    // Current item is empty already/marked for deletion (i.e. merged into another list element)
+                    if (!subMeshes.Value[subSubIndex1].Any())
+                        continue;
+                    
+                    for (var subSubIndex2 = 0; subSubIndex2 < subMeshes.Value.Count; subSubIndex2++)
+                    {
+                        // Current item is empty already/marked for deletion (i.e. merged into another list element)
+                        if (!subMeshes.Value[subSubIndex2].Any())
+                            continue;
+                        
+                        // Do not check against yourself
+                        if (subSubIndex1 == subSubIndex2)
+                            continue;
+                        
+                        var curArr = subMeshes.Value[subSubIndex1];
+                        var checkArr = subMeshes.Value[subSubIndex2];
+                        if (!curArr.Intersect(checkArr).Any())
+                            continue;
+
+                        curArr.AddRange(checkArr);
+                        // Clear as it's merged into another. Do not delete now as it would add complexity to loop.
+                        subMeshes.Value[subSubIndex2].Clear();
+                    }
+                }
+            }
+
+            foreach (var meshLoop in subSubMeshTempArrangement)
+            {
+                // The materialIndex was never used before.
+                if (!returnMeshes.ContainsKey(meshLoop.Key))
+                {
+                    var newSubMesh = new WorldData.SubMeshData
+                    {
+                        materialIndex = meshLoop.Key,
+                        material = world.materials[meshLoop.Key]
+                    };
+
+                    returnMeshes.Add(meshLoop.Key, new List<WorldData.SubMeshData>());
+                }
+                var currentSubMesh = returnMeshes[meshLoop.Key];
+
+                foreach (var subMeshLoop in meshLoop.Value)
+                {
+                    // Skip empty triangle entry lists only. (e.g. grass is then shrunk from ~500 submeshes down to ~150)
+                    if (!subMeshLoop.Any())
+                        continue;
+                    
+                    var currentSubSubMesh = new WorldData.SubMeshData
+                    {
+                        materialIndex = meshLoop.Key,
+                        material = world.materials[meshLoop.Key]
+                    };
+                    currentSubMesh.Add(currentSubSubMesh);
+
+                    foreach (var subMeshLoopIndices in subMeshLoop)
+                    {
+                        // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
+                        currentSubSubMesh.vertices.Add(vertices[subMeshLoopIndices].ToUnityVector());
+
+                        var featureIndex = featureIndices[subMeshLoopIndices];
+                        currentSubSubMesh.uvs.Add(features[featureIndex].texture.ToUnityVector());
+                        currentSubSubMesh.normals.Add(features[featureIndex].normal.ToUnityVector());
+
+                        currentSubSubMesh.triangles.Add(currentSubSubMesh.vertices.Count - 1);
+                    }
+                }
+            }
+
+            // DebugPrint(returnMeshes, "new");
+            
+            return returnMeshes;
+        }
+
+        private void DebugPrint(Dictionary<int, List<WorldData.SubMeshData>> data, string suffix)
+        {
+            var fileWriter = new StreamWriter(Application.persistentDataPath + "/" + DateTime.Now.ToString("hh-mm-ss") + "-" + suffix + ".txt", false);
+
+            foreach (var materialData in data)
+            {
+                fileWriter.WriteLine("newMaterial: " + materialData.Key);
+                fileWriter.WriteLine("{");
+                foreach (var subMeshData in materialData.Value)
+                {
+                    fileWriter.WriteLine("  newSubMesh");
+                    fileWriter.WriteLine("  {");
+                    for (var index=0; index<subMeshData.triangles.Count; index++)
+                    {
+                        fileWriter.WriteLine($"    vertex: {subMeshData.vertices[index]}");
+                        fileWriter.WriteLine($"    uv:     {subMeshData.uvs[index]}");
+                    }
+                    fileWriter.WriteLine("  }");
+                }
+                fileWriter.WriteLine("}");
+            }
+            
+            fileWriter.Close();
         }
 
 

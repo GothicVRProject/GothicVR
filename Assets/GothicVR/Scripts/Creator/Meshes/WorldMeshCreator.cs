@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using GVR.Manager;
 using GVR.Phoenix.Data;
@@ -25,23 +26,34 @@ namespace GVR.Creator.Meshes
             {
                 var subMeshObj = new GameObject()
                 {
-                    name = subMesh.material.name!,
+                    name = subMesh[0].material.name!,
                     isStatic = true
                 };
-
-                var meshFilter = subMeshObj.AddComponent<MeshFilter>();
-                var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
-
-                PrepareMeshRenderer(meshRenderer, subMesh);
-                PrepareMeshFilter(meshFilter, subMesh);
-                PrepareMeshCollider(subMeshObj, meshFilter.mesh, subMesh.material);
-
                 subMeshObj.SetParent(meshObj);
 
-                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
+                var i = 0;
+                foreach (var subSubMesh in subMesh)
+                {
+                    var subSubMeshObj = new GameObject()
+                    {
+                        name = i++.ToString(),
+                        isStatic = true
+                    };
+                    
+                    var meshFilter = subSubMeshObj.AddComponent<MeshFilter>();
+                    var meshRenderer = subSubMeshObj.AddComponent<MeshRenderer>();
 
-                if (++meshesCreated % meshesPerFrame == 0)
-                    await Task.Yield(); // Yield to allow other operations to run in the frame
+                    PrepareMeshRenderer(meshRenderer, subSubMesh);
+                    PrepareMeshFilter(meshFilter, subSubMesh);
+                    PrepareMeshCollider(subMeshObj, meshFilter.mesh, subSubMesh.material);
+
+                    subSubMeshObj.SetParent(subMeshObj);
+
+                    LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
+
+                    if (++meshesCreated % meshesPerFrame == 0)
+                        await Task.Yield(); // Yield to allow other operations to run in the frame  
+                }
             }
 
             return meshObj;
