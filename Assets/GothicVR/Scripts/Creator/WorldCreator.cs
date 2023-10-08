@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator.Meshes;
+using GVR.Debugging;
 using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
@@ -117,8 +118,16 @@ namespace GVR.Creator
                 waypointEdges = waypointEdges
             };
 
-            var subMeshes = CreateSubmeshesForUnity_New(world);
-            world.subMeshes = subMeshes;
+            if (FeatureFlags.I.enableLegacyBigWorldMeshCreation)
+            {
+                var subMeshes = CreateSubmeshesForUnity_Old(world);
+                world.subMeshes = subMeshes;
+            }
+            else
+            {
+                var subMeshes = CreateSubmeshesForUnity_New(world);
+                world.subMeshes = subMeshes;
+            }
 
             PxWorld.pxWorldDestroy(worldPtr);
 

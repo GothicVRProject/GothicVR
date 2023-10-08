@@ -342,6 +342,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useXRDeviceSimulator: 0
+  enableLegacyBigWorldMeshCreation: 0
   CreateVobs: 1
   CreateWaypoints: 1
   CreateWaypointEdges: 0

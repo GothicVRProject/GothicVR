@@ -15,6 +15,8 @@ namespace GVR.Debugging
         [Header("__________Developer__________")]
         [Tooltip("This will be used within Editor mode only. No effect for Standalone.")]
         public bool useXRDeviceSimulator;
+        [Tooltip("It's not yet clear if the new submesh-merging feature is better or worse for performance. We need to test with all the other improvements like VobCulling etc.")]
+        public bool enableLegacyBigWorldMeshCreation;
         
         [Header("__________World__________")]
         public bool CreateVobs;
