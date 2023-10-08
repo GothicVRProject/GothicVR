@@ -140,8 +140,8 @@ namespace GVR.Creator
                 // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
                 var materialIndex = world.materialIndices[loopVertexIndexId / 3];
                 
-                if (materialIndex != 60)
-                    continue;
+                // if (materialIndex != 60)
+                //     continue;
                 
                 // The materialIndex was never used before.
                 if (!subMeshes.ContainsKey(materialIndex))
@@ -176,15 +176,8 @@ namespace GVR.Creator
                 }
             }
 
-            // return subMeshes;
-            
-            // ca. 10 elements which should be glued together only.
-            var someWall = subMeshes.First(i => i.Key == 60); // 60, 48, 1395);
-
-            return new()
-            {
-                { someWall.Key, someWall.Value }
-            };
+            // DebugPrint(subMeshes, "old");
+            return subMeshes;
         }
         
         // FIXME - uvs (and most likely normals) are set wrong for submeshes so far.
@@ -192,8 +185,11 @@ namespace GVR.Creator
         // FIXME - submeshing isn't finished yet. e.g. materialIndex=4 (grass) is too segregated.
         private Dictionary<int, List<WorldData.SubMeshData>> CreateSubmeshesForUnity_New(WorldData world)
         {
+            // Dictionary<int, List<List<int>>> subSubMeshTempArrangement = new();
 
-            Dictionary<int, List<List<int>>> subSubMeshTempArrangement = new();
+            // Dict<materialId, List<KVP<List<vertexIndex>, List<featureIndex>>>>
+            Dictionary<int, List<ValueTuple<List<int>, List<int>>>> subSubMeshTempArrangement = new();
+            
             
             Dictionary<int, List<WorldData.SubMeshData>> returnMeshes = new(world.materials.Length);
             var vertices = world.vertices;
@@ -208,14 +204,14 @@ namespace GVR.Creator
                 // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
                 var materialIndex = world.materialIndices[loopVertexIndexId / 3];
 
-                // DEBUG! SomeWall
-                if (materialIndex != 60)
-                    continue;
+                // // DEBUG! SomeWall
+                // if (materialIndex != 60)
+                //     continue;
                 
                 // The materialIndex was never used before.
                 if (!subSubMeshTempArrangement.ContainsKey(materialIndex))
                 {
-                    subSubMeshTempArrangement.Add(materialIndex, new List<List<int>>());
+                    subSubMeshTempArrangement.Add(materialIndex, new List<ValueTuple<List<int>, List<int>>>());
                 }
 
                 var currentSubMesh = subSubMeshTempArrangement[materialIndex];
@@ -224,18 +220,21 @@ namespace GVR.Creator
                 var vertexIndex1 = vertexIndices[loopVertexIndexId - 1];
                 var vertexIndex2 = vertexIndices[loopVertexIndexId - 2];
 
+                var featureIndex0 = featureIndices[loopVertexIndexId];
+                var featureIndex1 = featureIndices[loopVertexIndexId - 1];
+                var featureIndex2 = featureIndices[loopVertexIndexId - 2];
+
                 var addedToSubSubMesh = false;
                 for (var indexSearch = 0; indexSearch < currentSubMesh.Count; indexSearch++)
                 {
                     var currentSubSubMesh = currentSubMesh[indexSearch];
-                    
-                    if (Array.IndexOf(currentSubSubMesh.ToArray(), vertexIndex0) >= 0
-                        || Array.IndexOf(currentSubSubMesh.ToArray(), vertexIndex1)  >= 0
-                        || Array.IndexOf(currentSubSubMesh.ToArray(), vertexIndex2)  >= 0)
+
+                    if (Array.IndexOf(currentSubSubMesh.Item1.ToArray(), vertexIndex0) >= 0
+                        || Array.IndexOf(currentSubSubMesh.Item1.ToArray(), vertexIndex1) >= 0
+                        || Array.IndexOf(currentSubSubMesh.Item1.ToArray(), vertexIndex2) >= 0)
                     {
-                        currentSubSubMesh.Add(vertexIndex0);
-                        currentSubSubMesh.Add(vertexIndex1);
-                        currentSubSubMesh.Add(vertexIndex2);
+                        currentSubSubMesh.Item1.AddRange(new[] { vertexIndex0, vertexIndex1, vertexIndex2 });
+                        currentSubSubMesh.Item2.AddRange(new[] { featureIndex0, featureIndex1, featureIndex2 });
                         
                         addedToSubSubMesh = true;
                         break;
@@ -245,7 +244,18 @@ namespace GVR.Creator
                 if (addedToSubSubMesh)
                     continue;
                 else
-                    currentSubMesh.Add(new List<int>{ vertexIndex0, vertexIndex1, vertexIndex2 });
+                {
+                    var newSubSub = new ValueTuple<List<int>, List<int>>()
+                    {
+                        Item1 = new List<int>(),
+                        Item2 = new List<int>()
+                    };
+                    
+                    newSubSub.Item1.AddRange(new[]{ vertexIndex0, vertexIndex1, vertexIndex2});
+                    newSubSub.Item2.AddRange(new[] { featureIndex0, featureIndex1, featureIndex2 });
+                        
+                    currentSubMesh.Add(newSubSub);
+                }
             }
 
             //
@@ -257,13 +267,13 @@ namespace GVR.Creator
                 for (var subSubIndex1 = 0; subSubIndex1 < subMeshes.Value.Count - 1; subSubIndex1++)
                 {
                     // Current item is empty already/marked for deletion (i.e. merged into another list element)
-                    if (!subMeshes.Value[subSubIndex1].Any())
+                    if (!subMeshes.Value[subSubIndex1].Item1.Any())
                         continue;
                     
                     for (var subSubIndex2 = 0; subSubIndex2 < subMeshes.Value.Count; subSubIndex2++)
                     {
                         // Current item is empty already/marked for deletion (i.e. merged into another list element)
-                        if (!subMeshes.Value[subSubIndex2].Any())
+                        if (!subMeshes.Value[subSubIndex2].Item1.Any())
                             continue;
                         
                         // Do not check against yourself
@@ -272,12 +282,14 @@ namespace GVR.Creator
                         
                         var curArr = subMeshes.Value[subSubIndex1];
                         var checkArr = subMeshes.Value[subSubIndex2];
-                        if (!curArr.Intersect(checkArr).Any())
+                        if (!curArr.Item1.Intersect(checkArr.Item1).Any())
                             continue;
 
-                        curArr.AddRange(checkArr);
+                        curArr.Item1.AddRange(checkArr.Item1);
+                        curArr.Item2.AddRange(checkArr.Item2);
                         // Clear as it's merged into another. Do not delete now as it would add complexity to loop.
-                        subMeshes.Value[subSubIndex2].Clear();
+                        subMeshes.Value[subSubIndex2].Item1.Clear();
+                        subMeshes.Value[subSubIndex2].Item2.Clear();
                     }
                 }
             }
@@ -300,7 +312,7 @@ namespace GVR.Creator
                 foreach (var subMeshLoop in meshLoop.Value)
                 {
                     // Skip empty triangle entry lists only. (e.g. grass is then shrunk from ~500 submeshes down to ~150)
-                    if (!subMeshLoop.Any())
+                    if (!subMeshLoop.Item1.Any())
                         continue;
                     
                     var currentSubSubMesh = new WorldData.SubMeshData
@@ -310,14 +322,15 @@ namespace GVR.Creator
                     };
                     currentSubMesh.Add(currentSubSubMesh);
 
-                    foreach (var subMeshLoopIndices in subMeshLoop)
+                    for (var pairId = 0; pairId < subMeshLoop.Item1.Count; pairId++)
                     {
+                        var curVertexIndex = subMeshLoop.Item1[pairId];
+                        var curFeatureIndex = subMeshLoop.Item2[pairId];
                         // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
-                        currentSubSubMesh.vertices.Add(vertices[subMeshLoopIndices].ToUnityVector());
+                        currentSubSubMesh.vertices.Add(vertices[curVertexIndex].ToUnityVector());
 
-                        var featureIndex = featureIndices[subMeshLoopIndices];
-                        currentSubSubMesh.uvs.Add(features[featureIndex].texture.ToUnityVector());
-                        currentSubSubMesh.normals.Add(features[featureIndex].normal.ToUnityVector());
+                        currentSubSubMesh.uvs.Add(features[curFeatureIndex].texture.ToUnityVector());
+                        currentSubSubMesh.normals.Add(features[curFeatureIndex].normal.ToUnityVector());
 
                         currentSubSubMesh.triangles.Add(currentSubSubMesh.vertices.Count - 1);
                     }
