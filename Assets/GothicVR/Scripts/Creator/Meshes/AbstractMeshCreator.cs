@@ -125,6 +125,11 @@ namespace GVR.Creator.Meshes
                 return null;
             }
 
+            // If there is no texture for any of the meshes, just skip this item.
+            // G1: Some skull decorations are without texture.
+            if (mrm.materials!.All(m => m.texture == ""))
+                return null;
+
             rootGo ??= new GameObject();
             rootGo.name = objectName;
             rootGo.SetParent(parent);
