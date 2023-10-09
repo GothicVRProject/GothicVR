@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GVR.Manager;
 using GVR.Phoenix.Data;
@@ -20,7 +21,7 @@ namespace GVR.Creator.Meshes
             // Track the progress of each sub-mesh creation separately
             int numSubMeshes = world.subMeshes.Values.Count;
             int meshesCreated = 0;
-
+            
             foreach (var subMesh in world.subMeshes.Values)
             {
                 var subMeshObj = new GameObject()
@@ -43,7 +44,7 @@ namespace GVR.Creator.Meshes
                 if (++meshesCreated % meshesPerFrame == 0)
                     await Task.Yield(); // Yield to allow other operations to run in the frame
             }
-
+            
             return meshObj;
         }
     }

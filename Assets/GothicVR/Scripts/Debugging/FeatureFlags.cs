@@ -1,5 +1,7 @@
-﻿using GVR.Util;
+﻿using System;
+using GVR.Util;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace GVR.Debugging
 {
@@ -50,6 +52,22 @@ namespace GVR.Debugging
         [Header("__________Audio__________")]
         public bool EnableSounds;
         public bool EnableMusic;
+        
+        [Serializable]
+        public class VobCullingGroupSetting
+        {
+            [Range(1f, 100f)] public float maxObjectSize;
+            [Range(1f, 1000f)] public float cullingDistance;
+        }
+        [Header("__________Performance__________")]
+        public bool vobCulling;
+        public VobCullingGroupSetting vobCullingSmall;
+        public VobCullingGroupSetting vobCullingMedium;
+        public VobCullingGroupSetting vobCullingLarge;
 
+        // Not yet implemented.
+        // [Header("__________Performance: NPC Culling__________")]
+        // public bool npcCulling;
+        // public VobCullingGroupSetting npcVobCullingSetting;
     }
 }
