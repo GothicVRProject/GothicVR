@@ -419,6 +419,15 @@ namespace GVR.Creator
                 return VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation!.Value.ToUnityMatrix().rotation, parent);
             }
 
+            // MDH+MDM (without MDL as wrapper)
+            var mdh = assetCache.TryGetMdh(meshName);
+            var mdm = assetCache.TryGetMdm(meshName);
+            if (mdh != null && mdm != null)
+            {
+                return VobMeshCreator.I.Create(meshName, mdm, mdh, vob.position.ToUnityVector(),
+                    vob.rotation!.Value.ToUnityMatrix().rotation, parent);
+            }
+
             // MRM
             var mrm = assetCache.TryGetMrm(meshName);
             if (mrm != null)

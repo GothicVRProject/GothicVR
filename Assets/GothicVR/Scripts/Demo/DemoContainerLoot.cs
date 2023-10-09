@@ -15,6 +15,10 @@ namespace GVR.Demo
 	{
 		public bool debugSpawnContentNow = false;
 
+		private readonly char[] itemNameSeparators = { ';', ',' };
+		private readonly char[] itemCountSeparators = { ':', '.' };
+		
+		
         [Serializable]
         public struct Content
         {
@@ -46,12 +50,12 @@ namespace GVR.Demo
 			if (contents == string.Empty)
 				return;
 
-			var items = contents.Split(',', ';');
+			var items = contents.Split(itemNameSeparators);
 
 			foreach (var item in items)
 			{
 				var count = 1;
-				var nameCountSplit = item.Split(':');
+				var nameCountSplit = item.Split(itemCountSeparators);
 
 				if (nameCountSplit.Length != 1)
 				{
