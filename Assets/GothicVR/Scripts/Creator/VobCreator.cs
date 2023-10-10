@@ -137,7 +137,7 @@ namespace GVR.Creator
                     case PxWorld.PxVobType.PxVob_zCMoverController:
                     case PxWorld.PxVobType.PxVob_zCPFXController:
                     {
-                        Debug.LogWarning($"{vob.type} not yet implemented.");
+                        // FIXME - not yet implemented.
                         break;
                     }
                     // Do nothing
@@ -170,6 +170,23 @@ namespace GVR.Creator
 
             var nonNullCullingGroupItems = cullingGroupObjects.Where(i => i != null).ToArray();
             CullingGroupManager.I.PrepareVobCulling(nonNullCullingGroupItems);
+            
+            // TODO - Not implemented warnings - print them once only.
+            foreach (var var in new[]{
+                         PxWorld.PxVobType.PxVob_zCVobScreenFX,
+                         PxWorld.PxVobType.PxVob_zCVobAnimate,
+                         PxWorld.PxVobType.PxVob_zCTriggerWorldStart,
+                         PxWorld.PxVobType.PxVob_zCTriggerList,
+                         PxWorld.PxVobType.PxVob_oCCSTrigger,
+                         PxWorld.PxVobType.PxVob_oCTriggerScript,
+                         PxWorld.PxVobType.PxVob_zCVobLensFlare,
+                         PxWorld.PxVobType.PxVob_zCVobLight,
+                         PxWorld.PxVobType.PxVob_zCMoverController,
+                         PxWorld.PxVobType.PxVob_zCPFXController
+                     })
+            {
+                Debug.LogWarning($"{var} not yet implemented.");
+            }
         }
 
         private void AddVobsToList(PxVobData[] vobs, List<PxVobData> allVobs)
