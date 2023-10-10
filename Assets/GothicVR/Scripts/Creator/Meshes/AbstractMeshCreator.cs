@@ -164,8 +164,7 @@ namespace GVR.Creator.Meshes
 
         protected void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
-            obj.transform.localRotation = rotation;
-            obj.transform.localPosition = position;
+            obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
         protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)

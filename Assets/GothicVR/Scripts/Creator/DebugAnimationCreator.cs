@@ -118,8 +118,7 @@ namespace GVR.Creator
             if (position.Equals(default) && rotation.Equals(default))
                 return;
 
-            obj.transform.localRotation = rotation;
-            obj.transform.localPosition = position;
+            obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
         private void PrepareMeshRenderer(Renderer renderer, PxMultiResolutionMeshData mrmData)

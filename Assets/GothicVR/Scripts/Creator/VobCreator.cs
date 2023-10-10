@@ -148,10 +148,12 @@ namespace GVR.Creator
                     }
                     case PxWorld.PxVobType.PxVob_zCVob:
                     {
-                        // if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
-                        // CreateDecal(vob);
-                        // else
-                        var obj = CreateDefaultMesh(vob);
+                        GameObject obj;
+                        if (vob.visualType == PxWorld.PxVobVisualType.PxVobVisualDecal)
+                            obj = CreateDecal(vob);
+                        else
+                            obj = CreateDefaultMesh(vob);
+                        
                         cullingGroupObjects.Add(obj);
                         break;
                     }
@@ -253,7 +255,7 @@ namespace GVR.Creator
 
             if (item.visual!.ToLower().EndsWith(".mms"))
             {
-                Debug.LogError($"Item {item.visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
+                Debug.LogWarning($"Item {item.visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
                 return null;
             }
 
@@ -409,15 +411,14 @@ namespace GVR.Creator
             return VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation!.Value, true, parentGosNonTeleport[vob.type], go);
         }
 
-        private void CreateDecal(PxVobData vob)
+        private GameObject CreateDecal(PxVobData vob)
         {
             if (!FeatureFlags.I.EnableDecals)
-            {
-                return;
-            }
+                return null;
+
             var parent = parentGosTeleport[vob.type];
 
-            VobMeshCreator.I.CreateDecal(vob, parent);
+            return VobMeshCreator.I.CreateDecal(vob, parent);
         }
 
         private GameObject CreateDefaultMesh(PxVobData vob, bool nonTeleport = false)
@@ -468,12 +469,11 @@ namespace GVR.Creator
 
         private void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, Quaternion rotation)
         {
-            // FIXME - This isn't working
+            // FIXME - This isn't working - but really needed?
             if (position.Equals(default) && rotation.Equals(default))
                 return;
 
-            obj.transform.localRotation = rotation;
-            obj.transform.localPosition = position;
+            obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
     }
 }

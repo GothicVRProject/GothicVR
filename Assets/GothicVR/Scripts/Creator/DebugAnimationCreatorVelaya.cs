@@ -196,8 +196,7 @@ namespace GVR.Creator
 
         private void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
-            obj.transform.localRotation = rotation;
-            obj.transform.localPosition = position;
+            obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
         private void PrepareMeshRenderer(Renderer renderer, PxMultiResolutionMeshData mrmData)

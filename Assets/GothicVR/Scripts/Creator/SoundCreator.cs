@@ -169,8 +169,7 @@ namespace GVR.Creator
 
         private void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, Quaternion rotation)
         {
-            obj.transform.localRotation = rotation;
-            obj.transform.localPosition = position;
+            obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
     }
 }

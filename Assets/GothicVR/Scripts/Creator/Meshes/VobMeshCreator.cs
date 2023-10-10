@@ -25,13 +25,11 @@ namespace GVR.Creator.Meshes
                 return base.Create(objectName, mdm, mdh, position, rotation, parent, rootGo);
         }
 
-        public void CreateDecal(PxVobData vob, GameObject parent)
+        public GameObject CreateDecal(PxVobData vob, GameObject parent)
         {
+            // G1: One Decal has no value to recognize what it is. Most likely a setup bug to ignore at this point.
             if (!vob.vobDecal.HasValue)
-            {
-                Debug.LogWarning("No decalData was set for: " + vob.visualName);
-                return;
-            }
+                return null;
 
             var decalData = vob.vobDecal.Value;
 
@@ -55,6 +53,8 @@ namespace GVR.Creator.Meshes
             material.SetTexture(Shader.PropertyToID("Base_Map"), texture);
 
             decalProj.material = material;
+
+            return decalProjectorGo;
         }
     }
 }
