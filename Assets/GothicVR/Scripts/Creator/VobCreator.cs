@@ -136,7 +136,6 @@ namespace GVR.Creator
                     case PxWorld.PxVobType.PxVob_zCVobLight:
                     case PxWorld.PxVobType.PxVob_zCMoverController:
                     case PxWorld.PxVobType.PxVob_zCPFXController:
-                    case PxWorld.PxVobType.PxVob_oCMobInter:
                     {
                         // FIXME - not yet implemented.
                         break;
@@ -157,6 +156,7 @@ namespace GVR.Creator
                         cullingGroupObjects.Add(obj);
                         break;
                     }
+                    case PxWorld.PxVobType.PxVob_oCMobInter:
                     default:
                     {
                         var obj = CreateDefaultMesh(vob);
@@ -185,8 +185,7 @@ namespace GVR.Creator
                          PxWorld.PxVobType.PxVob_zCVobLensFlare,
                          PxWorld.PxVobType.PxVob_zCVobLight,
                          PxWorld.PxVobType.PxVob_zCMoverController,
-                         PxWorld.PxVobType.PxVob_zCPFXController,
-                         PxWorld.PxVobType.PxVob_oCMobInter
+                         PxWorld.PxVobType.PxVob_zCPFXController
                      })
             {
                 Debug.LogWarning($"{var} not yet implemented.");
@@ -404,7 +403,7 @@ namespace GVR.Creator
 
             return go;
         }
-
+        
         private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
             var mrm = assetCache.TryGetMrm(item.visual);
@@ -428,8 +427,9 @@ namespace GVR.Creator
 
             if (meshName == string.Empty)
                 return null;
+            
+            // FIXME - PFX effects not yet implemented
             if (meshName.ToLower().EndsWith(".pfx"))
-                // FIXME - PFX effects not yet implemented
                 return null;
 
             // MDL

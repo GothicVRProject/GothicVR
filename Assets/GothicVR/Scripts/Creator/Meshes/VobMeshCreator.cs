@@ -15,7 +15,7 @@ namespace GVR.Creator.Meshes
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             // Check if there are completely empty elements without any texture.
-            // G1: e.g. Harp or Flute
+            // G1: e.g. Harp, Flute, and WASH_SLOT (usage moved to a FreePoint within daedalus functions)
             var noMeshTextures = mdm.meshes.All(mesh => mesh.mesh.subMeshes.All(subMesh => subMesh.material.texture == ""));
             var noAttachmentTextures = mdm.attachments.All(att => att.Value.materials.All(mat => mat.texture == ""));
 
