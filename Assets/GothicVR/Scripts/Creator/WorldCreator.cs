@@ -189,9 +189,6 @@ namespace GVR.Creator
             return subMeshes;
         }
         
-        // FIXME - uvs (and most likely normals) are set wrong for submeshes so far.
-        // FIXME - Find a faster algorithm to create and fill the submeshes.
-        // FIXME - submeshing isn't finished yet. e.g. materialIndex=4 (grass) is too segregated.
         private Dictionary<int, List<WorldData.SubMeshData>> CreateSubmeshesForUnity_New(WorldData world)
         {
             // Dictionary<int, List<List<int>>> subSubMeshTempArrangement = new();
