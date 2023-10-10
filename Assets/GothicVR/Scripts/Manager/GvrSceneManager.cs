@@ -4,14 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
-using GVR.GothicVR.Scripts.Manager;
 using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-using UnityEngine.XR.Interaction.Toolkit;
 using Debug = UnityEngine.Debug;
 
 namespace GVR.Manager
@@ -29,8 +27,16 @@ namespace GVR.Manager
         private string startVobAfterLoading;
         private Scene generalScene;
         private bool generalSceneLoaded;
+
         private GameObject startPoint;
         private GameObject player;
+
+
+        // Hint: Scene general is always loaded >after< world is fully filled with vobs etc.
+        [NonSerialized]
+        public readonly UnityEvent sceneGeneralLoaded = new();
+        [NonSerialized]
+        public readonly UnityEvent sceneGeneralUnloaded = new();
 
         private bool debugFreshlyDoneLoading;
         
@@ -141,6 +147,8 @@ namespace GVR.Manager
             {
                 SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName(ConstantsManager.SceneBootstrap));
                 SceneManager.UnloadSceneAsync(generalScene);
+                
+                sceneGeneralUnloaded.Invoke();
                 generalSceneLoaded = false;
             }
 
@@ -183,10 +191,10 @@ namespace GVR.Manager
                     AudioSourceManager.I.ResetDictionaries();
                     break;
                 case ConstantsManager.SceneGeneral:
-                    AudioSourceManager.I.SetAudioListener(Camera.main!.GetComponent<AudioListener>());
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
-                    WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
                     TeleportPlayerToSpot();
+                    
+                    sceneGeneralLoaded.Invoke();
                     
                     // FIXME - Move to UnityEvent once existing
                     XRDeviceSimulatorManager.I.PrepareForScene(scene);

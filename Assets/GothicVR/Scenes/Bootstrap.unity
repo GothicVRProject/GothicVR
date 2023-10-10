@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
+  m_IndirectSpecularColor: {r: 0.172768, g: 0.21589169, b: 0.29782546, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -364,6 +364,16 @@ MonoBehaviour:
   ShowPhoenixVfsFileNotFoundErrors: 0
   EnableSounds: 1
   EnableMusic: 1
+  vobCulling: 1
+  vobCullingSmall:
+    maxObjectSize: 1.2
+    cullingDistance: 50
+  vobCullingMedium:
+    maxObjectSize: 5
+    cullingDistance: 100
+  vobCullingLarge:
+    maxObjectSize: 100
+    cullingDistance: 200
 --- !u!1 &379812652
 GameObject:
   m_ObjectHideFlags: 0
@@ -968,8 +978,9 @@ GameObject:
   - component: {fileID: 1896514219}
   - component: {fileID: 1896514220}
   - component: {fileID: 1896514221}
-  - component: {fileID: 1896514222}
   - component: {fileID: 1896514223}
+  - component: {fileID: 1896514224}
+  - component: {fileID: 1896514222}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1138,6 +1149,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9af6bda13a014da48ee7a934228cefe9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8a5433ca9664e58a7e90654db1d382c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
