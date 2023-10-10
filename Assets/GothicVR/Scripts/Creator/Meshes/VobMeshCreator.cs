@@ -1,5 +1,7 @@
+using System.Linq;
 using GVR.Caches;
 using GVR.Phoenix.Util;
+using PxCs.Data.Model;
 using PxCs.Data.Vob;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -8,6 +10,21 @@ namespace GVR.Creator.Meshes
 {
     public class VobMeshCreator : AbstractMeshCreator<VobMeshCreator>
     {
+
+        public override GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh,
+            Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        {
+            // Check if there are completely empty elements without any texture.
+            // G1: e.g. Harp or Flute
+            var noMeshTextures = mdm.meshes.All(mesh => mesh.mesh.subMeshes.All(subMesh => subMesh.material.texture == ""));
+            var noAttachmentTextures = mdm.attachments.All(att => att.Value.materials.All(mat => mat.texture == ""));
+
+            if (noMeshTextures && noAttachmentTextures)
+                return null;
+            else
+                return base.Create(objectName, mdm, mdh, position, rotation, parent, rootGo);
+        }
+
         public void CreateDecal(PxVobData vob, GameObject parent)
         {
             if (!vob.vobDecal.HasValue)

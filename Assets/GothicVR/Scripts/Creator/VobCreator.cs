@@ -136,6 +136,7 @@ namespace GVR.Creator
                     case PxWorld.PxVobType.PxVob_zCVobLight:
                     case PxWorld.PxVobType.PxVob_zCMoverController:
                     case PxWorld.PxVobType.PxVob_zCPFXController:
+                    case PxWorld.PxVobType.PxVob_oCMobInter:
                     {
                         // FIXME - not yet implemented.
                         break;
@@ -182,7 +183,8 @@ namespace GVR.Creator
                          PxWorld.PxVobType.PxVob_zCVobLensFlare,
                          PxWorld.PxVobType.PxVob_zCVobLight,
                          PxWorld.PxVobType.PxVob_zCMoverController,
-                         PxWorld.PxVobType.PxVob_zCPFXController
+                         PxWorld.PxVobType.PxVob_zCPFXController,
+                         PxWorld.PxVobType.PxVob_oCMobInter
                      })
             {
                 Debug.LogWarning($"{var} not yet implemented.");
