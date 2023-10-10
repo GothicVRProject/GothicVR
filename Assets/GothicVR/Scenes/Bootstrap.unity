@@ -365,6 +365,7 @@ MonoBehaviour:
   EnableSounds: 1
   EnableMusic: 1
   vobCulling: 1
+  enableWorldCulling: 0
   vobCullingSmall:
     maxObjectSize: 1.2
     cullingDistance: 50
@@ -980,6 +981,7 @@ GameObject:
   - component: {fileID: 1896514221}
   - component: {fileID: 1896514223}
   - component: {fileID: 1896514224}
+  - component: {fileID: 1896514225}
   - component: {fileID: 1896514222}
   m_Layer: 0
   m_Name: Manager
@@ -1161,6 +1163,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d8a5433ca9664e58a7e90654db1d382c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0c4b438ae1b43abb2b46d35adb6e972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807

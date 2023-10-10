@@ -61,7 +61,10 @@ namespace GVR.Debugging
             [Range(1f, 100f)] public float maxObjectSize;
             [Range(1f, 1000f)] public float cullingDistance;
         }
+
         [Header("__________Performance__________")]
+        [Tooltip("Experimental. Looks weird without proper distance shadow.")]
+        public bool enableWorldCulling;
         public bool vobCulling;
         public VobCullingGroupSetting vobCullingSmall;
         public VobCullingGroupSetting vobCullingMedium;
