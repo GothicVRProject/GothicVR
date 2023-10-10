@@ -45,7 +45,7 @@ namespace GVR.Creator.Meshes
 
                     PrepareMeshRenderer(meshRenderer, subSubMesh);
                     PrepareMeshFilter(meshFilter, subSubMesh);
-                    PrepareMeshCollider(subMeshObj, meshFilter.mesh, subSubMesh.material);
+                    PrepareMeshCollider(subSubMeshObj, meshFilter.mesh, subSubMesh.material);
 
                     subSubMeshObj.SetParent(subMeshObj);
 
