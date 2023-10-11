@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.172768, g: 0.21589169, b: 0.29782546, a: 1}
+  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -339,6 +339,7 @@ MonoBehaviour:
   ShowMusicLogs: 0
   EnableSounds: 1
   EnableMusic: 1
+  enableSoundCulling: 0
   vobCulling: 1
   vobCullingSmall:
     maxObjectSize: 1.2
@@ -349,7 +350,6 @@ MonoBehaviour:
   vobCullingLarge:
     maxObjectSize: 100
     cullingDistance: 200
-  enableSoundCulling: 1
 --- !u!1 &379812652
 GameObject:
   m_ObjectHideFlags: 0
@@ -956,7 +956,7 @@ GameObject:
   - component: {fileID: 1896514222}
   - component: {fileID: 1896514225}
   - component: {fileID: 1896514223}
-  - component: {fileID: 1896514224}
+  - component: {fileID: 1896514226}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1046,8 +1046,7 @@ MonoBehaviour:
   backgroundmaterial: {fileID: 2100000, guid: 1e349bd46543d684da0fd00dfcc78b72, type: 2}
   buttonmaterial: {fileID: 2100000, guid: 731db01b086aeb94582b82a16a95775b, type: 2}
   slidermaterial: {fileID: 2100000, guid: 9edb2534304dae240937e63c8a079e58, type: 2}
-  sliderpositionmaterial: {fileID: 2100000, guid: ef75494119d9122438ca7408644d2e66,
-    type: 2}
+  sliderpositionmaterial: {fileID: 2100000, guid: ef75494119d9122438ca7408644d2e66, type: 2}
   arrowmaterial: {fileID: 2100000, guid: dc6ce4e18c065d34f9037b5b60259872, type: 2}
   fillermaterial: {fileID: 2100000, guid: 7f15366450c487344a1e66a13b22a847, type: 2}
   skymaterial: {fileID: 2100000, guid: 39ac659c922b5b1489714aacd9b952e9, type: 2}
@@ -1113,18 +1112,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9af6bda13a014da48ee7a934228cefe9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1896514224
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1896514212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a2b6d5503112494f89b3a4c775c37d5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1896514225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1135,6 +1122,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2762f7e8908f4fd7aa4f957deabdb262, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a2b6d5503112494f89b3a4c775c37d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807

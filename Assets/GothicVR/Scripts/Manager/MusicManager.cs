@@ -2,13 +2,10 @@ using System;
 using System.IO;
 using DMCs.Interface;
 using GVR.Caches;
-using GVR.Creator;
 using GVR.Debugging;
 using GVR.Manager.Settings;
-using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Data.Vm;
-using PxCs.Interface;
 using UnityEngine;
 
 namespace GVR.Manager
@@ -44,11 +41,10 @@ namespace GVR.Manager
 
         private static GameObject backgroundMusic;
 
-        private float musicUpdateInterval = 5f; // Update music every 5 seconds
-        private float musicUpdateTimer = 0f;
-
         // This multiplier is used to increase the buffer size and reduce the number times PrepareData is called
         // also affects the delay of the music, it doesn't sound so harsh when switching
+        // It also controls how fast/slow the music is updated 
+        // (since we are updating music when we don't have any more music data to parse)
         private int bufferSizeMultiplier = 16;
 
         private void Start()
@@ -59,26 +55,6 @@ namespace GVR.Manager
             musicSource = backgroundMusic.AddComponent<AudioSource>();
         }
 
-        /// <summary>
-        /// Called once every 0.20 seconds to update the music once the timer is bigger than the updateInterval
-        /// </summary>
-        private void FixedUpdate()
-        {
-            if (!FeatureFlags.I.EnableMusic)
-                return;
-
-            if (!WorldCreator.I.IsWorldLoaded)
-            {
-                UpdateMusic();
-                return;
-            }
-            musicUpdateTimer += Time.fixedDeltaTime;
-            if (musicUpdateTimer >= musicUpdateInterval)
-            {
-                musicUpdateTimer = 0f;
-                UpdateMusic();
-            }
-        }
 
         public void Create()
         {
@@ -129,6 +105,8 @@ namespace GVR.Manager
 
             float[] floatArray = Convert16BitByteArrayToFloatArray(byteArray, 0, byteArray.Length);
             Array.Copy(floatArray, data, floatArray.Length);
+
+            UpdateMusic();
         }
 
         private void UpdateMusic()
@@ -184,17 +162,17 @@ namespace GVR.Manager
 
         private static float[] Convert16BitByteArrayToFloatArray(byte[] source, int headerOffset, int dataSize)
         {
-            int bytesPerSample = sizeof(Int16); // block size = 2
+            int bytesPerSample = sizeof(short); // block size = 2
             int sampleCount = source.Length / bytesPerSample;
 
             float[] data = new float[sampleCount];
 
-            Int16 maxValue = Int16.MaxValue;
+            short maxValue = short.MaxValue;
 
             for (int i = 0; i < sampleCount; i++)
             {
                 int offset = i * bytesPerSample;
-                Int16 sample = BitConverter.ToInt16(source, offset);
+                short sample = BitConverter.ToInt16(source, offset);
                 float floatSample = (float)sample / maxValue;
                 data[i] = floatSample;
             }
