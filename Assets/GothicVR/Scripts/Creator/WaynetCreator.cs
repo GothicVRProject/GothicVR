@@ -32,7 +32,7 @@ namespace GVR.Creator
                 // var wpobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 var wpobject = new GameObject();
 
-                wpobject.tag = ConstantsManager.I.SpotTag;
+                wpobject.tag = ConstantsManager.SpotTag;
                 wpobject.name = waypoint.name;
                 wpobject.transform.position = waypoint.position.ToUnityVector();
 

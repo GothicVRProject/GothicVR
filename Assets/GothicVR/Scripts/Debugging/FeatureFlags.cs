@@ -23,6 +23,8 @@ namespace GVR.Debugging
         public bool CreateWaypoints;
         public bool CreateWaypointEdges;
         public bool SkipMainMenu;
+        [Tooltip("Leave blank if you want to spawn normal.")]
+        public string spawnAtSpecificFreePoint;
 
         [Header("__________DayTime__________")]
         public bool EnableDayTime;
@@ -48,10 +50,12 @@ namespace GVR.Debugging
         public bool ShowPhoenixDebugMessages;
         public bool ShowZspyLogs;
         public bool ShowPhoenixVfsFileNotFoundErrors;
+        public bool ShowMusicLogs;
 
         [Header("__________Audio__________")]
         public bool EnableSounds;
         public bool EnableMusic;
+        public bool enableSoundCulling;
         
         [Serializable]
         public class VobCullingGroupSetting
