@@ -49,8 +49,6 @@ namespace GVR.Manager
 
         private void Start()
         {
-            if (!FeatureFlags.I.EnableMusic)
-                return;
             backgroundMusic = GameObject.Find("BackgroundMusic");
             musicSource = backgroundMusic.AddComponent<AudioSource>();
         }
@@ -58,9 +56,6 @@ namespace GVR.Manager
 
         public void Create()
         {
-            if (!FeatureFlags.I.EnableMusic)
-                return;
-
             var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
 
             // Combine paths using Path.Combine instead of Path.Join

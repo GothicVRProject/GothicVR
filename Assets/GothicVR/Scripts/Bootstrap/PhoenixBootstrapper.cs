@@ -135,11 +135,9 @@ namespace GVR.Bootstrap
 
         private void LoadMusic()
         {
-            if (!FeatureFlags.I.EnableMusic)
-                return;
             var music = MusicManager.I;
             music.Create();
-            music.SetEnabled(true);
+            music.SetEnabled(FeatureFlags.I.EnableMusic);
             music.SetMusic("SYS_MENU");
             Debug.Log("Loading music");
         }
