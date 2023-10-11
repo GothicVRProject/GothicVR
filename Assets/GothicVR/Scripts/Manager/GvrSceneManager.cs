@@ -149,9 +149,6 @@ namespace GVR.Manager
                 SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName(ConstantsManager.SceneBootstrap));
                 SceneManager.UnloadSceneAsync(generalScene);
                 
-                // FIXME - move to event once vobCulling branch is merged
-                VobSoundCullingManager.I.PreWorldCreate();
-                
                 sceneGeneralUnloaded.Invoke();
                 generalSceneLoaded = false;
             }
@@ -197,8 +194,6 @@ namespace GVR.Manager
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
                     TeleportPlayerToSpot();
                     
-                    // FIXME - Move to UnityEvent once existing
-                    VobSoundCullingManager.I.PostWorldCreate();
                     sceneGeneralLoaded.Invoke();
                     
                     // FIXME - Move to UnityEvent once existing

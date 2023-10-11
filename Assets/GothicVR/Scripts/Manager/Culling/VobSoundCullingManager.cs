@@ -17,9 +17,8 @@ namespace GVR.Manager.Culling
         
         private void Start()
         {
-            // FIXME - reactivate when event is merged and existing in Main
-            // GvrSceneManager.I.sceneGeneralUnloaded.AddListener(PreWorldCreate);
-            // GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostWorldCreate);
+            GvrSceneManager.I.sceneGeneralUnloaded.AddListener(PreWorldCreate);
+            GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostWorldCreate);
 
             // Unity demands CullingGroups to be created in Awake() or Start() earliest.
             soundCullingGroup = new();

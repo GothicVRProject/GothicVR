@@ -187,7 +187,7 @@ namespace GVR.Creator
             }
 
             var nonNullCullingGroupItems = cullingGroupObjects.Where(i => i != null).ToArray();
-            CullingGroupManager.I.PrepareVobCulling(nonNullCullingGroupItems);
+            VobMeshCullingManager.I.PrepareVobCulling(nonNullCullingGroupItems);
             
             VobSoundCullingManager.I.PrepareSoundCulling(cullingSoundObjects);
         }
