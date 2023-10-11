@@ -125,14 +125,14 @@ namespace GVR.Creator
                 waypointEdges = waypointEdges
             };
 
-            if (FeatureFlags.I.enableLegacyBigWorldMeshCreation)
+            if (FeatureFlags.I.enableFineGrainedWorldMeshCreation)
             {
-                var subMeshes = CreateSubmeshesForUnity_Old(world);
+                var subMeshes = CreateSubMeshesForUnityExperimental(world);
                 world.subMeshes = subMeshes;
             }
             else
             {
-                var subMeshes = CreateSubmeshesForUnity_New(world);
+                var subMeshes = CreateSubMeshesForUnityStable(world);
                 world.subMeshes = subMeshes;
             }
 
@@ -141,7 +141,7 @@ namespace GVR.Creator
             return world;
         }
         
-        private Dictionary<int, List<WorldData.SubMeshData>> CreateSubmeshesForUnity_Old(WorldData world)
+        private Dictionary<int, List<WorldData.SubMeshData>> CreateSubMeshesForUnityStable(WorldData world)
         {
             Dictionary<int, List<WorldData.SubMeshData>> subMeshes = new(world.materials.Length);
             var vertices = world.vertices;
@@ -156,7 +156,8 @@ namespace GVR.Creator
                 // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
                 var materialIndex = world.materialIndices[loopVertexIndexId / 3];
                 
-                // if (materialIndex != 60)
+                // DEBUG! Some elements to test subMeshing
+                // if (materialIndex != 60) // 60 - some walls, 4 - grass
                 //     continue;
                 
                 // The materialIndex was never used before.
@@ -196,13 +197,16 @@ namespace GVR.Creator
             return subMeshes;
         }
         
-        private Dictionary<int, List<WorldData.SubMeshData>> CreateSubmeshesForUnity_New(WorldData world)
+        /// <summary>
+        /// This method is for initial collection of vertexIndex and featureIndex based on materialId
+        /// In a first step, we just collect all the indexes
+        /// In a second step, we try to merge elements together, which share vertexIndex
+        /// Then it will be transformed into WorldData.SubMeshData as known before
+        /// </summary>
+        private Dictionary<int, List<WorldData.SubMeshData>> CreateSubMeshesForUnityExperimental(WorldData world)
         {
-            // Dictionary<int, List<List<int>>> subSubMeshTempArrangement = new();
-
             // Dict<materialId, List<KVP<List<vertexIndex>, List<featureIndex>>>>
             Dictionary<int, List<ValueTuple<List<int>, List<int>>>> subSubMeshTempArrangement = new();
-            
             
             Dictionary<int, List<WorldData.SubMeshData>> returnMeshes = new(world.materials.Length);
             var vertices = world.vertices;
@@ -217,15 +221,13 @@ namespace GVR.Creator
                 // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
                 var materialIndex = world.materialIndices[loopVertexIndexId / 3];
 
-                // // DEBUG! SomeWall
-                // if (materialIndex != 60)
+                // DEBUG! Some elements to test subMeshing
+                // if (materialIndex != 60) // 60 - some walls, 4 - grass
                 //     continue;
                 
                 // The materialIndex was never used before.
                 if (!subSubMeshTempArrangement.ContainsKey(materialIndex))
-                {
                     subSubMeshTempArrangement.Add(materialIndex, new List<ValueTuple<List<int>, List<int>>>());
-                }
 
                 var currentSubMesh = subSubMeshTempArrangement[materialIndex];
 
@@ -349,8 +351,6 @@ namespace GVR.Creator
                     }
                 }
             }
-
-            // DebugPrint(returnMeshes, "new");
             
             return returnMeshes;
         }

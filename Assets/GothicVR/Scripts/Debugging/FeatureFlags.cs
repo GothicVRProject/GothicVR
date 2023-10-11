@@ -17,8 +17,6 @@ namespace GVR.Debugging
         [Header("__________Developer__________")]
         [Tooltip("This will be used within Editor mode only. No effect for Standalone.")]
         public bool useXRDeviceSimulator;
-        [Tooltip("It's not yet clear if the new submesh-merging feature is better or worse for performance. We need to test with all the other improvements like VobCulling etc.")]
-        public bool enableLegacyBigWorldMeshCreation;
         
         [Header("__________World__________")]
         public bool CreateVobs;
@@ -63,13 +61,17 @@ namespace GVR.Debugging
         }
 
         [Header("__________Performance__________")]
-        [Tooltip("Experimental. Looks weird without proper distance shadow.")]
-        public bool enableWorldCulling;
         public bool vobCulling;
         public VobCullingGroupSetting vobCullingSmall;
         public VobCullingGroupSetting vobCullingMedium;
         public VobCullingGroupSetting vobCullingLarge;
 
+        [Header("__________Experimental / Do not use in Production__________")]
+        [Tooltip("The current implementation costs more frames than it saves. But it's a potential starting point for further enhancements like gluing small related objects together. Stored here for future use.")]
+        public bool enableFineGrainedWorldMeshCreation;
+        [Tooltip("Experimental. Looks weird without proper distance shadow. Could save some frames if combined with well looking distance shadow.")]
+        public bool enableWorldCulling;
+        
         // Not yet implemented.
         // [Header("__________Performance: NPC Culling__________")]
         // public bool npcCulling;
