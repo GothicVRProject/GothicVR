@@ -309,6 +309,7 @@ namespace GVR.Creator
 
             var go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobSound);
             go.name = $"{vob.soundName}";
+            go.SetActive(false); // We don't want to have sound when we boot the game async for 30 seconds in non-spatial blend mode.
             go.SetParent(parentGosNonTeleport[vob.type]);
             SetPosAndRot(go, vob.position, vob.rotation);
             
@@ -337,6 +338,7 @@ namespace GVR.Creator
 
             var go = PrefabCache.I.TryGetObject(PrefabCache.PrefabType.VobSoundDaytime);
             go.name = $"{vob.soundName}-{vob.soundName2}";
+            go.SetActive(false); // We don't want to have sound when we boot the game async for 30 seconds in non-spatial blend mode.
             go.SetParent(parentGosNonTeleport[vob.type]);
             SetPosAndRot(go, vob.position, vob.rotation);
             
@@ -360,8 +362,8 @@ namespace GVR.Creator
             source.volume = soundData.volume / 100f; // Gothic's volume is 0...100, Unity's is 0...1. 
 
             source.loop = (soundData.mode == PxWorld.PxVobSoundMode.PxVobSoundModeLoop);
-            // If a sound is looping, we play it continuously. If not, we will handle it within a Component.
-            source.playOnAwake = source.loop;
+            source.playOnAwake = soundData.initiallyPlaying;
+            source.spatialBlend = soundData.ambient3d ? 1f : 0f;
         }
 
         private AudioClip GetSoundClip(string soundName)

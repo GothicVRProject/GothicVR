@@ -63,8 +63,10 @@ namespace GVR.Manager.Culling
                 spheres.Add(sphere);
             }
 
-            // Disable sounds if we're 1m away from last possible audible location.
-            soundCullingGroup.SetBoundingDistances(new[]{1f});
+            // Disable sounds if we're leaving the area and therefore last audible location.
+            // Hint: As there are non spatial sounds (always same volume wherever we are),
+            // we need to disable the sounds at exactly the spot we are.
+            soundCullingGroup.SetBoundingDistances(new[]{0f});
             soundCullingGroup.onStateChanged = SoundChanged;
             soundCullingGroup.SetBoundingSpheres(spheres.ToArray());
         }
