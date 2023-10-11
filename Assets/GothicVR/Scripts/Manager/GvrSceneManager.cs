@@ -12,7 +12,6 @@ using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-using UnityEngine.XR.Interaction.Toolkit;
 using Debug = UnityEngine.Debug;
 
 namespace GVR.Manager
@@ -30,8 +29,16 @@ namespace GVR.Manager
         private string startVobAfterLoading;
         private Scene generalScene;
         private bool generalSceneLoaded;
+
         private GameObject startPoint;
         private GameObject player;
+
+
+        // Hint: Scene general is always loaded >after< world is fully filled with vobs etc.
+        [NonSerialized]
+        public readonly UnityEvent sceneGeneralLoaded = new();
+        [NonSerialized]
+        public readonly UnityEvent sceneGeneralUnloaded = new();
 
         private bool debugFreshlyDoneLoading;
         
@@ -146,6 +153,7 @@ namespace GVR.Manager
                 // FIXME - move to event once vobCulling branch is merged
                 VobSoundCullingManager.I.PreWorldCreate();
                 
+                sceneGeneralUnloaded.Invoke();
                 generalSceneLoaded = false;
             }
 
@@ -188,11 +196,12 @@ namespace GVR.Manager
                     break;
                 case ConstantsManager.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
-                    WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
                     TeleportPlayerToSpot();
                     
                     // FIXME - Move to UnityEvent once existing
                     VobSoundCullingManager.I.PostWorldCreate();
+                    sceneGeneralLoaded.Invoke();
+                    
                     // FIXME - Move to UnityEvent once existing
                     XRDeviceSimulatorManager.I.PrepareForScene(scene);
                     break;

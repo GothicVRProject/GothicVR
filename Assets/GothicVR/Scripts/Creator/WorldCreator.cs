@@ -24,12 +24,13 @@ namespace GVR.Creator
         private GameObject teleportGo;
         private GameObject nonTeleportGo;
 
-        public bool IsWorldLoaded { get; private set; }
-
+        private void Start()
+        {
+            GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostCreate);
+        }
+        
         public async Task CreateAsync(string worldName)
         {
-            IsWorldLoaded = false;
-            
             var world = LoadWorld(worldName);
             GameData.I.World = world;
             worldGo = new GameObject("World");
@@ -56,10 +57,12 @@ namespace GVR.Creator
 
 
         /// <summary>
-        /// Logic to be called after world is fully loaded.
+        /// Logic to be called after world (i.e. general scene) is fully loaded.
         /// </summary>
-        public void PostCreate(XRInteractionManager interactionManager)
+        private void PostCreate()
         {
+            var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
+            
             // If we load a new scene, just remove the existing one.
             if (worldGo.TryGetComponent(out TeleportationArea teleportArea))
                 Destroy(teleportArea);
@@ -74,8 +77,6 @@ namespace GVR.Creator
             // TODO - For some reason the referenced skybox in scene is reset to default once game starts.
             // We therefore need to reset it now again.
             RenderSettings.skybox = TextureManager.I.skymaterial;
-
-            IsWorldLoaded = true;
         }
 
         private WorldData LoadWorld(string worldName)

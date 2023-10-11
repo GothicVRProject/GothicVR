@@ -4,7 +4,7 @@ using GVR.Debugging;
 using GVR.Util;
 using UnityEngine.SceneManagement;
 
-namespace GVR.GothicVR.Scripts.Manager
+namespace GVR.Manager
 {
     public class XRDeviceSimulatorManager: SingletonBehaviour<XRDeviceSimulatorManager>
     {
