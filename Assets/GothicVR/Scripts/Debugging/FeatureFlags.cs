@@ -1,5 +1,7 @@
-﻿using GVR.Util;
+﻿using System;
+using GVR.Util;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace GVR.Debugging
 {
@@ -22,6 +24,8 @@ namespace GVR.Debugging
         public bool CreateVobs;
         public bool CreateWaypoints;
         public bool SkipMainMenu;
+        [Tooltip("Leave blank if you want to spawn normal.")]
+        public string spawnAtSpecificFreePoint;
 
         [Header("__________DayTime__________")]
         public bool EnableDayTime;
@@ -45,10 +49,28 @@ namespace GVR.Debugging
         public bool ShowPhoenixDebugMessages;
         public bool ShowZspyLogs;
         public bool ShowPhoenixVfsFileNotFoundErrors;
+        public bool ShowMusicLogs;
 
         [Header("__________Audio__________")]
         public bool EnableSounds;
         public bool EnableMusic;
+        public bool enableSoundCulling;
+        
+        [Serializable]
+        public class VobCullingGroupSetting
+        {
+            [Range(1f, 100f)] public float maxObjectSize;
+            [Range(1f, 1000f)] public float cullingDistance;
+        }
+        [Header("__________Performance__________")]
+        public bool vobCulling;
+        public VobCullingGroupSetting vobCullingSmall;
+        public VobCullingGroupSetting vobCullingMedium;
+        public VobCullingGroupSetting vobCullingLarge;
 
+        // Not yet implemented.
+        // [Header("__________Performance: NPC Culling__________")]
+        // public bool npcCulling;
+        // public VobCullingGroupSetting npcVobCullingSetting;
     }
 }

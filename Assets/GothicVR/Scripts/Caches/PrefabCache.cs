@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GothicVR.Vob;
 using GVR.Phoenix.Util;
 using GVR.Util;
 using UnityEngine;
@@ -15,26 +16,27 @@ namespace GVR.Caches
         public enum PrefabType
         {
             VobItem,
-            VobSpot,
             VobInteractable,
+            VobSpot,
+            VobMusic,
+            VobSound,
+            VobSoundDaytime,
             XRDeviceSimulator
         }
 
         private string GetPath(PrefabType type)
         {
-            switch (type)
+            return type switch
             {
-                case PrefabType.VobItem:
-                    return "Prefabs/Vobs/oCItem";
-                case PrefabType.VobSpot:
-                    return "Prefabs/Vobs/zCVobSpot";
-                case PrefabType.VobInteractable:
-                    return "Prefabs/Vobs/Interactable";
-                case PrefabType.XRDeviceSimulator:
-                    return "Prefabs/XR Device Simulator";
-                default:
-                    throw new Exception($"Enum value {type} not yet defined.");
-            }
+                PrefabType.VobItem => "Prefabs/Vobs/oCItem",
+                PrefabType.VobInteractable => "Prefabs/Vobs/Interactable",
+                PrefabType.VobSpot => "Prefabs/Vobs/zCVobSpot",
+                PrefabType.VobMusic => "Prefabs/Vobs/oCZoneMusic",
+                PrefabType.VobSound => "Prefabs/Vobs/zCVobSound",
+                PrefabType.VobSoundDaytime => "Prefabs/Vobs/zCVobSoundDaytime",
+                PrefabType.XRDeviceSimulator => "Prefabs/XR Device Simulator",
+                _ => throw new Exception($"Enum value {type} not yet defined.")
+            };
         }
 
         public GameObject TryGetObject(PrefabType type)

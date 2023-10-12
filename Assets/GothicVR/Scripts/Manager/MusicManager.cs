@@ -1,17 +1,16 @@
 using System;
 using System.IO;
 using DMCs.Interface;
+using GVR.Caches;
 using GVR.Debugging;
 using GVR.Manager.Settings;
-using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Data.Vm;
-using PxCs.Interface;
 using UnityEngine;
 
-namespace GVR.Creator
+namespace GVR.Manager
 {
-    public class MusicCreator : SingletonBehaviour<MusicCreator>
+    public class MusicManager : SingletonBehaviour<MusicManager>
     {
         private IntPtr mixer;
         private IntPtr music;
@@ -30,8 +29,8 @@ namespace GVR.Creator
         private Tags pendingTags = Tags.Day;
         private Tags currentTags = Tags.Day;
 
-        private bool hasPending = false;
-        private bool reloadTheme = false;
+        private bool hasPending;
+        private bool reloadTheme;
 
         private PxVmMusicData pendingTheme;
 
@@ -42,19 +41,21 @@ namespace GVR.Creator
 
         private static GameObject backgroundMusic;
 
-        void Start()
+        // This multiplier is used to increase the buffer size and reduce the number times PrepareData is called
+        // also affects the delay of the music, it doesn't sound so harsh when switching
+        // It also controls how fast/slow the music is updated 
+        // (since we are updating music when we don't have any more music data to parse)
+        private int bufferSizeMultiplier = 16;
+
+        private void Start()
         {
-            if (!FeatureFlags.I.EnableMusic)
-                return;
             backgroundMusic = GameObject.Find("BackgroundMusic");
             musicSource = backgroundMusic.AddComponent<AudioSource>();
         }
 
+
         public void Create()
         {
-            if (!FeatureFlags.I.EnableMusic)
-                return;
-
             var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
 
             // Combine paths using Path.Combine instead of Path.Join
@@ -75,7 +76,7 @@ namespace GVR.Creator
             AddMusicPath(fullPath, "AddonWorld");
 
             // Create audio clip with, 4 times the bufferSize so we have enough room, 2 channels and 44100Hz
-            var audioClip = AudioClip.Create("Music", bufferSize * 4, 2, 44100, true, PrepareData);
+            var audioClip = AudioClip.Create("Music", bufferSize * 4 * bufferSizeMultiplier, 2, 44100, true, PrepareData);
 
             musicSource.priority = 0;
             musicSource.clip = audioClip;
@@ -90,9 +91,7 @@ namespace GVR.Creator
 
         private void PrepareData(float[] data)
         {
-            UpdateMusic();
-
-            shortBuffer = new short[bufferSize * 2];
+            shortBuffer = new short[bufferSize * 2 * bufferSizeMultiplier];
 
             DMMixer.DMusicMix(mixer, shortBuffer, (uint)data.Length / 2);
 
@@ -101,14 +100,14 @@ namespace GVR.Creator
 
             float[] floatArray = Convert16BitByteArrayToFloatArray(byteArray, 0, byteArray.Length);
             Array.Copy(floatArray, data, floatArray.Length);
+
+            UpdateMusic();
         }
 
         private void UpdateMusic()
         {
             if (!hasPending)
-            {
                 return;
-            }
 
             hasPending = false;
             PxVmMusicData theme = pendingTheme;
@@ -117,9 +116,7 @@ namespace GVR.Creator
             DMMixer.DMusicSetMusicVolume(mixer, pendingTheme.vol);
 
             if (!reloadTheme)
-            {
                 return;
-            }
 
             var pattern = DMDirectMusic.DMusicLoadFile(directmusic, theme.file, theme.file.Length);
 
@@ -160,17 +157,17 @@ namespace GVR.Creator
 
         private static float[] Convert16BitByteArrayToFloatArray(byte[] source, int headerOffset, int dataSize)
         {
-            int bytesPerSample = sizeof(Int16); // block size = 2
+            int bytesPerSample = sizeof(short); // block size = 2
             int sampleCount = source.Length / bytesPerSample;
 
             float[] data = new float[sampleCount];
 
-            Int16 maxValue = Int16.MaxValue;
+            short maxValue = short.MaxValue;
 
             for (int i = 0; i < sampleCount; i++)
             {
                 int offset = i * bytesPerSample;
-                Int16 sample = BitConverter.ToInt16(source, offset);
+                short sample = BitConverter.ToInt16(source, offset);
                 float floatSample = (float)sample / maxValue;
                 data[i] = floatSample;
             }
@@ -192,22 +189,28 @@ namespace GVR.Creator
             if ((tags & Tags.Thr) != 0)
                 musicTag = "THR";
 
-            string name = result + "_" + (isDay ? "DAY" : "NGT") + "_" + musicTag;
+            var musicName = $"{result}_{(isDay ? "DAY" : "NGT")}_{musicTag}";
 
-            var theme = PxVm.InitializeMusic(GameData.I.VmMusicPtr, name);
+            var theme = AssetCache.I.TryGetMusic(musicName);
 
             reloadTheme = pendingTheme.file != theme.file;
             pendingTheme = theme;
             pendingTags = tags;
             hasPending = true;
+
+            if (FeatureFlags.I.ShowMusicLogs)
+                Debug.Log($"Playing music: theme >{musicName}< from file >{theme.file}<");
         }
 
-        public void setMusic(string name)
+        public void SetMusic(string musicName)
         {
-            var theme = PxVm.InitializeMusic(GameData.I.VmMusicPtr, name);
+            var theme = AssetCache.I.TryGetMusic(musicName);
             reloadTheme = true;
             pendingTheme = theme;
             hasPending = true;
+
+            if (FeatureFlags.I.ShowMusicLogs)
+                Debug.Log($"[Music] Playing music: theme >{musicName}< from file >{theme.file}<");
         }
 
         private void StopMusic()
@@ -228,7 +231,7 @@ namespace GVR.Creator
             reloadTheme = true;
         }
 
-        public void setEnabled(bool enable)
+        public void SetEnabled(bool enable)
         {
             var isPlaying = musicSource.isPlaying;
             if (isPlaying == enable)

@@ -39,7 +39,7 @@ namespace GVR.Creator
                 else
                     wpObject = new GameObject();
 
-                wpObject.tag = ConstantsManager.I.SpotTag;
+                wpObject.tag = ConstantsManager.SpotTag;
                 wpObject.name = waypoint.name;
                 wpObject.transform.position = waypoint.position.ToUnityVector();
 

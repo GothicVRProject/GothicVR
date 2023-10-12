@@ -14,10 +14,11 @@ namespace GVR.Manager
         public LayerMask ItemLayer;
 
         //Tags for components to exchange the default font with custom Gothic title and subtitle / ingame fonts
-        public string MenuFontTag = "Title";
-        public string SubtitleFontTag = "IngameText";
-        public string ClimbableTag = "Climbable";
-        public string SpotTag = "PxVob_zCVobSpot";
+        public const string MenuFontTag = "Title";
+        public const string SubtitleFontTag = "IngameText";
+        public const string ClimbableTag = "Climbable";
+        public const string SpotTag = "PxVob_zCVobSpot";
+        public const string PlayerTag = "Player";
 
         public int MeshPerFrame = 10;
         public int VObPerFrame = 75;

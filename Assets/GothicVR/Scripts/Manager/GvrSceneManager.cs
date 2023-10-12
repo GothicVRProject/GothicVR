@@ -4,14 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
-using GVR.GothicVR.Scripts.Manager;
+using GVR.Manager.Culling;
 using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-using UnityEngine.XR.Interaction.Toolkit;
 using Debug = UnityEngine.Debug;
 
 namespace GVR.Manager
@@ -29,8 +28,16 @@ namespace GVR.Manager
         private string startVobAfterLoading;
         private Scene generalScene;
         private bool generalSceneLoaded;
+
         private GameObject startPoint;
         private GameObject player;
+
+
+        // Hint: Scene general is always loaded >after< world is fully filled with vobs etc.
+        [NonSerialized]
+        public readonly UnityEvent sceneGeneralLoaded = new();
+        [NonSerialized]
+        public readonly UnityEvent sceneGeneralUnloaded = new();
 
         private bool debugFreshlyDoneLoading;
         
@@ -95,7 +102,7 @@ namespace GVR.Manager
             }
             
             newWorldName = worldName;
-            MusicCreator.I.setMusic("SYS_LOADING");
+            MusicManager.I.SetMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
             StartWorldLoading.Invoke();
@@ -141,6 +148,8 @@ namespace GVR.Manager
             {
                 SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName(ConstantsManager.SceneBootstrap));
                 SceneManager.UnloadSceneAsync(generalScene);
+                
+                sceneGeneralUnloaded.Invoke();
                 generalSceneLoaded = false;
             }
 
@@ -180,13 +189,12 @@ namespace GVR.Manager
                 case ConstantsManager.SceneLoading:
                     LoadingManager.I.SetBarFromScene(scene);
                     LoadingManager.I.SetMaterialForLoading(scene);
-                    AudioSourceManager.I.ResetDictionaries();
                     break;
                 case ConstantsManager.SceneGeneral:
-                    AudioSourceManager.I.SetAudioListener(Camera.main!.GetComponent<AudioListener>());
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
-                    WorldCreator.I.PostCreate(interactionManager.GetComponent<XRInteractionManager>());
                     TeleportPlayerToSpot();
+                    
+                    sceneGeneralLoaded.Invoke();
                     
                     // FIXME - Move to UnityEvent once existing
                     XRDeviceSimulatorManager.I.PrepareForScene(scene);
@@ -217,7 +225,22 @@ namespace GVR.Manager
 
         private void SetSpawnPoint(Scene worldScene)
         {
-            var spots = GameObject.FindGameObjectsWithTag(ConstantsManager.I.SpotTag);
+            var spots = GameObject.FindGameObjectsWithTag(ConstantsManager.SpotTag);
+
+            // Spawn at specifically named point.
+            if (!string.IsNullOrWhiteSpace(FeatureFlags.I.spawnAtSpecificFreePoint))
+            {
+                // FIXME - Move to EqualsIgnoreCase() in the future
+                var fp = spots.FirstOrDefault(i =>
+                    i.name.Equals(FeatureFlags.I.spawnAtSpecificFreePoint, StringComparison.OrdinalIgnoreCase));
+
+                if (fp != null)
+                {
+                    startPoint = fp;
+                    return;
+                }
+            }
+            
             for (int i = 0; i < spots.Length; i++)
             {
                 if (spots[i].name == startVobAfterLoading)
