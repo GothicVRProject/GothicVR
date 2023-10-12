@@ -18,6 +18,7 @@ namespace GVR.Creator.Meshes
         // until we know how to change specifics to the cutout only. (e.g. bushes)
         protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
         private const string waterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
+        private const string alphaToCoverageShaderName = "Unlit/Unlit-AlphaToCoverage";
         protected const float decalOpacity = 0.75f;
 
 
@@ -504,12 +505,13 @@ namespace GVR.Creator.Meshes
             var shader = Shader.Find(defaultShader);
             if (isAlphaTest)
             {
-                shader = Shader.Find("Unlit/Unlit-AlphaToCoverage");
+                shader = Shader.Find(alphaToCoverageShaderName);
             }
             var material = new Material(shader);
             if (isAlphaTest)
             {
-                material.renderQueue = 2450;
+                // Manually correct the render queue for alpha test, as Unity doesn't want to do it from the shader's render queue tag.
+                material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
             }
             return material;
         }

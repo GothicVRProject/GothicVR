@@ -73,12 +73,14 @@ namespace GVR.Caches
             Texture2D texture = null;
             if (pxTexture.format == PxTexture.Format.tex_B8G8R8A8)
             {
+                // Let Unity generate mips for textures with alpha, as the game doesn't provide them.
                 texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, true);
                 texture.SetPixelData(pxTexture.mipmaps[0].mipmap, 0);
                 texture.Apply(true, true);
             }
             else
             {
+                // Use Gothic's mips for opaque textures. We could also let Unity generate them here, though.
                 texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, (int)pxTexture.mipmapCount, false);
                 for (int i = 0; i < pxTexture.mipmapCount; i++)
                 {
