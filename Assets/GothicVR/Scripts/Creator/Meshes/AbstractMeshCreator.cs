@@ -30,7 +30,7 @@ namespace GVR.Creator.Meshes
         {
             rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
             rootGo.SetParent(parent);
-            
+
             var nodeObjects = new GameObject[mdh.nodes!.Length];
 
             // Create empty GameObjects from hierarchy
@@ -86,7 +86,7 @@ namespace GVR.Creator.Meshes
             }
 
             var attachments = GetFilteredAttachments(mdm.attachments);
-            
+
             // Fill GameObjects with Meshes from attachments
             foreach (var subMesh in attachments)
             {
@@ -165,28 +165,7 @@ namespace GVR.Creator.Meshes
 
         protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
-            Material material;
-            switch (subMesh.material.group)
-            {
-                case PxMaterial.PxMaterialGroup.PxMaterialGroup_Water:
-                    material = GetWaterMaterial(subMesh.material);
-                    break;
-                default:
-                    material = GetDefaultMaterial();
-                    break;
-            }
-
             var bMaterial = subMesh.material;
-
-            rend.material = material;
-
-            // No texture to add.
-            if (bMaterial.texture == "")
-            {
-                Debug.LogWarning("No texture was set for: " + bMaterial.name);
-                return;
-            }
-
             var texture = GetTexture(bMaterial.texture);
 
             if (null == texture)
@@ -195,6 +174,26 @@ namespace GVR.Creator.Meshes
                     Debug.LogError("This is supposed to be a decal: " + bMaterial.texture);
                 else
                     Debug.LogError("Couldn't get texture from name: " + bMaterial.texture);
+            }
+
+            Material material;
+            switch (subMesh.material.group)
+            {
+                case PxMaterial.PxMaterialGroup.PxMaterialGroup_Water:
+                    material = GetWaterMaterial(subMesh.material);
+                    break;
+                default:
+                    material = GetDefaultMaterial(texture != null && texture.format == TextureFormat.RGBA32);
+                    break;
+            }
+
+            rend.material = material;
+
+            // No texture to add.
+            if (bMaterial.texture == "")
+            {
+                Debug.LogWarning("No texture was set for: " + bMaterial.name);
+                return;
             }
 
             material.mainTexture = texture;
@@ -224,8 +223,23 @@ namespace GVR.Creator.Meshes
 
             foreach (var subMesh in mrmData.subMeshes)
             {
-                var material = GetDefaultMaterial();
                 var materialData = subMesh.material;
+
+                var texture = GetTexture(materialData.texture);
+                if (null == texture)
+                {
+
+                    if (materialData.texture.EndsWith(".TGA"))
+                    {
+                        Debug.LogError("This is supposed to be a decal: " + materialData.texture);
+                    }
+                    else
+                    {
+                        Debug.LogError("Couldn't get texture from name: " + materialData.texture);
+                    }
+                }
+
+                var material = GetDefaultMaterial(texture != null && texture.format == TextureFormat.RGBA32);
 
                 rend.material = material;
 
@@ -235,13 +249,6 @@ namespace GVR.Creator.Meshes
                     Debug.LogWarning("No texture was set for: " + materialData.name);
                     return;
                 }
-
-                var texture = GetTexture(materialData.texture);
-                if (null == texture)
-                    if (materialData.texture.EndsWith(".TGA"))
-                        Debug.LogError("This is supposed to be a decal: " + materialData.texture);
-                    else
-                        Debug.LogError("Couldn't get texture from name: " + materialData.texture);
 
                 material.mainTexture = texture;
 
@@ -492,14 +499,18 @@ namespace GVR.Creator.Meshes
             return AssetCache.I.TryGetTexture(name);
         }
 
-        protected Material GetDefaultMaterial()
+        protected Material GetDefaultMaterial(bool isAlphaTest)
         {
-            var standardShader = Shader.Find(defaultShader);
-            var material = new Material(standardShader);
-
-            // Enable clipping of alpha values.
-            material.EnableKeyword("_ALPHATEST_ON");
-
+            var shader = Shader.Find(defaultShader);
+            if (isAlphaTest)
+            {
+                shader = Shader.Find("Unlit/Unlit-AlphaToCoverage");
+            }
+            var material = new Material(shader);
+            if (isAlphaTest)
+            {
+                material.renderQueue = 2450;
+            }
             return material;
         }
 
