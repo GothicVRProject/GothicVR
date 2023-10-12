@@ -74,10 +74,10 @@ Shader "Unlit/Unlit-AlphaToCoverage"
             half4 frag (v2f i) : SV_Target
             {
                 half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
-                // rescale alpha by mip level (if not using preserved coverage mip maps)
+                // Rescale alpha by mip level since preserved coverage mip maps can't be generated at runtime.
                 col.a *= 1 + max(0, CalcMipLevel(i.uv * _MainTex_TexelSize.zw)) * _MipScale;
                 // Rescale alpha by partial derivative, faded by distance. This way, at a distance, the wide coverage is kept to reduce aliasing further.
-                col.a = lerp((col.a - _Cutoff) / max(fwidth(col.a), 0.0001) + 0.5, col.a, saturate(i.distance / _DistanceFade));
+                col.a = lerp((col.a - _Cutoff) / max(fwidth(col.a), 0.0001) + 0.5, col.a, saturate(max(i.distance, 0.0001) / _DistanceFade));
                 return col;
             }
             ENDHLSL
