@@ -71,16 +71,30 @@ namespace GVR.Caches
             var format = pxTexture.format.AsUnityTextureFormat();
 
             Texture2D texture = null;
-            if (pxTexture.format == PxTexture.Format.tex_B8G8R8A8)
+            if (pxTexture.mipmapCount == 1)
             {
-                // Let Unity generate mips for textures with alpha, as the game doesn't provide them.
-                texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, true);
-                texture.SetPixelData(pxTexture.mipmaps[0].mipmap, 0);
-                texture.Apply(true, true);
+                // Let Unity generate mips if not provided.
+                if (format == TextureFormat.DXT1)
+                {
+                    // Unity doesn't want to create mips for DXT1 textures. Recreate them as RGB24.
+                    Texture2D dxtTexture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, false);
+                    dxtTexture.SetPixelData(pxTexture.mipmaps[0].mipmap, 0);
+                    dxtTexture.Apply(false);
+                    texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, TextureFormat.RGB24, true);
+                    texture.SetPixels(dxtTexture.GetPixels());
+                    texture.Apply(true, true);
+                    Destroy(dxtTexture);
+                }
+                else
+                {
+                    texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, true);
+                    texture.SetPixelData(pxTexture.mipmaps[0].mipmap, 0);
+                    texture.Apply(true, true);
+                }
             }
             else
             {
-                // Use Gothic's mips for opaque textures. We could also let Unity generate them here, though.
+                // Use Gothic's mips if provided. We could also let Unity generate them here, though.
                 texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, (int)pxTexture.mipmapCount, false);
                 for (int i = 0; i < pxTexture.mipmapCount; i++)
                 {
