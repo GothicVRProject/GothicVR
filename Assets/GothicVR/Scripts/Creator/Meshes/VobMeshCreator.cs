@@ -1,8 +1,10 @@
+using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
+using PxCs.Data.Model;
 using PxCs.Data.Vob;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -54,13 +56,26 @@ namespace GVR.Creator.Meshes
         }
 
         
-        public void CreateDecal(PxVobData vob, GameObject parent)
+
+        public override GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh,
+            Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
+            // Check if there are completely empty elements without any texture.
+            // G1: e.g. Harp, Flute, and WASH_SLOT (usage moved to a FreePoint within daedalus functions)
+            var noMeshTextures = mdm.meshes.All(mesh => mesh.mesh.subMeshes.All(subMesh => subMesh.material.texture == ""));
+            var noAttachmentTextures = mdm.attachments.All(att => att.Value.materials.All(mat => mat.texture == ""));
+
+            if (noMeshTextures && noAttachmentTextures)
+                return null;
+            else
+                return base.Create(objectName, mdm, mdh, position, rotation, parent, rootGo);
+        }
+
+        public GameObject CreateDecal(PxVobData vob, GameObject parent)
+        {
+            // G1: One Decal has no value to recognize what it is. Most likely a setup bug to ignore at this point.
             if (!vob.vobDecal.HasValue)
-            {
-                Debug.LogWarning("No decalData was set for: " + vob.visualName);
-                return;
-            }
+                return null;
 
             var decalData = vob.vobDecal.Value;
 
@@ -84,6 +99,8 @@ namespace GVR.Creator.Meshes
             material.SetTexture(Shader.PropertyToID("Base_Map"), texture);
 
             decalProj.material = material;
+
+            return decalProjectorGo;
         }
     }
 }
