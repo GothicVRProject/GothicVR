@@ -155,7 +155,7 @@ namespace GVR.Creator
                     case PxWorld.PxVobType.PxVob_zCMoverController:
                     case PxWorld.PxVobType.PxVob_zCPFXController:
                     {
-                        Debug.LogWarning($"{vob.type} not yet implemented.");
+                        // FIXME - not yet implemented.
                         break;
                     }
                     // Do nothing
@@ -165,13 +165,16 @@ namespace GVR.Creator
                     }
                     case PxWorld.PxVobType.PxVob_zCVob:
                     {
-                        // if (vob.visualType == PxVobVisualType.PxVobVisualDecal)
-                        // CreateDecal(vob);
-                        // else
-                        var obj = CreateDefaultMesh(vob);
+                        GameObject obj;
+                        if (vob.visualType == PxWorld.PxVobVisualType.PxVobVisualDecal)
+                            obj = CreateDecal(vob);
+                        else
+                            obj = CreateDefaultMesh(vob);
+                        
                         cullingGroupObjects.Add(obj);
                         break;
                     }
+                    case PxWorld.PxVobType.PxVob_oCMobInter:
                     default:
                     {
                         var obj = CreateDefaultMesh(vob);
@@ -190,6 +193,23 @@ namespace GVR.Creator
             VobMeshCullingManager.I.PrepareVobCulling(nonNullCullingGroupItems);
             
             VobSoundCullingManager.I.PrepareSoundCulling(cullingSoundObjects);
+            
+            // TODO - Not implemented warnings - print them once only.
+            foreach (var var in new[]{
+                         PxWorld.PxVobType.PxVob_zCVobScreenFX,
+                         PxWorld.PxVobType.PxVob_zCVobAnimate,
+                         PxWorld.PxVobType.PxVob_zCTriggerWorldStart,
+                         PxWorld.PxVobType.PxVob_zCTriggerList,
+                         PxWorld.PxVobType.PxVob_oCCSTrigger,
+                         PxWorld.PxVobType.PxVob_oCTriggerScript,
+                         PxWorld.PxVobType.PxVob_zCVobLensFlare,
+                         PxWorld.PxVobType.PxVob_zCVobLight,
+                         PxWorld.PxVobType.PxVob_zCMoverController,
+                         PxWorld.PxVobType.PxVob_zCPFXController
+                     })
+            {
+                Debug.LogWarning($"{var} not yet implemented.");
+            }
         }
 
         private void AddVobsToList(PxVobData[] vobs, List<PxVobData> allVobs)
@@ -498,23 +518,22 @@ namespace GVR.Creator
 
             return go;
         }
-
+        
         private GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
             var mrm = assetCache.TryGetMrm(item.visual);
             return VobMeshCreator.I.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation, true, parentGosNonTeleport[vob.type], go);
         }
 
-        private void CreateDecal(PxVobData vob)
+        private GameObject CreateDecal(PxVobData vob)
         {
             if (!FeatureFlags.I.EnableDecals)
-            {
-                return;
-            }
+                return null;
+
 
             var parent = parentGosTeleport[vob.type];
 
-            VobMeshCreator.I.CreateDecal(vob, parent);
+            return VobMeshCreator.I.CreateDecal(vob, parent);
         }
 
         private GameObject CreateDefaultMesh(PxVobData vob, bool nonTeleport = false)
@@ -524,8 +543,9 @@ namespace GVR.Creator
 
             if (meshName == string.Empty)
                 return null;
+            
+            // FIXME - PFX effects not yet implemented
             if (meshName.ToLower().EndsWith(".pfx"))
-                // FIXME - PFX effects not yet implemented
                 return null;
 
             // MDL
@@ -533,6 +553,15 @@ namespace GVR.Creator
             if (mdl != null)
             {
                 return VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation, parent);
+            }
+
+            // MDH+MDM (without MDL as wrapper)
+            var mdh = assetCache.TryGetMdh(meshName);
+            var mdm = assetCache.TryGetMdm(meshName);
+            if (mdh != null && mdm != null)
+            {
+                return VobMeshCreator.I.Create(meshName, mdm, mdh, vob.position.ToUnityVector(),
+                    vob.rotation!.Value.ToUnityMatrix().rotation, parent);
             }
 
             // MRM
@@ -556,12 +585,11 @@ namespace GVR.Creator
 
         private void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, Quaternion rotation)
         {
-            // FIXME - This isn't working
+            // FIXME - This isn't working - but really needed?
             if (position.Equals(default) && rotation.Equals(default))
                 return;
 
-            obj.transform.localRotation = rotation;
-            obj.transform.localPosition = position;
+            obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace GVR.Creator.Meshes
             return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
         }
 
-        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        public virtual GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
             rootGo.SetParent(parent);
@@ -126,6 +126,11 @@ namespace GVR.Creator.Meshes
                 return null;
             }
 
+            // If there is no texture for any of the meshes, just skip this item.
+            // G1: Some skull decorations are without texture.
+            if (mrm.materials!.All(m => m.texture == ""))
+                return null;
+
             rootGo ??= new GameObject();
             rootGo.name = objectName;
             rootGo.SetParent(parent);
@@ -160,8 +165,7 @@ namespace GVR.Creator.Meshes
 
         protected void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
-            obj.transform.localRotation = rotation;
-            obj.transform.localPosition = position;
+            obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
         protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
