@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GVR.Extensions;
 using GVR.Manager;
 using GVR.Manager.Culling;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Util;
 using UnityEngine;
 
 namespace GVR.Creator.Meshes
@@ -26,6 +26,14 @@ namespace GVR.Creator.Meshes
             
             foreach (var subMesh in world.subMeshes.Values)
             {
+                // No texture to add.
+                // For G1 this is: material.name == [KEINE, KEINETEXTUREN, DEFAULT, BRETT2, BRETT1, SUMPFWAASER, S:PSIT01_ABODEN]
+                // Removing these removes tiny slices of walls on the ground. If anyone finds them, I owe them a beer.
+                if (subMesh[0].material.texture == "")
+                {
+                    continue;
+                }
+                
                 var subMeshObj = new GameObject()
                 {
                     name = subMesh[0].material.name!,

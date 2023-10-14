@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using GVR.Extensions;
 using GVR.Manager;
-using TMPro;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Data.Vm.Gothic;
-using GVR.Phoenix.Util;
+using GVR.Properties;
 using GVR.Util;
-using GVR.Vob;
 using GVR.Vob.WayNet;
 using PxCs.Data.WayNet;
 using PxCs.Interface;
+using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace GVR.Phoenix.Interface
@@ -36,7 +36,8 @@ namespace GVR.Phoenix.Interface
 
         public readonly Dictionary<string, WayPoint> WayPoints = new();
         public readonly Dictionary<string, FreePoint> FreePoints = new();
-
+        public readonly List<VobProperties> VobsInteractable = new(); 
+        
         public TMP_FontAsset EmptyFont;
 
         // FIXME Find a better place for the NPC routines. E.g. on the NPCs itself? But we e.g. need to have a static NPCObject List to do so.
@@ -54,6 +55,7 @@ namespace GVR.Phoenix.Interface
                 World = null;
                 WayPoints.Clear();
                 FreePoints.Clear();
+                VobsInteractable.Clear();
             });
         }
 

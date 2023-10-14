@@ -102,7 +102,7 @@ namespace GVR.Manager
             }
             
             newWorldName = worldName;
-            MusicCreator.I.setMusic("SYS_LOADING");
+            MusicManager.I.SetMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
             StartWorldLoading.Invoke();
@@ -192,7 +192,6 @@ namespace GVR.Manager
                 case ConstantsManager.SceneLoading:
                     LoadingManager.I.SetBarFromScene(scene);
                     LoadingManager.I.SetMaterialForLoading(scene);
-                    AudioSourceManager.I.ResetDictionaries();
                     break;
                 case ConstantsManager.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
@@ -231,7 +230,22 @@ namespace GVR.Manager
 
         private void SetSpawnPoint(Scene worldScene)
         {
-            var spots = GameObject.FindGameObjectsWithTag(ConstantsManager.I.SpotTag);
+            var spots = GameObject.FindGameObjectsWithTag(ConstantsManager.SpotTag);
+
+            // Spawn at specifically named point.
+            if (!string.IsNullOrWhiteSpace(FeatureFlags.I.spawnAtSpecificFreePoint))
+            {
+                // FIXME - Move to EqualsIgnoreCase() in the future
+                var fp = spots.FirstOrDefault(i =>
+                    i.name.Equals(FeatureFlags.I.spawnAtSpecificFreePoint, StringComparison.OrdinalIgnoreCase));
+
+                if (fp != null)
+                {
+                    startPoint = fp;
+                    return;
+                }
+            }
+            
             for (int i = 0; i < spots.Length; i++)
             {
                 if (spots[i].name == startVobAfterLoading)
