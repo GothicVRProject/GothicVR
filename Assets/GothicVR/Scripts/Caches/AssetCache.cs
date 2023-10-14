@@ -69,14 +69,42 @@ namespace GVR.Caches
             }
 
             var format = pxTexture.format.AsUnityTextureFormat();
-            var texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, (int)pxTexture.mipmapCount, false);
+
+            Texture2D texture = null;
+            if (pxTexture.mipmapCount == 1)
+            {
+                // Let Unity generate mips if not provided.
+                if (format == TextureFormat.DXT1)
+                {
+                    // Unity doesn't want to create mips for DXT1 textures. Recreate them as RGB24.
+                    Texture2D dxtTexture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, false);
+                    dxtTexture.SetPixelData(pxTexture.mipmaps[0].mipmap, 0);
+                    dxtTexture.Apply(false);
+                    texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, TextureFormat.RGB24, true);
+                    texture.SetPixels(dxtTexture.GetPixels());
+                    texture.Apply(true, true);
+                    Destroy(dxtTexture);
+                }
+                else
+                {
+                    texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, true);
+                    texture.SetPixelData(pxTexture.mipmaps[0].mipmap, 0);
+                    texture.Apply(true, true);
+                }
+            }
+            else
+            {
+                // Use Gothic's mips if provided. We could also let Unity generate them here, though.
+                texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, (int)pxTexture.mipmapCount, false);
+                for (int i = 0; i < pxTexture.mipmapCount; i++)
+                {
+                    texture.SetPixelData(pxTexture.mipmaps[i].mipmap, i);
+                }
+                texture.Apply(false, true);
+            }
+
+            texture.filterMode = FilterMode.Trilinear;
             texture.name = key;
-
-            for (var i = 0u; i < pxTexture.mipmapCount; i++)
-                texture.SetPixelData(pxTexture.mipmaps[i].mipmap, (int)i);
-
-            texture.Apply();
-
             textureCache[preparedKey] = texture;
             return texture;
         }
@@ -92,7 +120,7 @@ namespace GVR.Caches
 
             return newData;
         }
-        
+
         public PxAnimationData TryGetAnimation(string mdsKey, string animKey)
         {
             var preparedMdsKey = GetPreparedKey(mdsKey);
@@ -141,10 +169,10 @@ namespace GVR.Caches
             mdmCache[preparedKey] = newData;
 
             FixArmorTriangles(preparedKey, newData);
-            
+
             return newData;
         }
-        
+
         /// <summary>
         /// Some armor mdm's have wrong triangles. This function corrects them hard coded until we find a proper solution.
         /// </summary>
@@ -152,7 +180,7 @@ namespace GVR.Caches
         {
             if (!misplacedMdmArmors.Contains(key, StringComparer.OrdinalIgnoreCase))
                 return;
-            
+
             foreach (var mesh in mdm.meshes!)
             {
                 for (var i = 0; i < mesh.mesh!.positions!.Length; i++)
@@ -198,7 +226,7 @@ namespace GVR.Caches
 
             return newData;
         }
-        
+
         /// <summary>
         /// Hint: Instances only need to be initialized once on phoenix.
         /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
