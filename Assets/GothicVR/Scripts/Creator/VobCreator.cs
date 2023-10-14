@@ -593,8 +593,13 @@ namespace GVR.Creator
             if (mdl != null)
             {
                 var go = GetPrefab(vob);
-                VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation, parent, go);
-                return go;
+                var ret = VobMeshCreator.I.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation, parent, go);
+                
+                // A few objects are broken and have no meshes. We need to destroy them immediately again.
+                if (ret == null)
+                    Destroy(go);
+
+                return ret;
             }
 
             // MDH+MDM (without MDL as wrapper)
@@ -603,7 +608,7 @@ namespace GVR.Creator
             if (mdh != null && mdm != null)
             {
                 return VobMeshCreator.I.Create(meshName, mdm, mdh, vob.position.ToUnityVector(),
-                    vob.rotation!.Value.ToUnityMatrix().rotation, parent);
+                    vob.rotation!.ToUnityMatrix().rotation, parent);
             }
 
             // MRM
@@ -614,8 +619,13 @@ namespace GVR.Creator
                 var withCollider = false; // vob.cdDynamic; // We will create separate colliders for ZS(lots) instead of mesh. 
 
                 var go = GetPrefab(vob);
-                VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation, withCollider, parent, go);
-                return go;
+                var ret = VobMeshCreator.I.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation, withCollider, parent, go);
+
+                // A few objects are broken and have no meshes. We need to destroy them immediately again.
+                if (ret == null)
+                    Destroy(go);
+
+                return ret;
             }
 
             Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");

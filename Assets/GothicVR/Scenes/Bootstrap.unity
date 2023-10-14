@@ -320,7 +320,7 @@ MonoBehaviour:
   createWaypointEdgeMeshes: 0
   CreateVobs: 1
   CreateWaypoints: 1
-  SkipMainMenu: 0
+  SkipMainMenu: 1
   spawnAtSpecificFreePoint: 
   EnableDayTime: 1
   SunMovementPerformanceValue: 0
@@ -350,6 +350,8 @@ MonoBehaviour:
   vobCullingLarge:
     maxObjectSize: 100
     cullingDistance: 200
+  enableFineGrainedWorldMeshCreation: 0
+  enableWorldCulling: 0
 --- !u!1 &379812652
 GameObject:
   m_ObjectHideFlags: 0
@@ -957,6 +959,7 @@ GameObject:
   - component: {fileID: 1896514228}
   - component: {fileID: 1896514227}
   - component: {fileID: 1896514225}
+  - component: {fileID: 1896514230}
   - component: {fileID: 1896514229}
   - component: {fileID: 1896514223}
   - component: {fileID: 1896514226}
@@ -1173,6 +1176,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1c302eb8c3a44a1da137e49fb5e78677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0c4b438ae1b43abb2b46d35adb6e972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807

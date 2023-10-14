@@ -208,7 +208,7 @@ namespace GVR.Creator.Meshes
         protected void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
         {
             var mesh = new Mesh();
-            meshFilter.mesh = mesh;
+            meshFilter.sharedMesh = mesh;
 
             mesh.SetVertices(subMesh.vertices);
             mesh.SetTriangles(subMesh.triangles, 0);

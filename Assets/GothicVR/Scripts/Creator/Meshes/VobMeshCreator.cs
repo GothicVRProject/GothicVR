@@ -1,6 +1,7 @@
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
+using JetBrains.Annotations;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
@@ -38,9 +39,9 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Add ZenginSlot collider. i.e. positions where 
         /// </summary>
-        private void AddZsCollider(GameObject go)
+        private void AddZsCollider([CanBeNull] GameObject go)
         {
-            if (go.transform.childCount == 0)
+            if (go == null || go.transform.childCount == 0)
                 return;
             
             var zm = go.transform.GetChild(0);
