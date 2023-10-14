@@ -1,32 +1,44 @@
-using UnityEngine;
-using GVR.Util;
-using GVR.Creator;
 using System.Collections.Generic;
+using GVR.Creator;
+using GVR.Debugging;
+using GVR.Manager;
+using UnityEngine;
 
 namespace GVR.Phoenix.Util
 {
     public class MusicCollisionHandler : MonoBehaviour
     {
-        private static List<string> musicZones = new List<string>();
+        private static List<string> musicZones = new();
 
-        void OnTriggerEnter(Collider other)
+        private void OnTriggerEnter(Collider other)
         {
-            if (!other.CompareTag("Player")) return;
+            if (!FeatureFlags.I.EnableMusic)
+                return;
+
+            if (!other.CompareTag(ConstantsManager.PlayerTag))
+                return;
 
             musicZones.Add(gameObject.name);
 
-            MusicCreator.I.SetMusic(gameObject.name, MusicCreator.Tags.Std);
+            MusicManager.I.SetMusic(gameObject.name, MusicManager.Tags.Std);
         }
 
-        void OnTriggerExit(Collider other)
+        private void OnTriggerExit(Collider other)
         {
-            if (!other.CompareTag("Player")) return;
+            if (!FeatureFlags.I.EnableMusic)
+                return;
+            
+            if (!other.CompareTag(ConstantsManager.PlayerTag))
+                return;
 
             musicZones.Remove(gameObject.name);
 
-            if (musicZones.Count > 0) return;
+            // Other music will play now.
+            if (musicZones.Count > 0)
+                return;
 
-            MusicCreator.I.SetMusic("MUSICZONE_DEF", MusicCreator.Tags.Std);
+            // Play default music.
+            MusicManager.I.SetMusic("MUSICZONE_DEF", MusicManager.Tags.Std);
         }
     }
 }

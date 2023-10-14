@@ -1,4 +1,4 @@
-using GVR.Manager;
+using GVR.Manager.Culling;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -11,7 +11,7 @@ namespace GVR.Vob
         
         public void SelectEntered(SelectEnterEventArgs args)
         {
-            CullingGroupManager.I.StartTrackVobPositionUpdates(gameObject);
+            VobMeshCullingManager.I.StartTrackVobPositionUpdates(gameObject);
         }
         
         /// <summary>
@@ -19,7 +19,7 @@ namespace GVR.Vob
         /// </summary>
         public void SelectExited(SelectExitEventArgs args)
         {
-            CullingGroupManager.I.StopTrackVobPositionUpdates(gameObject);
+            VobMeshCullingManager.I.StopTrackVobPositionUpdates(gameObject);
             
             if (alreadyGrabbedOnce)
                 return;

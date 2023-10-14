@@ -34,7 +34,7 @@ public class RayTeleportClimb : MonoBehaviour
     private void OnRaycastHit(SelectEnterEventArgs args)
     {
         // Check if the interactable GameObject has the tag "Climbable"
-        if (args.interactableObject != null && args.interactableObject.transform.CompareTag(ConstantsManager.I.ClimbableTag))
+        if (args.interactableObject != null && args.interactableObject.transform.CompareTag(ConstantsManager.ClimbableTag))
         {
             // Show a message in the logs
             var hitObject = args.interactableObject.transform.gameObject;

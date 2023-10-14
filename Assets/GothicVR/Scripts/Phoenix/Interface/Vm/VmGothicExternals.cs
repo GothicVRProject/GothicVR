@@ -50,7 +50,6 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInstCh", PrintDebugInstCh); 
 
             PxVm.pxVmRegisterExternal(vmPtr, "AI_StandUp", AI_StandUp); 
-            PxVm.pxVmRegisterExternal(vmPtr, "AI_OUTPUT", AI_OUTPUT);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_SetWalkMode", AI_SetWalkMode);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_GotoWP", AI_GotoWP);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_AlignToWP", AI_AlignToWP);
@@ -444,14 +443,6 @@ namespace GVR.Phoenix.Interface.Vm
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
             NpcCreator.I.ExtEquipItem(npcPtr, itemId);
-        }
-        
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void AI_OUTPUT(IntPtr vmPtr)
-        {
-            var soundString = PxVm.VmStackPopString(vmPtr);
-
-            SoundCreator.I.ExtAiOutput(soundString);
         }
     }
 }
