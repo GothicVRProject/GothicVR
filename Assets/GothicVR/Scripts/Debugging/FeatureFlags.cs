@@ -16,6 +16,7 @@ namespace GVR.Debugging
 
         [Header("__________Developer__________")]
         [Tooltip("This will be used within Editor mode only. No effect for Standalone.")]
+        public bool SkipMainMenu;
         public bool useXRDeviceSimulator;
         public bool createWayPointMeshes;
         public bool createWaypointEdgeMeshes;
@@ -23,7 +24,6 @@ namespace GVR.Debugging
         [Header("__________World__________")]
         public bool CreateVobs;
         public bool CreateWaypoints;
-        public bool SkipMainMenu;
         [Tooltip("Leave blank if you want to spawn normal.")]
         public string spawnAtSpecificFreePoint;
 
