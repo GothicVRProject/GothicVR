@@ -16,6 +16,8 @@ namespace GVR.Caches
         public enum PrefabType
         {
             VobItem,
+            VobInteractable,
+            VobSpot,
             VobMusic,
             VobSound,
             VobSoundDaytime,
@@ -27,6 +29,8 @@ namespace GVR.Caches
             return type switch
             {
                 PrefabType.VobItem => "Prefabs/Vobs/oCItem",
+                PrefabType.VobInteractable => "Prefabs/Vobs/Interactable",
+                PrefabType.VobSpot => "Prefabs/Vobs/zCVobSpot",
                 PrefabType.VobMusic => "Prefabs/Vobs/oCZoneMusic",
                 PrefabType.VobSound => "Prefabs/Vobs/zCVobSound",
                 PrefabType.VobSoundDaytime => "Prefabs/Vobs/zCVobSoundDaytime",
@@ -37,7 +41,7 @@ namespace GVR.Caches
 
         public GameObject TryGetObject(PrefabType type)
         {
-            if (prefabCache.TryGetValue(type, out GameObject prefab))
+            if (prefabCache.TryGetValue(type, out var prefab))
                 return Instantiate(prefab);
             
             var path = GetPath(type);

@@ -3,12 +3,13 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Creator.Meshes;
 using GVR.Debugging;
+using GVR.Extensions;
 using GVR.Manager;
 using GVR.Npc;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
-using GVR.Phoenix.Util;
+using GVR.Properties;
 using GVR.Util;
 using GVR.Vob.WayNet;
 using PxCs.Data.Vm;
@@ -25,7 +26,6 @@ namespace GVR.Creator
 
         // Hint - If this scale ratio isn't looking well, feel free to change it.
         private const float fatnessScale = 0.1f;
-        private const float fplookupDistance = 20f;
         
         void Start()
         {
@@ -44,7 +44,12 @@ namespace GVR.Creator
             return npcRootGo;
         }
 
-        private Properties GetProperties(IntPtr npcPtr)
+        private static GameObject GetNpc(IntPtr npcPtr)
+        {
+            return GetProperties(npcPtr).gameObject;
+        }
+        
+        private static NpcProperties GetProperties(IntPtr npcPtr)
         {
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
             var props = lookupCache.NpcCache[symbolIndex];
@@ -66,6 +71,10 @@ namespace GVR.Creator
             return GetProperties(npcPtr).gameObject;
         }
 
+        private const int DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY = 1;
+        private int debugNpcsSpawned;
+        private const int DEBUG_BLOODWYN_INSTANCE_ID = 6596;
+        
         /// <summary>
         /// Original Gothic uses this function to spawn an NPC instance into the world.
         /// 
@@ -75,12 +84,18 @@ namespace GVR.Creator
         /// </summary>
         public void ExtWldInsertNpc(int npcInstance, string spawnPoint)
         {
+            if (++debugNpcsSpawned > DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY)
+                return;
+
+            // if (npcInstance != DEBUG_BLOODWYN_INSTANCE_ID)
+            //     return;
+            
+            
             var newNpc = Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
-            var props = newNpc.GetComponent<Properties>();
-            newNpc.SetParent(GetRootGo());
+            var props = newNpc.GetComponent<NpcProperties>();
             
             // Humans are singletons.
-            if (lookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<Properties>()))
+            if (lookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<NpcProperties>()))
             {
                 var pxNpc = PxVm.InitializeNpc(GameData.I.VmGothicPtr, (uint)npcInstance);
                 props.npc = pxNpc;
@@ -89,20 +104,22 @@ namespace GVR.Creator
             else
             {
                 var origNpc = lookupCache.NpcCache[(uint)npcInstance];
-                var origProps = origNpc.GetComponent<Properties>();
-                // clone Properties as they're required from the first instance.
-
-                // CLone values from first/original Instance.
+                var origProps = origNpc.GetComponent<NpcProperties>();
+                // Clone Properties as they're required from the first instance.
                 props.Copy(origProps);
             }
 
             newNpc.name = props.npc!.names[0];
-         
-
+            
             var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
             NpcMeshCreator.I.CreateNpc(name, props.mdmName, mdhName, props.BodyData.Head, props.BodyData, newNpc);
+            newNpc.SetParent(GetRootGo());
+
+            foreach (var equippedItem in props.EquippedItems)
+                NpcMeshCreator.I.EquipWeapon(newNpc, equippedItem, equippedItem.mainFlag, equippedItem.flags);
             
             SetSpawnPoint(newNpc, spawnPoint, props.npc);
+            StartRoutine(newNpc);
         }
 
         private void SetSpawnPoint(GameObject npcGo, string spawnPoint, PxVmNpcData pxNpc)
@@ -128,23 +145,6 @@ namespace GVR.Creator
             }
             
             npcGo.transform.position = initialSpawnPoint.Position;
-        }
-
-        public bool ExtWldIsFPAvailable(IntPtr npcPtr, string fpNamePart)
-        {
-            var props = GetProperties(npcPtr);
-            var npcGo = props.gameObject;
-            var freePoints = WayNetManager.I.FindFreePointsWithName(npcGo.transform.position, fpNamePart, fplookupDistance);
-
-            foreach (var fp in freePoints)
-            {
-                if (props.CurrentFreePoint == fp)
-                    return true;
-                if (!fp.IsLocked)
-                    return true;
-            }
-
-            return false;
         }
         
         public void ExtTaMin(VmGothicExternals.ExtTaMinData data)
@@ -172,34 +172,6 @@ namespace GVR.Creator
             GameData.I.npcRoutines.TryAdd(data.Npc, new());
             GameData.I.npcRoutines[data.Npc].Add(routine);
         }
-
-        public void ExtAiStandUp(IntPtr npcPtr)
-        {
-            // FIXME - from docu:
-            // * Ist der Nsc in einem Animatinsstate, wird die passende Rücktransition abgespielt.
-            // * Benutzt der NSC gerade ein MOBSI, poppt er ins stehen.
-        }
-        
-        public void ExtAiSetWalkMode(IntPtr npcPtr, VmGothicEnums.WalkMode walkMode)
-        {
-            GetProperties(npcPtr).walkMode = walkMode;
-        }
-
-        public void ExtAiGotoWP(IntPtr npcPtr, string spawnPoint)
-        {
-            // FIXME implement
-            // FIXME - e.g. for Thorus there's initially no string value for TA_Boss() self.wp - Intended or a bug on our side?
-        }
-
-        public void ExtAiAlignToWP(IntPtr npcPtr)
-        {
-            // FIXME implement
-        }
-        
-        public void ExtAiPlayAni(IntPtr npcPtr, string name)
-        {
-            // FIXME implement
-        }
         
         public void ExtMdlSetVisual(IntPtr npcPtr, string visual)
         {
@@ -224,6 +196,7 @@ namespace GVR.Creator
             if (FeatureFlags.I.CreateNpcArmor && data.Armor >= 0)
             {
                 var armorData = assetCache.TryGetItemData((uint)data.Armor);
+                props.EquippedItems.Add(assetCache.TryGetItemData((uint)data.Armor));
                 props.mdmName = armorData.visualChange;
             }
             else
@@ -251,7 +224,7 @@ namespace GVR.Creator
 
         public IntPtr ExtHlpGetNpc(int instanceId)
         {
-            if (!lookupCache.NpcCache.TryGetValue((uint)instanceId, out Properties properties))
+            if (!lookupCache.NpcCache.TryGetValue((uint)instanceId, out var properties))
             {
                 Debug.LogError($"Couldn't find NPC {instanceId} inside cache.");
                 return IntPtr.Zero;
@@ -278,7 +251,7 @@ namespace GVR.Creator
             props.Talents[talent] = level;
         }
 
-        public void ExtCreateInvItems(IntPtr npcPtr, int itemId, int amount)
+        public void ExtCreateInvItems(IntPtr npcPtr, uint itemId, int amount)
         {
             var props = GetProperties(npcPtr);
             
@@ -295,17 +268,22 @@ namespace GVR.Creator
         public void ExtEquipItem(IntPtr npcPtr, int itemId)
         {
             var props = GetProperties(npcPtr);
-            var npc = props.gameObject;
             var itemData = assetCache.TryGetItemData((uint)itemId);
 
-            props.EquippedItem = itemData;
-            
-            NpcMeshCreator.I.EquipWeapon(npc, itemData, itemData.mainFlag, itemData.flags);
+            props.EquippedItems.Add(itemData);
+        }
+        
+        private static void StartRoutine(GameObject npc)
+        {
+            var routineComp = npc.GetComponent<Routine>();
+            var firstRoutine = routineComp.routines.FirstOrDefault();
+
+            npc.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action);
         }
         
         public void DebugAddIdleAnimationToAllNpc()
         {
-            DebugDanceAll();
+            // DebugDanceAll();
             DebugThorus();
             DebugMeatBug();
 
@@ -333,8 +311,8 @@ namespace GVR.Creator
             {
                 var routineComp = props.GetComponent<Routine>();
                 var firstRoutine = routineComp.routines.FirstOrDefault();
-                
-                PxVm.CallFunction(GameData.I.VmGothicPtr, (uint)firstRoutine.action, props.npcPtr);
+
+                props.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action);
             }
         }
 

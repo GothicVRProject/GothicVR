@@ -1,6 +1,6 @@
 using PxCs.Data.Struct;
 
-namespace GVR.Phoenix.Util
+namespace GVR.Extensions
 {
     public static class PxMatrixExtension
     {

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GVR.Extensions;
 using GVR.Manager;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Util;
 using UnityEngine;
 
 namespace GVR.Creator.Meshes

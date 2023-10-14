@@ -17,11 +17,12 @@ namespace GVR.Debugging
         [Header("__________Developer__________")]
         [Tooltip("This will be used within Editor mode only. No effect for Standalone.")]
         public bool useXRDeviceSimulator;
-        
+        public bool createWayPointMeshes;
+        public bool createWaypointEdgeMeshes;
+
         [Header("__________World__________")]
         public bool CreateVobs;
         public bool CreateWaypoints;
-        public bool CreateWaypointEdges;
         public bool SkipMainMenu;
         [Tooltip("Leave blank if you want to spawn normal.")]
         public string spawnAtSpecificFreePoint;
@@ -35,8 +36,6 @@ namespace GVR.Debugging
         [Header("__________VOBs__________")]
         [Tooltip("Only for Debug purposes. It'll not change functionality itself.")]
         public bool EnableVobFPMesh;
-        [Tooltip("For Debug purposes within Scene view in Editor only. Might imply some performance issues in Editor mode.")]
-        public bool EnableVobFPMeshEditorLabel;
         public bool EnableDecals;
         
         [Header("__________NPCs__________")]

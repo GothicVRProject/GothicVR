@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace GVR.Phoenix.Util
+namespace GVR.Extensions
 {
     public static class NumericsExtension
     {

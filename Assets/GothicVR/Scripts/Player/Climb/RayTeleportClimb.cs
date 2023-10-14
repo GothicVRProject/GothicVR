@@ -1,8 +1,8 @@
-using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
-using GVR.Phoenix.Util;
+using GVR.Extensions;
 using GVR.Manager;
+using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class RayTeleportClimb : MonoBehaviour
 {

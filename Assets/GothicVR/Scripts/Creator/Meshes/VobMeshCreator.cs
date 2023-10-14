@@ -1,8 +1,12 @@
 using System.Linq;
 using GVR.Caches;
-using GVR.Phoenix.Util;
+using GVR.Extensions;
+using PxCs.Data.Mesh;
+using PxCs.Data.Model;
+using PxCs.Data.Struct;
 using PxCs.Data.Model;
 using PxCs.Data.Vob;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -10,6 +14,48 @@ namespace GVR.Creator.Meshes
 {
     public class VobMeshCreator : AbstractMeshCreator<VobMeshCreator>
     {
+        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position,
+            PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+        {
+            var go = base.Create(objectName, mrm, position, rotation, withCollider, parent, rootGo);
+            
+            AddZsCollider(go);
+            
+            return go;
+        }
+
+        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation,
+            GameObject parent = null, GameObject rootGo = null)
+        {
+            var go = base.Create(objectName, mdl, position, rotation, parent, rootGo);
+
+            AddZsCollider(go);
+
+            return go;
+        }
+
+
+        /// <summary>
+        /// Add ZenginSlot collider. i.e. positions where 
+        /// </summary>
+        private void AddZsCollider(GameObject go)
+        {
+            if (go.transform.childCount == 0)
+                return;
+            
+            var zm = go.transform.GetChild(0);
+            for (var i = 0; i < zm.childCount; i++)
+            {
+                var child = zm.GetChild(i);
+                if (!child.name.StartsWithIgnoreCase("ZS"))
+                    continue;
+                
+                // Used for event triggers with NPCs.
+                child.AddComponent<SphereCollider>();
+            }
+        }
+
+        
 
         public override GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh,
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)

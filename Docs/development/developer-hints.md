@@ -1,8 +1,48 @@
 ## Unity setup hints
 
-* For locla Gothic installation directory, please create file _GameSettings.dev.json_ next inside _Assets/StreamingAssets_. This file is ignored by git and you need to set its values to make the game run in Unity.
+* For local Gothic installation directory, please create file _GameSettings.dev.json_ next inside _Assets/StreamingAssets_. This file is ignored by git and you need to set its values to make the game run in Unity.
 * Load scene "Bootstrap" in your Editor. Hit play and you're good to go.
 * You can (de)activate features with the Component "FeatureFlags". It changes features at Editor time and won't change elements during runtime. (change values first, hit play second).
+
+## Software Architecture
+
+![General architecture](./diagrams/General-software-architecture.drawio.png)
+
+* Creator - Creator handles creation (loading) of objects. (e.g. NpcCreator, VobCreator)
+* Manager - Manager handle changes on objects at runtime (e.g. WayNetManager to find WayPoint/FreePoint based on Vector3 position or NpcManager to handle Daedalus calls for checking inventory items)
+* Properties - Attached to Prefabs. They will store all properties needed for an object. (e.g. NpcProperties, SpotProperties)
+
+### AI handling
+
+Ai consists of two elements:
+1. Control logic flow - External functions are executed immediately. (e.g. AI_SetWalkmode(), Wld_IsMobAvailable())
+2. Execute an animation - These animations will be put into an ActionQueue and will be executed sequentially. (e.g. AI_GotoWP(), AI_UseMob(), AI_Wait())
+
+```c++
+func void ZS_WalkAround	()
+{
+	AI_SetWalkmode (self,NPC_WALK);  // Execute immediately while parsing
+
+	if (Wld_IsMobAvailable (self,"BED")) // Immediately
+	{
+        AI_GotoWP (self,self.wp); // QueueAction - Put into Queue and execute sequentially
+        AI_AlignToWP (self); // QueueAction
+	    AI_UseMob		(self,	"BED",1); 
+	}
+	
+	AI_Wait				(self, 1); // QueueAction
+};
+```
+
+QueueActions (animations) can become quite complex (e.g. AI_UseMob() requires 1/ turning to Mob, 2/ walking to Mob, 3/ executing animation on mob).
+We therefore put them into Command pattern ([wiki](https://en.wikipedia.org/wiki/Command_pattern)).
+It means, that every QueueAction handles it's state on it's own and tells the Queue owner, when it's done and another Action can be triggered.
+
+![Animation ](./diagrams/Npc-Ai-Queue.drawio.png)
+
+More information about AnimationQueue mechanism at [ataulien/Inside-Gothic - Action-Queue](https://ataulien.github.io/Inside-Gothic/ActionQueue/)
+
+
 
 ## Gothic assets loading
 

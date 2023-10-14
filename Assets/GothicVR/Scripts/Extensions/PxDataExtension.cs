@@ -1,8 +1,8 @@
-using PxCs.Data.Mesh;
 using System;
+using PxCs.Data.Mesh;
 using UnityEngine;
 
-namespace GVR.Phoenix.Util
+namespace GVR.Extensions
 {
     public static class PxDataExtension
     {

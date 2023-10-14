@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
+using GVR.Extensions;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace GVR.Creator.Meshes
 {
@@ -22,15 +23,15 @@ namespace GVR.Creator.Meshes
         protected const float decalOpacity = 0.75f;
 
 
-        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
+        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
+            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
         }
 
         public virtual GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
-            rootGo.SetParent(parent);
+            rootGo.SetParent(parent, true, true);
 
             var nodeObjects = new GameObject[mdh.nodes!.Length];
 
@@ -69,7 +70,7 @@ namespace GVR.Creator.Meshes
             {
                 var mesh = softSkinMesh.mesh;
 
-                var meshObj = new GameObject("JaX_ZM_0");
+                var meshObj = new GameObject("ZM_0");
                 meshObj.SetParent(rootGo);
 
                 var meshFilter = meshObj.AddComponent<MeshFilter>();
@@ -542,8 +543,8 @@ namespace GVR.Creator.Meshes
 
             material.SetFloat("_Surface", 0);
             material.SetInt("_ZWrite", 0);
-            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
 
             return material;
         }

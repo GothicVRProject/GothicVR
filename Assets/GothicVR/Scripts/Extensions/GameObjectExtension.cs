@@ -1,14 +1,13 @@
+using System.Linq;
 using UnityEngine;
 
-namespace GVR.Phoenix.Util
+namespace GVR.Extensions
 {
     public static class GameObjectExtension
     {
         public static void SetParent(this GameObject obj, GameObject parent, bool resetLocation = false, bool resetRotation = false)
         {
-            if (parent == null)
-                obj.transform.parent = null;
-            else
+            if (parent != null)
                 obj.transform.parent = parent.transform;
 
             // FIXME - I don't know why, but Unity adds location, rotation, and scale to newly attached sub elements.
@@ -40,5 +39,17 @@ namespace GVR.Phoenix.Util
             // The child object was not found
             return null;
         }
+
+        /// <summary>
+        /// Returns direct Children of a GameObject. Non-recursive! 
+        /// </summary>
+        public static GameObject[] GetAllDirectChildren(this GameObject go)
+        {
+            return Enumerable
+                .Range(0, go.transform.childCount)
+                .Select(i => go.transform.GetChild(i).gameObject)
+                .ToArray();
+        }
+        
     }
 }

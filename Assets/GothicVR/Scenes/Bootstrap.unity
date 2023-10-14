@@ -316,9 +316,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useXRDeviceSimulator: 0
+  createWayPointMeshes: 0
+  createWaypointEdgeMeshes: 0
   CreateVobs: 1
   CreateWaypoints: 1
-  CreateWaypointEdges: 0
   SkipMainMenu: 0
   spawnAtSpecificFreePoint: 
   EnableDayTime: 1
@@ -326,7 +327,6 @@ MonoBehaviour:
   StartHour: 17
   StartMinute: 59
   EnableVobFPMesh: 0
-  EnableVobFPMeshEditorLabel: 0
   EnableDecals: 0
   CreateOcNpcs: 1
   EnableNpcRoutines: 1
@@ -954,8 +954,10 @@ GameObject:
   - component: {fileID: 1896514220}
   - component: {fileID: 1896514221}
   - component: {fileID: 1896514222}
+  - component: {fileID: 1896514228}
   - component: {fileID: 1896514227}
   - component: {fileID: 1896514225}
+  - component: {fileID: 1896514229}
   - component: {fileID: 1896514223}
   - component: {fileID: 1896514226}
   m_Layer: 0
@@ -1147,6 +1149,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d8a5433ca9664e58a7e90654db1d382c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b59e485fb4d4b61be1623c4ef3b43f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c302eb8c3a44a1da137e49fb5e78677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807

@@ -2,42 +2,53 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GVR.Caches;
-using GVR.Phoenix.Util;
+using GVR.Extensions;
+using GVR.Npc.Actions;
 using GVR.Util;
 using PxCs.Data.Animation;
 using PxCs.Data.Model;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Playables;
 
 namespace GVR.Creator
 {
     public class AnimationCreator : SingletonBehaviour<AnimationCreator>
     {
-        public void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go)
+        public void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
         {
-            var animationKeyName = GetPreparedAnimationKey(mdsName, animationName);
-            var pxAnimation = AssetCache.I.TryGetAnimation(mdsName, animationName);
-
-            // Try to load from cache
-            if (!LookupCache.I.AnimClipCache.TryGetValue(animationKeyName, out var clip))
-            {
-                clip = LoadAnimationClip(pxAnimation, mdh, go);
-                LookupCache.I.AnimClipCache[animationKeyName] = clip;
-            }
-            
+            var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var animationComp = go.GetComponent<Animation>();
             
-            animationComp.AddClip(clip, "debugIdle");
-            animationComp.Play("debugIdle");
+            //Shortcut: Animation is already set at GO.
+            if (animationComp.GetClip(mdsAnimationKeyName) != null)
+            {
+                animationComp.Play(mdsAnimationKeyName);
+                return;
+            }
+
+            var mds = AssetCache.I.TryGetMds(mdsName);
+            var pxAnimation = AssetCache.I.TryGetAnimation(mdsName, animationName);
+            
+            // Try to load from cache
+            if (!LookupCache.I.AnimClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
+            {
+                clip = LoadAnimationClip(pxAnimation, mdh, go);
+                LookupCache.I.AnimClipCache[mdsAnimationKeyName] = clip;
+                clip.wrapMode = repeat ? WrapMode.Loop : WrapMode.Once;
+            }
+            
+            AddClipEvents(clip, mds, pxAnimation, animationName);
+            AddClipEndEvent(clip);
+            
+            animationComp.AddClip(clip, mdsAnimationKeyName);
+
+            animationComp.Play(mdsAnimationKeyName);
         }
 
         private AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone)
         {
             var clip = new AnimationClip
             {
-                legacy = true,
-                wrapMode = WrapMode.Loop
+                legacy = true
             };
             
             var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.nodeCount);
@@ -92,10 +103,10 @@ namespace GVR.Creator
 
             // Add some final settings
             clip.EnsureQuaternionContinuity();
+            clip.frameRate = pxAnimation.fps;
 
             return clip;
         }
-    
         
         // TODO - If we have a performance bottleneck while loading animations, then we could cache these results.
         private string GetChildPathRecursively(Transform parent, string curName, string currentPath)
@@ -127,8 +138,79 @@ namespace GVR.Creator
                 return null;
             }
         }
+
+        private void AddClipEvents(AnimationClip clip, PxModelScriptData mds, PxAnimationData pxAnimation, string animationName)
+        {
+            var anim = mds.animations.First(i => i.name.EqualsIgnoreCase(animationName));
+
+            foreach (var pxEvent in anim.events)
+            {
+                var clampedFrame = ClampFrame(pxEvent.frame, anim.firstFrame, (int)pxAnimation.frameCount, anim.lastFrame);
+                
+                AnimationEvent animEvent = new()
+                {
+                    time = clampedFrame / clip.frameRate,
+                    functionName = nameof(IAnimationCallbacks.AnimationCallback),
+                    stringParameter = JsonUtility.ToJson(pxEvent) // As we can't add a custom object, we serialize data.
+                 };
+                
+                clip.AddEvent(animEvent);
+            }
+
+            foreach (var sfxEvent in anim.sfx)
+            {
+                var clampedFrame = ClampFrame(sfxEvent.frame, anim.firstFrame, (int)pxAnimation.frameCount, anim.lastFrame);
+                AnimationEvent animEvent = new()
+                {
+                    time = clampedFrame / clip.frameRate,
+                    functionName = nameof(IAnimationCallbacks.AnimationSfxCallback),
+                    stringParameter = JsonUtility.ToJson(sfxEvent) // As we can't add a custom object, we serialize data.
+                };
+                
+                clip.AddEvent(animEvent);
+            }
+
+            foreach (var sfxEvent in anim.sfx)
+            {
+                Debug.LogWarning($"SFX events not yet implemented: {sfxEvent.name}");
+            }
+        }
+
+        /// <summary>
+        /// Bugfix: There are events which would happen after the animation is done.
+        /// </summary>
+        private float ClampFrame(int expectedFrame, int firstFrame, int frameCount, int lastFrame)
+        {
+            if (expectedFrame < firstFrame)
+                return 0;
+            // e.g. beer-in-hand destroy animation would be triggered after animation itself.
+            if (expectedFrame >= (firstFrame + frameCount))
+                return frameCount - 1;
+            else
+                return expectedFrame - firstFrame;
+        }
         
-        private string GetPreparedAnimationKey(string mdsKey, string animKey)
+        /// <summary>
+        /// Adds event at the end of animation.
+        /// The event is called on every MonoBehaviour on GameObject where Clip is played.
+        /// @see: https://docs.unity3d.com/ScriptReference/AnimationEvent.html
+        /// @see: https://docs.unity3d.com/ScriptReference/GameObject.SendMessage.html
+        /// </summary>
+        private void AddClipEndEvent(AnimationClip clip)
+        {
+            AnimationEvent finalEvent = new()
+            {
+                time = clip.length,
+                functionName = nameof(IAnimationCallbacks.AnimationEndCallback),
+            };
+            
+            clip.AddEvent(finalEvent);
+        }
+        
+        /// <summary>
+        /// .man files are combined of MDSNAME-ANIMATIONNAME.man
+        /// </summary>
+        private string GetCombinedAnimationKey(string mdsKey, string animKey)
         {
             var preparedMdsKey = GetPreparedKey(mdsKey);
             var preparedAnimKey = GetPreparedKey(animKey);
@@ -136,6 +218,9 @@ namespace GVR.Creator
             return preparedMdsKey + "-" + preparedAnimKey;
         }
         
+        /// <summary>
+        /// Basically extract file ending and lower names.
+        /// </summary>
         private string GetPreparedKey(string key)
         {
             var lowerKey = key.ToLower();
