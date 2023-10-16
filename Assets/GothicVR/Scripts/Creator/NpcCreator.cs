@@ -86,7 +86,7 @@ namespace GVR.Creator
         {
             if (++debugNpcsSpawned > DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY)
                 return;
-
+            
             // if (npcInstance != DEBUG_BLOODWYN_INSTANCE_ID)
             //     return;
             

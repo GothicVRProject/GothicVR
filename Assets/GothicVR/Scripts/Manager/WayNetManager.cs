@@ -52,6 +52,7 @@ namespace GVR.Manager
             return nearestWayPoint.Value;
         }
 
+        [CanBeNull]
         public FreePoint FindNearestFreePoint(Vector3 lookupPosition, string fpNamePart)
         {
             return GameData.I.FreePoints

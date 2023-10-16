@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 1243189466349480952}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -143,7 +143,7 @@ GameObject:
   - component: {fileID: 123521218895422301}
   - component: {fileID: 9042877295681826828}
   - component: {fileID: 9038235182245234386}
-  - component: {fileID: 6620014795357072787}
+  - component: {fileID: 4065270797602007223}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -179,6 +179,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da21e4a06ee346319b0a6dc74e0dcc61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  npc:
+    symbolIndex: 0
+    id: 0
+    names: []
+    routine: 0
   npcSound: {fileID: 1118880304771858134}
   CurrentFreePoint:
     Name: 
@@ -187,6 +192,7 @@ MonoBehaviour:
   mdmName: 
   baseMdsName: 
   overlayMdsName: 
+  EquippedItems: []
   perceptionTime: 0
   walkMode: 0
   bodyState: 0
@@ -276,13 +282,13 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 10
   m_CollisionDetection: 0
---- !u!136 &6620014795357072787
-CapsuleCollider:
+--- !u!65 &4065270797602007223
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -299,8 +305,6 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  serializedVersion: 3
+  m_Size: {x: 1, y: 2, z: 1}
+  m_Center: {x: 0, y: 1, z: 0}

@@ -5,6 +5,9 @@ namespace GVR.Manager
 {
     public class ConstantsManager : SingletonBehaviour<ConstantsManager>
     {
+        public const float NpcWalkingSpeed = 1f;
+        public const float NpcRotationSpeed = 3f;
+        
         public const string SceneBootstrap = "Bootstrap";
         public const string SceneGeneral = "General";
         public const string SceneMainMenu = "MainMenu";

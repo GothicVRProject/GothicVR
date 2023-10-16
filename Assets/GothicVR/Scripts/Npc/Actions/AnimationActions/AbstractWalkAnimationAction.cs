@@ -1,5 +1,6 @@
 using GVR.Caches;
 using GVR.Creator;
+using GVR.Manager;
 using GVR.Phoenix.Interface.Vm;
 using UnityEngine;
 
@@ -20,7 +21,6 @@ namespace GVR.Npc.Actions.AnimationActions
         
         protected AbstractWalkAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
-        
         
         /// <summary>
         /// As we use legacy animations, we can't use RootMotion. We therefore need to rebuild it.
@@ -57,7 +57,7 @@ namespace GVR.Npc.Actions.AnimationActions
         
         private void HandleRotation(Transform transform)
         {
-            var singleStep = 1.0f * Time.deltaTime;
+            var singleStep = ConstantsManager.NpcRotationSpeed * Time.deltaTime;
             var targetDirection = movingLocation - transform.position;
 
             // If we set TargetDirection of >y< to 0, then we rotate left/right only.
@@ -98,7 +98,7 @@ namespace GVR.Npc.Actions.AnimationActions
         
         private void HandleWalk(Transform transform)
         {
-            var step =  1f * Time.deltaTime; // calculate distance to move
+            var step =  ConstantsManager.NpcWalkingSpeed * Time.deltaTime; // calculate distance to move
             var newPos = Vector3.MoveTowards(transform.position, movingLocation, step);
             
             transform.position = newPos;
