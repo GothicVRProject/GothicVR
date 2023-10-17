@@ -1693,7 +1693,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 0}
+    m_Reference: {fileID: -2446297833567266351, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   velocityLeft:
     m_UseReference: 1
     m_Action:
@@ -1705,7 +1705,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 0}
+    m_Reference: {fileID: -4538930393538190949, guid: c348712bda248c246b8c49b3db54643f, type: 3}
 --- !u!1 &3286136462967229782
 GameObject:
   m_ObjectHideFlags: 0

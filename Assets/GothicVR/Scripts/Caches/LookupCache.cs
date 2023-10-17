@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using GVR.Npc;
+using GVR.Properties;
 using TMPro;
 using UnityEngine;
 
@@ -21,7 +22,7 @@ namespace GVR.Caches
         /// <summary>
         /// [symbolIndex] = Properties-Component
         /// </summary>
-        public readonly Dictionary<uint, Properties> NpcCache = new();
+        public readonly Dictionary<uint, NpcProperties> NpcCache = new();
 
         /// <summary>
         /// Already created AnimationClips can be reused.

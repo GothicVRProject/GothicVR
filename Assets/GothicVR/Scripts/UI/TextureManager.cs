@@ -1,7 +1,7 @@
-using UnityEngine;
 using GVR.Caches;
-using GVR.Phoenix.Util;
+using GVR.Extensions;
 using GVR.Util;
+using UnityEngine;
 
 public class TextureManager : SingletonBehaviour<TextureManager>
 {

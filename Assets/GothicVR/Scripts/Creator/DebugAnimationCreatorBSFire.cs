@@ -4,9 +4,8 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Creator.Meshes;
 using GVR.Debugging;
-using GVR.Demo;
+using GVR.Extensions;
 using GVR.Phoenix.Interface;
-using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Animation;
 using PxCs.Data.Mesh;
@@ -14,8 +13,6 @@ using PxCs.Data.Model;
 using PxCs.Data.Struct;
 using PxCs.Interface;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 
 namespace GVR.Creator
