@@ -155,12 +155,10 @@ namespace GVR.Bootstrap
 
         private void LoadMusic()
         {
-            if (!FeatureFlags.I.EnableMusic)
-                return;
-            var music = MusicCreator.I;
+            var music = MusicManager.I;
             music.Create();
-            music.setEnabled(true);
-            music.setMusic("SYS_MENU");
+            music.SetEnabled(FeatureFlags.I.EnableMusic);
+            music.SetMusic("SYS_MENU");
             Debug.Log("Loading music");
         }
 

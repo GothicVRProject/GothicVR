@@ -1,11 +1,11 @@
-using GVR.Phoenix.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using GVR.Extensions;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Collections.Generic;
-using System.Linq;
-using System;
 
 namespace GVR.Manager
 {

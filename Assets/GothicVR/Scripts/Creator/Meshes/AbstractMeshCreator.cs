@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
+using GVR.Extensions;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Util;
 using GVR.Util;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace GVR.Creator.Meshes
 {
@@ -18,19 +19,20 @@ namespace GVR.Creator.Meshes
         // until we know how to change specifics to the cutout only. (e.g. bushes)
         protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
         private const string waterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
+        private const string alphaToCoverageShaderName = "Unlit/Unlit-AlphaToCoverage";
         protected const float decalOpacity = 0.75f;
 
 
-        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null)
+        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent);
+            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
         }
 
-        public GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        public virtual GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
-            rootGo.SetParent(parent);
-            
+            rootGo.SetParent(parent, true, true);
+
             var nodeObjects = new GameObject[mdh.nodes!.Length];
 
             // Create empty GameObjects from hierarchy
@@ -68,7 +70,7 @@ namespace GVR.Creator.Meshes
             {
                 var mesh = softSkinMesh.mesh;
 
-                var meshObj = new GameObject("JaX_ZM_0");
+                var meshObj = new GameObject("ZM_0");
                 meshObj.SetParent(rootGo);
 
                 var meshFilter = meshObj.AddComponent<MeshFilter>();
@@ -86,7 +88,7 @@ namespace GVR.Creator.Meshes
             }
 
             var attachments = GetFilteredAttachments(mdm.attachments);
-            
+
             // Fill GameObjects with Meshes from attachments
             foreach (var subMesh in attachments)
             {
@@ -125,6 +127,11 @@ namespace GVR.Creator.Meshes
                 return null;
             }
 
+            // If there is no texture for any of the meshes, just skip this item.
+            // G1: Some skull decorations are without texture.
+            if (mrm.materials!.All(m => m.texture == ""))
+                return null;
+
             rootGo ??= new GameObject();
             rootGo.name = objectName;
             rootGo.SetParent(parent);
@@ -159,34 +166,12 @@ namespace GVR.Creator.Meshes
 
         protected void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
-            obj.transform.localRotation = rotation;
-            obj.transform.localPosition = position;
+            obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
         protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
-            Material material;
-            switch (subMesh.material.group)
-            {
-                case PxMaterial.PxMaterialGroup.PxMaterialGroup_Water:
-                    material = GetWaterMaterial(subMesh.material);
-                    break;
-                default:
-                    material = GetDefaultMaterial();
-                    break;
-            }
-
             var bMaterial = subMesh.material;
-
-            rend.material = material;
-
-            // No texture to add.
-            if (bMaterial.texture == "")
-            {
-                Debug.LogWarning("No texture was set for: " + bMaterial.name);
-                return;
-            }
-
             var texture = GetTexture(bMaterial.texture);
 
             if (null == texture)
@@ -197,13 +182,33 @@ namespace GVR.Creator.Meshes
                     Debug.LogError("Couldn't get texture from name: " + bMaterial.texture);
             }
 
+            Material material;
+            switch (subMesh.material.group)
+            {
+                case PxMaterial.PxMaterialGroup.PxMaterialGroup_Water:
+                    material = GetWaterMaterial(subMesh.material);
+                    break;
+                default:
+                    material = GetDefaultMaterial(texture != null && texture.format == TextureFormat.RGBA32);
+                    break;
+            }
+
+            rend.material = material;
+
+            // No texture to add.
+            if (bMaterial.texture == "")
+            {
+                Debug.LogWarning("No texture was set for: " + bMaterial.name);
+                return;
+            }
+
             material.mainTexture = texture;
         }
 
         protected void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
         {
             var mesh = new Mesh();
-            meshFilter.mesh = mesh;
+            meshFilter.sharedMesh = mesh;
 
             mesh.SetVertices(subMesh.vertices);
             mesh.SetTriangles(subMesh.triangles, 0);
@@ -224,8 +229,23 @@ namespace GVR.Creator.Meshes
 
             foreach (var subMesh in mrmData.subMeshes)
             {
-                var material = GetDefaultMaterial();
                 var materialData = subMesh.material;
+
+                var texture = GetTexture(materialData.texture);
+                if (null == texture)
+                {
+
+                    if (materialData.texture.EndsWith(".TGA"))
+                    {
+                        Debug.LogError("This is supposed to be a decal: " + materialData.texture);
+                    }
+                    else
+                    {
+                        Debug.LogError("Couldn't get texture from name: " + materialData.texture);
+                    }
+                }
+
+                var material = GetDefaultMaterial(texture != null && texture.format == TextureFormat.RGBA32);
 
                 rend.material = material;
 
@@ -235,13 +255,6 @@ namespace GVR.Creator.Meshes
                     Debug.LogWarning("No texture was set for: " + materialData.name);
                     return;
                 }
-
-                var texture = GetTexture(materialData.texture);
-                if (null == texture)
-                    if (materialData.texture.EndsWith(".TGA"))
-                        Debug.LogError("This is supposed to be a decal: " + materialData.texture);
-                    else
-                        Debug.LogError("Couldn't get texture from name: " + materialData.texture);
 
                 material.mainTexture = texture;
 
@@ -492,14 +505,19 @@ namespace GVR.Creator.Meshes
             return AssetCache.I.TryGetTexture(name);
         }
 
-        protected Material GetDefaultMaterial()
+        protected Material GetDefaultMaterial(bool isAlphaTest)
         {
-            var standardShader = Shader.Find(defaultShader);
-            var material = new Material(standardShader);
-
-            // Enable clipping of alpha values.
-            material.EnableKeyword("_ALPHATEST_ON");
-
+            var shader = Shader.Find(defaultShader);
+            if (isAlphaTest)
+            {
+                shader = Shader.Find(alphaToCoverageShaderName);
+            }
+            var material = new Material(shader);
+            if (isAlphaTest)
+            {
+                // Manually correct the render queue for alpha test, as Unity doesn't want to do it from the shader's render queue tag.
+                material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
+            }
             return material;
         }
 
@@ -525,8 +543,8 @@ namespace GVR.Creator.Meshes
 
             material.SetFloat("_Surface", 0);
             material.SetInt("_ZWrite", 0);
-            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
 
             return material;
         }
