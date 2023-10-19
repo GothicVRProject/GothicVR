@@ -555,16 +555,20 @@ namespace GVR.Creator
 
         private GameObject CreateLadder(PxVobData vob)
         {
-            // FIXME - use Prefab instead.
+            // FIXME - use Prefab instead. And be cautious of settings!
             var vobObj = CreateDefaultMesh(vob, true);
             var meshGo = vobObj;
             var grabComp = meshGo.AddComponent<XRGrabInteractable>();
             var rigidbodyComp = meshGo.GetComponent<Rigidbody>();
+            var meshColliderComp = vobObj.GetComponentInChildren<MeshCollider>();
 
-            meshGo.tag = "Climbable";
+            meshColliderComp.convex = true; // We need to set it to overcome Physics.ClosestPoint warnings.
+            meshGo.tag = ConstantsManager.ClimbableTag;
             rigidbodyComp.isKinematic = true;
+            grabComp.throwOnDetach = false; // Throws errors and isn't needed as we don't want to move the kinematic ladder when released.
             grabComp.trackPosition = false;
             grabComp.trackRotation = false;
+            grabComp.selectMode = InteractableSelectMode.Multiple; // With this, we can grab with both hands!
 
             return vobObj;
         }
