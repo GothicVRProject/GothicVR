@@ -37,7 +37,7 @@ namespace GVR.Creator.Meshes
 
 
         /// <summary>
-        /// Add ZenginSlot collider. i.e. positions where 
+        /// Add ZengineSlot collider. i.e. positions where an NPC can sit on a bench.
         /// </summary>
         private void AddZsCollider([CanBeNull] GameObject go)
         {
@@ -52,7 +52,8 @@ namespace GVR.Creator.Meshes
                     continue;
                 
                 // Used for event triggers with NPCs.
-                child.AddComponent<SphereCollider>();
+                var coll = child.AddComponent<SphereCollider>();
+                coll.isTrigger = true;
             }
         }
 
