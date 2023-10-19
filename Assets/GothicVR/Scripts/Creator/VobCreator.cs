@@ -543,7 +543,9 @@ namespace GVR.Creator
             var meshGo = vobObj;
             var grabComp = meshGo.AddComponent<XRGrabInteractable>();
             var rigidbodyComp = meshGo.GetComponent<Rigidbody>();
+            var meshColliderComp = vobObj.GetComponentInChildren<MeshCollider>();
 
+            meshColliderComp.convex = true; // We need to set it to overcome Physics.ClosestPoint warnings.
             meshGo.tag = ConstantsManager.ClimbableTag;
             rigidbodyComp.isKinematic = true;
             grabComp.throwOnDetach = false; // Throws errors and isn't needed as we don't want to move the kinematic ladder when released.
