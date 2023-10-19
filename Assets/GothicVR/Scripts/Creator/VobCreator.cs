@@ -19,7 +19,6 @@ using GVR.Util;
 using GVR.Vob;
 using GVR.Vob.WayNet;
 using JetBrains.Annotations;
-using PxCs.Data.Sound;
 using PxCs.Data.Struct;
 using PxCs.Data.Vm;
 using PxCs.Data.Vob;
@@ -51,6 +50,24 @@ namespace GVR.Creator
         private void Start()
         {
             assetCache = AssetCache.I;
+            
+            GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostWorldLoaded);
+        }
+
+        private void PostWorldLoaded()
+        {
+            // We need to check for all Sounds once, if they need to be activated as they're next to player.
+            // As CullingGroup only triggers deactivation once player spawns, but not activation.
+            var loc = Camera.main!.transform.position;
+            foreach (var sound in LookupCache.I.vobSoundsAndDayTime)
+            {
+                var soundLoc = sound.transform.position;
+                var soundDist = sound.GetComponent<AudioSource>().maxDistance;
+                var dist = UnityEngine.Vector3.Distance(loc, soundLoc);
+                
+                if (dist < soundDist)
+                    sound.SetActive(true);
+            }
         }
 
         private int GetTotalVobCount(PxVobData[] vobs)
@@ -71,8 +88,7 @@ namespace GVR.Creator
             if (!FeatureFlags.I.CreateVobs)
                 return;
 
-            var cullingGroupObjects = new List<GameObject>();
-            var cullingSoundObjects = new List<GameObject>();
+            var cullingVobObjects = new List<GameObject>();
 
             totalVObs = GetTotalVobCount(world.vobs);
 
@@ -100,25 +116,25 @@ namespace GVR.Creator
                     case PxWorld.PxVobType.PxVob_oCItem:
                     {
                         var obj = CreateItem((PxVobItemData)vob);
-                        cullingGroupObjects.Add(obj);
+                        cullingVobObjects.Add(obj);
                         break;
                     }
                     case PxWorld.PxVobType.PxVob_oCMobContainer:
                     {
                         var obj = CreateMobContainer((PxVobMobContainerData)vob);
-                        cullingGroupObjects.Add(obj);
+                        cullingVobObjects.Add(obj);
                         break;
                     }
                     case PxWorld.PxVobType.PxVob_zCVobSound:
                     {
                         var obj = CreateSound((PxVobSoundData)vob);
-                        cullingSoundObjects.Add(obj);
+                        LookupCache.I.vobSoundsAndDayTime.Add(obj);
                         break;
                     }
                     case PxWorld.PxVobType.PxVob_zCVobSoundDaytime:
                     {
                         var obj = CreateSoundDaytime((PxVobSoundDaytimeData)vob);
-                        cullingSoundObjects.Add(obj);
+                        LookupCache.I.vobSoundsAndDayTime.Add(obj);
                         break;
                     }
                     case PxWorld.PxVobType.PxVob_oCZoneMusic:
@@ -135,7 +151,7 @@ namespace GVR.Creator
                     case PxWorld.PxVobType.PxVob_oCMobLadder:
                     {
                         var obj = CreateLadder(vob);
-                        cullingGroupObjects.Add(obj);
+                        cullingVobObjects.Add(obj);
                         break;
                     }
                     case PxWorld.PxVobType.PxVob_oCTriggerChangeLevel:
@@ -170,14 +186,14 @@ namespace GVR.Creator
                         else
                             obj = CreateDefaultMesh(vob);
                         
-                        cullingGroupObjects.Add(obj);
+                        cullingVobObjects.Add(obj);
                         break;
                     }
                     case PxWorld.PxVobType.PxVob_oCMobInter:
                     default:
                     {
                         var obj = CreateDefaultMesh(vob);
-                        cullingGroupObjects.Add(obj);
+                        cullingVobObjects.Add(obj);
                         break;
                     }
                 }
@@ -190,10 +206,10 @@ namespace GVR.Creator
                     await Task.Yield(); // Wait for the next frame
             }
 
-            var nonNullCullingGroupItems = cullingGroupObjects.Where(i => i != null).ToArray();
+            var nonNullCullingGroupItems = cullingVobObjects.Where(i => i != null).ToArray();
             VobMeshCullingManager.I.PrepareVobCulling(nonNullCullingGroupItems);
             
-            VobSoundCullingManager.I.PrepareSoundCulling(cullingSoundObjects);
+            VobSoundCullingManager.I.PrepareSoundCulling(LookupCache.I.vobSoundsAndDayTime);
             
             // TODO - Not implemented warnings - print them once only.
             foreach (var var in new[]{
