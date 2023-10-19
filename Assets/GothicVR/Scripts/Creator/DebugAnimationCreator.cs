@@ -6,7 +6,6 @@ using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Phoenix.Interface;
-using GVR.Util;
 using PxCs.Data.Animation;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
@@ -17,18 +16,10 @@ using UnityEngine.SceneManagement;
 
 namespace GVR.Creator
 {
-    public class DebugAnimationCreator : SingletonBehaviour<DebugAnimationCreator>
+    public static class DebugAnimationCreator
     {
-        private AssetCache assetCache;
         private const string DEFAULT_SHADER = "Universal Render Pipeline/Unlit";
-
-
-        private void Start()
-        {
-            assetCache = AssetCache.I;
-        }
-
-        public void Create(string worldName)
+        public static void Create(string worldName)
         {
             if (!FeatureFlags.I.CreateExampleAnimation)
                 return;
@@ -39,7 +30,7 @@ namespace GVR.Creator
         }
 
         #region Chest
-        private void CreateChest(string worldName)
+        private static void CreateChest(string worldName)
         {
             var name = "DebugChest";
             var mdsName = "ChestSmall_OCCratesmall.MDS";
@@ -49,8 +40,8 @@ namespace GVR.Creator
             var debugObj = new GameObject("DebugChest");
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(debugObj);
 
-            var mds = PxModelScript.GetModelScriptFromVfs(GameData.I.VfsPtr, mdsName);
-            var mdl = PxModel.LoadModelFromVfs(GameData.I.VfsPtr, mdlName);
+            var mds = PxModelScript.GetModelScriptFromVfs(GameData.VfsPtr, mdsName);
+            var mdl = PxModel.LoadModelFromVfs(GameData.VfsPtr, mdlName);
 
             var obj = CreateAttachmentObj(name, mdl, debugObj);
             debugObj.transform.localPosition = new(-15f, 10f, 0);
@@ -58,7 +49,7 @@ namespace GVR.Creator
             PlayAnimationChest(obj, mds, mdl, mdsName, animationName);
         }
 
-        private GameObject CreateAttachmentObj(string objectName, PxModelData mdl, GameObject parent)
+        private static GameObject CreateAttachmentObj(string objectName, PxModelData mdl, GameObject parent)
         {
             var mdh = mdl.hierarchy;
             var mdm = mdl.mesh;
@@ -104,12 +95,12 @@ namespace GVR.Creator
             return rootObj;
         }
 
-        private void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
+        private static void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
         {
             var unityMatrix = matrix.ToUnityMatrix();
             SetPosAndRot(obj, unityMatrix.GetPosition() / 100, unityMatrix.rotation);
         }
-        private void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
+        private static void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
             // FIXME - This isn't working
             if (position.Equals(default) && rotation.Equals(default))
@@ -118,7 +109,7 @@ namespace GVR.Creator
             obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
-        private void PrepareMeshRenderer(Renderer renderer, PxMultiResolutionMeshData mrmData)
+        private static void PrepareMeshRenderer(Renderer renderer, PxMultiResolutionMeshData mrmData)
         {
             var finalMaterials = new List<Material>(mrmData.subMeshes.Length);
 
@@ -134,7 +125,7 @@ namespace GVR.Creator
                 if (materialData.texture == "")
                     return;
 
-                var texture = assetCache.TryGetTexture(materialData.texture);
+                var texture = AssetCache.TryGetTexture(materialData.texture);
 
                 if (null == texture)
                     throw new Exception("Couldn't get texture from name: " + materialData.texture);
@@ -147,7 +138,7 @@ namespace GVR.Creator
             renderer.SetMaterials(finalMaterials);
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
+        private static void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
         {
             /**
              * Ok, brace yourself:
@@ -225,7 +216,7 @@ namespace GVR.Creator
             }
         }
 
-        private void PlayAnimationChest(GameObject rootObj, PxModelScriptData mds, PxModelData mdl, string mdsName, string animationName)
+        private static void PlayAnimationChest(GameObject rootObj, PxModelScriptData mds, PxModelData mdl, string mdsName, string animationName)
         {
             var mdh = mdl.hierarchy;
 
@@ -233,7 +224,7 @@ namespace GVR.Creator
             for (int i = 0; i < animations.Length; i++)
             {
                 var animName = mdsName.Replace(".MDS", $"-{mds.animations[i].name}.MAN", StringComparison.OrdinalIgnoreCase);
-                animations[i] = PxAnimation.LoadFromVfs(GameData.I.VfsPtr, animName);
+                animations[i] = PxAnimation.LoadFromVfs(GameData.VfsPtr, animName);
             }
             var animation = animations.First(i => i.name == animationName);
 
@@ -304,7 +295,7 @@ namespace GVR.Creator
         #endregion
 
         #region Grindstone
-        private void CreateGrindstone(string worldName)
+        private static void CreateGrindstone(string worldName)
         {
             var name = "DebugGrindstone";
             var mdsName = "BSSHARP_OC.MDS";
@@ -314,8 +305,8 @@ namespace GVR.Creator
             var debugObj = new GameObject("DebugGrindstone");
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(debugObj);
 
-            var mds = PxModelScript.GetModelScriptFromVfs(GameData.I.VfsPtr, mdsName);
-            var mdl = PxModel.LoadModelFromVfs(GameData.I.VfsPtr, mdlName);
+            var mds = PxModelScript.GetModelScriptFromVfs(GameData.VfsPtr, mdsName);
+            var mdl = PxModel.LoadModelFromVfs(GameData.VfsPtr, mdlName);
 
             var obj = CreateAttachmentObj(name, mdl, debugObj);
             debugObj.transform.localPosition = new(-20f, 10f, 0);
@@ -323,7 +314,7 @@ namespace GVR.Creator
             PlayAnimationGrindstone(obj, mds, mdl, mdsName, animationName);
         }
 
-        private void PlayAnimationGrindstone(GameObject rootObj, PxModelScriptData mds, PxModelData mdl, string mdsName, string animationName)
+        private static void PlayAnimationGrindstone(GameObject rootObj, PxModelScriptData mds, PxModelData mdl, string mdsName, string animationName)
         {
             var mdh = mdl.hierarchy;
 
@@ -331,7 +322,7 @@ namespace GVR.Creator
             for (int i = 0; i < animations.Length; i++)
             {
                 var animName = mdsName.Replace(".MDS", $"-{mds.animations[i].name}.MAN", StringComparison.OrdinalIgnoreCase);
-                animations[i] = PxAnimation.LoadFromVfs(GameData.I.VfsPtr, animName);
+                animations[i] = PxAnimation.LoadFromVfs(GameData.VfsPtr, animName);
             }
             var animation = animations.First(i => i.name == animationName);
 
@@ -410,7 +401,7 @@ namespace GVR.Creator
         }
         #endregion
 
-        private void CreateBloodfly()
+        private static void CreateBloodfly()
         {
             ///
             /// File names to change
@@ -427,12 +418,12 @@ namespace GVR.Creator
             var debugObj = new GameObject("DebugAnimationObject");
             SceneManager.GetSceneByName("SampleScene").GetRootGameObjects().Append(debugObj);
 
-            var mds = PxModelScript.GetModelScriptFromVfs(GameData.I.VfsPtr, mdsName);
-            var mdl = PxModel.LoadModelFromVfs(GameData.I.VfsPtr, mdlName);
-            var mdh = PxModelHierarchy.LoadFromVfs(GameData.I.VfsPtr, mdhName);
-            var mdm = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, mdmName);
-            var mrm = PxMultiResolutionMesh.GetMRMFromVfs(GameData.I.VfsPtr, mrmName);
-            var obj = MeshCreator.I.Create(name, mdm, mdh, default, default, debugObj);
+            var mds = PxModelScript.GetModelScriptFromVfs(GameData.VfsPtr, mdsName);
+            var mdl = PxModel.LoadModelFromVfs(GameData.VfsPtr, mdlName);
+            var mdh = PxModelHierarchy.LoadFromVfs(GameData.VfsPtr, mdhName);
+            var mdm = PxModelMesh.LoadModelMeshFromVfs(GameData.VfsPtr, mdmName);
+            var mrm = PxMultiResolutionMesh.GetMRMFromVfs(GameData.VfsPtr, mrmName);
+            var obj = MeshCreator.Create(name, mdm, mdh, default, default, debugObj);
 
 
 
@@ -440,7 +431,7 @@ namespace GVR.Creator
             for (int i = 0; i < animations.Length; i++)
             {
                 var animName = mdsName.Replace(".MDS", $"-{mds.animations[i].name}.MAN", StringComparison.OrdinalIgnoreCase);
-                animations[i] = PxAnimation.LoadFromVfs(GameData.I.VfsPtr, animName);
+                animations[i] = PxAnimation.LoadFromVfs(GameData.VfsPtr, animName);
             }
             var debugAnimationNames = animations.Select(i => i.name).ToArray();
             var anim = animations.First(i => i.name == animationName);

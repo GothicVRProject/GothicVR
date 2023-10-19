@@ -9,32 +9,27 @@ using GVR.Extensions;
 using GVR.Manager;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
-using GVR.Util;
 using PxCs.Data.WayNet;
 using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
 
 namespace GVR.Creator
 {
-    public class WorldCreator : SingletonBehaviour<WorldCreator>
+    public static class WorldCreator
     {
-        private GameObject worldGo;
-        private GameObject teleportGo;
-        private GameObject nonTeleportGo;
+        private static GameObject worldGo;
+        private static GameObject teleportGo;
+        private static GameObject nonTeleportGo;
 
-        private void Start()
-        {
-            GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostCreate);
-        }
-        
-        public async Task CreateAsync(string worldName)
+        public static async Task CreateAsync(string worldName)
         {
             var world = LoadWorld(worldName);
-            GameData.I.World = world;
+            GameData.World = world;
             worldGo = new GameObject("World");
 
             // Interactable Vobs (item, ladder, ...) have their own collider Components
@@ -44,14 +39,14 @@ namespace GVR.Creator
             teleportGo.SetParent(worldGo);
             nonTeleportGo.SetParent(worldGo);
 
-            await WorldMeshCreator.I.CreateAsync(world, teleportGo, ConstantsManager.I.MeshPerFrame);
-            await VobCreator.I.CreateAsync(teleportGo, nonTeleportGo, world, ConstantsManager.I.VObPerFrame);
-            WaynetCreator.I.Create(worldGo, world);
+            await WorldMeshCreator.CreateAsync(world, teleportGo, ConstantsManager.MeshPerFrame);
+            await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, ConstantsManager.VObPerFrame);
+            WaynetCreator.Create(worldGo, world);
 
-            DebugAnimationCreator.I.Create(worldName);
-            DebugAnimationCreatorBSFire.I.Create(worldName);
-            DebugAnimationCreatorVelaya.I.Create(worldName);
-            DebugAnimationCreatorBloodwyn.I.Create();
+            DebugAnimationCreator.Create(worldName);
+            DebugAnimationCreatorBSFire.Create(worldName);
+            DebugAnimationCreatorVelaya.Create(worldName);
+            DebugAnimationCreatorBloodwyn.Create();
 
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
@@ -61,13 +56,13 @@ namespace GVR.Creator
         /// <summary>
         /// Logic to be called after world (i.e. general scene) is fully loaded.
         /// </summary>
-        private void PostCreate()
+        public static void PostCreate()
         {
             var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
-            
+
             // If we load a new scene, just remove the existing one.
             if (worldGo.TryGetComponent(out TeleportationArea teleportArea))
-                Destroy(teleportArea);
+                GameObject.Destroy(teleportArea);
 
             // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
             var teleportationArea = teleportGo.AddComponent<TeleportationArea>();
@@ -75,15 +70,15 @@ namespace GVR.Creator
             {
                 teleportationArea.interactionManager = interactionManager;
             }
-            
+
             // TODO - For some reason the referenced skybox in scene is reset to default once game starts.
             // We therefore need to reset it now again.
             RenderSettings.skybox = TextureManager.I.skymaterial;
         }
 
-        private WorldData LoadWorld(string worldName)
+        private static WorldData LoadWorld(string worldName)
         {
-            var worldPtr = PxWorld.pxWorldLoadFromVfs(GameData.I.VfsPtr, worldName);
+            var worldPtr = PxWorld.pxWorldLoadFromVfs(GameData.VfsPtr, worldName);
             if (worldPtr == IntPtr.Zero)
                 throw new ArgumentException($"World >{worldName}< couldn't be found.");
 
@@ -125,7 +120,7 @@ namespace GVR.Creator
                 waypointEdges = waypointEdges
             };
 
-            if (FeatureFlags.I.enableFineGrainedWorldMeshCreation)
+            if (FeatureFlags.I && FeatureFlags.I.enableFineGrainedWorldMeshCreation)
             {
                 var subMeshes = CreateSubMeshesForUnityExperimental(world);
                 world.subMeshes = subMeshes;
@@ -140,8 +135,8 @@ namespace GVR.Creator
 
             return world;
         }
-        
-        private Dictionary<int, List<WorldData.SubMeshData>> CreateSubMeshesForUnityStable(WorldData world)
+
+        private static Dictionary<int, List<WorldData.SubMeshData>> CreateSubMeshesForUnityStable(WorldData world)
         {
             Dictionary<int, List<WorldData.SubMeshData>> subMeshes = new(world.materials.Length);
             var vertices = world.vertices;
@@ -151,15 +146,15 @@ namespace GVR.Creator
 
             // We need to put vertex_indices (aka triangles) in reversed order
             // to make Unity draw mesh elements right (instead of upside down)
-            for (var loopVertexIndexId = vertexIndices.LongLength - 1; loopVertexIndexId >= 0; loopVertexIndexId-=3)
+            for (var loopVertexIndexId = vertexIndices.LongLength - 1; loopVertexIndexId >= 0; loopVertexIndexId -= 3)
             {
                 // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
                 var materialIndex = world.materialIndices[loopVertexIndexId / 3];
-                
+
                 // DEBUG! Some elements to test subMeshing
                 // if (materialIndex != 60) // 60 - some walls, 4 - grass
                 //     continue;
-                
+
                 // The materialIndex was never used before.
                 if (!subMeshes.ContainsKey(materialIndex))
                 {
@@ -174,17 +169,17 @@ namespace GVR.Creator
 
                     subMeshes.Add(materialIndex, newSubMesh);
                 }
-                
+
                 var currentSubMesh = subMeshes[materialIndex];
                 var currentSubMeshFirstListItem = currentSubMesh.First();
 
                 for (var subVertexIndexId = loopVertexIndexId; subVertexIndexId > loopVertexIndexId - 3; subVertexIndexId--)
                 {
                     var origVertexIndex = vertexIndices[subVertexIndexId];
-                    
+
                     // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
                     currentSubMeshFirstListItem.vertices.Add(vertices[origVertexIndex].ToUnityVector());
-                    
+
                     var featureIndex = featureIndices[subVertexIndexId];
                     currentSubMeshFirstListItem.uvs.Add(features[featureIndex].texture.ToUnityVector());
                     currentSubMeshFirstListItem.normals.Add(features[featureIndex].normal.ToUnityVector());
@@ -196,18 +191,18 @@ namespace GVR.Creator
             // DebugPrint(subMeshes, "old");
             return subMeshes;
         }
-        
+
         /// <summary>
         /// This method is for initial collection of vertexIndex and featureIndex based on materialId
         /// In a first step, we just collect all the indexes
         /// In a second step, we try to merge elements together, which share vertexIndex
         /// Then it will be transformed into WorldData.SubMeshData as known before
         /// </summary>
-        private Dictionary<int, List<WorldData.SubMeshData>> CreateSubMeshesForUnityExperimental(WorldData world)
+        private static Dictionary<int, List<WorldData.SubMeshData>> CreateSubMeshesForUnityExperimental(WorldData world)
         {
             // Dict<materialId, List<KVP<List<vertexIndex>, List<featureIndex>>>>
             Dictionary<int, List<ValueTuple<List<int>, List<int>>>> subSubMeshTempArrangement = new();
-            
+
             Dictionary<int, List<WorldData.SubMeshData>> returnMeshes = new(world.materials.Length);
             var vertices = world.vertices;
             var vertexIndices = world.vertexIndices;
@@ -216,7 +211,7 @@ namespace GVR.Creator
 
             // We need to put vertex_indices (aka triangles) in reversed order
             // to make Unity draw mesh elements right (instead of upside down)
-            for (var loopVertexIndexId = vertexIndices.LongLength - 1; loopVertexIndexId >= 0; loopVertexIndexId-=3)
+            for (var loopVertexIndexId = vertexIndices.LongLength - 1; loopVertexIndexId >= 0; loopVertexIndexId -= 3)
             {
                 // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
                 var materialIndex = world.materialIndices[loopVertexIndexId / 3];
@@ -224,7 +219,7 @@ namespace GVR.Creator
                 // DEBUG! Some elements to test subMeshing
                 // if (materialIndex != 60) // 60 - some walls, 4 - grass
                 //     continue;
-                
+
                 // The materialIndex was never used before.
                 if (!subSubMeshTempArrangement.ContainsKey(materialIndex))
                     subSubMeshTempArrangement.Add(materialIndex, new List<ValueTuple<List<int>, List<int>>>());
@@ -250,7 +245,7 @@ namespace GVR.Creator
                     {
                         currentSubSubMesh.Item1.AddRange(new[] { vertexIndex0, vertexIndex1, vertexIndex2 });
                         currentSubSubMesh.Item2.AddRange(new[] { featureIndex0, featureIndex1, featureIndex2 });
-                        
+
                         addedToSubSubMesh = true;
                         break;
                     }
@@ -265,10 +260,10 @@ namespace GVR.Creator
                         Item1 = new List<int>(),
                         Item2 = new List<int>()
                     };
-                    
-                    newSubSub.Item1.AddRange(new[]{ vertexIndex0, vertexIndex1, vertexIndex2});
+
+                    newSubSub.Item1.AddRange(new[] { vertexIndex0, vertexIndex1, vertexIndex2 });
                     newSubSub.Item2.AddRange(new[] { featureIndex0, featureIndex1, featureIndex2 });
-                        
+
                     currentSubMesh.Add(newSubSub);
                 }
             }
@@ -284,17 +279,17 @@ namespace GVR.Creator
                     // Current item is empty already/marked for deletion (i.e. merged into another list element)
                     if (!subMeshes.Value[subSubIndex1].Item1.Any())
                         continue;
-                    
+
                     for (var subSubIndex2 = 0; subSubIndex2 < subMeshes.Value.Count; subSubIndex2++)
                     {
                         // Current item is empty already/marked for deletion (i.e. merged into another list element)
                         if (!subMeshes.Value[subSubIndex2].Item1.Any())
                             continue;
-                        
+
                         // Do not check against yourself
                         if (subSubIndex1 == subSubIndex2)
                             continue;
-                        
+
                         var curArr = subMeshes.Value[subSubIndex1];
                         var checkArr = subMeshes.Value[subSubIndex2];
                         if (!curArr.Item1.Intersect(checkArr.Item1).Any())
@@ -329,7 +324,7 @@ namespace GVR.Creator
                     // Skip empty triangle entry lists only. (e.g. grass is then shrunk from ~500 submeshes down to ~150)
                     if (!subMeshLoop.Item1.Any())
                         continue;
-                    
+
                     var currentSubSubMesh = new WorldData.SubMeshData
                     {
                         materialIndex = meshLoop.Key,
@@ -351,11 +346,11 @@ namespace GVR.Creator
                     }
                 }
             }
-            
+
             return returnMeshes;
         }
 
-        private void DebugPrint(Dictionary<int, List<WorldData.SubMeshData>> data, string suffix)
+        private static void DebugPrint(Dictionary<int, List<WorldData.SubMeshData>> data, string suffix)
         {
             var fileWriter = new StreamWriter(Application.persistentDataPath + "/" + DateTime.Now.ToString("hh-mm-ss") + "-" + suffix + ".txt", false);
 
@@ -367,7 +362,7 @@ namespace GVR.Creator
                 {
                     fileWriter.WriteLine("  newSubMesh");
                     fileWriter.WriteLine("  {");
-                    for (var index=0; index<subMeshData.triangles.Count; index++)
+                    for (var index = 0; index < subMeshData.triangles.Count; index++)
                     {
                         fileWriter.WriteLine($"    vertex: {subMeshData.vertices[index]}");
                         fileWriter.WriteLine($"    uv:     {subMeshData.uvs[index]}");
@@ -376,7 +371,7 @@ namespace GVR.Creator
                 }
                 fileWriter.WriteLine("}");
             }
-            
+
             fileWriter.Close();
         }
 
@@ -385,39 +380,19 @@ namespace GVR.Creator
         /// <summary>
         /// Loads the world for occlusion culling.
         /// </summary>
-        public void LoadEditorWorld(IntPtr vfsPtr, string zen)
+        public static async void LoadEditorWorld(IntPtr vfsPtr)
         {
-            var worldScene = EditorSceneManager.GetSceneByName(zen);
-
-            if (!worldScene.isLoaded)
+            Scene worldScene = EditorSceneManager.GetActiveScene();
+            if (Path.GetDirectoryName(worldScene.path) != "Assets\\GothicVR\\Scenes\\Worlds")
             {
-                // unload the current scene and load the new one
-                if (EditorSceneManager.GetActiveScene().name != "Bootstrap")
-                    EditorSceneManager.UnloadSceneAsync(EditorSceneManager.GetActiveScene());
-                EditorSceneManager.OpenScene(zen);
-                worldScene = EditorSceneManager.GetSceneByName(zen); // we do this to reload the values for the new scene which are no updated for the above cast
+                Debug.LogWarning($"Open a world scene, from Assets/GothicVR/Scenes/Worlds.");
+                return;
             }
 
-            var world = LoadWorld(zen);
+            GameData.VfsPtr = vfsPtr;
+            GameData.World = LoadWorld(worldScene.name);
 
-            // FIXME - Might not work as we have no context inside Editor mode. Need to test and find alternative.
-            GameData.I.VfsPtr = vfsPtr;
-            GameData.I.World = world;
-
-            var worldGo = new GameObject("World");
-
-            // We use SampleScene because it contains all the VM pointers and asset cache necesarry to generate the world
-            var sampleScene = EditorSceneManager.GetSceneByName("Bootstrap");
-            EditorSceneManager.SetActiveScene(sampleScene);
-            sampleScene.GetRootGameObjects().Append(worldGo);
-            
-            // move the world to the correct scene
-            EditorSceneManager.MoveGameObjectToScene(worldGo, worldScene);
-
-            // Subscribe the SetActiveScene method to the sceneLoaded event
-            // so that we can set the proper scene as active when the scene is finally loaded
-            // is related to occlusion culling
-            EditorSceneManager.sceneLoaded += (scene, mode) => EditorSceneManager.SetActiveScene(scene);
+            await WorldMeshCreator.CreateAsync(GameData.World, new GameObject("World"), ConstantsManager.MeshPerFrame);
         }
 #endif
     }

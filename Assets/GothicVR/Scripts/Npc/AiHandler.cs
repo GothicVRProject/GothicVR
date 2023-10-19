@@ -45,10 +45,10 @@ namespace GVR.Npc
                         if (properties.stateLoop == 0)
                             return;
                         properties.currentLoopState = NpcProperties.LoopState.Loop;
-                        PxVm.CallFunction(GameData.I.VmGothicPtr, properties.stateLoop, properties.npcPtr);
+                        PxVm.CallFunction(GameData.VmGothicPtr, properties.stateLoop, properties.npcPtr);
                         break;
                     case NpcProperties.LoopState.Loop:
-                        PxVm.CallFunction(GameData.I.VmGothicPtr, properties.stateLoop, properties.npcPtr);
+                        PxVm.CallFunction(GameData.VmGothicPtr, properties.stateLoop, properties.npcPtr);
                         break;
                 }
             }
@@ -64,18 +64,18 @@ namespace GVR.Npc
         {
             properties.stateStart = action;
 
-            var routineSymbol = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, action);
+            var routineSymbol = PxDaedalusScript.GetSymbol(GameData.VmGothicPtr, action);
             
-            var symbolLoop = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, $"{routineSymbol.name}_Loop");
+            var symbolLoop = PxDaedalusScript.GetSymbol(GameData.VmGothicPtr, $"{routineSymbol.name}_Loop");
             if (symbolLoop != null)
                 properties.stateLoop = symbolLoop.id;
             
-            var symbolEnd = PxDaedalusScript.GetSymbol(GameData.I.VmGothicPtr, $"{routineSymbol.name}_End");
+            var symbolEnd = PxDaedalusScript.GetSymbol(GameData.VmGothicPtr, $"{routineSymbol.name}_End");
             if (symbolEnd != null)
                 properties.stateEnd = symbolEnd.id;
             
             properties.currentLoopState = NpcProperties.LoopState.Start;
-            PxVm.CallFunction(GameData.I.VmGothicPtr, action, GetComponent<NpcProperties>().npcPtr);
+            PxVm.CallFunction(GameData.VmGothicPtr, action, GetComponent<NpcProperties>().npcPtr);
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace GVR.Npc
                 properties.currentLoopState = NpcProperties.LoopState.End;
                 
                 if (properties.stateEnd != 0)
-                    PxVm.CallFunction(GameData.I.VmGothicPtr, properties.stateEnd, GetComponent<NpcProperties>().npcPtr);
+                    PxVm.CallFunction(GameData.VmGothicPtr, properties.stateEnd, GetComponent<NpcProperties>().npcPtr);
             }
         }
         

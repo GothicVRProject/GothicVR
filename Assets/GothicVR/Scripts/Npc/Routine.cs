@@ -58,7 +58,7 @@ namespace GVR.Npc
         }
         void setWaypoint()
         {
-            if (GameData.I.World.waypointsDict.TryGetValue(currentDestination.waypoint, out PxWayPointData value))
+            if (GameData.World.waypointsDict.TryGetValue(currentDestination.waypoint, out PxWayPointData value))
             {
                 waypoint = value;
             }

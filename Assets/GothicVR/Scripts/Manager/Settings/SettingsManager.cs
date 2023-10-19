@@ -1,26 +1,23 @@
 ﻿using System;
 using System.IO;
 using UnityEngine;
-using GVR.Util;
+using GVR.Bootstrap;
 
 namespace GVR.Manager.Settings
 {
-    public class SettingsManager : SingletonBehaviour<SettingsManager>
+    public class SettingsManager : MonoBehaviour
     {
-        public GameSettings GameSettings { get; private set; }
+        public static GameSettings GameSettings { get; private set; }
 
         private const string SETTINGS_FILE_NAME = "GameSettings.json";
         private const string SETTINGS_FILE_NAME_DEV = "GameSettings.dev.json";
 
-
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
             LoadGameSettings();
         }
 
-
-        private void LoadGameSettings()
+        public static void LoadGameSettings()
         {
             var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
             if (!File.Exists(settingsFilePath))
@@ -46,6 +43,7 @@ namespace GVR.Manager.Settings
             }
 
             CheckIfGothicIDirectoryExists();
+            PhoenixBootstrapper.SetLanguage();
         }
 
         /// <summary>
@@ -53,7 +51,7 @@ namespace GVR.Manager.Settings
         /// As there is no "folder" for an Android build (as it's a packaged .apk file), we need to check within user directory.
         /// </summary>
         /// <returns></returns>
-        private string GetRootPath()
+        private static string GetRootPath()
         {
             if (Application.platform == RuntimePlatform.Android)
                 // https://docs.unity3d.com/ScriptReference/Application-persistentDataPath.html
@@ -67,7 +65,7 @@ namespace GVR.Manager.Settings
                 return Application.streamingAssetsPath;
         }
 
-        private void CheckIfGothicIDirectoryExists()
+        private static void CheckIfGothicIDirectoryExists()
         {
             if (!Directory.Exists(GameSettings.GothicIPath))
                 throw new ArgumentException(
@@ -80,7 +78,7 @@ namespace GVR.Manager.Settings
         /// Since the settings file is in streamingAssetPath, we need to use UnityWebRequest to move it so we can have access to it
         /// as detailed here https://docs.unity3d.com/ScriptReference/Application-streamingAssetsPath.html
         /// </summary>
-        private void CopyGameSettingsForAndroidBuild()
+        private static void CopyGameSettingsForAndroidBuild()
         {
             string GameSettingsPath = System.IO.Path.Combine(Application.streamingAssetsPath, $"{SETTINGS_FILE_NAME}");
             string result = "";

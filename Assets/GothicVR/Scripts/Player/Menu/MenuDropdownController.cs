@@ -34,7 +34,7 @@ namespace GVR.Player.Menu
 
             WaypointSetDropdownValues();
             waypointDropdown.onValueChanged.AddListener(WaypointDropdownItemSelected);
-            waypointDropdown.value = waypoints.Keys.ToList().IndexOf(ConstantsManager.I.selectedWaypoint);
+            waypointDropdown.value = waypoints.Keys.ToList().IndexOf(ConstantsManager.selectedWaypoint);
         }
 
         public void WaypointSetDropdownValues()
@@ -49,9 +49,7 @@ namespace GVR.Player.Menu
 
         void WaypointDropdownItemSelected(int value)
         {
-            var item = waypointDropdown.options[value].text;
-
-            ConstantsManager.I.selectedWaypoint = waypoints.Keys.ElementAt(value);
+            ConstantsManager.selectedWaypoint = waypoints.Keys.ElementAt(value);
         }
     }
 }
