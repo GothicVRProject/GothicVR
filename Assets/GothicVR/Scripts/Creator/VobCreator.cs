@@ -551,6 +551,7 @@ namespace GVR.Creator
             grabComp.throwOnDetach = false; // Throws errors and isn't needed as we don't want to move the kinematic ladder when released.
             grabComp.trackPosition = false;
             grabComp.trackRotation = false;
+            grabComp.selectMode = InteractableSelectMode.Multiple; // With this, we can grab with both hands!
 
             return vobObj;
         }
