@@ -1612,6 +1612,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbf7a98cf00d737498f767805a1f7b75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vobSoundsAndDayTime: []
 --- !u!4 &1613829617
 Transform:
   m_ObjectHideFlags: 0
