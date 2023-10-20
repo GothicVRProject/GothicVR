@@ -31,7 +31,7 @@ public class ControllerManager : MonoBehaviour
         rightSecondaryButtonAction = new InputAction("secondaryButton", binding: "<XRController>{RightHand}/secondaryButton");
 
 
-        rightPrimaryButtonAction.started += ctx => ShowMainMenu();
+        rightSecondaryButtonAction.started += ctx => ShowMainMenu();
 
         rightPrimaryButtonAction.Enable();
         rightSecondaryButtonAction.Enable();
