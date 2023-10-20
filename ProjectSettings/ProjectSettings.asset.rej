@@ -1,0 +1,12 @@
+diff a/ProjectSettings/ProjectSettings.asset b/ProjectSettings/ProjectSettings.asset	(rejected hunks)
+@@ -135,8 +135,8 @@
+   loadStoreDebugModeEnabled: 0
+   bundleVersion: 0.1
+   preloadedAssets:
+-  - {fileID: -5702201265392082154, guid: ea302bef6e5dfab4abc884c353c0926d, type: 2}
+-  - {fileID: 1745335173907407439, guid: af3964d8a6279b54a9254cbe6379b9d1, type: 2}
++  - {fileID: 1935565065551831612, guid: ea302bef6e5dfab4abc884c353c0926d, type: 2}
++  - {fileID: 3119080696744858793, guid: af3964d8a6279b54a9254cbe6379b9d1, type: 2}
+   metroInputSource: 0
+   wsaTransparentSwapchain: 0
+   m_HolographicPauseOnTrackingLoss: 1
