@@ -19,7 +19,7 @@ namespace GVR.Manager.Culling
         private CullingGroup vobCullingGroupSmall;
         private CullingGroup vobCullingGroupMedium;
         private CullingGroup vobCullingGroupLarge;
-        
+
         // Stored for later index mapping SphereIndex => GOIndex
         private readonly List<GameObject> vobObjectsSmall = new();
         private readonly List<GameObject> vobObjectsMedium = new();
@@ -29,7 +29,7 @@ namespace GVR.Manager.Culling
         private BoundingSphere[] vobSpheresSmall;
         private BoundingSphere[] vobSpheresMedium;
         private BoundingSphere[] vobSpheresLarge;
-        
+
         private enum VobList
         {
             Small,
@@ -41,7 +41,7 @@ namespace GVR.Manager.Culling
         private readonly Dictionary<GameObject, Tuple<VobList, int>> pausedVobs = new();
         private readonly Dictionary<GameObject, Rigidbody> pausedVobsToReenable = new();
         private readonly Dictionary<GameObject, Coroutine> pausedVobsToReenableCoroutine = new();
-        
+
         private void Start()
         {
             GvrSceneManager.I.sceneGeneralUnloaded.AddListener(PreWorldCreate);
@@ -55,6 +55,42 @@ namespace GVR.Manager.Culling
             StartCoroutine(StopVobTrackingBasedOnVelocity());
         }
 
+        /// <summary>
+        /// This method will only be called within EditorMode. It's tested to not being executed within Standalone mode.
+        /// </summary>
+        private void OnDrawGizmos()
+        {
+            if (!Application.isPlaying || !FeatureFlags.I.drawVobCullingGizmos)
+            {
+                return;
+            }
+
+            Gizmos.color = new Color(.5f, 0, 0);
+            if (vobSpheresSmall != null)
+            {
+                foreach (BoundingSphere sphere in vobSpheresSmall)
+                {
+                    Gizmos.DrawWireSphere(sphere.position, sphere.radius);
+                }
+            }
+            Gizmos.color = new Color(.4f, 0, 0);
+            if (vobSpheresMedium != null)
+            {
+                foreach (BoundingSphere sphere in vobSpheresMedium)
+                {
+                    Gizmos.DrawWireSphere(sphere.position, sphere.radius);
+                }
+            }
+            Gizmos.color = new Color(.3f, 0, 0);
+            if (vobSpheresLarge != null)
+            {
+                foreach (BoundingSphere sphere in vobSpheresLarge)
+                {
+                    Gizmos.DrawWireSphere(sphere.position, sphere.radius);
+                }
+            }
+        }
+
         private void PreWorldCreate()
         {
             vobCullingGroupSmall.Dispose();
@@ -64,7 +100,7 @@ namespace GVR.Manager.Culling
             vobCullingGroupSmall = new();
             vobCullingGroupMedium = new();
             vobCullingGroupLarge = new();
-            
+
             vobObjectsSmall.Clear();
             vobObjectsMedium.Clear();
             vobObjectsLarge.Clear();
@@ -72,12 +108,12 @@ namespace GVR.Manager.Culling
             vobSpheresSmall = null;
             vobSpheresMedium = null;
             vobSpheresLarge = null;
-            
+
             pausedVobs.Clear();
             pausedVobsToReenable.Clear();
             pausedVobsToReenableCoroutine.Clear();
         }
-        
+
         private void VobSmallChanged(CullingGroupEvent evt)
         {
             var smallPaused = pausedVobs
@@ -89,7 +125,7 @@ namespace GVR.Manager.Culling
 
             vobObjectsSmall[evt.index].SetActive(evt.hasBecomeVisible);
         }
-        
+
         private void VobMediumChanged(CullingGroupEvent evt)
         {
             var mediumPaused = pausedVobs
@@ -98,19 +134,19 @@ namespace GVR.Manager.Culling
 
             if (mediumPaused.Contains(evt.index))
                 return;
-            
+
             vobObjectsMedium[evt.index].SetActive(evt.hasBecomeVisible);
         }
-        
+
         private void VobLargeChanged(CullingGroupEvent evt)
         {
             var largePaused = pausedVobs
                 .Where(i => i.Value.Item1 == VobList.Large)
                 .Select(i => i.Value.Item2);
-            
+
             if (largePaused.Contains(evt.index))
                 return;
-            
+
             vobObjectsLarge[evt.index].SetActive(evt.hasBecomeVisible);
         }
 
@@ -135,13 +171,13 @@ namespace GVR.Manager.Culling
                 {
                     if (!obj.name.Equals("WASH_SLOT.ASC", StringComparison.OrdinalIgnoreCase)) // Wash slot is placed wrong in G1. Therefore skip.
                         Debug.LogError($"Couldn't find mesh for >{obj}< to be used for CullingGroup. Skipping...");
-    
+
                     continue;
                 }
 
                 var sphere = GetSphere(obj, mesh);
                 var size = sphere.radius * 2;
-                
+
                 if (size <= smallDim)
                 {
                     vobObjectsSmall.Add(obj);
@@ -162,15 +198,15 @@ namespace GVR.Manager.Culling
             vobCullingGroupSmall.onStateChanged = VobSmallChanged;
             vobCullingGroupMedium.onStateChanged = VobMediumChanged;
             vobCullingGroupLarge.onStateChanged = VobLargeChanged;
-            
-            vobCullingGroupSmall.SetBoundingDistances(new[]{FeatureFlags.I.vobCullingSmall.cullingDistance});
-            vobCullingGroupMedium.SetBoundingDistances(new[]{FeatureFlags.I.vobCullingMedium.cullingDistance});
-            vobCullingGroupLarge.SetBoundingDistances(new[]{FeatureFlags.I.vobCullingLarge.cullingDistance});
+
+            vobCullingGroupSmall.SetBoundingDistances(new[] { FeatureFlags.I.vobCullingSmall.cullingDistance });
+            vobCullingGroupMedium.SetBoundingDistances(new[] { FeatureFlags.I.vobCullingMedium.cullingDistance });
+            vobCullingGroupLarge.SetBoundingDistances(new[] { FeatureFlags.I.vobCullingLarge.cullingDistance });
 
             vobSpheresSmall = spheresSmall.ToArray();
             vobSpheresMedium = spheresMedium.ToArray();
             vobSpheresLarge = spheresLarge.ToArray();
-            
+
             vobCullingGroupSmall.SetBoundingSpheres(vobSpheresSmall);
             vobCullingGroupMedium.SetBoundingSpheres(vobSpheresMedium);
             vobCullingGroupLarge.SetBoundingSpheres(vobSpheresLarge);
@@ -179,13 +215,14 @@ namespace GVR.Manager.Culling
         private BoundingSphere GetSphere(GameObject go, Mesh mesh)
         {
             var bboxSize = mesh.bounds.size;
-                
+            Vector3 worldCenter = go.transform.TransformPoint(mesh.bounds.center);
+
             var maxDimension = Mathf.Max(bboxSize.x, bboxSize.y, bboxSize.z); // Get biggest dim for calculation of object size group.
-            var sphere = new BoundingSphere(go.transform.position, maxDimension / 2); // Radius is half the size.
+            var sphere = new BoundingSphere(worldCenter, maxDimension / 2); // Radius is half the size.
 
             return sphere;
         }
-        
+
         /// <summary>
         /// TODO If performance allows it, we could also look dynamically for all the existing meshes inside GO
         /// TODO and look for maximum value for largest mesh. But it should be fine for now.
@@ -193,7 +230,7 @@ namespace GVR.Manager.Culling
         private Mesh GetMesh(GameObject go)
         {
             var transf = go.transform;
-            
+
             if (transf.TryGetComponent<MeshFilter>(out var mesh0)) // Lookup: /
                 return mesh0.mesh;
             else if (transf.GetChild(0).TryGetComponent<MeshFilter>(out var mesh1)) // Lookup: /BIP 01
@@ -205,14 +242,14 @@ namespace GVR.Manager.Culling
             else
                 return null;
         }
-        
+
         /// <summary>
         /// Set main camera once world is loaded fully.
         /// Doesn't work at loading time as we change scenes etc.
         /// </summary>
         private void PostWorldCreate()
         {
-            foreach (var group in new[] {vobCullingGroupSmall, vobCullingGroupMedium, vobCullingGroupLarge})
+            foreach (var group in new[] { vobCullingGroupSmall, vobCullingGroupMedium, vobCullingGroupLarge })
             {
                 var mainCamera = Camera.main!;
                 group.targetCamera = mainCamera; // Needed for FrustumCulling and OcclusionCulling to work.
@@ -223,11 +260,11 @@ namespace GVR.Manager.Culling
         public void StartTrackVobPositionUpdates(GameObject go)
         {
             CancelStopTrackVobPositionUpdates(go);
-            
+
             // Entry is already in list
             if (pausedVobs.ContainsKey(go))
                 return;
-            
+
             // Check Small list
             var index = Array.IndexOf(vobObjectsSmall.ToArray(), go);
             var vobType = VobList.Small;
@@ -243,15 +280,15 @@ namespace GVR.Manager.Culling
                 index = Array.IndexOf(vobObjectsLarge.ToArray(), go);
                 vobType = VobList.Large;
             }
-            
+
             pausedVobs.Add(go, new(vobType, index));
         }
-        
+
         public void StopTrackVobPositionUpdates(GameObject go)
         {
             if (pausedVobsToReenable.ContainsKey(go))
                 return;
-            
+
             pausedVobsToReenableCoroutine.Add(go, StartCoroutine(nameof(StopTrackVobPositionUpdatesDelayed), go));
         }
 
@@ -282,7 +319,7 @@ namespace GVR.Manager.Culling
         {
             yield return new WaitForSeconds(1f);
             pausedVobsToReenableCoroutine.Remove(go);
-            
+
             pausedVobsToReenable.Add(go, go.GetComponent<Rigidbody>());
         }
 
@@ -295,13 +332,13 @@ namespace GVR.Manager.Culling
                     var velocity = obj.Value.velocity;
                     if (velocity != Vector3.zero)
                         continue;
-                    
+
                     UpdateSpherePosition(obj.Key);
-                    
+
                     pausedVobs.Remove(obj.Key);
                     pausedVobsToReenable.Remove(obj.Key);
                 }
-                
+
                 yield return null;
             }
         }
@@ -323,7 +360,7 @@ namespace GVR.Manager.Culling
 
             sphereList[index].position = go.transform.position;
         }
-        
+
         private void OnDestroy()
         {
             vobCullingGroupSmall.Dispose();

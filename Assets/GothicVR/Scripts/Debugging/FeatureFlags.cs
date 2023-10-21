@@ -20,6 +20,7 @@ namespace GVR.Debugging
         public bool useXRDeviceSimulator;
         public bool createWayPointMeshes;
         public bool createWaypointEdgeMeshes;
+        public bool drawVobCullingGizmos;
 
         [Header("__________World__________")]
         public bool CreateVobs;
