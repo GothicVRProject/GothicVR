@@ -15,9 +15,6 @@ namespace GVR.Manager.Culling
     /// </summary>
     public class VobMeshCullingManager : SingletonBehaviour<VobMeshCullingManager>
     {
-        [SerializeField]
-        protected bool drawGizmos;
-
         // Stored for resetting after world switch
         private CullingGroup vobCullingGroupSmall;
         private CullingGroup vobCullingGroupMedium;
@@ -58,9 +55,12 @@ namespace GVR.Manager.Culling
             StartCoroutine(StopVobTrackingBasedOnVelocity());
         }
 
+        /// <summary>
+        /// This method will only be called within EditorMode. It's tested to not being executed within Standalone mode.
+        /// </summary>
         private void OnDrawGizmos()
         {
-            if (!drawGizmos)
+            if (!Application.isPlaying || !FeatureFlags.I.drawVobCullingGizmos)
             {
                 return;
             }
