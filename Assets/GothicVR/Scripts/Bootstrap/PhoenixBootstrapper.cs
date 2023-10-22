@@ -16,8 +16,8 @@ namespace GVR.Bootstrap
 {
     public class PhoenixBootstrapper : SingletonBehaviour<PhoenixBootstrapper>
     {
-        private bool _loaded = false;
-        public GameObject configurationMessage;
+        private bool isBootstrapped;
+        public GameObject invalidInstallationDirMessage;
         public GameObject filePickerButton;
 
         private void Start()
@@ -25,7 +25,7 @@ namespace GVR.Bootstrap
             PxLogging.pxLoggerSet(PxLoggerCallback);
 
             // Just in case we forgot to disable it in scene view. ;-)
-            configurationMessage.SetActive(false);
+            invalidInstallationDirMessage.SetActive(false);
         }
 
         private void OnApplicationQuit()
@@ -36,9 +36,9 @@ namespace GVR.Bootstrap
         private void Update()
         {
             // Load after Start() so that other MonoBehaviours can subscribe to DaedalusVM events.
-            if (_loaded)
+            if (isBootstrapped)
                 return;
-            _loaded = true;
+            isBootstrapped = true;
 
             var g1Dir = SettingsManager.GameSettings.GothicIPath;
 
@@ -49,7 +49,7 @@ namespace GVR.Bootstrap
             else
             {
                 //Show the startup config message, show filepicker for PCVR but not for Android standalone
-                configurationMessage.SetActive(true);
+                invalidInstallationDirMessage.SetActive(true);
                 if (Application.platform == RuntimePlatform.Android)
                     filePickerButton.SetActive(false);
                 else

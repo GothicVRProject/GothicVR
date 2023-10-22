@@ -1440,7 +1440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a9bc266eaeba904b874cccfe887cf92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configurationMessage: {fileID: 1623647995}
+  invalidInstallationDirMessage: {fileID: 1623647995}
   filePickerButton: {fileID: 185791143}
 --- !u!4 &1892061894
 Transform:
