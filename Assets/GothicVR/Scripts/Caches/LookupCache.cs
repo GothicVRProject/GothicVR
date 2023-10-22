@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GVR.Manager;
 using GVR.Properties;
 using TMPro;
 using UnityEngine;
@@ -17,15 +18,26 @@ namespace GVR.Caches
 
         /// <summary>
         /// Already created AnimationClips can be reused.
-        ///
-        /// For creation of AnimationClip and it's curves, we need to have GameObject
         /// </summary>
         public static Dictionary<string, AnimationClip> AnimClipCache = new();
-
-
+        
         /// <summary>
         /// This dictionary caches the sprite assets for fonts.
         /// </summary>
         public static Dictionary<string, TMP_SpriteAsset> fontCache = new();
+        
+        /// <summary>
+        /// VobSounds and VobSoundsDayTime GOs.
+        /// </summary>
+        public static List<GameObject> vobSoundsAndDayTime = new();
+        
+        
+        static LookupCache()
+        {
+            GvrSceneManager.I.sceneGeneralUnloaded.AddListener(delegate
+            {
+                vobSoundsAndDayTime.Clear();
+            });
+        }
     }
 }

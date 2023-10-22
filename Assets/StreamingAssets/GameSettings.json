@@ -1,7 +1,7 @@
 ﻿{
-  "GothicIPath": "---Please set it to the path where your game is installed---",
-  "GothicILanguage": "---Supported values are cs/en/de/fr/it/pl/es/ru---",
-  "LogLevel": "---Set log level to one of these values: Debug/Warning/Error/Exception---",
-  "GothicMenuFontPath": "---(Optional) If it points to an official Gothic font (e.g. from worldofgothic), it will be picked and used for menu texts.---",
-  "GothicSubtitleFontPath": "---(Optional) If it points to an official Gothic font (e.g. from worldofgothic), it will be picked and used for subtitles.---"
+    "GothicIPath": "---Please set it to the path where your game is installed---",
+    "GothicILanguage": "---Supported values are cs/en/de/fr/it/pl/es/ru---",
+    "LogLevel": "---Set log level to one of these values: Debug/Warning/Error/Exception---",
+    "GothicMenuFontPath": "---(Optional) If it points to an official Gothic font (e.g. from worldofgothic), it will be picked and used for menu texts.---",
+    "GothicSubtitleFontPath": "---(Optional) If it points to an official Gothic font (e.g. from worldofgothic), it will be picked and used for subtitles.---"
 }

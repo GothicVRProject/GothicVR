@@ -16,8 +16,18 @@ namespace GVR.Manager.Settings
         {
             LoadGameSettings();
         }
+        
+        public static void SaveGameSettings(GameSettings gameSettings)
+        {
+            if(Application.platform != RuntimePlatform.Android)
+            {
+                var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
+                var settingsJson = JsonUtility.ToJson(gameSettings, true);
+                File.WriteAllText(settingsFilePath,settingsJson);
+            }
+        }
 
-        public static void LoadGameSettings()
+        public static GameSettings LoadGameSettings()
         {
             var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
             if (!File.Exists(settingsFilePath))
@@ -42,8 +52,7 @@ namespace GVR.Manager.Settings
                 JsonUtility.FromJsonOverwrite(devJson, GameSettings);
             }
 
-            CheckIfGothicIDirectoryExists();
-            PhoenixBootstrapper.SetLanguage();
+            return GameSettings;
         }
 
         /// <summary>
@@ -65,12 +74,13 @@ namespace GVR.Manager.Settings
                 return Application.streamingAssetsPath;
         }
 
-        private static void CheckIfGothicIDirectoryExists()
+        public static bool CheckIfGothic1InstallationExists()
         {
-            if (!Directory.Exists(GameSettings.GothicIPath))
-                throw new ArgumentException(
-                    $"GothicI installation path wasn't found at >{GameSettings.GothicIPath}<." +
-                    $"Please put in the right absolute path to your local installation.");
+            if (Directory.Exists(GameSettings.GothicIPath))
+            {
+                return Directory.Exists($"{GameSettings.GothicIPath}\\Data");
+            }
+            return false;
         }
 
         /// <summary>

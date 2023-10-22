@@ -9,6 +9,7 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Util;
 using PxCs.Helper;
 using PxCs.Interface;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace GVR.Bootstrap
@@ -16,10 +17,15 @@ namespace GVR.Bootstrap
     public class PhoenixBootstrapper : SingletonBehaviour<PhoenixBootstrapper>
     {
         private bool _loaded = false;
+        public GameObject configurationMessage;
+        public GameObject filePickerButton;
 
         private void Start()
         {
             PxLogging.pxLoggerSet(PxLoggerCallback);
+
+            // Just in case we forgot to disable it in scene view. ;-)
+            configurationMessage.SetActive(false);
         }
 
         private void OnApplicationQuit()
@@ -34,16 +40,32 @@ namespace GVR.Bootstrap
                 return;
             _loaded = true;
 
-            var watch = Stopwatch.StartNew();
-
             var g1Dir = SettingsManager.GameSettings.GothicIPath;
+
+            if (SettingsManager.CheckIfGothic1InstallationExists())
+            {
+                BootGothicVR(g1Dir);
+            }
+            else
+            {
+                //Show the startup config message, show filepicker for PCVR but not for Android standalone
+                configurationMessage.SetActive(true);
+                if (Application.platform == RuntimePlatform.Android)
+                    filePickerButton.SetActive(false);
+                else
+                    filePickerButton.SetActive(true);
+            }
+        }
+        
+        public void BootGothicVR(string g1Dir)
+        {
+            var watch = Stopwatch.StartNew();
             
             // FIXME - We currently don't load from within _WORK directory which is required for e.g. mods who use it.
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "Data"));
 
             // Holy grail of everything! If this pointer is zero, we have nothing but a plain empty wormhole.
             GameData.VfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);
-
             
             SetLanguage();
             LoadGothicVM(g1Dir);
