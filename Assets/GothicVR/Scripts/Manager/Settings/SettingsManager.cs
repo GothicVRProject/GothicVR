@@ -1,25 +1,22 @@
 ﻿using System;
 using System.IO;
 using UnityEngine;
-using GVR.Util;
-using System.Xml.Linq;
+using GVR.Bootstrap;
 
 namespace GVR.Manager.Settings
 {
-    public class SettingsManager : SingletonBehaviour<SettingsManager>
+    public class SettingsManager : MonoBehaviour
     {
-        public GameSettings GameSettings { get; private set; }
+        public static GameSettings GameSettings { get; private set; }
 
         private const string SETTINGS_FILE_NAME = "GameSettings.json";
         private const string SETTINGS_FILE_NAME_DEV = "GameSettings.dev.json";
 
-
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
             LoadGameSettings();
         }
-
+        
         public void SaveGameSettings(GameSettings gameSettings)
         {
             if(Application.platform != RuntimePlatform.Android)
@@ -30,7 +27,7 @@ namespace GVR.Manager.Settings
             }
         }
 
-        public GameSettings LoadGameSettings()
+        public static void LoadGameSettings()
         {
             var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
             if (!File.Exists(settingsFilePath))
@@ -43,6 +40,7 @@ namespace GVR.Manager.Settings
 
             var settingsJson = File.ReadAllText(settingsFilePath);
             GameSettings = JsonUtility.FromJson<GameSettings>(settingsJson);
+
             // We ignore the "GothicIPath" field which is found in GameSettings for Android
             if (Application.platform == RuntimePlatform.Android)
                 GameSettings.GothicIPath = GetRootPath();
@@ -53,8 +51,6 @@ namespace GVR.Manager.Settings
                 var devJson = File.ReadAllText(settingsDevFilePath);
                 JsonUtility.FromJsonOverwrite(devJson, GameSettings);
             }
-
-            return GameSettings;
         }
 
         /// <summary>
@@ -62,7 +58,7 @@ namespace GVR.Manager.Settings
         /// As there is no "folder" for an Android build (as it's a packaged .apk file), we need to check within user directory.
         /// </summary>
         /// <returns></returns>
-        private string GetRootPath()
+        private static string GetRootPath()
         {
             if (Application.platform == RuntimePlatform.Android)
                 // https://docs.unity3d.com/ScriptReference/Application-persistentDataPath.html
@@ -76,23 +72,21 @@ namespace GVR.Manager.Settings
                 return Application.streamingAssetsPath;
         }
 
-        public bool CheckIfGothic1InstallationExists()
+        public static bool CheckIfGothic1InstallationExists()
         {
-            bool isValid = false;
             if (Directory.Exists(GameSettings.GothicIPath))
             {
-                var pathGothicExe = GameSettings.GothicIPath + "\\Data";
-                isValid = Directory.Exists(pathGothicExe);
+                return Directory.Exists($"{GameSettings.GothicIPath}\\Data");
             }
-            return isValid;
-         }
+            return false;
+        }
 
         /// <summary>
         /// Import the settings file from streamingAssetPath to persistentDataPath.
         /// Since the settings file is in streamingAssetPath, we need to use UnityWebRequest to move it so we can have access to it
         /// as detailed here https://docs.unity3d.com/ScriptReference/Application-streamingAssetsPath.html
         /// </summary>
-        private void CopyGameSettingsForAndroidBuild()
+        private static void CopyGameSettingsForAndroidBuild()
         {
             string GameSettingsPath = System.IO.Path.Combine(Application.streamingAssetsPath, $"{SETTINGS_FILE_NAME}");
             string result = "";
