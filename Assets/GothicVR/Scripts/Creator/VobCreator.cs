@@ -630,7 +630,7 @@ namespace GVR.Creator
             if (mrm != null)
             {
                 // If the object is a dynamic one, it will collide.
-                var withCollider = false; // vob.cdDynamic; // We will create separate colliders for ZS(lots) instead of mesh. 
+                var withCollider = vob.cdDynamic;
 
                 var go = GetPrefab(vob);
                 var ret = VobMeshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation, withCollider, parent, go);
