@@ -1,6 +1,6 @@
-using GVR.Phoenix.Util;
-using PxCs.Interface;
 using System;
+using GVR.Extensions;
+using PxCs.Interface;
 using TMPro;
 using UnityEngine;
 
@@ -8,9 +8,9 @@ namespace GVR.Phoenix.Interface
 {
     public static class FontBridge
 	{
-		public static TMP_FontAsset LoadFont(IntPtr vdfsPtr, string fontName)
+		public static TMP_FontAsset LoadFont(IntPtr vfsPtr, string fontName)
 		{
-			var fontData = PxFont.LoadFont(vdfsPtr, fontName);
+			var fontData = PxFont.LoadFont(vfsPtr, fontName);
 			var textureData = fontData.texture;
 			var font = new Font(fontData.name);
 

@@ -1,8 +1,9 @@
-﻿using UnityEngine;
-using GVR.Demo;
+﻿using GVR.Debugging;
+using GVR.Extensions;
+using GVR.Manager;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Util;
 using GVR.Util;
+using UnityEngine;
 
 namespace GVR.Creator
 {
@@ -20,26 +21,35 @@ namespace GVR.Creator
 
         private void CreateWaypoints(GameObject parent, WorldData world)
         {
-            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateWaypoints)
+            if (!FeatureFlags.I.CreateWaypoints)
                 return;
 
             var waypointsObj = new GameObject(string.Format("Waypoints"));
-            waypointsObj.transform.parent = parent.transform;
+            waypointsObj.SetParent(parent);
 
             foreach (var waypoint in world.waypoints)
             {
-                var wpobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                GameObject wpObject;
+                if (FeatureFlags.I.createWayPointMeshes)
+                {
+                    wpObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    wpObject.transform.localScale = new(0.5f, 0.5f, 0.5f);
+                    Destroy(wpObject.GetComponent<Collider>());
+                }
+                else
+                    wpObject = new GameObject();
 
-                wpobject.name = waypoint.name;
-                wpobject.transform.position = waypoint.position.ToUnityVector();
+                wpObject.tag = ConstantsManager.SpotTag;
+                wpObject.name = waypoint.name;
+                wpObject.transform.position = waypoint.position.ToUnityVector();
 
-                wpobject.transform.parent = waypointsObj.transform;
+                wpObject.SetParent(waypointsObj);
             }
         }
 
         private void CreateWaypointEdges(GameObject parent, WorldData world)
         {
-            if (!SingletonBehaviour<DebugSettings>.GetOrCreate().CreateWaypointEdges)
+            if (!FeatureFlags.I.createWaypointEdgeMeshes)
                 return;
 
             var waypointEdgesObj = new GameObject(string.Format("Edges"));

@@ -1,5 +1,6 @@
 ﻿using PxCs.Data;
 using PxCs.Data.Mesh;
+using PxCs.Data.Vob;
 using PxCs.Data.WayNet;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace GVR.Phoenix.Data
         public PxFeatureData[] features;
         public PxMaterialData[] materials;
 
-        public Dictionary<int, SubMeshData> subMeshes;
+        public Dictionary<int, List<SubMeshData>> subMeshes;
 
         public class SubMeshData
         {

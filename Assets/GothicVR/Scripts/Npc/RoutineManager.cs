@@ -6,6 +6,7 @@ using GVR.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Debugging;
 using UnityEngine;
 
 /// <summary>
@@ -18,7 +19,7 @@ public class RoutineManager : SingletonBehaviour<RoutineManager>
 
     private void OnEnable()
     {
-        gameTime = SingletonBehaviour<GameTime>.GetOrCreate();
+        gameTime = GameTime.I;
         gameTime.minuteChangeCallback.AddListener(Invoke);
     }
 
@@ -30,7 +31,7 @@ public class RoutineManager : SingletonBehaviour<RoutineManager>
     private void Start()
     {
         //Init starting position
-        if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
+        if (!FeatureFlags.I.EnableNpcRoutines)
             return;
         DateTime StartTime = new(1, 1, 1, 15, 0, 0);
         Invoke(StartTime);
@@ -38,7 +39,7 @@ public class RoutineManager : SingletonBehaviour<RoutineManager>
 
     public void Subscribe(Routine npcID, List<RoutineData> routines)
     {
-        if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
+        if (!FeatureFlags.I.EnableNpcRoutines)
             return;
         
         foreach (RoutineData routine in routines)   //Todo: fill in routines backwards, for Mud and Scorpio have bugged Routines and will be picked the wrong way as is.
@@ -50,14 +51,16 @@ public class RoutineManager : SingletonBehaviour<RoutineManager>
 
     public void Unsubscribe(Routine routineInstance, List<RoutineData> routines)
     {
-        if (!SingletonBehaviour<DebugSettings>.GetOrCreate().EnableNpcRoutines)
-            return;
-        
         foreach (RoutineData routine in routines)
         {
-            npcStartTimeDict[routine.start].Remove(routineInstance);    //Delete value from List
-            if (!npcStartTimeDict[routine.start].Any())                 //If List is empty afterwards
-                npcStartTimeDict.Remove(routine.start);                 //Delete key aswell
+            if (!npcStartTimeDict.TryGetValue(routine.start, out List<Routine> routinesForStartPoint))
+                return;
+
+            routinesForStartPoint.Remove(routineInstance);
+
+            // Remove element if empty
+            if (npcStartTimeDict[routine.start].Count == 0)
+                npcStartTimeDict.Remove(routine.start);
         }
     }
 

@@ -1,14 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using GVR.Extensions;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
-using GVR.Phoenix.Util;
-using GVR.World;
-using System;
-using System.Data;
 using PxCs.Data.WayNet;
-using GVR.Util;
+using UnityEngine;
 
 namespace GVR.Npc
 {
@@ -16,7 +13,7 @@ namespace GVR.Npc
     {
         private const float SPEED = 1f;
         private RoutineManager routineManager;
-        PxCs.Data.WayNet.PxWayPointData waypoint;
+        PxWayPointData waypoint;
         RoutineData currentDestination;
 
         public List<RoutineData> routines = new();
@@ -24,7 +21,7 @@ namespace GVR.Npc
 
         private void Start()
         {
-            routineManager = SingletonBehaviour<RoutineManager>.GetOrCreate();
+            routineManager = RoutineManager.I;
             routineManager.Subscribe(this, routines);
         }
         private void OnDisable()
@@ -61,7 +58,7 @@ namespace GVR.Npc
         }
         void setWaypoint()
         {
-            if (PhoenixBridge.World.waypointsDict.TryGetValue(currentDestination.waypoint, out PxWayPointData value))
+            if (GameData.I.World.waypointsDict.TryGetValue(currentDestination.waypoint, out PxWayPointData value))
             {
                 waypoint = value;
             }
