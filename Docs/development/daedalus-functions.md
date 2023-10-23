@@ -15,6 +15,26 @@ Currently, every Daedalus function is registered in the [VmGothicBridge](https:/
 
 If you got any notes, assumed complexity or something else to add, feel free to edit this page and the table below!
 
+# Technical Introduction
+
+This section gives a technical overview for understanding how the external Daedalus functions work in the application's context. It is divided in the initialization and the workflow when the game is running.
+
+When the game is booted, the `VmGothicBridge.LoadGothicVM(G1Dir: string)` call initializes the phoenix VM. The call looks as follows:
+
+![VM initialization](../assets/diagrams/phoenixvm_init.png)
+
+As can be seen, the `VmGothicBridge` is GothicVR's internal layer for communicating with the phoenix VM; which handles the execution of the Gothic Daedalus scripts.
+
+The Daedalus scripting language used by Gothic has a list of external functions that can be called from within each script. These can be used e.g. to spawn NPCs, add items to the inventory or handle dialogs. These functions have to be implemented by us, so that they can interact with our project's code. For this to work, the phoenix VM is able to register our own implementations for each function that will be executed when being called from a Daedalus script. In the above diagram you can see that the `VmGothicBridge` registers each single function with the `pxVmRegisterExternal(...)` method on the static `PxVm` object.
+
+When executing the Daedalus scripts, the phoenix VM will then look up which of our functions is registered for the specific one being called. It will then execute our registered function and pass the `vmPtr` object which can be used to retrieve the function's parameters. The process is being described in the following diagram:
+
+![External function execution from VM](../assets/diagrams/phoenixvm_execution.png)
+
+The above call will be executed when the invocation of an external function is found in a Daedalus script while evaluating it in the phoenix VM.
+
+> *Note*: When no Daedalus function with the same name is explicitly registered, the default handler `DefaultExternal` is called which currently logs the function's name so that missing functions can be easily identified in the game's logs.
+
 # List of all External Daedalus Functions
 
 All functions have been shamelessly copied from [World of Gothic](https://www.worldofgothic.de/modifikation/article_371.htm).
