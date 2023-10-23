@@ -6,7 +6,6 @@ using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Phoenix.Interface;
-using GVR.Util;
 using PxCs.Data.Animation;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
@@ -17,18 +16,10 @@ using UnityEngine.SceneManagement;
 
 namespace GVR.Creator
 {
-    public class DebugAnimationCreatorBSFire : SingletonBehaviour<DebugAnimationCreatorBSFire>
+    public static class DebugAnimationCreatorBSFire
     {
-        private AssetCache assetCache;
         private const string DEFAULT_SHADER = "Universal Render Pipeline/Unlit";
-
-
-        private void Start()
-        {
-            assetCache = AssetCache.I;
-        }
-
-        public void Create(string worldName)
+        public static void Create(string worldName)
         {
             if (!FeatureFlags.I.CreateExampleAnimation)
                 return;
@@ -42,12 +33,12 @@ namespace GVR.Creator
             var animationName = "S_S1";
 
 
-            var mds = PxModelScript.GetModelScriptFromVfs(GameData.I.VfsPtr, mdsName);
-            var mdl = PxModel.LoadModelFromVfs(GameData.I.VfsPtr, mdlName);
+            var mds = PxModelScript.GetModelScriptFromVfs(GameData.VfsPtr, mdsName);
+            var mdl = PxModel.LoadModelFromVfs(GameData.VfsPtr, mdlName);
 
 
             var obj1 = CreateBSFireObj(name, mdl);
-            var obj2 = MeshCreator.I.Create(name + "2", mdl, new(-26f, 10f, 0), Quaternion.identity);
+            var obj2 = MeshCreator.Create(name + "2", mdl, new(-26f, 10f, 0), Quaternion.identity);
 
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj1);
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj2);
@@ -58,7 +49,7 @@ namespace GVR.Creator
             PlayAnimationBSFire(obj2, mds, mdl, mdsName, animationName);
         }
 
-        private GameObject CreateBSFireObj(string objectName, PxModelData mdl)
+        private static GameObject CreateBSFireObj(string objectName, PxModelData mdl)
         {
             var mdh = mdl.hierarchy!;
             var mdm = mdl.mesh;
@@ -140,23 +131,23 @@ namespace GVR.Creator
             return rootObj;
         }
         
-        private void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
+        private static void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
         {
             SetPosAndRot(obj, matrix.ToUnityMatrix());
         }
         
-        private void SetPosAndRot(GameObject obj, Matrix4x4 unityMatrix)
+        private static void SetPosAndRot(GameObject obj, Matrix4x4 unityMatrix)
         {
             SetPosAndRot(obj, unityMatrix.GetPosition() / 100, unityMatrix.rotation);
         }
 
-        private void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
+        private static void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
             obj.transform.localRotation = rotation;
             obj.transform.localPosition = position;
         }
 
-        private void PrepareMeshRenderer(Renderer renderer, PxMultiResolutionMeshData mrmData)
+        private static void PrepareMeshRenderer(Renderer renderer, PxMultiResolutionMeshData mrmData)
         {
             var finalMaterials = new List<Material>(mrmData.subMeshes.Length);
 
@@ -172,7 +163,7 @@ namespace GVR.Creator
                 if (materialData.texture == "")
                     return;
 
-                var texture = assetCache.TryGetTexture(materialData.texture);
+                var texture = AssetCache.TryGetTexture(materialData.texture);
 
                 if (null == texture)
                     throw new Exception("Couldn't get texture from name: " + materialData.texture);
@@ -185,7 +176,7 @@ namespace GVR.Creator
             renderer.SetMaterials(finalMaterials);
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
+        private static void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
         {
             /**
              * Ok, brace yourself:
@@ -275,7 +266,7 @@ namespace GVR.Creator
             }
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
+        private static void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
         {
             /**
              * Ok, brace yourself:
@@ -370,7 +361,7 @@ namespace GVR.Creator
             renderer.bones = meshBones;
         }
 
-        private void PlayAnimationBSFire(GameObject rootObj, PxModelScriptData mds, PxModelData mdl, string mdsName, string animationName)
+        private static void PlayAnimationBSFire(GameObject rootObj, PxModelScriptData mds, PxModelData mdl, string mdsName, string animationName)
         {
             var mdh = mdl.hierarchy;
 
@@ -378,7 +369,7 @@ namespace GVR.Creator
             for (int i = 0; i < animations.Length; i++)
             {
                 var animName = mdsName.Replace(".MDS", $"-{mds.animations[i].name}.MAN", StringComparison.OrdinalIgnoreCase);
-                animations[i] = PxAnimation.LoadFromVfs(GameData.I.VfsPtr, animName);
+                animations[i] = PxAnimation.LoadFromVfs(GameData.VfsPtr, animName);
             }
             var animation = animations.First(i => i.name == animationName);
 

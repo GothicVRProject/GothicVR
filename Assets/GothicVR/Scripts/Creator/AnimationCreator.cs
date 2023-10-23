@@ -4,16 +4,15 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.Npc.Actions;
-using GVR.Util;
 using PxCs.Data.Animation;
 using PxCs.Data.Model;
 using UnityEngine;
 
 namespace GVR.Creator
 {
-    public class AnimationCreator : SingletonBehaviour<AnimationCreator>
+    public static class AnimationCreator
     {
-        public void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
+        public static void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
         {
             var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var animationComp = go.GetComponent<Animation>();
@@ -25,14 +24,14 @@ namespace GVR.Creator
                 return;
             }
 
-            var mds = AssetCache.I.TryGetMds(mdsName);
-            var pxAnimation = AssetCache.I.TryGetAnimation(mdsName, animationName);
+            var mds = AssetCache.TryGetMds(mdsName);
+            var pxAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
             
             // Try to load from cache
-            if (!LookupCache.I.AnimClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
+            if (!LookupCache.AnimClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
             {
                 clip = LoadAnimationClip(pxAnimation, mdh, go);
-                LookupCache.I.AnimClipCache[mdsAnimationKeyName] = clip;
+                LookupCache.AnimClipCache[mdsAnimationKeyName] = clip;
                 clip.wrapMode = repeat ? WrapMode.Loop : WrapMode.Once;
             }
             
@@ -44,7 +43,7 @@ namespace GVR.Creator
             animationComp.Play(mdsAnimationKeyName);
         }
 
-        private AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone)
+        private static AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone)
         {
             var clip = new AnimationClip
             {
@@ -109,7 +108,7 @@ namespace GVR.Creator
         }
         
         // TODO - If we have a performance bottleneck while loading animations, then we could cache these results.
-        private string GetChildPathRecursively(Transform parent, string curName, string currentPath)
+        private static string GetChildPathRecursively(Transform parent, string curName, string currentPath)
         {
             var result = parent.Find(curName);
 
@@ -139,7 +138,7 @@ namespace GVR.Creator
             }
         }
 
-        private void AddClipEvents(AnimationClip clip, PxModelScriptData mds, PxAnimationData pxAnimation, string animationName)
+        private static void AddClipEvents(AnimationClip clip, PxModelScriptData mds, PxAnimationData pxAnimation, string animationName)
         {
             var anim = mds.animations.First(i => i.name.EqualsIgnoreCase(animationName));
 
@@ -179,7 +178,7 @@ namespace GVR.Creator
         /// <summary>
         /// Bugfix: There are events which would happen after the animation is done.
         /// </summary>
-        private float ClampFrame(int expectedFrame, int firstFrame, int frameCount, int lastFrame)
+        private static float ClampFrame(int expectedFrame, int firstFrame, int frameCount, int lastFrame)
         {
             if (expectedFrame < firstFrame)
                 return 0;
@@ -196,7 +195,7 @@ namespace GVR.Creator
         /// @see: https://docs.unity3d.com/ScriptReference/AnimationEvent.html
         /// @see: https://docs.unity3d.com/ScriptReference/GameObject.SendMessage.html
         /// </summary>
-        private void AddClipEndEvent(AnimationClip clip)
+        private static void AddClipEndEvent(AnimationClip clip)
         {
             AnimationEvent finalEvent = new()
             {
@@ -210,7 +209,7 @@ namespace GVR.Creator
         /// <summary>
         /// .man files are combined of MDSNAME-ANIMATIONNAME.man
         /// </summary>
-        private string GetCombinedAnimationKey(string mdsKey, string animKey)
+        private static string GetCombinedAnimationKey(string mdsKey, string animKey)
         {
             var preparedMdsKey = GetPreparedKey(mdsKey);
             var preparedAnimKey = GetPreparedKey(animKey);
@@ -221,7 +220,7 @@ namespace GVR.Creator
         /// <summary>
         /// Basically extract file ending and lower names.
         /// </summary>
-        private string GetPreparedKey(string key)
+        private static string GetPreparedKey(string key)
         {
             var lowerKey = key.ToLower();
             var extension = Path.GetExtension(lowerKey);

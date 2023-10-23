@@ -7,7 +7,6 @@ using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
-using GVR.Util;
 using PxCs.Data.Animation;
 using PxCs.Data.Model;
 using PxCs.Interface;
@@ -16,11 +15,11 @@ using UnityEngine.SceneManagement;
 
 namespace GVR.Creator
 {
-    public class DebugAnimationCreatorBloodwyn: SingletonBehaviour<DebugAnimationCreatorBloodwyn>
+    public static class DebugAnimationCreatorBloodwyn
     {
         private const string worldName = "world.zen";
         
-        public void Create()
+        public static void Create()
         {
             if (!FeatureFlags.I.CreateExampleAnimation)
                 return;
@@ -30,13 +29,13 @@ namespace GVR.Creator
             CreateShadow();
             CreateGuard();
 
-            var mdmBroken = AssetCache.I.TryGetMdm("Hum_GRDM_ARMOR");
-            var mdmWorking = AssetCache.I.TryGetMdm("Hum_STTS_ARMOR");
-            var mdmWorkingCrawler = AssetCache.I.TryGetMdm("Hum_CRAWLER_ARMOR");
-            var mdmWorkingNaked = AssetCache.I.TryGetMdm("Hum_Body_Naked0.ASC");
+            var mdmBroken = AssetCache.TryGetMdm("Hum_GRDM_ARMOR");
+            var mdmWorking = AssetCache.TryGetMdm("Hum_STTS_ARMOR");
+            var mdmWorkingCrawler = AssetCache.TryGetMdm("Hum_CRAWLER_ARMOR");
+            var mdmWorkingNaked = AssetCache.TryGetMdm("Hum_Body_Naked0.ASC");
         }
 
-        private void CreateNaked()
+        private static void CreateNaked()
         {
             var name = "DebugBloodwyn";
             var mdhName = "HUMANS.mdh";
@@ -50,9 +49,9 @@ namespace GVR.Creator
                 TeethTexNr = 1, // B=1, D=4
             };
 
-            var mdh = AssetCache.I.TryGetMdh(mdhName);
-            var mdm = AssetCache.I.TryGetMdm(armor);
-            var obj = NpcMeshCreator.I.CreateNpc(name, armor, mdhName, head, variant, null);
+            var mdh = AssetCache.TryGetMdh(mdhName);
+            var mdm = AssetCache.TryGetMdm(armor);
+            var obj = NpcMeshCreator.CreateNpc(name, armor, mdhName, head, variant, null);
 
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
 
@@ -61,7 +60,7 @@ namespace GVR.Creator
             
             var mdsName = "HUMANS.mds";
             // var animationName = "t_Stand_2_Jump";
-            var mds = AssetCache.I.TryGetMds(mdsName);
+            var mds = AssetCache.TryGetMds(mdsName);
 
             try
             {
@@ -73,7 +72,7 @@ namespace GVR.Creator
             }
         }
 
-        private void CreateCrawler()
+        private static void CreateCrawler()
         {
             var name = "DebugBloodwyn";
             var mdhName = "HUMANS.mdh";
@@ -87,9 +86,9 @@ namespace GVR.Creator
                 TeethTexNr = 1, // B=1, D=4
             };
 
-            var mdh = AssetCache.I.TryGetMdh(mdhName);
-            var mdm = AssetCache.I.TryGetMdm(armor);
-            var obj = NpcMeshCreator.I.CreateNpc(name, armor, mdhName, head, variant, null);
+            var mdh = AssetCache.TryGetMdh(mdhName);
+            var mdm = AssetCache.TryGetMdm(armor);
+            var obj = NpcMeshCreator.CreateNpc(name, armor, mdhName, head, variant, null);
 
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
 
@@ -98,7 +97,7 @@ namespace GVR.Creator
             
             var mdsName = "HUMANS.mds";
             // var animationName = "t_Stand_2_Jump";
-            var mds = AssetCache.I.TryGetMds(mdsName);
+            var mds = AssetCache.TryGetMds(mdsName);
 
             try
             {
@@ -110,7 +109,7 @@ namespace GVR.Creator
             }
         }
 
-        private void CreateShadow()
+        private static void CreateShadow()
         {
             var name = "DebugBloodwyn";
             var mdhName = "HUMANS.mdh";
@@ -124,9 +123,9 @@ namespace GVR.Creator
                 TeethTexNr = 1, // B=1, D=4
             };
 
-            var mdh = AssetCache.I.TryGetMdh(mdhName);
-            var mdm = AssetCache.I.TryGetMdm(armor);
-            var obj = NpcMeshCreator.I.CreateNpc(name, armor, mdhName, head, variant, null);
+            var mdh = AssetCache.TryGetMdh(mdhName);
+            var mdm = AssetCache.TryGetMdm(armor);
+            var obj = NpcMeshCreator.CreateNpc(name, armor, mdhName, head, variant, null);
 
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
 
@@ -135,7 +134,7 @@ namespace GVR.Creator
             
             var mdsName = "HUMANS.mds";
             // var animationName = "t_Stand_2_Jump";
-            var mds = AssetCache.I.TryGetMds(mdsName);
+            var mds = AssetCache.TryGetMds(mdsName);
 
             try
             {
@@ -147,7 +146,7 @@ namespace GVR.Creator
             }
         }
 
-        private void CreateGuard()
+        private static void CreateGuard()
         {
             var name = "DebugBloodwyn";
             var mdhName = "HUMANS.mdh";
@@ -161,9 +160,9 @@ namespace GVR.Creator
                 TeethTexNr = 1, // B=1, D=4
             };
 
-            var mdh = AssetCache.I.TryGetMdh(mdhName);
-            var mdm = AssetCache.I.TryGetMdm(armor);
-            var obj = NpcMeshCreator.I.CreateNpc(name, armor, mdhName, head, variant, null);
+            var mdh = AssetCache.TryGetMdh(mdhName);
+            var mdm = AssetCache.TryGetMdm(armor);
+            var obj = NpcMeshCreator.CreateNpc(name, armor, mdhName, head, variant, null);
 
             SceneManager.GetSceneByName(worldName).GetRootGameObjects().Append(obj);
 
@@ -172,7 +171,7 @@ namespace GVR.Creator
             
             var mdsName = "HUMANS.mds";
             // var animationName = "t_Stand_2_Jump";
-            var mds = AssetCache.I.TryGetMds(mdsName);
+            var mds = AssetCache.TryGetMds(mdsName);
 
             try
             {
@@ -184,15 +183,13 @@ namespace GVR.Creator
             }
         }
 
-        
-        
-        private void PlayAnimationBloodwyn(GameObject rootObj, PxModelScriptData mds, PxModelHierarchyData mdh, string mdsName, string animationName)
+        private static void PlayAnimationBloodwyn(GameObject rootObj, PxModelScriptData mds, PxModelHierarchyData mdh, string mdsName, string animationName)
         {
             PxAnimationData[] animations = new PxAnimationData[mds.animations.Length];
             for (int i = 0; i < animations.Length; i++)
             {
                 var animName = mdsName.Replace(".MDS", $"-{mds.animations[i].name}.MAN", StringComparison.OrdinalIgnoreCase);
-                animations[i] = PxAnimation.LoadFromVfs(GameData.I.VfsPtr, animName);
+                animations[i] = PxAnimation.LoadFromVfs(GameData.VfsPtr, animName);
             }
             
             var animation = animations.First(i => i.name.ToUpper() == animationName.ToUpper());
@@ -256,7 +253,7 @@ namespace GVR.Creator
             animationComp.AddClip(clip, "debug");
             animationComp.Play("debug");
         }
-        string FindDeepChild(Transform parent, string name, string currentPath = "")
+        private static string FindDeepChild(Transform parent, string name, string currentPath = "")
         {
             Transform result = parent.Find(name);
 

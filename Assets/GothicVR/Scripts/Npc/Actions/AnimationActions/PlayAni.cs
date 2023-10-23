@@ -12,9 +12,9 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            var mdh = AssetCache.I.TryGetMdh(props.overlayMdhName);
+            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
             // FIXME - We need to handle both mds and mdh options! (base vs overlay)
-            AnimationCreator.I.PlayAnimation(props.baseMdsName, action.str0, mdh, npcGo);
+            AnimationCreator.PlayAnimation(props.baseMdsName, action.str0, mdh, npcGo);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             var pos = npcGo.transform.position;
 
-            fp = WayNetManager.I.FindNearestFreePoint(pos, action.str0);
+            fp = WayNetHelper.FindNearestFreePoint(pos, action.str0);
 
             movingLocation = fp.Position;
         }

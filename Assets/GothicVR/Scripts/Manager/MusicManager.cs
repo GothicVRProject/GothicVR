@@ -56,7 +56,7 @@ namespace GVR.Manager
 
         public void Create()
         {
-            var g1Dir = SettingsManager.I.GameSettings.GothicIPath;
+            var g1Dir = SettingsManager.GameSettings.GothicIPath;
 
             // Combine paths using Path.Combine instead of Path.Join
             var fullPath = Path.Combine(g1Dir, "_work", "DATA", "Music");
@@ -191,7 +191,7 @@ namespace GVR.Manager
 
             var musicName = $"{result}_{(isDay ? "DAY" : "NGT")}_{musicTag}";
 
-            var theme = AssetCache.I.TryGetMusic(musicName);
+            var theme = AssetCache.TryGetMusic(musicName);
 
             reloadTheme = pendingTheme.file != theme.file;
             pendingTheme = theme;
@@ -204,7 +204,7 @@ namespace GVR.Manager
 
         public void SetMusic(string musicName)
         {
-            var theme = AssetCache.I.TryGetMusic(musicName);
+            var theme = AssetCache.TryGetMusic(musicName);
             reloadTheme = true;
             pendingTheme = theme;
             hasPending = true;

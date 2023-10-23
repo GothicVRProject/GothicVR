@@ -4,21 +4,20 @@ using GVR.Extensions;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Properties;
-using GVR.Util;
 using JetBrains.Annotations;
 using PxCs.Data.Sound;
 using UnityEngine;
 
 namespace GVR.GothicVR.Scripts.Manager
 {
-    public class VobManager : SingletonBehaviour<VobManager>
+    public static class VobHelper
     {
         private const float lookupDistance = 10f; // meter
         
         [CanBeNull]
-        public VobProperties GetFreeInteractableWithin10M(Vector3 position, string visualScheme)
+        public static VobProperties GetFreeInteractableWithin10M(Vector3 position, string visualScheme)
         {
-            return GameData.I.VobsInteractable
+            return GameData.VobsInteractable
                 .Where(i => Vector3.Distance(i.transform.position, position) < lookupDistance)
                 .Where(i => i.visualScheme.EqualsIgnoreCase(visualScheme))
                 .OrderBy(i => Vector3.Distance(i.transform.position, position))
@@ -26,7 +25,7 @@ namespace GVR.GothicVR.Scripts.Manager
         }
 
         [CanBeNull]
-        public GameObject GetNearestSlot(GameObject go, Vector3 position)
+        public static GameObject GetNearestSlot(GameObject go, Vector3 position)
         {
             var goTransform = go.transform;
 
@@ -41,7 +40,7 @@ namespace GVR.GothicVR.Scripts.Manager
                 .FirstOrDefault();
         }
         
-        public AudioClip GetSoundClip(string soundName)
+        public static AudioClip GetSoundClip(string soundName)
         {
             PxSoundData<float> wavFile;
 
@@ -56,11 +55,11 @@ namespace GVR.GothicVR.Scripts.Manager
             // FIXME - Move to EndsWithIgnoreCase()
             if (soundName.ToLower().EndsWith(".wav"))
             {
-                wavFile = AssetCache.I.TryGetSound(soundName);
+                wavFile = AssetCache.TryGetSound(soundName);
             }
             else
             {
-                var sfxData = AssetCache.I.TryGetSfxData(soundName);
+                var sfxData = AssetCache.TryGetSfxData(soundName);
 
                 if (sfxData == null)
                 {
@@ -68,7 +67,7 @@ namespace GVR.GothicVR.Scripts.Manager
                     return null;
                 }
 
-                wavFile = AssetCache.I.TryGetSound(sfxData.file);
+                wavFile = AssetCache.TryGetSound(sfxData.file);
             }
 
             if (wavFile == null)

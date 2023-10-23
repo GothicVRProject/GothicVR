@@ -2,7 +2,6 @@ using System;
 using System.Reflection;
 using GVR.Caches;
 using GVR.Extensions;
-using GVR.Phoenix.Interface;
 using GVR.Util;
 using TMPro;
 using UnityEngine;
@@ -12,18 +11,19 @@ namespace GVR.Manager
 {
     public class FontManager : SingletonBehaviour<FontManager>
     {
+        public TMP_FontAsset DefaultFont;
 
         public void Create()
         {
             TMP_Settings.defaultSpriteAsset = LoadFont("font_old_20_white.FNT");
-            TMP_Settings.defaultFontAsset = GameData.I.EmptyFont;
+            TMP_Settings.defaultFontAsset = DefaultFont;
         }
 
         public TMP_SpriteAsset LoadFont(string fontName)
         {
-            if (LookupCache.I.fontCache.TryGetValue(fontName.ToUpper(), out TMP_SpriteAsset data))
+            if (LookupCache.fontCache.TryGetValue(fontName.ToUpper(), out TMP_SpriteAsset data))
                 return data;
-            var fontData = AssetCache.I.TryGetFont(fontName.ToUpper());
+            var fontData = AssetCache.TryGetFont(fontName.ToUpper());
 
             var format = fontData.texture.format.AsUnityTextureFormat();
             var texture = new Texture2D((int)fontData.texture.width, (int)fontData.texture.height, format, (int)fontData.texture.mipmapCount, false);
@@ -83,7 +83,7 @@ namespace GVR.Manager
 
             spriteAsset.UpdateLookupTables();
 
-            LookupCache.I.fontCache[fontName.ToUpper()] = spriteAsset;
+            LookupCache.fontCache[fontName.ToUpper()] = spriteAsset;
 
             return spriteAsset;
         }

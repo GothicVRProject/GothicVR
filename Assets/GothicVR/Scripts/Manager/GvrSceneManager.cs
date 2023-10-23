@@ -58,7 +58,7 @@ namespace GVR.Manager
             try
             {
                 if (FeatureFlags.I.SkipMainMenu)
-                    await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
+                    await LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint);
                 else
                     await LoadMainMenu();
             }
@@ -78,10 +78,10 @@ namespace GVR.Manager
                 debugFreshlyDoneLoading = false;
             
             if (FeatureFlags.I.CreateOcNpcs)
-                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
+                PxVm.CallFunction(GameData.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
 
             if (FeatureFlags.I.CreateDebugIdleAnimations)
-                NpcCreator.I.DebugAddIdleAnimationToAllNpc();
+                NpcCreator.DebugAddIdleAnimationToAllNpc();
         }
 
         private async Task LoadMainMenu()
@@ -105,11 +105,12 @@ namespace GVR.Manager
             MusicManager.I.SetMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
+            GameData.Reset();
             StartWorldLoading.Invoke();
             
             await ShowLoadingScene(worldName);
             var newWorldScene = await LoadNewWorldScene(newWorldName);
-            await WorldCreator.I.CreateAsync(newWorldName);
+            await WorldCreator.CreateAsync(newWorldName);
             SetSpawnPoint(newWorldScene);
 
             HideLoadingScene();
@@ -128,10 +129,10 @@ namespace GVR.Manager
             await Task.Yield();
 
             // Remove previous scene if it exists
-            if (GameData.I.WorldScene.HasValue)
-                SceneManager.UnloadSceneAsync(GameData.I.WorldScene.Value);
+            if (GameData.WorldScene.HasValue)
+                SceneManager.UnloadSceneAsync(GameData.WorldScene.Value);
 
-            GameData.I.WorldScene = newWorldScene;
+            GameData.WorldScene = newWorldScene;
             return newWorldScene;
         }
 
@@ -196,9 +197,10 @@ namespace GVR.Manager
                 case ConstantsManager.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
                     TeleportPlayerToSpot();
-                    
+
                     sceneGeneralLoaded.Invoke();
                     
+                    WorldCreator.PostCreate();
                     // FIXME - Move to UnityEvent once existing
                     WorldCullingManager.I.PostWorldCreate();
                     // FIXME - Move to UnityEvent once existing
@@ -267,8 +269,8 @@ namespace GVR.Manager
 
         public void MoveToWorldScene(GameObject go)
         {
-            GameData.I.WorldScene!.Value.GetRootGameObjects().Append(go);
-            SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.I.WorldScene.Value.name));
+            GameData.WorldScene!.Value.GetRootGameObjects().Append(go);
+            SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.WorldScene.Value.name));
         }
 
         private void SetPlayer()
