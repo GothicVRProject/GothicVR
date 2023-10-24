@@ -53,6 +53,9 @@ namespace GVR.Creator
         {
             // We need to check for all Sounds once, if they need to be activated as they're next to player.
             // As CullingGroup only triggers deactivation once player spawns, but not activation.
+            if (!FeatureFlags.I.EnableSounds)
+                return;
+
             var loc = Camera.main!.transform.position;
             foreach (var sound in LookupCache.vobSoundsAndDayTime)
             {
