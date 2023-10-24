@@ -150,6 +150,7 @@ namespace GVR.Player.Climb
             reticleImage.type = Image.Type.Filled;
             reticleImage.fillMethod = Image.FillMethod.Vertical;
             Destroy(reticle.GetComponent<Collider>());
+            reticle.SetActive(false);
         }
     }
 }
