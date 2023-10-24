@@ -1893,7 +1893,7 @@ GameObject:
   - component: {fileID: 7242628824849592837}
   - component: {fileID: 1485463712071812010}
   - component: {fileID: 5139670529807056872}
-  - component: {fileID: 6969592086016783357}
+  - component: {fileID: 6139376406399139866}
   m_Layer: 5
   m_Name: TurnSettingDropdown
   m_TagString: Untagged
@@ -2022,7 +2022,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_AlphaFadeSpeed: 0.15
---- !u!114 &6969592086016783357
+--- !u!114 &6139376406399139866
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2031,12 +2031,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2620367377614364553}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef149701c0a67744b88eaf8a23a75f75, type: 3}
+  m_Script: {fileID: 11500000, guid: 25cafb487887685459ed02e2541a4070, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  locomotionsystem: {fileID: 0}
-  snapTurn: {fileID: 0}
-  continuousTurn: {fileID: 0}
 --- !u!1 &2696797225813865958
 GameObject:
   m_ObjectHideFlags: 0
@@ -5534,7 +5531,7 @@ MonoBehaviour:
   MovementMenu: {fileID: 2970808030810714954}
   UIMenu: {fileID: 330079844024664551}
   moveSpeedController: {fileID: 5718367256005164722}
-  turnSettingDropdownController: {fileID: 6969592086016783357}
+  turnSettingDropdownController: {fileID: 0}
 --- !u!1 &5909829140847279542
 GameObject:
   m_ObjectHideFlags: 0
