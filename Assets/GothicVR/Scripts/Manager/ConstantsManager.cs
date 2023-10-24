@@ -11,6 +11,7 @@ namespace GVR.Manager
         
         //Layer for all Items, specifically to disable collision physics between player and items
         public static LayerMask ItemLayer { get; set; } = LayerMask.NameToLayer("Item");
+        public static LayerMask IgnoreRaycastLayer { get; set; } = LayerMask.NameToLayer("Ignore Raycast");
 
         //Tags for components to exchange the default font with custom Gothic title and subtitle / ingame fonts
         public const string MenuFontTag = "Title";
