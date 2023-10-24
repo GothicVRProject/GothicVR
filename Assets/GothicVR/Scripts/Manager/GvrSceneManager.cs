@@ -93,6 +93,7 @@ namespace GVR.Manager
         public async Task LoadWorld(string worldName, string startVob, bool newGame = false)
         {
             startVobAfterLoading = startVob;
+            worldName = worldName.ToLower();
             
             if (worldName == newWorldName)
             {
