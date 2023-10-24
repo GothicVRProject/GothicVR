@@ -58,7 +58,7 @@ namespace GVR.Manager
             try
             {
                 if (FeatureFlags.I.SkipMainMenu)
-                    await LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint);
+                    await LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint, true);
                 else
                     await LoadMainMenu();
             }
