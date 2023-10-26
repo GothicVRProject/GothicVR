@@ -54,7 +54,7 @@ namespace GVR.Creator
             // We need to check for all Sounds once, if they need to be activated as they're next to player.
             // As CullingGroup only triggers deactivation once player spawns, but not activation.
             var loc = Camera.main!.transform.position;
-            foreach (var sound in LookupCache.vobSoundsAndDayTime)
+            foreach (var sound in LookupCache.vobSoundsAndDayTime.Where(i => i != null))
             {
                 var soundLoc = sound.transform.position;
                 var soundDist = sound.GetComponent<AudioSource>().maxDistance;
@@ -607,6 +607,13 @@ namespace GVR.Creator
             go.SetParent(parent);
 
             var pfx = AssetCache.TryGetPfxData(vob.visualName);
+
+            var particle = go.AddComponent<ParticleSystem>();
+            var renderer = go.GetComponent<ParticleSystemRenderer>();
+
+            TextureManager.I.SetTexture(pfx.visName, renderer.material);
+
+            renderer.material.ToCutoutMode(); // e.g. leaves.pfx. Others won't work this way.
 
             return go;
         }
