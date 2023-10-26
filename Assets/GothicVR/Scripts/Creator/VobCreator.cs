@@ -176,11 +176,18 @@ namespace GVR.Creator
                     case PxWorld.PxVobType.PxVob_zCVob:
                     {
                         GameObject obj;
-                        if (vob.visualType == PxWorld.PxVobVisualType.PxVobVisualDecal)
-                            obj = CreateDecal(vob);
-                        else
-                            obj = CreateDefaultMesh(vob);
-                        
+                        switch (vob.visualType)
+                        {
+                            case PxWorld.PxVobVisualType.PxVobVisualDecal:
+                                obj = CreateDecal(vob);
+                                break;
+                            case PxWorld.PxVobVisualType.PxVobVisualParticleSystem:
+                                obj = CreatePfx(vob);
+                                break;
+                            default:
+                                obj = CreateDefaultMesh(vob);
+                                break;
+                        }
                         cullingVobObjects.Add(obj);
                         break;
                     }
@@ -584,10 +591,24 @@ namespace GVR.Creator
             if (!FeatureFlags.I.EnableDecals)
                 return null;
 
-
             var parent = parentGosTeleport[vob.type];
 
             return VobMeshCreator.CreateDecal(vob, parent);
+        }
+
+        private static GameObject CreatePfx(PxVobData vob)
+        {
+            // FIXME - move to non-teleport
+            var parent = parentGosTeleport[vob.type];
+
+            var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            go.name = vob.visualName;
+            go.transform.SetPositionAndRotation(vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation);
+            go.SetParent(parent);
+
+            var pfx = AssetCache.TryGetPfxData(vob.visualName);
+
+            return go;
         }
 
         private static GameObject CreateDefaultMesh(PxVobData vob, bool nonTeleport = false)
@@ -596,10 +617,6 @@ namespace GVR.Creator
             var meshName = vob.showVisual ? vob.visualName : vob.vobName;
 
             if (meshName == string.Empty)
-                return null;
-            
-            // FIXME - PFX effects not yet implemented
-            if (meshName.ToLower().EndsWith(".pfx"))
                 return null;
 
             // MDL
