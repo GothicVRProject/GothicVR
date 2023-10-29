@@ -602,18 +602,57 @@ namespace GVR.Creator
             var parent = parentGosTeleport[vob.type];
 
             var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            GameObject.Destroy(go.GetComponent<SphereCollider>());
+
             go.name = vob.visualName;
             go.transform.SetPositionAndRotation(vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation);
             go.SetParent(parent);
 
             var pfx = AssetCache.TryGetPfxData(vob.visualName);
+            var particleSystem = go.AddComponent<ParticleSystem>();
 
-            var particle = go.AddComponent<ParticleSystem>();
-            var renderer = go.GetComponent<ParticleSystemRenderer>();
+            // Main module
+            {
+                var mainModule = particleSystem.main;
+                var minLifeTime = pfx.lspPartAvg - pfx.lspPartVar;
+                var maxLifeTime = pfx.lspPartAvg + pfx.lspPartVar;
+                mainModule.startLifetime = new ParticleSystem.MinMaxCurve(minLifeTime, maxLifeTime);
+            }
 
-            TextureManager.I.SetTexture(pfx.visName, renderer.material);
+            // Renderer module
+            {
+                var rendererModule = go.GetComponent<ParticleSystemRenderer>();
+                TextureManager.I.SetTexture(pfx.visName, rendererModule.material);
+                // renderer.material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest; // First check with no change.
 
-            renderer.material.ToCutoutMode(); // e.g. leaves.pfx. Others won't work this way.
+                switch (pfx.visAlphaFunc.ToUpper())
+                {
+                    case "BLEND":
+                        rendererModule.material.ToCutoutMode(); // e.g. leaves.pfx.
+                        break;
+                    default:
+                        Debug.LogError($"Particle AlphaFunc {pfx.visAlphaFunc} not yet handled.");
+                        break;
+                }
+            }
+
+            // Shape module
+            {
+                var shapeModule = particleSystem.shape;
+                switch (pfx.shpType.ToUpper())
+                {
+                    case "SPHERE":
+                        shapeModule.shapeType = ParticleSystemShapeType.Sphere;
+                        break;
+                    case "CIRCLE":
+                        shapeModule.shapeType = ParticleSystemShapeType.Circle;
+                        break;
+                    default:
+                        Debug.LogError($"Particle ShapeType {pfx.shpType} not yet handled.");
+                        break;
+                }
+            }
+
 
             return go;
         }
