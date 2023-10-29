@@ -58,7 +58,7 @@ namespace GVR.Manager
             try
             {
                 if (FeatureFlags.I.SkipMainMenu)
-                    await LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint);
+                    await LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint, true);
                 else
                     await LoadMainMenu();
             }
@@ -90,9 +90,10 @@ namespace GVR.Manager
             await LoadNewWorldScene(ConstantsManager.SceneMainMenu);
         }
 
-        public async Task LoadWorld(string worldName, string startVob)
+        public async Task LoadWorld(string worldName, string startVob, bool newGame = false)
         {
             startVobAfterLoading = startVob;
+            worldName = worldName.ToLower();
             
             if (worldName == newWorldName)
             {
@@ -108,7 +109,7 @@ namespace GVR.Manager
             GameData.Reset();
             StartWorldLoading.Invoke();
             
-            await ShowLoadingScene(worldName);
+            await ShowLoadingScene(worldName, newGame);
             var newWorldScene = await LoadNewWorldScene(newWorldName);
             await WorldCreator.CreateAsync(newWorldName);
             SetSpawnPoint(newWorldScene);
@@ -140,7 +141,7 @@ namespace GVR.Manager
         /// Create loading scene and wait for a few milliseconds to go on, ensuring loading bar is selectable.
         /// Async: execute in sync, but whole process can be paused for x amount of frames.
         /// </summary>
-        private async Task ShowLoadingScene(string worldName = null)
+        private async Task ShowLoadingScene(string worldName = null, bool newGame = false)
         {
             TextureManager.I.LoadLoadingDefaultTextures();
 
@@ -157,7 +158,7 @@ namespace GVR.Manager
                 generalSceneLoaded = false;
             }
 
-            SetLoadingTextureForWorld(worldName);
+            SetLoadingTextureForWorld(worldName, newGame);
 
             SceneManager.LoadScene(ConstantsManager.SceneLoading, new LoadSceneParameters(LoadSceneMode.Additive));
 
@@ -166,14 +167,12 @@ namespace GVR.Manager
             await Task.Delay(ensureLoadingBarDelayMilliseconds);
         }
 
-        private void SetLoadingTextureForWorld(string worldName)
+        private void SetLoadingTextureForWorld(string worldName, bool newGame = false)
         {
             if (worldName == null)
                 return;
 
-            // set the loading background texture properly
-            // TODO: for new game we need to load texture "LOADING.TGA"
-            var textureString = "LOADING_" + worldName.Split('.')[0].ToUpper() + ".TGA";
+            string textureString = newGame ? "LOADING.TGA" : $"LOADING_{worldName.Split('.')[0].ToUpper()}.TGA";
             TextureManager.I.SetTexture(textureString, TextureManager.I.GothicLoadingMenuMaterial);
         }
 

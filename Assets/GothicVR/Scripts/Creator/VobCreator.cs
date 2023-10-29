@@ -53,6 +53,9 @@ namespace GVR.Creator
         {
             // We need to check for all Sounds once, if they need to be activated as they're next to player.
             // As CullingGroup only triggers deactivation once player spawns, but not activation.
+            if (!FeatureFlags.I.EnableSounds)
+                return;
+
             var loc = Camera.main!.transform.position;
             foreach (var sound in LookupCache.vobSoundsAndDayTime.Where(i => i != null))
             {
@@ -487,7 +490,9 @@ namespace GVR.Creator
             var go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobMusic);
             go.SetParent(parentGosNonTeleport[vob.type], true, true);
             go.name = vob.vobName;
-            
+
+            go.layer = ConstantsManager.IgnoreRaycastLayer;
+
             var min = vob.boundingBox.min.ToUnityVector();
             var max = vob.boundingBox.max.ToUnityVector();
 
@@ -503,6 +508,8 @@ namespace GVR.Creator
         {
             var vobObj = new GameObject(vob.vobName);
             vobObj.SetParent(parentGosTeleport[vob.type]);
+
+            vobObj.layer = ConstantsManager.IgnoreRaycastLayer;
 
             var trigger = vobObj.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
