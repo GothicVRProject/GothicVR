@@ -617,13 +617,21 @@ namespace GVR.Creator
 
             var pfx = AssetCache.TryGetPfxData(vob.visualName);
             var particleSystem = go.AddComponent<ParticleSystem>();
-
+            
             // Main module
             {
                 var mainModule = particleSystem.main;
                 var minLifeTime = pfx.lspPartAvg - pfx.lspPartVar;
                 var maxLifeTime = pfx.lspPartAvg + pfx.lspPartVar;
+                mainModule.duration = 1f; // I assume pfx data wants a cycle being 1 second long.
                 mainModule.startLifetime = new ParticleSystem.MinMaxCurve(minLifeTime, maxLifeTime);
+                mainModule.loop = pfx.ppsIsLooping;
+            }
+
+            // Emission module
+            {
+                var emissionModule = particleSystem.emission;
+                emissionModule.rateOverTime = new ParticleSystem.MinMaxCurve(pfx.ppsValue);
             }
 
             // Renderer module
