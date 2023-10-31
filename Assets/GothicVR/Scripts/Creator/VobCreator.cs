@@ -609,6 +609,7 @@ namespace GVR.Creator
             // FIXME - move to non-teleport
             var parent = parentGosTeleport[vob.type];
 
+            // FIXME - Move to prefab
             var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             GameObject.Destroy(go.GetComponent<SphereCollider>());
 
@@ -618,8 +619,20 @@ namespace GVR.Creator
 
             var pfx = AssetCache.TryGetPfxData(vob.visualName);
             var particleSystem = go.AddComponent<ParticleSystem>();
+
+            go.AddComponent<VobPfxProperties>().pfxData = pfx;
             
             particleSystem.Stop();
+
+            var gravity = pfx.flyGravity.Split();
+            float gravityX = 1f, gravityY = 1f, gravityZ = 1f;
+            if (gravity.Length == 3)
+            {
+                // Gravity seems too low. Therefore *10k.
+                gravityX = float.Parse(gravity[0], CultureInfo.InvariantCulture) * 10000;
+                gravityY = float.Parse(gravity[1], CultureInfo.InvariantCulture) * 10000;
+                gravityZ = float.Parse(gravity[2], CultureInfo.InvariantCulture) * 10000;
+            }
             
             // Main module
             {
@@ -629,7 +642,13 @@ namespace GVR.Creator
                 mainModule.duration = 1f; // I assume pfx data wants a cycle being 1 second long.
                 mainModule.startLifetime = new (minLifeTime, maxLifeTime);
                 mainModule.loop = pfx.ppsIsLooping;
-                mainModule.startSpeed = 1;
+
+                // I couldn't find a specific property. Therefore using the combined gravity value. ƪ(˘⌣˘)ʃ
+                var speed = 1f;
+                speed *= Math.Abs(gravityX) > 0.01f ? Math.Abs(gravityX) : 1;
+                speed *= Math.Abs(gravityY) > 0.01f ? Math.Abs(gravityY) : 1;
+                speed *= Math.Abs(gravityZ) > 0.01f ? Math.Abs(gravityZ) : 1;
+                mainModule.startSpeed = speed;
             }
 
             // Emission module
@@ -638,15 +657,15 @@ namespace GVR.Creator
                 emissionModule.rateOverTime = new ParticleSystem.MinMaxCurve(pfx.ppsValue);
             }
 
+            // Force over Lifetime module
             {
                 var forceModule = particleSystem.forceOverLifetime;
-                var gravity = pfx.flyGravity.Split();
                 if (gravity.Length == 3)
                 {
                     forceModule.enabled = true;
-                    forceModule.x = float.Parse(gravity[0], CultureInfo.InvariantCulture) * 1000; // Gravity seems too low. Therefore *1k.
-                    forceModule.y = float.Parse(gravity[1], CultureInfo.InvariantCulture) * 1000;
-                    forceModule.z = float.Parse(gravity[2], CultureInfo.InvariantCulture) * 1000;
+                    forceModule.x = gravityX;
+                    forceModule.y = gravityY;
+                    forceModule.z = gravityZ;
                 }
             }
 
@@ -682,6 +701,8 @@ namespace GVR.Creator
                         Debug.LogError($"Particle ShapeType {pfx.shpType} not yet handled.");
                         break;
                 }
+
+                shapeModule.rotation = new(pfx.dirAngleElev, 0, 0);
             }
 
             particleSystem.Play();
