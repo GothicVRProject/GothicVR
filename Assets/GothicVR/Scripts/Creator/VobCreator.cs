@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using GothicVR.Vob;
@@ -618,20 +619,35 @@ namespace GVR.Creator
             var pfx = AssetCache.TryGetPfxData(vob.visualName);
             var particleSystem = go.AddComponent<ParticleSystem>();
             
+            particleSystem.Stop();
+            
             // Main module
             {
                 var mainModule = particleSystem.main;
-                var minLifeTime = pfx.lspPartAvg - pfx.lspPartVar;
-                var maxLifeTime = pfx.lspPartAvg + pfx.lspPartVar;
+                var minLifeTime = (pfx.lspPartAvg - pfx.lspPartVar) / 1000; // I assume we need to change milliseconds to seconds.
+                var maxLifeTime = (pfx.lspPartAvg + pfx.lspPartVar) / 1000;
                 mainModule.duration = 1f; // I assume pfx data wants a cycle being 1 second long.
-                mainModule.startLifetime = new ParticleSystem.MinMaxCurve(minLifeTime, maxLifeTime);
+                mainModule.startLifetime = new (minLifeTime, maxLifeTime);
                 mainModule.loop = pfx.ppsIsLooping;
+                mainModule.startSpeed = 1;
             }
 
             // Emission module
             {
                 var emissionModule = particleSystem.emission;
                 emissionModule.rateOverTime = new ParticleSystem.MinMaxCurve(pfx.ppsValue);
+            }
+
+            {
+                var forceModule = particleSystem.forceOverLifetime;
+                var gravity = pfx.flyGravity.Split();
+                if (gravity.Length == 3)
+                {
+                    forceModule.enabled = true;
+                    forceModule.x = float.Parse(gravity[0], CultureInfo.InvariantCulture) * 1000; // Gravity seems too low. Therefore *1k.
+                    forceModule.y = float.Parse(gravity[1], CultureInfo.InvariantCulture) * 1000;
+                    forceModule.z = float.Parse(gravity[2], CultureInfo.InvariantCulture) * 1000;
+                }
             }
 
             // Renderer module
@@ -668,6 +684,7 @@ namespace GVR.Creator
                 }
             }
 
+            particleSystem.Play();
 
             return go;
         }
