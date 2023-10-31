@@ -648,7 +648,10 @@ namespace GVR.Creator
                 speed *= Math.Abs(gravityX) > 0.01f ? Math.Abs(gravityX) : 1;
                 speed *= Math.Abs(gravityY) > 0.01f ? Math.Abs(gravityY) : 1;
                 speed *= Math.Abs(gravityZ) > 0.01f ? Math.Abs(gravityZ) : 1;
-                mainModule.startSpeed = speed;
+                
+                var minSpeed = (pfx.velAvg - pfx.velVar) / 1000;
+                var maxSpeed = (pfx.velAvg + pfx.velVar) / 1000;
+                mainModule.startSpeed = new(minSpeed, maxSpeed);
             }
 
             // Emission module
@@ -702,6 +705,17 @@ namespace GVR.Creator
                         break;
                 }
 
+                var shapeDimensions = pfx.shpDim.Split();
+                switch (shapeDimensions.Length)
+                {
+                    case 1:
+                        shapeModule.radius = float.Parse(shapeDimensions[0], CultureInfo.InvariantCulture) / 100; // cm in m
+                        break;
+                    default:
+                        Debug.LogError($"shpDim >{pfx.shpDim}< not yet handled");
+                        break;
+                }
+                
                 shapeModule.rotation = new(pfx.dirAngleElev, 0, 0);
             }
 
