@@ -604,6 +604,10 @@ namespace GVR.Creator
             return VobMeshCreator.CreateDecal(vob, parent);
         }
 
+        /// <summary>
+        /// Please check description at worldofgothic for more details:
+        /// https://www.worldofgothic.de/modifikation/index.php?go=particelfx
+        /// </summary>
         private static GameObject CreatePfx(PxVobData vob)
         {
             // FIXME - move to non-teleport
@@ -684,7 +688,17 @@ namespace GVR.Creator
                         rendererModule.material.ToCutoutMode(); // e.g. leaves.pfx.
                         break;
                     default:
-                        Debug.LogError($"Particle AlphaFunc {pfx.visAlphaFunc} not yet handled.");
+                        Debug.LogWarning($"Particle AlphaFunc {pfx.visAlphaFunc} not yet handled.");
+                        break;
+                }
+
+                switch (pfx.visOrientation)
+                {
+                    case "NONE":
+                        rendererModule.alignment = ParticleSystemRenderSpace.View;
+                        break;
+                    default:
+                        Debug.LogWarning($"visOrientation {pfx.visOrientation} not yet handled.");
                         break;
                 }
             }
@@ -701,7 +715,7 @@ namespace GVR.Creator
                         shapeModule.shapeType = ParticleSystemShapeType.Circle;
                         break;
                     default:
-                        Debug.LogError($"Particle ShapeType {pfx.shpType} not yet handled.");
+                        Debug.LogWarning($"Particle ShapeType {pfx.shpType} not yet handled.");
                         break;
                 }
 
@@ -712,7 +726,7 @@ namespace GVR.Creator
                         shapeModule.radius = float.Parse(shapeDimensions[0], CultureInfo.InvariantCulture) / 100; // cm in m
                         break;
                     default:
-                        Debug.LogError($"shpDim >{pfx.shpDim}< not yet handled");
+                        Debug.LogWarning($"shpDim >{pfx.shpDim}< not yet handled");
                         break;
                 }
                 
