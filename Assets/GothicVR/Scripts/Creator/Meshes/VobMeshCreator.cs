@@ -5,7 +5,6 @@ using JetBrains.Annotations;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
-using PxCs.Data.Model;
 using PxCs.Data.Vob;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -13,22 +12,22 @@ using UnityEngine.Rendering.Universal;
 
 namespace GVR.Creator.Meshes
 {
-    public class VobMeshCreator : AbstractMeshCreator<VobMeshCreator>
+    public abstract class VobMeshCreator : MeshCreator
     {
-        public GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position,
+        public new static GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position,
             PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
-            var go = base.Create(objectName, mrm, position, rotation, withCollider, parent, rootGo);
+            var go = MeshCreator.Create(objectName, mrm, position, rotation, withCollider, parent, rootGo);
             
             AddZsCollider(go);
             
             return go;
         }
 
-        public GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation,
+        public new static GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation,
             GameObject parent = null, GameObject rootGo = null)
         {
-            var go = base.Create(objectName, mdl, position, rotation, parent, rootGo);
+            var go = MeshCreator.Create(objectName, mdl, position, rotation, parent, rootGo);
 
             AddZsCollider(go);
 
@@ -37,9 +36,9 @@ namespace GVR.Creator.Meshes
 
 
         /// <summary>
-        /// Add ZenginSlot collider. i.e. positions where 
+        /// Add ZengineSlot collider. i.e. positions where an NPC can sit on a bench.
         /// </summary>
-        private void AddZsCollider([CanBeNull] GameObject go)
+        private static void AddZsCollider([CanBeNull] GameObject go)
         {
             if (go == null || go.transform.childCount == 0)
                 return;
@@ -52,13 +51,12 @@ namespace GVR.Creator.Meshes
                     continue;
                 
                 // Used for event triggers with NPCs.
-                child.AddComponent<SphereCollider>();
+                var coll = child.AddComponent<SphereCollider>();
+                coll.isTrigger = true;
             }
         }
 
-        
-
-        public override GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh,
+        public new static GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh,
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             // Check if there are completely empty elements without any texture.
@@ -69,10 +67,10 @@ namespace GVR.Creator.Meshes
             if (noMeshTextures && noAttachmentTextures)
                 return null;
             else
-                return base.Create(objectName, mdm, mdh, position, rotation, parent, rootGo);
+                return MeshCreator.Create(objectName, mdm, mdh, position, rotation, parent, rootGo);
         }
 
-        public GameObject CreateDecal(PxVobData vob, GameObject parent)
+        public static GameObject CreateDecal(PxVobData vob, GameObject parent)
         {
             // G1: One Decal has no value to recognize what it is. Most likely a setup bug to ignore at this point.
             if (!vob.vobDecal.HasValue)
@@ -82,7 +80,7 @@ namespace GVR.Creator.Meshes
 
             var decalProjectorGo = new GameObject(decalData.name);
             var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
-            var texture = AssetCache.I.TryGetTexture(vob.visualName);
+            var texture = AssetCache.TryGetTexture(vob.visualName);
 
             // x/y needs to be made twice the size and transformed from cm in m.
             // z - value is close to what we see in Gothic spacer.

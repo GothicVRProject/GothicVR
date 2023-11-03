@@ -1,7 +1,10 @@
 using System;
+using GVR.Manager;
+using Unity.VisualScripting;
+using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace GothicVR.Player.Climb
+namespace GVR.Player.Climb
 {
     /// <summary>
     /// @see https://medium.com/@dnwesdman/climbing-in-vr-with-the-xr-interaction-toolkit-164f6b381ed9
@@ -9,8 +12,8 @@ namespace GothicVR.Player.Climb
     /// </summary>
     public class XRDirectClimbInteractor : XRDirectInteractor
     {
-        public static event Action<string> ClimbHandActivated;
-        public static event Action<string> ClimbHandDeactivated;
+        public static UnityEvent<string> ClimbHandActivated = new();
+        public static UnityEvent<string> ClimbHandDeactivated = new();
 
         private string controllerName;
 
@@ -24,17 +27,16 @@ namespace GothicVR.Player.Climb
         {
             base.OnSelectEntered(args);
 
-            if (args.interactableObject.transform.gameObject.CompareTag("Climbable"))
-            {
-                ClimbHandActivated?.Invoke(controllerName);
-            }
+            if (args.interactableObject.transform.CompareTag(ConstantsManager.ClimbableTag))
+                ClimbHandActivated.Invoke(controllerName);
         }
 
         protected override void OnSelectExited(SelectExitEventArgs args)
         {
             base.OnSelectExited(args);
 
-            ClimbHandDeactivated?.Invoke(controllerName);
+            if (args.interactableObject.transform.CompareTag(ConstantsManager.ClimbableTag))
+                ClimbHandDeactivated.Invoke(controllerName);
         }
     }
 }

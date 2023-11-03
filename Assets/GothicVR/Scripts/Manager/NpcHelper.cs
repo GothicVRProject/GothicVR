@@ -6,32 +6,30 @@ using GVR.GothicVR.Scripts.Manager;
 using GVR.Npc;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
-using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Properties;
-using GVR.Util;
 using PxCs.Interface;
 using UnityEngine;
 
 namespace GVR.Manager
 {
-    public class NpcManager : SingletonBehaviour<NpcManager>
+    public static class NpcHelper
     {
         private const float fpLookupDistance = 20f; // meter
 
-        public bool ExtIsMobAvailable(IntPtr npcPtr, string vobName)
+        public static bool ExtIsMobAvailable(IntPtr npcPtr, string vobName)
         {
             var npc = GetNpc(npcPtr);
-            var vob = VobManager.I.GetFreeInteractableWithin10M(npc.transform.position, vobName);
+            var vob = VobHelper.GetFreeInteractableWithin10M(npc.transform.position, vobName);
 
             return (vob != null);
         }
         
-        public bool ExtWldIsFPAvailable(IntPtr npcPtr, string fpNamePart)
+        public static bool ExtWldIsFPAvailable(IntPtr npcPtr, string fpNamePart)
         {
             var props = GetProperties(npcPtr);
             var npcGo = props.gameObject;
-            var freePoints = WayNetManager.I.FindFreePointsWithName(npcGo.transform.position, fpNamePart, fpLookupDistance);
+            var freePoints = WayNetHelper.FindFreePointsWithName(npcGo.transform.position, fpNamePart, fpLookupDistance);
 
             foreach (var fp in freePoints)
             {
@@ -48,14 +46,14 @@ namespace GVR.Manager
         {
             var pos = GetProperties(npcPtr).transform.position;
 
-            return WayNetManager.I.FindNearestWayPoint(pos).Name;
+            return WayNetHelper.FindNearestWayPoint(pos).Name;
         }
 
         public static bool ExtIsNextFpAvailable(IntPtr npcPtr, string fpNamePart)
         {
             var props = GetProperties(npcPtr);
             var pos = props.transform.position;
-            var fp = WayNetManager.I.FindNearestFreePoint(pos, fpNamePart);
+            var fp = WayNetHelper.FindNearestFreePoint(pos, fpNamePart);
 
             if (fp == null)
                 return false;
@@ -76,7 +74,7 @@ namespace GVR.Manager
             return armor?.instancePtr ?? IntPtr.Zero;
         }
         
-        public bool ExtIsNpcOnFp(IntPtr npcPtr, string vobNamePrefix)
+        public static bool ExtIsNpcOnFp(IntPtr npcPtr, string vobNamePrefix)
         {
             var freePoint = GetProperties(npcPtr).CurrentFreePoint;
 
@@ -86,7 +84,7 @@ namespace GVR.Manager
             return freePoint.Name.StartsWithIgnoreCase(vobNamePrefix);
         }
 
-        public bool ExtWldDetectNpcEx(IntPtr npcPtr, int npcInstance, int aiState, int guild, bool ignorePlayer)
+        public static bool ExtWldDetectNpcEx(IntPtr npcPtr, int npcInstance, int aiState, int guild, bool ignorePlayer)
         {
             var npc = GetNpc(npcPtr);
             var npcPos = npc.transform.position;
@@ -99,7 +97,7 @@ namespace GVR.Manager
             // FIXME - Add AiState check
             // FIXME - Add NpcCinstance check (only look for specific NPC)
             
-            var foundNpc = LookupCache.I.NpcCache.Values
+            var foundNpc = LookupCache.NpcCache.Values
                 .Where(i => Vector3.Distance(i.gameObject.transform.position, npcPos) <= distance)
                 .Where(i => i.gameObject != npc)
                 .OrderBy(i => Vector3.Distance(i.gameObject.transform.position, npcPos))
@@ -108,7 +106,7 @@ namespace GVR.Manager
             return (foundNpc != null);
         }
 
-        public int ExtNpcHasItems(IntPtr npcPtr, uint itemId)
+        public static int ExtNpcHasItems(IntPtr npcPtr, uint itemId)
         {
             if (GetProperties(npcPtr).Items.TryGetValue(itemId, out var amount))
                 return amount;
@@ -117,7 +115,7 @@ namespace GVR.Manager
         }
         
         
-        private GameObject GetNpc(IntPtr npcPtr)
+        private static GameObject GetNpc(IntPtr npcPtr)
         {
             return GetProperties(npcPtr).gameObject;
         }
@@ -125,7 +123,7 @@ namespace GVR.Manager
         private static NpcProperties GetProperties(IntPtr npcPtr)
         {
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
-            var props = LookupCache.I.NpcCache[symbolIndex];
+            var props = LookupCache.NpcCache[symbolIndex];
 
             // Workaround: When calling PxVm.InitializeNpc(), phoenix will start executing all of the INSTANCEs methods.
             // But some of them like Hlp_GetNpc() need the IntPtr before it's being returned by InitializeNpc().
@@ -256,7 +254,7 @@ namespace GVR.Manager
         private static AiHandler GetAi(IntPtr npcPtr)
         {
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
-            var props = LookupCache.I.NpcCache[symbolIndex];
+            var props = LookupCache.NpcCache[symbolIndex];
 
             return props.GetComponent<AiHandler>();
         }

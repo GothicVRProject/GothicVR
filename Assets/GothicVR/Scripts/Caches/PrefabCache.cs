@@ -1,17 +1,12 @@
 using System;
 using System.Collections.Generic;
-using GothicVR.Vob;
-using GVR.Phoenix.Util;
-using GVR.Util;
 using UnityEngine;
 
 namespace GVR.Caches
 {
-    public class PrefabCache : SingletonBehaviour<PrefabCache>
+    public static class PrefabCache
     {
-        public GameObject prefabRootGo;
-        
-        private Dictionary<PrefabType, GameObject> prefabCache = new();
+        private static Dictionary<PrefabType, GameObject> prefabCache = new();
 
         public enum PrefabType
         {
@@ -24,7 +19,7 @@ namespace GVR.Caches
             XRDeviceSimulator
         }
 
-        private string GetPath(PrefabType type)
+        private static string GetPath(PrefabType type)
         {
             return type switch
             {
@@ -39,16 +34,16 @@ namespace GVR.Caches
             };
         }
 
-        public GameObject TryGetObject(PrefabType type)
+        public static GameObject TryGetObject(PrefabType type)
         {
             if (prefabCache.TryGetValue(type, out var prefab))
-                return Instantiate(prefab);
+                return GameObject.Instantiate(prefab);
             
             var path = GetPath(type);
             var newPrefab = Resources.Load<GameObject>(path);
 
             prefabCache[type] = newPrefab;
-            return Instantiate(newPrefab);
+            return GameObject.Instantiate(newPrefab);
         }
     }
 }

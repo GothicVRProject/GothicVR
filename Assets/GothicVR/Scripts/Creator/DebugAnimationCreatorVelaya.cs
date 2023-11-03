@@ -5,7 +5,6 @@ using GVR.Caches;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Phoenix.Interface;
-using GVR.Util;
 using PxCs.Data.Animation;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
@@ -16,24 +15,14 @@ using UnityEngine.SceneManagement;
 
 namespace GVR.Creator
 {
-    public class DebugAnimationCreatorVelaya : SingletonBehaviour<DebugAnimationCreatorVelaya>
+    public static class DebugAnimationCreatorVelaya
     {
-        private AssetCache assetCache;
         private const string DEFAULT_SHADER = "Universal Render Pipeline/Unlit";
 
-
-        private void Start()
-        {
-            assetCache = AssetCache.I;
-        }
-
-        public void Create(string worldName)
+        public static void Create(string worldName)
         {
             if (!FeatureFlags.I.CreateExampleAnimation)
                 return;
-
-
-
 
             // var blenderObject = GameObject.Find("Armature");
             // var blenderRenderer = blenderObject.GetComponent<SkinnedMeshRenderer>();
@@ -46,10 +35,10 @@ namespace GVR.Creator
             var animationName = "S_DANCE1";
 
 
-            var mds = PxModelScript.GetModelScriptFromVfs(GameData.I.VfsPtr, mdsName);
-            var mdh = PxModelHierarchy.LoadFromVfs(GameData.I.VfsPtr, mdhName);
-            var mdm = PxModelMesh.LoadModelMeshFromVfs(GameData.I.VfsPtr, mdmName);
-            var mmb = PxMorphMesh.LoadMorphMeshFromVfs(GameData.I.VfsPtr, mmbName);
+            var mds = PxModelScript.GetModelScriptFromVfs(GameData.VfsPtr, mdsName);
+            var mdh = PxModelHierarchy.LoadFromVfs(GameData.VfsPtr, mdhName);
+            var mdm = PxModelMesh.LoadModelMeshFromVfs(GameData.VfsPtr, mdmName);
+            var mmb = PxMorphMesh.LoadMorphMeshFromVfs(GameData.VfsPtr, mmbName);
 
 
             var obj = CreateVelayaObj(name, mdh, mdm, mmb);
@@ -60,7 +49,7 @@ namespace GVR.Creator
             PlayAnimationVelaya(obj, mds, mdh, mdsName, animationName);
         }
 
-        private GameObject CreateVelayaObj(string objectName, PxModelHierarchyData mdh, PxModelMeshData mdm, PxMorphMeshData mmb)
+        private static GameObject CreateVelayaObj(string objectName, PxModelHierarchyData mdh, PxModelMeshData mdm, PxMorphMeshData mmb)
         {
             var rootObj = new GameObject(objectName);
 
@@ -163,7 +152,7 @@ namespace GVR.Creator
         ///
         /// FIXME: Seems unoptimized as for every node we potentially have n iterations of the whole array. (n*m)
         /// </summary>
-        private void mkSkeleton(PxModelHierarchyNodeData[] nodes, Matrix4x4[] matrixValues, int parentIndex)
+        private static void mkSkeleton(PxModelHierarchyNodeData[] nodes, Matrix4x4[] matrixValues, int parentIndex)
         {
             for (var i = 0; i < nodes.Length; ++i)
             {
@@ -181,22 +170,22 @@ namespace GVR.Creator
             }
         }
 
-        private void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
+        private static void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
         {
             SetPosAndRot(obj, matrix.ToUnityMatrix());
         }
 
-        private void SetPosAndRot(GameObject obj, Matrix4x4 unityMatrix)
+        private static void SetPosAndRot(GameObject obj, Matrix4x4 unityMatrix)
         {
             SetPosAndRot(obj, unityMatrix.GetPosition() / 100, unityMatrix.rotation);
         }
 
-        private void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
+        private static void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
             obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
-        private void PrepareMeshRenderer(Renderer renderer, PxMultiResolutionMeshData mrmData)
+        private static void PrepareMeshRenderer(Renderer renderer, PxMultiResolutionMeshData mrmData)
         {
             var finalMaterials = new List<Material>(mrmData.subMeshes.Length);
 
@@ -212,7 +201,7 @@ namespace GVR.Creator
                 if (materialData.texture == "")
                     return;
 
-                var texture = assetCache.TryGetTexture(materialData.texture);
+                var texture = AssetCache.TryGetTexture(materialData.texture);
 
                 if (null == texture)
                     throw new Exception("Couldn't get texture from name: " + materialData.texture);
@@ -225,7 +214,7 @@ namespace GVR.Creator
             renderer.SetMaterials(finalMaterials);
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
+        private static void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
         {
             /**
              * Ok, brace yourself:
@@ -315,7 +304,7 @@ namespace GVR.Creator
             }
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
+        private static void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
         {
             /**
              * Ok, brace yourself:
@@ -410,13 +399,13 @@ namespace GVR.Creator
             renderer.bones = meshBones;
         }
 
-        private void PlayAnimationVelaya(GameObject rootObj, PxModelScriptData mds, PxModelHierarchyData mdh, string mdsName, string animationName)
+        private static void PlayAnimationVelaya(GameObject rootObj, PxModelScriptData mds, PxModelHierarchyData mdh, string mdsName, string animationName)
         {
             PxAnimationData[] animations = new PxAnimationData[mds.animations.Length];
             for (int i = 0; i < animations.Length; i++)
             {
                 var animName = mdsName.Replace(".MDS", $"-{mds.animations[i].name}.MAN", StringComparison.OrdinalIgnoreCase);
-                animations[i] = PxAnimation.LoadFromVfs(GameData.I.VfsPtr, animName);
+                animations[i] = PxAnimation.LoadFromVfs(GameData.VfsPtr, animName);
             }
             var animation = animations.First(i => i.name == animationName);
 
@@ -480,7 +469,7 @@ namespace GVR.Creator
             animationComp.AddClip(clip, "debug");
             animationComp.Play("debug");
         }
-        string FindDeepChild(Transform parent, string name, string currentPath = "")
+        private static string FindDeepChild(Transform parent, string name, string currentPath = "")
         {
             Transform result = parent.Find(name);
 
@@ -511,7 +500,7 @@ namespace GVR.Creator
                 return null;
             }
         }
-        Transform FindDeepChild(Transform parent, string name)
+        private static Transform FindDeepChild(Transform parent, string name)
         {
             Transform result = parent.Find(name);
 

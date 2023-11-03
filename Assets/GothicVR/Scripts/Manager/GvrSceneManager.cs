@@ -58,7 +58,7 @@ namespace GVR.Manager
             try
             {
                 if (FeatureFlags.I.SkipMainMenu)
-                    await LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
+                    await LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint, true);
                 else
                     await LoadMainMenu();
             }
@@ -78,10 +78,10 @@ namespace GVR.Manager
                 debugFreshlyDoneLoading = false;
             
             if (FeatureFlags.I.CreateOcNpcs)
-                PxVm.CallFunction(GameData.I.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
+                PxVm.CallFunction(GameData.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
 
             if (FeatureFlags.I.CreateDebugIdleAnimations)
-                NpcCreator.I.DebugAddIdleAnimationToAllNpc();
+                NpcCreator.DebugAddIdleAnimationToAllNpc();
         }
 
         private async Task LoadMainMenu()
@@ -90,9 +90,10 @@ namespace GVR.Manager
             await LoadNewWorldScene(ConstantsManager.SceneMainMenu);
         }
 
-        public async Task LoadWorld(string worldName, string startVob)
+        public async Task LoadWorld(string worldName, string startVob, bool newGame = false)
         {
             startVobAfterLoading = startVob;
+            worldName = worldName.ToLower();
             
             if (worldName == newWorldName)
             {
@@ -105,11 +106,12 @@ namespace GVR.Manager
             MusicManager.I.SetMusic("SYS_LOADING");
             var watch = Stopwatch.StartNew();
 
+            GameData.Reset();
             StartWorldLoading.Invoke();
             
-            await ShowLoadingScene(worldName);
+            await ShowLoadingScene(worldName, newGame);
             var newWorldScene = await LoadNewWorldScene(newWorldName);
-            await WorldCreator.I.CreateAsync(newWorldName);
+            await WorldCreator.CreateAsync(newWorldName);
             SetSpawnPoint(newWorldScene);
 
             HideLoadingScene();
@@ -128,10 +130,10 @@ namespace GVR.Manager
             await Task.Yield();
 
             // Remove previous scene if it exists
-            if (GameData.I.WorldScene.HasValue)
-                SceneManager.UnloadSceneAsync(GameData.I.WorldScene.Value);
+            if (GameData.WorldScene.HasValue)
+                SceneManager.UnloadSceneAsync(GameData.WorldScene.Value);
 
-            GameData.I.WorldScene = newWorldScene;
+            GameData.WorldScene = newWorldScene;
             return newWorldScene;
         }
 
@@ -139,7 +141,7 @@ namespace GVR.Manager
         /// Create loading scene and wait for a few milliseconds to go on, ensuring loading bar is selectable.
         /// Async: execute in sync, but whole process can be paused for x amount of frames.
         /// </summary>
-        private async Task ShowLoadingScene(string worldName = null)
+        private async Task ShowLoadingScene(string worldName = null, bool newGame = false)
         {
             TextureManager.I.LoadLoadingDefaultTextures();
 
@@ -156,7 +158,7 @@ namespace GVR.Manager
                 generalSceneLoaded = false;
             }
 
-            SetLoadingTextureForWorld(worldName);
+            SetLoadingTextureForWorld(worldName, newGame);
 
             SceneManager.LoadScene(ConstantsManager.SceneLoading, new LoadSceneParameters(LoadSceneMode.Additive));
 
@@ -165,14 +167,12 @@ namespace GVR.Manager
             await Task.Delay(ensureLoadingBarDelayMilliseconds);
         }
 
-        private void SetLoadingTextureForWorld(string worldName)
+        private void SetLoadingTextureForWorld(string worldName, bool newGame = false)
         {
             if (worldName == null)
                 return;
 
-            // set the loading background texture properly
-            // TODO: for new game we need to load texture "LOADING.TGA"
-            var textureString = "LOADING_" + worldName.Split('.')[0].ToUpper() + ".TGA";
+            string textureString = newGame ? "LOADING.TGA" : $"LOADING_{worldName.Split('.')[0].ToUpper()}.TGA";
             TextureManager.I.SetTexture(textureString, TextureManager.I.GothicLoadingMenuMaterial);
         }
 
@@ -196,9 +196,10 @@ namespace GVR.Manager
                 case ConstantsManager.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
                     TeleportPlayerToSpot();
-                    
+
                     sceneGeneralLoaded.Invoke();
                     
+                    WorldCreator.PostCreate();
                     // FIXME - Move to UnityEvent once existing
                     WorldCullingManager.I.PostWorldCreate();
                     // FIXME - Move to UnityEvent once existing
@@ -267,8 +268,8 @@ namespace GVR.Manager
 
         public void MoveToWorldScene(GameObject go)
         {
-            GameData.I.WorldScene!.Value.GetRootGameObjects().Append(go);
-            SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.I.WorldScene.Value.name));
+            GameData.WorldScene!.Value.GetRootGameObjects().Append(go);
+            SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.WorldScene.Value.name));
         }
 
         private void SetPlayer()

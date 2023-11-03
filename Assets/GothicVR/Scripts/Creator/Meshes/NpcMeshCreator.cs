@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.Phoenix.Interface.Vm;
-using JetBrains.Annotations;
 using PxCs.Data.Mesh;
 using PxCs.Data.Vm;
 using PxCs.Interface;
@@ -11,16 +10,16 @@ using UnityEngine;
 
 namespace GVR.Creator.Meshes
 {
-    public class NpcMeshCreator : AbstractMeshCreator<NpcMeshCreator>
+    public abstract class NpcMeshCreator : MeshCreator
     {
-        private VmGothicExternals.ExtSetVisualBodyData tempBodyData;
+        private static VmGothicExternals.ExtSetVisualBodyData tempBodyData;
 
-        public GameObject CreateNpc(string npcName, string mdmName, string mdhName,
+        public static GameObject CreateNpc(string npcName, string mdmName, string mdhName,
             string headName, VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
         {
             tempBodyData = bodyData;
-            var mdm = AssetCache.I.TryGetMdm(mdmName);
-            var mdh = AssetCache.I.TryGetMdh(mdhName);
+            var mdm = AssetCache.TryGetMdm(mdmName);
+            var mdh = AssetCache.TryGetMdh(mdhName);
             
             if (mdm == null)
             {
@@ -38,14 +37,14 @@ namespace GVR.Creator.Meshes
 
             if (!string.IsNullOrEmpty(headName))
             {
-                var mmb = AssetCache.I.TryGetMmb(headName);   
+                var mmb = AssetCache.TryGetMmb(headName);   
                 AddHead(npcName, npcGo, mmb);
             }
 
             return npcGo;
         }
 
-        private void AddHead(string npcName, GameObject npcGo, PxMorphMeshData morphMesh)
+        private static void AddHead(string npcName, GameObject npcGo, PxMorphMeshData morphMesh)
         {
             var headGo = npcGo.FindChildRecursively("BIP01 HEAD");
 
@@ -65,7 +64,7 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Change texture name based on VisualBodyData.
         /// </summary>
-        protected override Texture2D GetTexture(string name)
+        protected static new Texture2D GetTexture(string name)
         {
             string finalTextureName;
             
@@ -87,10 +86,10 @@ namespace GVR.Creator.Meshes
                 // No changeable texture needed? Skip updating texture name.
                 finalTextureName = name;
 
-            return base.GetTexture(finalTextureName);
+            return MeshCreator.GetTexture(finalTextureName);
         }
         
-        protected override Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
+        protected static new Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
         {
             Dictionary<string, PxMultiResolutionMeshData> newAttachments = new(attachments);
 
@@ -101,9 +100,7 @@ namespace GVR.Creator.Meshes
             return newAttachments;
         }
 
-
-
-        public void EquipWeapon(GameObject npcGo, PxVmItemData itemData, PxVm.PxVmItemFlags mainFlag, PxVm.PxVmItemFlags flags)
+        public static void EquipWeapon(GameObject npcGo, PxVmItemData itemData, PxVm.PxVmItemFlags mainFlag, PxVm.PxVmItemFlags flags)
         {
             switch (mainFlag)
             {
@@ -116,9 +113,9 @@ namespace GVR.Creator.Meshes
             }
         }
 
-        private void EquipMeleeWeapon(GameObject npcGo, PxVmItemData itemData)
+        private static void EquipMeleeWeapon(GameObject npcGo, PxVmItemData itemData)
         {
-            var mrm = AssetCache.I.TryGetMrm(itemData.visual);
+            var mrm = AssetCache.TryGetMrm(itemData.visual);
 
             string slotName;
             switch (itemData.flags)
@@ -147,7 +144,7 @@ namespace GVR.Creator.Meshes
             PrepareMeshFilter(meshFilter, mrm);
         }
 
-        private void EquipRangeWeapon(GameObject npcGo, PxVmItemData itemData)
+        private static void EquipRangeWeapon(GameObject npcGo, PxVmItemData itemData)
         {
             string slotName;
             switch (itemData.flags)
@@ -164,7 +161,7 @@ namespace GVR.Creator.Meshes
             if (weaponGo == null)
                 return;
 
-            var mms = AssetCache.I.TryGetMmb(itemData.visual);
+            var mms = AssetCache.TryGetMmb(itemData.visual);
 
             var meshFilter = weaponGo.AddComponent<MeshFilter>();
             var meshRenderer = weaponGo.AddComponent<MeshRenderer>();
