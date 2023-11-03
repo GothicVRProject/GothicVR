@@ -610,6 +610,9 @@ namespace GVR.Creator
         /// </summary>
         private static GameObject CreatePfx(PxVobData vob)
         {
+            if (!FeatureFlags.I.enableVobParticles)
+                return null;
+
             // FIXME - move to non-teleport
             var parent = parentGosTeleport[vob.type];
 

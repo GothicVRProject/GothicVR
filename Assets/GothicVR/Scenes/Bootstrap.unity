@@ -349,6 +349,7 @@ MonoBehaviour:
   vobCullingLarge:
     maxObjectSize: 100
     cullingDistance: 200
+  enableVobParticles: 0
   enableFineGrainedWorldMeshCreation: 0
   enableWorldCulling: 0
 --- !u!1 &394991343
