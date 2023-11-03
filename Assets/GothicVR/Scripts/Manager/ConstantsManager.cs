@@ -1,17 +1,19 @@
 using UnityEngine;
-using GVR.Util;
 
 namespace GVR.Manager
 {
-    public class ConstantsManager : SingletonBehaviour<ConstantsManager>
+    public static class ConstantsManager
     {
         public const string SceneBootstrap = "Bootstrap";
         public const string SceneGeneral = "General";
         public const string SceneMainMenu = "MainMenu";
         public const string SceneLoading = "Loading";
-        
+
         //Layer for all Items, specifically to disable collision physics between player and items
-        public LayerMask ItemLayer;
+        public static LayerMask ItemLayer { get; set; } = LayerMask.NameToLayer("Item");
+
+        // solves some weird interactions between the teleport raycast and collider (musicZone/worldTriggerChange)
+        public static LayerMask IgnoreRaycastLayer { get; set; } = LayerMask.NameToLayer("Ignore Raycast");
 
         //Tags for components to exchange the default font with custom Gothic title and subtitle / ingame fonts
         public const string MenuFontTag = "Title";
@@ -20,23 +22,15 @@ namespace GVR.Manager
         public const string SpotTag = "PxVob_zCVobSpot";
         public const string PlayerTag = "Player";
 
-        public int MeshPerFrame = 10;
-        public int VObPerFrame = 75;
+        public static int MeshPerFrame { get; } = 10;
+        public static int VObPerFrame { get; } = 75;
 
         //Collection of PlayerPref entries for settings
-        public string moveSpeedPlayerPref = "MoveSpeed";
+        public const string moveSpeedPlayerPref = "MoveSpeed";
+        public const string turnSettingPlayerPref = "TurnSetting";
+        public static float moveSpeed { get; set; } = 8f;
 
-        public string turnSettingPlayerPref = "TurnSetting";
-
-        public float moveSpeed = 8f;
-
-        public string selectedWorld = "world.zen";
-        public string selectedWaypoint = "START"; 
-
-        protected override void Awake()
-        {
-            base.Awake();
-            ItemLayer = LayerMask.NameToLayer("Item");
-        }
+        public static string selectedWorld { get; set; } = "world.zen";
+        public static string selectedWaypoint { get; set; } = "START";
     }
 }

@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using GVR.Phoenix.Interface;
 using GVR.Manager;
 
 public class TurnSettingDropdownController : MonoBehaviour
@@ -17,8 +15,8 @@ public class TurnSettingDropdownController : MonoBehaviour
         var dropdown = transform.GetComponent<TMP_Dropdown>();
         dropdown.onValueChanged.AddListener(DropdownItemSelected);
 
-        dropdown.value = PlayerPrefs.GetInt(ConstantsManager.I.turnSettingPlayerPref);
-        Debug.Log(PlayerPrefs.GetInt(ConstantsManager.I.turnSettingPlayerPref));
+        dropdown.value = PlayerPrefs.GetInt(ConstantsManager.turnSettingPlayerPref);
+        Debug.Log(PlayerPrefs.GetInt(ConstantsManager.turnSettingPlayerPref));
         DropdownItemSelected(dropdown.value);
 
         // FIXME - If we're on Loading scene, there is no locomotionSystem. We should switch it to something like "isLoadingState".
@@ -44,7 +42,7 @@ public class TurnSettingDropdownController : MonoBehaviour
 
     void EnableSnapTurn()
     {
-        PlayerPrefs.SetInt(ConstantsManager.I.turnSettingPlayerPref, 0);
+        PlayerPrefs.SetInt(ConstantsManager.turnSettingPlayerPref, 0);
 
         if (!locomotionsystem)
             return;
@@ -55,7 +53,7 @@ public class TurnSettingDropdownController : MonoBehaviour
 
     void EnableContinuousTurn()
     {
-        PlayerPrefs.SetInt(ConstantsManager.I.turnSettingPlayerPref, 1);
+        PlayerPrefs.SetInt(ConstantsManager.turnSettingPlayerPref, 1);
 
         if (!locomotionsystem)
             return;

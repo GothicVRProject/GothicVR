@@ -27,14 +27,14 @@ namespace GVR.Player.Menu
             if (moveSpeedController == null || turnSettingDropdownController == null)
                 return;
 
-            moveSpeedController.ChangeMoveSpeed(PlayerPrefs.GetFloat(ConstantsManager.I.moveSpeedPlayerPref));
-            turnSettingDropdownController.DropdownItemSelected(PlayerPrefs.GetInt(ConstantsManager.I.turnSettingPlayerPref));
+            moveSpeedController.ChangeMoveSpeed(PlayerPrefs.GetFloat(ConstantsManager.moveSpeedPlayerPref));
+            turnSettingDropdownController.DropdownItemSelected(PlayerPrefs.GetInt(ConstantsManager.turnSettingPlayerPref));
         }
 
         public void PlayFunction()
         {
 #pragma warning disable CS4014 // It's intended, that this async call is not awaited.
-            GvrSceneManager.I.LoadWorld(ConstantsManager.I.selectedWorld, ConstantsManager.I.selectedWaypoint);
+            GvrSceneManager.I.LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint, true);
 #pragma warning restore CS4014
         }
 

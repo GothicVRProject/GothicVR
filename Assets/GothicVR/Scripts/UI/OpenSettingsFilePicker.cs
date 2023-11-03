@@ -14,14 +14,14 @@ namespace GVR
             if (paths == null || paths.Length == 0)
                 return;
             
-            GameSettings gameSettings = SettingsManager.I.LoadGameSettings();
-            gameSettings.GothicIPath = paths[0];
-            SettingsManager.I.SaveGameSettings(gameSettings);
+            SettingsManager.LoadGameSettings();
+            SettingsManager.GameSettings.GothicIPath = paths[0];
+            SettingsManager.SaveGameSettings(SettingsManager.GameSettings);
             
-            if (SettingsManager.I.CheckIfGothic1InstallationExists())
+            if (SettingsManager.CheckIfGothic1InstallationExists())
             {
-                PhoenixBootstrapper.I.configurationMessage.SetActive(false);
-                PhoenixBootstrapper.I.BootGothicVR(SettingsManager.I.GameSettings.GothicIPath);
+                PhoenixBootstrapper.I.invalidInstallationDirMessage.SetActive(false);
+                PhoenixBootstrapper.I.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
             }
         }
     }

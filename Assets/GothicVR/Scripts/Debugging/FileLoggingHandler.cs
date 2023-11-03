@@ -38,9 +38,9 @@ namespace GVR.Debugging
 		/// </summary>
 		private void Start()
 		{
-			if (LogLevel.TryParse(SettingsManager.I.GameSettings.LogLevel, true, out LogLevel value))
+			if (LogLevel.TryParse(SettingsManager.GameSettings.LogLevel, true, out LogLevel value))
 			{
-				fileWriter.WriteLine("LogLevel Setting found: " + SettingsManager.I.GameSettings.LogLevel);
+				fileWriter.WriteLine("LogLevel Setting found: " + SettingsManager.GameSettings.LogLevel);
 				logLevel = value;
 			}
 			else

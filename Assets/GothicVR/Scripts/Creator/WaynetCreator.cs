@@ -2,14 +2,13 @@
 using GVR.Extensions;
 using GVR.Manager;
 using GVR.Phoenix.Data;
-using GVR.Util;
 using UnityEngine;
 
 namespace GVR.Creator
 {
-    public class WaynetCreator: SingletonBehaviour<WaynetCreator>
+    public static class WaynetCreator
     {
-        public void Create(GameObject root, WorldData world)
+        public static void Create(GameObject root, WorldData world)
         {
             var waynetObj = new GameObject(string.Format("Waynet"));
             waynetObj.transform.parent = root.transform;
@@ -19,7 +18,7 @@ namespace GVR.Creator
             CreateWaypointEdges(waynetObj, world);
         }
 
-        private void CreateWaypoints(GameObject parent, WorldData world)
+        private static void CreateWaypoints(GameObject parent, WorldData world)
         {
             if (!FeatureFlags.I.CreateWaypoints)
                 return;
@@ -34,7 +33,7 @@ namespace GVR.Creator
                 {
                     wpObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     wpObject.transform.localScale = new(0.5f, 0.5f, 0.5f);
-                    Destroy(wpObject.GetComponent<Collider>());
+                    GameObject.Destroy(wpObject.GetComponent<Collider>());
                 }
                 else
                     wpObject = new GameObject();
@@ -47,7 +46,7 @@ namespace GVR.Creator
             }
         }
 
-        private void CreateWaypointEdges(GameObject parent, WorldData world)
+        private static void CreateWaypointEdges(GameObject parent, WorldData world)
         {
             if (!FeatureFlags.I.createWaypointEdgeMeshes)
                 return;

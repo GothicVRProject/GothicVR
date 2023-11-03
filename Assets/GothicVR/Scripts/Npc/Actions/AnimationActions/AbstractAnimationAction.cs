@@ -1,15 +1,8 @@
-using System;
-using System.Diagnostics;
-using GVR.Caches;
-using GVR.Creator;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
-using GVR.Manager;
 using GVR.Properties;
-using PxCs.Data.Animation;
 using PxCs.Data.Event;
 using PxCs.Interface;
-using Unity.VisualScripting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -37,7 +30,7 @@ namespace GVR.Npc.Actions.AnimationActions
         /// </summary>
         public virtual void AnimationSfxEventCallback(PxEventSfxData sfxData)
         {
-            var clip = VobManager.I.GetSoundClip(sfxData.name);
+            var clip = VobHelper.GetSoundClip(sfxData.name);
             props.npcSound.clip = clip;
             props.npcSound.maxDistance = sfxData.range.ToMeter();
             props.npcSound.Play();

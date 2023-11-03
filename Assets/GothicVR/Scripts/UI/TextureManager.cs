@@ -50,49 +50,49 @@ public class TextureManager : SingletonBehaviour<TextureManager>
     public void LoadLoadingDefaultTextures()
     {
 
-        var mainMenuImageBackgroundTexture = AssetCache.I.TryGetTexture("STARTSCREEN.TGA");
+        var mainMenuImageBackgroundTexture = AssetCache.TryGetTexture("STARTSCREEN.TGA");
         MainMenuImageBackgroundMaterial.mainTexture = mainMenuImageBackgroundTexture;
 
-        var mainMenuImageTexture = AssetCache.I.TryGetTexture("MENU_INGAME.TGA");
+        var mainMenuImageTexture = AssetCache.TryGetTexture("MENU_INGAME.TGA");
         MainMenuBackgroundMaterial.mainTexture = mainMenuImageTexture;
 
-        var mainMenuTextImageTexture = AssetCache.I.TryGetTexture("MENU_GOTHIC.TGA");
+        var mainMenuTextImageTexture = AssetCache.TryGetTexture("MENU_GOTHIC.TGA");
         MainMenuTextImageMaterial.mainTexture = mainMenuTextImageTexture;
 
-        var loadingBackgroundTexture = AssetCache.I.TryGetTexture("LOADING.TGA");
+        var loadingBackgroundTexture = AssetCache.TryGetTexture("LOADING.TGA");
         GothicLoadingMenuMaterial.mainTexture = loadingBackgroundTexture;
 
-        var progressBackgroundTexture = AssetCache.I.TryGetTexture("PROGRESS.TGA");
+        var progressBackgroundTexture = AssetCache.TryGetTexture("PROGRESS.TGA");
         LoadingBarBackgroundMaterial.mainTexture = progressBackgroundTexture;
 
-        var progressTexture = AssetCache.I.TryGetTexture("PROGRESS_BAR.TGA");
+        var progressTexture = AssetCache.TryGetTexture("PROGRESS_BAR.TGA");
         LoadingBarMaterial.mainTexture = progressTexture;
 
-        var backgroundtexture = AssetCache.I.TryGetTexture("LOG_PAPER.TGA");
+        var backgroundtexture = AssetCache.TryGetTexture("LOG_PAPER.TGA");
         backgroundmaterial.mainTexture = backgroundtexture;
 
-        var buttontexture = AssetCache.I.TryGetTexture("INV_SLOT.TGA");
+        var buttontexture = AssetCache.TryGetTexture("INV_SLOT.TGA");
         buttonmaterial.mainTexture = buttontexture;
 
-        var slidertexture = AssetCache.I.TryGetTexture("MENU_SLIDER_BACK.TGA");
+        var slidertexture = AssetCache.TryGetTexture("MENU_SLIDER_BACK.TGA");
         slidermaterial.mainTexture = slidertexture;
 
-        var sliderpositiontexture = AssetCache.I.TryGetTexture("MENU_SLIDER_POS.TGA");
+        var sliderpositiontexture = AssetCache.TryGetTexture("MENU_SLIDER_POS.TGA");
         sliderpositionmaterial.mainTexture = sliderpositiontexture;
 
-        var fillertexture = AssetCache.I.TryGetTexture("MENU_BUTTONBACK-C.TEX");
+        var fillertexture = AssetCache.TryGetTexture("MENU_BUTTONBACK-C.TEX");
         fillermaterial.mainTexture = fillertexture;
 
-        var arrowtexture = AssetCache.I.TryGetTexture("U.TGA");
+        var arrowtexture = AssetCache.TryGetTexture("U.TGA");
         arrowmaterial.mainTexture = arrowtexture;
 
-        var skytexture = AssetCache.I.TryGetTexture("SKYDAY_LAYER1_A0-C.TEX");
+        var skytexture = AssetCache.TryGetTexture("SKYDAY_LAYER1_A0-C.TEX");
         skymaterial.mainTexture = skytexture;
     }
 
     public void SetTexture(string texture, Material material)
     {
-        material.mainTexture = AssetCache.I.TryGetTexture(texture);
+        material.mainTexture = AssetCache.TryGetTexture(texture);
     }
 
     private Material GetEmptyMaterial(MaterialExtension.BlendMode blendMode = MaterialExtension.BlendMode.Opaque)

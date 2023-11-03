@@ -23,13 +23,6 @@ namespace GVR.Demo
         }
         public List<Content> content = new();
 
-		private AssetCache assetCache;
-
-		private void Start()
-		{
-			assetCache = AssetCache.I;
-		}
-
 		private void Update()
 		{
 			if (debugSpawnContentNow)
@@ -72,10 +65,10 @@ namespace GVR.Demo
 			
 			foreach (var item in content)
 			{
-				var pxItem = assetCache.TryGetItemData(item.name);
+				var pxItem = AssetCache.TryGetItemData(item.name);
 
-				var mrm = assetCache.TryGetMrm(pxItem?.visual);
-				var itemObj = MeshCreator.I.Create(item.name, mrm, default, default, true, itemsObj);
+				var mrm = AssetCache.TryGetMrm(pxItem?.visual);
+				var itemObj = MeshCreator.Create(item.name, mrm, default, default, true, itemsObj);
 			}
 		}
 	}

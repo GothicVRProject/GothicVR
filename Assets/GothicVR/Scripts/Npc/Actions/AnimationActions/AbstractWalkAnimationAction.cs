@@ -49,8 +49,8 @@ namespace GVR.Npc.Actions.AnimationActions
         private void StartRotation(Transform transform)
         {
             // FIXME - we need to evaluate if we turn right or left. Then choose TurnR/TurnL properly.
-            var mdh = AssetCache.I.TryGetMdh(props.overlayMdhName);
-            AnimationCreator.I.PlayAnimation(props.baseMdsName, "t_WalkWTurnR", mdh, npcGo, true);
+            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
+            AnimationCreator.PlayAnimation(props.baseMdsName, "t_WalkWTurnR", mdh, npcGo, true);
             
             walkState = WalkState.Rotate;
         }
@@ -90,8 +90,8 @@ namespace GVR.Npc.Actions.AnimationActions
         private void StartWalkAnimation()
         {
             var animName = GetWalkModeAnimationString();
-            var mdh = AssetCache.I.TryGetMdh(props.overlayMdhName);
-            AnimationCreator.I.PlayAnimation(props.baseMdsName, animName, mdh, npcGo, true);
+            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
+            AnimationCreator.PlayAnimation(props.baseMdsName, animName, mdh, npcGo, true);
 
             walkState = WalkState.Walk;
         }

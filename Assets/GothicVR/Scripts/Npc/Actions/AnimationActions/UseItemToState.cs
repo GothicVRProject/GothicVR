@@ -38,24 +38,24 @@ namespace GVR.Npc.Actions.AnimationActions
 
         private void StartItemStateAnimation(int itemAnimationState)
         {
-            var mdh = AssetCache.I.TryGetMdh(props.overlayMdhName);
-            var item = AssetCache.I.TryGetItemData(action.ui0);
+            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
+            var item = AssetCache.TryGetItemData(action.ui0);
 
             // e.g. T_POTION_STAND_2_S0
             var animationName = string.Format(animationStartScheme, item.schemeName, itemAnimationState);
             
-            AnimationCreator.I.PlayAnimation(props.baseMdsName, animationName, mdh, npcGo);
+            AnimationCreator.PlayAnimation(props.baseMdsName, animationName, mdh, npcGo);
         }
 
         private void EndItemStateAnimation(int itemAnimationState)
         {
-            var mdh = AssetCache.I.TryGetMdh(props.overlayMdhName);
-            var item = AssetCache.I.TryGetItemData(action.ui0);
+            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
+            var item = AssetCache.TryGetItemData(action.ui0);
 
             // e.g. T_POTION_S0_2_STAND
             var animationName = string.Format(animationEndScheme, item.schemeName, itemAnimationState);
             
-            AnimationCreator.I.PlayAnimation(props.baseMdsName, animationName, mdh, npcGo);
+            AnimationCreator.PlayAnimation(props.baseMdsName, animationName, mdh, npcGo);
         }
 
         public override void AnimationEventCallback(PxEventTagData data)
@@ -80,7 +80,7 @@ namespace GVR.Npc.Actions.AnimationActions
         private void InsertItem(string slot)
         {
             var slotGo = npcGo.FindChildRecursively(slot);
-            VobCreator.I.CreateItem(props.currentItem, slotGo);
+            VobCreator.CreateItem(props.currentItem, slotGo);
 
             props.usedItemSlot = slot;
         }
