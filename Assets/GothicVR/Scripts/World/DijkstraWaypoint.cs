@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GVR
 {
-    public class DijkstraWaypoint
+    public class DijkstraWaypointm
     {
         public string name = "";                                //as index to find other data like position, underwater and probably isFree
 
