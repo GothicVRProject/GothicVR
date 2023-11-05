@@ -32,6 +32,15 @@ namespace GVR.Editor.Builds.UnityBuildTools
 			PerformQuestBuild(buildProductionReady);
 		}
 
+		static void PerformQuestBuild()
+		{
+			string target_path = TARGET_DIR + "/Quest/" + APP_NAME + ".apk";
+			SetQuestSettings();
+				FeatureFlagTool.SetFeatureFlags();
+				EditorSceneManager.SaveScene(SceneManager.GetSceneByName("Bootstrap"));
+			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
+		}
+
 		static void PerformQuestBuild(bool resetFeatureFlags = true)
         {
             string target_path = TARGET_DIR + "/Quest/" + APP_NAME + ".apk";
@@ -53,6 +62,15 @@ namespace GVR.Editor.Builds.UnityBuildTools
 		{
 			bool buildProductionReady = ShowConfirmationPopup("Should the feature flags be set to Production Ready?");
 			PerformPicoBuild(buildProductionReady);
+		}
+
+		static void PerformPicoBuild()
+		{
+			string target_path = TARGET_DIR + "/Pico/" + APP_NAME + ".apk";
+			SetPicoSettings();
+				FeatureFlagTool.SetFeatureFlags();
+				EditorSceneManager.SaveScene(SceneManager.GetSceneByName("Bootstrap"));
+			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
 		}
 		static void PerformPicoBuild(bool resetFeatureFlags = true)
 		{
@@ -77,6 +95,13 @@ namespace GVR.Editor.Builds.UnityBuildTools
 			PerformWindows64Build(buildProductionReady);
 		}
 
+		static void PerformWindows64Build()
+		{
+			string target_path = TARGET_DIR + "/Windows64/" + APP_NAME + ".exe";
+				FeatureFlagTool.SetFeatureFlags();
+				EditorSceneManager.SaveScene(SceneManager.GetSceneByName("Bootstrap"));	
+			GenericBuild(SCENES, target_path, BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64, BuildOptions.None);
+		}
 		static void PerformWindows64Build(bool resetFeatureFlags = true)
 		{
 			string target_path = TARGET_DIR + "/Windows64/" + APP_NAME + ".exe";
