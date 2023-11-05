@@ -1,18 +1,18 @@
-using UnityEditor;
+using System;
 using System.Collections.Generic;
+using GVR.Editor.Tools;
+using UnityEditor;
 using UnityEditor.Build.Reporting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.XR.OpenXR;
+using UnityEngine.XR.OpenXR.Features.Interactions;
 using UnityEngine.XR.OpenXR.Features.MetaQuestSupport;
 using UnityEngine.XR.OpenXR.Features.PICOSupport;
-using UnityEngine.XR.OpenXR.Features.Interactions;
-using UnityEngine.XR.Management;
-using Unity.VisualScripting;
-using System;
 
-namespace GVR.Editor.UnityBuildTools
+namespace GVR.Editor.Builds.UnityBuildTools
 {
-
 	public class UnityBuilderAction
     {
         static string[] SCENES = FindEnabledEditorScenes();
@@ -21,27 +21,76 @@ namespace GVR.Editor.UnityBuildTools
         static readonly string TARGET_DIR = "build";
 
 
-        [MenuItem("GothicVR/Build/Build Quest2")]
-        static void PerformQuestBuild()
+		/// <summary>
+		/// Perform Quest Build
+		/// </summary>
+
+		[MenuItem("GothicVR/Build/Build Quest")]
+		static void PerformLocalQuestBuild()
+		{
+			bool buildProductionReady = ShowConfirmationPopup("Should the feature flags be set to Production Ready?");
+			PerformQuestBuild(buildProductionReady);
+		}
+
+		static void PerformQuestBuild(bool resetFeatureFlags = true)
         {
             string target_path = TARGET_DIR + "/Quest/" + APP_NAME + ".apk";
             SetQuestSettings();
+            if (resetFeatureFlags)
+            {
+                FeatureFlagTool.SetFeatureFlags();
+				EditorSceneManager.SaveScene(SceneManager.GetSceneByName("Bootstrap"));
+			}
 			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
         }
 
+		/// <summary>
+		/// Perform Quest Build
+		/// </summary>
+
 		[MenuItem("GothicVR/Build/Build Pico4")]
-		static void PerformPicoBuild()
+		static void PerformLocalPicoBuild()
+		{
+			bool buildProductionReady = ShowConfirmationPopup("Should the feature flags be set to Production Ready?");
+			PerformPicoBuild(buildProductionReady);
+		}
+		static void PerformPicoBuild(bool resetFeatureFlags = true)
 		{
 			string target_path = TARGET_DIR + "/Pico/" + APP_NAME + ".apk";
             SetPicoSettings();
+			if (resetFeatureFlags)
+			{
+				FeatureFlagTool.SetFeatureFlags();
+				EditorSceneManager.SaveScene(SceneManager.GetSceneByName("Bootstrap"));
+			}
 			GenericBuild(SCENES, target_path, BuildTargetGroup.Android, BuildTarget.Android, BuildOptions.None);
 		}
 
+		/// <summary>
+		/// Perform Quest Build
+		/// </summary>
+
 		[MenuItem("GothicVR/Build/Build PCVR")]
-		static void PerformWindows64Build()
+		static void PerformLocalWindows64Build()
+		{
+			bool buildProductionReady = ShowConfirmationPopup("Should the feature flags be set to Production Ready?");
+			PerformWindows64Build(buildProductionReady);
+		}
+
+		static void PerformWindows64Build(bool resetFeatureFlags = true)
 		{
 			string target_path = TARGET_DIR + "/Windows64/" + APP_NAME + ".exe";
+			if (resetFeatureFlags)
+			{
+				FeatureFlagTool.SetFeatureFlags();
+				EditorSceneManager.SaveScene(SceneManager.GetSceneByName("Bootstrap"));
+			}
 			GenericBuild(SCENES, target_path, BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64, BuildOptions.None);
+		}
+
+		static bool ShowConfirmationPopup(string message)
+		{
+			return EditorUtility.DisplayDialog("Confirmation", message, "Yes", "No");
 		}
 
 		private static void GenericBuild(string[] scenes, string target_path, BuildTargetGroup build_target_group, BuildTarget build_target, BuildOptions build_options)

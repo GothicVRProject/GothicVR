@@ -7,7 +7,7 @@ using PxCs.Interface;
 using UnityEditor;
 using UnityEngine;
 
-namespace GothicVR.Editor
+namespace GVR.Editor.Tools
 {
     /// HOW TO USE:
     /// 1. LOAD THE SCENE FOR WHICH YOU WANT OCCULUSION CULLING
