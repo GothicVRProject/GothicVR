@@ -1,18 +1,15 @@
-using UnityEditor;
+using System;
 using System.Collections.Generic;
+using GVR.Editor.Tools;
+using UnityEditor;
 using UnityEditor.Build.Reporting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.XR.OpenXR;
+using UnityEngine.XR.OpenXR.Features.Interactions;
 using UnityEngine.XR.OpenXR.Features.MetaQuestSupport;
 using UnityEngine.XR.OpenXR.Features.PICOSupport;
-using UnityEngine.XR.OpenXR.Features.Interactions;
-using UnityEngine.XR.Management;
-using Unity.VisualScripting;
-using System;
-using GVR.Editor.Tools;
-using UnityEngine.SceneManagement;
-using UnityEditor.SceneManagement;
-using UnityEditor.SearchService;
 
 namespace GVR.Editor.UnityBuildTools
 {
@@ -29,8 +26,8 @@ namespace GVR.Editor.UnityBuildTools
 		/// Perform Quest Build
 		/// </summary>
 
-		[MenuItem("GothicVR/LokalBuild/Build Quest")]
-		static void PerformLokalQuestBuild()
+		[MenuItem("GothicVR/Build/Build Quest")]
+		static void PerformLocalQuestBuild()
 		{
 			bool buildProductionReady = ShowConfirmationPopup("Should the feature flags be set to Production Ready?");
 			PerformQuestBuild(buildProductionReady);
@@ -52,8 +49,8 @@ namespace GVR.Editor.UnityBuildTools
 		/// Perform Quest Build
 		/// </summary>
 
-		[MenuItem("GothicVR/LokalBuild/Build Pico4")]
-		static void PerformLokalPicoBuild()
+		[MenuItem("GothicVR/Build/Build Pico4")]
+		static void PerformLocalPicoBuild()
 		{
 			bool buildProductionReady = ShowConfirmationPopup("Should the feature flags be set to Production Ready?");
 			PerformPicoBuild(buildProductionReady);
@@ -74,8 +71,8 @@ namespace GVR.Editor.UnityBuildTools
 		/// Perform Quest Build
 		/// </summary>
 
-		[MenuItem("GothicVR/LokalBuild/Build PCVR")]
-		static void PerformLokalWindows64Build()
+		[MenuItem("GothicVR/Build/Build PCVR")]
+		static void PerformLocalWindows64Build()
 		{
 			bool buildProductionReady = ShowConfirmationPopup("Should the feature flags be set to Production Ready?");
 			PerformWindows64Build(buildProductionReady);
