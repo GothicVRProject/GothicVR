@@ -11,9 +11,8 @@ using UnityEngine.XR.OpenXR.Features.Interactions;
 using UnityEngine.XR.OpenXR.Features.MetaQuestSupport;
 using UnityEngine.XR.OpenXR.Features.PICOSupport;
 
-namespace GVR.Editor.UnityBuildTools
+namespace GVR.Editor.Builds.UnityBuildTools
 {
-
 	public class UnityBuilderAction
     {
         static string[] SCENES = FindEnabledEditorScenes();
