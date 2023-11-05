@@ -76,9 +76,11 @@ namespace GVR.Manager.Settings
 
         public static bool CheckIfGothic1InstallationExists()
         {
-            if (Directory.Exists(GameSettings.GothicIPath))
+            var g1DataPath = Path.GetFullPath(Path.Join(GameSettings.GothicIPath, "Data"));
+			var g1_WorkPath = Path.GetFullPath(Path.Join(GameSettings.GothicIPath, "_work"));
+			if (g1DataPath != null && g1_WorkPath != null)
             {
-                return Directory.Exists($"{GameSettings.GothicIPath}\\Data");
+				return true;
             }
             return false;
         }
