@@ -16,6 +16,7 @@ using PxCs.Data.Vob;
 using PxCs.Interface;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -25,11 +26,14 @@ namespace GVR.Lab.VobGrabPoints
     {
         public TMP_Dropdown vobDropdown;
         public GameObject itemSpawnSlot;
-        public Slider SliderX;
-        public Slider SliderY;
-        public Slider SliderZ;
+        public Slider SliderPosX;
+        public Slider SliderPosY;
+        public Slider SliderPosZ;
+        public Slider SliderRotX;
+        public Slider SliderRotY;
+        public Slider SliderRotZ;
 
-        private XRGrabInteractable itemGrab;
+        private XRGrabInteractable xrGrabComp;
 
         public void Start()
         {
@@ -58,10 +62,12 @@ namespace GVR.Lab.VobGrabPoints
 
         public void LoadVobOnClick()
         {
+            // We want to have one element only.
+            if (itemSpawnSlot.transform.childCount != 0)
+                Destroy(itemSpawnSlot.transform.GetChild(0).gameObject);
+
             var itemName = vobDropdown.options[vobDropdown.value].text;
             var item = CreateItem(itemName);
-
-            itemGrab = item.GetComponent<XRGrabInteractable>();
         }
 
         private GameObject CreateItem(string itemName)
@@ -69,28 +75,37 @@ namespace GVR.Lab.VobGrabPoints
             var itemPrefab = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobItem);
             var pxItem = AssetCache.TryGetItemData(itemName);
             var mrm = AssetCache.TryGetMrm(pxItem.visual);
-            var item = VobMeshCreator.Create(pxItem.visual, mrm, default, default, true, rootGo: itemPrefab, parent: itemSpawnSlot);
+            var itemGo = VobMeshCreator.Create(pxItem.visual, mrm, default, default, true, rootGo: itemPrefab, parent: itemSpawnSlot);
 
-            var grabComp = item.AddComponent<XRGrabInteractable>();
-            var colliderComp = item.GetComponent<MeshCollider>();
+            var itemGrabComp = itemGo.GetComponent<ItemGrabInteractable>();
+            var colliderComp = itemGo.GetComponent<MeshCollider>();
+
+            // Adding it now will set some default values for collider and grabbing now.
+            // Easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
+            xrGrabComp = itemGo.AddComponent<XRGrabInteractable>();
+
+            xrGrabComp.attachTransform = itemGrabComp.attachPoint1.transform;
+            xrGrabComp.secondaryAttachTransform = itemGrabComp.attachPoint2.transform;
+
             colliderComp.convex = true;
 
             return gameObject;
         }
 
-        public void SliderXValueChanged()
+        public void SliderPositionValueChanged()
         {
-
+            xrGrabComp.attachTransform.localPosition = new Vector3(SliderPosX.value, SliderPosY.value, SliderPosZ.value);
+            SliderPosX.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderPosX.value.ToString();
+            SliderPosY.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderPosY.value.ToString();
+            SliderPosZ.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderPosZ.value.ToString();
         }
 
-        public void SliderYValueChanged()
+        public void SliderRotationValueChanged()
         {
-
-        }
-
-        public void SliderZValueChanged()
-        {
-
+            xrGrabComp.attachTransform.localRotation = Quaternion.Euler(SliderRotX.value, SliderRotY.value, SliderRotZ.value);
+            SliderRotX.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderRotX.value.ToString();
+            SliderRotY.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderRotY.value.ToString();
+            SliderRotZ.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderRotZ.value.ToString();
         }
 
         public void SaveVobOnClick()

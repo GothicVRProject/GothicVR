@@ -379,16 +379,19 @@ namespace GVR.Creator
                 return null;
             }
 
+            var itemGrabComp = vobObj.GetComponent<ItemGrabInteractable>();
+            var colliderComp = vobObj.GetComponent<MeshCollider>();
+
             // Adding it now will set some default values for collider and grabbing now.
             // Easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
             var grabComp = vobObj.AddComponent<XRGrabInteractable>();
 
-            var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
-            var colliderComp = vobObj.GetComponent<MeshCollider>();
+            grabComp.attachTransform = itemGrabComp.attachPoint1.transform;
+            grabComp.secondaryAttachTransform = itemGrabComp.attachPoint2.transform;
 
             colliderComp.convex = true;
-            grabComp.selectEntered.AddListener(eventComp.SelectEntered);
-            grabComp.selectExited.AddListener(eventComp.SelectExited);
+            grabComp.selectEntered.AddListener(itemGrabComp.SelectEntered);
+            grabComp.selectExited.AddListener(itemGrabComp.SelectExited);
 
             return vobObj;
         }
