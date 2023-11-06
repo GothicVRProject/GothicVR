@@ -379,13 +379,12 @@ namespace GVR.Creator
                 return null;
             }
 
-            // It will set some default values for collider and grabbing now.
-            // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
+            // Adding it now will set some default values for collider and grabbing now.
+            // Easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
             var grabComp = vobObj.AddComponent<XRGrabInteractable>();
+
             var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
             var colliderComp = vobObj.GetComponent<MeshCollider>();
-
-            vobObj.layer = ConstantsManager.ItemLayer;
 
             colliderComp.convex = true;
             grabComp.selectEntered.AddListener(eventComp.SelectEntered);

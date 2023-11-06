@@ -7,6 +7,7 @@ using GVR.Caches;
 using GVR.Creator;
 using GVR.Creator.Meshes;
 using GVR.Extensions;
+using GVR.Manager;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
@@ -15,6 +16,7 @@ using PxCs.Data.Vob;
 using PxCs.Interface;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace GVR.Lab.VobGrabPoints
@@ -23,6 +25,16 @@ namespace GVR.Lab.VobGrabPoints
     {
         public TMP_Dropdown vobDropdown;
         public GameObject itemSpawnSlot;
+        public Slider SliderX;
+        public Slider SliderY;
+        public Slider SliderZ;
+
+        private XRGrabInteractable itemGrab;
+
+        public void Start()
+        {
+            var x = GameObject.Find("MinMax Slider");
+        }
 
         public void InitializeOnClick()
         {
@@ -48,21 +60,37 @@ namespace GVR.Lab.VobGrabPoints
         {
             var itemName = vobDropdown.options[vobDropdown.value].text;
             var item = CreateItem(itemName);
-        }
 
+            itemGrab = item.GetComponent<XRGrabInteractable>();
+        }
 
         private GameObject CreateItem(string itemName)
         {
+            var itemPrefab = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobItem);
             var pxItem = AssetCache.TryGetItemData(itemName);
             var mrm = AssetCache.TryGetMrm(pxItem.visual);
-            var item = VobMeshCreator.Create(pxItem.visual, mrm, default, default, true, parent: itemSpawnSlot);
+            var item = VobMeshCreator.Create(pxItem.visual, mrm, default, default, true, rootGo: itemPrefab, parent: itemSpawnSlot);
 
             var grabComp = item.AddComponent<XRGrabInteractable>();
-            var eventComp = item.GetComponent<ItemGrabInteractable>();
             var colliderComp = item.GetComponent<MeshCollider>();
             colliderComp.convex = true;
 
             return gameObject;
+        }
+
+        public void SliderXValueChanged()
+        {
+
+        }
+
+        public void SliderYValueChanged()
+        {
+
+        }
+
+        public void SliderZValueChanged()
+        {
+
         }
 
         public void SaveVobOnClick()

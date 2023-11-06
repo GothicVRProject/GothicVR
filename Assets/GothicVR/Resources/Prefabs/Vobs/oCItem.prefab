@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1778516865459391894}
   - component: {fileID: 4740512252186575585}
   - component: {fileID: 2998231252423532423}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: oCItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,6 +73,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 024fa582612e45c0afcf4ba9d756341e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <visual>k__BackingField: 
+  <visualScheme>k__BackingField: 
 --- !u!114 &2998231252423532423
 MonoBehaviour:
   m_ObjectHideFlags: 0
