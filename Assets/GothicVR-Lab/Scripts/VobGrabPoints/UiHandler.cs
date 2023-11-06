@@ -92,6 +92,15 @@ namespace GVR.Lab.VobGrabPoints
             return gameObject;
         }
 
+        public void LeftSliderButtonPosXClicked() { SliderPosX.value -= 0.1f; }
+        public void LeftSliderButtonPosYClicked() { SliderPosY.value -= 0.1f; }
+        public void LeftSliderButtonPosZClicked() { SliderPosZ.value -= 0.1f; }
+
+        public void RightSliderButtonPosXClicked() { SliderPosX.value += 0.1f; }
+        public void RightSliderButtonPosYClicked() { SliderPosY.value += 0.1f; }
+        public void RightSliderButtonPosZClicked() { SliderPosZ.value += 0.1f; }
+
+
         public void SliderPositionValueChanged()
         {
             xrGrabComp.attachTransform.localPosition = new Vector3(SliderPosX.value, SliderPosY.value, SliderPosZ.value);
