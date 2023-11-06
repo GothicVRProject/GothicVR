@@ -136,6 +136,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1353668847}
     m_Modifications:
+    - target: {fileID: 2133138095488065320, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: settingsManager
+      value: 
+      objectReference: {fileID: 1353668846}
     - target: {fileID: 3286136461781483594, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_Name
       value: VRPlayer
@@ -257,7 +261,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa0feeef66d8e224f83e74bd5df49302, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turntype: 0
+  turntypeUI: 0
   locomotionsystem: {fileID: 1263267814}
   snapTurn: {fileID: 1263267813}
   continuousTurn: {fileID: 1263267811}

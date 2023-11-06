@@ -5,14 +5,8 @@ using GVR.Manager;
 
 public class TurnSettingDropdownController_v2 : MonoBehaviour
 {
-    private RuntimeSettings runtimeSettings;
-
     void Awake()
     {
-
-        runtimeSettings.turntype = RuntimeSettings.TurnType.ContinuousTurn;
-        Debug.Log(runtimeSettings.turntype.ToString());
-
         var dropdown = transform.GetComponent<TMP_Dropdown>();
         dropdown.onValueChanged.AddListener(DropdownItemSelected);
 
@@ -25,11 +19,11 @@ public class TurnSettingDropdownController_v2 : MonoBehaviour
         switch (value)
         {
             case 1:
-                runtimeSettings.turntype = RuntimeSettings.TurnType.ContinuousTurn;
+                RuntimeSettings.I.DropdownItemSelected(RuntimeSettings.TurnType.ContinuousTurn);
                 break;
             case 0:
             default:
-                runtimeSettings.turntype = RuntimeSettings.TurnType.SnapTurn;
+                RuntimeSettings.I.DropdownItemSelected(RuntimeSettings.TurnType.SnapTurn);
                 break;
         }
     }
