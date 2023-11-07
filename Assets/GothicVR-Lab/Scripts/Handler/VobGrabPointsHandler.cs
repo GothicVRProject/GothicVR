@@ -4,25 +4,21 @@ using System.IO;
 using System.Linq;
 using GVR.Bootstrap;
 using GVR.Caches;
-using GVR.Creator;
 using GVR.Creator.Meshes;
 using GVR.Extensions;
-using GVR.Manager;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Vob;
-using PxCs.Data.Vob;
 using PxCs.Interface;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace GVR.Lab.VobGrabPoints
+namespace GVR.Lab.Handler
 {
-    public class UiHandler: MonoBehaviour
+    public class VobGrabPointsHandler: MonoBehaviour
     {
         public TMP_Dropdown vobDropdown;
         public GameObject itemSpawnSlot;
@@ -112,7 +108,7 @@ namespace GVR.Lab.VobGrabPoints
 
         public void SliderPositionValueChanged()
         {
-            xrGrabComp.attachTransform.localPosition = new Vector3(SliderPosX.value, SliderPosY.value, SliderPosZ.value);
+            attachPoint1.localPosition = new Vector3(SliderPosX.value, SliderPosY.value, SliderPosZ.value);
             SliderPosX.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderPosX.value.ToString();
             SliderPosY.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderPosY.value.ToString();
             SliderPosZ.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderPosZ.value.ToString();
@@ -128,7 +124,7 @@ namespace GVR.Lab.VobGrabPoints
 
         public void SliderRotationValueChanged()
         {
-            xrGrabComp.attachTransform.localRotation = Quaternion.Euler(SliderRotX.value, SliderRotY.value, SliderRotZ.value);
+            attachPoint1.localRotation = Quaternion.Euler(SliderRotX.value, SliderRotY.value, SliderRotZ.value);
             SliderRotX.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderRotX.value.ToString();
             SliderRotY.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderRotY.value.ToString();
             SliderRotZ.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderRotZ.value.ToString();
@@ -157,9 +153,28 @@ namespace GVR.Lab.VobGrabPoints
             currentItemText.text += $"Rotation: {SliderRotX.value}, {SliderRotY.value}, {SliderRotZ.value}";
         }
 
+        private Vector3 copyPosition1;
+        private Vector3 copyRotation1;
+
         public void CopyCurrentItemClick()
         {
+            copyPosition1 = attachPoint1.localPosition;
+            copyRotation1 = attachPoint1.localRotation.eulerAngles;
 
+            copiedItemText.text = $"Name: {currentItemName} \n";
+            copiedItemText.text += $"Position: {copyPosition1.x}, {copyPosition1.y}, {copyPosition1.z}\n";
+            copiedItemText.text += $"Rotation: {copyRotation1.x}, {copyRotation1.y}, {copyRotation1.z}";
+        }
+
+        public void ApplyCopyItemClick()
+        {
+            if (copyPosition1 == default && copyRotation1 == default)
+                return;
+
+            attachPoint1.localPosition = copyPosition1;
+            attachPoint1.localRotation = Quaternion.Euler(copyRotation1);
+
+            SetInitialItemValue();
         }
 
         public void SaveVobOnClick()
