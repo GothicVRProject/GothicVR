@@ -691,7 +691,10 @@ namespace GVR.Creator
                 switch (pfx.visAlphaFunc.ToUpper())
                 {
                     case "BLEND":
-                        rendererModule.material.ToCutoutMode(); // e.g. leaves.pfx.
+                        rendererModule.material.ToTransparentMode(); // e.g. leaves.pfx.
+                        break;
+                    case "ADD":
+                        rendererModule.material.ToAdditive();
                         break;
                     default:
                         Debug.LogWarning($"Particle AlphaFunc {pfx.visAlphaFunc} not yet handled.");
@@ -702,6 +705,12 @@ namespace GVR.Creator
                 {
                     case "NONE":
                         rendererModule.alignment = ParticleSystemRenderSpace.View;
+                        break;
+                    case "WORLD":
+                        rendererModule.alignment = ParticleSystemRenderSpace.World;
+                        break;
+                    case "VELO":
+                        rendererModule.alignment = ParticleSystemRenderSpace.Velocity;
                         break;
                     default:
                         Debug.LogWarning($"visOrientation {pfx.visOrientation} not yet handled.");
@@ -719,6 +728,9 @@ namespace GVR.Creator
                         break;
                     case "CIRCLE":
                         shapeModule.shapeType = ParticleSystemShapeType.Circle;
+                        break;
+                    case "MESH":
+                        shapeModule.shapeType = ParticleSystemShapeType.Mesh;
                         break;
                     default:
                         Debug.LogWarning($"Particle ShapeType {pfx.shpType} not yet handled.");
