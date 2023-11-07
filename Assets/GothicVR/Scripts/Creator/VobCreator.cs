@@ -694,7 +694,7 @@ namespace GVR.Creator
                         rendererModule.material.ToTransparentMode(); // e.g. leaves.pfx.
                         break;
                     case "ADD":
-                        rendererModule.material.ToAdditive();
+                        rendererModule.material.ToAdditiveMode();
                         break;
                     default:
                         Debug.LogWarning($"Particle AlphaFunc {pfx.visAlphaFunc} not yet handled.");
