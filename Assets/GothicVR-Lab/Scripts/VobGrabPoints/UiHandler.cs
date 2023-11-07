@@ -92,14 +92,15 @@ namespace GVR.Lab.VobGrabPoints
             return gameObject;
         }
 
-        public void LeftSliderButtonPosXClicked() { SliderPosX.value -= 0.1f; }
-        public void LeftSliderButtonPosYClicked() { SliderPosY.value -= 0.1f; }
-        public void LeftSliderButtonPosZClicked() { SliderPosZ.value -= 0.1f; }
+        public void SliderButtonPosMinus1Clicked(Slider slider) { slider.value -= 0.001f; }
+        public void SliderButtonPosMinus2Clicked(Slider slider) { slider.value -= 0.01f; }
+        public void SliderButtonPosMinus3Clicked(Slider slider) { slider.value -= 0.1f; }
 
-        public void RightSliderButtonPosXClicked() { SliderPosX.value += 0.1f; }
-        public void RightSliderButtonPosYClicked() { SliderPosY.value += 0.1f; }
-        public void RightSliderButtonPosZClicked() { SliderPosZ.value += 0.1f; }
+        public void SliderButtonPosPlus1Clicked(Slider slider) { slider.value += 0.001f; }
+        public void SliderButtonPosPlus2Clicked(Slider slider) { slider.value += 0.01f; }
+        public void SliderButtonPosPlus3Clicked(Slider slider) { slider.value += 0.1f; }
 
+        public void SliderResetClicked(Slider slider) { slider.value = 0f; }
 
         public void SliderPositionValueChanged()
         {
@@ -108,6 +109,14 @@ namespace GVR.Lab.VobGrabPoints
             SliderPosY.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderPosY.value.ToString();
             SliderPosZ.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderPosZ.value.ToString();
         }
+
+        public void SliderButtonRotMinus1Clicked(Slider slider) { slider.value -= 0.01f; }
+        public void SliderButtonRotMinus2Clicked(Slider slider) { slider.value -= 0.1f; }
+        public void SliderButtonRotMinus3Clicked(Slider slider) { slider.value -= 1f; }
+
+        public void SliderButtonRotPlus1Clicked(Slider slider) { slider.value += 0.01f; }
+        public void SliderButtonRotPlus2Clicked(Slider slider) { slider.value += 0.1f; }
+        public void SliderButtonRotPlus3Clicked(Slider slider) { slider.value += 1f; }
 
         public void SliderRotationValueChanged()
         {
