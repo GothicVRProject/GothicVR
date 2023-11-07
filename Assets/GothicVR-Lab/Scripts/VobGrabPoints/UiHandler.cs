@@ -33,12 +33,15 @@ namespace GVR.Lab.VobGrabPoints
         public Slider SliderRotY;
         public Slider SliderRotZ;
 
+        public TMP_Text copiedItemText;
+        public TMP_Text currentItemText;
+
         private XRGrabInteractable xrGrabComp;
 
-        public void Start()
-        {
-            var x = GameObject.Find("MinMax Slider");
-        }
+        private string currentItemName;
+        private Transform attachPoint1;
+        private Transform attachPoint2;
+
 
         public void InitializeOnClick()
         {
@@ -66,8 +69,13 @@ namespace GVR.Lab.VobGrabPoints
             if (itemSpawnSlot.transform.childCount != 0)
                 Destroy(itemSpawnSlot.transform.GetChild(0).gameObject);
 
-            var itemName = vobDropdown.options[vobDropdown.value].text;
-            var item = CreateItem(itemName);
+            currentItemName = vobDropdown.options[vobDropdown.value].text;
+            var item = CreateItem(currentItemName);
+
+            attachPoint1 = item.FindChildRecursively("AttachPoint1").transform;
+            attachPoint2 = item.FindChildRecursively("AttachPoint2").transform;
+
+            SetInitialItemValue();
         }
 
         private GameObject CreateItem(string itemName)
@@ -124,6 +132,34 @@ namespace GVR.Lab.VobGrabPoints
             SliderRotX.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderRotX.value.ToString();
             SliderRotY.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderRotY.value.ToString();
             SliderRotZ.gameObject.FindChildRecursively("Value Text").GetComponent<TMP_Text>().text = SliderRotZ.value.ToString();
+        }
+
+
+        private void SetInitialItemValue()
+        {
+            var pos1 = attachPoint1.localPosition;
+            var rot1 = attachPoint1.localRotation.eulerAngles;
+
+            SliderPosX.value = pos1.x;
+            SliderPosY.value = pos1.y;
+            SliderPosZ.value = pos1.z;
+            SliderRotX.value = rot1.x;
+            SliderRotY.value = rot1.y;
+            SliderRotZ.value = rot1.z;
+
+            ItemValueChanged();
+        }
+
+        public void ItemValueChanged()
+        {
+            currentItemText.text = $"Name: {currentItemName} \n";
+            currentItemText.text += $"Position: {SliderPosX.value}, {SliderPosY.value}, {SliderPosZ.value}\n";
+            currentItemText.text += $"Rotation: {SliderRotX.value}, {SliderRotY.value}, {SliderRotZ.value}";
+        }
+
+        public void CopyCurrentItemClick()
+        {
+
         }
 
         public void SaveVobOnClick()
