@@ -24,6 +24,7 @@ using PxCs.Data.Vm;
 using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
 using Vector3 = System.Numerics.Vector3;
 
@@ -616,19 +617,16 @@ namespace GVR.Creator
             // FIXME - move to non-teleport
             var parent = parentGosTeleport[vob.type];
 
-            // FIXME - Move to prefab
-            var go = new GameObject();
-            // GameObject.Destroy(go.GetComponent<SphereCollider>());
-
-            go.name = vob.visualName;
-            go.transform.SetPositionAndRotation(vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation);
-            go.SetParent(parent);
+            var pfxGo = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobPfx);
+            pfxGo.name = vob.visualName;
+            SetPosAndRot(pfxGo, vob.position, vob.rotation);
+            pfxGo.SetParent(parent);
 
             var pfx = AssetCache.TryGetPfxData(vob.visualName);
-            var particleSystem = go.AddComponent<ParticleSystem>();
+            var particleSystem = pfxGo.GetComponent<ParticleSystem>();
 
-            go.AddComponent<VobPfxProperties>().pfxData = pfx;
-            
+            pfxGo.GetComponent<VobPfxProperties>().pfxData = pfx;
+
             particleSystem.Stop();
 
             var gravity = pfx.flyGravity.Split();
@@ -640,7 +638,7 @@ namespace GVR.Creator
                 gravityY = float.Parse(gravity[1], CultureInfo.InvariantCulture) * 10000;
                 gravityZ = float.Parse(gravity[2], CultureInfo.InvariantCulture) * 10000;
             }
-            
+
             // Main module
             {
                 var mainModule = particleSystem.main;
@@ -650,12 +648,6 @@ namespace GVR.Creator
                 mainModule.startLifetime = new (minLifeTime, maxLifeTime);
                 mainModule.loop = pfx.ppsIsLooping;
 
-                // I couldn't find a specific property. Therefore using the combined gravity value. ƪ(˘⌣˘)ʃ
-                var speed = 1f;
-                speed *= Math.Abs(gravityX) > 0.01f ? Math.Abs(gravityX) : 1;
-                speed *= Math.Abs(gravityY) > 0.01f ? Math.Abs(gravityY) : 1;
-                speed *= Math.Abs(gravityZ) > 0.01f ? Math.Abs(gravityZ) : 1;
-                
                 var minSpeed = (pfx.velAvg - pfx.velVar) / 1000;
                 var maxSpeed = (pfx.velAvg + pfx.velVar) / 1000;
                 mainModule.startSpeed = new(minSpeed, maxSpeed);
@@ -681,7 +673,8 @@ namespace GVR.Creator
 
             // Renderer module
             {
-                var rendererModule = go.GetComponent<ParticleSystemRenderer>();
+                var rendererModule = pfxGo.GetComponent<ParticleSystemRenderer>();
+                // FIXME - Move to a cached constant value
                 var standardShader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
                 var material = new Material(standardShader);
                 rendererModule.material = material;
@@ -701,7 +694,7 @@ namespace GVR.Creator
                         break;
                 }
                 // makes the material render both faces
-                rendererModule.material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
+                rendererModule.material.SetInt("_Cull", (int)CullMode.Off);
 
                 switch (pfx.visOrientation)
                 {
@@ -749,14 +742,14 @@ namespace GVR.Creator
                         Debug.LogWarning($"shpDim >{pfx.shpDim}< not yet handled");
                         break;
                 }
-                
+
                 shapeModule.rotation = new(pfx.dirAngleElev, 0, 0);
                 shapeModule.alignToDirection = true;
             }
 
             particleSystem.Play();
 
-            return go;
+            return pfxGo;
         }
 
         private static GameObject CreateDefaultMesh(PxVobData vob, bool nonTeleport = false)
