@@ -682,6 +682,9 @@ namespace GVR.Creator
             // Renderer module
             {
                 var rendererModule = go.GetComponent<ParticleSystemRenderer>();
+                var standardShader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+                var material = new Material(standardShader);
+                rendererModule.material = material;
                 TextureManager.I.SetTexture(pfx.visName, rendererModule.material);
                 // renderer.material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest; // First check with no change.
 
