@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.17276807, g: 0.21589197, b: 0.29782572, a: 1}
+  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -322,9 +322,9 @@ MonoBehaviour:
   CreateWaypoints: 1
   spawnAtSpecificFreePoint: 
   EnableDayTime: 1
-  SunMovementPerformanceValue: 0
-  StartHour: 17
-  StartMinute: 59
+  SunMovementPerformanceValue: 1
+  StartHour: 10
+  StartMinute: 10
   EnableVobFPMesh: 0
   EnableDecals: 0
   CreateOcNpcs: 0
