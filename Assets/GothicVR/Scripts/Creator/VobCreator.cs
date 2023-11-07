@@ -617,8 +617,8 @@ namespace GVR.Creator
             var parent = parentGosTeleport[vob.type];
 
             // FIXME - Move to prefab
-            var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            GameObject.Destroy(go.GetComponent<SphereCollider>());
+            var go = new GameObject();
+            // GameObject.Destroy(go.GetComponent<SphereCollider>());
 
             go.name = vob.visualName;
             go.transform.SetPositionAndRotation(vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation);
@@ -700,6 +700,8 @@ namespace GVR.Creator
                         Debug.LogWarning($"Particle AlphaFunc {pfx.visAlphaFunc} not yet handled.");
                         break;
                 }
+                // makes the material render both faces
+                rendererModule.material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
 
                 switch (pfx.visOrientation)
                 {
@@ -749,6 +751,7 @@ namespace GVR.Creator
                 }
                 
                 shapeModule.rotation = new(pfx.dirAngleElev, 0, 0);
+                shapeModule.alignToDirection = true;
             }
 
             particleSystem.Play();
