@@ -697,6 +697,27 @@ namespace GVR.Creator
                 colorOverTime.color = gradient;
             }
 
+            // Size over lifetime module
+            {
+                var sizeOverTime = particleSystem.sizeOverLifetime;
+                sizeOverTime.enabled = true;
+
+                AnimationCurve curve = new AnimationCurve();
+                var shapeScaleKeys = pfx.shpScaleKeys.Split();
+                if (shapeScaleKeys.Length > 1 && pfx.shpScaleKeys != "")
+                {
+                    var curveTime = 0f;
+
+                    for (var i = 0; i < shapeScaleKeys.Length; i++)
+                    {
+                        curve.AddKey(curveTime, float.Parse(shapeScaleKeys[i]) / 100 * float.Parse(pfx.shpDim));
+                        curveTime += 1f / shapeScaleKeys.Length;
+                    }
+
+                    sizeOverTime.size = new ParticleSystem.MinMaxCurve(1f, curve);
+                }
+            }
+
             // Renderer module
             {
                 var rendererModule = pfxGo.GetComponent<ParticleSystemRenderer>();
