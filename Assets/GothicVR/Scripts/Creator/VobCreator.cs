@@ -671,6 +671,32 @@ namespace GVR.Creator
                 }
             }
 
+            // Color over Lifetime module
+            {
+                var colorOverTime = particleSystem.colorOverLifetime;
+                colorOverTime.enabled = true;
+                var gradient = new Gradient();
+                var colorStart = pfx.visTexColorStart.Split();
+                var colorEnd = pfx.visTexColorEnd.Split();
+                gradient.SetKeys(
+                    new GradientColorKey[]
+                    {
+                        new GradientColorKey(
+                            new Color(float.Parse(colorStart[0]) / 255, float.Parse(colorStart[1]) / 255,
+                                float.Parse(colorStart[2]) / 255),
+                            0f),
+                        new GradientColorKey(
+                            new Color(float.Parse(colorEnd[0]) / 255, float.Parse(colorEnd[1]) / 255,
+                                float.Parse(colorEnd[2]) / 255), 1f)
+                    },
+                    new GradientAlphaKey[]
+                    {
+                        new GradientAlphaKey(pfx.visAlphaStart / 255, 0),
+                        new GradientAlphaKey(pfx.visAlphaEnd / 255, 1),
+                    });
+                colorOverTime.color = gradient;
+            }
+
             // Renderer module
             {
                 var rendererModule = pfxGo.GetComponent<ParticleSystemRenderer>();
