@@ -770,7 +770,18 @@ namespace GVR.Creator
                 }
 
                 shapeModule.rotation = new(pfx.dirAngleElev, 0, 0);
+
+                var shapeOffsetVec = pfx.shpOffsetVec.Split();
+                if (float.TryParse(shapeOffsetVec[0], out var x) && float.TryParse(shapeOffsetVec[1], out var y) &&
+                    float.TryParse(shapeOffsetVec[2], out var z))
+                    shapeModule.position = new UnityEngine.Vector3(x / 100, y / 100, z / 100);
+                else
+                    Debug.LogError(
+                        "One or more of the shape offset vector components could not be parsed into a float");
+
                 shapeModule.alignToDirection = true;
+
+                shapeModule.radiusThickness = pfx.shpIsVolume ? 1f : 0f;
             }
 
             particleSystem.Play();
