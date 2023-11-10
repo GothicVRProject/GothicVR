@@ -5,6 +5,7 @@ using System.Linq;
 using GVR.Bootstrap;
 using GVR.Caches;
 using GVR.Creator.Meshes;
+using GVR.Data;
 using GVR.Extensions;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
@@ -38,13 +39,16 @@ namespace GVR.Lab.Handler
         private Transform attachPoint1;
         private Transform attachPoint2;
 
+        private VobItemAttachPoints attachPoints;
+
 
         public void InitializeOnClick()
         {
             /*
              * 1. Load Vdfs
-             * 2. Load Vob name list
-             * 3. Fill dropdown
+             * 2. Load VobItemAttachPoints json
+             * 3. Load Vob name list
+             * 4. Fill dropdown
              */
             PhoenixBootstrapper.SetLanguage();
 
@@ -57,7 +61,12 @@ namespace GVR.Lab.Handler
             List<string> itemNames = new();
             PxVm.pxVmEnumerateInstancesByClassName(GameData.VmGothicPtr, "C_Item", (string name) => itemNames.Add(name));
             vobDropdown.options = itemNames.Select(name => new TMP_Dropdown.OptionData(name)).ToList();
+
+
+            var attachPointJson = Resources.Load<TextAsset>("Configuration/VobItemAttachPoints");
+            attachPoints = JsonUtility.FromJson<VobItemAttachPoints>(attachPointJson.text);
         }
+
 
         public void LoadVobOnClick()
         {
@@ -133,6 +142,13 @@ namespace GVR.Lab.Handler
 
         private void SetInitialItemValue()
         {
+            var savedPoint = attachPoints.points.FirstOrDefault(p => p.name == currentItemName);
+            if (savedPoint != null)
+            {
+                attachPoint1.localPosition = savedPoint.position;
+                attachPoint1.localRotation = Quaternion.Euler(savedPoint.rotation);
+            }
+
             var pos1 = attachPoint1.localPosition;
             var rot1 = attachPoint1.localRotation.eulerAngles;
 
@@ -179,7 +195,24 @@ namespace GVR.Lab.Handler
 
         public void SaveVobOnClick()
         {
-            Debug.Log("Save Vob");
+            var item = attachPoints.points.FirstOrDefault(p => p.name == currentItemName);
+            if (item == null)
+            {
+                attachPoints.points.Add(new()
+                {
+                    name = currentItemName,
+                    position = attachPoint1.localPosition,
+                    rotation = attachPoint1.localRotation.eulerAngles
+                });
+            }
+            else
+            {
+                item.position = attachPoint1.localPosition;
+                item.rotation = attachPoint1.localRotation.eulerAngles;
+            }
+
+            var content = JsonUtility.ToJson(attachPoints, true);
+            File.WriteAllText($"{Application.dataPath}/GothicVR/Resources/Configuration/VobItemAttachPoints.json", content);
         }
 
         private void OnDestroy()

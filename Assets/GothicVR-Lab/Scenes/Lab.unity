@@ -3453,6 +3453,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752612064773, guid: f4c83e540c0057948b19107b827dc236, type: 3}
+      propertyPath: m_text
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8969571752612064773, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_ActiveFontFeatures.Array.data[0]
       value: 1801810542
       objectReference: {fileID: 0}
@@ -3550,11 +3554,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752666551115, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_MaxValue
-      value: 180
+      value: 360
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752666551115, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_MinValue
-      value: -180
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752666551115, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
@@ -4791,6 +4795,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752612064773, guid: f4c83e540c0057948b19107b827dc236, type: 3}
+      propertyPath: m_text
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8969571752612064773, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_ActiveFontFeatures.Array.data[0]
       value: 1801810542
       objectReference: {fileID: 0}
@@ -4888,11 +4896,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752666551115, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_MaxValue
-      value: 180
+      value: 360
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752666551115, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_MinValue
-      value: -180
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752666551115, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
@@ -14272,6 +14280,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752612064773, guid: f4c83e540c0057948b19107b827dc236, type: 3}
+      propertyPath: m_text
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8969571752612064773, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_ActiveFontFeatures.Array.data[0]
       value: 1801810542
       objectReference: {fileID: 0}
@@ -14369,11 +14381,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752666551115, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_MaxValue
-      value: 180
+      value: 360
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752666551115, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_MinValue
-      value: -180
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8969571752666551115, guid: f4c83e540c0057948b19107b827dc236, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
