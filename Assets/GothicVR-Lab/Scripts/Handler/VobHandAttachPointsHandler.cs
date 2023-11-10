@@ -19,7 +19,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace GVR.Lab.Handler
 {
-    public class VobGrabPointsHandler: MonoBehaviour
+    public class VobHandAttachPointsHandler: MonoBehaviour
     {
         public TMP_Dropdown vobDropdown;
         public GameObject itemSpawnSlot;
