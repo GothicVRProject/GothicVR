@@ -671,6 +671,53 @@ namespace GVR.Creator
                 }
             }
 
+            // Color over Lifetime module
+            {
+                var colorOverTime = particleSystem.colorOverLifetime;
+                colorOverTime.enabled = true;
+                var gradient = new Gradient();
+                var colorStart = pfx.visTexColorStart.Split();
+                var colorEnd = pfx.visTexColorEnd.Split();
+                gradient.SetKeys(
+                    new GradientColorKey[]
+                    {
+                        new GradientColorKey(
+                            new Color(float.Parse(colorStart[0]) / 255, float.Parse(colorStart[1]) / 255,
+                                float.Parse(colorStart[2]) / 255),
+                            0f),
+                        new GradientColorKey(
+                            new Color(float.Parse(colorEnd[0]) / 255, float.Parse(colorEnd[1]) / 255,
+                                float.Parse(colorEnd[2]) / 255), 1f)
+                    },
+                    new GradientAlphaKey[]
+                    {
+                        new GradientAlphaKey(pfx.visAlphaStart / 255, 0),
+                        new GradientAlphaKey(pfx.visAlphaEnd / 255, 1),
+                    });
+                colorOverTime.color = gradient;
+            }
+
+            // Size over lifetime module
+            {
+                var sizeOverTime = particleSystem.sizeOverLifetime;
+                sizeOverTime.enabled = true;
+
+                AnimationCurve curve = new AnimationCurve();
+                var shapeScaleKeys = pfx.shpScaleKeys.Split();
+                if (shapeScaleKeys.Length > 1 && pfx.shpScaleKeys != "")
+                {
+                    var curveTime = 0f;
+
+                    for (var i = 0; i < shapeScaleKeys.Length; i++)
+                    {
+                        curve.AddKey(curveTime, float.Parse(shapeScaleKeys[i]) / 100 * float.Parse(pfx.shpDim));
+                        curveTime += 1f / shapeScaleKeys.Length;
+                    }
+
+                    sizeOverTime.size = new ParticleSystem.MinMaxCurve(1f, curve);
+                }
+            }
+
             // Renderer module
             {
                 var rendererModule = pfxGo.GetComponent<ParticleSystemRenderer>();
@@ -744,7 +791,18 @@ namespace GVR.Creator
                 }
 
                 shapeModule.rotation = new(pfx.dirAngleElev, 0, 0);
+
+                var shapeOffsetVec = pfx.shpOffsetVec.Split();
+                if (float.TryParse(shapeOffsetVec[0], out var x) && float.TryParse(shapeOffsetVec[1], out var y) &&
+                    float.TryParse(shapeOffsetVec[2], out var z))
+                    shapeModule.position = new UnityEngine.Vector3(x / 100, y / 100, z / 100);
+                else
+                    Debug.LogError(
+                        "One or more of the shape offset vector components could not be parsed into a float");
+
                 shapeModule.alignToDirection = true;
+
+                shapeModule.radiusThickness = pfx.shpIsVolume ? 1f : 0f;
             }
 
             particleSystem.Play();
