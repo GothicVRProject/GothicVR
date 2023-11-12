@@ -1,3 +1,4 @@
+using GVR.GothicVR.Scripts.UI;
 using GVR.Manager;
 using UnityEngine;
 
@@ -17,6 +18,9 @@ namespace GVR.Player.Menu
         [SerializeField]
         private TurnSettingDropdownController turnSettingDropdownController;
 
+        [SerializeField] private AudioMixerHandler musicVolumeHandler;
+        [SerializeField] private AudioMixerHandler soundEffectsVolumeHandler;
+
         void Awake()
         {
             SetSettingsValues();
@@ -29,6 +33,8 @@ namespace GVR.Player.Menu
 
             moveSpeedController.ChangeMoveSpeed(PlayerPrefs.GetFloat(ConstantsManager.moveSpeedPlayerPref));
             turnSettingDropdownController.DropdownItemSelected(PlayerPrefs.GetInt(ConstantsManager.turnSettingPlayerPref));
+            musicVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(ConstantsManager.musicVolumePlayerPref));
+            soundEffectsVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(ConstantsManager.soundEffectsVolumePlayerPref));
         }
 
         public void PlayFunction()
