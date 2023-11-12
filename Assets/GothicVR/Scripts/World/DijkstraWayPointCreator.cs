@@ -1,3 +1,4 @@
+using GVR.Phoenix.Data;
 using PxCs.Data.WayNet;
 using System;
 using System.Collections.Generic;
@@ -9,9 +10,11 @@ namespace GVR
     {
         public static Dictionary<string, DijkstraWaypoint> DijkstraWaypoints;
 
-        public static Dictionary<string, DijkstraWaypoint> Create(List<PxWayPointData> wayPoints, List<PxWayEdgeData> wayEdges)
+        public static Dictionary<string, DijkstraWaypoint> Create(WorldData world)
         {
             Dictionary<string, DijkstraWaypoint> DijkstraWaypoints = new();
+            var wayEdges = world.waypointEdges;
+            var wayPoints = world.waypoints;
 
             foreach (var edge in wayEdges)
             {
