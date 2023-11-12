@@ -5,8 +5,12 @@ using UnityEngine;
 
 namespace GVR
 {
-    public List<PxWayPointData> CreatePath(string startPoint, string destination)
+    public class RoutePlanner : MonoBehaviour
     {
-
+        public List<PxWayPointData> CreatePath(string start, string end)
+        {
+            return null;
+        }
     }
+    
 }
