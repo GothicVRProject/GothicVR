@@ -10,7 +10,7 @@ namespace GVR.GothicVR.Scripts.UI
         [SerializeField] private Slider audioVolumeSlider;
         [SerializeField] private string volumePlayerPrefName;
 
-        void onEnable()
+        void Awake()
         {
             float oldVolume = PlayerPrefs.GetFloat(volumePlayerPrefName);
             audioVolumeSlider.value = oldVolume;
