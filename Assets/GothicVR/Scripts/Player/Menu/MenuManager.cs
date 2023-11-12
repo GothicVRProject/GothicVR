@@ -9,7 +9,7 @@ namespace GVR.Player.Menu
         public GameObject SettingsMenu;
         public GameObject TeleportMenu;
         public GameObject MovementMenu;
-        public GameObject UIMenu;
+        public GameObject SoundMenu;
 
         [SerializeField]
         private MoveSpeedController moveSpeedController;
@@ -44,7 +44,7 @@ namespace GVR.Player.Menu
             SettingsMenu.SetActive(menu == SettingsMenu);
             TeleportMenu.SetActive(menu == TeleportMenu);
             MovementMenu.SetActive(menu == MovementMenu);
-            UIMenu.SetActive(menu == UIMenu);
+            SoundMenu.SetActive(menu == SoundMenu);
         }
 
         public void QuitGameFunction()
