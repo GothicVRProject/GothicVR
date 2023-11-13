@@ -31,6 +31,8 @@ namespace GVR.Manager
         //Collection of PlayerPref entries for settings
         public const string moveSpeedPlayerPref = "MoveSpeed";
         public const string turnSettingPlayerPref = "TurnSetting";
+        public const string musicVolumePlayerPref = "BackgroundMusicVolume";
+        public const string soundEffectsVolumePlayerPref = "SoundEffectsVolume";
         public static float moveSpeed { get; set; } = 8f;
 
         public static string selectedWorld { get; set; } = "world.zen";
