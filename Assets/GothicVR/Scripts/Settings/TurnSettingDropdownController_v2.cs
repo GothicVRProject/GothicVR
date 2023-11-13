@@ -10,7 +10,7 @@ public class TurnSettingDropdownController_v2 : MonoBehaviour
         var dropdown = transform.GetComponent<TMP_Dropdown>();
         dropdown.onValueChanged.AddListener(DropdownItemSelected);
 
-        dropdown.value = RuntimeSettings.LoadSettingsFromPlayerPrefs(ConstantsManager.turnSettingPlayerPref);
+        dropdown.value = PlayerSettingsManager.LoadSettingsFromPlayerPrefs(ConstantsManager.turnSettingPlayerPref);
         DropdownItemSelected(dropdown.value);
     }
 
@@ -19,11 +19,11 @@ public class TurnSettingDropdownController_v2 : MonoBehaviour
         switch (value)
         {
             case 1:
-                RuntimeSettings.I.DropdownItemSelected(RuntimeSettings.TurnType.ContinuousTurn);
+                PlayerSettingsManager.I.DropdownItemSelected(PlayerSettingsManager.TurnType.ContinuousTurn);
                 break;
             case 0:
             default:
-                RuntimeSettings.I.DropdownItemSelected(RuntimeSettings.TurnType.SnapTurn);
+                PlayerSettingsManager.I.DropdownItemSelected(PlayerSettingsManager.TurnType.SnapTurn);
                 break;
         }
     }

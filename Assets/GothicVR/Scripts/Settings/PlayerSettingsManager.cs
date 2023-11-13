@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace GVR.Debugging
 {
-    public class RuntimeSettings : SingletonBehaviour<RuntimeSettings>
+    public class PlayerSettingsManager : SingletonBehaviour<PlayerSettingsManager>
     {
         public enum TurnType
         {  
@@ -23,14 +23,13 @@ namespace GVR.Debugging
         public GameObject locomotionsystem;
         public ActionBasedSnapTurnProvider snapTurn;
         public ActionBasedContinuousTurnProvider continuousTurn;
+        private bool isAwoken = false;
 
-        protected override void Awake()
+        protected void OnEnable()
         {
-            Debug.Log("Initial PlayerPref: " + PlayerPrefs.GetInt(ConstantsManager.turnSettingPlayerPref).ToString());
             base.Awake();
+            isAwoken = true;
             turntypeUI = (TurnType)PlayerPrefs.GetInt(ConstantsManager.turnSettingPlayerPref);
-            Debug.Log(PlayerPrefs.GetInt(ConstantsManager.turnSettingPlayerPref).ToString());
-            Debug.Log(turntypeUI.ToString());
             turntype = turntypeUI;
             DropdownItemSelected(turntypeUI);
         }
@@ -38,22 +37,25 @@ namespace GVR.Debugging
 #if UNITY_EDITOR
         void OnValidate()
         {
-            DropdownItemSelected(turntypeUI);
+            if (isAwoken)
+            {
+                DropdownItemSelected(turntypeUI);
+            }
         }
 #endif
 
-        public void DropdownItemSelected(TurnType turntypeUI)
+        public void DropdownItemSelected(TurnType selectedturntypeUI)
         {
-            switch(turntypeUI)
+            switch(selectedturntypeUI)
             {
                 case TurnType.ContinuousTurn:
                     EnableContinuousTurn();
-                    Debug.Log("Cont");
+                    turntypeUI = TurnType.ContinuousTurn;
                     break;
                 case TurnType.SnapTurn:
                 default:
                     EnableSnapTurn();
-                    Debug.Log("Snap");
+                    turntypeUI = TurnType.SnapTurn;
                     break;
             }
         }
@@ -61,7 +63,6 @@ namespace GVR.Debugging
         void EnableSnapTurn()
         {
             SaveIntegerSettingsToPlayerPrefs(ConstantsManager.turnSettingPlayerPref, 0);
-            Debug.Log("Saved: " + 0);
 
             if (!locomotionsystem)
                 return;
@@ -74,7 +75,6 @@ namespace GVR.Debugging
         void EnableContinuousTurn()
         {
             SaveIntegerSettingsToPlayerPrefs(ConstantsManager.turnSettingPlayerPref, 1);
-            Debug.Log("Saved: " + 1);
 
             if (!locomotionsystem)
                 return;
