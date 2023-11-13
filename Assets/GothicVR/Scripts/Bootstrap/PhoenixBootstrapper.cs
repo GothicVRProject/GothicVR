@@ -70,6 +70,7 @@ namespace GVR.Bootstrap
             SetLanguage();
             LoadGothicVM(g1Dir);
             LoadSfxVM(g1Dir);
+            LoadPfxVm(g1Dir);
             LoadMusicVM(g1Dir);
             LoadMusic();
             LoadFonts();
@@ -145,6 +146,13 @@ namespace GVR.Bootstrap
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
             var vmPtr = VmGothicExternals.LoadVm(fullPath);
             GameData.VmSfxPtr = vmPtr;
+        }
+
+        private static void LoadPfxVm(string g1Dir)
+        {
+            var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/PARTICLEFX.DAT"));
+            var vmPtr = VmGothicExternals.LoadVm(fullPath);
+            GameData.VmPfxPtr = vmPtr;
         }
 
         private void LoadMusicVM(string G1Dir)

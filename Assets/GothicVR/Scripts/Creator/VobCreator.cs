@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using GothicVR.Vob;
@@ -23,6 +24,7 @@ using PxCs.Data.Vm;
 using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
 using Vector3 = System.Numerics.Vector3;
 
@@ -57,7 +59,7 @@ namespace GVR.Creator
                 return;
 
             var loc = Camera.main!.transform.position;
-            foreach (var sound in LookupCache.vobSoundsAndDayTime)
+            foreach (var sound in LookupCache.vobSoundsAndDayTime.Where(i => i != null))
             {
                 var soundLoc = sound.transform.position;
                 var soundDist = sound.GetComponent<AudioSource>().maxDistance;
@@ -179,11 +181,18 @@ namespace GVR.Creator
                     case PxWorld.PxVobType.PxVob_zCVob:
                     {
                         GameObject obj;
-                        if (vob.visualType == PxWorld.PxVobVisualType.PxVobVisualDecal)
-                            obj = CreateDecal(vob);
-                        else
-                            obj = CreateDefaultMesh(vob);
-                        
+                        switch (vob.visualType)
+                        {
+                            case PxWorld.PxVobVisualType.PxVobVisualDecal:
+                                obj = CreateDecal(vob);
+                                break;
+                            case PxWorld.PxVobVisualType.PxVobVisualParticleSystem:
+                                obj = CreatePfx(vob);
+                                break;
+                            default:
+                                obj = CreateDefaultMesh(vob);
+                                break;
+                        }
                         cullingVobObjects.Add(obj);
                         break;
                     }
@@ -593,10 +602,214 @@ namespace GVR.Creator
             if (!FeatureFlags.I.EnableDecals)
                 return null;
 
-
             var parent = parentGosTeleport[vob.type];
 
             return VobMeshCreator.CreateDecal(vob, parent);
+        }
+
+        /// <summary>
+        /// Please check description at worldofgothic for more details:
+        /// https://www.worldofgothic.de/modifikation/index.php?go=particelfx
+        /// </summary>
+        private static GameObject CreatePfx(PxVobData vob)
+        {
+            if (!FeatureFlags.I.enableVobParticles)
+                return null;
+
+            // FIXME - move to non-teleport
+            var parent = parentGosTeleport[vob.type];
+
+            var pfxGo = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobPfx);
+            pfxGo.name = vob.visualName;
+            SetPosAndRot(pfxGo, vob.position, vob.rotation);
+            pfxGo.SetParent(parent);
+
+            var pfx = AssetCache.TryGetPfxData(vob.visualName);
+            var particleSystem = pfxGo.GetComponent<ParticleSystem>();
+
+            pfxGo.GetComponent<VobPfxProperties>().pfxData = pfx;
+
+            particleSystem.Stop();
+
+            var gravity = pfx.flyGravity.Split();
+            float gravityX = 1f, gravityY = 1f, gravityZ = 1f;
+            if (gravity.Length == 3)
+            {
+                // Gravity seems too low. Therefore *10k.
+                gravityX = float.Parse(gravity[0], CultureInfo.InvariantCulture) * 10000;
+                gravityY = float.Parse(gravity[1], CultureInfo.InvariantCulture) * 10000;
+                gravityZ = float.Parse(gravity[2], CultureInfo.InvariantCulture) * 10000;
+            }
+
+            // Main module
+            {
+                var mainModule = particleSystem.main;
+                var minLifeTime = (pfx.lspPartAvg - pfx.lspPartVar) / 1000; // I assume we need to change milliseconds to seconds.
+                var maxLifeTime = (pfx.lspPartAvg + pfx.lspPartVar) / 1000;
+                mainModule.duration = 1f; // I assume pfx data wants a cycle being 1 second long.
+                mainModule.startLifetime = new (minLifeTime, maxLifeTime);
+                mainModule.loop = pfx.ppsIsLooping;
+
+                var minSpeed = (pfx.velAvg - pfx.velVar) / 1000;
+                var maxSpeed = (pfx.velAvg + pfx.velVar) / 1000;
+                mainModule.startSpeed = new(minSpeed, maxSpeed);
+            }
+
+            // Emission module
+            {
+                var emissionModule = particleSystem.emission;
+                emissionModule.rateOverTime = new ParticleSystem.MinMaxCurve(pfx.ppsValue);
+            }
+
+            // Force over Lifetime module
+            {
+                var forceModule = particleSystem.forceOverLifetime;
+                if (gravity.Length == 3)
+                {
+                    forceModule.enabled = true;
+                    forceModule.x = gravityX;
+                    forceModule.y = gravityY;
+                    forceModule.z = gravityZ;
+                }
+            }
+
+            // Color over Lifetime module
+            {
+                var colorOverTime = particleSystem.colorOverLifetime;
+                colorOverTime.enabled = true;
+                var gradient = new Gradient();
+                var colorStart = pfx.visTexColorStart.Split();
+                var colorEnd = pfx.visTexColorEnd.Split();
+                gradient.SetKeys(
+                    new GradientColorKey[]
+                    {
+                        new GradientColorKey(
+                            new Color(float.Parse(colorStart[0]) / 255, float.Parse(colorStart[1]) / 255,
+                                float.Parse(colorStart[2]) / 255),
+                            0f),
+                        new GradientColorKey(
+                            new Color(float.Parse(colorEnd[0]) / 255, float.Parse(colorEnd[1]) / 255,
+                                float.Parse(colorEnd[2]) / 255), 1f)
+                    },
+                    new GradientAlphaKey[]
+                    {
+                        new GradientAlphaKey(pfx.visAlphaStart / 255, 0),
+                        new GradientAlphaKey(pfx.visAlphaEnd / 255, 1),
+                    });
+                colorOverTime.color = gradient;
+            }
+
+            // Size over lifetime module
+            {
+                var sizeOverTime = particleSystem.sizeOverLifetime;
+                sizeOverTime.enabled = true;
+
+                AnimationCurve curve = new AnimationCurve();
+                var shapeScaleKeys = pfx.shpScaleKeys.Split();
+                if (shapeScaleKeys.Length > 1 && pfx.shpScaleKeys != "")
+                {
+                    var curveTime = 0f;
+
+                    for (var i = 0; i < shapeScaleKeys.Length; i++)
+                    {
+                        curve.AddKey(curveTime, float.Parse(shapeScaleKeys[i]) / 100 * float.Parse(pfx.shpDim));
+                        curveTime += 1f / shapeScaleKeys.Length;
+                    }
+
+                    sizeOverTime.size = new ParticleSystem.MinMaxCurve(1f, curve);
+                }
+            }
+
+            // Renderer module
+            {
+                var rendererModule = pfxGo.GetComponent<ParticleSystemRenderer>();
+                // FIXME - Move to a cached constant value
+                var standardShader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+                var material = new Material(standardShader);
+                rendererModule.material = material;
+                TextureManager.I.SetTexture(pfx.visName, rendererModule.material);
+                // renderer.material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest; // First check with no change.
+
+                switch (pfx.visAlphaFunc.ToUpper())
+                {
+                    case "BLEND":
+                        rendererModule.material.ToTransparentMode(); // e.g. leaves.pfx.
+                        break;
+                    case "ADD":
+                        rendererModule.material.ToAdditiveMode();
+                        break;
+                    default:
+                        Debug.LogWarning($"Particle AlphaFunc {pfx.visAlphaFunc} not yet handled.");
+                        break;
+                }
+                // makes the material render both faces
+                rendererModule.material.SetInt("_Cull", (int)CullMode.Off);
+
+                switch (pfx.visOrientation)
+                {
+                    case "NONE":
+                        rendererModule.alignment = ParticleSystemRenderSpace.View;
+                        break;
+                    case "WORLD":
+                        rendererModule.alignment = ParticleSystemRenderSpace.World;
+                        break;
+                    case "VELO":
+                        rendererModule.alignment = ParticleSystemRenderSpace.Velocity;
+                        break;
+                    default:
+                        Debug.LogWarning($"visOrientation {pfx.visOrientation} not yet handled.");
+                        break;
+                }
+            }
+
+            // Shape module
+            {
+                var shapeModule = particleSystem.shape;
+                switch (pfx.shpType.ToUpper())
+                {
+                    case "SPHERE":
+                        shapeModule.shapeType = ParticleSystemShapeType.Sphere;
+                        break;
+                    case "CIRCLE":
+                        shapeModule.shapeType = ParticleSystemShapeType.Circle;
+                        break;
+                    case "MESH":
+                        shapeModule.shapeType = ParticleSystemShapeType.Mesh;
+                        break;
+                    default:
+                        Debug.LogWarning($"Particle ShapeType {pfx.shpType} not yet handled.");
+                        break;
+                }
+
+                var shapeDimensions = pfx.shpDim.Split();
+                switch (shapeDimensions.Length)
+                {
+                    case 1:
+                        shapeModule.radius = float.Parse(shapeDimensions[0], CultureInfo.InvariantCulture) / 100; // cm in m
+                        break;
+                    default:
+                        Debug.LogWarning($"shpDim >{pfx.shpDim}< not yet handled");
+                        break;
+                }
+
+                shapeModule.rotation = new(pfx.dirAngleElev, 0, 0);
+
+                var shapeOffsetVec = pfx.shpOffsetVec.Split();
+                if (float.TryParse(shapeOffsetVec[0], out var x) && float.TryParse(shapeOffsetVec[1], out var y) &&
+                    float.TryParse(shapeOffsetVec[2], out var z))
+                    shapeModule.position = new UnityEngine.Vector3(x / 100, y / 100, z / 100);
+                else
+                    Debug.LogError(
+                        "One or more of the shape offset vector components could not be parsed into a float");
+
+                shapeModule.alignToDirection = true;
+
+                shapeModule.radiusThickness = pfx.shpIsVolume ? 1f : 0f;
+            }
+
+            particleSystem.Play();
+
+            return pfxGo;
         }
 
         private static GameObject CreateDefaultMesh(PxVobData vob, bool nonTeleport = false)
@@ -605,10 +818,6 @@ namespace GVR.Creator
             var meshName = vob.showVisual ? vob.visualName : vob.vobName;
 
             if (meshName == string.Empty)
-                return null;
-            
-            // FIXME - PFX effects not yet implemented
-            if (meshName.ToLower().EndsWith(".pfx"))
                 return null;
 
             // MDL
