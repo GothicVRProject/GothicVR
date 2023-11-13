@@ -33,8 +33,8 @@ namespace GVR.Player.Menu
 
             moveSpeedController.ChangeMoveSpeed(PlayerPrefs.GetFloat(ConstantsManager.moveSpeedPlayerPref));
             turnSettingDropdownController.DropdownItemSelected(PlayerPrefs.GetInt(ConstantsManager.turnSettingPlayerPref));
-            musicVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(ConstantsManager.musicVolumePlayerPref));
-            soundEffectsVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(ConstantsManager.soundEffectsVolumePlayerPref));
+            musicVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(ConstantsManager.musicVolumePlayerPref, 1f));
+            soundEffectsVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(ConstantsManager.soundEffectsVolumePlayerPref, 1f));
         }
 
         public void PlayFunction()

@@ -12,7 +12,7 @@ namespace GVR.GothicVR.Scripts.UI
 
         void Awake()
         {
-            float oldVolume = PlayerPrefs.GetFloat(volumePlayerPrefName);
+            float oldVolume = PlayerPrefs.GetFloat(volumePlayerPrefName, 1f);
             audioVolumeSlider.value = oldVolume;
         }
 
