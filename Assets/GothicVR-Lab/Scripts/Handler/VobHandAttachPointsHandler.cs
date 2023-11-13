@@ -11,6 +11,7 @@ using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Vob;
+using PxCs.Data.Vm;
 using PxCs.Interface;
 using TMPro;
 using UnityEngine;
@@ -21,7 +22,8 @@ namespace GVR.Lab.Handler
 {
     public class VobHandAttachPointsHandler: MonoBehaviour
     {
-        public TMP_Dropdown vobDropdown;
+        public TMP_Dropdown vobCategoryDropdown;
+        public TMP_Dropdown vobItemDropdown;
         public GameObject itemSpawnSlot;
         public Slider SliderPosX;
         public Slider SliderPosY;
@@ -39,10 +41,12 @@ namespace GVR.Lab.Handler
         private Transform attachPoint1;
         private Transform attachPoint2;
 
+        private Dictionary<string, PxVmItemData> pxItems = new();
         private VobItemAttachPoints attachPoints;
 
 
-        public void InitializeOnClick()
+
+        private void Start()
         {
             /*
              * 1. Load Vdfs
@@ -60,13 +64,28 @@ namespace GVR.Lab.Handler
 
             List<string> itemNames = new();
             PxVm.pxVmEnumerateInstancesByClassName(GameData.VmGothicPtr, "C_Item", (string name) => itemNames.Add(name));
-            vobDropdown.options = itemNames.Select(name => new TMP_Dropdown.OptionData(name)).ToList();
 
+            pxItems = itemNames
+                .ToDictionary(itemName => itemName, AssetCache.TryGetItemData);
+
+            vobCategoryDropdown.options = pxItems
+                .Select(item => item.Value.mainFlag.ToString())
+                .Distinct()
+                .Select(flag => new TMP_Dropdown.OptionData(flag))
+                .ToList();
+
+            CategoryDropdownValueChanged();
 
             var attachPointJson = Resources.Load<TextAsset>("Configuration/VobItemAttachPoints");
             attachPoints = JsonUtility.FromJson<VobItemAttachPoints>(attachPointJson.text);
         }
 
+        public void CategoryDropdownValueChanged()
+        {
+            Enum.TryParse<PxVm.PxVmItemFlags>(vobCategoryDropdown.options[vobCategoryDropdown.value].text, out var category);
+            var items = pxItems.Where(item => item.Value.mainFlag == category).ToList();
+            vobItemDropdown.options = items.Select(item => new TMP_Dropdown.OptionData(item.Key)).ToList();
+        }
 
         public void LoadVobOnClick()
         {
@@ -74,7 +93,7 @@ namespace GVR.Lab.Handler
             if (itemSpawnSlot.transform.childCount != 0)
                 Destroy(itemSpawnSlot.transform.GetChild(0).gameObject);
 
-            currentItemName = vobDropdown.options[vobDropdown.value].text;
+            currentItemName = vobItemDropdown.options[vobItemDropdown.value].text;
             var item = CreateItem(currentItemName);
 
             attachPoint1 = item.FindChildRecursively("AttachPoint1").transform;
