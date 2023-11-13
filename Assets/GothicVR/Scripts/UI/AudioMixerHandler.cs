@@ -19,6 +19,8 @@ namespace GVR.GothicVR.Scripts.UI
         public void SliderUpdate(float value)
         {
             PlayerPrefs.SetFloat(volumePlayerPrefName, value);
+            // Volume and loudness are not the same, volume can be linear but loudness is logarithmic
+            // https://www.msdmanuals.com/home/multimedia/table/measurement-of-loudness
             audioMixer.audioMixer.SetFloat(volumePlayerPrefName, Mathf.Log10(value) * 20);
         }
     }
