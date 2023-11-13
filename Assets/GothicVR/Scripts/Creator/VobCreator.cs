@@ -542,68 +542,112 @@ namespace GVR.Creator
             return vobObj;
         }
 
-        private void CreateTriggerList(PxVobTriggerListData vob)
+        private static GameObject CreateTriggerScript(PxVobTriggerScriptData vob)
         {
-            var gameObject = new GameObject(vob.vobName);
-            gameObject.SetParent(parentGosNonTeleport[vob.type]);
-            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+            var vobObj = new GameObject(vob.vobName);
+            vobObj.SetParent(parentGosNonTeleport[vob.type]);
+            vobObj.layer = LayerMask.NameToLayer("Ignore Raycast");
 
-            var trigger = gameObject.AddComponent<BoxCollider>();
+            var trigger = vobObj.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
 
             var min = vob.boundingBox.min.ToUnityVector();
             var max = vob.boundingBox.max.ToUnityVector();
-            gameObject.transform.position = (min + max) / 2f;
+            vobObj.transform.position = (min + max) / 2f;
 
-            gameObject.transform.localScale = (max - min);
+            vobObj.transform.localScale = (max - min);
+            
+            return vobObj;
         }
 
-        private void CreateTriggerWorldStart(PxVobTriggerWorldStartData vob)
+        private static GameObject CreateTrigger(PxVobTriggerData vob)
         {
-            var gameObject = new GameObject(vob.vobName);
-            gameObject.SetParent(parentGosNonTeleport[vob.type]);
-            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+            var vobObj = new GameObject(vob.vobName);
+            vobObj.SetParent(parentGosNonTeleport[vob.type]);
+            vobObj.layer = LayerMask.NameToLayer("Ignore Raycast");
 
-            var trigger = gameObject.AddComponent<BoxCollider>();
+            var trigger = vobObj.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
 
             var min = vob.boundingBox.min.ToUnityVector();
             var max = vob.boundingBox.max.ToUnityVector();
-            gameObject.transform.position = (min + max) / 2f;
+            vobObj.transform.position = (min + max) / 2f;
 
-            gameObject.transform.localScale = (max - min);
+            vobObj.transform.localScale = (max - min);
+
+            return vobObj;
         }
 
-        private void CreateTriggerScript(PxVobTriggerScriptData vob)
+        private static GameObject CreateTriggerList(PxVobTriggerListData vob)
         {
-            var gameObject = new GameObject(vob.vobName);
-            gameObject.SetParent(parentGosNonTeleport[vob.type]);
-            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+            var vobObj = new GameObject(vob.vobName);
+            vobObj.SetParent(parentGosNonTeleport[vob.type]);
+            vobObj.layer = LayerMask.NameToLayer("Ignore Raycast");
 
-            var trigger = gameObject.AddComponent<BoxCollider>();
+            var trigger = vobObj.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
 
             var min = vob.boundingBox.min.ToUnityVector();
             var max = vob.boundingBox.max.ToUnityVector();
-            gameObject.transform.position = (min + max) / 2f;
+            vobObj.transform.position = (min + max) / 2f;
 
-            gameObject.transform.localScale = (max - min);
+            vobObj.transform.localScale = (max - min);
+
+            return vobObj;
         }
 
-        private void CreateTrigger(PxVobTriggerData vob)
+        private static GameObject CreateTriggerWorldStart(PxVobTriggerWorldStartData vob)
         {
-            var gameObject = new GameObject(vob.vobName);
-            gameObject.SetParent(parentGosNonTeleport[vob.type]);
-            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+            var vobObj = new GameObject(vob.vobName);
+            vobObj.SetParent(parentGosNonTeleport[vob.type]);
+            vobObj.layer = LayerMask.NameToLayer("Ignore Raycast");
 
-            var trigger = gameObject.AddComponent<BoxCollider>();
+            var trigger = vobObj.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
 
             var min = vob.boundingBox.min.ToUnityVector();
             var max = vob.boundingBox.max.ToUnityVector();
-            gameObject.transform.position = (min + max) / 2f;
+            vobObj.transform.position = (min + max) / 2f;
 
-            gameObject.transform.localScale = (max - min);
+            vobObj.transform.localScale = (max - min);
+
+            return vobObj;
+        }
+
+        private static GameObject CreateTriggerScript(PxVobTriggerScriptData vob)
+        {
+            var vobObj = new GameObject(vob.vobName);
+            vobObj.SetParent(parentGosNonTeleport[vob.type]);
+            vobObj.layer = LayerMask.NameToLayer("Ignore Raycast");
+
+            var trigger = vobObj.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            vobObj.transform.position = (min + max) / 2f;
+
+            vobObj.transform.localScale = (max - min);
+
+            return vobObj;
+        }
+
+        private static GameObject CreateTrigger(PxVobTriggerData vob)
+        {
+            var vobObj = new GameObject(vob.vobName);
+            vobObj.SetParent(parentGosNonTeleport[vob.type]);
+            vobObj.layer = LayerMask.NameToLayer("Ignore Raycast");
+
+            var trigger = vobObj.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+
+            var min = vob.boundingBox.min.ToUnityVector();
+            var max = vob.boundingBox.max.ToUnityVector();
+            vobObj.transform.position = (min + max) / 2f;
+
+            vobObj.transform.localScale = (max - min);
+
+            return vobObj;
         }
 
         /// <summary>

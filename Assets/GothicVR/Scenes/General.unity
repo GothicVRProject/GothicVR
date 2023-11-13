@@ -184,6 +184,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3286136462967229777, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_UIScrollAction.m_Action.m_Id
+      value: fb7f82fb-abd5-48c0-887b-0d1f0b89629d
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136462967229777, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_IsTrackedAction.m_Action.m_Id
+      value: 95da5d77-2c81-4cf8-930d-77154ea65c24
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136462967229778, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_RaycastMask.m_Bits
+      value: 499
+      objectReference: {fileID: 0}
     - target: {fileID: 7775121018924269947, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: moveSpeedController
       value: 
