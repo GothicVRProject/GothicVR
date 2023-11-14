@@ -27,6 +27,8 @@ namespace GVR.Debugging
         public bool CreateWaypoints;
         [Tooltip("Leave blank if you want to spawn normal.")]
         public string spawnAtSpecificFreePoint;
+        [Tooltip("True will render all pickables with dynamic attach points")]
+        public bool dynamicGrab;
 
         [Header("__________DayTime__________")]
         public bool EnableDayTime;
