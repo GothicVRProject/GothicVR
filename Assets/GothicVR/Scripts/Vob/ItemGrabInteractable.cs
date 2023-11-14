@@ -7,6 +7,9 @@ namespace GVR.Vob
     [RequireComponent(typeof(Rigidbody))]
     public class ItemGrabInteractable : MonoBehaviour
     {
+        public GameObject attachPoint1;
+        public GameObject attachPoint2;
+        
         private bool alreadyGrabbedOnce;
         
         public void SelectEntered(SelectEnterEventArgs args)

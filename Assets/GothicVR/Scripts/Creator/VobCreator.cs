@@ -398,14 +398,17 @@ namespace GVR.Creator
                 grabComp.selectMode = InteractableSelectMode.Multiple;
             }
 
-            var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
+            var itemGrabComp = vobObj.GetComponent<ItemGrabInteractable>();
             var colliderComp = vobObj.GetComponent<MeshCollider>();
+
+            grabComp.attachTransform = itemGrabComp.attachPoint1.transform;
+            grabComp.secondaryAttachTransform = itemGrabComp.attachPoint2.transform;
 
             vobObj.layer = ConstantsManager.ItemLayer;
 
             colliderComp.convex = true;
-            grabComp.selectEntered.AddListener(eventComp.SelectEntered);
-            grabComp.selectExited.AddListener(eventComp.SelectExited);
+            grabComp.selectEntered.AddListener(itemGrabComp.SelectEntered);
+            grabComp.selectExited.AddListener(itemGrabComp.SelectExited);
 
             return vobObj;
         }
