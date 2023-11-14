@@ -394,8 +394,8 @@ namespace GVR.Creator
 
             if (FeatureFlags.I.vobItemsDynamicAttach)
             {
-            grabComp.useDynamicAttach = true;
-            grabComp.selectMode = InteractableSelectMode.Multiple;
+                grabComp.useDynamicAttach = true;
+                grabComp.selectMode = InteractableSelectMode.Multiple;
             }
 
             var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
