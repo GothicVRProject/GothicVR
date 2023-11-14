@@ -31,7 +31,7 @@ namespace GVR.Lab.Handler
         public Slider SliderRotX;
         public Slider SliderRotY;
         public Slider SliderRotZ;
-
+        public Toggle dynamicAttachToggle;
         public TMP_Text copiedItemText;
         public TMP_Text currentItemText;
 
@@ -166,6 +166,7 @@ namespace GVR.Lab.Handler
             {
                 attachPoint1.localPosition = savedPoint.position;
                 attachPoint1.localRotation = Quaternion.Euler(savedPoint.rotation);
+                xrGrabComp.useDynamicAttach = savedPoint.isDynamicAttach;
             }
 
             var pos1 = attachPoint1.localPosition;
@@ -178,6 +179,8 @@ namespace GVR.Lab.Handler
             SliderRotY.value = rot1.y;
             SliderRotZ.value = rot1.z;
 
+            dynamicAttachToggle.isOn = xrGrabComp.useDynamicAttach;
+
             ItemValueChanged();
         }
 
@@ -188,15 +191,23 @@ namespace GVR.Lab.Handler
             currentItemText.text += $"Rotation: {SliderRotX.value}, {SliderRotY.value}, {SliderRotZ.value}";
         }
 
+        public void DynamicAttachToggleValueChanged()
+        {
+            xrGrabComp.useDynamicAttach = dynamicAttachToggle.isOn;
+        }
+
         private Vector3 copyPosition1;
         private Vector3 copyRotation1;
+        private bool copyDynamicAttach;
 
         public void CopyCurrentItemClick()
         {
             copyPosition1 = attachPoint1.localPosition;
             copyRotation1 = attachPoint1.localRotation.eulerAngles;
+            copyDynamicAttach = dynamicAttachToggle.isOn;
 
             copiedItemText.text = $"Name: {currentItemName} \n";
+            copiedItemText.text += $"Is Dynamic Attach: {dynamicAttachToggle.isOn} \n";
             copiedItemText.text += $"Position: {copyPosition1.x}, {copyPosition1.y}, {copyPosition1.z}\n";
             copiedItemText.text += $"Rotation: {copyRotation1.x}, {copyRotation1.y}, {copyRotation1.z}";
         }
@@ -208,6 +219,7 @@ namespace GVR.Lab.Handler
 
             attachPoint1.localPosition = copyPosition1;
             attachPoint1.localRotation = Quaternion.Euler(copyRotation1);
+            dynamicAttachToggle.isOn = copyDynamicAttach;
 
             SetInitialItemValue();
         }
@@ -220,12 +232,14 @@ namespace GVR.Lab.Handler
                 attachPoints.points.Add(new()
                 {
                     name = currentItemName,
+                    isDynamicAttach = dynamicAttachToggle.isOn,
                     position = attachPoint1.localPosition,
                     rotation = attachPoint1.localRotation.eulerAngles
                 });
             }
             else
             {
+                item.isDynamicAttach = dynamicAttachToggle.isOn;
                 item.position = attachPoint1.localPosition;
                 item.rotation = attachPoint1.localRotation.eulerAngles;
             }

@@ -19,6 +19,7 @@ namespace GVR.Data
         public class Point
         {
             public string name;
+            public bool isDynamicAttach;
             public Vector3 position;
             public Vector3 rotation;
         }
