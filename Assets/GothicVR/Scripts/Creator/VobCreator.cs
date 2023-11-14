@@ -482,8 +482,9 @@ namespace GVR.Creator
             source.maxDistance = soundData.radius / 100f; // Gothic's values are in cm, Unity's in m.
             source.volume = soundData.volume / 100f; // Gothic's volume is 0...100, Unity's is 0...1. 
 
+            // Random sounds shouldn't play initially, but after certain time.
+            source.playOnAwake = (soundData.initiallyPlaying && soundData.mode != PxWorld.PxVobSoundMode.PxVobSoundModeRandom);
             source.loop = (soundData.mode == PxWorld.PxVobSoundMode.PxVobSoundModeLoop);
-            source.playOnAwake = soundData.initiallyPlaying;
             source.spatialBlend = soundData.ambient3d ? 1f : 0f;
         }
         
