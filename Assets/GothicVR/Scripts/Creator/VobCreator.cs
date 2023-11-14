@@ -391,6 +391,13 @@ namespace GVR.Creator
             // It will set some default values for collider and grabbing now.
             // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
             var grabComp = vobObj.AddComponent<XRGrabInteractable>();
+
+            if (FeatureFlags.I.vobItemsDynamicAttach)
+            {
+                grabComp.useDynamicAttach = true;
+                grabComp.selectMode = InteractableSelectMode.Multiple;
+            }
+
             var eventComp = vobObj.GetComponent<ItemGrabInteractable>();
             var colliderComp = vobObj.GetComponent<MeshCollider>();
 
