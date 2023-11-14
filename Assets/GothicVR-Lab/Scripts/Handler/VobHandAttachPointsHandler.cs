@@ -44,8 +44,6 @@ namespace GVR.Lab.Handler
         private Dictionary<string, PxVmItemData> pxItems = new();
         private VobItemAttachPoints attachPoints;
 
-
-
         private void Start()
         {
             /*
@@ -54,14 +52,6 @@ namespace GVR.Lab.Handler
              * 3. Load Vob name list
              * 4. Fill dropdown
              */
-            PhoenixBootstrapper.SetLanguage();
-
-            var vdfsPath = Path.GetFullPath($"{SettingsManager.GameSettings.GothicIPath}/Data");
-            GameData.VfsPtr = VfsBridge.LoadVfsInDirectory(vdfsPath);
-
-            var gothicVmPath = Path.GetFullPath($"{SettingsManager.GameSettings.GothicIPath}/_work/DATA/scripts/_compiled/GOTHIC.DAT");
-            GameData.VmGothicPtr = VmGothicExternals.LoadVm(gothicVmPath);
-
             List<string> itemNames = new();
             PxVm.pxVmEnumerateInstancesByClassName(GameData.VmGothicPtr, "C_Item", (string name) => itemNames.Add(name));
 
