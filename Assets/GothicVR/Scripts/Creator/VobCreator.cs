@@ -392,7 +392,8 @@ namespace GVR.Creator
             // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
             var grabComp = vobObj.AddComponent<XRGrabInteractable>();
 
-            if(FeatureFlags.I.dynamicGrab){
+            if (FeatureFlags.I.vobItemsDynamicAttach)
+            {
             grabComp.useDynamicAttach = true;
             grabComp.selectMode = InteractableSelectMode.Multiple;
             }
