@@ -76,7 +76,7 @@ namespace GVR.GothicVR.Scripts.Manager
                 return null;
             }
             
-            return SoundConverter.ToAudioClip(wavFile.sound);
+            return SoundConverter.ToAudioClip(wavFile);
         }
     }
 }
