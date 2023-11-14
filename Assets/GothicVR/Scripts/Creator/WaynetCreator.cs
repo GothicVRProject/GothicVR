@@ -11,6 +11,9 @@ namespace GVR.Creator
         public static void Create(GameObject root, WorldData world)
         {
             var waynetObj = new GameObject(string.Format("Waynet"));
+
+            DijkstraPathFinder pathFinder = waynetObj.AddComponent<DijkstraPathFinder>();
+            pathFinder.SetDijkstraWaypoints(DijkstraWayPointCreator.Create(world));
             waynetObj.transform.parent = root.transform;
 
 

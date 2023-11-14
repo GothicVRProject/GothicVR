@@ -8,6 +8,9 @@ namespace GVR
 {
     public class DijkstraWayPointCreator : MonoBehaviour
     {
+        /// <summary>
+        /// A dictionary containing all the DijkstraWaypoints in the scene, with their names as keys.
+        /// </summary>
         public static Dictionary<string, DijkstraWaypoint> DijkstraWaypoints;
 
         public static Dictionary<string, DijkstraWaypoint> Create(WorldData world)
@@ -40,6 +43,9 @@ namespace GVR
                     DijkstraWaypoints[wayPoints[(int)edge.b].name].neighbors.Add(wayPoints[(int)edge.a].name);
                 }
             }
+
+            DijkstraPathFinder.Instance.SetDijkstraWaypoints(DijkstraWaypoints);
+            
             return DijkstraWaypoints;
         }
 
