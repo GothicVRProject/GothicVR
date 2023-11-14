@@ -24,6 +24,7 @@ namespace GVR.Editor.Tools
             new (nameof(FeatureFlags.EnableMusic), typeof(bool), true),
             new (nameof(FeatureFlags.vobCulling), typeof(bool), true),
             new (nameof(FeatureFlags.enableSoundCulling), typeof(bool), true),
+            new (nameof(FeatureFlags.vobItemsDynamicAttach), typeof(bool), true),
 
             // Ints
             new (nameof(FeatureFlags.StartHour), typeof(int), 10),

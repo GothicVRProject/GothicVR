@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -82,6 +83,14 @@ namespace GVR.Lab.Handler
             // We want to have one element only.
             if (itemSpawnSlot.transform.childCount != 0)
                 Destroy(itemSpawnSlot.transform.GetChild(0).gameObject);
+
+            StartCoroutine(LoadVobOnClickDelayed());
+        }
+
+        private IEnumerator LoadVobOnClickDelayed()
+        {
+            // Wait 1 frame for GOs to be destroyed.
+            yield return null;
 
             currentItemName = vobItemDropdown.options[vobItemDropdown.value].text;
             var item = CreateItem(currentItemName);
