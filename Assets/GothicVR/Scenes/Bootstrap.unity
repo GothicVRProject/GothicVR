@@ -321,6 +321,7 @@ MonoBehaviour:
   CreateVobs: 1
   CreateWaypoints: 1
   spawnAtSpecificFreePoint: 
+  vobItemsDynamicAttach: 1
   EnableDayTime: 1
   SunMovementPerformanceValue: 1
   StartHour: 10
