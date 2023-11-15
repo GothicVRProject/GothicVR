@@ -42,7 +42,7 @@ namespace GVR.Creator
             await WorldMeshCreator.CreateAsync(world, teleportGo, ConstantsManager.MeshPerFrame);
             await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, ConstantsManager.VObPerFrame);
             WaynetCreator.Create(worldGo, world);
-            DijkstraWayPointCreator.Create(world);      //Is there a better place for this call?
+            /*DijkstraWayPointCreator.Create(world);      //Is there a better place for this call? this might still work  */ 
 
             DebugAnimationCreator.Create(worldName);
             DebugAnimationCreatorBSFire.Create(worldName);

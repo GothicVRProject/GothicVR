@@ -1,3 +1,4 @@
+using GVR.Extensions;
 using GVR.Phoenix.Data;
 using PxCs.Data.WayNet;
 using System;
@@ -18,29 +19,29 @@ namespace GVR
             Dictionary<string, DijkstraWaypoint> DijkstraWaypoints = new();
             var wayEdges = world.waypointEdges;
             var wayPoints = world.waypoints;
-
+    
             foreach (var edge in wayEdges)
             {
                 if (!DijkstraWaypoints.ContainsKey(wayPoints[(int)edge.a].name))
                 {
-                    DijkstraWaypoints.Add(wayPoints[(int)edge.a].name, new DijkstraWaypoint());
-                    DijkstraWaypoints[wayPoints[(int)edge.a].name].neighbors.Add(wayPoints[(int)edge.b].name);
+                    DijkstraWaypoints.Add(wayPoints[(int)edge.a].name, new DijkstraWaypoint(wayPoints[(int)edge.a].name));
+                    DijkstraWaypoints[wayPoints[(int)edge.a].name]._neighbors.Add(wayPoints[(int)edge.b].name);
                 }
                 else
                 {
-                    DijkstraWaypoints[wayPoints[(int)edge.a].name].neighbors.Add(wayPoints[(int)edge.b].name);
+                    DijkstraWaypoints[wayPoints[(int)edge.a].name]._neighbors.Add(wayPoints[(int)edge.b].name);
                 }
             }
             foreach (var edge in wayEdges)
             {
                 if (!DijkstraWaypoints.ContainsKey(wayPoints[(int)edge.b].name))
                 {
-                    DijkstraWaypoints.Add(wayPoints[(int)edge.b].name, new DijkstraWaypoint());
-                    DijkstraWaypoints[wayPoints[(int)edge.b].name].neighbors.Add(wayPoints[(int)edge.a].name);
+                    DijkstraWaypoints.Add(wayPoints[(int)edge.b].name, new DijkstraWaypoint(wayPoints[(int)edge.b].name));
+                    DijkstraWaypoints[wayPoints[(int)edge.b].name]._neighbors.Add(wayPoints[(int)edge.a].name);
                 }
                 else
                 {
-                    DijkstraWaypoints[wayPoints[(int)edge.b].name].neighbors.Add(wayPoints[(int)edge.a].name);
+                    DijkstraWaypoints[wayPoints[(int)edge.b].name]._neighbors.Add(wayPoints[(int)edge.a].name);
                 }
             }
 
