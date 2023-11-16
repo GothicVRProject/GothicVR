@@ -12,21 +12,21 @@ using UnityEngine.Rendering;
 
 namespace GVR.Creator.Meshes
 {
-    public abstract class MeshCreator
+    public abstract class AbstractMeshCreator
     {
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
-        public const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
-        public const string waterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
-        public const string alphaToCoverageShaderName = "Unlit/Unlit-AlphaToCoverage";
-        public const float decalOpacity = 0.75f;
+        protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        protected const string waterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
+        protected const string alphaToCoverageShaderName = "Unlit/Unlit-AlphaToCoverage";
+        protected const float decalOpacity = 0.75f;
 
-        public static GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        protected GameObject CreateInternal(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
+            return CreateInternal(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
         }
 
-        public static GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        protected GameObject CreateInternal(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
             rootGo.SetParent(parent, true, true);
@@ -112,12 +112,12 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// There are some objects (e.g. NPCs) where we want to skip specific attachments. This method can be overridden for this feature.
         /// </summary>
-        protected static Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
+        protected virtual Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
         {
             return attachments;
         }
 
-        public static GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+        protected GameObject CreateInternal(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             if (mrm == null)
             {
@@ -147,27 +147,27 @@ namespace GVR.Creator.Meshes
             return rootGo;
         }
 
-        protected static void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
+        protected void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
         {
             SetPosAndRot(obj, matrix.ToUnityMatrix());
         }
 
-        protected static void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
+        protected void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
         {
             SetPosAndRot(obj, matrix.GetPosition() / 100, matrix.rotation);
         }
 
-        protected static void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
+        protected void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
         {
             SetPosAndRot(obj, position, rotation.ToUnityMatrix().rotation);
         }
 
-        protected static void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
+        protected void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
             obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
-        protected static void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
+        protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
             var bMaterial = subMesh.material;
             var texture = GetTexture(bMaterial.texture);
@@ -203,7 +203,7 @@ namespace GVR.Creator.Meshes
             material.mainTexture = texture;
         }
 
-        protected static void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
         {
             var mesh = new Mesh();
             meshFilter.sharedMesh = mesh;
@@ -213,7 +213,7 @@ namespace GVR.Creator.Meshes
             mesh.SetUVs(0, subMesh.uvs);
         }
 
-        protected static void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
+        protected void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
             // check if mrmData.subMeshes is null
 
@@ -262,7 +262,7 @@ namespace GVR.Creator.Meshes
             rend.SetMaterials(finalMaterials);
         }
 
-        protected static void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
         {
             /**
              * Ok, brace yourself:
@@ -346,7 +346,7 @@ namespace GVR.Creator.Meshes
         }
 
 
-        protected static void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
         {
             /**
              * Ok, brace yourself:
@@ -434,7 +434,7 @@ namespace GVR.Creator.Meshes
             }
         }
 
-        protected static Collider PrepareMeshCollider(GameObject obj, Mesh mesh)
+        protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh)
         {
             var meshCollider = obj.AddComponent<MeshCollider>();
             meshCollider.sharedMesh = mesh;
@@ -444,7 +444,7 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        protected static Collider PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
+        protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
         {
             if (materialData.disableCollision ||
                 materialData.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water)
@@ -461,7 +461,7 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        protected static void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData[] materialDatas)
+        protected void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData[] materialDatas)
         {
             var anythingDisableCollission = materialDatas.Any(i => i.disableCollision);
             var anythingWater = materialDatas.Any(i => i.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water);
@@ -481,7 +481,7 @@ namespace GVR.Creator.Meshes
         /// @see https://docs.unity3d.com/ScriptReference/Mesh-bindposes.html
         /// @see https://forum.unity.com/threads/some-explanations-on-bindposes.86185/
         /// </summary>
-        private static void CreateBonesData(GameObject rootObj, GameObject[] nodeObjects, SkinnedMeshRenderer renderer, PxSoftSkinMeshData mesh)
+        private void CreateBonesData(GameObject rootObj, GameObject[] nodeObjects, SkinnedMeshRenderer renderer, PxSoftSkinMeshData mesh)
         {
             var meshBones = new Transform[mesh.nodes!.Length];
             var bindPoses = new Matrix4x4[mesh.nodes!.Length];
@@ -498,12 +498,17 @@ namespace GVR.Creator.Meshes
             renderer.bones = meshBones;
         }
 
-        protected static Texture2D GetTexture(string name)
+        protected virtual Texture2D GetTexture(string name)
+        {
+            return GetTextureInternal(name);
+        }
+
+        protected Texture2D GetTextureInternal(string name)
         {
             return AssetCache.TryGetTexture(name);
         }
 
-        protected static Material GetDefaultMaterial(bool isAlphaTest)
+        protected Material GetDefaultMaterial(bool isAlphaTest)
         {
             var shader = Shader.Find(defaultShader);
             if (isAlphaTest)
@@ -519,7 +524,7 @@ namespace GVR.Creator.Meshes
             return material;
         }
 
-        private static Material GetWaterMaterial(PxMaterialData materialData)
+        private Material GetWaterMaterial(PxMaterialData materialData)
         {
             var shader = Shader.Find(waterShader);
             Material material = new Material(shader);

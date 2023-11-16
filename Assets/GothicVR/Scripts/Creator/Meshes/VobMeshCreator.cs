@@ -12,33 +12,36 @@ using UnityEngine.Rendering.Universal;
 
 namespace GVR.Creator.Meshes
 {
-    public abstract class VobMeshCreator : MeshCreator
+    public class VobMeshCreator : AbstractMeshCreator
     {
-        public new static GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position,
+        // As we subclass the main Mesh Creator, we need to have a parent-child inheritance instance.
+        // Needed e.g. for overwriting PrepareMeshRenderer() to change specific behaviour.
+        private static readonly VobMeshCreator Self = new();
+
+        public static GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position,
             PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
-            var go = MeshCreator.Create(objectName, mrm, position, rotation, withCollider, parent, rootGo);
+            var go = Self.CreateInternal(objectName, mrm, position, rotation, withCollider, parent, rootGo);
             
-            AddZsCollider(go);
+            Self.AddZsCollider(go);
             
             return go;
         }
 
-        public new static GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation,
+        public static GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation,
             GameObject parent = null, GameObject rootGo = null)
         {
-            var go = MeshCreator.Create(objectName, mdl, position, rotation, parent, rootGo);
+            var go = Self.CreateInternal(objectName, mdl, position, rotation, parent, rootGo);
 
-            AddZsCollider(go);
+            Self.AddZsCollider(go);
 
             return go;
         }
-
 
         /// <summary>
         /// Add ZengineSlot collider. i.e. positions where an NPC can sit on a bench.
         /// </summary>
-        private static void AddZsCollider([CanBeNull] GameObject go)
+        private void AddZsCollider([CanBeNull] GameObject go)
         {
             if (go == null || go.transform.childCount == 0)
                 return;
@@ -56,7 +59,7 @@ namespace GVR.Creator.Meshes
             }
         }
 
-        public new static GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh,
+        public static GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh,
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             // Check if there are completely empty elements without any texture.
@@ -67,7 +70,7 @@ namespace GVR.Creator.Meshes
             if (noMeshTextures && noAttachmentTextures)
                 return null;
             else
-                return MeshCreator.Create(objectName, mdm, mdh, position, rotation, parent, rootGo);
+                return Self.CreateInternal(objectName, mdm, mdh, position, rotation, parent, rootGo);
         }
 
         public static GameObject CreateDecal(PxVobData vob, GameObject parent)
@@ -86,7 +89,7 @@ namespace GVR.Creator.Meshes
             // z - value is close to what we see in Gothic spacer.
             decalProj.size = new(decalData.dimension.X * 2 / 100, decalData.dimension.Y * 2 / 100, 0.5f);
             decalProjectorGo.SetParent(parent);
-            SetPosAndRot(decalProjectorGo, vob.position.ToUnityVector(), vob.rotation);
+            Self.SetPosAndRot(decalProjectorGo, vob.position.ToUnityVector(), vob.rotation);
 
             decalProj.pivot = Vector3.zero;
             decalProj.fadeFactor = decalOpacity;

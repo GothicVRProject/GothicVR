@@ -68,7 +68,7 @@ namespace GVR.Demo
 				var pxItem = AssetCache.TryGetItemData(item.name);
 
 				var mrm = AssetCache.TryGetMrm(pxItem?.visual);
-				var itemObj = MeshCreator.Create(item.name, mrm, default, default, true, itemsObj);
+				var itemObj = VobMeshCreator.Create(item.name, mrm, default, default, true, itemsObj);
 			}
 		}
 	}
