@@ -74,14 +74,14 @@ namespace GVR.Manager
             return armor?.instancePtr ?? IntPtr.Zero;
         }
         
-        public static bool ExtIsNpcOnFp(IntPtr npcPtr, string vobNamePrefix)
+        public static bool ExtIsNpcOnFp(IntPtr npcPtr, string vobNamePart)
         {
             var freePoint = GetProperties(npcPtr).CurrentFreePoint;
 
             if (freePoint == null)
                 return false;
 
-            return freePoint.Name.StartsWithIgnoreCase(vobNamePrefix);
+            return freePoint.Name.ContainsIgnoreCase(vobNamePart);
         }
 
         public static bool ExtWldDetectNpcEx(IntPtr npcPtr, int npcInstance, int aiState, int guild, bool ignorePlayer)
@@ -134,7 +134,7 @@ namespace GVR.Manager
             return props;
         }
         
-                public static void ExtAiWait(IntPtr npcPtr, float seconds)
+        public static void ExtAiWait(IntPtr npcPtr, float seconds)
         {
             var props = GetProperties(npcPtr);
             props.AnimationQueue.Enqueue(new Wait(

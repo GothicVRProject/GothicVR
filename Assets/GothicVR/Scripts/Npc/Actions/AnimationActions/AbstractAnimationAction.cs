@@ -56,13 +56,14 @@ namespace GVR.Npc.Actions.AnimationActions
             isFinished = true;
         }
 
-        /// <summary>
-        /// Only needed for walking or other movement related animations.
-        /// </summary>
-        public virtual void OnCollisionEnter(Collision collision)
+        public virtual void OnCollisionEnter(Collision coll)
         { }
-        
-        public virtual void OnCollisionExit(Collision collision)
+        public virtual void OnTriggerEnter(Collider coll)
+        { }
+
+        public virtual void OnCollisionExit(Collision coll)
+        { }
+        public virtual void OnTriggerExit(Collider coll)
         { }
         
         /// <summary>

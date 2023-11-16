@@ -620,10 +620,10 @@ namespace GVR.Phoenix.Interface.Vm
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_IsOnFP(IntPtr vmPtr)
         {
-            var vobNamePrefix = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
+            var vobNamePart = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            var res = NpcHelper.ExtIsNpcOnFp(npcPtr, vobNamePrefix);
+            var res = NpcHelper.ExtIsNpcOnFp(npcPtr, vobNamePart);
 
             PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(res));
         }

@@ -21,16 +21,12 @@ namespace GVR.Npc.Actions.AnimationActions
             movingLocation = fp.Position;
         }
         
-        public override void OnCollisionEnter(Collision collision)
+        public override void OnTriggerEnter(Collider coll)
         {
             if (walkState != WalkState.Walk)
                 return;
-            
-            var expectedGo = collision.contacts
-                .Select(i => i.otherCollider.gameObject)
-                .FirstOrDefault(i => i.name == fp.Name);
 
-            if (expectedGo == null)
+            if (coll.gameObject.name != fp.Name)
                 return;
 
             props.CurrentFreePoint = fp;
