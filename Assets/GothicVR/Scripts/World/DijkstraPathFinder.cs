@@ -146,19 +146,14 @@ namespace GVR
 
         }
 
-        public DijkstraWaypoint[] FindFastestPath(DijkstraWaypoint start = null, DijkstraWaypoint end = null)
+        public DijkstraWaypoint[] FindFastestPath(string startWaypoint = null, string endWaypoint = null)
         {
-            if (start == null)
-            {
-                start = DijkstraWaypoints[this.start] ?? throw new ArgumentException("The specified start waypoint is not in the queue.");
+            if(startWaypoint == null || endWaypoint == null){
+                startWaypoint = start;
+                endWaypoint = end;
             }
-            if (end == null)
-            {
-                end = DijkstraWaypoints[this.end] ?? throw new ArgumentException("The specified end waypoint is not in the queue.");
-            }
-
-            var startDijkstraWaypoint = DijkstraWaypoints[start];
-            var endDijkstraWaypoint = DijkstraWaypoints[end];
+            var startDijkstraWaypoint = DijkstraWaypoints[startWaypoint];
+            var endDijkstraWaypoint = DijkstraWaypoints[endWaypoint];
 
             var distances = new Dictionary<string, double>();
             var previousNodes = new Dictionary<string, DijkstraWaypoint>();
@@ -166,7 +161,7 @@ namespace GVR
 
             foreach (var waypointx in DijkstraWaypoints.Values)
             {
-                if (waypointx._name == start)
+                if (waypointx._name == startWaypoint)
                 {
                     distances[waypointx._name] = 0;
                 }
@@ -183,7 +178,7 @@ namespace GVR
             {
                 var currentWaypoint = unvisited.Dequeue();
 
-                if (currentWaypoint._name == end)
+                if (currentWaypoint._name == endWaypoint)
                 {
                     break;
                 }
