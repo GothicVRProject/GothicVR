@@ -500,11 +500,6 @@ namespace GVR.Creator.Meshes
 
         protected virtual Texture2D GetTexture(string name)
         {
-            return GetTextureInternal(name);
-        }
-
-        protected Texture2D GetTextureInternal(string name)
-        {
             return AssetCache.TryGetTexture(name);
         }
 

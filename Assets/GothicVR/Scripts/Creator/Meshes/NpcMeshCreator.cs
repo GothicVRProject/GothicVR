@@ -90,7 +90,7 @@ namespace GVR.Creator.Meshes
                 // No changeable texture needed? Skip updating texture name.
                 finalTextureName = name;
 
-            return Self.GetTextureInternal(finalTextureName);
+            return base.GetTexture(finalTextureName);
         }
         
         protected override Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
