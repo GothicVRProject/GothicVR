@@ -146,8 +146,17 @@ namespace GVR
 
         }
 
-        public DijkstraWaypoint[] FindFastestPath()
+        public DijkstraWaypoint[] FindFastestPath(DijkstraWaypoint start = null, DijkstraWaypoint end = null)
         {
+            if (start == null)
+            {
+                start = DijkstraWaypoints[this.start] ?? throw new ArgumentException("The specified start waypoint is not in the queue.");
+            }
+            if (end == null)
+            {
+                end = DijkstraWaypoints[this.end] ?? throw new ArgumentException("The specified end waypoint is not in the queue.");
+            }
+
             var startDijkstraWaypoint = DijkstraWaypoints[start];
             var endDijkstraWaypoint = DijkstraWaypoints[end];
 
