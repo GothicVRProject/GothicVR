@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using AOT;
 using GVR.Debugging;
+using GVR.Extensions;
 using GVR.Manager;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
@@ -91,7 +92,7 @@ namespace GVR.Bootstrap
                     Debug.LogWarning(message);
                     break;
                 case PxLogging.Level.error:
-                    var isVfsMessage = message.StartsWith("failed to find vfs entry");
+                    var isVfsMessage = message.ContainsIgnoreCase("failed to find vfs entry");
                     if (isVfsMessage && !FeatureFlags.I.ShowPhoenixVfsFileNotFoundErrors)
                         break;
 
