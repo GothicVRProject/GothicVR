@@ -19,7 +19,7 @@ namespace GVR.Creator.Meshes
         private static readonly NpcMeshCreator Self = new();
 
         public static GameObject CreateNpc(string npcName, string mdmName, string mdhName,
-            string headName, VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
+            VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
         {
             tempBodyData = bodyData;
             var mdm = AssetCache.TryGetMdm(mdmName);
@@ -39,9 +39,9 @@ namespace GVR.Creator.Meshes
             
             var npcGo = Self.CreateInternal(npcName, mdm, mdh, default, default, null, root);
 
-            if (!string.IsNullOrEmpty(headName))
+            if (!string.IsNullOrEmpty(bodyData.Head))
             {
-                var mmb = AssetCache.TryGetMmb(headName);   
+                var mmb = AssetCache.TryGetMmb(bodyData.Head);
                 Self.AddHead(npcName, npcGo, mmb);
             }
 

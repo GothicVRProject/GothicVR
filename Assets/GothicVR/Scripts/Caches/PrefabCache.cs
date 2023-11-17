@@ -10,6 +10,7 @@ namespace GVR.Caches
 
         public enum PrefabType
         {
+            Npc,
             VobItem,
             VobInteractable,
             VobSpot,
@@ -24,6 +25,7 @@ namespace GVR.Caches
         {
             return type switch
             {
+                PrefabType.Npc => "Prefabs/Npc",
                 PrefabType.VobItem => "Prefabs/Vobs/oCItem",
                 PrefabType.VobInteractable => "Prefabs/Vobs/Interactable",
                 PrefabType.VobSpot => "Prefabs/Vobs/zCVobSpot",

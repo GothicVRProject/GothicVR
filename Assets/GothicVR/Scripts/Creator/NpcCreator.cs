@@ -81,7 +81,7 @@ namespace GVR.Creator
                 return;
             
             
-            var newNpc = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
+            var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             var props = newNpc.GetComponent<NpcProperties>();
             
             // Humans are singletons.
@@ -102,7 +102,7 @@ namespace GVR.Creator
             newNpc.name = props.npc!.names[0];
             
             var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
-            NpcMeshCreator.CreateNpc(newNpc.name, props.mdmName, mdhName, props.BodyData.Head, props.BodyData, newNpc);
+            NpcMeshCreator.CreateNpc(newNpc.name, props.mdmName, mdhName, props.BodyData, newNpc);
             newNpc.SetParent(GetRootGo());
 
             foreach (var equippedItem in props.EquippedItems)
