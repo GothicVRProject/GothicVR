@@ -59,8 +59,8 @@ namespace GVR.Creator.Meshes
                     PrepareMeshCollider(subSubMeshObj, meshFilter.sharedMesh, subSubMesh.material);
 
 #if UNITY_EDITOR
-                    // Don't set alpha clipped as occluders.
-                    if (meshRenderer.sharedMaterial.shader.name == alphaToCoverageShaderName)
+                    // Don't set transparent meshes as occluders.
+                    if (IsTransparentShader(meshRenderer.sharedMaterial.shader))
                     {
                         UnityEditor.GameObjectUtility.SetStaticEditorFlags(subSubMeshObj, (UnityEditor.StaticEditorFlags)(int.MaxValue & ~(int)UnityEditor.StaticEditorFlags.OccluderStatic));
                     }
