@@ -55,11 +55,11 @@ namespace GVR
                 waypointsPosition.Clear();
                 waypointsPosition.Add(DijkstraWaypoints[start]._position);
                 waypointsPosition.Add(DijkstraWaypoints[end]._position);
-                LightUpWaypoint(start);
-                LightUpWaypoint(end);
+                LightUpWaypoint(start, Color.green);
+                LightUpWaypoint(end, Color.green);
                 Debug.Log("start: " + waypointsPosition[0]);
                 Debug.Log("end: " + waypointsPosition[1]);
-                FindFastestPath();
+                StartCoroutine(FindFastestPath());
             }
 
 
@@ -93,14 +93,15 @@ namespace GVR
 
         }
 
-        private void LightUpWaypoint(string wayPointName)
+        private void LightUpWaypoint(string wayPointName, Color color)
         {
             var waypoint = FindWaypointGO(wayPointName);
             if (waypoint == null)
             {
                 return;
             }
-            waypoint.GetComponent<Renderer>().material.color = Color.green;
+            var newColor = color == null ? Color.green : color;
+            waypoint.GetComponent<Renderer>().material.color = color;
         }
 
         private GameObject FindWaypointGO(string wayPointName)
@@ -146,16 +147,16 @@ namespace GVR
 
         }
 
-        public DijkstraWaypoint[] FindFastestPath(string startWaypoint = null, string endWaypoint = null)
+        public IEnumerator FindFastestPath(string startWaypoint = null, string endWaypoint = null)
         {
-            if(startWaypoint == null || endWaypoint == null){
+            if (startWaypoint == null || endWaypoint == null)
+            {
                 startWaypoint = start;
                 endWaypoint = end;
             }
             var startDijkstraWaypoint = DijkstraWaypoints[startWaypoint];
             var endDijkstraWaypoint = DijkstraWaypoints[endWaypoint];
 
-            var distances = new Dictionary<string, double>();
             var previousNodes = new Dictionary<string, DijkstraWaypoint>();
             var unvisited = new PriorityQueue();
 
@@ -163,37 +164,45 @@ namespace GVR
             {
                 if (waypointx._name == startWaypoint)
                 {
-                    distances[waypointx._name] = 0;
+                    waypointx._summedDistance = 0;
                 }
                 else
                 {
-                    distances[waypointx._name] = double.MaxValue;
+                    waypointx._summedDistance = double.MaxValue;
                 }
 
-                unvisited.Enqueue(waypointx, distances[waypointx._name]);
+                unvisited.Enqueue(waypointx, waypointx._summedDistance);
                 previousNodes[waypointx._name] = null;
             }
 
             while (unvisited.Count > 0)
             {
                 var currentWaypoint = unvisited.Dequeue();
-
-                if (currentWaypoint._name == endWaypoint)
-                {
-                    break;
-                }
+                Debug.Log(currentWaypoint._name + " " + currentWaypoint._summedDistance);
+                LightUpWaypoint(currentWaypoint._name, Color.yellow);
 
                 foreach (var neighborName in currentWaypoint._distanceToNeighbors.Keys)
                 {
                     var neighbor = DijkstraWaypoints[neighborName];
-                    var alt = distances[currentWaypoint._name] + currentWaypoint._distanceToNeighbors[neighborName];
-                    if (alt < distances[neighbor._name])
+                    var alt = currentWaypoint._summedDistance + currentWaypoint._distanceToNeighbors[neighborName];
+                    if (alt < neighbor._summedDistance || neighbor._name == endDijkstraWaypoint._name)
                     {
-                        distances[neighbor._name] = alt;
+                        neighbor._summedDistance = alt;
                         previousNodes[neighbor._name] = currentWaypoint;
                         unvisited.Remove(neighbor);
-                        unvisited.Enqueue(neighbor, alt);
+                        unvisited.Enqueue(neighbor, alt + Heuristic(neighbor, endDijkstraWaypoint));
                     }
+                }
+                
+                // Check if a valid path from start to end has been found
+                var lastChecked = endWaypoint;
+                while (lastChecked != null && previousNodes[lastChecked] != null)
+                {
+                    lastChecked = previousNodes[lastChecked]._name;
+                }
+                if (lastChecked == startWaypoint)
+                {
+                    break;
                 }
             }
 
@@ -203,7 +212,7 @@ namespace GVR
             while (waypoint != null)
             {
                 path.Insert(0, waypoint);
-                LightUpWaypoint(waypoint._name);
+                LightUpWaypoint(waypoint._name, Color.green);
                 waypoint = previousNodes[waypoint._name];
             }
 
@@ -212,9 +221,23 @@ namespace GVR
                 Debug.Log("[" + i + "]" + path[i]._name);
             }
 
+            var testing = previousNodes.Where(x => x.Value != null).Select(x => x).ToList();
+
             _path = path.ToArray();
 
-            return path.ToArray();
+            if(_path.Length == 1)
+            {
+                _path.Append(_path[0]);
+            }
+
+            yield return path.ToArray();
+        }
+
+        private double Heuristic(DijkstraWaypoint a, DijkstraWaypoint b)
+        {
+            double euclidean = Vector3.Distance(a._position, b._position);
+
+            return euclidean;
         }
     }
 
@@ -292,10 +315,12 @@ namespace GVR
 
         public void Remove(DijkstraWaypoint waypoint)
         {
-            int index = data.FindIndex(pair => pair.Key == waypoint);
+            int index = data.FindIndex(pair => pair.Key._name == waypoint._name);
             if (index == -1)
             {
-                throw new ArgumentException("The specified waypoint is not in the queue.");
+                //throw new ArgumentException("The specified waypoint is not in the queue.");
+                Debug.Log("The specified waypoint " + waypoint._name + " is not in the queue.");
+                return;
             }
             data.RemoveAt(index);
         }
