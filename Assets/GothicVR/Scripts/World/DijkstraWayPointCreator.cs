@@ -3,6 +3,7 @@ using GVR.Phoenix.Data;
 using PxCs.Data.WayNet;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace GVR
@@ -19,34 +20,21 @@ namespace GVR
             Dictionary<string, DijkstraWaypoint> DijkstraWaypoints = new();
             var wayEdges = world.waypointEdges;
             var wayPoints = world.waypoints;
-    
-            foreach (var edge in wayEdges)
+
+            // Refactored using Linq 
+            DijkstraWaypoints = wayEdges.SelectMany(edge => new[]
             {
-                if (!DijkstraWaypoints.ContainsKey(wayPoints[(int)edge.a].name))
-                {
-                    DijkstraWaypoints.Add(wayPoints[(int)edge.a].name, new DijkstraWaypoint(wayPoints[(int)edge.a].name));
-                    DijkstraWaypoints[wayPoints[(int)edge.a].name].Neighbors.Add(wayPoints[(int)edge.b].name);
-                }
-                else
-                {
-                    DijkstraWaypoints[wayPoints[(int)edge.a].name].Neighbors.Add(wayPoints[(int)edge.b].name);
-                }
-            }
-            foreach (var edge in wayEdges)
+                new { a = wayPoints[(int)edge.a], b = wayPoints[(int)edge.b] },
+                new { a = wayPoints[(int)edge.b], b = wayPoints[(int)edge.a] }
+            })
+            .GroupBy(x => x.a.name)
+            .ToDictionary(g => g.Key, g => new DijkstraWaypoint(g.Key)
             {
-                if (!DijkstraWaypoints.ContainsKey(wayPoints[(int)edge.b].name))
-                {
-                    DijkstraWaypoints.Add(wayPoints[(int)edge.b].name, new DijkstraWaypoint(wayPoints[(int)edge.b].name));
-                    DijkstraWaypoints[wayPoints[(int)edge.b].name].Neighbors.Add(wayPoints[(int)edge.a].name);
-                }
-                else
-                {
-                    DijkstraWaypoints[wayPoints[(int)edge.b].name].Neighbors.Add(wayPoints[(int)edge.a].name);
-                }
-            }
+                Neighbors = g.Select(x => x.b.name).ToList()
+            });
 
             DijkstraPathFinder.Instance.SetDijkstraWaypoints(DijkstraWaypoints);
-            
+
             return DijkstraWaypoints;
         }
 
