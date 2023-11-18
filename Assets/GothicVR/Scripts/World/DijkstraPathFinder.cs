@@ -9,6 +9,7 @@ using GVR.Vob.WayNet;
 using System.Linq;
 using System;
 using System.IO;
+using GVR.Creator;
 
 namespace GVR
 {
@@ -24,9 +25,9 @@ namespace GVR
 
         public Dictionary<string, DijkstraWaypoint> DijkstraWaypoints; // The original waypoints, as read from the world data
 
-        public void SetDijkstraWaypointsOriginal(WorldData world)
+        public void SetDijkstraWaypointsOriginal(Dictionary<string, DijkstraWaypoint> dijkstraWapoints)
         {
-            DijkstraWaypoints = DijkstraWayPointCreator.Create(world);      //Is there a better place for this call?
+            DijkstraWaypoints = dijkstraWapoints;
         }
 
         private void CalculateNeighbourDistances()
@@ -201,8 +202,8 @@ namespace GVR
                     lastChecked = previousNodes[lastChecked].Name;
                 }
                 if (lastChecked == startWaypoint)
-                {
-                    break;
+                    {
+                        break;
                 }
             }
 
@@ -236,7 +237,6 @@ namespace GVR
         private double Heuristic(DijkstraWaypoint a, DijkstraWaypoint b)
         {
             double euclidean = Vector3.Distance(a.Position, b.Position);
-
             return euclidean;
         }
     }
