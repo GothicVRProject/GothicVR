@@ -16,11 +16,11 @@ namespace GVR
     public class DijkstraPathFinder : MonoBehaviour
     {
         public static DijkstraPathFinder Instance;
-        public string start;
-        public string end;
-        private List<Vector3> waypointsPosition = new();
-        private DijkstraWaypoint[] _path = null;
-        public bool waypointsRendered { get; set; } = false;
+        public string Start;
+        public string End;
+        private List<Vector3> WaypointsPosition = new();
+        private DijkstraWaypoint[] Path = null;
+        public bool WaypointsRendered { get; set; } = false;
 
         public Dictionary<string, DijkstraWaypoint> DijkstraWaypoints; // The original waypoints, as read from the world data
 
@@ -33,13 +33,13 @@ namespace GVR
         {
             foreach (var waypoint in DijkstraWaypoints.Values)
             {
-                foreach (var neighbour in waypoint._neighbors)
+                foreach (var neighbour in waypoint.Neighbors)
                 {
-                    if (waypoint._distanceToNeighbors.ContainsKey(neighbour))
+                    if (waypoint.DistanceToNeighbors.ContainsKey(neighbour))
                     {
                         continue;
                     }
-                    waypoint._distanceToNeighbors.Add(neighbour, Vector3.Distance(waypoint._position, DijkstraWaypoints[neighbour]._position));
+                    waypoint.DistanceToNeighbors.Add(neighbour, Vector3.Distance(waypoint.Position, DijkstraWaypoints[neighbour].Position));
                 }
             }
         }
@@ -49,16 +49,16 @@ namespace GVR
 
             Debug.Log("OnValidate");
 
-            if (DijkstraWaypoints != null && DijkstraWaypoints.TryGetValue(start, out var startWaypoint) &&
-            DijkstraWaypoints.TryGetValue(end, out var endWaypoint))
+            if (DijkstraWaypoints != null && DijkstraWaypoints.TryGetValue(Start, out var startWaypoint) &&
+            DijkstraWaypoints.TryGetValue(End, out var endWaypoint))
             {
-                waypointsPosition.Clear();
-                waypointsPosition.Add(DijkstraWaypoints[start]._position);
-                waypointsPosition.Add(DijkstraWaypoints[end]._position);
-                LightUpWaypoint(start, Color.green);
-                LightUpWaypoint(end, Color.green);
-                Debug.Log("start: " + waypointsPosition[0]);
-                Debug.Log("end: " + waypointsPosition[1]);
+                WaypointsPosition.Clear();
+                WaypointsPosition.Add(DijkstraWaypoints[Start].Position);
+                WaypointsPosition.Add(DijkstraWaypoints[End].Position);
+                LightUpWaypoint(Start, Color.green);
+                LightUpWaypoint(End, Color.green);
+                Debug.Log("Start: " + WaypointsPosition[0]);
+                Debug.Log("End: " + WaypointsPosition[1]);
                 StartCoroutine(FindFastestPath());
             }
 
@@ -69,14 +69,14 @@ namespace GVR
         {
             // Draw a yellow sphere at the transform's position
             Gizmos.color = Color.green;
-            if (waypointsPosition == null)
+            if (WaypointsPosition == null)
             {
                 return;
             }
-            Gizmos.DrawLineList(waypointsPosition.ToArray());
-            if (_path != null)
+            Gizmos.DrawLineList(WaypointsPosition.ToArray());
+            if (Path != null)
             {
-                var path = _path.Select(waypoint => waypoint._position).ToList();
+                var path = Path.Select(waypoint => waypoint.Position).ToList();
                 var finalPath = new List<Vector3>();
 
                 for (int i = 0; i < path.Count; i++)
@@ -139,7 +139,7 @@ namespace GVR
                 var result = gameObject.FindChildRecursively(waypoint.Key).transform.position;
                 if (result != null)
                 {
-                    waypoint.Value._position = result;
+                    waypoint.Value.Position = result;
                 }
             }
             Debug.Log("DijkstraWaypoints set");
@@ -151,8 +151,8 @@ namespace GVR
         {
             if (startWaypoint == null || endWaypoint == null)
             {
-                startWaypoint = start;
-                endWaypoint = end;
+                startWaypoint = Start;
+                endWaypoint = End;
             }
             var startDijkstraWaypoint = DijkstraWaypoints[startWaypoint];
             var endDijkstraWaypoint = DijkstraWaypoints[endWaypoint];
@@ -162,43 +162,43 @@ namespace GVR
 
             foreach (var waypointx in DijkstraWaypoints.Values)
             {
-                if (waypointx._name == startWaypoint)
+                if (waypointx.Name == startWaypoint)
                 {
-                    waypointx._summedDistance = 0;
+                    waypointx.SummedDistance = 0;
                 }
                 else
                 {
-                    waypointx._summedDistance = double.MaxValue;
+                    waypointx.SummedDistance = double.MaxValue;
                 }
 
-                unvisited.Enqueue(waypointx, waypointx._summedDistance);
-                previousNodes[waypointx._name] = null;
+                unvisited.Enqueue(waypointx, waypointx.SummedDistance);
+                previousNodes[waypointx.Name] = null;
             }
 
             while (unvisited.Count > 0)
             {
                 var currentWaypoint = unvisited.Dequeue();
-                Debug.Log(currentWaypoint._name + " " + currentWaypoint._summedDistance);
-                LightUpWaypoint(currentWaypoint._name, Color.yellow);
+                Debug.Log(currentWaypoint.Name + " " + currentWaypoint.SummedDistance);
+                LightUpWaypoint(currentWaypoint.Name, Color.yellow);
 
-                foreach (var neighborName in currentWaypoint._distanceToNeighbors.Keys)
+                foreach (var neighborName in currentWaypoint.DistanceToNeighbors.Keys)
                 {
                     var neighbor = DijkstraWaypoints[neighborName];
-                    var alt = currentWaypoint._summedDistance + currentWaypoint._distanceToNeighbors[neighborName];
-                    if (alt < neighbor._summedDistance || neighbor._name == endDijkstraWaypoint._name)
+                    var alt = currentWaypoint.SummedDistance + currentWaypoint.DistanceToNeighbors[neighborName];
+                    if (alt < neighbor.SummedDistance || neighbor.Name == endDijkstraWaypoint.Name)
                     {
-                        neighbor._summedDistance = alt;
-                        previousNodes[neighbor._name] = currentWaypoint;
+                        neighbor.SummedDistance = alt;
+                        previousNodes[neighbor.Name] = currentWaypoint;
                         unvisited.Remove(neighbor);
                         unvisited.Enqueue(neighbor, alt + Heuristic(neighbor, endDijkstraWaypoint));
                     }
                 }
                 
-                // Check if a valid path from start to end has been found
+                // Check if a valid path from Start to End has been found
                 var lastChecked = endWaypoint;
                 while (lastChecked != null && previousNodes[lastChecked] != null)
                 {
-                    lastChecked = previousNodes[lastChecked]._name;
+                    lastChecked = previousNodes[lastChecked].Name;
                 }
                 if (lastChecked == startWaypoint)
                 {
@@ -212,22 +212,22 @@ namespace GVR
             while (waypoint != null)
             {
                 path.Insert(0, waypoint);
-                LightUpWaypoint(waypoint._name, Color.green);
-                waypoint = previousNodes[waypoint._name];
+                LightUpWaypoint(waypoint.Name, Color.green);
+                waypoint = previousNodes[waypoint.Name];
             }
 
             for (int i = 0; i < path.Count; i++)
             {
-                Debug.Log("[" + i + "]" + path[i]._name);
+                Debug.Log("[" + i + "]" + path[i].Name);
             }
 
             var testing = previousNodes.Where(x => x.Value != null).Select(x => x).ToList();
 
-            _path = path.ToArray();
+            Path = path.ToArray();
 
-            if(_path.Length == 1)
+            if(Path.Length == 1)
             {
-                _path.Append(_path[0]);
+                Path.Append(Path[0]);
             }
 
             yield return path.ToArray();
@@ -235,7 +235,7 @@ namespace GVR
 
         private double Heuristic(DijkstraWaypoint a, DijkstraWaypoint b)
         {
-            double euclidean = Vector3.Distance(a._position, b._position);
+            double euclidean = Vector3.Distance(a.Position, b.Position);
 
             return euclidean;
         }
@@ -315,11 +315,11 @@ namespace GVR
 
         public void Remove(DijkstraWaypoint waypoint)
         {
-            int index = data.FindIndex(pair => pair.Key._name == waypoint._name);
+            int index = data.FindIndex(pair => pair.Key.Name == waypoint.Name);
             if (index == -1)
             {
                 //throw new ArgumentException("The specified waypoint is not in the queue.");
-                Debug.Log("The specified waypoint " + waypoint._name + " is not in the queue.");
+                Debug.Log("The specified waypoint " + waypoint.Name + " is not in the queue.");
                 return;
             }
             data.RemoveAt(index);

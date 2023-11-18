@@ -8,23 +8,23 @@ namespace GVR
 {
     public class DijkstraWaypoint : IComparable<DijkstraWaypoint>
     {
-        public string _name = "";                                //as index to find other data like position, underwater and probably isFree
+        public string Name = "";                                //as index to find other data like position, underwater and probably isFree
 
-        public double _coveredDistance = 0;
+        public double CoveredDistance = 0;
 
-        public double _summedDistance = 99999;
+        public double SummedDistance = 99999;
         
-        public Dictionary<string, float> _distanceToNeighbors = new Dictionary<string, float>();
+        public Dictionary<string, float> DistanceToNeighbors = new Dictionary<string, float>();
 
-        public List<string> _neighbors = new List<string>();
+        public List<string> Neighbors = new List<string>();
 
-        public Vector3 _position = new Vector3();
+        public Vector3 Position = new Vector3();
 
-        public string _fatherWP = "";
+        public string FatherWP = "";
 
         public DijkstraWaypoint(string name)
         {
-            _name = name;
+            Name = name;
         }
 
         public int CompareTo(DijkstraWaypoint other)

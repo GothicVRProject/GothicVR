@@ -25,11 +25,11 @@ namespace GVR
                 if (!DijkstraWaypoints.ContainsKey(wayPoints[(int)edge.a].name))
                 {
                     DijkstraWaypoints.Add(wayPoints[(int)edge.a].name, new DijkstraWaypoint(wayPoints[(int)edge.a].name));
-                    DijkstraWaypoints[wayPoints[(int)edge.a].name]._neighbors.Add(wayPoints[(int)edge.b].name);
+                    DijkstraWaypoints[wayPoints[(int)edge.a].name].Neighbors.Add(wayPoints[(int)edge.b].name);
                 }
                 else
                 {
-                    DijkstraWaypoints[wayPoints[(int)edge.a].name]._neighbors.Add(wayPoints[(int)edge.b].name);
+                    DijkstraWaypoints[wayPoints[(int)edge.a].name].Neighbors.Add(wayPoints[(int)edge.b].name);
                 }
             }
             foreach (var edge in wayEdges)
@@ -37,11 +37,11 @@ namespace GVR
                 if (!DijkstraWaypoints.ContainsKey(wayPoints[(int)edge.b].name))
                 {
                     DijkstraWaypoints.Add(wayPoints[(int)edge.b].name, new DijkstraWaypoint(wayPoints[(int)edge.b].name));
-                    DijkstraWaypoints[wayPoints[(int)edge.b].name]._neighbors.Add(wayPoints[(int)edge.a].name);
+                    DijkstraWaypoints[wayPoints[(int)edge.b].name].Neighbors.Add(wayPoints[(int)edge.a].name);
                 }
                 else
                 {
-                    DijkstraWaypoints[wayPoints[(int)edge.b].name]._neighbors.Add(wayPoints[(int)edge.a].name);
+                    DijkstraWaypoints[wayPoints[(int)edge.b].name].Neighbors.Add(wayPoints[(int)edge.a].name);
                 }
             }
 
