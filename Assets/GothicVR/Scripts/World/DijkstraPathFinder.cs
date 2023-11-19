@@ -151,6 +151,9 @@ namespace GVR
 
         public DijkstraWaypoint[] FindFastestPath(string startWaypoint = null, string endWaypoint = null)
         {
+            // Start the timer
+            var watch = System.Diagnostics.Stopwatch.StartNew(); 
+
             // If start or end waypoints are not provided, use the default Start and End waypoints
             if (startWaypoint == null || endWaypoint == null)
             {
@@ -254,6 +257,15 @@ namespace GVR
             }
 
             path.Reverse();
+
+            // Stop the timer
+            watch.Stop();
+            // Print the time elapsed
+            Debug.Log($"Time spent for finding the path: {watch.Elapsed}");
+            // debug amount of nodes checked
+            Debug.Log("Nodes checked: " + testing.Count);
+            // debug amount of nodes in path
+            Debug.Log("Nodes in path: " + path.Count);
 
             return path.ToArray();
         }
