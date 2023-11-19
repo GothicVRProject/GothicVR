@@ -197,12 +197,12 @@ namespace GVR
                         // If the neighbor is in the unvisited set, update its priority.
                         if (unvisited.Contains(neighbor))
                         {
-                            unvisited.UpdatePriority(neighbor, alt + Heuristic(neighbor, endDijkstraWaypoint));
+                            unvisited.UpdatePriority(neighbor, alt);
                         }
                         // Otherwise, add it to the unvisited set with the new priority.
                         else
                         {
-                            unvisited.Enqueue(neighbor, alt + Heuristic(neighbor, endDijkstraWaypoint));
+                            unvisited.Enqueue(neighbor, alt);
                         }
                     }
                 }
@@ -246,12 +246,6 @@ namespace GVR
             path.Reverse();
 
             return path.ToArray();
-        }
-
-        private double Heuristic(DijkstraWaypoint a, DijkstraWaypoint b)
-        {
-            double euclidean = Vector3.Distance(a.Position, b.Position);
-            return 0.0 * euclidean;
         }
     }
 
