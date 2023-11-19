@@ -151,29 +151,39 @@ namespace GVR
 
         public DijkstraWaypoint[] FindFastestPath(string startWaypoint = null, string endWaypoint = null)
         {
+            // If start or end waypoints are not provided, use the default Start and End waypoints
             if (startWaypoint == null || endWaypoint == null)
             {
                 startWaypoint = Start;
                 endWaypoint = End;
             }
+
+            // Get the start and end waypoints from the DijkstraWaypoints dictionary
             var startDijkstraWaypoint = DijkstraWaypoints[startWaypoint];
             var endDijkstraWaypoint = DijkstraWaypoints[endWaypoint];
 
+            // Initialize the previousNodes dictionary to keep track of the path
             var previousNodes = new Dictionary<string, DijkstraWaypoint>();
+            // Initialize the unvisited priority queue to keep track of waypoints to be visited
             var unvisited = new PriorityQueue();
 
+            // For each waypoint in DijkstraWaypoints 
             foreach (var waypointx in DijkstraWaypoints.Values)
             {
+                // If the waypoint is the start waypoint, set its SummedDistance to 0
                 if (waypointx.Name == startWaypoint)
                 {
                     waypointx.SummedDistance = 0;
                 }
+                // Otherwise, set its SummedDistance to infinity
                 else
                 {
                     waypointx.SummedDistance = double.MaxValue;
                 }
 
+                // Add the waypoint to the unvisited set and set its previous node to null
                 unvisited.Enqueue(waypointx, waypointx.SummedDistance);
+                // Add the waypoint to the previousNodes dictionary and set its previous node to null
                 previousNodes[waypointx.Name] = null;
             }
 
@@ -291,9 +301,9 @@ namespace GVR
             }
         }
 
-//  "Sift" in the context of a heap data structure refers to the process of adjusting 
-//  the position of an element to maintain the heap property. This is done by moving
-//  the element up or down in the heap until the heap property is satisfied.
+        //  "Sift" in the context of a heap data structure refers to the process of adjusting 
+        //  the position of an element to maintain the heap property. This is done by moving
+        //  the element up or down in the heap until the heap property is satisfied.
 
         private void SiftUp(int index)
         {
