@@ -10,6 +10,7 @@ using System.Linq;
 using System;
 using System.IO;
 using GVR.Creator;
+using Unity.VisualScripting;
 
 namespace GVR
 {
@@ -60,7 +61,7 @@ namespace GVR
                 LightUpWaypoint(End, Color.green);
                 Debug.Log("Start: " + WaypointsPosition[0]);
                 Debug.Log("End: " + WaypointsPosition[1]);
-                StartCoroutine(FindFastestPath());
+                FindFastestPath();
             }
 
 
@@ -148,7 +149,7 @@ namespace GVR
 
         }
 
-        public IEnumerator FindFastestPath(string startWaypoint = null, string endWaypoint = null)
+        public DijkstraWaypoint[] FindFastestPath(string startWaypoint = null, string endWaypoint = null)
         {
             if (startWaypoint == null || endWaypoint == null)
             {
@@ -186,15 +187,26 @@ namespace GVR
                 {
                     var neighbor = DijkstraWaypoints[neighborName];
                     var alt = currentWaypoint.SummedDistance + currentWaypoint.DistanceToNeighbors[neighborName];
-                    if (alt < neighbor.SummedDistance || neighbor.Name == endDijkstraWaypoint.Name)
+
+                    // If a shorter path to the neighbor is found, update its distance and previous node.
+                    if (alt < neighbor.SummedDistance)
                     {
                         neighbor.SummedDistance = alt;
                         previousNodes[neighbor.Name] = currentWaypoint;
-                        unvisited.Remove(neighbor);
-                        unvisited.Enqueue(neighbor, alt + Heuristic(neighbor, endDijkstraWaypoint));
+
+                        // If the neighbor is in the unvisited set, update its priority.
+                        if (unvisited.Contains(neighbor))
+                        {
+                            unvisited.UpdatePriority(neighbor, alt + Heuristic(neighbor, endDijkstraWaypoint));
+                        }
+                        // Otherwise, add it to the unvisited set with the new priority.
+                        else
+                        {
+                            unvisited.Enqueue(neighbor, alt + Heuristic(neighbor, endDijkstraWaypoint));
+                        }
                     }
                 }
-                
+
                 // Check if a valid path from Start to End has been found
                 var lastChecked = endWaypoint;
                 while (lastChecked != null && previousNodes[lastChecked] != null)
@@ -202,8 +214,8 @@ namespace GVR
                     lastChecked = previousNodes[lastChecked].Name;
                 }
                 if (lastChecked == startWaypoint)
-                    {
-                        break;
+                {
+                    break;
                 }
             }
 
@@ -226,18 +238,20 @@ namespace GVR
 
             Path = path.ToArray();
 
-            if(Path.Length == 1)
+            if (Path.Length == 1)
             {
                 Path.Append(Path[0]);
             }
 
-            yield return path.ToArray();
+            path.Reverse();
+
+            return path.ToArray();
         }
 
         private double Heuristic(DijkstraWaypoint a, DijkstraWaypoint b)
         {
             double euclidean = Vector3.Distance(a.Position, b.Position);
-            return euclidean;
+            return 0.0 * euclidean;
         }
     }
 
@@ -248,6 +262,87 @@ namespace GVR
         public PriorityQueue()
         {
             this.data = new List<KeyValuePair<DijkstraWaypoint, double>>();
+        }
+
+        public bool Contains(DijkstraWaypoint item)
+        {
+            // Check if the queue contains the item by comparing the names of the waypoints
+            return data.Select(x => x.Key.Name == item.Name).Count() > 0;
+        }
+
+        public void UpdatePriority(DijkstraWaypoint item, double priority)
+        {
+            // Find the index of the item
+            int index = data.FindIndex(pair => pair.Key.Name == item.Name);
+            if (index == -1)
+            {
+                // If the item is not in the queue, throw an exception (it should never do that so this is a good way to catch bugs)
+                throw new ArgumentException("Item does not exist in the queue.");
+            }
+
+            // Get the old priority of the item
+            double oldPriority = data[index].Value;
+            // Update the priority of the item in the queue
+            data[index] = new KeyValuePair<DijkstraWaypoint, double>(item, priority);
+
+            // If the new priority is less than the old priority, sift up
+            if (priority < oldPriority)
+            {
+                SiftUp(index);
+            }
+            // If the new priority is greater than the old priority, sift down
+            else if (priority > oldPriority)
+            {
+                SiftDown(index);
+            }
+        }
+
+//  "Sift" in the context of a heap data structure refers to the process of adjusting 
+//  the position of an element to maintain the heap property. This is done by moving
+//  the element up or down in the heap until the heap property is satisfied.
+
+        private void SiftUp(int index)
+        {
+            int parentIndex = (index - 1) / 2;
+            while (index > 0 && data[index].Value < data[parentIndex].Value)
+            {
+                Swap(index, parentIndex);
+                index = parentIndex;
+                parentIndex = (index - 1) / 2;
+            }
+        }
+
+        private void SiftDown(int index)
+        {
+            int leftChildIndex = index * 2 + 1;
+            int rightChildIndex = index * 2 + 2;
+            int smallestChildIndex = leftChildIndex;
+
+            if (rightChildIndex < data.Count && data[rightChildIndex].Value < data[leftChildIndex].Value)
+            {
+                smallestChildIndex = rightChildIndex;
+            }
+
+            while (smallestChildIndex < data.Count && data[smallestChildIndex].Value < data[index].Value)
+            {
+                Swap(index, smallestChildIndex);
+                index = smallestChildIndex;
+                leftChildIndex = index * 2 + 1;
+                rightChildIndex = index * 2 + 2;
+                smallestChildIndex = leftChildIndex;
+
+                if (rightChildIndex < data.Count && data[rightChildIndex].Value < data[leftChildIndex].Value)
+                {
+                    smallestChildIndex = rightChildIndex;
+                }
+            }
+        }
+
+        private void Swap(int index1, int index2)
+        {
+            var temp = data[index1];
+            data[index1] = data[index2];
+            data[index2] = temp;
         }
 
         public void Enqueue(DijkstraWaypoint waypoint, double priority)
