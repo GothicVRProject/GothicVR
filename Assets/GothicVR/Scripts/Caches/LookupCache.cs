@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using GVR.Manager;
+using GVR.Npc.Data;
 using GVR.Properties;
 using TMPro;
 using UnityEngine;
@@ -19,7 +21,7 @@ namespace GVR.Caches
         /// <summary>
         /// Already created AnimationClips can be reused.
         /// </summary>
-        public static Dictionary<string, AnimationClip> AnimClipCache = new();
+        public static Dictionary<string, Tuple<RootMotionData, AnimationClip>> AnimClipCache = new();
         
         /// <summary>
         /// This dictionary caches the sprite assets for fonts.

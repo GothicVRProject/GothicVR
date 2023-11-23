@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GVR.Caches;
-using GVR.Creator;
-using GVR.Extensions;
+﻿using GVR.Extensions;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Phoenix.Interface;
-using GVR.Phoenix.Interface.Vm;
 using GVR.Properties;
 using PxCs.Data.Event;
 using PxCs.Interface;
@@ -26,7 +20,6 @@ namespace GVR.Npc
         
         private void Update()
         {
-            
             properties.currentAction.Tick(transform);
           
             // Add new milliseconds when stateTime shall be measured.

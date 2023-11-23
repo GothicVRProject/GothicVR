@@ -1,6 +1,9 @@
+using System;
+using System.Linq;
 using GVR.Caches;
 using GVR.Creator;
 using GVR.Manager;
+using GVR.Npc.Data;
 using GVR.Phoenix.Interface.Vm;
 using UnityEngine;
 
@@ -18,22 +21,20 @@ namespace GVR.Npc.Actions.AnimationActions
 
         protected Vector3 movingLocation;
         protected WalkState walkState = WalkState.Initial;
-        
+
         protected AbstractWalkAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
         
-        /// <summary>
-        /// As we use legacy animations, we can't use RootMotion. We therefore need to rebuild it.
-        /// </summary>
         public override void Tick(Transform transform)
         {
             switch (walkState)
             {
                 case WalkState.Initial:
-                    StartRotation(transform);
+                    walkState = WalkState.Rotate;
+                    HandleRotation(transform, GetDestination());
                     return;
                 case WalkState.Rotate:
-                    HandleRotation(transform);
+                    HandleRotation(transform, GetDestination());
                     return;
                 case WalkState.Walk:
                     HandleWalk(transform);
@@ -46,35 +47,14 @@ namespace GVR.Npc.Actions.AnimationActions
             }
         }
 
-        private void StartRotation(Transform transform)
+        public override void AnimationEventEndCallback()
         {
-            // FIXME - we need to evaluate if we turn right or left. Then choose TurnR/TurnL properly.
-            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            AnimationCreator.PlayAnimation(props.baseMdsName, "t_WalkWTurnR", mdh, npcGo, true);
-            
-            walkState = WalkState.Rotate;
+            base.AnimationEventEndCallback();
+
+            walkingStartPos = npcGo.transform.localPosition;
+            npcGo.GetComponent<Animation>()[rootMotions.Item2.name].time = 0f;
         }
-        
-        private void HandleRotation(Transform transform)
-        {
-            var singleStep = ConstantsManager.NpcRotationSpeed * Time.deltaTime;
-            var targetDirection = movingLocation - transform.position;
 
-            // If we set TargetDirection of >y< to 0, then we rotate left/right only.
-            targetDirection.y = 0;
-            var newDirection = Vector3.RotateTowards(transform.forward, targetDirection, singleStep, 0.0f);
-            var newRotation = Quaternion.LookRotation(newDirection);
-
-            // Rotation is done.
-            if (transform.rotation == newRotation)
-            {
-                StartWalkAnimation();
-                return;
-            }
-
-            transform.rotation = newRotation;
-        }
-        
         private string GetWalkModeAnimationString()
         {
             switch (props.walkMode)
@@ -86,22 +66,84 @@ namespace GVR.Npc.Actions.AnimationActions
                     return "";
             }
         }
-        
-        private void StartWalkAnimation()
+
+        private Tuple<RootMotionData, AnimationClip> rootMotions;
+        private Vector3 walkingStartPos;
+
+        private void StartWalk()
         {
             var animName = GetWalkModeAnimationString();
             var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            AnimationCreator.PlayAnimation(props.baseMdsName, animName, mdh, npcGo, true);
+            rootMotions = AnimationCreator.PlayAnimation(props.baseMdsName, animName, mdh, npcGo, true);
+
+            walkingStartPos = npcGo.transform.localPosition;
 
             walkState = WalkState.Walk;
         }
-        
+
         private void HandleWalk(Transform transform)
         {
-            var step =  ConstantsManager.NpcWalkingSpeed * Time.deltaTime; // calculate distance to move
-            var newPos = Vector3.MoveTowards(transform.position, movingLocation, step);
-            
-            transform.position = newPos;
+            // RotateIfNeeded
+            {
+                var destination = GetDestination();
+                if (GetDestination() != default)
+                    HandleRotation(transform, destination);
+            }
+            HandleRootMotion(transform);
+        }
+
+        protected virtual Vector3 GetDestination()
+        {
+            return default;
+        }
+
+        private void HandleRotation(Transform transform, Vector3 destination)
+        {
+            var sameHeightDirection = new Vector3(destination.x, transform.position.y, destination.z);
+            var direction = (sameHeightDirection - transform.position).normalized;
+            var dot = Vector3.Dot(direction, transform.forward);
+
+            if (Math.Abs(dot - 1f) < 0.0001f)
+            {
+                StartWalk();
+                walkState = WalkState.Walk;
+                return;
+            }
+
+            var lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * 100);
+        }
+
+        /// <summary>
+        /// As we use legacy animations, we can't use RootMotion. We therefore need to rebuild it.
+        /// </summary>
+        private void HandleRootMotion(Transform transform)
+        {
+            var currentTime = npcGo.GetComponent<Animation>()[rootMotions.Item2.name].time;
+
+            // We seek the item, which is the exact animation at that time or the next with only a few milliseconds more time.
+            // It's more performant to search for than doing a _between_ check ;-)
+            var indexObj = rootMotions.Item1.PosX.keys.FirstOrDefault(i => i.time >= currentTime);
+            var index = Array.IndexOf(rootMotions.Item1.PosX.keys, indexObj);
+
+            var itemPosX = indexObj.value;
+            var itemPosY = rootMotions.Item1.PosY.keys[index].value;
+            var itemPosZ = rootMotions.Item1.PosZ.keys[index].value;
+
+            var itemRotW = rootMotions.Item1.RotW.keys[index];
+            var itemRotX = rootMotions.Item1.RotX.keys[index];
+            var itemRotY = rootMotions.Item1.RotY.keys[index];
+            var itemRotZ = rootMotions.Item1.RotZ.keys[index];
+
+            var newPos = new Vector3(itemPosX, itemPosY, itemPosZ);
+            var newRot = new Quaternion(itemRotX.value, itemRotY.value, itemRotZ.value, -itemRotW.value);
+
+            // location, when animation started + (rootMotion's location change rotated into direction of current localRot)
+            transform.localPosition = walkingStartPos + transform.localRotation * newPos;
+
+            // transform.localRotation = newRot * walkingStartRot;
+
+            Debug.Log(currentTime);
         }
     }
 }

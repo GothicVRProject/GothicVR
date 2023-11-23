@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.Npc.Actions;
+using GVR.Npc.Data;
 using PxCs.Data.Animation;
 using PxCs.Data.Model;
 using UnityEngine;
@@ -12,27 +14,31 @@ namespace GVR.Creator
 {
     public static class AnimationCreator
     {
-        public static void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
+        public static Tuple<RootMotionData, AnimationClip> PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
         {
             var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var animationComp = go.GetComponent<Animation>();
             
             //Shortcut: Animation is already set at GO.
-            if (animationComp.GetClip(mdsAnimationKeyName) != null)
-            {
-                animationComp.Play(mdsAnimationKeyName);
-                return;
-            }
+            // if (animationComp.GetClip(mdsAnimationKeyName) != null)
+            // {
+            //     animationComp.Play(mdsAnimationKeyName);
+            //     return;
+            // }
 
             var mds = AssetCache.TryGetMds(mdsName);
             var pxAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
-            
+            AnimationClip clip;
             // Try to load from cache
-            if (!LookupCache.AnimClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
+            if (!LookupCache.AnimClipCache.TryGetValue(mdsAnimationKeyName, out var animationData))
             {
-                clip = LoadAnimationClip(pxAnimation, mdh, go);
-                LookupCache.AnimClipCache[mdsAnimationKeyName] = clip;
-                clip.wrapMode = repeat ? WrapMode.Loop : WrapMode.Once;
+                animationData = LoadAnimationClip(pxAnimation, mdh, go, repeat, mdsAnimationKeyName);
+                LookupCache.AnimClipCache[mdsAnimationKeyName] = animationData;
+                clip = animationData.Item2;
+            }
+            else
+            {
+                clip = animationData.Item2;
             }
             
             AddClipEvents(clip, mds, pxAnimation, animationName);
@@ -41,14 +47,20 @@ namespace GVR.Creator
             animationComp.AddClip(clip, mdsAnimationKeyName);
 
             animationComp.Play(mdsAnimationKeyName);
+
+            return animationData;
         }
 
-        private static AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone)
+        private static Tuple<RootMotionData, AnimationClip> LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone, bool repeat, string clipName)
         {
             var clip = new AnimationClip
             {
-                legacy = true
+                legacy = true,
+                name = clipName,
+                wrapMode = repeat ? WrapMode.Loop : WrapMode.Once
             };
+
+            var rootMotionData = new RootMotionData();
             
             var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.nodeCount);
             var boneNames = pxAnimation.node_indices!.Select(nodeIndex => mdh.nodes![nodeIndex].name).ToArray();
@@ -79,7 +91,13 @@ namespace GVR.Creator
 
                 // We add 6 properties for location and rotation.
                 boneList[0].AddKey(time, uPosition.x);
-                boneList[1].AddKey(time, uPosition.y);
+
+                // NPCs animation starts higher than on the ground. Adjust it for all bones to come.
+                if (boneName.EqualsIgnoreCase("BIP01"))
+                    boneList[1].AddKey(time, 0.0f);
+                else
+                    boneList[1].AddKey(time, uPosition.y);
+
                 boneList[2].AddKey(time, uPosition.z);
                 boneList[3].AddKey(time, -sample.rotation.w); // It's important to have this value with a -1. Otherwise animation is inversed.
                 boneList[4].AddKey(time, sample.rotation.x);
@@ -87,24 +105,38 @@ namespace GVR.Creator
                 boneList[6].AddKey(time, sample.rotation.z);
             }
 
+            var rootNodeTime = 0f;
             foreach (var entry in curves)
             {
                 var path = GetChildPathRecursively(rootBone.transform, entry.Key, "");
 
-                clip.SetCurve(path, typeof(Transform), "m_LocalPosition.x", entry.Value[0]);
-                clip.SetCurve(path, typeof(Transform), "m_LocalPosition.y", entry.Value[1]);
-                clip.SetCurve(path, typeof(Transform), "m_LocalPosition.z", entry.Value[2]);
-                clip.SetCurve(path, typeof(Transform), "m_LocalRotation.w", entry.Value[3]);
-                clip.SetCurve(path, typeof(Transform), "m_LocalRotation.x", entry.Value[4]);
-                clip.SetCurve(path, typeof(Transform), "m_LocalRotation.y", entry.Value[5]);
-                clip.SetCurve(path, typeof(Transform), "m_LocalRotation.z", entry.Value[6]);
+                if (path.EqualsIgnoreCase("BIP01"))
+                {
+                    rootMotionData.PosX = entry.Value[0];
+                    rootMotionData.PosY = entry.Value[1];
+                    rootMotionData.PosZ = entry.Value[2];
+                    rootMotionData.RotW = entry.Value[3];
+                    rootMotionData.RotX = entry.Value[4];
+                    rootMotionData.RotY = entry.Value[5];
+                    rootMotionData.RotZ = entry.Value[6];
+                }
+                else
+                {
+                    clip.SetCurve(path, typeof(Transform), "m_LocalPosition.x", entry.Value[0]);
+                    clip.SetCurve(path, typeof(Transform), "m_LocalPosition.y", entry.Value[1]);
+                    clip.SetCurve(path, typeof(Transform), "m_LocalPosition.z", entry.Value[2]);
+                    clip.SetCurve(path, typeof(Transform), "m_LocalRotation.w", entry.Value[3]);
+                    clip.SetCurve(path, typeof(Transform), "m_LocalRotation.x", entry.Value[4]);
+                    clip.SetCurve(path, typeof(Transform), "m_LocalRotation.y", entry.Value[5]);
+                    clip.SetCurve(path, typeof(Transform), "m_LocalRotation.z", entry.Value[6]);
+                }
             }
 
             // Add some final settings
             clip.EnsureQuaternionContinuity();
             clip.frameRate = pxAnimation.fps;
 
-            return clip;
+            return new Tuple<RootMotionData, AnimationClip>(rootMotionData, clip);
         }
         
         // TODO - If we have a performance bottleneck while loading animations, then we could cache these results.

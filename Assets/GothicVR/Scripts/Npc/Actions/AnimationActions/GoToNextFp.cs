@@ -45,5 +45,11 @@ namespace GVR.Npc.Actions.AnimationActions
 
             isFinished = false;
         }
+
+        protected override Vector3 GetDestination()
+        {
+            return fp.Position;
+        }
+
     }
 }
