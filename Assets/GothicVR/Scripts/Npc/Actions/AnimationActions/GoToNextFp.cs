@@ -38,5 +38,12 @@ namespace GVR.Npc.Actions.AnimationActions
             walkState = WalkState.Done;
             isFinished = true;
         }
+
+        public override void AnimationEventEndCallback()
+        {
+            base.AnimationEventEndCallback();
+
+            isFinished = false;
+        }
     }
 }
