@@ -1,16 +1,10 @@
-using UnityEngine;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using GVR.Extensions;
-using PxCs.Interface;
-using GVR.Phoenix.Data;
-using System.Collections;
-using GVR.Vob.WayNet;
-using System.Linq;
 using System;
-using System.IO;
-using GVR.Creator;
-using Unity.VisualScripting;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using GVR.Extensions;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace GVR
 {
@@ -18,11 +12,10 @@ namespace GVR
     public class DijkstraPathFinder : MonoBehaviour
     {
         public static DijkstraPathFinder Instance;
-        public string Start;
-        public string End;
-        private List<Vector3> WaypointsPosition = new();
-        private DijkstraWaypoint[] Path = null;
-        public bool WaypointsRendered { get; set; } = false;
+        public string debugStart;
+        public string debugEnd;
+        private List<Vector3> waypointsPosition = new();
+        private DijkstraWaypoint[] path;
 
         public Dictionary<string, DijkstraWaypoint> DijkstraWaypoints; // The original waypoints, as read from the world data
 
@@ -46,39 +39,39 @@ namespace GVR
             }
         }
 
+        /// <summary>
+        /// Debug method to draw Gizmo line for selected debugStart -> debugEnd
+        /// </summary>
         private void OnValidate()
         {
-
             Debug.Log("OnValidate");
 
-            if (DijkstraWaypoints != null && DijkstraWaypoints.TryGetValue(Start, out var startWaypoint) &&
-            DijkstraWaypoints.TryGetValue(End, out var endWaypoint))
+            if (DijkstraWaypoints != null && DijkstraWaypoints.TryGetValue(debugStart, out var startWaypoint) &&
+            DijkstraWaypoints.TryGetValue(debugEnd, out var endWaypoint))
             {
-                WaypointsPosition.Clear();
-                WaypointsPosition.Add(DijkstraWaypoints[Start].Position);
-                WaypointsPosition.Add(DijkstraWaypoints[End].Position);
-                LightUpWaypoint(Start, Color.green);
-                LightUpWaypoint(End, Color.green);
-                Debug.Log("Start: " + WaypointsPosition[0]);
-                Debug.Log("End: " + WaypointsPosition[1]);
+                waypointsPosition.Clear();
+                waypointsPosition.Add(DijkstraWaypoints[debugStart].Position);
+                waypointsPosition.Add(DijkstraWaypoints[debugEnd].Position);
+                LightUpWaypoint(debugStart, Color.green);
+                LightUpWaypoint(debugEnd, Color.green);
+                Debug.Log("Start: " + waypointsPosition[0]);
+                Debug.Log("End: " + waypointsPosition[1]);
                 FindFastestPath();
             }
-
-
         }
 
         void OnDrawGizmos()
         {
             // Draw a yellow sphere at the transform's position
             Gizmos.color = Color.green;
-            if (WaypointsPosition == null)
+            if (waypointsPosition == null)
             {
                 return;
             }
-            Gizmos.DrawLineList(WaypointsPosition.ToArray());
-            if (Path != null)
+            Gizmos.DrawLineList(waypointsPosition.ToArray());
+            if (path != null)
             {
-                var path = Path.Select(waypoint => waypoint.Position).ToList();
+                var path = this.path.Select(waypoint => waypoint.Position).ToList();
                 var finalPath = new List<Vector3>();
 
                 for (int i = 0; i < path.Count; i++)
@@ -92,21 +85,17 @@ namespace GVR
                 Gizmos.color = Color.red;
                 Gizmos.DrawLineList(finalPath.ToArray());
             }
-
         }
 
         private void LightUpWaypoint(string wayPointName, Color color)
         {
-            var waypoint = FindWaypointGO(wayPointName);
+            var waypoint = FindWaypointGo(wayPointName);
             if (waypoint == null)
-            {
                 return;
-            }
-            var newColor = color == null ? Color.green : color;
             waypoint.GetComponent<Renderer>().material.color = color;
         }
 
-        private GameObject FindWaypointGO(string wayPointName)
+        private GameObject FindWaypointGo(string wayPointName)
         {
             var result = gameObject.FindChildRecursively(wayPointName);
             if (result != null)
@@ -123,13 +112,9 @@ namespace GVR
         private void Awake()
         {
             if (Instance == null)
-            {
                 Instance = this;
-            }
             else
-            {
                 Destroy(gameObject);
-            }
         }
 
         public void SetDijkstraWaypoints(Dictionary<string, DijkstraWaypoint> waypoints)
@@ -146,19 +131,18 @@ namespace GVR
             }
             Debug.Log("DijkstraWaypoints set");
             CalculateNeighbourDistances();
-
         }
 
         public DijkstraWaypoint[] FindFastestPath(string startWaypoint = null, string endWaypoint = null)
         {
             // Start the timer
-            var watch = System.Diagnostics.Stopwatch.StartNew(); 
+            var watch = Stopwatch.StartNew();
 
             // If start or end waypoints are not provided, use the default Start and End waypoints
             if (startWaypoint == null || endWaypoint == null)
             {
-                startWaypoint = Start;
-                endWaypoint = End;
+                startWaypoint = debugStart;
+                endWaypoint = debugEnd;
             }
 
             // Get the start and end waypoints from the DijkstraWaypoints dictionary
@@ -171,26 +155,26 @@ namespace GVR
             var unvisited = new PriorityQueue();
 
             // For each waypoint in DijkstraWaypoints 
-            foreach (var waypointx in DijkstraWaypoints.Values)
+            foreach (var waypointX in DijkstraWaypoints.Values)
             {
                 // If the waypoint is the start waypoint, set its SummedDistance to 0
-                if (waypointx.Name == startWaypoint)
+                if (waypointX.Name == startWaypoint)
                 {
-                    waypointx.SummedDistance = 0;
+                    waypointX.SummedDistance = 0;
                 }
                 // Otherwise, set its SummedDistance to infinity
                 else
                 {
-                    waypointx.SummedDistance = double.MaxValue;
+                    waypointX.SummedDistance = double.MaxValue;
                 }
 
                 // Add the waypoint to the unvisited set and set its previous node to null
-                unvisited.Enqueue(waypointx, waypointx.SummedDistance);
+                unvisited.Enqueue(waypointX, waypointX.SummedDistance);
                 // Add the waypoint to the previousNodes dictionary and set its previous node to null
-                previousNodes[waypointx.Name] = null;
+                previousNodes[waypointX.Name] = null;
             }
 
-            while (unvisited.Count > 0)
+            while (unvisited.count > 0)
             {
                 var currentWaypoint = unvisited.Dequeue();
                 Debug.Log(currentWaypoint.Name + " " + currentWaypoint.SummedDistance);
@@ -242,18 +226,18 @@ namespace GVR
                 waypoint = previousNodes[waypoint.Name];
             }
 
-            for (int i = 0; i < path.Count; i++)
+            for (var i = 0; i < path.Count; i++)
             {
                 Debug.Log("[" + i + "]" + path[i].Name);
             }
 
             var testing = previousNodes.Where(x => x.Value != null).Select(x => x).ToList();
 
-            Path = path.ToArray();
+            this.path = path.ToArray();
 
-            if (Path.Length == 1)
+            if (this.path.Length == 1)
             {
-                Path.Append(Path[0]);
+                this.path.Append(this.path[0]);
             }
 
             path.Reverse();
@@ -273,12 +257,7 @@ namespace GVR
 
     public class PriorityQueue
     {
-        private List<KeyValuePair<DijkstraWaypoint, double>> data;
-
-        public PriorityQueue()
-        {
-            this.data = new List<KeyValuePair<DijkstraWaypoint, double>>();
-        }
+        private List<KeyValuePair<DijkstraWaypoint, double>> data = new();
 
         public bool Contains(DijkstraWaypoint item)
         {
@@ -289,7 +268,7 @@ namespace GVR
         public void UpdatePriority(DijkstraWaypoint item, double priority)
         {
             // Find the index of the item
-            int index = data.FindIndex(pair => pair.Key.Name == item.Name);
+            var index = data.FindIndex(pair => pair.Key.Name == item.Name);
             if (index == -1)
             {
                 // If the item is not in the queue, throw an exception (it should never do that so this is a good way to catch bugs)
@@ -313,13 +292,14 @@ namespace GVR
             }
         }
 
-        //  "Sift" in the context of a heap data structure refers to the process of adjusting 
-        //  the position of an element to maintain the heap property. This is done by moving
-        //  the element up or down in the heap until the heap property is satisfied.
-
+        /// <summary>
+        /// "Shift" in the context of a heap data structure refers to the process of adjusting
+        /// the position of an element to maintain the heap property. This is done by moving
+        /// the element up or down in the heap until the heap property is satisfied.
+        /// </summary>
         private void SiftUp(int index)
         {
-            int parentIndex = (index - 1) / 2;
+            var parentIndex = (index - 1) / 2;
             while (index > 0 && data[index].Value < data[parentIndex].Value)
             {
                 Swap(index, parentIndex);
@@ -330,9 +310,9 @@ namespace GVR
 
         private void SiftDown(int index)
         {
-            int leftChildIndex = index * 2 + 1;
-            int rightChildIndex = index * 2 + 2;
-            int smallestChildIndex = leftChildIndex;
+            var leftChildIndex = index * 2 + 1;
+            var rightChildIndex = index * 2 + 2;
+            var smallestChildIndex = leftChildIndex;
 
             if (rightChildIndex < data.Count && data[rightChildIndex].Value < data[leftChildIndex].Value)
             {
@@ -356,28 +336,24 @@ namespace GVR
 
         private void Swap(int index1, int index2)
         {
-            var temp = data[index1];
-            data[index1] = data[index2];
-            data[index2] = temp;
+            (data[index1], data[index2]) = (data[index2], data[index1]);
         }
 
         public void Enqueue(DijkstraWaypoint waypoint, double priority)
         {
             data.Add(new KeyValuePair<DijkstraWaypoint, double>(waypoint, priority));
-            int currentIndex = data.Count - 1;
+            var currentIndex = data.Count - 1;
 
             while (currentIndex > 0)
             {
-                int parentIndex = (currentIndex - 1) / 2;
+                var parentIndex = (currentIndex - 1) / 2;
 
                 if (data[currentIndex].Value >= data[parentIndex].Value)
                 {
                     break;
                 }
 
-                var tmp = data[currentIndex];
-                data[currentIndex] = data[parentIndex];
-                data[parentIndex] = tmp;
+                (data[currentIndex], data[parentIndex]) = (data[parentIndex], data[currentIndex]);
 
                 currentIndex = parentIndex;
             }
@@ -385,8 +361,8 @@ namespace GVR
 
         public DijkstraWaypoint Dequeue()
         {
-            int lastIndex = data.Count - 1;
-            DijkstraWaypoint frontItem = data[0].Key;
+            var lastIndex = data.Count - 1;
+            var frontItem = data[0].Key;
             data[0] = data[lastIndex];
             data.RemoveAt(lastIndex);
 
@@ -406,9 +382,7 @@ namespace GVR
 
                 if (data[parentIndex].Value <= data[leftChildIndex].Value) break;
 
-                var tmp = data[parentIndex];
-                data[parentIndex] = data[leftChildIndex];
-                data[leftChildIndex] = tmp;
+                (data[parentIndex], data[leftChildIndex]) = (data[leftChildIndex], data[parentIndex]);
 
                 parentIndex = leftChildIndex;
             }
@@ -416,17 +390,11 @@ namespace GVR
             return frontItem;
         }
 
-        public int Count
-        {
-            get
-            {
-                return data.Count;
-            }
-        }
+        public int count => data.Count;
 
         public void Remove(DijkstraWaypoint waypoint)
         {
-            int index = data.FindIndex(pair => pair.Key.Name == waypoint.Name);
+            var index = data.FindIndex(pair => pair.Key.Name == waypoint.Name);
             if (index == -1)
             {
                 //throw new ArgumentException("The specified waypoint is not in the queue.");
