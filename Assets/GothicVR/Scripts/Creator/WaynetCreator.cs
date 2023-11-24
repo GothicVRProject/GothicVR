@@ -4,6 +4,8 @@ using GVR.Manager;
 using GVR.Phoenix.Data;
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Phoenix.Interface;
+using GVR.World;
 using UnityEngine;
 
 namespace GVR.Creator
@@ -14,41 +16,67 @@ namespace GVR.Creator
         {
             var waynetObj = new GameObject(string.Format("Waynet"));
 
-            DijkstraPathFinder pathFinder = waynetObj.AddComponent<DijkstraPathFinder>();
             waynetObj.transform.parent = root.transform;
 
             CreateWaypoints(waynetObj, world);
-
-            pathFinder.SetDijkstraWaypointsOriginal(CreateDijkstraWaypoints(world)); // Has to be here to get the waypoints position
-
+            CreateDijkstraWaypoints(world);
+            CalculateDijkstraNeighbourDistances();
             CreateWaypointEdges(waynetObj, world);
         }
 
-        public static Dictionary<string, DijkstraWaypoint> CreateDijkstraWaypoints(WorldData world)
+        private static void CreateDijkstraWaypoints(WorldData world)
         {
-            Dictionary<string, DijkstraWaypoint> DijkstraWaypoints = new();
+            CreateDijkstraWaypointEntries(world);
+            AttachWaypointPositionToDijkstraEntries();
+            CalculateDijkstraNeighbourDistances();
+        }
+
+        private static void CreateDijkstraWaypointEntries(WorldData world)
+        {
+            Dictionary<string, DijkstraWaypoint> dijkstraWaypoints = new();
             var wayEdges = world.waypointEdges;
             var wayPoints = world.waypoints;
 
             // Using LINQ to transform wayEdges into DijkstraWaypoints.
-            DijkstraWaypoints = wayEdges.SelectMany(edge => new[]
-            {
-                // For each edge, create two entries: one for each direction of the edge.
-                // 'a' is the source waypoint, 'b' is the destination waypoint.
-                new { a = wayPoints[(int)edge.a], b = wayPoints[(int)edge.b] },
-                new { a = wayPoints[(int)edge.b], b = wayPoints[(int)edge.a] }
-            })
-            .GroupBy(x => x.a.name) // Group the entries by the name of the source waypoint.
-            .ToDictionary(g => g.Key, g => new DijkstraWaypoint(g.Key) // Transform each group into a DijkstraWaypoint.
-            {
-                // The neighbors of the DijkstraWaypoint are the names of the destination waypoints in the group.
-                Neighbors = g.Select(x => x.b.name).ToList()
-            });
+            dijkstraWaypoints = wayEdges.SelectMany(edge => new[]
+                {
+                    // For each edge, create two entries: one for each direction of the edge.
+                    // 'a' is the source waypoint, 'b' is the destination waypoint.
+                    new { a = wayPoints[(int)edge.a], b = wayPoints[(int)edge.b] },
+                    new { a = wayPoints[(int)edge.b], b = wayPoints[(int)edge.a] }
+                })
+                .GroupBy(x => x.a.name) // Group the entries by the name of the source waypoint.
+                .ToDictionary(g => g.Key, g => new DijkstraWaypoint(g.Key) // Transform each group into a DijkstraWaypoint.
+                {
+                    // The neighbors of the DijkstraWaypoint are the names of the destination waypoints in the group.
+                    Neighbors = g.Select(x => x.b.name).ToList()
+                });
 
-            // Set the DijkstraWaypoints in the DijkstraPathFinder instance.
-            DijkstraPathFinder.Instance.SetDijkstraWaypoints(DijkstraWaypoints);
+            GameData.DijkstraWaypoints = dijkstraWaypoints;
+        }
 
-            return DijkstraWaypoints;
+        private static void AttachWaypointPositionToDijkstraEntries()
+        {
+            foreach (var waypoint in GameData.DijkstraWaypoints)
+            {
+                var result = GameData.WayPoints.First(i => i.Key == waypoint.Key).Value.Position;
+                waypoint.Value.Position = result;
+            }
+        }
+        /// <summary>
+        /// Needed for future calculations.
+        /// </summary>
+        private static void CalculateDijkstraNeighbourDistances()
+        {
+            foreach (var waypoint in GameData.DijkstraWaypoints.Values)
+            {
+                foreach (var neighbour in waypoint.Neighbors)
+                {
+                    if (waypoint.DistanceToNeighbors.ContainsKey(neighbour))
+                        continue;
+                    waypoint.DistanceToNeighbors.Add(neighbour, Vector3.Distance(waypoint.Position, GameData.DijkstraWaypoints[neighbour].Position));
+                }
+            }
         }
 
         private static void CreateWaypoints(GameObject parent, WorldData world)
