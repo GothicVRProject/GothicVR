@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using GVR.Debugging;
-using GVR.Npc;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Util;
 using GVR.World;
+using UnityEngine;
 
 namespace GVR.Npc
 {
@@ -67,15 +67,15 @@ namespace GVR.Npc
         /// Calls the routineInstances that are due.
         /// Triggers Routine Change
         /// </summary>
-        private void Invoke(DateTime currTime)
+        private void Invoke(DateTime now)
         {
-            if (npcStartTimeDict.ContainsKey(currTime))
+            Debug.Log($"RoutineManager.timeChanged={now}");
+            if (!npcStartTimeDict.TryGetValue(now, out var routineItems))
+                return;
+            
+            foreach (var routineItem in routineItems)
             {
-                List<Routine> routineItems = npcStartTimeDict[currTime];
-                foreach (var routineItem in routineItems)
-                {
-                    routineItem.ChangeRoutine(currTime);
-                }
+                routineItem.ChangeRoutine(now);
             }
         }
     }

@@ -4,7 +4,9 @@ using System.Linq;
 using GVR.Extensions;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface;
+using GVR.Properties;
 using PxCs.Data.WayNet;
+using PxCs.Interface;
 using UnityEngine;
 
 namespace GVR.Npc
@@ -45,10 +47,14 @@ namespace GVR.Npc
 
         public void ChangeRoutine(DateTime time)
         {
-            setRoutine(time);
-            if (currentDestination == null)
-                return;
-            setWaypoint();
+            var instancePtr = GetComponent<NpcProperties>().npc.instancePtr;
+            var npcRoutine = routines.FirstOrDefault(item => item.start <= time && time < item.stop);
+            PxVm.CallFunction(GameData.VmGothicPtr, (uint)npcRoutine.action, instancePtr);
+
+            // setRoutine(time);
+            // if (currentDestination == null)
+            //     return;
+            // setWaypoint();
         }
         void setRoutine(DateTime time)
         {
