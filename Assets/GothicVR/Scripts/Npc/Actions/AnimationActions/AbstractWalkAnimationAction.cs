@@ -52,7 +52,7 @@ namespace GVR.Npc.Actions.AnimationActions
             base.AnimationEventEndCallback();
 
             walkingStartPos = npcGo.transform.localPosition;
-            npcGo.GetComponent<Animation>()[rootMotions.Item2.name].time = 0f;
+            npcGo.GetComponent<Animation>()[animationData.clip.name].time = 0f;
         }
 
         private string GetWalkModeAnimationString()
@@ -67,14 +67,14 @@ namespace GVR.Npc.Actions.AnimationActions
             }
         }
 
-        private Tuple<RootMotionData, AnimationClip> rootMotions;
+        private AnimationData animationData;
         private Vector3 walkingStartPos;
 
         private void StartWalk()
         {
             var animName = GetWalkModeAnimationString();
             var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            rootMotions = AnimationCreator.PlayAnimation(props.baseMdsName, animName, mdh, npcGo, true);
+            animationData = AnimationCreator.PlayAnimation(props.baseMdsName, animName, mdh, npcGo, true);
 
             walkingStartPos = npcGo.transform.localPosition;
 
@@ -119,27 +119,14 @@ namespace GVR.Npc.Actions.AnimationActions
         /// </summary>
         private void HandleRootMotion(Transform transform)
         {
-            var currentTime = npcGo.GetComponent<Animation>()[rootMotions.Item2.name].time;
+            var currentTime = npcGo.GetComponent<Animation>()[animationData.clip.name].time;
 
             // We seek the item, which is the exact animation at that time or the next with only a few milliseconds more time.
             // It's more performant to search for than doing a _between_ check ;-)
-            var indexObj = rootMotions.Item1.PosX.keys.FirstOrDefault(i => i.time >= currentTime);
-            var index = Array.IndexOf(rootMotions.Item1.PosX.keys, indexObj);
-
-            var itemPosX = indexObj.value;
-            var itemPosY = rootMotions.Item1.PosY.keys[index].value;
-            var itemPosZ = rootMotions.Item1.PosZ.keys[index].value;
-
-            var itemRotW = rootMotions.Item1.RotW.keys[index];
-            var itemRotX = rootMotions.Item1.RotX.keys[index];
-            var itemRotY = rootMotions.Item1.RotY.keys[index];
-            var itemRotZ = rootMotions.Item1.RotZ.keys[index];
-
-            var newPos = new Vector3(itemPosX, itemPosY, itemPosZ);
-            var newRot = new Quaternion(itemRotX.value, itemRotY.value, itemRotZ.value, -itemRotW.value);
-
+            var indexObj = animationData.rootMotions.FirstOrDefault(i => i.time >= currentTime);
+            
             // location, when animation started + (rootMotion's location change rotated into direction of current localRot)
-            transform.localPosition = walkingStartPos + transform.localRotation * newPos;
+            transform.localPosition = walkingStartPos + transform.localRotation * indexObj.position;
 
             // transform.localRotation = newRot * walkingStartRot;
 

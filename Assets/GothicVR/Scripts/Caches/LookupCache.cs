@@ -19,9 +19,9 @@ namespace GVR.Caches
         public static readonly Dictionary<uint, NpcProperties> NpcCache = new();
 
         /// <summary>
-        /// Already created AnimationClips can be reused.
+        /// Already created AnimationData (Clips + RootMotions) can be reused.
         /// </summary>
-        public static Dictionary<string, Tuple<RootMotionData, AnimationClip>> AnimClipCache = new();
+        public static Dictionary<string, AnimationData> AnimationCache = new();
         
         /// <summary>
         /// This dictionary caches the sprite assets for fonts.

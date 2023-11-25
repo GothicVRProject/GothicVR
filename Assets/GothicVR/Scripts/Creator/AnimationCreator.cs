@@ -14,44 +14,34 @@ namespace GVR.Creator
 {
     public static class AnimationCreator
     {
-        public static Tuple<RootMotionData, AnimationClip> PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
+        public static AnimationData PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
         {
             var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var animationComp = go.GetComponent<Animation>();
             
-            //Shortcut: Animation is already set at GO.
-            // if (animationComp.GetClip(mdsAnimationKeyName) != null)
-            // {
-            //     animationComp.Play(mdsAnimationKeyName);
-            //     return;
-            // }
-
             var mds = AssetCache.TryGetMds(mdsName);
             var pxAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
-            AnimationClip clip;
+
             // Try to load from cache
-            if (!LookupCache.AnimClipCache.TryGetValue(mdsAnimationKeyName, out var animationData))
+            if (!LookupCache.AnimationCache.TryGetValue(mdsAnimationKeyName, out var animationData))
             {
                 animationData = LoadAnimationClip(pxAnimation, mdh, go, repeat, mdsAnimationKeyName);
-                LookupCache.AnimClipCache[mdsAnimationKeyName] = animationData;
-                clip = animationData.Item2;
+                LookupCache.AnimationCache[mdsAnimationKeyName] = animationData;
             }
-            else
+
+            if (animationComp[mdsAnimationKeyName] == null)
             {
-                clip = animationData.Item2;
+                AddClipEvents(animationData.clip, mds, pxAnimation, animationName);
+                AddClipEndEvent(animationData.clip);
+                animationComp.AddClip(animationData.clip, mdsAnimationKeyName);
             }
-            
-            AddClipEvents(clip, mds, pxAnimation, animationName);
-            AddClipEndEvent(clip);
-            
-            animationComp.AddClip(clip, mdsAnimationKeyName);
 
             animationComp.Play(mdsAnimationKeyName);
 
             return animationData;
         }
 
-        private static Tuple<RootMotionData, AnimationClip> LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone, bool repeat, string clipName)
+        private static AnimationData LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone, bool repeat, string clipName)
         {
             var clip = new AnimationClip
             {
@@ -60,7 +50,10 @@ namespace GVR.Creator
                 wrapMode = repeat ? WrapMode.Loop : WrapMode.Once
             };
 
-            var rootMotionData = new RootMotionData();
+            var animationData = new AnimationData()
+            {
+                clip = clip
+            };
             
             var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.nodeCount);
             var boneNames = pxAnimation.node_indices!.Select(nodeIndex => mdh.nodes![nodeIndex].name).ToArray();
@@ -105,20 +98,31 @@ namespace GVR.Creator
                 boneList[6].AddKey(time, sample.rotation.z);
             }
 
-            var rootNodeTime = 0f;
             foreach (var entry in curves)
             {
                 var path = GetChildPathRecursively(rootBone.transform, entry.Key, "");
-
+                
                 if (path.EqualsIgnoreCase("BIP01"))
                 {
-                    rootMotionData.PosX = entry.Value[0];
-                    rootMotionData.PosY = entry.Value[1];
-                    rootMotionData.PosZ = entry.Value[2];
-                    rootMotionData.RotW = entry.Value[3];
-                    rootMotionData.RotX = entry.Value[4];
-                    rootMotionData.RotY = entry.Value[5];
-                    rootMotionData.RotZ = entry.Value[6];
+                    // We reorganize RootMotion entries to get more performance during execution each frame.
+                    // Takes slightly more time to create during first load, but will benefit within Update().
+                    for (var i = 0; i < entry.Value[0].length; i++)
+                    {
+                        animationData.rootMotions.Add(new()
+                        {
+                            time = entry.Value[0].keys[i].time,
+                            position = new Vector3(
+                                    entry.Value[0].keys[i].value,
+                                    entry.Value[1].keys[i].value,
+                                    entry.Value[2].keys[i].value),
+                            rotation = new Quaternion(
+                                entry.Value[3].keys[i].value,
+                                entry.Value[4].keys[i].value,
+                                entry.Value[5].keys[i].value,
+                                entry.Value[6].keys[i].value
+                                )
+                        });
+                    }
                 }
                 else
                 {
@@ -136,7 +140,7 @@ namespace GVR.Creator
             clip.EnsureQuaternionContinuity();
             clip.frameRate = pxAnimation.fps;
 
-            return new Tuple<RootMotionData, AnimationClip>(rootMotionData, clip);
+            return animationData;
         }
         
         // TODO - If we have a performance bottleneck while loading animations, then we could cache these results.
