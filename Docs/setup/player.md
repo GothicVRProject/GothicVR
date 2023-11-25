@@ -17,6 +17,9 @@ GothicVR needs to know where your Gothic installation is located for streaming t
 
 Information on where the `GameSettings.json` is located and more about the other settings can be found in the [GameSettings](#GameSettings) section.
 
+And easy alternative to adjusting the game settings is to start the application and use the provided filepicker to select a legal copy of Gothic 1.
+Doing so will adjust the game settings file in the background and start the game right away.
+
 ### Quest 2/Pico 4
 
 To get the Gothic assets onto your headset you have to copy them to the GothicVR data directory on your headset: `/storage/emulated/0/Android/data/com.GothicVRProject.GothicVR/files/`. After the copy, the folder should look something like the following (Where required folders are marked; the other directories can be removed). Make sure that the Gothic game files are **not** in their own `files/Gothic` subfolder!

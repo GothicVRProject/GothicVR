@@ -62,6 +62,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 513c433f9b1848e3b13f8ff67a37fe18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <visual>k__BackingField: 
+  <visualScheme>k__BackingField: 
   soundDaytimeData:
     id: 0
     type: 0
@@ -115,7 +117,7 @@ AudioSource:
   m_GameObject: {fileID: 6503575194566409312}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 6160132109742411210, guid: 118dcb5485ad4894fb619aab7e1f8708, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
@@ -211,7 +213,7 @@ AudioSource:
   m_GameObject: {fileID: 6503575194566409312}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 6160132109742411210, guid: 118dcb5485ad4894fb619aab7e1f8708, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1

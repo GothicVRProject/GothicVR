@@ -4,6 +4,9 @@ namespace GVR.Manager
 {
     public static class ConstantsManager
     {
+        public const float NpcWalkingSpeed = 1f;
+        public const float NpcRotationSpeed = 3f;
+        
         public const string SceneBootstrap = "Bootstrap";
         public const string SceneGeneral = "General";
         public const string SceneMainMenu = "MainMenu";
@@ -28,6 +31,8 @@ namespace GVR.Manager
         //Collection of PlayerPref entries for settings
         public const string moveSpeedPlayerPref = "MoveSpeed";
         public const string turnSettingPlayerPref = "TurnSetting";
+        public const string musicVolumePlayerPref = "BackgroundMusicVolume";
+        public const string soundEffectsVolumePlayerPref = "SoundEffectsVolume";
         public static float moveSpeed { get; set; } = 8f;
 
         public static string selectedWorld { get; set; } = "world.zen";

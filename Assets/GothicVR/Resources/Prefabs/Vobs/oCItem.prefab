@@ -1,5 +1,67 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1719445109422103566
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4365943387502713912}
+  m_Layer: 6
+  m_Name: AttachPoint1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4365943387502713912
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719445109422103566}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2022050282646122291}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4927507512436651019
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4571074789436134969}
+  m_Layer: 6
+  m_Name: AttachPoint2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4571074789436134969
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4927507512436651019}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2022050282646122291}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6503575194566409312
 GameObject:
   m_ObjectHideFlags: 0
@@ -12,7 +74,7 @@ GameObject:
   - component: {fileID: 1778516865459391894}
   - component: {fileID: 4740512252186575585}
   - component: {fileID: 2998231252423532423}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: oCItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31,7 +93,9 @@ Transform:
   m_LocalPosition: {x: -328.3223, y: 27.197954, z: -177.9182}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4365943387502713912}
+  - {fileID: 4571074789436134969}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 88, y: 0, z: 0}
 --- !u!54 &1778516865459391894
@@ -73,6 +137,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 024fa582612e45c0afcf4ba9d756341e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <visual>k__BackingField: 
+  <visualScheme>k__BackingField: 
 --- !u!114 &2998231252423532423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,3 +151,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab18e8a1635d4730aa4ff1427c59da6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attachPoint1: {fileID: 1719445109422103566}
+  attachPoint2: {fileID: 4927507512436651019}

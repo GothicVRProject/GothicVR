@@ -55,6 +55,8 @@ namespace GVR.Manager
             var pos = props.transform.position;
             var fp = WayNetHelper.FindNearestFreePoint(pos, fpNamePart);
 
+            if (fp == null)
+                return false;
             // Ignore if we're already on this FP.
             if (fp == props.CurrentFreePoint)
                 return false;

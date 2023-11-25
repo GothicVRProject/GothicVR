@@ -16,7 +16,8 @@ namespace GVR.Phoenix.Interface
     {
         public static IntPtr VfsPtr;
         public static IntPtr VmGothicPtr;
-        public static IntPtr VmSfxPtr;
+        public static IntPtr VmSfxPtr; // Sound FX
+        public static IntPtr VmPfxPtr; // Particle FX
         public static IntPtr VmMusicPtr;
 
         private static WorldData worldInternal;
@@ -68,6 +69,12 @@ namespace GVR.Phoenix.Interface
             {
                 PxVm.pxVmDestroy(VmSfxPtr);
                 VmSfxPtr = IntPtr.Zero;
+            }
+
+            if (VmPfxPtr != IntPtr.Zero)
+            {
+                PxVm.pxVmDestroy(VmPfxPtr);
+                VmPfxPtr = IntPtr.Zero;
             }
 
             if (VmMusicPtr != IntPtr.Zero)

@@ -28,6 +28,7 @@ namespace GVR.Caches
         private static Dictionary<string, PxVmItemData> itemDataCache = new();
         private static Dictionary<string, PxVmMusicData> musicDataCache = new();
         private static Dictionary<string, PxVmSfxData> sfxDataCache = new();
+        private static Dictionary<string, PxVmPfxData> pfxDataCache = new();
         private static Dictionary<string, PxSoundData<float>> soundCache = new();
         private static Dictionary<string, PxFontData> fontCache = new();
 
@@ -266,6 +267,21 @@ namespace GVR.Caches
 
             var newData = PxVm.InitializeSfx(GameData.VmSfxPtr, preparedKey);
             sfxDataCache[preparedKey] = newData;
+
+            return newData;
+        }
+
+        /// <summary>
+        /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
+        /// </summary>
+        public static PxVmPfxData TryGetPfxData(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (pfxDataCache.TryGetValue(preparedKey, out var data))
+                return data;
+
+            var newData = PxVm.InitializePfx(GameData.VmPfxPtr, preparedKey);
+            pfxDataCache[preparedKey] = newData;
 
             return newData;
         }

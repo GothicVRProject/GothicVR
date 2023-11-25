@@ -193,21 +193,22 @@ namespace GVR.Phoenix.Interface.Vm
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void PrintDebug(IntPtr vmPtr)
         {
+            var message = PxVm.VmStackPopString(vmPtr);
+            
             if (!FeatureFlags.I.ShowZspyLogs)
                 return;
             
-            var message = PxVm.VmStackPopString(vmPtr);
             Debug.Log($"[zspy]: {message}");
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void PrintDebugCh(IntPtr vmPtr)
         {
-            if (!FeatureFlags.I.ShowZspyLogs)
-                return;
-            
             var message = PxVm.VmStackPopString(vmPtr);
             var channel = PxVm.pxVmStackPopInt(vmPtr);
+
+            if (!FeatureFlags.I.ShowZspyLogs)
+                return;
             
             Debug.Log($"[zspy,{channel}]: {message}");
         }
@@ -215,21 +216,22 @@ namespace GVR.Phoenix.Interface.Vm
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void PrintDebugInst(IntPtr vmPtr)
         {
+            var message = PxVm.VmStackPopString(vmPtr);
+
             if (!FeatureFlags.I.ShowZspyLogs)
                 return;
 
-            var message = PxVm.VmStackPopString(vmPtr);
             Debug.Log($"[zspy]: {message}");
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void PrintDebugInstCh(IntPtr vmPtr)
         {
-            if (!FeatureFlags.I.ShowZspyLogs)
-                return;
-            
             var message = PxVm.VmStackPopString(vmPtr);
             var channel = PxVm.pxVmStackPopInt(vmPtr);
+
+            if (!FeatureFlags.I.ShowZspyLogs)
+                return;
             
             Debug.Log($"[zspy,{channel}]: {message}");
         }

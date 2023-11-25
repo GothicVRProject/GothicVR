@@ -74,11 +74,11 @@ namespace GVR.Creator
         /// </summary>
         public static void ExtWldInsertNpc(int npcInstance, string spawnPoint)
         {
-            if (++debugNpcsSpawned > DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY)
-                return;
-
-            // if (npcInstance != DEBUG_BLOODWYN_INSTANCE_ID)
+            // if (++debugNpcsSpawned > DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY)
             //     return;
+            
+            if (npcInstance != DEBUG_BLOODWYN_INSTANCE_ID)
+                return;
             
             
             var newNpc = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));

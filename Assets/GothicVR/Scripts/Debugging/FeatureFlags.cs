@@ -27,6 +27,8 @@ namespace GVR.Debugging
         public bool CreateWaypoints;
         [Tooltip("Leave blank if you want to spawn normal.")]
         public string spawnAtSpecificFreePoint;
+        [Tooltip("True will render all pickables with dynamic attach points")]
+        public bool vobItemsDynamicAttach;
 
         [Header("__________DayTime__________")]
         public bool EnableDayTime;
@@ -71,6 +73,8 @@ namespace GVR.Debugging
         public VobCullingGroupSetting vobCullingLarge;
 
         [Header("__________Experimental / Do not use in Production__________")]
+        [Tooltip("Looks already quite good for leaves.pfy in the forest, but fire is awkward.")]
+        public bool enableVobParticles;
         [Tooltip("The current implementation costs more frames than it saves. But it's a potential starting point for further enhancements like gluing small related objects together. Stored here for future use.")]
         public bool enableFineGrainedWorldMeshCreation;
         [Tooltip("Experimental. Looks weird without proper distance shadow. Could save some frames if combined with well looking distance shadow.")]

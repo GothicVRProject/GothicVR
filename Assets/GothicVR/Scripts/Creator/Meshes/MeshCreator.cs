@@ -82,6 +82,9 @@ namespace GVR.Creator.Meshes
 
                 meshRenderer.sharedMesh = meshFilter.mesh;
 
+                var collider = meshObj.AddComponent<MeshCollider>();
+                collider.convex = true;
+                var rigidbody = meshObj.AddComponent<Rigidbody>();
                 CreateBonesData(rootGo, nodeObjects, meshRenderer, softSkinMesh);
             }
 
