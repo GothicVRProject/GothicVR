@@ -112,9 +112,9 @@ namespace GVR.Creator
                 return;
 
             var waypointEdgesObj = new GameObject(string.Format("Edges"));
-            waypointEdgesObj.transform.parent = parent.transform;
+            waypointEdgesObj.SetParent(parent);
 
-            for (int i = 0; i < world.waypointEdges.Length; i++)
+            for (var i = 0; i < world.waypointEdges.Length; i++)
             {
                 var edge = world.waypointEdges[i];
                 var startPos = world.waypoints[(int)edge.a].position.ToUnityVector();
@@ -122,14 +122,14 @@ namespace GVR.Creator
                 var lineObj = new GameObject();
 
                 lineObj.AddComponent<LineRenderer>();
-                LineRenderer lr = lineObj.GetComponent<LineRenderer>();
+                var lr = lineObj.GetComponent<LineRenderer>();
                 lr.material = new Material(Shader.Find("Standard"));
                 lr.startWidth = 0.1f;
                 lr.endWidth = 0.1f;
                 lr.SetPosition(0, startPos);
                 lr.SetPosition(1, endPos);
 
-                lineObj.name = string.Format("{0}->{1}", edge.a, edge.b);
+                lineObj.name = $"{edge.a}->{edge.b}";
                 lineObj.transform.position = startPos;
                 lineObj.transform.parent = waypointEdgesObj.transform;
             }
