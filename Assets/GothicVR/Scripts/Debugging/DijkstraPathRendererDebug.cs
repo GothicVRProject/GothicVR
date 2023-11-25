@@ -1,7 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using GVR.Extensions;
 using GVR.Manager;
 using GVR.Phoenix.Interface;
-using GVR.World;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace GVR.Debugging
@@ -10,7 +12,10 @@ namespace GVR.Debugging
     {
         public string debugStart;
         public string debugEnd;
-        private DijkstraWaypoint[] waypointsPosition = {};
+
+        public List<string> pathDistanceCalculation;
+
+        private Vector3[] gizmoWayPoints;
         private GameObject wayPointsGo;
 
         /// <summary>
@@ -18,55 +23,63 @@ namespace GVR.Debugging
         /// </summary>
         private void OnValidate()
         {
-            Debug.Log("OnValidate");
+            // Load rootGo for the first time. Start() would be too early, as world loads later.
+            // And we want to have this load only during Editor time, therefore inside OnValidate()
+            if (wayPointsGo == null)
+                wayPointsGo = GameObject.Find("World/Waynet/Waypoints");
 
             if (GameData.DijkstraWaypoints.TryGetValue(debugStart, out var startWaypoint) &&
                 GameData.DijkstraWaypoints.TryGetValue(debugEnd, out var endWaypoint))
             {
-                waypointsPosition = WayNetHelper.FindFastestPath(debugStart, debugEnd);
 
-                // Load rootGo for the first time
-                if (wayPointsGo == null)
-                    wayPointsGo = GameObject.Find("World/Waynet/Waypoints");
-
-                // waypointsPosition.Add(GameData.DijkstraWaypoints[debugStart].Position);
-                // waypointsPosition.Add(GameData.DijkstraWaypoints[debugEnd].Position);
                 LightUpWaypoint(debugStart, Color.green);
                 LightUpWaypoint(debugEnd, Color.green);
-                Debug.Log("Start: " + waypointsPosition[0]);
-                Debug.Log("End: " + waypointsPosition[1]);
+
+                var path = WayNetHelper.FindFastestPath(debugStart, debugEnd);
+                var tempGizmoWayPoints = new List<Vector3>();
+                for (var i = 0; i < path.Length - 1; i++)
+                {
+                    tempGizmoWayPoints.Add(path[i].Position);
+                    tempGizmoWayPoints.Add(path[i+1].Position);
+                }
+                gizmoWayPoints = tempGizmoWayPoints.ToArray();
+
+                Debug.Log("Start: " + gizmoWayPoints.First());
+                Debug.Log("End: " + gizmoWayPoints.Last());
+            }
+
+            if (pathDistanceCalculation.Count > 0)
+            {
+                var summarizedDistance = 0.0f;
+                for (var i = 0; i < pathDistanceCalculation.Count - 1; i++)
+                {
+                    var wayPointName1 = pathDistanceCalculation[i];
+                    var wayPointName2 = pathDistanceCalculation[i+1];
+                    var wp1 = FindWaypointGo(wayPointName1);
+                    var wp2 = FindWaypointGo(wayPointName2);
+
+                    if (wp1 == null || wp2 == null)
+                    {
+                        summarizedDistance = 0.0f;
+                        break;
+                    }
+                    summarizedDistance += Vector3.Distance(wp1.transform.position, wp2.transform.position);
+                }
+
+                if (summarizedDistance > 0.0f)
+                    Debug.Log($"Summarized distance: {summarizedDistance}");
             }
         }
 
-        // With this function, we want to draw lines for the routes. But I'm currently unsure how to use it with DijkstraObjects instead of Vector3.
-        // Something to re-activate in the future.
+        private void OnDrawGizmos()
+        {
+            // Draw a yellow sphere at the transform's position
+            Gizmos.color = Color.green;
+            if (gizmoWayPoints == null)
+                return;
 
-        // void OnDrawGizmos()
-        // {
-        //     // Draw a yellow sphere at the transform's position
-        //     Gizmos.color = Color.green;
-        //     if (waypointsPosition == null)
-        //     {
-        //         return;
-        //     }
-        //     Gizmos.DrawLineList(waypointsPosition.ToArray());
-        //     if (path != null)
-        //     {
-        //         var path = this.path.Select(waypoint => waypoint.Position).ToList();
-        //         var finalPath = new List<Vector3>();
-        //
-        //         for (int i = 0; i < path.Count; i++)
-        //         {
-        //             finalPath.Add(path[i]);
-        //             if (i != 0 && i != path.Count - 1)
-        //             {
-        //                 finalPath.Add(path[i]);
-        //             }
-        //         }
-        //         Gizmos.color = Color.red;
-        //         Gizmos.DrawLineList(finalPath.ToArray());
-        //     }
-        // }
+            Gizmos.DrawLineList(gizmoWayPoints);
+        }
 
         private void LightUpWaypoint(string wayPointName, Color color)
         {
@@ -76,19 +89,10 @@ namespace GVR.Debugging
             waypoint.GetComponent<Renderer>().material.color = color;
         }
 
+        [CanBeNull]
         private GameObject FindWaypointGo(string wayPointName)
         {
-            var result = wayPointsGo.FindChildRecursively(wayPointName);
-            if (result != null)
-            {
-                return result;
-            }
-            else
-            {
-                Debug.Log("Waypoint not found");
-                return null;
-            }
+            return wayPointsGo.FindChildRecursively(wayPointName);
         }
-
     }
 }

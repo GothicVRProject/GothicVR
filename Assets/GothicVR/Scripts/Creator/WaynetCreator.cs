@@ -20,7 +20,6 @@ namespace GVR.Creator
 
             CreateWaypoints(waynetObj, world);
             CreateDijkstraWaypoints(world);
-            CalculateDijkstraNeighbourDistances();
             CreateWaypointEdges(waynetObj, world);
         }
 
