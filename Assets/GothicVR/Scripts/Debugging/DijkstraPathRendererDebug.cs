@@ -86,7 +86,10 @@ namespace GVR.Debugging
             var waypoint = FindWaypointGo(wayPointName);
             if (waypoint == null)
                 return;
-            waypoint.GetComponent<Renderer>().material.color = color;
+            var wpRenderer = waypoint.GetComponent<Renderer>();
+            if (wpRenderer == null)
+                return;
+            wpRenderer.material.color = color;
         }
 
         [CanBeNull]

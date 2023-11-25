@@ -1231,6 +1231,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debugStart: 
   debugEnd: 
+  pathDistanceCalculation: []
 --- !u!1 &1280490518
 GameObject:
   m_ObjectHideFlags: 0
