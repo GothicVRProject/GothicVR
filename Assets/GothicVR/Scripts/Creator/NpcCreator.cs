@@ -183,7 +183,7 @@ namespace GVR.Creator
 
             props.BodyData = data;
             
-            if (FeatureFlags.I.CreateNpcArmor && data.Armor >= 0)
+            if (data.Armor >= 0)
             {
                 var armorData = AssetCache.TryGetItemData((uint)data.Armor);
                 props.EquippedItems.Add(AssetCache.TryGetItemData((uint)data.Armor));
@@ -269,56 +269,6 @@ namespace GVR.Creator
             var firstRoutine = routineComp.routines.FirstOrDefault();
 
             npc.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action);
-        }
-        
-        public static void DebugAddIdleAnimationToAllNpc()
-        {
-            // DebugDanceAll();
-            DebugThorus();
-            DebugMeatBug();
-
-        }
-
-        private static void DebugDanceAll()
-        {
-            var npcs = LookupCache.NpcCache.Values
-                .Where(i => i.name != "Thorus")
-                .Where(i => i.name != "Fleischwanze")
-                .Where(i => i.name != "Meatbug");
-            
-            foreach (var props in npcs)
-            {
-                var mdsName = props.baseMdsName;
-                var mdh = AssetCache.TryGetMdh(props.baseMdhName);
-                var animationName = mdsName.ToLower() == "humans.mds" ? "T_1HSFREE" : "S_DANCE1";
-                AnimationCreator.PlayAnimation(mdsName, animationName, mdh, props.gameObject);
-            }
-        }
-        
-        private static void DebugThorus()
-        {
-            foreach (var props in LookupCache.NpcCache.Values.Where(i => i.name == "Thorus"))
-            {
-                var routineComp = props.GetComponent<Routine>();
-                var firstRoutine = routineComp.routines.FirstOrDefault();
-
-                props.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action);
-            }
-        }
-
-        private static void DebugMeatBug()
-        {
-            var x = LookupCache.NpcCache.Values.Where(i => i.name == "Fleischwanze").Count();
-            
-            foreach (var props in LookupCache.NpcCache.Values.Where(i => i.name == "Fleischwanze"))
-            {
-                var mds = AssetCache.TryGetMds(props.baseMdsName);
-                var mdh = AssetCache.TryGetMdh(props.baseMdhName);
-                
-                var animNames = mds.animations.Select(i => i.name).ToArray();
-                
-                AnimationCreator.PlayAnimation(props.baseMdsName, "s_FistRunL", mdh, props.gameObject);
-            }
         }
     }
 }

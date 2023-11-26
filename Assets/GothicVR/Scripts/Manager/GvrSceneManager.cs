@@ -57,7 +57,7 @@ namespace GVR.Manager
         {
             try
             {
-                if (FeatureFlags.I.SkipMainMenu)
+                if (FeatureFlags.I.skipMainMenu)
                     await LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint, true);
                 else
                     await LoadMainMenu();
@@ -77,11 +77,8 @@ namespace GVR.Manager
             else
                 debugFreshlyDoneLoading = false;
             
-            if (FeatureFlags.I.CreateOcNpcs)
+            if (FeatureFlags.I.createOcNpcs)
                 PxVm.CallFunction(GameData.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
-
-            if (FeatureFlags.I.CreateDebugIdleAnimations)
-                NpcCreator.DebugAddIdleAnimationToAllNpc();
         }
 
         private async Task LoadMainMenu()

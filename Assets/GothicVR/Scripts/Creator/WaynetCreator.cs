@@ -80,7 +80,7 @@ namespace GVR.Creator
 
         private static void CreateWaypoints(GameObject parent, WorldData world)
         {
-            if (!FeatureFlags.I.CreateWaypoints)
+            if (!FeatureFlags.I.createWaypoints)
                 return;
 
             var waypointsObj = new GameObject(string.Format("Waypoints"));

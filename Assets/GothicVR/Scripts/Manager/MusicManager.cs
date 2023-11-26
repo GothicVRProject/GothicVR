@@ -197,7 +197,7 @@ namespace GVR.Manager
             pendingTags = tags;
             hasPending = true;
 
-            if (FeatureFlags.I.ShowMusicLogs)
+            if (FeatureFlags.I.showMusicLogs)
                 Debug.Log($"Playing music: theme >{musicName}< from file >{theme.file}<");
         }
 
@@ -208,7 +208,7 @@ namespace GVR.Manager
             pendingTheme = theme;
             hasPending = true;
 
-            if (FeatureFlags.I.ShowMusicLogs)
+            if (FeatureFlags.I.showMusicLogs)
                 Debug.Log($"[Music] Playing music: theme >{musicName}< from file >{theme.file}<");
         }
 

@@ -30,7 +30,7 @@ namespace GVR.Npc
         private void Start()
         {
             //Init starting position
-            if (!FeatureFlags.I.EnableNpcRoutines)
+            if (!FeatureFlags.I.enableNpcRoutines)
                 return;
             DateTime StartTime = new(1, 1, 1, 15, 0, 0);
             Invoke(StartTime);
@@ -38,7 +38,7 @@ namespace GVR.Npc
 
         public void Subscribe(Routine npcID, List<RoutineData> routines)
         {
-            if (!FeatureFlags.I.EnableNpcRoutines)
+            if (!FeatureFlags.I.enableNpcRoutines)
                 return;
         
             foreach (RoutineData routine in routines)   //Todo: fill in routines backwards, for Mud and Scorpio have bugged Routines and will be picked the wrong way as is.

@@ -17,21 +17,21 @@ namespace GVR.Editor.Tools
         private static readonly List<Tuple<string, Type, object>> ProductionFlags = new()
         {
             // Booleans
-            new(nameof(FeatureFlags.CreateVobs), typeof(bool), true),
-            new (nameof(FeatureFlags.CreateWaypoints), typeof(bool), true),
-            new (nameof(FeatureFlags.EnableDayTime), typeof(bool), true),
-            new (nameof(FeatureFlags.EnableSounds), typeof(bool), true),
-            new (nameof(FeatureFlags.EnableMusic), typeof(bool), true),
+            new(nameof(FeatureFlags.createVobs), typeof(bool), true),
+            new (nameof(FeatureFlags.createWaypoints), typeof(bool), true),
+            new (nameof(FeatureFlags.enableDayTime), typeof(bool), true),
+            new (nameof(FeatureFlags.enableSounds), typeof(bool), true),
+            new (nameof(FeatureFlags.enableMusic), typeof(bool), true),
             new (nameof(FeatureFlags.vobCulling), typeof(bool), true),
             new (nameof(FeatureFlags.enableSoundCulling), typeof(bool), true),
             new (nameof(FeatureFlags.vobItemsDynamicAttach), typeof(bool), true),
 
             // Ints
-            new (nameof(FeatureFlags.StartHour), typeof(int), 10),
-            new (nameof(FeatureFlags.StartMinute), typeof(int), 10),
+            new (nameof(FeatureFlags.startHour), typeof(int), 10),
+            new (nameof(FeatureFlags.startMinute), typeof(int), 10),
 
             // Enums (Handled as Int internally)
-            new (nameof(FeatureFlags.SunMovementPerformanceValue), typeof(int), FeatureFlags.SunMovementPerformance.EveryIngameMinute),
+            new (nameof(FeatureFlags.sunMovementPerformanceValue), typeof(int), FeatureFlags.SunMovementPerformance.EveryIngameMinute),
 
             // Special types
             new (nameof(FeatureFlags.vobCullingSmall), typeof(FeatureFlags.VobCullingGroupSetting),

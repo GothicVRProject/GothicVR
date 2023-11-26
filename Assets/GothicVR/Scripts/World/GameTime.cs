@@ -29,13 +29,13 @@ namespace GVR.World
 
         void Start()
         {
-            if (!FeatureFlags.I.EnableDayTime)
+            if (!FeatureFlags.I.enableDayTime)
                 return;
 
             // Set debug value for current Time.
             time = new DateTime(time.Year, time.Month, time.Day,
-                    FeatureFlags.I.StartHour, FeatureFlags.I.StartMinute, time.Second);
-            minutesInHour = FeatureFlags.I.StartMinute;
+                    FeatureFlags.I.startHour, FeatureFlags.I.startMinute, time.Second);
+            minutesInHour = FeatureFlags.I.startMinute;
             
             StartCoroutine(TimeTick());
         }
