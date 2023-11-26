@@ -150,7 +150,7 @@ namespace GVR.Npc
         /// </summary>
         public void AnimationEndCallback()
         {
-            properties.currentAction.AnimationEventEndCallback();
+            properties.currentAction.AnimationEndEventCallback();
         }
     }
 }

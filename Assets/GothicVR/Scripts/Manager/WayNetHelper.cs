@@ -65,7 +65,7 @@ namespace GVR.Manager
         }
 
 
-        public static DijkstraWaypoint[] FindFastestPath(string startWaypoint = null, string endWaypoint = null)
+        public static DijkstraWaypoint[] FindFastestPath(string startWaypoint, string endWaypoint)
         {
             // Start the timer
             var watch = Stopwatch.StartNew();

@@ -51,7 +51,7 @@ namespace GVR.Npc.Actions.AnimationActions
         /// <summary>
         /// Most of our animations are fine if we just set this flag and return it via IsFinished()
         /// </summary>
-        public virtual void AnimationEventEndCallback()
+        public virtual void AnimationEndEventCallback()
         {
             isFinished = true;
         }

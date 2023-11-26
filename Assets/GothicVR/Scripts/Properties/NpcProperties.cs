@@ -14,8 +14,9 @@ namespace GVR.Properties
         public PxVmNpcData npc;
         public AudioSource npcSound;
 
-        public FreePoint CurrentFreePoint;
-        
+        public FreePoint currentFreePoint;
+        public WayPoint currentWayPoint;
+            
         // Visual
         public string mdmName;
         public string baseMdsName;

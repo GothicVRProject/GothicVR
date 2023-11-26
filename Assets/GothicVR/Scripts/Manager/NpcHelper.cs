@@ -33,8 +33,10 @@ namespace GVR.Manager
 
             foreach (var fp in freePoints)
             {
-                if (props.CurrentFreePoint == fp)
+                // Kind of: If we're already standing on a FreePoint, then there is one available.
+                if (props.currentFreePoint == fp)
                     return true;
+                // Alternatively, we found a free one within range.
                 if (!fp.IsLocked)
                     return true;
             }
@@ -58,7 +60,7 @@ namespace GVR.Manager
             if (fp == null)
                 return false;
             // Ignore if we're already on this FP.
-            if (fp == props.CurrentFreePoint)
+            else if (fp == props.currentFreePoint)
                 return false;
             else if (fp.IsLocked)
                 return false;
@@ -76,7 +78,7 @@ namespace GVR.Manager
         
         public static bool ExtIsNpcOnFp(IntPtr npcPtr, string vobNamePart)
         {
-            var freePoint = GetProperties(npcPtr).CurrentFreePoint;
+            var freePoint = GetProperties(npcPtr).currentFreePoint;
 
             if (freePoint == null)
                 return false;

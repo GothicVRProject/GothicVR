@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using GVR.Caches;
 using GVR.Creator.Meshes;
 using GVR.Debugging;
@@ -135,6 +136,12 @@ namespace GVR.Creator
             }
             
             npcGo.transform.position = initialSpawnPoint.Position;
+
+            if (initialSpawnPoint.GetType() == typeof(WayPoint))
+                npcGo.GetComponent<NpcProperties>().currentWayPoint = (WayPoint)initialSpawnPoint;
+            else
+                npcGo.GetComponent<NpcProperties>().currentFreePoint = (FreePoint)initialSpawnPoint;
+            
         }
         
         public static void ExtTaMin(VmGothicExternals.ExtTaMinData data)

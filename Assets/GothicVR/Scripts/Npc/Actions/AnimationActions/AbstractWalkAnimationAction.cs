@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using GVR.Caches;
 using GVR.Creator;
-using GVR.Manager;
 using GVR.Npc.Data;
 using GVR.Phoenix.Interface.Vm;
 using UnityEngine;
@@ -19,11 +18,15 @@ namespace GVR.Npc.Actions.AnimationActions
             Done
         }
 
-        protected Vector3 movingLocation;
         protected WalkState walkState = WalkState.Initial;
 
         protected AbstractWalkAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
+        
+        /// <summary>
+        /// We need to define the final destination spot within overriding class.
+        /// </summary>
+        protected abstract Vector3 GetWalkDestination();
         
         public override void Tick(Transform transform)
         {
@@ -31,10 +34,10 @@ namespace GVR.Npc.Actions.AnimationActions
             {
                 case WalkState.Initial:
                     walkState = WalkState.Rotate;
-                    HandleRotation(transform, GetDestination());
+                    HandleRotation(transform, GetWalkDestination());
                     return;
                 case WalkState.Rotate:
-                    HandleRotation(transform, GetDestination());
+                    HandleRotation(transform, GetWalkDestination());
                     return;
                 case WalkState.Walk:
                     HandleWalk(transform);
@@ -47,9 +50,9 @@ namespace GVR.Npc.Actions.AnimationActions
             }
         }
 
-        public override void AnimationEventEndCallback()
+        public override void AnimationEndEventCallback()
         {
-            base.AnimationEventEndCallback();
+            base.AnimationEndEventCallback();
 
             walkingStartPos = npcGo.transform.localPosition;
             npcGo.GetComponent<Animation>()[animationData.clip.name].time = 0f;
@@ -85,18 +88,13 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             // RotateIfNeeded
             {
-                var destination = GetDestination();
-                if (GetDestination() != default)
+                var destination = GetWalkDestination();
+                if (GetWalkDestination() != default)
                     HandleRotation(transform, destination);
             }
             HandleRootMotion(transform);
         }
-
-        protected virtual Vector3 GetDestination()
-        {
-            return default;
-        }
-
+        
         private void HandleRotation(Transform transform, Vector3 destination)
         {
             var sameHeightDirection = new Vector3(destination.x, transform.position.y, destination.z);

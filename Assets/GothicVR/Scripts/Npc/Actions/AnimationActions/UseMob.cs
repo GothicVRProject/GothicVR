@@ -15,6 +15,8 @@ namespace GVR.Npc.Actions.AnimationActions
         private const string mobUseString = "T_{0}_{1}_{2}_2_{3}";
         private GameObject mobGo;
         private GameObject slotGo;
+        private Vector3 destination;
+
 
         public UseMob(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
@@ -29,7 +31,6 @@ namespace GVR.Npc.Actions.AnimationActions
 
             mobGo = mob;
             slotGo = slotPos;
-            movingLocation = slotPos.transform.position;
         }
 
         [CanBeNull]
@@ -89,11 +90,16 @@ namespace GVR.Npc.Actions.AnimationActions
             else
                 return "";
         }
-        
+
+        protected override Vector3 GetWalkDestination()
+        {
+            return destination;
+        }
+
         /// <summary>
         /// Only after the Mob is reached and final animation is done, we will close the loop.
         /// </summary>
-        public override void AnimationEventEndCallback()
+        public override void AnimationEndEventCallback()
         {
             if (walkState == WalkState.Done)
                 isFinished = true;

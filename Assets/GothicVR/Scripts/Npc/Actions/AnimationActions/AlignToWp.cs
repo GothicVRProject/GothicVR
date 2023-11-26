@@ -12,7 +12,7 @@ namespace GVR.Npc.Actions.AnimationActions
             // FIXME TODO
         }
 
-        public override void AnimationEventEndCallback()
+        public override void AnimationEndEventCallback()
         {
             // FIXME TODO
         }

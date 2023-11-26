@@ -40,8 +40,10 @@ namespace GVR.Npc
         {
             if (!FeatureFlags.I.enableNpcRoutines)
                 return;
-        
-            foreach (RoutineData routine in routines)   //Todo: fill in routines backwards, for Mud and Scorpio have bugged Routines and will be picked the wrong way as is.
+
+            // We need to fill in routines backwards as e.g. Mud and Scorpio have duplicate routines. Last one needs to win.
+            routines.Reverse();
+            foreach (var routine in routines)
             {
                 npcStartTimeDict.TryAdd(routine.start, new());
                 npcStartTimeDict[routine.start].Add(npcID);

@@ -17,8 +17,6 @@ namespace GVR.Npc.Actions.AnimationActions
             var pos = npcGo.transform.position;
 
             fp = WayNetHelper.FindNearestFreePoint(pos, action.str0);
-
-            movingLocation = fp.Position;
         }
         
         public override void OnTriggerEnter(Collider coll)
@@ -29,7 +27,7 @@ namespace GVR.Npc.Actions.AnimationActions
             if (coll.gameObject.name != fp.Name)
                 return;
 
-            props.CurrentFreePoint = fp;
+            props.currentFreePoint = fp;
             fp.IsLocked = true;
 
             var animationComp = npcGo.GetComponent<Animation>();
@@ -39,17 +37,16 @@ namespace GVR.Npc.Actions.AnimationActions
             isFinished = true;
         }
 
-        public override void AnimationEventEndCallback()
+        public override void AnimationEndEventCallback()
         {
-            base.AnimationEventEndCallback();
+            base.AnimationEndEventCallback();
 
             isFinished = false;
         }
 
-        protected override Vector3 GetDestination()
+        protected override Vector3 GetWalkDestination()
         {
             return fp.Position;
         }
-
     }
 }
