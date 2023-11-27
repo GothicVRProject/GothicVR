@@ -8,7 +8,7 @@ namespace GVR.Npc.Actions.AnimationActions
 {
     public class GoToWp : AbstractWalkAnimationAction
     {
-        private string destination => action.str0;
+        private string destination => action.String0;
 
         private Stack<DijkstraWaypoint> route;
             
@@ -17,8 +17,11 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            // Happens (e.g.) during spawning. As we spawn NPCs onto their current WayPoints, they don't need to walk there from entrance of OC.
-            if (props.currentWayPoint.Name == destination)
+            /*
+             * 1. AI_StartState() can get called multiple times until it won't share the WP. (e.g. ZS_SLEEP -> ZS_StandAround())
+             * 2. Happens (e.g.) during spawning. As we spawn NPCs onto their current WayPoints, they don't need to walk there from entrance of OC.
+             */
+            if (destination == "" || props.currentWayPoint.Name == destination)
             {
                 isFinished = true;
                 return;

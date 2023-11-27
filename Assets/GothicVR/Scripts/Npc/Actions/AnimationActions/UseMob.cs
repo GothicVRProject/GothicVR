@@ -37,7 +37,7 @@ namespace GVR.Npc.Actions.AnimationActions
         private GameObject GetNearestMob()
         {
             var pos = npcGo.transform.position;
-            return VobHelper.GetFreeInteractableWithin10M(pos, action.str0)?.gameObject;
+            return VobHelper.GetFreeInteractableWithin10M(pos, action.String0)?.gameObject;
         }
         
         [CanBeNull]
@@ -75,7 +75,7 @@ namespace GVR.Npc.Actions.AnimationActions
             var slotPositionName = GetSlotPositionTag(slotGo.name);
             
             // FIXME - Somewhat hardcoded. Needs more love in the future!
-            var animName = string.Format(mobUseString, mobVisualName, slotPositionName, "S0", $"S{action.i0}");
+            var animName = string.Format(mobUseString, mobVisualName, slotPositionName, "S0", $"S{action.Int0}");
             
             var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
             AnimationCreator.PlayAnimation(props.baseMdsName, animName, mdh, npcGo);

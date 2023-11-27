@@ -16,7 +16,7 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             var pos = npcGo.transform.position;
 
-            fp = WayNetHelper.FindNearestFreePoint(pos, action.str0);
+            fp = WayNetHelper.FindNearestFreePoint(pos, action.String0);
         }
         
         public override void OnTriggerEnter(Collider coll)

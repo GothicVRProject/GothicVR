@@ -20,26 +20,26 @@ namespace GVR.Npc.Actions.AnimationActions
         public override void Start()
         {
             // Nothing in hand && new item shall be put into hand
-            if (props.itemAnimationState < 0 && action.i0 >= 0)
+            if (props.itemAnimationState < 0 && action.Int0 >= 0)
             {
-                StartItemStateAnimation(action.i0);
+                StartItemStateAnimation(action.Int0);
                 props.hasItemEquipped = true;
             }
             // Something in hand && item shall be removed
-            else if (props.itemAnimationState >= 0 && action.i0 < 0)
+            else if (props.itemAnimationState >= 0 && action.Int0 < 0)
             {
                 EndItemStateAnimation(props.itemAnimationState);
                 props.hasItemEquipped = false;
             }
 
-            props.itemAnimationState = action.i0;
-            props.currentItem = action.ui0;
+            props.itemAnimationState = action.Int0;
+            props.currentItem = action.Uint0;
         }
 
         private void StartItemStateAnimation(int itemAnimationState)
         {
             var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            var item = AssetCache.TryGetItemData(action.ui0);
+            var item = AssetCache.TryGetItemData(action.Uint0);
 
             // e.g. T_POTION_STAND_2_S0
             var animationName = string.Format(animationStartScheme, item.schemeName, itemAnimationState);
@@ -50,7 +50,7 @@ namespace GVR.Npc.Actions.AnimationActions
         private void EndItemStateAnimation(int itemAnimationState)
         {
             var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            var item = AssetCache.TryGetItemData(action.ui0);
+            var item = AssetCache.TryGetItemData(action.Uint0);
 
             // e.g. T_POTION_S0_2_STAND
             var animationName = string.Format(animationEndScheme, item.schemeName, itemAnimationState);

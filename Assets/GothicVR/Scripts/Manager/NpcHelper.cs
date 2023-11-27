@@ -140,7 +140,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npcPtr);
             props.AnimationQueue.Enqueue(new Wait(
-                new(AnimationAction.Type.AIWait, f0: seconds),
+                new(AnimationAction.Type.AIWait, float0: seconds),
                 props.gameObject));
         }
 
@@ -148,7 +148,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npcPtr);
             props.AnimationQueue.Enqueue(new UseMob(
-                new(AnimationAction.Type.AIUseMob, str0: target, i0: state),
+                new(AnimationAction.Type.AIUseMob, string0: target, int0: state),
                 props.gameObject));
         }
         
@@ -172,7 +172,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npcPtr);
             props.AnimationQueue.Enqueue(new GoToWp(
-                new(AnimationAction.Type.AIGoToWP, str0: point),
+                new(AnimationAction.Type.AIGoToWP, string0: point),
                 props.gameObject));
         }
 
@@ -180,7 +180,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npcPtr);
             props.AnimationQueue.Enqueue(new GoToNextFp(
-                new(AnimationAction.Type.AIGoToNextFp, str0: fpNamePart),
+                new(AnimationAction.Type.AIGoToNextFp, string0: fpNamePart),
                 props.gameObject));
         }
 
@@ -196,24 +196,16 @@ namespace GVR.Manager
         {
             var props = GetProperties(npcPtr);
             props.AnimationQueue.Enqueue(new PlayAni(
-                new(AnimationAction.Type.AIPlayAni, str0: name),
+                new(AnimationAction.Type.AIPlayAni, string0: name),
                 props.gameObject));
         }
 
         public static void ExtAiStartState(IntPtr npcPtr, uint action, bool stopCurrentState, string wayPointName)
         {
             var props = GetProperties(npcPtr);
-            var ai = props.GetComponent<AiHandler>();
-
-            ai.ClearState(stopCurrentState);
-            
-            if (wayPointName != "")
-                Debug.LogError("FIXME - Waypoint unused so far.");
-            
-            props.isStateTimeActive = true;
-            props.stateTime = 0;
-            
-            ai.StartRoutine(action, wayPointName);
+            props.AnimationQueue.Enqueue(new StartState(
+                new(AnimationAction.Type.AIStartState, uint0: action, bool0: stopCurrentState, string0: wayPointName),
+                props.gameObject));
         }
 
         public static float ExtNpcGetStateTime(IntPtr npcPtr)
@@ -238,7 +230,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npcPtr);
             props.AnimationQueue.Enqueue(new UseItemToState(
-                new(AnimationAction.Type.AIUseItemToState, ui0: itemId, i0: animationState),
+                new(AnimationAction.Type.AIUseItemToState, uint0: itemId, int0: animationState),
                 props.gameObject));
         }
 
