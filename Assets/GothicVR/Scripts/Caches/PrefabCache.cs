@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace GVR.Caches
 {
@@ -11,6 +12,7 @@ namespace GVR.Caches
         public enum PrefabType
         {
             Npc,
+            WayPoint,
             VobItem,
             VobInteractable,
             VobSpot,
@@ -26,6 +28,7 @@ namespace GVR.Caches
             return type switch
             {
                 PrefabType.Npc => "Prefabs/Npc",
+                PrefabType.WayPoint => "Prefabs/WayPoint",
                 PrefabType.VobItem => "Prefabs/Vobs/oCItem",
                 PrefabType.VobInteractable => "Prefabs/Vobs/Interactable",
                 PrefabType.VobSpot => "Prefabs/Vobs/zCVobSpot",
@@ -41,13 +44,13 @@ namespace GVR.Caches
         public static GameObject TryGetObject(PrefabType type)
         {
             if (prefabCache.TryGetValue(type, out var prefab))
-                return GameObject.Instantiate(prefab);
+                return Object.Instantiate(prefab);
             
             var path = GetPath(type);
             var newPrefab = Resources.Load<GameObject>(path);
 
             prefabCache[type] = newPrefab;
-            return GameObject.Instantiate(newPrefab);
+            return Object.Instantiate(newPrefab);
         }
     }
 }

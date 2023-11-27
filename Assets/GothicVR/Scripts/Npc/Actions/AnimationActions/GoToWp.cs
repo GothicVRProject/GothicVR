@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using GVR.Extensions;
 using GVR.Manager;
 using GVR.World;
 using UnityEngine;
@@ -11,7 +10,7 @@ namespace GVR.Npc.Actions.AnimationActions
     {
         private string destination => action.str0;
 
-        private Queue<DijkstraWaypoint> route;
+        private Stack<DijkstraWaypoint> route;
             
         public GoToWp(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
@@ -25,7 +24,7 @@ namespace GVR.Npc.Actions.AnimationActions
                 return;
             }
             
-            route = new Queue<DijkstraWaypoint>(WayNetHelper.FindFastestPath(props.currentWayPoint.Name, destination));
+            route = new Stack<DijkstraWaypoint>(WayNetHelper.FindFastestPath(props.currentWayPoint.Name, destination));
         }
         
         public override void OnTriggerEnter(Collider coll)
@@ -39,13 +38,15 @@ namespace GVR.Npc.Actions.AnimationActions
             // FIXME - get current waypoint object
             // props.currentWayPoint = coll.gameObject.
 
-            route.Dequeue();
-            
+            route.Pop();
+
             if (route.Count == 0)
             {
                 walkState = WalkState.Done;
                 isFinished = true;
             }
+            else
+                walkState = WalkState.Initial;
         }
 
         protected override Vector3 GetWalkDestination()

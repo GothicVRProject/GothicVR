@@ -4,6 +4,7 @@ using GVR.Manager;
 using GVR.Phoenix.Data;
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Caches;
 using GVR.Phoenix.Interface;
 using GVR.World;
 using UnityEngine;
@@ -88,15 +89,12 @@ namespace GVR.Creator
 
             foreach (var waypoint in world.waypoints)
             {
-                GameObject wpObject;
-                if (FeatureFlags.I.createWayPointMeshes)
-                {
-                    wpObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    wpObject.transform.localScale = new(0.5f, 0.5f, 0.5f);
-                    GameObject.Destroy(wpObject.GetComponent<Collider>());
-                }
-                else
-                    wpObject = new GameObject();
+                var wpObject = PrefabCache.TryGetObject(PrefabCache.PrefabType.WayPoint);
+
+                // We remove the Renderer only if not wanted.
+                // TODO - Can be outsourced to a different Prefab-variant without Renderer for a fractal of additional performance. ;-)
+                if (!FeatureFlags.I.createWayPointMeshes)
+                    Object.Destroy(wpObject.GetComponent<MeshRenderer>());
 
                 wpObject.tag = ConstantsManager.SpotTag;
                 wpObject.name = waypoint.name;

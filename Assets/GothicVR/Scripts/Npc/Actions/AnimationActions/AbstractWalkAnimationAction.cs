@@ -126,8 +126,6 @@ namespace GVR.Npc.Actions.AnimationActions
             transform.localPosition = walkingStartPos + transform.localRotation * indexObj.position;
 
             // transform.localRotation = newRot * walkingStartRot;
-
-            Debug.Log(currentTime);
         }
     }
 }

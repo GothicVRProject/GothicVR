@@ -30,9 +30,9 @@ namespace GVR.Npc
 
         public void ChangeRoutine(DateTime time)
         {
-            var instancePtr = GetComponent<NpcProperties>().npc.instancePtr;
-            var npcRoutine = routines.FirstOrDefault(item => item.start <= time && time < item.stop);
-            PxVm.CallFunction(GameData.VmGothicPtr, (uint)npcRoutine.action, instancePtr);
+            var npcRoutine = routines.First(item => item.start <= time && time < item.stop);
+
+            GetComponent<AiHandler>().StartRoutine((uint)npcRoutine.action, npcRoutine.waypoint);
         }
     }
 }
