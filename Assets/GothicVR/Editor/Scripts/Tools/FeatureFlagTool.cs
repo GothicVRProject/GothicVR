@@ -87,6 +87,17 @@ namespace GVR.Editor.Tools
                     case "VobCullingGroupSetting":
                             field.SetValue(featureFlags, new FeatureFlags.VobCullingGroupSetting());
                             break;
+                    case "List`1":
+                        switch (field.FieldType.GenericTypeArguments[0].Name)
+                        {
+                            case "Int32":
+                                ((List<int>)field.GetValue(featureFlags)).Clear();
+                                break;
+                            default:
+                                Debug.LogError($"Unsupported field type {field.FieldType.Name}");
+                                break;
+                        }
+                        break;
                     default:
                         Debug.LogError($"Unsupported field type {field.FieldType.Name}");
                         break;

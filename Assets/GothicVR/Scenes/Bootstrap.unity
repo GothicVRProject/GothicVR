@@ -341,6 +341,7 @@ MonoBehaviour:
   drawVobCullingGizmos: 0
   createOcNpcs: 0
   enableNpcRoutines: 0
+  npcToSpawn: 
   showPhoenixDebugMessages: 0
   showZspyLogs: 0
   showPhoenixVfsFileNotFoundErrors: 0

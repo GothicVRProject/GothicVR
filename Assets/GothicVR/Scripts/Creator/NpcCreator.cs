@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using GVR.Caches;
 using GVR.Creator.Meshes;
 using GVR.Debugging;
@@ -15,6 +14,7 @@ using GVR.Vob.WayNet;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace GVR.Creator
 {
@@ -24,9 +24,6 @@ namespace GVR.Creator
 
         // Hint - If this scale ratio isn't looking well, feel free to change it.
         private const float fatnessScale = 0.1f;
-        private const int DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY = 1;
-        private const int DEBUG_BLOODWYN_INSTANCE_ID = 6596;
-        private static int debugNpcsSpawned;
 
         private static GameObject GetRootGo()
         {
@@ -65,7 +62,7 @@ namespace GVR.Creator
         {
             return GetProperties(npcPtr).gameObject;
         }
-        
+
         /// <summary>
         /// Original Gothic uses this function to spawn an NPC instance into the world.
         /// 
@@ -75,13 +72,6 @@ namespace GVR.Creator
         /// </summary>
         public static void ExtWldInsertNpc(int npcInstance, string spawnPoint)
         {
-            // if (++debugNpcsSpawned > DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY)
-            //     return;
-            
-            if (npcInstance != DEBUG_BLOODWYN_INSTANCE_ID)
-                return;
-            
-            
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             var props = newNpc.GetComponent<NpcProperties>();
             
@@ -100,6 +90,12 @@ namespace GVR.Creator
                 props.Copy(origProps);
             }
 
+            if (FeatureFlags.I.npcToSpawn.Any() && !FeatureFlags.I.npcToSpawn.Contains(props.npc.id))
+            {
+                Object.Destroy(newNpc);
+                return;
+            }
+
             newNpc.name = props.npc!.names[0];
             
             var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
@@ -110,7 +106,9 @@ namespace GVR.Creator
                 NpcMeshCreator.EquipWeapon(newNpc, equippedItem, equippedItem.mainFlag, equippedItem.flags);
             
             SetSpawnPoint(newNpc, spawnPoint, props.npc);
-            StartRoutine(newNpc);
+
+            if (FeatureFlags.I.enableNpcRoutines)
+                StartRoutine(newNpc);
         }
 
         private static void SetSpawnPoint(GameObject npcGo, string spawnPoint, PxVmNpcData pxNpc)

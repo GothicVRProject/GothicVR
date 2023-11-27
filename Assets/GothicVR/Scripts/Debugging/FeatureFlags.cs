@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -54,6 +55,10 @@ namespace GVR.Debugging
         [Header("__________NPCs__________")]
         public bool createOcNpcs;
         public bool enableNpcRoutines;
+
+        [Header("__________NPCs - Developer__________")]
+        [Tooltip("Add the Daedalus ids for NPCs to spawn. Take them from C_NPC instances. (Ignored if empty)")]
+        public List<int> npcToSpawn;
 
         [Header("__________SPAMmy debug messages__________")]
         public bool showPhoenixDebugMessages;
