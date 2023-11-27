@@ -30,6 +30,11 @@ namespace GVR.Npc.Actions.AnimationActions
         
         public override void Tick(Transform transform)
         {
+            base.Tick(transform);
+
+            if (isFinished)
+                return;
+
             switch (walkState)
             {
                 case WalkState.Initial:
@@ -40,7 +45,7 @@ namespace GVR.Npc.Actions.AnimationActions
                     HandleRotation(transform, GetWalkDestination());
                     return;
                 case WalkState.Walk:
-                    HandleWalk(transform);
+                    HandleWalk(transform, GetWalkDestination());
                     return;
                 case WalkState.Done:
                     return; // NOP
@@ -84,14 +89,8 @@ namespace GVR.Npc.Actions.AnimationActions
             walkState = WalkState.Walk;
         }
 
-        private void HandleWalk(Transform transform)
+        private void HandleWalk(Transform transform, Vector3 destination)
         {
-            // RotateIfNeeded
-            {
-                var destination = GetWalkDestination();
-                if (GetWalkDestination() != default)
-                    HandleRotation(transform, destination);
-            }
             HandleRootMotion(transform);
         }
         

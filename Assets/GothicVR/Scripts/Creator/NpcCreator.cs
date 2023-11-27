@@ -273,9 +273,9 @@ namespace GVR.Creator
         private static void StartRoutine(GameObject npc)
         {
             var routineComp = npc.GetComponent<Routine>();
-            var firstRoutine = routineComp.routines.FirstOrDefault();
+            var firstRoutine = routineComp.routines.First();
 
-            npc.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action);
+            npc.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action, firstRoutine.waypoint);
         }
     }
 }

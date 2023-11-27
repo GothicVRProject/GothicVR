@@ -213,7 +213,7 @@ namespace GVR.Manager
             props.isStateTimeActive = true;
             props.stateTime = 0;
             
-            ai.StartRoutine(action);
+            ai.StartRoutine(action, wayPointName);
         }
 
         public static float ExtNpcGetStateTime(IntPtr npcPtr)

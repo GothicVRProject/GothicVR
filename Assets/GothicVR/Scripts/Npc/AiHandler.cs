@@ -17,7 +17,14 @@ namespace GVR.Npc
         {
             properties.currentAction = new None(new(AnimationAction.Type.AINone), gameObject);
         }
-        
+
+        /// <summary>
+        /// Basically:
+        /// 1. Send Update (Tick) into current Animation to handle
+        /// 2. If finished, then check, if we need to handle the new state. _Start() --> _Loop()
+        ///
+        /// Hint: The isStateTimeActive is only for AI_StartState() from Daedalus which calls sub-routine within routine.
+        /// </summary>
         private void Update()
         {
             properties.currentAction.Tick(transform);
@@ -53,8 +60,12 @@ namespace GVR.Npc
             }
         }
 
-        public void StartRoutine(uint action)
+        public void StartRoutine(uint action, string wayPointName)
         {
+            // We need to set WayPoint within Daedalus instance as it calls _self.wp_ during routine loops.
+            PxVm.pxVmInstanceNpcSetWP(properties.npc.instancePtr, wayPointName);
+            properties.npc.wp = wayPointName;
+
             properties.stateStart = action;
 
             var routineSymbol = PxDaedalusScript.GetSymbol(GameData.VmGothicPtr, action);

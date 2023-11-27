@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GVR.Extensions;
 using GVR.Manager;
-using GVR.Properties;
 using GVR.World;
 using UnityEngine;
 
@@ -20,7 +19,7 @@ namespace GVR.Npc.Actions.AnimationActions
         public override void Start()
         {
             // Happens (e.g.) during spawning. As we spawn NPCs onto their current WayPoints, they don't need to walk there from entrance of OC.
-            if (props.currentWayPoint.Name.EqualsIgnoreCase(destination))
+            if (props.currentWayPoint.Name == destination)
             {
                 isFinished = true;
                 return;
