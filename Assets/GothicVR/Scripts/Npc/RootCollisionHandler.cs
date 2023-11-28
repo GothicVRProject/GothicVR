@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GVR.Npc
 {
-    public class RootColliderHandler : MonoBehaviour
+    public class RootCollisionHandler : MonoBehaviour
     {
         public NpcProperties properties;
 

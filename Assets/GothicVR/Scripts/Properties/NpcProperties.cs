@@ -5,16 +5,16 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Vob.WayNet;
 using PxCs.Data.Vm;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace GVR.Properties
 {
     public class NpcProperties : AbstractProperties
     {
-        public GameObject rootCollider;
-
         public IntPtr npcPtr;
         public PxVmNpcData npc;
         public AudioSource npcSound;
+        public GameObject rootMotionGo;
 
         public FreePoint currentFreePoint;
         public WayPoint currentWayPoint;

@@ -37,7 +37,20 @@ namespace GVR.Creator.Meshes
             {
                 for (var i = 0; i < mdh.nodes.Length; i++)
                 {
-                    nodeObjects[i] = new GameObject(mdh.nodes[i].name);
+                    var node = mdh.nodes[i];
+                    // We attached some Components to root of bones. Therefore reusing it.
+                    if (node.name == "BIP01")
+                    {
+                        var bip01 = rootGo.FindChildRecursively("BIP01");
+                        if (bip01 != null)
+                            nodeObjects[i] = rootGo.FindChildRecursively("BIP01");
+                        else
+                            nodeObjects[i] = new GameObject(mdh.nodes[i].name);
+                    }
+                    else
+                    {
+                        nodeObjects[i] = new GameObject(mdh.nodes[i].name);
+                    }
                 }
 
                 // Now set parents

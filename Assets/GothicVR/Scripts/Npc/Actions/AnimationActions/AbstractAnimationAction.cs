@@ -98,7 +98,7 @@ namespace GVR.Npc.Actions.AnimationActions
             // The whole RootMotion needs to be copied over to the NPCs Collider to ensure we have proper collision detection during animation time.
             var bip01Transform = NpcGo.FindChildRecursively("BIP01").transform;
 
-            Props.rootCollider.transform.SetLocalPositionAndRotation(bip01Transform.localPosition, bip01Transform.localRotation);
+            Props.rootMotionGo.transform.SetLocalPositionAndRotation(bip01Transform.localPosition, bip01Transform.localRotation);
 
 
             /*
@@ -106,7 +106,7 @@ namespace GVR.Npc.Actions.AnimationActions
              * Hint: If an NPC walks up, the +y velocity isn't enough. Therefore we add up some force to help the NPC to not fall through the ground.
              * FIXME - There will be better solutions like setting it static to a value of ~+2f etc. Need to check later!
              */
-            var velocity = Props.rootCollider.GetComponent<Rigidbody>().velocity;
+            var velocity = Props.rootMotionGo.GetComponent<Rigidbody>().velocity;
             if (velocity.y > 0.0f)
             {
                 velocity.y += prevVelocityUpAddition;
