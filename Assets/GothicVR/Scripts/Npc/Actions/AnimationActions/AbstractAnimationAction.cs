@@ -59,6 +59,9 @@ namespace GVR.Npc.Actions.AnimationActions
         /// </summary>
         public virtual void AnimationEndEventCallback()
         {
+            var bip01Transform = NpcGo.FindChildRecursively("BIP01").transform;
+            Props.rootCollider.transform.SetLocalPositionAndRotation(bip01Transform.localPosition, bip01Transform.localRotation);
+
             isFinished = true;
         }
 
@@ -84,6 +87,23 @@ namespace GVR.Npc.Actions.AnimationActions
         /// </summary>
         protected void HandleRootMotion(Transform transform)
         {
+            /*
+             * root
+             *  /BIP01/ <- animation root
+             *    /BIP01/... <- animation bones
+             *  /RootCollider/ <- gets transform.pos+rot from /BIP01
+             */
+
+            // The whole RootMotion needs to be copied over to the NPCs Collider to ensure we have proper collision detection during animation time.
+            var bip01Transform = NpcGo.FindChildRecursively("BIP01").transform;
+            Props.rootCollider.transform.SetLocalPositionAndRotation(bip01Transform.localPosition, bip01Transform.localRotation);
+
+            // On top of collision, we also need to handle physics. This is done by changing root's position with
+            // dynamic rigidbody's velocity.
+            bip01Transform.parent.localPosition += Props.rootCollider.GetComponent<Rigidbody>().velocity * Time.deltaTime;
+
+            return;
+
             var currentTime = NpcGo.GetComponent<Animation>()[AnimationData.clip.name].time;
 
             // We seek the item, which is the exact animation at that time or the next with only a few milliseconds more time.

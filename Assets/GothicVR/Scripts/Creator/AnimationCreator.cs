@@ -102,7 +102,7 @@ namespace GVR.Creator
             {
                 var path = GetChildPathRecursively(rootBone.transform, entry.Key, "");
                 
-                if (path.EqualsIgnoreCase("BIP01"))
+                if (path.EqualsIgnoreCase("BIP01!!!"))
                 {
                     // We reorganize RootMotion entries to get more performance during execution each frame.
                     // Takes slightly more time to create during first load, but will benefit within Update().

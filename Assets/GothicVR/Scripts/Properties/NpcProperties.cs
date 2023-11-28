@@ -10,6 +10,8 @@ namespace GVR.Properties
 {
     public class NpcProperties : AbstractProperties
     {
+        public GameObject rootCollider;
+
         public IntPtr npcPtr;
         public PxVmNpcData npc;
         public AudioSource npcSound;
