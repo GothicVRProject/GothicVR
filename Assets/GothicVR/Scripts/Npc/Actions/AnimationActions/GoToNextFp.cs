@@ -32,6 +32,7 @@ namespace GVR.Npc.Actions.AnimationActions
 
             var animationComp = NpcGo.GetComponent<Animation>();
             animationComp.Stop();
+            AnimationEndEventCallback();
 
             walkState = WalkState.Done;
             isFinished = true;

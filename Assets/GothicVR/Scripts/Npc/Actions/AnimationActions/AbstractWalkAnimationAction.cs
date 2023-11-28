@@ -1,8 +1,6 @@
 using System;
-using System.Linq;
 using GVR.Caches;
 using GVR.Creator;
-using GVR.Npc.Data;
 using GVR.Phoenix.Interface.Vm;
 using UnityEngine;
 
@@ -55,14 +53,6 @@ namespace GVR.Npc.Actions.AnimationActions
             }
         }
 
-        public override void AnimationEndEventCallback()
-        {
-            base.AnimationEndEventCallback();
-
-            AnimationStartPos = NpcGo.transform.localPosition;
-            NpcGo.GetComponent<Animation>()[AnimationData.clip.name].time = 0f;
-        }
-
         private string GetWalkModeAnimationString()
         {
             switch (Props.walkMode)
@@ -79,9 +69,7 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             var animName = GetWalkModeAnimationString();
             var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
-            AnimationData = AnimationCreator.PlayAnimation(Props.baseMdsName, animName, mdh, NpcGo, true);
-
-            AnimationStartPos = NpcGo.transform.localPosition;
+            AnimationCreator.PlayAnimation(Props.baseMdsName, animName, mdh, NpcGo, true);
 
             walkState = WalkState.Walk;
         }

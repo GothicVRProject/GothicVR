@@ -1,12 +1,9 @@
-using System.Linq;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
-using GVR.Npc.Data;
 using GVR.Properties;
 using PxCs.Data.Event;
 using PxCs.Interface;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
@@ -15,10 +12,6 @@ namespace GVR.Npc.Actions.AnimationActions
         protected readonly AnimationAction Action;
         protected readonly GameObject NpcGo;
         protected readonly NpcProperties Props;
-
-        // Root motion handling
-        protected Vector3 AnimationStartPos;
-        protected AnimationData AnimationData;
 
         protected bool isFinished;
 
@@ -60,7 +53,13 @@ namespace GVR.Npc.Actions.AnimationActions
         public virtual void AnimationEndEventCallback()
         {
             var bip01Transform = NpcGo.FindChildRecursively("BIP01").transform;
-            Props.rootCollider.transform.SetLocalPositionAndRotation(bip01Transform.localPosition, bip01Transform.localRotation);
+            var root = NpcGo.transform;
+            root.position = bip01Transform.position;
+            bip01Transform.localPosition = Vector3.zero;
+
+            // root.SetLocalPositionAndRotation(
+            //     root.localPosition + bip01Transform.localPosition,
+            //     root.localRotation * bip01Transform.localRotation);
 
             isFinished = true;
         }
@@ -82,6 +81,8 @@ namespace GVR.Npc.Actions.AnimationActions
         public virtual void Tick(Transform transform)
         { }
 
+        private float prevVelocityUpAddition;
+
         /// <summary>
         /// As we use legacy animations, we can't use RootMotion. We therefore need to rebuild it.
         /// </summary>
@@ -96,24 +97,27 @@ namespace GVR.Npc.Actions.AnimationActions
 
             // The whole RootMotion needs to be copied over to the NPCs Collider to ensure we have proper collision detection during animation time.
             var bip01Transform = NpcGo.FindChildRecursively("BIP01").transform;
+
             Props.rootCollider.transform.SetLocalPositionAndRotation(bip01Transform.localPosition, bip01Transform.localRotation);
 
-            // On top of collision, we also need to handle physics. This is done by changing root's position with
-            // dynamic rigidbody's velocity.
-            bip01Transform.parent.localPosition += Props.rootCollider.GetComponent<Rigidbody>().velocity * Time.deltaTime;
 
-            return;
+            /*
+             * On top of collision, we also need to handle physics. This is done by changing root's position with dynamic rigidbody's velocity.
+             * Hint: If an NPC walks up, the +y velocity isn't enough. Therefore we add up some force to help the NPC to not fall through the ground.
+             * FIXME - There will be better solutions like setting it static to a value of ~+2f etc. Need to check later!
+             */
+            var velocity = Props.rootCollider.GetComponent<Rigidbody>().velocity;
+            if (velocity.y > 0.0f)
+            {
+                velocity.y += prevVelocityUpAddition;
+                prevVelocityUpAddition += 0.1f;
+            }
+            else
+            {
+                prevVelocityUpAddition = 0f;
+            }
 
-            var currentTime = NpcGo.GetComponent<Animation>()[AnimationData.clip.name].time;
-
-            // We seek the item, which is the exact animation at that time or the next with only a few milliseconds more time.
-            // It's more performant to search for than doing a _between_ check ;-)
-            var indexObj = AnimationData.rootMotions.FirstOrDefault(i => i.time >= currentTime);
-
-            // location, when animation started + (rootMotion's location change rotated into direction of current localRot)
-            transform.localPosition = AnimationStartPos + transform.localRotation * indexObj.position;
-
-            // transform.localRotation = newRot * walkingStartRot;
+            NpcGo.transform.localPosition += velocity * Time.deltaTime;
         }
         
         /// <summary>

@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.Npc.Actions;
-using GVR.Npc.Data;
 using PxCs.Data.Animation;
 using PxCs.Data.Model;
 using UnityEngine;
@@ -14,7 +12,7 @@ namespace GVR.Creator
 {
     public static class AnimationCreator
     {
-        public static AnimationData PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
+        public static void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
         {
             var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var animationComp = go.GetComponent<Animation>();
@@ -23,25 +21,23 @@ namespace GVR.Creator
             var pxAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
 
             // Try to load from cache
-            if (!LookupCache.AnimationCache.TryGetValue(mdsAnimationKeyName, out var animationData))
+            if (!LookupCache.AnimationClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
             {
-                animationData = LoadAnimationClip(pxAnimation, mdh, go, repeat, mdsAnimationKeyName);
-                LookupCache.AnimationCache[mdsAnimationKeyName] = animationData;
+                clip = LoadAnimationClip(pxAnimation, mdh, go, repeat, mdsAnimationKeyName);
+                LookupCache.AnimationClipCache[mdsAnimationKeyName] = clip;
             }
 
             if (animationComp[mdsAnimationKeyName] == null)
             {
-                AddClipEvents(animationData.clip, mds, pxAnimation, animationName);
-                AddClipEndEvent(animationData.clip);
-                animationComp.AddClip(animationData.clip, mdsAnimationKeyName);
+                AddClipEvents(clip, mds, pxAnimation, animationName);
+                AddClipEndEvent(clip);
+                animationComp.AddClip(clip, mdsAnimationKeyName);
             }
 
             animationComp.Play(mdsAnimationKeyName);
-
-            return animationData;
         }
 
-        private static AnimationData LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone, bool repeat, string clipName)
+        private static AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone, bool repeat, string clipName)
         {
             var clip = new AnimationClip
             {
@@ -50,11 +46,6 @@ namespace GVR.Creator
                 wrapMode = repeat ? WrapMode.Loop : WrapMode.Once
             };
 
-            var animationData = new AnimationData()
-            {
-                clip = clip
-            };
-            
             var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.nodeCount);
             var boneNames = pxAnimation.node_indices!.Select(nodeIndex => mdh.nodes![nodeIndex].name).ToArray();
 
@@ -102,45 +93,20 @@ namespace GVR.Creator
             {
                 var path = GetChildPathRecursively(rootBone.transform, entry.Key, "");
                 
-                if (path.EqualsIgnoreCase("BIP01!!!"))
-                {
-                    // We reorganize RootMotion entries to get more performance during execution each frame.
-                    // Takes slightly more time to create during first load, but will benefit within Update().
-                    for (var i = 0; i < entry.Value[0].length; i++)
-                    {
-                        animationData.rootMotions.Add(new()
-                        {
-                            time = entry.Value[0].keys[i].time,
-                            position = new Vector3(
-                                    entry.Value[0].keys[i].value,
-                                    entry.Value[1].keys[i].value,
-                                    entry.Value[2].keys[i].value),
-                            rotation = new Quaternion(
-                                entry.Value[3].keys[i].value,
-                                entry.Value[4].keys[i].value,
-                                entry.Value[5].keys[i].value,
-                                entry.Value[6].keys[i].value
-                                )
-                        });
-                    }
-                }
-                else
-                {
-                    clip.SetCurve(path, typeof(Transform), "m_LocalPosition.x", entry.Value[0]);
-                    clip.SetCurve(path, typeof(Transform), "m_LocalPosition.y", entry.Value[1]);
-                    clip.SetCurve(path, typeof(Transform), "m_LocalPosition.z", entry.Value[2]);
-                    clip.SetCurve(path, typeof(Transform), "m_LocalRotation.w", entry.Value[3]);
-                    clip.SetCurve(path, typeof(Transform), "m_LocalRotation.x", entry.Value[4]);
-                    clip.SetCurve(path, typeof(Transform), "m_LocalRotation.y", entry.Value[5]);
-                    clip.SetCurve(path, typeof(Transform), "m_LocalRotation.z", entry.Value[6]);
-                }
+                clip.SetCurve(path, typeof(Transform), "m_LocalPosition.x", entry.Value[0]);
+                clip.SetCurve(path, typeof(Transform), "m_LocalPosition.y", entry.Value[1]);
+                clip.SetCurve(path, typeof(Transform), "m_LocalPosition.z", entry.Value[2]);
+                clip.SetCurve(path, typeof(Transform), "m_LocalRotation.w", entry.Value[3]);
+                clip.SetCurve(path, typeof(Transform), "m_LocalRotation.x", entry.Value[4]);
+                clip.SetCurve(path, typeof(Transform), "m_LocalRotation.y", entry.Value[5]);
+                clip.SetCurve(path, typeof(Transform), "m_LocalRotation.z", entry.Value[6]);
             }
 
             // Add some final settings
             clip.EnsureQuaternionContinuity();
             clip.frameRate = pxAnimation.fps;
 
-            return animationData;
+            return clip;
         }
         
         // TODO - If we have a performance bottleneck while loading animations, then we could cache these results.
