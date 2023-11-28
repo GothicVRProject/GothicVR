@@ -13,7 +13,7 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            waitSeconds = action.Float0;
+            waitSeconds = Action.Float0;
         }
 
         public override bool IsFinished()

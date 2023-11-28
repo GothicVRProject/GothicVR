@@ -36,8 +36,8 @@ namespace GVR.Npc.Actions.AnimationActions
         [CanBeNull]
         private GameObject GetNearestMob()
         {
-            var pos = npcGo.transform.position;
-            return VobHelper.GetFreeInteractableWithin10M(pos, action.String0)?.gameObject;
+            var pos = NpcGo.transform.position;
+            return VobHelper.GetFreeInteractableWithin10M(pos, Action.String0)?.gameObject;
         }
         
         [CanBeNull]
@@ -46,7 +46,7 @@ namespace GVR.Npc.Actions.AnimationActions
             if (mob == null)
                 return null;
             
-            var pos = npcGo.transform.position;
+            var pos = NpcGo.transform.position;
             var slotPos = VobHelper.GetNearestSlot(mob.gameObject, pos);
 
             return slotPos;
@@ -66,19 +66,19 @@ namespace GVR.Npc.Actions.AnimationActions
                 return;
 
             walkState = WalkState.Done;
-            props.bodyState = VmGothicEnums.BodyState.BS_MOBINTERACT;
+            Props.bodyState = VmGothicEnums.BodyState.BS_MOBINTERACT;
             
-            npcGo.transform.position = mobGo.transform.position;
-            npcGo.transform.rotation = mobGo.transform.rotation;
+            NpcGo.transform.position = mobGo.transform.position;
+            NpcGo.transform.rotation = mobGo.transform.rotation;
 
             var mobVisualName = mobGo.GetComponent<VobProperties>().visualScheme;
             var slotPositionName = GetSlotPositionTag(slotGo.name);
             
             // FIXME - Somewhat hardcoded. Needs more love in the future!
-            var animName = string.Format(mobUseString, mobVisualName, slotPositionName, "S0", $"S{action.Int0}");
+            var animName = string.Format(mobUseString, mobVisualName, slotPositionName, "S0", $"S{Action.Int0}");
             
-            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            AnimationCreator.PlayAnimation(props.baseMdsName, animName, mdh, npcGo);
+            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
+            AnimationCreator.PlayAnimation(Props.baseMdsName, animName, mdh, NpcGo);
         }
 
         private string GetSlotPositionTag(string name)

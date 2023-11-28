@@ -12,9 +12,18 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
+            AnimationStartPos = NpcGo.transform.localPosition;
+            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
+
             // FIXME - We need to handle both mds and mdh options! (base vs overlay)
-            AnimationCreator.PlayAnimation(props.baseMdsName, action.String0, mdh, npcGo);
+            AnimationData = AnimationCreator.PlayAnimation(Props.baseMdsName, Action.String0, mdh, NpcGo);
+        }
+
+        public override void Tick(Transform transform)
+        {
+            base.Tick(transform);
+
+            HandleRootMotion(transform);
         }
     }
 }

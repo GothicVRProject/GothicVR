@@ -9,14 +9,14 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            var ai = props.GetComponent<AiHandler>();
+            var ai = Props.GetComponent<AiHandler>();
 
-            ai.ClearState(action.Bool0);
+            ai.ClearState(Action.Bool0);
 
-            props.isStateTimeActive = true;
-            props.stateTime = 0;
+            Props.isStateTimeActive = true;
+            Props.stateTime = 0;
 
-            ai.StartRoutine(action.Uint0, action.String0);
+            ai.StartRoutine(Action.Uint0, Action.String0);
         }
 
         /// <summary>

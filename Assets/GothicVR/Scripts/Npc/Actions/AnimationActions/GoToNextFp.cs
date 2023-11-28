@@ -14,9 +14,9 @@ namespace GVR.Npc.Actions.AnimationActions
         
         public override void Start()
         {
-            var pos = npcGo.transform.position;
+            var pos = NpcGo.transform.position;
 
-            fp = WayNetHelper.FindNearestFreePoint(pos, action.String0);
+            fp = WayNetHelper.FindNearestFreePoint(pos, Action.String0);
         }
         
         public override void OnTriggerEnter(Collider coll)
@@ -27,10 +27,10 @@ namespace GVR.Npc.Actions.AnimationActions
             if (coll.gameObject.name != fp.Name)
                 return;
 
-            props.currentFreePoint = fp;
+            Props.currentFreePoint = fp;
             fp.IsLocked = true;
 
-            var animationComp = npcGo.GetComponent<Animation>();
+            var animationComp = NpcGo.GetComponent<Animation>();
             animationComp.Stop();
 
             walkState = WalkState.Done;

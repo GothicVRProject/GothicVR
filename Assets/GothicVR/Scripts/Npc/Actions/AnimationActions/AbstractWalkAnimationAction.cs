@@ -45,7 +45,7 @@ namespace GVR.Npc.Actions.AnimationActions
                     HandleRotation(transform, GetWalkDestination());
                     return;
                 case WalkState.Walk:
-                    HandleWalk(transform, GetWalkDestination());
+                    HandleWalk(transform);
                     return;
                 case WalkState.Done:
                     return; // NOP
@@ -59,37 +59,34 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             base.AnimationEndEventCallback();
 
-            walkingStartPos = npcGo.transform.localPosition;
-            npcGo.GetComponent<Animation>()[animationData.clip.name].time = 0f;
+            AnimationStartPos = NpcGo.transform.localPosition;
+            NpcGo.GetComponent<Animation>()[AnimationData.clip.name].time = 0f;
         }
 
         private string GetWalkModeAnimationString()
         {
-            switch (props.walkMode)
+            switch (Props.walkMode)
             {
                 case VmGothicEnums.WalkMode.Walk:
                     return "S_WALKL";
                 default:
-                    Debug.LogWarning($"Animation of type {props.walkMode} not yet implemented.");
+                    Debug.LogWarning($"Animation of type {Props.walkMode} not yet implemented.");
                     return "";
             }
         }
 
-        private AnimationData animationData;
-        private Vector3 walkingStartPos;
-
         private void StartWalk()
         {
             var animName = GetWalkModeAnimationString();
-            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            animationData = AnimationCreator.PlayAnimation(props.baseMdsName, animName, mdh, npcGo, true);
+            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
+            AnimationData = AnimationCreator.PlayAnimation(Props.baseMdsName, animName, mdh, NpcGo, true);
 
-            walkingStartPos = npcGo.transform.localPosition;
+            AnimationStartPos = NpcGo.transform.localPosition;
 
             walkState = WalkState.Walk;
         }
 
-        private void HandleWalk(Transform transform, Vector3 destination)
+        private void HandleWalk(Transform transform)
         {
             HandleRootMotion(transform);
         }
@@ -109,23 +106,6 @@ namespace GVR.Npc.Actions.AnimationActions
 
             var lookRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * 100);
-        }
-
-        /// <summary>
-        /// As we use legacy animations, we can't use RootMotion. We therefore need to rebuild it.
-        /// </summary>
-        private void HandleRootMotion(Transform transform)
-        {
-            var currentTime = npcGo.GetComponent<Animation>()[animationData.clip.name].time;
-
-            // We seek the item, which is the exact animation at that time or the next with only a few milliseconds more time.
-            // It's more performant to search for than doing a _between_ check ;-)
-            var indexObj = animationData.rootMotions.FirstOrDefault(i => i.time >= currentTime);
-            
-            // location, when animation started + (rootMotion's location change rotated into direction of current localRot)
-            transform.localPosition = walkingStartPos + transform.localRotation * indexObj.position;
-
-            // transform.localRotation = newRot * walkingStartRot;
         }
     }
 }
