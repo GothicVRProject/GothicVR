@@ -15,16 +15,15 @@ Ai consists of two elements:
 ```c++
 func void ZS_WalkAround	()
 {
-	AI_SetWalkmode (self,NPC_WALK);  // Execute immediately while parsing
-
-	if (Wld_IsMobAvailable (self,"BED")) // Immediately
-	{
+    AI_SetWalkmode (self,NPC_WALK);  // Execute immediately while parsing
+    if (Wld_IsMobAvailable (self,"BED")) // Immediately
+    {
         AI_GotoWP (self,self.wp); // QueueAction - Put into Queue and execute sequentially
         AI_AlignToWP (self); // QueueAction
-	    AI_UseMob		(self,	"BED",1); 
-	}
-	
-	AI_Wait				(self, 1); // QueueAction
+        AI_UseMob		(self,	"BED",1); 
+    }
+
+    AI_Wait				(self, 1); // QueueAction
 };
 ```
 
