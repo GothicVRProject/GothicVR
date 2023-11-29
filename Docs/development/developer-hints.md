@@ -20,10 +20,10 @@ func void ZS_WalkAround	()
     {
         AI_GotoWP (self,self.wp); // QueueAction - Put into Queue and execute sequentially
         AI_AlignToWP (self); // QueueAction
-        AI_UseMob		(self,	"BED",1); 
+        AI_UseMob (self,	"BED",1); 
     }
 
-    AI_Wait				(self, 1); // QueueAction
+    AI_Wait (self, 1); // QueueAction
 };
 ```
 
