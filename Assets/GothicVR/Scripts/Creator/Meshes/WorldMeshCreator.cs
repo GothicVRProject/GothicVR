@@ -64,7 +64,7 @@ namespace GVR.Creator.Meshes
 
 #if UNITY_EDITOR
                     // Don't set alpha clipped as occluders.
-                    if (meshRenderer.sharedMaterial.shader.name == alphaToCoverageShaderName)
+                    if (meshRenderer.sharedMaterial.shader.name == AlphaToCoverageShaderName)
                     {
                         UnityEditor.GameObjectUtility.SetStaticEditorFlags(subSubMeshObj, (UnityEditor.StaticEditorFlags)(int.MaxValue & ~(int)UnityEditor.StaticEditorFlags.OccluderStatic));
                     }

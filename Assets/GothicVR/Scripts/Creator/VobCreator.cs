@@ -597,13 +597,13 @@ namespace GVR.Creator
         private static GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
         {
             var mrm = AssetCache.TryGetMrm(item.visual);
-            return VobMeshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation, true, parentGosNonTeleport[vob.type], go);
+            return MeshObjectCreator.CreateVob(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation, true, parentGosNonTeleport[vob.type], go);
         }
         
         private static GameObject CreateItemMesh(PxVmItemData item, GameObject go)
         {
             var mrm = AssetCache.TryGetMrm(item.visual);
-            return VobMeshCreator.Create(item.visual, mrm, default, default, false, parent: go);
+            return MeshObjectCreator.CreateVob(item.visual, mrm, default, default, false, parent: go);
         }
 
         private static GameObject CreateDecal(PxVobData vob)
@@ -613,7 +613,7 @@ namespace GVR.Creator
 
             var parent = parentGosTeleport[vob.type];
 
-            return VobMeshCreator.CreateDecal(vob, parent);
+            return MeshObjectCreator.CreateVobDecal(vob, parent);
         }
 
         /// <summary>
@@ -834,7 +834,7 @@ namespace GVR.Creator
             if (mdl != null)
             {
                 var go = GetPrefab(vob);
-                var ret = VobMeshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation, parent, go);
+                var ret = MeshObjectCreator.CreateVob(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation, parent, go);
                 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
                 if (ret == null)
@@ -848,7 +848,7 @@ namespace GVR.Creator
             var mdm = AssetCache.TryGetMdm(meshName);
             if (mdh != null && mdm != null)
             {
-                return VobMeshCreator.Create(meshName, mdm, mdh, vob.position.ToUnityVector(),
+                return MeshObjectCreator.CreateVob(meshName, mdm, mdh, vob.position.ToUnityVector(),
                     vob.rotation!.ToUnityMatrix().rotation, parent);
             }
 
@@ -860,7 +860,7 @@ namespace GVR.Creator
                 var withCollider = vob.cdDynamic;
 
                 var go = GetPrefab(vob);
-                var ret = VobMeshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation, withCollider, parent, go);
+                var ret = MeshObjectCreator.CreateVob(meshName, mrm, vob.position.ToUnityVector(), vob.rotation, withCollider, parent, go);
 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
                 if (ret == null)

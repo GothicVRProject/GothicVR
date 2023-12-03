@@ -1,4 +1,5 @@
 using GVR.Caches;
+using GVR.Creator;
 using GVR.Creator.Meshes;
 using GVR.Extensions;
 using GVR.Phoenix.Interface;
@@ -41,7 +42,7 @@ namespace GVR.Lab.Handler
                 TeethTexNr = 1
             };
 
-            NpcMeshCreator.CreateNpc(newNpc.name, mdmName, mdhName, body, newNpc);
+            MeshObjectCreator.CreateNpc(newNpc.name, mdmName, mdhName, body, newNpc);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using GVR.Bootstrap;
 using GVR.Caches;
+using GVR.Creator;
 using GVR.Creator.Meshes;
 using GVR.Data;
 using GVR.Extensions;
@@ -106,7 +107,7 @@ namespace GVR.Lab.Handler
             var itemPrefab = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobItem);
             var pxItem = AssetCache.TryGetItemData(itemName);
             var mrm = AssetCache.TryGetMrm(pxItem.visual);
-            var itemGo = VobMeshCreator.Create(pxItem.visual, mrm, default, default, true, rootGo: itemPrefab, parent: itemSpawnSlot);
+            var itemGo = MeshObjectCreator.CreateVob(pxItem.visual, mrm, default, default, true, rootGo: itemPrefab, parent: itemSpawnSlot);
 
             var itemGrabComp = itemGo.GetComponent<ItemGrabInteractable>();
             var colliderComp = itemGo.GetComponent<MeshCollider>();

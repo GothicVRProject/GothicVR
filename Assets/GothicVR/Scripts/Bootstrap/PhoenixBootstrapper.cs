@@ -169,7 +169,6 @@ namespace GVR.Bootstrap
             music.Create();
             music.SetEnabled(FeatureFlags.I.enableMusic);
             music.SetMusic("SYS_MENU");
-            Debug.Log("Loading music");
         }
 
         private void LoadFonts()

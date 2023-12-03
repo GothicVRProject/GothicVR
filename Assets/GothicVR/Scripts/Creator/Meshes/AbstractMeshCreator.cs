@@ -16,17 +16,17 @@ namespace GVR.Creator.Meshes
     {
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
-        protected const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
-        protected const string waterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
-        protected const string alphaToCoverageShaderName = "Unlit/Unlit-AlphaToCoverage";
-        protected const float decalOpacity = 0.75f;
+        protected const string DefaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        protected const string WaterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
+        protected const string AlphaToCoverageShaderName = "Unlit/Unlit-AlphaToCoverage";
+        protected const float DecalOpacity = 0.75f;
 
-        protected GameObject CreateInternal(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        protected GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            return CreateInternal(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
+            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
         }
 
-        protected GameObject CreateInternal(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        protected GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
             rootGo.SetParent(parent, true, true);
@@ -130,17 +130,17 @@ namespace GVR.Creator.Meshes
             return attachments;
         }
 
-        protected GameObject CreateInternal(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+        protected GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             if (mrm == null)
             {
                 Debug.LogError("No mesh data was found for: " + objectName);
                 return null;
             }
-
+            
             // If there is no texture for any of the meshes, just skip this item.
             // G1: Some skull decorations are without texture.
-            if (mrm.materials!.All(m => m.texture == ""))
+            if (mrm.materials!.All(m => m.texture.IsEmpty()))
                 return null;
 
             rootGo ??= new GameObject();
@@ -228,8 +228,6 @@ namespace GVR.Creator.Meshes
 
         protected void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
-            // check if mrmData.subMeshes is null
-
             if (null == mrmData)
             {
                 Debug.LogError("No mesh data could be added to renderer: " + rend.transform.parent.name);
@@ -261,7 +259,7 @@ namespace GVR.Creator.Meshes
                 rend.material = material;
 
                 // No texture to add.
-                if (materialData.texture == "")
+                if (materialData.texture.IsEmpty())
                 {
                     Debug.LogWarning("No texture was set for: " + materialData.name);
                     return;
@@ -277,7 +275,7 @@ namespace GVR.Creator.Meshes
 
         protected void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
         {
-            /**
+            /*
              * Ok, brace yourself:
              * There are three parameters of interest when it comes to creating meshes for items (etc.).
              * 1. positions - Unity: vertices (=Vector3)
@@ -361,7 +359,7 @@ namespace GVR.Creator.Meshes
 
         protected void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
         {
-            /**
+            /*
              * Ok, brace yourself:
              * There are three parameters of interest when it comes to creating meshes for items (etc.).
              * 1. positions - Unity: vertices (=Vector3)
@@ -518,29 +516,29 @@ namespace GVR.Creator.Meshes
 
         protected Material GetDefaultMaterial(bool isAlphaTest)
         {
-            var shader = Shader.Find(defaultShader);
+            var shader = Shader.Find(DefaultShader);
             if (isAlphaTest)
             {
-                shader = Shader.Find(alphaToCoverageShaderName);
+                shader = Shader.Find(AlphaToCoverageShaderName);
             }
             var material = new Material(shader);
             if (isAlphaTest)
             {
                 // Manually correct the render queue for alpha test, as Unity doesn't want to do it from the shader's render queue tag.
-                material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
+                material.renderQueue = (int)RenderQueue.AlphaTest;
             }
             return material;
         }
 
         private Material GetWaterMaterial(PxMaterialData materialData)
         {
-            var shader = Shader.Find(waterShader);
+            var shader = Shader.Find(WaterShader);
             Material material = new Material(shader);
 
             // FIXME - Running water speed and direction is hardcoded based on material names
             // Needs to be improved by a better shader and the implementation of proper water material parameters
 
-            //Jaxtors suggestion for a not so hardcoded running water implementation
+            //JaXt0r's suggestion for a not so hardcoded running water implementation
             //material.SetFloat("_ScrollSpeed", -900000 * materialData.animMapDir.ToUnityVector().SqrMagnitude());
 
             switch (materialData.name)

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Debugging;
+using GVR.Extensions;
 using GVR.Util;
 using UnityEngine;
 
@@ -169,7 +170,8 @@ namespace GVR.Manager.Culling
                 var mesh = GetMesh(obj);
                 if (mesh == null)
                 {
-                    if (!obj.name.Equals("WASH_SLOT.ASC", StringComparison.OrdinalIgnoreCase)) // Wash slot is placed wrong in G1. Therefore skip.
+                    // Wash slot is placed wrong in G1. Therefore let's skip it.
+                    if (obj.name != "WASHSLOT")
                         Debug.LogError($"Couldn't find mesh for >{obj}< to be used for CullingGroup. Skipping...");
 
                     continue;

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using GVR.Bootstrap;
 using GVR.Creator;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
@@ -31,14 +32,12 @@ namespace GVR.Editor.Tools
         {
             // Do not show Window when game is started.
             if (Application.isPlaying)
-            {
                 return;
-            }
 
             if (SettingsManager.GameSettings == null)
-            {
                 SettingsManager.LoadGameSettings();
-            }
+
+            PhoenixBootstrapper.SetLanguage();
 
             string fullPath = Path.GetFullPath(Path.Join(SettingsManager.GameSettings.GothicIPath, "Data"));
             _vfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);
@@ -51,18 +50,13 @@ namespace GVR.Editor.Tools
         {
             // Do not show Window when game is started.
             if (Application.isPlaying)
-            {
                 Close();
-                return;
-            }
         }
 
         private void OnDestroy()
         {
             if (_vfsPtr == IntPtr.Zero)
-            {
                 return;
-            }
 
             PxVfs.DestroyVfs(_vfsPtr);
             _vfsPtr = IntPtr.Zero;

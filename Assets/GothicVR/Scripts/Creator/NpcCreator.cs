@@ -99,11 +99,11 @@ namespace GVR.Creator
             newNpc.name = props.npc!.names[0];
             
             var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
-            NpcMeshCreator.CreateNpc(newNpc.name, props.mdmName, mdhName, props.BodyData, newNpc);
+            MeshObjectCreator.CreateNpc(newNpc.name, props.mdmName, mdhName, props.BodyData, newNpc);
             newNpc.SetParent(GetRootGo());
 
             foreach (var equippedItem in props.EquippedItems)
-                NpcMeshCreator.EquipWeapon(newNpc, equippedItem, equippedItem.mainFlag, equippedItem.flags);
+                MeshObjectCreator.EquipNpcWeapon(newNpc, equippedItem, equippedItem.mainFlag, equippedItem.flags);
             
             SetSpawnPoint(newNpc, spawnPoint, props.npc);
 

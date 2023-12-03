@@ -27,7 +27,7 @@ namespace GVR.Manager.Settings
             }
         }
 
-        public static GameSettings LoadGameSettings()
+        public static void LoadGameSettings()
         {
             var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
             if (!File.Exists(settingsFilePath))
@@ -51,8 +51,6 @@ namespace GVR.Manager.Settings
                 var devJson = File.ReadAllText(settingsDevFilePath);
                 JsonUtility.FromJsonOverwrite(devJson, GameSettings);
             }
-
-            return GameSettings;
         }
 
         /// <summary>

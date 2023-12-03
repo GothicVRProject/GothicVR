@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GVR.Caches;
+using GVR.Creator;
 using GVR.Creator.Meshes;
 using GVR.Extensions;
 using UnityEngine;
@@ -68,7 +69,7 @@ namespace GVR.Demo
 				var pxItem = AssetCache.TryGetItemData(item.name);
 
 				var mrm = AssetCache.TryGetMrm(pxItem?.visual);
-				var itemObj = VobMeshCreator.Create(item.name, mrm, default, default, true, itemsObj);
+				var itemObj = MeshObjectCreator.CreateVob(item.name, mrm, default, default, true, itemsObj);
 			}
 		}
 	}
