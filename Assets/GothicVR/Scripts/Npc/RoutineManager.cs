@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GVR.Debugging;
+using GVR.Manager;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Util;
 using GVR.World;
@@ -32,8 +33,16 @@ namespace GVR.Npc
             //Init starting position
             if (!FeatureFlags.I.enableNpcRoutines)
                 return;
-            DateTime StartTime = new(1, 1, 1, 15, 0, 0);
-            Invoke(StartTime);
+            
+            GvrSceneManager.I.sceneGeneralLoaded.AddListener(WorldLoadedEvent);
+        }
+
+        private void WorldLoadedEvent()
+        {
+            var time = new DateTime(1, 1, 1,
+                FeatureFlags.I.startHour, FeatureFlags.I.startMinute, 0);
+            
+            Invoke(time);
         }
 
         public void Subscribe(Routine npcID, List<RoutineData> routines)

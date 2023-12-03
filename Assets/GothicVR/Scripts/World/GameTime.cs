@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using GVR.Debugging;
+using GVR.Manager;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.Events;
@@ -26,7 +27,9 @@ namespace GVR.World
         // Reference (ger): https://forum.worldofplayers.de/forum/threads/939357-Wie-lange-dauert-ein-Tag-in-Gothic
         private static readonly float ONE_INGAME_SECOND = 0.06944f;
         private DateTime time = new(1, 1, 1, 15, 0, 0);
-
+        private Coroutine timeTickCoroutineHandler;
+        
+        
         void Start()
         {
             if (!FeatureFlags.I.enableDayTime)
@@ -36,8 +39,20 @@ namespace GVR.World
             time = new DateTime(time.Year, time.Month, time.Day,
                     FeatureFlags.I.startHour, FeatureFlags.I.startMinute, time.Second);
             minutesInHour = FeatureFlags.I.startMinute;
-            
-            StartCoroutine(TimeTick());
+
+            GvrSceneManager.I.sceneGeneralLoaded.AddListener(WorldLoaded);
+            GvrSceneManager.I.sceneGeneralUnloaded.AddListener(WorldUnloaded);
+        }
+
+        private void WorldLoaded()
+        {
+            timeTickCoroutineHandler = StartCoroutine(TimeTick());
+        }
+
+        private void WorldUnloaded()
+        {
+            // Pause Coroutine until next world is loaded.
+            StopCoroutine(timeTickCoroutineHandler);
         }
 
         public DateTime GetCurrentDateTime()

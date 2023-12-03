@@ -20,12 +20,7 @@ namespace GVR.Creator.Meshes
         protected const string WaterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
         protected const string AlphaToCoverageShaderName = "Unlit/Unlit-AlphaToCoverage";
         protected const float DecalOpacity = 0.75f;
-
-        protected GameObject Create(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
-        {
-            return Create(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
-        }
-
+        
         protected GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
