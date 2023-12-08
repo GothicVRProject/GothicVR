@@ -21,22 +21,22 @@ namespace GVR.Caches
 {
     public static class AssetCache
     {
-        private static Dictionary<string, Texture2D> textureCache = new();
-        private static Dictionary<string, PxModelScriptData> mdsCache = new();
-        private static Dictionary<string, PxAnimationData> animCache = new();
-        private static Dictionary<string, PxModelHierarchyData> mdhCache = new();
-        private static Dictionary<string, PxModelData> mdlCache = new();
-        private static Dictionary<string, PxModelMeshData> mdmCache = new();
-        private static Dictionary<string, PxMultiResolutionMeshData> mrmCache = new();
-        private static Dictionary<string, PxMorphMeshData> mmbCache = new();
-        private static Dictionary<string, PxVmItemData> itemDataCache = new();
-        private static Dictionary<string, PxVmMusicData> musicDataCache = new();
-        private static Dictionary<string, PxVmSfxData> sfxDataCache = new();
-        private static Dictionary<string, PxVmPfxData> pfxDataCache = new();
-        private static Dictionary<string, PxSoundData<float>> soundCache = new();
-        private static Dictionary<string, ZenKit.Materialized.Font> fontCache = new();
+        private static readonly Dictionary<string, Texture2D> TextureCache = new();
+        private static readonly Dictionary<string, PxModelScriptData> MdsCache = new();
+        private static readonly Dictionary<string, PxAnimationData> AnimCache = new();
+        private static readonly Dictionary<string, PxModelHierarchyData> MdhCache = new();
+        private static readonly Dictionary<string, PxModelData> MdlCache = new();
+        private static readonly Dictionary<string, PxModelMeshData> MdmCache = new();
+        private static readonly Dictionary<string, PxMultiResolutionMeshData> MrmCache = new();
+        private static readonly Dictionary<string, PxMorphMeshData> MmbCache = new();
+        private static readonly Dictionary<string, PxVmItemData> ItemDataCache = new();
+        private static readonly Dictionary<string, PxVmMusicData> MusicDataCache = new();
+        private static readonly Dictionary<string, PxVmSfxData> SfxDataCache = new();
+        private static readonly Dictionary<string, PxVmPfxData> PfxDataCache = new();
+        private static readonly Dictionary<string, PxSoundData<float>> SoundCache = new();
+        private static readonly Dictionary<string, ZenKit.Materialized.Font> FontCache = new();
 
-        private static readonly string[] misplacedMdmArmors =
+        private static readonly string[] MisplacedMdmArmors =
         {
             "Hum_GrdS_Armor",
             "Hum_GrdM_Armor",
@@ -53,9 +53,9 @@ namespace GVR.Caches
         public static Texture2D TryGetTexture(string key)
         {
             string preparedKey = GetPreparedKey(key);
-            if (textureCache.ContainsKey(preparedKey) && textureCache[preparedKey])
+            if (TextureCache.ContainsKey(preparedKey) && TextureCache[preparedKey])
             {
-                return textureCache[preparedKey];
+                return TextureCache[preparedKey];
             }
 
             ZenKit.Texture zkTexture;
@@ -98,7 +98,7 @@ namespace GVR.Caches
 
             texture.filterMode = FilterMode.Trilinear;
             texture.name = key;
-            textureCache[preparedKey] = texture;
+            TextureCache[preparedKey] = texture;
 
             return texture;
         }
@@ -123,11 +123,11 @@ namespace GVR.Caches
         public static PxModelScriptData TryGetMds(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (mdsCache.TryGetValue(preparedKey, out var data))
+            if (MdsCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var newData = PxModelScript.GetModelScriptFromVfs(GameData.VfsPtr, $"{preparedKey}.mds");
-            mdsCache[preparedKey] = newData;
+            MdsCache[preparedKey] = newData;
 
             return newData;
         }
@@ -137,11 +137,11 @@ namespace GVR.Caches
             var preparedMdsKey = GetPreparedKey(mdsKey);
             var preparedAnimKey = GetPreparedKey(animKey);
             var preparedKey = preparedMdsKey + "-" + preparedAnimKey;
-            if (animCache.TryGetValue(preparedKey, out var data))
+            if (AnimCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var newData = PxAnimation.LoadFromVfs(GameData.VfsPtr, $"{preparedKey}.man");
-            animCache[preparedKey] = newData;
+            AnimCache[preparedKey] = newData;
 
             return newData;
         }
@@ -149,11 +149,11 @@ namespace GVR.Caches
         public static PxModelHierarchyData TryGetMdh(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (mdhCache.TryGetValue(preparedKey, out var data))
+            if (MdhCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var newData = PxModelHierarchy.LoadFromVfs(GameData.VfsPtr, $"{preparedKey}.mdh");
-            mdhCache[preparedKey] = newData;
+            MdhCache[preparedKey] = newData;
 
             return newData;
         }
@@ -161,11 +161,11 @@ namespace GVR.Caches
         public static PxModelData TryGetMdl(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (mdlCache.TryGetValue(preparedKey, out var data))
+            if (MdlCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var newData = PxModel.LoadModelFromVfs(GameData.VfsPtr, $"{preparedKey}.mdl");
-            mdlCache[preparedKey] = newData;
+            MdlCache[preparedKey] = newData;
 
             return newData;
         }
@@ -173,11 +173,11 @@ namespace GVR.Caches
         public static PxModelMeshData TryGetMdm(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (mdmCache.TryGetValue(preparedKey, out var data))
+            if (MdmCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var newData = PxModelMesh.LoadModelMeshFromVfs(GameData.VfsPtr, $"{preparedKey}.mdm");
-            mdmCache[preparedKey] = newData;
+            MdmCache[preparedKey] = newData;
 
             FixArmorTriangles(preparedKey, newData);
 
@@ -189,7 +189,7 @@ namespace GVR.Caches
         /// </summary>
         private static void FixArmorTriangles(string key, PxModelMeshData mdm)
         {
-            if (!misplacedMdmArmors.Contains(key, StringComparer.OrdinalIgnoreCase))
+            if (!MisplacedMdmArmors.Contains(key, StringComparer.OrdinalIgnoreCase))
                 return;
 
             foreach (var mesh in mdm.meshes!)
@@ -205,11 +205,11 @@ namespace GVR.Caches
         public static PxMultiResolutionMeshData TryGetMrm(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (mrmCache.TryGetValue(preparedKey, out var data))
+            if (MrmCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var newData = PxMultiResolutionMesh.GetMRMFromVfs(GameData.VfsPtr, $"{preparedKey}.mrm");
-            mrmCache[preparedKey] = newData;
+            MrmCache[preparedKey] = newData;
 
             return newData;
         }
@@ -217,11 +217,11 @@ namespace GVR.Caches
         public static PxMorphMeshData TryGetMmb(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (mmbCache.TryGetValue(preparedKey, out var data))
+            if (MmbCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var newData = PxMorphMesh.LoadMorphMeshFromVfs(GameData.VfsPtr, $"{preparedKey}.mmb");
-            mmbCache[preparedKey] = newData;
+            MmbCache[preparedKey] = newData;
 
             return newData;
         }
@@ -229,11 +229,11 @@ namespace GVR.Caches
         public static PxVmMusicData TryGetMusic(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (musicDataCache.TryGetValue(preparedKey, out var data))
+            if (MusicDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var newData = PxVm.InitializeMusic(GameData.VmMusicPtr, preparedKey);
-            musicDataCache[preparedKey] = newData;
+            MusicDataCache[preparedKey] = newData;
 
             return newData;
         }
@@ -259,11 +259,11 @@ namespace GVR.Caches
         public static PxVmItemData TryGetItemData(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (itemDataCache.TryGetValue(preparedKey, out var data))
+            if (ItemDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var newData = PxVm.InitializeItem(GameData.VmGothicPtr, preparedKey);
-            itemDataCache[preparedKey] = newData;
+            ItemDataCache[preparedKey] = newData;
 
             return newData;
         }
@@ -274,11 +274,11 @@ namespace GVR.Caches
         public static PxVmSfxData TryGetSfxData(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (sfxDataCache.TryGetValue(preparedKey, out var data))
+            if (SfxDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var newData = PxVm.InitializeSfx(GameData.VmSfxPtr, preparedKey);
-            sfxDataCache[preparedKey] = newData;
+            SfxDataCache[preparedKey] = newData;
 
             return newData;
         }
@@ -289,11 +289,11 @@ namespace GVR.Caches
         public static PxVmPfxData TryGetPfxData(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (pfxDataCache.TryGetValue(preparedKey, out var data))
+            if (PfxDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var newData = PxVm.InitializePfx(GameData.VmPfxPtr, preparedKey);
-            pfxDataCache[preparedKey] = newData;
+            PfxDataCache[preparedKey] = newData;
 
             return newData;
         }
@@ -301,11 +301,11 @@ namespace GVR.Caches
         public static PxSoundData<float> TryGetSound(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (soundCache.TryGetValue(preparedKey, out var data))
+            if (SoundCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             var wavFile = PxSound.GetSoundArrayFromVfs<float>(GameData.VfsPtr, $"{preparedKey}.wav");
-            soundCache[preparedKey] = wavFile;
+            SoundCache[preparedKey] = wavFile;
 
             return wavFile;
         }
@@ -313,11 +313,11 @@ namespace GVR.Caches
         public static ZenKit.Materialized.Font TryGetFont(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (fontCache.TryGetValue(preparedKey, out var data))
+            if (FontCache.TryGetValue(preparedKey, out var data))
                 return data;
             
             var fontData = new ZenKit.Font(GameData.Vfs, $"{preparedKey}.fnt").Materialize();
-            fontCache[preparedKey] = fontData;
+            FontCache[preparedKey] = fontData;
 
             return fontData;
         }
