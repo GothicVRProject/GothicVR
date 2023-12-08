@@ -140,13 +140,13 @@ namespace GVR.Creator
             }
         }
 
-        private static void AddClipEvents(AnimationClip clip, PxModelScriptData mds, PxAnimationData pxAnimation, string animationName)
+        private static void AddClipEvents(AnimationClip clip, ZenKit.Materialized.ModelScript mds, PxAnimationData pxAnimation, string animationName)
         {
-            var anim = mds.animations.First(i => i.name.EqualsIgnoreCase(animationName));
+            var anim = mds.Animations.First(i => i.Name.EqualsIgnoreCase(animationName));
 
-            foreach (var pxEvent in anim.events)
+            foreach (var pxEvent in anim.EventTags)
             {
-                var clampedFrame = ClampFrame(pxEvent.frame, anim.firstFrame, (int)pxAnimation.frameCount, anim.lastFrame);
+                var clampedFrame = ClampFrame(pxEvent.Frame, anim.FirstFrame, (int)pxAnimation.frameCount, anim.LastFrame);
                 
                 AnimationEvent animEvent = new()
                 {
@@ -158,9 +158,9 @@ namespace GVR.Creator
                 clip.AddEvent(animEvent);
             }
 
-            foreach (var sfxEvent in anim.sfx)
+            foreach (var sfxEvent in anim.SoundEffects)
             {
-                var clampedFrame = ClampFrame(sfxEvent.frame, anim.firstFrame, (int)pxAnimation.frameCount, anim.lastFrame);
+                var clampedFrame = ClampFrame(sfxEvent.Frame, anim.FirstFrame, (int)pxAnimation.frameCount, anim.LastFrame);
                 AnimationEvent animEvent = new()
                 {
                     time = clampedFrame / clip.frameRate,
@@ -171,10 +171,8 @@ namespace GVR.Creator
                 clip.AddEvent(animEvent);
             }
 
-            foreach (var sfxEvent in anim.sfx)
-            {
-                Debug.LogWarning($"SFX events not yet implemented: {sfxEvent.name}");
-            }
+            if (anim.ParticleEffects.Any())
+                Debug.LogWarning($"SFX events not yet implemented. Tried to use for {anim.Name}");
         }
 
         /// <summary>

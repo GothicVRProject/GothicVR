@@ -6,15 +6,16 @@ using GVR.Extensions;
 using GVR.Phoenix.Interface;
 using JetBrains.Annotations;
 using PxCs.Data.Animation;
-using PxCs.Data.Font;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Sound;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
-using ZenKit;
+using ModelScript = ZenKit.Materialized.ModelScript;
+using Font = ZenKit.Materialized.Font;
 using Object = UnityEngine.Object;
+using Texture = ZenKit.Texture;
 using TextureFormat = UnityEngine.TextureFormat;
 
 namespace GVR.Caches
@@ -22,7 +23,7 @@ namespace GVR.Caches
     public static class AssetCache
     {
         private static readonly Dictionary<string, Texture2D> TextureCache = new();
-        private static readonly Dictionary<string, PxModelScriptData> MdsCache = new();
+        private static readonly Dictionary<string, ModelScript> MdsCache = new();
         private static readonly Dictionary<string, PxAnimationData> AnimCache = new();
         private static readonly Dictionary<string, PxModelHierarchyData> MdhCache = new();
         private static readonly Dictionary<string, PxModelData> MdlCache = new();
@@ -34,7 +35,7 @@ namespace GVR.Caches
         private static readonly Dictionary<string, PxVmSfxData> SfxDataCache = new();
         private static readonly Dictionary<string, PxVmPfxData> PfxDataCache = new();
         private static readonly Dictionary<string, PxSoundData<float>> SoundCache = new();
-        private static readonly Dictionary<string, ZenKit.Materialized.Font> FontCache = new();
+        private static readonly Dictionary<string, Font> FontCache = new();
 
         private static readonly string[] MisplacedMdmArmors =
         {
@@ -58,10 +59,10 @@ namespace GVR.Caches
                 return TextureCache[preparedKey];
             }
 
-            ZenKit.Texture zkTexture;
+            Texture zkTexture;
             try
             {
-                zkTexture = new ZenKit.Texture(GameData.Vfs, $"{preparedKey}-C.TEX");
+                zkTexture = new Texture(GameData.Vfs, $"{preparedKey}-C.TEX");
             }
             catch (Exception e)
             {
@@ -106,7 +107,7 @@ namespace GVR.Caches
         /// <summary>
         /// Unity doesn't want to create mips for DXT1 textures. Recreate them as RGB24.
         /// </summary>
-        private static Texture2D GenerateDxt1Mipmaps(ZenKit.Texture zkTexture)
+        private static Texture2D GenerateDxt1Mipmaps(Texture zkTexture)
         {
             var dxtTexture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, TextureFormat.DXT1, false);
             dxtTexture.SetPixelData(zkTexture.AllMipmapsRaw[0], 0);
@@ -120,13 +121,13 @@ namespace GVR.Caches
             return texture;
         }
 
-        public static PxModelScriptData TryGetMds(string key)
+        public static ModelScript TryGetMds(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (MdsCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxModelScript.GetModelScriptFromVfs(GameData.VfsPtr, $"{preparedKey}.mds");
+            var newData = new ZenKit.ModelScript(GameData.Vfs, $"{preparedKey}.mds").Materialize();
             MdsCache[preparedKey] = newData;
 
             return newData;
@@ -310,7 +311,7 @@ namespace GVR.Caches
             return wavFile;
         }
 
-        public static ZenKit.Materialized.Font TryGetFont(string key)
+        public static Font TryGetFont(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (FontCache.TryGetValue(preparedKey, out var data))
