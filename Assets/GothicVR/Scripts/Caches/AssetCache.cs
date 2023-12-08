@@ -12,6 +12,7 @@ using PxCs.Data.Sound;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit.Materialized;
 using ModelScript = ZenKit.Materialized.ModelScript;
 using Font = ZenKit.Materialized.Font;
 using Object = UnityEngine.Object;
@@ -24,7 +25,7 @@ namespace GVR.Caches
     {
         private static readonly Dictionary<string, Texture2D> TextureCache = new();
         private static readonly Dictionary<string, ModelScript> MdsCache = new();
-        private static readonly Dictionary<string, PxAnimationData> AnimCache = new();
+        private static readonly Dictionary<string, ModelAnimation> AnimCache = new();
         private static readonly Dictionary<string, PxModelHierarchyData> MdhCache = new();
         private static readonly Dictionary<string, PxModelData> MdlCache = new();
         private static readonly Dictionary<string, PxModelMeshData> MdmCache = new();
@@ -133,7 +134,7 @@ namespace GVR.Caches
             return newData;
         }
 
-        public static PxAnimationData TryGetAnimation(string mdsKey, string animKey)
+        public static ModelAnimation TryGetAnimation(string mdsKey, string animKey)
         {
             var preparedMdsKey = GetPreparedKey(mdsKey);
             var preparedAnimKey = GetPreparedKey(animKey);
@@ -141,7 +142,7 @@ namespace GVR.Caches
             if (AnimCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxAnimation.LoadFromVfs(GameData.VfsPtr, $"{preparedKey}.man");
+            var newData = new ZenKit.ModelAnimation(GameData.Vfs, $"{preparedKey}.man").Materialize();
             AnimCache[preparedKey] = newData;
 
             return newData;
