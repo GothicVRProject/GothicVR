@@ -9,12 +9,16 @@ using GVR.World;
 using PxCs.Data.WayNet;
 using PxCs.Interface;
 using UnityEngine.SceneManagement;
+using ZenKit;
+using WayPoint = GVR.Vob.WayNet.WayPoint;
 
 namespace GVR.Phoenix.Interface
 {
     public static class GameData
     {
+        [Obsolete("Use new ZenKit API instead.")]
         public static IntPtr VfsPtr;
+        public static Vfs Vfs;
         public static IntPtr VmGothicPtr;
         public static IntPtr VmSfxPtr; // Sound FX
         public static IntPtr VmPfxPtr; // Particle FX

@@ -11,6 +11,7 @@ using GVR.Util;
 using PxCs.Helper;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit;
 using Debug = UnityEngine.Debug;
 
 namespace GVR.Bootstrap
@@ -67,7 +68,8 @@ namespace GVR.Bootstrap
 
             // Holy grail of everything! If this pointer is zero, we have nothing but a plain empty wormhole.
             GameData.VfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);
-            
+
+            MountVfs(g1Dir);
             SetLanguage();
             LoadGothicVM(g1Dir);
             LoadSfxVM(g1Dir);
@@ -107,6 +109,24 @@ namespace GVR.Bootstrap
             }
         }
 
+        /// <summary>
+        /// Holy grail of everything! If this pointer is zero, we have nothing but a plain empty wormhole.
+        /// </summary>
+        private static void MountVfs(string g1Dir)
+        {
+            GameData.Vfs = new Vfs();
+
+            // FIXME - We currently don't load from within _WORK directory which is required for e.g. mods who use it.
+            var fullPath = Path.GetFullPath(Path.Join(g1Dir, "Data"));
+
+            var vfsPaths = Directory.GetFiles(fullPath, "*.VDF", SearchOption.AllDirectories);
+
+            foreach (var path in vfsPaths)
+            {
+                GameData.Vfs.MountDisk(path, VfsOverwriteBehavior.Older);
+            }
+        }
+
         public static void SetLanguage()
         {
             var g1Language = SettingsManager.GameSettings.GothicILanguage;
@@ -116,9 +136,11 @@ namespace GVR.Bootstrap
                 case "cs":
                 case "pl":
                     PxEncoding.SetEncoding(PxEncoding.SupportedEncodings.CentralEurope);
+                    StringEncodingController.SetEncoding(StringEncoding.CentralEurope);
                     break;
                 case "ru":
                     PxEncoding.SetEncoding(PxEncoding.SupportedEncodings.EastEurope);
+                    StringEncodingController.SetEncoding(StringEncoding.EastEurope);
                     break;
                 case "de":
                 case "en":
@@ -127,6 +149,7 @@ namespace GVR.Bootstrap
                 case "it":
                 default:
                     PxEncoding.SetEncoding(PxEncoding.SupportedEncodings.WestEurope);
+                    StringEncodingController.SetEncoding(StringEncoding.WestEurope);
                     break;
             }
         }
