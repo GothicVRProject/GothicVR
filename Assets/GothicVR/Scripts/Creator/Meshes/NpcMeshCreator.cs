@@ -10,12 +10,16 @@ using UnityEngine;
 
 namespace GVR.Creator.Meshes
 {
-    public abstract class NpcMeshCreator : MeshCreator
+    public class NpcMeshCreator : AbstractMeshCreator
     {
         private static VmGothicExternals.ExtSetVisualBodyData tempBodyData;
 
+        // As we subclass the main Mesh Creator, we need to have a parent-child inheritance instance.
+        // Needed e.g. for NPCs to change head color while calling Create()
+        private static readonly NpcMeshCreator Self = new();
+
         public static GameObject CreateNpc(string npcName, string mdmName, string mdhName,
-            string headName, VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
+            VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
         {
             tempBodyData = bodyData;
             var mdm = AssetCache.TryGetMdm(mdmName);
@@ -33,18 +37,18 @@ namespace GVR.Creator.Meshes
                 return null;
             }
             
-            var npcGo = Create(npcName, mdm, mdh, default, default, null, root);
+            var npcGo = Self.CreateInternal(npcName, mdm, mdh, default, default, null, root);
 
-            if (!string.IsNullOrEmpty(headName))
+            if (!string.IsNullOrEmpty(bodyData.Head))
             {
-                var mmb = AssetCache.TryGetMmb(headName);   
-                AddHead(npcName, npcGo, mmb);
+                var mmb = AssetCache.TryGetMmb(bodyData.Head);
+                Self.AddHead(npcName, npcGo, mmb);
             }
 
             return npcGo;
         }
 
-        private static void AddHead(string npcName, GameObject npcGo, PxMorphMeshData morphMesh)
+        private void AddHead(string npcName, GameObject npcGo, PxMorphMeshData morphMesh)
         {
             var headGo = npcGo.FindChildRecursively("BIP01 HEAD");
 
@@ -57,14 +61,14 @@ namespace GVR.Creator.Meshes
             var headMeshFilter = headGo.AddComponent<MeshFilter>();
             var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(headMeshRenderer, morphMesh.mesh);
-            PrepareMeshFilter(headMeshFilter, morphMesh.mesh);
+            Self.PrepareMeshRenderer(headMeshRenderer, morphMesh.mesh);
+            Self.PrepareMeshFilter(headMeshFilter, morphMesh.mesh);
         }
 
         /// <summary>
         /// Change texture name based on VisualBodyData.
         /// </summary>
-        protected static new Texture2D GetTexture(string name)
+        protected override Texture2D GetTexture(string name)
         {
             string finalTextureName;
             
@@ -86,10 +90,10 @@ namespace GVR.Creator.Meshes
                 // No changeable texture needed? Skip updating texture name.
                 finalTextureName = name;
 
-            return MeshCreator.GetTexture(finalTextureName);
+            return base.GetTexture(finalTextureName);
         }
         
-        protected static new Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
+        protected override Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
         {
             Dictionary<string, PxMultiResolutionMeshData> newAttachments = new(attachments);
 
@@ -140,8 +144,8 @@ namespace GVR.Creator.Meshes
             if (!weaponGo.TryGetComponent<MeshRenderer>(out var meshRenderer))
                 meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(meshRenderer, mrm);
-            PrepareMeshFilter(meshFilter, mrm);
+            Self.PrepareMeshRenderer(meshRenderer, mrm);
+            Self.PrepareMeshFilter(meshFilter, mrm);
         }
 
         private static void EquipRangeWeapon(GameObject npcGo, PxVmItemData itemData)
@@ -166,8 +170,8 @@ namespace GVR.Creator.Meshes
             var meshFilter = weaponGo.AddComponent<MeshFilter>();
             var meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(meshRenderer, mms.mesh);
-            PrepareMeshFilter(meshFilter, mms.mesh);
+            Self.PrepareMeshRenderer(meshRenderer, mms.mesh);
+            Self.PrepareMeshFilter(meshFilter, mms.mesh);
         }
     }
 }

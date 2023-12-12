@@ -17,39 +17,35 @@ namespace GVR.Creator
             var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var animationComp = go.GetComponent<Animation>();
             
-            //Shortcut: Animation is already set at GO.
-            if (animationComp.GetClip(mdsAnimationKeyName) != null)
-            {
-                animationComp.Play(mdsAnimationKeyName);
-                return;
-            }
-
             var mds = AssetCache.TryGetMds(mdsName);
             var pxAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
-            
+
             // Try to load from cache
-            if (!LookupCache.AnimClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
+            if (!LookupCache.AnimationClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
             {
-                clip = LoadAnimationClip(pxAnimation, mdh, go);
-                LookupCache.AnimClipCache[mdsAnimationKeyName] = clip;
-                clip.wrapMode = repeat ? WrapMode.Loop : WrapMode.Once;
+                clip = LoadAnimationClip(pxAnimation, mdh, go, repeat, mdsAnimationKeyName);
+                LookupCache.AnimationClipCache[mdsAnimationKeyName] = clip;
             }
-            
-            AddClipEvents(clip, mds, pxAnimation, animationName);
-            AddClipEndEvent(clip);
-            
-            animationComp.AddClip(clip, mdsAnimationKeyName);
+
+            if (animationComp[mdsAnimationKeyName] == null)
+            {
+                AddClipEvents(clip, mds, pxAnimation, animationName);
+                AddClipEndEvent(clip);
+                animationComp.AddClip(clip, mdsAnimationKeyName);
+            }
 
             animationComp.Play(mdsAnimationKeyName);
         }
 
-        private static AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone)
+        private static AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone, bool repeat, string clipName)
         {
             var clip = new AnimationClip
             {
-                legacy = true
+                legacy = true,
+                name = clipName,
+                wrapMode = repeat ? WrapMode.Loop : WrapMode.Once
             };
-            
+
             var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.nodeCount);
             var boneNames = pxAnimation.node_indices!.Select(nodeIndex => mdh.nodes![nodeIndex].name).ToArray();
 
@@ -79,7 +75,13 @@ namespace GVR.Creator
 
                 // We add 6 properties for location and rotation.
                 boneList[0].AddKey(time, uPosition.x);
-                boneList[1].AddKey(time, uPosition.y);
+
+                // NPCs animation starts higher than on the ground. Adjust it for all bones to come.
+                if (boneName.EqualsIgnoreCase("BIP01"))
+                    boneList[1].AddKey(time, 0.0f);
+                else
+                    boneList[1].AddKey(time, uPosition.y);
+
                 boneList[2].AddKey(time, uPosition.z);
                 boneList[3].AddKey(time, -sample.rotation.w); // It's important to have this value with a -1. Otherwise animation is inversed.
                 boneList[4].AddKey(time, sample.rotation.x);
@@ -90,7 +92,7 @@ namespace GVR.Creator
             foreach (var entry in curves)
             {
                 var path = GetChildPathRecursively(rootBone.transform, entry.Key, "");
-
+                
                 clip.SetCurve(path, typeof(Transform), "m_LocalPosition.x", entry.Value[0]);
                 clip.SetCurve(path, typeof(Transform), "m_LocalPosition.y", entry.Value[1]);
                 clip.SetCurve(path, typeof(Transform), "m_LocalPosition.z", entry.Value[2]);

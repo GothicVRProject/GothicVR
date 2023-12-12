@@ -55,7 +55,7 @@ namespace GVR.Creator
         {
             // We need to check for all Sounds once, if they need to be activated as they're next to player.
             // As CullingGroup only triggers deactivation once player spawns, but not activation.
-            if (!FeatureFlags.I.EnableSounds)
+            if (!FeatureFlags.I.enableSounds)
                 return;
 
             var loc = Camera.main!.transform.position;
@@ -85,7 +85,7 @@ namespace GVR.Creator
         public static async Task CreateAsync(GameObject rootTeleport, GameObject rootNonTeleport, WorldData world,
             int vobsPerFrame)
         {
-            if (!FeatureFlags.I.CreateVobs)
+            if (!FeatureFlags.I.createVobs)
                 return;
 
             var cullingVobObjects = new List<GameObject>();
@@ -434,7 +434,7 @@ namespace GVR.Creator
         [CanBeNull]
         private static GameObject CreateSound(PxVobSoundData vob)
         {
-            if (!FeatureFlags.I.EnableSounds)
+            if (!FeatureFlags.I.enableSounds)
                 return null;
 
             var go = GetPrefab(vob);
@@ -464,7 +464,7 @@ namespace GVR.Creator
         [CanBeNull]
         private static GameObject CreateSoundDaytime(PxVobSoundDaytimeData vob)
         {
-            if (!FeatureFlags.I.EnableSounds)
+            if (!FeatureFlags.I.enableSounds)
                 return null;
 
             var go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobSoundDaytime);
@@ -533,7 +533,7 @@ namespace GVR.Creator
 
             vobObj.transform.localScale = (max - min);
 
-            if (FeatureFlags.I.CreateVobs)
+            if (FeatureFlags.I.createVobs)
             {
                 var triggerHandler = vobObj.AddComponent<ChangeLevelTriggerHandler>();
                 triggerHandler.levelName = vob.levelName;
@@ -552,7 +552,7 @@ namespace GVR.Creator
             // FIXME - change to a Prefab in the future.
             var vobObj = GetPrefab(vob);
 
-            if (!FeatureFlags.I.EnableVobFPMesh)
+            if (!FeatureFlags.I.drawFreePointMeshes)
             {
                 // Quick win: If we don't want to render the spots, we just remove the Renderer.
                 GameObject.Destroy(vobObj.GetComponent<MeshRenderer>());
@@ -608,7 +608,7 @@ namespace GVR.Creator
 
         private static GameObject CreateDecal(PxVobData vob)
         {
-            if (!FeatureFlags.I.EnableDecals)
+            if (!FeatureFlags.I.enableDecals)
                 return null;
 
             var parent = parentGosTeleport[vob.type];

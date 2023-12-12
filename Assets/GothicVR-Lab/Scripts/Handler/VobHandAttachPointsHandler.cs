@@ -246,20 +246,5 @@ namespace GVR.Lab.Handler
             var content = JsonUtility.ToJson(attachPoints, true);
             File.WriteAllText($"{Application.dataPath}/GothicVR/Resources/Configuration/VobItemAttachPoints.json", content);
         }
-
-        private void OnDestroy()
-        {
-            if (GameData.VfsPtr != IntPtr.Zero)
-            {
-                PxVfs.pxVfsDestroy(GameData.VfsPtr);
-                GameData.VfsPtr = IntPtr.Zero;
-            }
-
-            if (GameData.VmGothicPtr != IntPtr.Zero)
-            {
-                PxVm.pxVmDestroy(GameData.VmGothicPtr);
-                GameData.VmGothicPtr = IntPtr.Zero;
-            }
-        }
     }
 }

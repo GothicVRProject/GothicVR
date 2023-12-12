@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using AOT;
 using GVR.Debugging;
+using GVR.Extensions;
 using GVR.Manager;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
@@ -91,14 +92,14 @@ namespace GVR.Bootstrap
                     Debug.LogWarning(message);
                     break;
                 case PxLogging.Level.error:
-                    var isVfsMessage = message.StartsWith("failed to find vfs entry");
-                    if (isVfsMessage && !FeatureFlags.I.ShowPhoenixVfsFileNotFoundErrors)
+                    var isVfsMessage = message.ContainsIgnoreCase("failed to find vfs entry");
+                    if (isVfsMessage && !FeatureFlags.I.showPhoenixVfsFileNotFoundErrors)
                         break;
 
                     Debug.LogError(message);
                     break;
                 default:
-                    if (!FeatureFlags.I.ShowPhoenixDebugMessages)
+                    if (!FeatureFlags.I.showPhoenixDebugMessages)
                         break;
 
                     Debug.Log(message);
@@ -166,7 +167,7 @@ namespace GVR.Bootstrap
         {
             var music = MusicManager.I;
             music.Create();
-            music.SetEnabled(FeatureFlags.I.EnableMusic);
+            music.SetEnabled(FeatureFlags.I.enableMusic);
             music.SetMusic("SYS_MENU");
             Debug.Log("Loading music");
         }

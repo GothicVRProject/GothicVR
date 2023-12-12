@@ -1,17 +1,19 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace GVR.Npc
 {
     public class Dialog: BasePlayerBehaviour
     {
-        private void OnCollisionEnter(Collision collision)
+        private void OnTriggerEnter(Collider other)
         {
-            if (!collision.gameObject.CompareTag("Player"))
+            if (!other.CompareTag("Player"))
                 return;
 
             Debug.Log("Player collission");
 
             // TODO Call dialog
+
         }
     }
 }

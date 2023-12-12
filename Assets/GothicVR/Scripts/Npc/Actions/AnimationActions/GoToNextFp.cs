@@ -14,33 +14,40 @@ namespace GVR.Npc.Actions.AnimationActions
         
         public override void Start()
         {
-            var pos = npcGo.transform.position;
+            var pos = NpcGo.transform.position;
 
-            fp = WayNetHelper.FindNearestFreePoint(pos, action.str0);
-
-            movingLocation = fp.Position;
+            fp = WayNetHelper.FindNearestFreePoint(pos, Action.String0);
         }
         
-        public override void OnCollisionEnter(Collision collision)
+        public override void OnTriggerEnter(Collider coll)
         {
             if (walkState != WalkState.Walk)
                 return;
-            
-            var expectedGo = collision.contacts
-                .Select(i => i.otherCollider.gameObject)
-                .FirstOrDefault(i => i.name == fp.Name);
 
-            if (expectedGo == null)
+            if (coll.gameObject.name != fp.Name)
                 return;
 
-            props.CurrentFreePoint = fp;
+            Props.currentFreePoint = fp;
             fp.IsLocked = true;
 
-            var animationComp = npcGo.GetComponent<Animation>();
+            var animationComp = NpcGo.GetComponent<Animation>();
             animationComp.Stop();
+            AnimationEndEventCallback();
 
             walkState = WalkState.Done;
             isFinished = true;
+        }
+
+        public override void AnimationEndEventCallback()
+        {
+            base.AnimationEndEventCallback();
+
+            isFinished = false;
+        }
+
+        protected override Vector3 GetWalkDestination()
+        {
+            return fp.Position;
         }
     }
 }

@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GVR.Caches;
-using GVR.Creator;
-using GVR.Extensions;
+﻿using GVR.Extensions;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Phoenix.Interface;
-using GVR.Phoenix.Interface.Vm;
 using GVR.Properties;
 using PxCs.Data.Event;
 using PxCs.Interface;
@@ -23,10 +17,16 @@ namespace GVR.Npc
         {
             properties.currentAction = new None(new(AnimationAction.Type.AINone), gameObject);
         }
-        
+
+        /// <summary>
+        /// Basically:
+        /// 1. Send Update (Tick) into current Animation to handle
+        /// 2. If finished, then check, if we need to handle the new state. _Start() --> _Loop()
+        ///
+        /// Hint: The isStateTimeActive is only for AI_StartState() from Daedalus which calls sub-routine within routine.
+        /// </summary>
         private void Update()
         {
-            
             properties.currentAction.Tick(transform);
           
             // Add new milliseconds when stateTime shall be measured.
@@ -60,8 +60,12 @@ namespace GVR.Npc
             }
         }
 
-        public void StartRoutine(uint action)
+        public void StartRoutine(uint action, string wayPointName)
         {
+            // We need to set WayPoint within Daedalus instance as it calls _self.wp_ during routine loops.
+            PxVm.pxVmInstanceNpcSetWP(properties.npc.instancePtr, wayPointName);
+            properties.npc.wp = wayPointName;
+
             properties.stateStart = action;
 
             var routineSymbol = PxDaedalusScript.GetSymbol(GameData.VmGothicPtr, action);
@@ -99,26 +103,6 @@ namespace GVR.Npc
             }
         }
         
-        private void OnCollisionEnter(Collision collision)
-        {
-            properties.currentAction?.OnCollisionEnter(collision);
-        }
-
-        /// <summary>
-        /// Sometimes a currentAnimation needs this information. Sometimes it's just for a FreePoint to clear up.
-        /// </summary>
-        private void OnCollisionExit(Collision collision)
-        {
-            properties.currentAction?.OnCollisionExit(collision);
-
-            // If NPC walks out of a FreePoint, it gets freed.
-            collision.contacts
-                .Where(i => i.otherCollider.name.StartsWithIgnoreCase("FP_"))
-                .Select(i => i.otherCollider.gameObject.GetComponent<VobSpotProperties>())
-                .ToList()
-                .ForEach(i => i.fp.IsLocked = false);
-        }
-        
         private void PlayNextAnimation(AbstractAnimationAction action)
         {
             properties.currentAction = action;
@@ -142,7 +126,7 @@ namespace GVR.Npc
         /// </summary>
         public void AnimationEndCallback()
         {
-            properties.currentAction.AnimationEventEndCallback();
+            properties.currentAction.AnimationEndEventCallback();
         }
     }
 }

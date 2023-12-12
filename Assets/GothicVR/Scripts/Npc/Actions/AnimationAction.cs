@@ -56,19 +56,21 @@ namespace GVR.Npc.Actions
                 AILookAt
             }
     
-            public AnimationAction(Type actionType, string str0 = null, int i0 = 0, uint ui0 = 0, float f0 = 0f)
+            public AnimationAction(Type actionType, string string0 = null, int int0 = 0, uint uint0 = 0, float float0 = 0f, bool bool0 = false)
             {
                 this.ActionType = actionType;
-                this.str0 = str0;
-                this.i0 = i0;
-                this.ui0 = ui0;
-                this.f0 = f0;
+                this.String0 = string0;
+                this.Int0 = int0;
+                this.Uint0 = uint0;
+                this.Float0 = float0;
+                this.Bool0 = bool0;
             }
             
             public readonly Type ActionType;
-            public readonly string str0;
-            public readonly int i0;
-            public readonly uint ui0;
-            public readonly float f0;
+            public readonly string String0;
+            public readonly int Int0;
+            public readonly uint Uint0;
+            public readonly float Float0;
+            public readonly bool Bool0;
     }
 }

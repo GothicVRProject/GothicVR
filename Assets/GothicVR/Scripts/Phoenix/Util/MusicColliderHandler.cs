@@ -12,7 +12,7 @@ namespace GVR.Phoenix.Util
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!FeatureFlags.I.EnableMusic)
+            if (!FeatureFlags.I.enableMusic)
                 return;
 
             if (!other.CompareTag(ConstantsManager.PlayerTag))
@@ -25,7 +25,7 @@ namespace GVR.Phoenix.Util
 
         private void OnTriggerExit(Collider other)
         {
-            if (!FeatureFlags.I.EnableMusic)
+            if (!FeatureFlags.I.enableMusic)
                 return;
             
             if (!other.CompareTag(ConstantsManager.PlayerTag))

@@ -12,8 +12,8 @@ using GVR.Phoenix.Interface;
 using PxCs.Data.WayNet;
 using PxCs.Interface;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR.Interaction.Toolkit;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
@@ -42,11 +42,6 @@ namespace GVR.Creator
             await WorldMeshCreator.CreateAsync(world, teleportGo, ConstantsManager.MeshPerFrame);
             await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, ConstantsManager.VObPerFrame);
             WaynetCreator.Create(worldGo, world);
-            
-            DebugAnimationCreator.Create(worldName);
-            DebugAnimationCreatorBSFire.Create(worldName);
-            DebugAnimationCreatorVelaya.Create(worldName);
-            DebugAnimationCreatorBloodwyn.Create();
 
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);

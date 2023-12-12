@@ -195,7 +195,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var message = PxVm.VmStackPopString(vmPtr);
             
-            if (!FeatureFlags.I.ShowZspyLogs)
+            if (!FeatureFlags.I.showZspyLogs)
                 return;
             
             Debug.Log($"[zspy]: {message}");
@@ -207,7 +207,7 @@ namespace GVR.Phoenix.Interface.Vm
             var message = PxVm.VmStackPopString(vmPtr);
             var channel = PxVm.pxVmStackPopInt(vmPtr);
 
-            if (!FeatureFlags.I.ShowZspyLogs)
+            if (!FeatureFlags.I.showZspyLogs)
                 return;
             
             Debug.Log($"[zspy,{channel}]: {message}");
@@ -218,7 +218,7 @@ namespace GVR.Phoenix.Interface.Vm
         {
             var message = PxVm.VmStackPopString(vmPtr);
 
-            if (!FeatureFlags.I.ShowZspyLogs)
+            if (!FeatureFlags.I.showZspyLogs)
                 return;
 
             Debug.Log($"[zspy]: {message}");
@@ -230,7 +230,7 @@ namespace GVR.Phoenix.Interface.Vm
             var message = PxVm.VmStackPopString(vmPtr);
             var channel = PxVm.pxVmStackPopInt(vmPtr);
 
-            if (!FeatureFlags.I.ShowZspyLogs)
+            if (!FeatureFlags.I.showZspyLogs)
                 return;
             
             Debug.Log($"[zspy,{channel}]: {message}");
@@ -620,10 +620,10 @@ namespace GVR.Phoenix.Interface.Vm
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_IsOnFP(IntPtr vmPtr)
         {
-            var vobNamePrefix = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
+            var vobNamePart = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            var res = NpcHelper.ExtIsNpcOnFp(npcPtr, vobNamePrefix);
+            var res = NpcHelper.ExtIsNpcOnFp(npcPtr, vobNamePart);
 
             PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(res));
         }
