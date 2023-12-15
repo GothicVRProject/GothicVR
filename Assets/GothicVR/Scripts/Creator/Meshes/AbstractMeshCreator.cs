@@ -9,6 +9,10 @@ using PxCs.Data.Struct;
 using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering;
+using ZenKit;
+using Material = UnityEngine.Material;
+using Mesh = UnityEngine.Mesh;
+using TextureFormat = UnityEngine.TextureFormat;
 
 namespace GVR.Creator.Meshes
 {
@@ -125,7 +129,7 @@ namespace GVR.Creator.Meshes
             return attachments;
         }
 
-        protected GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+        protected GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             if (mrm == null)
             {
@@ -404,10 +408,10 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData materialData)
+        protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh, ZenKit.Material materialData)
         {
-            if (materialData.disableCollision ||
-                materialData.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water)
+            if (materialData.DisableCollision ||
+                materialData.Group == MaterialGroup.Water)
             {
                 // Do not add colliders
                 return null;
@@ -479,7 +483,7 @@ namespace GVR.Creator.Meshes
             return material;
         }
 
-        private Material GetWaterMaterial(PxMaterialData materialData)
+        protected Material GetWaterMaterial(ZenKit.Material materialData)
         {
             var shader = Shader.Find(WaterShader);
             Material material = new Material(shader);
@@ -490,13 +494,13 @@ namespace GVR.Creator.Meshes
             //JaXt0r's suggestion for a not so hardcoded running water implementation
             //material.SetFloat("_ScrollSpeed", -900000 * materialData.animMapDir.ToUnityVector().SqrMagnitude());
 
-            switch (materialData.name)
+            switch (materialData.Name)
             {
                 case "OWODSEA2SWAMP": material.SetFloat("_ScrollSpeed", 0f); break;
                 case "NCWASSER": material.SetFloat("_ScrollSpeed", 0f); break;
-                case "OWODWATSTOP": material.SetFloat("_ScrollSpeed", (materialData.animFps / 75f)); break;
-                case "OWODWFALL": material.SetFloat("_ScrollSpeed", -(materialData.animFps / 10f)); break;
-                default: material.SetFloat("_ScrollSpeed", -(materialData.animFps / 75f)); break;
+                case "OWODWATSTOP": material.SetFloat("_ScrollSpeed", (materialData.TextureAnimationFps / 75f)); break;
+                case "OWODWFALL": material.SetFloat("_ScrollSpeed", -(materialData.TextureAnimationFps / 10f)); break;
+                default: material.SetFloat("_ScrollSpeed", -(materialData.TextureAnimationFps / 75f)); break;
             }
 
             material.SetFloat("_Surface", 0);

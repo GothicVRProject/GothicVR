@@ -4,23 +4,22 @@ using GVR.Extensions;
 using JetBrains.Annotations;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
-using PxCs.Data.Struct;
-using PxCs.Data.Vob;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using ZenKit.Vobs;
 
 namespace GVR.Creator.Meshes
 {
     public class VobMeshCreator : AbstractMeshCreator
     {
         public GameObject CreateVob(string objectName, PxMultiResolutionMeshData mrm, Vector3 position,
-            PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+            Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             var go = Create(objectName, mrm, position, rotation, withCollider, parent, rootGo);
-            
+
             AddZsCollider(go);
-            
+
             return go;
         }
 
@@ -48,23 +47,21 @@ namespace GVR.Creator.Meshes
                 return Create(objectName, mdm, mdh, position, rotation, parent, rootGo);
         }
 
-        public GameObject CreateVobDecal(PxVobData vob, GameObject parent)
+        public GameObject CreateVobDecal(VirtualObject vob, VisualDecal decal, GameObject parent)
         {
             // G1: One Decal has no value to recognize what it is. Most likely a setup bug to ignore at this point.
-            if (!vob.vobDecal.HasValue)
+            if (!vob.Name.IsEmpty())
                 return null;
 
-            var decalData = vob.vobDecal.Value;
-
-            var decalProjectorGo = new GameObject(decalData.name);
+            var decalProjectorGo = new GameObject(vob.Name);
             var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
-            var texture = AssetCache.TryGetTexture(vob.visualName);
+            var texture = AssetCache.TryGetTexture(vob.Name);
 
             // x/y needs to be made twice the size and transformed from cm in m.
             // z - value is close to what we see in Gothic spacer.
-            decalProj.size = new(decalData.dimension.X * 2 / 100, decalData.dimension.Y * 2 / 100, 0.5f);
+            decalProj.size = new(decal.Dimension.X * 2 / 100, decal.Dimension.Y * 2 / 100, 0.5f);
             decalProjectorGo.SetParent(parent);
-            SetPosAndRot(decalProjectorGo, vob.position.ToUnityVector(), vob.rotation);
+            SetPosAndRot(decalProjectorGo, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion());
 
             decalProj.pivot = Vector3.zero;
             decalProj.fadeFactor = DecalOpacity;

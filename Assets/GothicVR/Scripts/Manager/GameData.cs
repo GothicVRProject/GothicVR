@@ -88,15 +88,15 @@ namespace GVR.Phoenix.Interface
             }
         }
 
-        private static void SetWayPointData(PxWayPointData[] wayPoints)
+        private static void SetWayPointData(List<ZenKit.WayPoint> wayPoints)
         {
             WayPoints.Clear();
             foreach (var wp in wayPoints)
             {
-                WayPoints.Add(wp.name, new ()
+                WayPoints.Add(wp.Name, new ()
                 {
-                    Name = wp.name,
-                    Position = wp.position.ToUnityVector()
+                    Name = wp.Name,
+                    Position = wp.Position.ToUnityVector()
                 });
             }
         }

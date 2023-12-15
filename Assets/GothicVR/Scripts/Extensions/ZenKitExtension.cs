@@ -1,6 +1,4 @@
-﻿using PxCs.Interface;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace GVR.Extensions
 {
@@ -14,6 +12,11 @@ namespace GVR.Extensions
                 ZenKit.TextureFormat.Dxt5 => TextureFormat.DXT5,
                 _ => TextureFormat.RGBA32 // Everything else we need to use uncompressed for Unity (e.g. DXT3).
             };
+        }
+
+        public static Quaternion ToUnityQuaternion(this System.Numerics.Quaternion numericsQuaternion)
+        {
+            return new Quaternion(numericsQuaternion.X, numericsQuaternion.Y, numericsQuaternion.Z, numericsQuaternion.W);
         }
     }
 }

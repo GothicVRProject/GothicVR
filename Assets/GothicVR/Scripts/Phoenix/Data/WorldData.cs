@@ -1,14 +1,10 @@
-﻿using PxCs.Data;
-using PxCs.Data.Mesh;
-using PxCs.Data.Vob;
-using PxCs.Data.WayNet;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Numerics;
 using ZenKit;
-using ZenKit.Vobs.Materialized;
-using Material = ZenKit.Materialized.Material;
-using WayPoint = ZenKit.Materialized.WayPoint;
+using ZenKit.Vobs;
+using Material = ZenKit.Material;
+using Vector2 = UnityEngine.Vector2;
+using WayPoint = ZenKit.WayPoint;
 
 namespace GVR.Phoenix.Data
 {
@@ -22,7 +18,7 @@ namespace GVR.Phoenix.Data
         public int[] materialIndices; // each key (index) of a vertex_index has a material index in here.
         public int[] featureIndices; // Each vertex_index has a feature index.
 
-        public System.Numerics.Vector3[] vertices;
+        public Vector3[] vertices;
         public Vertex[] features;
         public List<Material> materials;
 
@@ -33,10 +29,10 @@ namespace GVR.Phoenix.Data
             public int materialIndex;
             public Material material;
 
-            public List<Vector3> vertices = new();
+            public List<UnityEngine.Vector3> vertices = new();
             public List<int> triangles = new();
             public List<Vector2> uvs = new() ;
-            public List<Vector3> normals = new();
+            public List<UnityEngine.Vector3> normals = new();
         }
 
         public List<VirtualObject> vobs;

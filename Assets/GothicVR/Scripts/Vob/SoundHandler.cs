@@ -3,6 +3,7 @@ using System.Collections;
 using PxCs.Interface;
 using Unity.VisualScripting;
 using UnityEngine;
+using ZenKit.Vobs;
 using Random = UnityEngine.Random;
 
 namespace GothicVR.Vob
@@ -47,7 +48,7 @@ namespace GothicVR.Vob
         private void StartCoroutine()
         {
             // Either it's not yet initialized (no clip) or it's no random loop
-            if (audioSource.clip == null || properties.soundData.mode != PxWorld.PxVobSoundMode.PxVobSoundModeRandom)
+            if (audioSource.clip == null || properties.soundData.Mode != SoundMode.Random)
                 return;
             
             if (isCoroutineRunning)
@@ -61,8 +62,8 @@ namespace GothicVR.Vob
         {
             while (true)
             {
-                var nextRandomPlayTime = properties.soundData.randomDelay
-                                         + Random.Range(0.0f, properties.soundData.randomDelayVar);
+                var nextRandomPlayTime = properties.soundData.RandomDelay
+                                         + Random.Range(0.0f, properties.soundData.RandomDelayVar);
                 yield return new WaitForSeconds(nextRandomPlayTime);
 
                 audioSource.Play();

@@ -1,3 +1,4 @@
+using System.Numerics;
 using PxCs.Data.Struct;
 
 namespace GVR.Extensions

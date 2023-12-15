@@ -6,6 +6,10 @@ using GVR.Manager.Culling;
 using GVR.Phoenix.Data;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit;
+using Material = UnityEngine.Material;
+using Mesh = UnityEngine.Mesh;
+using TextureFormat = UnityEngine.TextureFormat;
 
 namespace GVR.Creator.Meshes
 {
@@ -34,14 +38,14 @@ namespace GVR.Creator.Meshes
                 // No texture to add.
                 // For G1 this is: material.name == [KEINE, KEINETEXTUREN, DEFAULT, BRETT2, BRETT1, SUMPFWAASER, S:PSIT01_ABODEN]
                 // Removing these removes tiny slices of walls on the ground. If anyone finds them, I owe them a beer.
-                if (subMesh[0].material.texture == "")
+                if (subMesh[0].material.Texture.IsEmpty())
                 {
                     continue;
                 }
 
                 var subMeshObj = new GameObject()
                 {
-                    name = subMesh[0].material.name!,
+                    name = subMesh[0].material.Name,
                     isStatic = true
                 };
 
@@ -93,20 +97,20 @@ namespace GVR.Creator.Meshes
         protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
             var bMaterial = subMesh.material;
-            var texture = GetTexture(bMaterial.texture);
+            var texture = GetTexture(bMaterial.Texture);
 
             if (null == texture)
             {
-                if (bMaterial.texture.EndsWith(".TGA"))
-                    Debug.LogError("This is supposed to be a decal: " + bMaterial.texture);
+                if (bMaterial.Texture.EndsWithIgnoreCase(".TGA"))
+                    Debug.LogError($"This is supposed to be a decal: ${bMaterial.Texture}");
                 else
-                    Debug.LogError("Couldn't get texture from name: " + bMaterial.texture);
+                    Debug.LogError($"Couldn't get texture from name: {bMaterial.Texture}");
             }
 
             Material material;
-            switch (subMesh.material.group)
+            switch (subMesh.material.Group)
             {
-                case PxMaterial.PxMaterialGroup.PxMaterialGroup_Water:
+                case MaterialGroup.Water:
                     material = GetWaterMaterial(subMesh.material);
                     break;
                 default:
@@ -117,9 +121,9 @@ namespace GVR.Creator.Meshes
             rend.material = material;
 
             // No texture to add.
-            if (bMaterial.texture == "")
+            if (bMaterial.Texture.IsEmpty())
             {
-                Debug.LogWarning("No texture was set for: " + bMaterial.name);
+                Debug.LogWarning($"No texture was set for: {bMaterial.Name}");
                 return;
             }
 

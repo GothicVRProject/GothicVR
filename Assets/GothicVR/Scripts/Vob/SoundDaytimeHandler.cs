@@ -3,6 +3,7 @@ using System.Collections;
 using GVR.World;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit.Vobs;
 using Random = UnityEngine.Random;
 
 namespace GothicVR.Vob
@@ -37,8 +38,8 @@ namespace GothicVR.Vob
 
         public void PrepareSoundHandling()
         {
-            var startTime = properties.soundDaytimeData.startTime;
-            var endTime = properties.soundDaytimeData.endTime;
+            var startTime = properties.soundDaytimeData.StartTime;
+            var endTime = properties.soundDaytimeData.EndTime;
             if (startTime != (int)startTime || endTime != (int)endTime)
             {
                 Debug.LogError($"Currently fractional times for DayTimeAudio aren't supported. Only full hours are handled. start={startSound1} end={endSound1}");
@@ -64,7 +65,7 @@ namespace GothicVR.Vob
         private void StartCoroutineInternal()
         {
             // Either it's not yet initialized (no clip) or it's no random loop
-            if (audioSource1.clip == null || properties.soundDaytimeData.mode != PxWorld.PxVobSoundMode.PxVobSoundModeRandom)
+            if (audioSource1.clip == null || properties.soundDaytimeData.Mode != SoundMode.Random)
                 return;
             
             if (isCoroutineRunning)
@@ -116,8 +117,8 @@ namespace GothicVR.Vob
         {
             while (true)
             {
-                var nextRandomPlayTime = properties.soundDaytimeData.randomDelay
-                                         + Random.Range(0.0f, properties.soundDaytimeData.randomDelayVar);
+                var nextRandomPlayTime = properties.soundDaytimeData.RandomDelay
+                                         + Random.Range(0.0f, properties.soundDaytimeData.RandomDelayVar);
                 yield return new WaitForSeconds(nextRandomPlayTime);
 
                 activeAudio.Play();

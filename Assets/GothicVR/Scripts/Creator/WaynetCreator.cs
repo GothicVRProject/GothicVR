@@ -42,14 +42,14 @@ namespace GVR.Creator
                 {
                     // For each edge, create two entries: one for each direction of the edge.
                     // 'a' is the source waypoint, 'b' is the destination waypoint.
-                    new { a = wayPoints[(int)edge.a], b = wayPoints[(int)edge.b] },
-                    new { a = wayPoints[(int)edge.b], b = wayPoints[(int)edge.a] }
+                    new { a = wayPoints[(int)edge.A], b = wayPoints[(int)edge.B] },
+                    new { a = wayPoints[(int)edge.B], b = wayPoints[(int)edge.A] }
                 })
-                .GroupBy(x => x.a.name) // Group the entries by the name of the source waypoint.
+                .GroupBy(x => x.a.Name) // Group the entries by the name of the source waypoint.
                 .ToDictionary(g => g.Key, g => new DijkstraWaypoint(g.Key) // Transform each group into a DijkstraWaypoint.
                 {
                     // The neighbors of the DijkstraWaypoint are the names of the destination waypoints in the group.
-                    Neighbors = g.Select(x => x.b.name).ToList()
+                    Neighbors = g.Select(x => x.b.Name).ToList()
                 });
 
             GameData.DijkstraWaypoints = dijkstraWaypoints;
@@ -97,8 +97,8 @@ namespace GVR.Creator
                     Object.Destroy(wpObject.GetComponent<MeshRenderer>());
 
                 wpObject.tag = ConstantsManager.SpotTag;
-                wpObject.name = waypoint.name;
-                wpObject.transform.position = waypoint.position.ToUnityVector();
+                wpObject.name = waypoint.Name;
+                wpObject.transform.position = waypoint.Position.ToUnityVector();
 
                 wpObject.SetParent(waypointsObj);
             }
@@ -115,8 +115,8 @@ namespace GVR.Creator
             for (var i = 0; i < world.waypointEdges.Length; i++)
             {
                 var edge = world.waypointEdges[i];
-                var startPos = world.waypoints[(int)edge.a].position.ToUnityVector();
-                var endPos = world.waypoints[(int)edge.b].position.ToUnityVector();
+                var startPos = world.waypoints[(int)edge.A].Position.ToUnityVector();
+                var endPos = world.waypoints[(int)edge.B].Position.ToUnityVector();
                 var lineObj = new GameObject();
 
                 lineObj.AddComponent<LineRenderer>();
@@ -127,7 +127,7 @@ namespace GVR.Creator
                 lr.SetPosition(0, startPos);
                 lr.SetPosition(1, endPos);
 
-                lineObj.name = $"{edge.a}->{edge.b}";
+                lineObj.name = $"{edge.A}->{edge.B}";
                 lineObj.transform.position = startPos;
                 lineObj.transform.parent = waypointEdgesObj.transform;
             }

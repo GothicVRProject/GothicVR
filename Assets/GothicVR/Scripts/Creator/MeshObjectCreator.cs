@@ -2,11 +2,10 @@
 using GVR.Phoenix.Interface.Vm;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
-using PxCs.Data.Struct;
 using PxCs.Data.Vm;
-using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit.Vobs;
 
 namespace GVR.Creator
 {
@@ -35,7 +34,7 @@ namespace GVR.Creator
         }
 
         public static GameObject CreateVob(string objectName, PxMultiResolutionMeshData mrm, Vector3 position,
-            PxMatrix3x3Data rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+            Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             return VobMeshCreator.CreateVob(objectName, mrm, position, rotation, withCollider, parent, rootGo);
         }
@@ -52,9 +51,9 @@ namespace GVR.Creator
             return VobMeshCreator.CreateVob(objectName, mdm, mdh, position, rotation, parent, rootGo);
         }
 
-        public static GameObject CreateVobDecal(PxVobData vob, GameObject parent)
+        public static GameObject CreateVobDecal(VirtualObject vob, VisualDecal decal, GameObject parent)
         {
-            return VobMeshCreator.CreateVobDecal(vob, parent);
+            return VobMeshCreator.CreateVobDecal(vob, decal, parent);
         }
     }
 }

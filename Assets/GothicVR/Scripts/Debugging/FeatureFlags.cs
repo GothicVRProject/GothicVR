@@ -74,8 +74,6 @@ namespace GVR.Debugging
         [Header("__________Experimental / Do not use in Production__________")]
         [Tooltip("Looks already quite good for leaves.pfy in the forest, but fire is awkward.")]
         public bool enableVobParticles;
-        [Tooltip("The current implementation costs more frames than it saves. But it's a potential starting point for further enhancements like gluing small related objects together. Stored here for future use.")]
-        public bool enableFineGrainedWorldMeshCreation;
         [Tooltip("Experimental. Looks weird without proper distance shadow. Could save some frames if combined with well looking distance shadow.")]
         public bool enableWorldCulling;
         
