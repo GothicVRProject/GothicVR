@@ -14,6 +14,8 @@ using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
+using ZenKit.Materialized;
+using Mesh = ZenKit.Materialized.Mesh;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
@@ -73,45 +75,33 @@ namespace GVR.Creator
 
         private static WorldData LoadWorld(string worldName)
         {
-            var worldPtr = PxWorld.pxWorldLoadFromVfs(GameData.VfsPtr, worldName);
-            if (worldPtr == IntPtr.Zero)
+            var zkWorld = new ZenKit.World(GameData.Vfs, worldName).Materialize();
+
+            if (zkWorld.RootObjects.IsEmpty())
                 throw new ArgumentException($"World >{worldName}< couldn't be found.");
 
-            var worldMeshPtr = PxWorld.pxWorldGetMesh(worldPtr);
-            if (worldMeshPtr == IntPtr.Zero)
+            var zkMesh = zkWorld.Mesh;
+            if (zkMesh.Polygons.IsEmpty())
                 throw new ArgumentException($"No mesh in world >{worldName}< found.");
 
-            var vertexIndices = PxMesh.GetPolygonVertexIndices(worldMeshPtr);
-            var materialIndices = PxMesh.GetPolygonMaterialIndices(worldMeshPtr);
-            var featureIndices = PxMesh.GetPolygonFeatureIndices(worldMeshPtr);
+            var vertexIndices = GetPositionIndices(zkWorld);
 
-            var vertices = PxMesh.GetVertices(worldMeshPtr);
-            var features = PxMesh.GetFeatures(worldMeshPtr);
-            var materials = PxMesh.GetMaterials(worldMeshPtr);
+            var vertices = zkMesh.Positions;
+            var features = zkMesh.Features;
+            var materials = zkWorld.Mesh.Materials;
 
-            var waypoints = PxWorld.GetWayPoints(worldPtr);
-            var waypointsDict = new Dictionary<string, PxWayPointData>();
-            foreach (var waypoint in waypoints)
-            {
-                waypointsDict[waypoint.name] = waypoint;
-            }
-            var waypointEdges = PxWorld.GetWayEdges(worldPtr);
+            var waypoints = zkWorld.WayNet.Points;
+
+            var waypointEdges = zkWorld.WayNet.Edges;
 
             WorldData world = new()
             {
                 vertexIndices = vertexIndices,
-                materialIndices = materialIndices,
-                featureIndices = featureIndices,
-
                 vertices = vertices,
                 features = features,
                 materials = materials,
-
-
-                vobs = PxWorld.GetVobs(worldPtr),
-
+                vobs = zkWorld.RootObjects,
                 waypoints = waypoints,
-                waypointsDict = waypointsDict,
                 waypointEdges = waypointEdges
             };
 
@@ -126,14 +116,25 @@ namespace GVR.Creator
                 world.subMeshes = subMeshes;
             }
 
-            PxWorld.pxWorldDestroy(worldPtr);
-
             return world;
         }
 
-        private static Dictionary<int, List<WorldData.SubMeshData>> CreateSubMeshesForUnityStable(WorldData world)
+        private static int[] GetPositionIndices(ZenKit.Materialized.World zkWorld)
         {
-            Dictionary<int, List<WorldData.SubMeshData>> subMeshes = new(world.materials.Length);
+            List<int> positionIndices = new();
+
+            foreach (var leafPolygonId in zkWorld.BspTree.LeafPolygonIndices)
+            {
+                var polygon = zkWorld.Mesh.Polygons[(int)leafPolygonId];
+                positionIndices.AddRange(polygon.PositionIndices);
+            }
+
+            return positionIndices.ToArray();
+        }
+
+        private static Dictionary<int, List<WorldData.SubMeshData>> CreateSubMeshesForUnityStable(WorldData world, ZenKit.Materialized.World zkWorld)
+        {
+            Dictionary<int, List<WorldData.SubMeshData>> subMeshes = new(world.materials.Count);
             var vertices = world.vertices;
             var vertexIndices = world.vertexIndices;
             var featureIndices = world.featureIndices;
@@ -141,14 +142,10 @@ namespace GVR.Creator
 
             // We need to put vertex_indices (aka triangles) in reversed order
             // to make Unity draw mesh elements right (instead of upside down)
-            for (var loopVertexIndexId = vertexIndices.LongLength - 1; loopVertexIndexId >= 0; loopVertexIndexId -= 3)
+            foreach (var leafPolygonIndex in zkWorld.BspTree.LeafPolygonIndices)
             {
-                // For each 3 vertexIndices (aka each triangle) there's one materialIndex.
-                var materialIndex = world.materialIndices[loopVertexIndexId / 3];
-
-                // DEBUG! Some elements to test subMeshing
-                // if (materialIndex != 60) // 60 - some walls, 4 - grass
-                //     continue;
+                var polygon = zkWorld.Mesh.Polygons[(int)leafPolygonIndex];
+                var materialIndex = (int)polygon.MaterialIndex;
 
                 // The materialIndex was never used before.
                 if (!subMeshes.ContainsKey(materialIndex))
@@ -168,16 +165,16 @@ namespace GVR.Creator
                 var currentSubMesh = subMeshes[materialIndex];
                 var currentSubMeshFirstListItem = currentSubMesh.First();
 
-                for (var subVertexIndexId = loopVertexIndexId; subVertexIndexId > loopVertexIndexId - 3; subVertexIndexId--)
+                for (var polygonIndices = 0; polygonIndices < polygon.PositionIndices.Length; polygonIndices++)
                 {
-                    var origVertexIndex = vertexIndices[subVertexIndexId];
+                    var origVertexIndex = polygon.PositionIndices[polygonIndices];
 
                     // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
                     currentSubMeshFirstListItem.vertices.Add(vertices[origVertexIndex].ToUnityVector());
 
-                    var featureIndex = featureIndices[subVertexIndexId];
-                    currentSubMeshFirstListItem.uvs.Add(features[featureIndex].texture.ToUnityVector());
-                    currentSubMeshFirstListItem.normals.Add(features[featureIndex].normal.ToUnityVector());
+                    var featureIndex = polygon.FeatureIndices[polygonIndices];
+                    currentSubMeshFirstListItem.uvs.Add(features[featureIndex].Texture.ToUnityVector());
+                    currentSubMeshFirstListItem.normals.Add(features[featureIndex].Normal.ToUnityVector());
 
                     currentSubMeshFirstListItem.triangles.Add(currentSubMeshFirstListItem.vertices.Count - 1);
                 }
@@ -198,7 +195,7 @@ namespace GVR.Creator
             // Dict<materialId, List<KVP<List<vertexIndex>, List<featureIndex>>>>
             Dictionary<int, List<ValueTuple<List<int>, List<int>>>> subSubMeshTempArrangement = new();
 
-            Dictionary<int, List<WorldData.SubMeshData>> returnMeshes = new(world.materials.Length);
+            Dictionary<int, List<WorldData.SubMeshData>> returnMeshes = new(world.materials.Count);
             var vertices = world.vertices;
             var vertexIndices = world.vertexIndices;
             var featureIndices = world.featureIndices;

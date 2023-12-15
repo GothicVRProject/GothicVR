@@ -5,6 +5,10 @@ using PxCs.Data.WayNet;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using ZenKit;
+using ZenKit.Vobs.Materialized;
+using Material = ZenKit.Materialized.Material;
+using WayPoint = ZenKit.Materialized.WayPoint;
 
 namespace GVR.Phoenix.Data
 {
@@ -19,15 +23,15 @@ namespace GVR.Phoenix.Data
         public int[] featureIndices; // Each vertex_index has a feature index.
 
         public System.Numerics.Vector3[] vertices;
-        public PxFeatureData[] features;
-        public PxMaterialData[] materials;
+        public Vertex[] features;
+        public List<Material> materials;
 
         public Dictionary<int, List<SubMeshData>> subMeshes;
 
         public class SubMeshData
         {
             public int materialIndex;
-            public PxMaterialData material;
+            public Material material;
 
             public List<Vector3> vertices = new();
             public List<int> triangles = new();
@@ -35,10 +39,9 @@ namespace GVR.Phoenix.Data
             public List<Vector3> normals = new();
         }
 
-        public PxVobData[] vobs;
+        public List<VirtualObject> vobs;
 
-        public PxWayPointData[] waypoints;
-        public Dictionary<string, PxWayPointData> waypointsDict;
-        public PxWayEdgeData[] waypointEdges;
+        public List<WayPoint> waypoints;
+        public WayEdge[] waypointEdges;
     }
 }

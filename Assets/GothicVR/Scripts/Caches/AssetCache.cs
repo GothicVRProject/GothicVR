@@ -138,7 +138,7 @@ namespace GVR.Caches
         {
             var preparedMdsKey = GetPreparedKey(mdsKey);
             var preparedAnimKey = GetPreparedKey(animKey);
-            var preparedKey = preparedMdsKey + "-" + preparedAnimKey;
+            var preparedKey = $"{preparedMdsKey}-{preparedAnimKey}";
             if (AnimCache.TryGetValue(preparedKey, out var data))
                 return data;
 

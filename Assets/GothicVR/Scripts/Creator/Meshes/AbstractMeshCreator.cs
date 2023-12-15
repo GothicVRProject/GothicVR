@@ -175,52 +175,6 @@ namespace GVR.Creator.Meshes
             obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
-        protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
-        {
-            var bMaterial = subMesh.material;
-            var texture = GetTexture(bMaterial.texture);
-
-            if (null == texture)
-            {
-                if (bMaterial.texture.EndsWith(".TGA"))
-                    Debug.LogError("This is supposed to be a decal: " + bMaterial.texture);
-                else
-                    Debug.LogError("Couldn't get texture from name: " + bMaterial.texture);
-            }
-
-            Material material;
-            switch (subMesh.material.group)
-            {
-                case PxMaterial.PxMaterialGroup.PxMaterialGroup_Water:
-                    material = GetWaterMaterial(subMesh.material);
-                    break;
-                default:
-                    material = GetDefaultMaterial(texture != null && texture.format == TextureFormat.RGBA32);
-                    break;
-            }
-
-            rend.material = material;
-
-            // No texture to add.
-            if (bMaterial.texture == "")
-            {
-                Debug.LogWarning("No texture was set for: " + bMaterial.name);
-                return;
-            }
-
-            material.mainTexture = texture;
-        }
-
-        protected void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
-        {
-            var mesh = new Mesh();
-            meshFilter.sharedMesh = mesh;
-
-            mesh.SetVertices(subMesh.vertices);
-            mesh.SetTriangles(subMesh.triangles, 0);
-            mesh.SetUVs(0, subMesh.uvs);
-        }
-
         protected void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
         {
             if (null == mrmData)

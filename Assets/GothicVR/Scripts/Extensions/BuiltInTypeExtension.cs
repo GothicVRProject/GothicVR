@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GVR.Extensions
@@ -6,6 +7,11 @@ namespace GVR.Extensions
     public static class BuiltInTypeExtension
     {
         public static bool IsEmpty(this string self)
+        {
+            return !self.Any();
+        }
+
+        public static bool IsEmpty<T>(this IEnumerable<T> self)
         {
             return !self.Any();
         }
