@@ -11,6 +11,8 @@ using GVR.Phoenix.Interface;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
+using ZenKit.Materialized;
+using Mesh = ZenKit.Materialized.Mesh;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
@@ -75,19 +77,17 @@ namespace GVR.Creator
             if (zkWorld.RootObjects.IsEmpty())
                 throw new ArgumentException($"World >{worldName}< couldn't be found.");
 
-            var zkMesh = zkWorld.Mesh;
+            var zkMesh = zkWorld.Mesh.Materialize();
+            var zkBspTree = zkWorld.BspTree.Materialize();
             if (zkMesh.Polygons.IsEmpty())
                 throw new ArgumentException($"No mesh in world >{worldName}< found.");
 
-            var vertexIndices = GetPositionIndices(zkWorld);
+            var zkWayNet = zkWorld.WayNet.Materialize();
+            var vertexIndices = GetPositionIndices(zkBspTree, zkMesh);
 
             var vertices = zkMesh.Positions;
             var features = zkMesh.Features;
             var materials = zkWorld.Mesh.Materials;
-
-            var waypoints = zkWorld.WayNet.Points;
-
-            var waypointEdges = zkWorld.WayNet.Edges;
 
             WorldData world = new()
             {
@@ -96,8 +96,7 @@ namespace GVR.Creator
                 features = features,
                 materials = materials,
                 vobs = zkWorld.RootObjects,
-                waypoints = waypoints,
-                waypointEdges = waypointEdges
+                wayNet = zkWayNet
             };
 
             var subMeshes = CreateSubMeshesForUnityStable(world, zkWorld);
@@ -106,16 +105,20 @@ namespace GVR.Creator
             return world;
         }
 
-        private static int[] GetPositionIndices(ZenKit.World zkWorld)
+        private static int[] GetPositionIndices(BspTree tree, Mesh mesh)
         {
             List<int> positionIndices = new();
 
-            foreach (var leafPolygonId in zkWorld.BspTree.LeafPolygonIndices)
+            var leaves = tree.Nodes.
+                Where(i => i.FrontIndex == -1 && i.BackIndex == -1).
+                ToArray();
+            
+            
+            foreach (var leaf in leaves)
             {
-                var polygon = zkWorld.Mesh.Polygons[(int)leafPolygonId];
-                positionIndices.AddRange(polygon.PositionIndices.Select(i => (int)i));
+                mesh.Polygons.GetRange((int)leaf.PolygonIndex, (int)leaf.PolygonCount);
             }
-
+            
             return positionIndices.ToArray();
         }
 

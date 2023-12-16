@@ -4,6 +4,7 @@ using ZenKit;
 using ZenKit.Vobs;
 using Material = ZenKit.Material;
 using Vector2 = UnityEngine.Vector2;
+using WayNet = ZenKit.Materialized.WayNet;
 using WayPoint = ZenKit.WayPoint;
 
 namespace GVR.Phoenix.Data
@@ -37,6 +38,7 @@ namespace GVR.Phoenix.Data
 
         public List<VirtualObject> vobs;
 
+        public WayNet wayNet;
         public List<WayPoint> waypoints;
         public WayEdge[] waypointEdges;
     }
