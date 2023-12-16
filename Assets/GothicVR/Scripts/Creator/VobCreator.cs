@@ -18,16 +18,14 @@ using GVR.Properties;
 using GVR.Vob;
 using GVR.Vob.WayNet;
 using JetBrains.Annotations;
-using PxCs.Data.Struct;
 using PxCs.Data.Vm;
-using PxCs.Data.Vob;
 using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
 using ZenKit.Vobs;
+using Quaternion = System.Numerics.Quaternion;
 using Vector3 = System.Numerics.Vector3;
-using VirtualObject = ZenKit.Vobs.VirtualObject;
 
 namespace GVR.Creator
 {
@@ -601,10 +599,10 @@ namespace GVR.Creator
             return MeshObjectCreator.CreateVob(item.visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
         }
         
-        private static GameObject CreateItemMesh(Item item, GameObject go)
+        private static GameObject CreateItemMesh(PxVmItemData item, GameObject go)
         {
-            var mrm = AssetCache.TryGetMrm(item.Visual!.Name);
-            return MeshObjectCreator.CreateVob(item.Visual.Name, mrm, default, default, false, parent: go);
+            var mrm = AssetCache.TryGetMrm(item.visual);
+            return MeshObjectCreator.CreateVob(item.visual, mrm, default, default, false, parent: go);
         }
 
         private static GameObject CreateDecal(VirtualObject vob)
@@ -874,12 +872,12 @@ namespace GVR.Creator
             return null;
         }
         
-        private static void SetPosAndRot(GameObject obj, Vector3 position, System.Numerics.Quaternion rotation)
+        private static void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
         {
             SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityQuaternion());
         }
 
-        private static void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, Quaternion rotation)
+        private static void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, UnityEngine.Quaternion rotation)
         {
             obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
