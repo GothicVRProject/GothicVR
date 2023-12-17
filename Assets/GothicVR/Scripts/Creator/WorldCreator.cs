@@ -73,16 +73,15 @@ namespace GVR.Creator
         private static WorldData LoadWorld(string worldName)
         {
             var zkWorld = new ZenKit.World(GameData.Vfs, worldName);
+            var zkMesh = zkWorld.Mesh.Materialize();
+            var zkBspTree = zkWorld.BspTree.Materialize();
+            var zkWayNet = zkWorld.WayNet.Materialize();
 
             if (zkWorld.RootObjects.IsEmpty())
                 throw new ArgumentException($"World >{worldName}< couldn't be found.");
-
-            var zkMesh = zkWorld.Mesh.Materialize();
-            var zkBspTree = zkWorld.BspTree.Materialize();
             if (zkMesh.Polygons.IsEmpty())
                 throw new ArgumentException($"No mesh in world >{worldName}< found.");
 
-            var zkWayNet = zkWorld.WayNet.Materialize();
             var vertexIndices = GetPositionIndices(zkBspTree, zkMesh);
 
             var vertices = zkMesh.Positions;
@@ -99,7 +98,7 @@ namespace GVR.Creator
                 wayNet = zkWayNet
             };
 
-            var subMeshes = CreateSubMeshesForUnityStable(world, zkWorld);
+            var subMeshes = CreateSubMeshesForUnity(world, zkMesh, zkBspTree);
             world.subMeshes = subMeshes;
 
             return world;
@@ -122,7 +121,11 @@ namespace GVR.Creator
             return positionIndices.ToArray();
         }
 
-        private static Dictionary<int, List<WorldData.SubMeshData>> CreateSubMeshesForUnityStable(WorldData world, ZenKit.World zkWorld)
+        /// <summary>
+        /// If we keep Polygons/Vertices like they're provided by Gothic, then we would have hundreds of thousands of small meshes.
+        /// We therefore merge them into blobs grouped by materials.
+        /// </summary>
+        private static Dictionary<int, List<WorldData.SubMeshData>> CreateSubMeshesForUnity(WorldData world, Mesh zkMesh, BspTree zkBspTree)
         {
             Dictionary<int, List<WorldData.SubMeshData>> subMeshes = new(world.materials.Count);
             var vertices = world.vertices;
@@ -132,9 +135,9 @@ namespace GVR.Creator
 
             // We need to put vertex_indices (aka triangles) in reversed order
             // to make Unity draw mesh elements right (instead of upside down)
-            foreach (var leafPolygonIndex in zkWorld.BspTree.LeafPolygonIndices)
+            foreach (var leafPolygonIndex in zkBspTree.LeafPolygonIndices)
             {
-                var polygon = zkWorld.Mesh.Polygons[(int)leafPolygonIndex];
+                var polygon = zkMesh.Polygons[(int)leafPolygonIndex];
                 var materialIndex = (int)polygon.MaterialIndex;
 
                 // The materialIndex was never used before.
