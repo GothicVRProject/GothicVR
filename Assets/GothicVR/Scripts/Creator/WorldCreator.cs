@@ -82,94 +82,54 @@ namespace GVR.Creator
             if (zkMesh.Polygons.IsEmpty())
                 throw new ArgumentException($"No mesh in world >{worldName}< found.");
 
-            var vertexIndices = GetPositionIndices(zkBspTree, zkMesh);
-
             var vertices = zkMesh.Positions;
             var features = zkMesh.Features;
             var materials = zkWorld.Mesh.Materials;
 
             WorldData world = new()
             {
-                vertexIndices = vertexIndices,
-                vertices = vertices,
-                features = features,
-                materials = materials,
                 vobs = zkWorld.RootObjects,
                 wayNet = zkWayNet
             };
 
-            var subMeshes = CreateSubMeshesForUnity(world, zkMesh, zkBspTree);
+            var subMeshes = CreateSubMeshesForUnity(zkMesh, zkBspTree);
             world.subMeshes = subMeshes;
 
             return world;
-        }
-
-        private static int[] GetPositionIndices(BspTree tree, Mesh mesh)
-        {
-            List<int> positionIndices = new();
-
-            var leaves = tree.Nodes.
-                Where(i => i.FrontIndex == -1 && i.BackIndex == -1).
-                ToArray();
-            
-            
-            foreach (var leaf in leaves)
-            {
-                mesh.Polygons.GetRange((int)leaf.PolygonIndex, (int)leaf.PolygonCount);
-            }
-            
-            return positionIndices.ToArray();
         }
 
         /// <summary>
         /// If we keep Polygons/Vertices like they're provided by Gothic, then we would have hundreds of thousands of small meshes.
         /// We therefore merge them into blobs grouped by materials.
         /// </summary>
-        private static Dictionary<int, List<WorldData.SubMeshData>> CreateSubMeshesForUnity(WorldData world, Mesh zkMesh, BspTree zkBspTree)
+        private static Dictionary<int, WorldData.SubMeshData> CreateSubMeshesForUnity(Mesh zkMesh, BspTree zkBspTree)
         {
-            Dictionary<int, List<WorldData.SubMeshData>> subMeshes = new(world.materials.Count);
-            var vertices = world.vertices;
-            var vertexIndices = world.vertexIndices;
-            var featureIndices = world.featureIndices;
-            var features = world.features;
+            // As we know the exact size of Submeshes (aka size of Materials), we will prefill them now.
+            Dictionary<int, WorldData.SubMeshData> subMeshes = new(zkMesh.Materials.Count);
+            for (int materialIndex = 0; materialIndex < zkMesh.Materials.Count; materialIndex++)
+                subMeshes.Add(materialIndex, new());
 
             // We need to put vertex_indices (aka triangles) in reversed order
             // to make Unity draw mesh elements right (instead of upside down)
-            foreach (var leafPolygonIndex in zkBspTree.LeafPolygonIndices)
+            foreach (var leafPolygonIndex in zkBspTree.LeafPolygonIndices.Distinct())
             {
                 var polygon = zkMesh.Polygons[(int)leafPolygonIndex];
                 var materialIndex = (int)polygon.MaterialIndex;
 
-                // The materialIndex was never used before.
-                if (!subMeshes.ContainsKey(materialIndex))
-                {
-                    var newSubMesh = new List<WorldData.SubMeshData>()
-                    {
-                        new WorldData.SubMeshData()
-                        {
-                            materialIndex = materialIndex,
-                            material = world.materials[materialIndex]
-                        }
-                    };
-
-                    subMeshes.Add(materialIndex, newSubMesh);
-                }
-
                 var currentSubMesh = subMeshes[materialIndex];
-                var currentSubMeshFirstListItem = currentSubMesh.First();
 
                 for (var polygonIndices = 0; polygonIndices < polygon.PositionIndices.Length; polygonIndices++)
                 {
                     var origVertexIndex = polygon.PositionIndices[polygonIndices];
 
                     // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
-                    currentSubMeshFirstListItem.vertices.Add(vertices[origVertexIndex].ToUnityVector());
+                    currentSubMesh.vertices.Add(zkMesh.Positions[origVertexIndex].ToUnityVector());
 
                     var featureIndex = polygon.FeatureIndices[polygonIndices];
-                    currentSubMeshFirstListItem.uvs.Add(features[featureIndex].Texture.ToUnityVector());
-                    currentSubMeshFirstListItem.normals.Add(features[featureIndex].Normal.ToUnityVector());
+                    currentSubMesh.uvs.Add(zkMesh.Features[featureIndex].Texture.ToUnityVector());
+                    currentSubMesh.normals.Add(zkMesh.Features[featureIndex].Normal.ToUnityVector());
 
-                    currentSubMeshFirstListItem.triangles.Add(currentSubMeshFirstListItem.vertices.Count - 1);
+                    currentSubMesh.triangles.Add(currentSubMesh.vertices.Count - 1);
                 }
             }
 

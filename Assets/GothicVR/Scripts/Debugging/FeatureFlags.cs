@@ -74,9 +74,7 @@ namespace GVR.Debugging
         [Header("__________Experimental / Do not use in Production__________")]
         [Tooltip("Looks already quite good for leaves.pfy in the forest, but fire is awkward.")]
         public bool enableVobParticles;
-        [Tooltip("Experimental. Looks weird without proper distance shadow. Could save some frames if combined with well looking distance shadow.")]
-        public bool enableWorldCulling;
-        
+
         // Not yet implemented. Left here for future use.
         // [Header("__________Performance: NPC Culling__________")]
         // public bool npcCulling;

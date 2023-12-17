@@ -15,15 +15,7 @@ namespace GVR.Phoenix.Data
     /// </summary>
     public class WorldData
     {
-        public int[] vertexIndices; // index to vertices. 3 indices form one triangle.
-        public int[] materialIndices; // each key (index) of a vertex_index has a material index in here.
-        public int[] featureIndices; // Each vertex_index has a feature index.
-
-        public Vector3[] vertices;
-        public Vertex[] features;
-        public List<Material> materials;
-
-        public Dictionary<int, List<SubMeshData>> subMeshes;
+        public Dictionary<int, SubMeshData> subMeshes;
 
         public class SubMeshData
         {
