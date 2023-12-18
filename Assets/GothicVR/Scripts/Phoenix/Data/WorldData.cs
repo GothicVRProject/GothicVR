@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Numerics;
-using ZenKit;
+using UnityEngine;
 using ZenKit.Vobs;
-using Material = ZenKit.Material;
+using Material = ZenKit.Materialized.Material;
 using Vector2 = UnityEngine.Vector2;
 using WayNet = ZenKit.Materialized.WayNet;
-using WayPoint = ZenKit.WayPoint;
 
 namespace GVR.Phoenix.Data
 {
@@ -22,16 +20,13 @@ namespace GVR.Phoenix.Data
             public int materialIndex;
             public Material material;
 
-            public List<UnityEngine.Vector3> vertices = new();
+            public List<Vector3> vertices = new();
             public List<int> triangles = new();
             public List<Vector2> uvs = new() ;
-            public List<UnityEngine.Vector3> normals = new();
+            public List<Vector3> normals = new();
         }
 
         public List<VirtualObject> vobs;
-
         public WayNet wayNet;
-        public List<WayPoint> waypoints;
-        public WayEdge[] waypointEdges;
     }
 }

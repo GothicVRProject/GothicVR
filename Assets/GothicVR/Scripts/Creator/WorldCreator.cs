@@ -82,10 +82,6 @@ namespace GVR.Creator
             if (zkMesh.Polygons.IsEmpty())
                 throw new ArgumentException($"No mesh in world >{worldName}< found.");
 
-            var vertices = zkMesh.Positions;
-            var features = zkMesh.Features;
-            var materials = zkWorld.Mesh.Materials;
-
             WorldData world = new()
             {
                 vobs = zkWorld.RootObjects,
@@ -107,7 +103,13 @@ namespace GVR.Creator
             // As we know the exact size of Submeshes (aka size of Materials), we will prefill them now.
             Dictionary<int, WorldData.SubMeshData> subMeshes = new(zkMesh.Materials.Count);
             for (int materialIndex = 0; materialIndex < zkMesh.Materials.Count; materialIndex++)
-                subMeshes.Add(materialIndex, new());
+            {
+                subMeshes.Add(materialIndex, new()
+                {
+                    materialIndex = materialIndex,
+                    material = zkMesh.Materials[materialIndex]
+                });
+            }
 
             // We need to put vertex_indices (aka triangles) in reversed order
             // to make Unity draw mesh elements right (instead of upside down)

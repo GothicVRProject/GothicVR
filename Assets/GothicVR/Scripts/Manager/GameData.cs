@@ -6,7 +6,6 @@ using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Properties;
 using GVR.Vob.WayNet;
 using GVR.World;
-using PxCs.Data.WayNet;
 using PxCs.Interface;
 using UnityEngine.SceneManagement;
 using ZenKit;
@@ -32,7 +31,7 @@ namespace GVR.Phoenix.Interface
             {
                 worldInternal = value;
                 if (value != null)
-                    SetWayPointData(value.waypoints);
+                    SetWayPointData(value.wayNet.Points);
             }
         }
 
@@ -53,6 +52,20 @@ namespace GVR.Phoenix.Interface
             WayPoints.Clear();
             FreePoints.Clear();
             VobsInteractable.Clear();
+        }
+
+
+        private static void SetWayPointData(List<ZenKit.Materialized.WayPoint> wayPoints)
+        {
+            WayPoints.Clear();
+            foreach (var wp in wayPoints)
+            {
+                WayPoints.Add(wp.Name, new ()
+                {
+                    Name = wp.Name,
+                    Position = wp.Position.ToUnityVector()
+                });
+            }
         }
 
         public static void Dispose()
@@ -85,19 +98,6 @@ namespace GVR.Phoenix.Interface
             {
                 PxVm.pxVmDestroy(VmMusicPtr);
                 VmMusicPtr = IntPtr.Zero;
-            }
-        }
-
-        private static void SetWayPointData(List<ZenKit.WayPoint> wayPoints)
-        {
-            WayPoints.Clear();
-            foreach (var wp in wayPoints)
-            {
-                WayPoints.Add(wp.Name, new ()
-                {
-                    Name = wp.Name,
-                    Position = wp.Position.ToUnityVector()
-                });
             }
         }
     }

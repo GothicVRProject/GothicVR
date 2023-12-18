@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
-using GVR.Manager.Culling;
 using GVR.Phoenix.Interface;
 using GVR.Util;
 using PxCs.Interface;
