@@ -37,7 +37,7 @@ namespace GVR.Creator.Meshes
                 // No texture to add.
                 // For G1 this is: material.name == [KEINE, KEINETEXTUREN, DEFAULT, BRETT2, BRETT1, SUMPFWAASER, S:PSIT01_ABODEN]
                 // Removing these removes tiny slices of walls on the ground. If anyone finds them, I owe them a beer.
-                if (subMesh.material.Texture.IsEmpty())
+                if (subMesh.material.Texture.IsEmpty() || subMesh.triangles.IsEmpty())
                     continue;
 
                 var subMeshObj = new GameObject()

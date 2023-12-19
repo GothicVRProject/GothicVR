@@ -114,9 +114,9 @@ namespace GVR.Creator
             var zkPositions = zkMesh.Positions;
             var zkFeatures = zkMesh.Features;
 
-            // As we know the exact size of Submeshes (aka size of Materials), we will prefill them now.
+            // As we know the exact size of SubMeshes (aka size of Materials), we will prefill them now.
             Dictionary<int, WorldData.SubMeshData> subMeshes = new(zkMaterials.Count);
-            for (int materialIndex = 0; materialIndex < zkMaterials.Count; materialIndex++)
+            for (var materialIndex = 0; materialIndex < zkMaterials.Count; materialIndex++)
             {
                 subMeshes.Add(materialIndex, new()
                 {
@@ -125,11 +125,16 @@ namespace GVR.Creator
                 });
             }
 
+            // Currently LeafPolygonIndices aren't distinct. We therefore need to rearrange them this way.
+            // Alternatively we could also loop through all Nodes and fetch where Front==Back==-1 (aka Leaf)
             foreach (var leafPolygonIndex in zkBspTree.LeafPolygonIndices.Distinct())
             {
                 var polygon = zkPolygons[(int)leafPolygonIndex];
                 var currentSubMesh = subMeshes[(int)polygon.MaterialIndex];
 
+                // DEBUG for faster testing
+                // if (currentSubMesh.material.Name != "S:UTEMP01_OTWABILDVIELE") // only 112 triangles, MaterialIndex=1956
+                //     continue;
 
                 // As we always use element 0 and i+1, we skip it in the loop.
                 for (var i=1; i < polygon.PositionIndices.Length - 1; i++)
@@ -141,30 +146,31 @@ namespace GVR.Creator
                 }
             }
 
+            // To have easier to read code above, we reverse the arrays now at the end.
+            foreach (var subMesh in subMeshes)
+            {
+                subMesh.Value.vertices.Reverse();
+                subMesh.Value.uvs.Reverse();
+                subMesh.Value.normals.Reverse();
+            }
+
             return subMeshes;
         }
 
         private static void AddEntry(Vector3[] zkPositions, ZenKit.Vertex[] features, ZenKit.Polygon polygon, WorldData.SubMeshData currentSubMesh, int index)
         {
-            try
-            {
-                // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
-                currentSubMesh.vertices.Add(zkPositions[index].ToUnityVector());
-                // This triangle (index where Vector 3 lies inside vertices, points to the newly added vertex (Vector3) as we don't reuse vertices.
-                currentSubMesh.triangles.Add(currentSubMesh.vertices.Count - 1);
+            // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
+            var positionIndex = polygon.PositionIndices[index];
+            currentSubMesh.vertices.Add(zkPositions[positionIndex].ToUnityVector());
 
-                var featureIndex = polygon.FeatureIndices[index];
-                var feature = features[(int)featureIndex];
-                currentSubMesh.uvs.Add(feature.Texture.ToUnityVector());
-                currentSubMesh.normals.Add(feature.Normal.ToUnityVector());
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-                throw;
-            }
+            // This triangle (index where Vector 3 lies inside vertices, points to the newly added vertex (Vector3) as we don't reuse vertices.
+            currentSubMesh.triangles.Add(currentSubMesh.vertices.Count - 1);
+
+            var featureIndex = polygon.FeatureIndices[index];
+            var feature = features[(int)featureIndex];
+            currentSubMesh.uvs.Add(feature.Texture.ToUnityVector());
+            currentSubMesh.normals.Add(feature.Normal.ToUnityVector());
         }
-
 
 #if UNITY_EDITOR
         /// <summary>
