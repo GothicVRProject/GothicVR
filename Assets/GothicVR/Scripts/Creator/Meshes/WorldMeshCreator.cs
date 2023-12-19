@@ -114,6 +114,9 @@ namespace GVR.Creator.Meshes
             var mesh = new Mesh();
             meshFilter.sharedMesh = mesh;
 
+            if (subMesh.triangles.Count % 3 != 0)
+                Debug.LogError("Triangle count is not a multiple of 3");
+
             mesh.SetVertices(subMesh.vertices);
             mesh.SetTriangles(subMesh.triangles, 0);
             mesh.SetUVs(0, subMesh.uvs);

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using ZenKit.Vobs;
-using Material = ZenKit.Materialized.Material;
+using Material = ZenKit.Material;
 using Vector2 = UnityEngine.Vector2;
 using WayNet = ZenKit.Materialized.WayNet;
 
