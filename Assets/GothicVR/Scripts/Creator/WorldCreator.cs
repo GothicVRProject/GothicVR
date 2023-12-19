@@ -97,6 +97,13 @@ namespace GVR.Creator
         /// <summary>
         /// If we keep Polygons/Vertices like they're provided by Gothic, then we would have hundreds of thousands of small meshes.
         /// We therefore merge them into blobs grouped by materials.
+        ///
+        /// Gothic provides Polygons as Triangle Fans. As Unity can't handle them out-of-the-box, we just map them
+        /// (every 4th element - aka every new triangle -  is dependent on element 0 (A).
+        /// @see https://en.wikipedia.org/wiki/Triangle_fan
+        ///
+        /// We also need to put the triangle indices in in Reverse() order to make Unity
+        /// draw mesh elements right (instead of upside down)
         /// </summary>
         private static Dictionary<int, WorldData.SubMeshData> CreateSubMeshesForUnity(Mesh zkMesh, BspTree zkBspTree)
         {
@@ -111,31 +118,44 @@ namespace GVR.Creator
                 });
             }
 
-            // We need to put vertex_indices (aka triangles) in reversed order
-            // to make Unity draw mesh elements right (instead of upside down)
             foreach (var leafPolygonIndex in zkBspTree.LeafPolygonIndices.Distinct())
             {
                 var polygon = zkMesh.Polygons[(int)leafPolygonIndex];
-                var materialIndex = (int)polygon.MaterialIndex;
+                var currentSubMesh = subMeshes[(int)polygon.MaterialIndex];
 
-                var currentSubMesh = subMeshes[materialIndex];
 
-                for (var polygonIndices = 0; polygonIndices < polygon.PositionIndices.Length; polygonIndices++)
+                // As we always use element 0 and i+1, we skip it in the loop.
+                for (var i=1; i < polygon.PositionIndices.Length - 1; i++)
                 {
-                    var origVertexIndex = polygon.PositionIndices[polygonIndices];
-
-                    // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
-                    currentSubMesh.vertices.Add(zkMesh.Positions[origVertexIndex].ToUnityVector());
-
-                    var featureIndex = polygon.FeatureIndices[polygonIndices];
-                    currentSubMesh.uvs.Add(zkMesh.Features[featureIndex].Texture.ToUnityVector());
-                    currentSubMesh.normals.Add(zkMesh.Features[featureIndex].Normal.ToUnityVector());
-
-                    currentSubMesh.triangles.Add(currentSubMesh.vertices.Count - 1);
+                    // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
+                    AddEntry(zkMesh, polygon, currentSubMesh, 0);
+                    AddEntry(zkMesh, polygon, currentSubMesh, i);
+                    AddEntry(zkMesh, polygon, currentSubMesh, i+1);
                 }
             }
 
             return subMeshes;
+        }
+
+        private static void AddEntry(Mesh zkMesh, Polygon polygon, WorldData.SubMeshData currentSubMesh, int index)
+        {
+            try
+            {
+                // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
+                currentSubMesh.vertices.Add(zkMesh.Positions[index].ToUnityVector());
+                // This triangle (index where Vector 3 lies inside vertices, points to the newly added vertex (Vector3) as we don't reuse vertices.
+                currentSubMesh.triangles.Add(currentSubMesh.vertices.Count - 1);
+
+                var featureIndex = polygon.FeatureIndices[index];
+                var feature = zkMesh.Features[featureIndex];
+                currentSubMesh.uvs.Add(feature.Texture.ToUnityVector());
+                currentSubMesh.normals.Add(feature.Normal.ToUnityVector());
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                throw;
+            }
         }
 
 
