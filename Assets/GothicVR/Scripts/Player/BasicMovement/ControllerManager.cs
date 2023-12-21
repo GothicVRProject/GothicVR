@@ -9,6 +9,7 @@ public class ControllerManager : MonoBehaviour
     public GameObject directLeft;
     public GameObject directRight;
     public GameObject MenuGameObject;
+    public GameObject MapObject;
 
     private InputAction leftPrimaryButtonAction;
     private InputAction leftSecondaryButtonAction;
@@ -30,7 +31,7 @@ public class ControllerManager : MonoBehaviour
         rightPrimaryButtonAction = new InputAction("primaryButton", binding: "<XRController>{RightHand}/primaryButton");
         rightSecondaryButtonAction = new InputAction("secondaryButton", binding: "<XRController>{RightHand}/secondaryButton");
 
-
+        rightPrimaryButtonAction.started += ctx => ShowMap();
         rightSecondaryButtonAction.started += ctx => ShowMainMenu();
 
         rightPrimaryButtonAction.Enable();
@@ -68,6 +69,14 @@ public class ControllerManager : MonoBehaviour
             MenuGameObject.SetActive(true);
         else
             MenuGameObject.SetActive(false);
+    }
+
+    public void ShowMap()
+    {
+        if (!MapObject.activeSelf)
+            MapObject.SetActive(true);
+        else
+            MapObject.SetActive(false);
     }
 
     public void ShowInventory()

@@ -3791,6 +3791,7 @@ MonoBehaviour:
   directLeft: {fileID: 3286136461689514591}
   directRight: {fileID: 3286136463242076545}
   MenuGameObject: {fileID: 1762865631986952849}
+  MapObject: {fileID: 0}
 --- !u!1 &5086955422694840730
 GameObject:
   m_ObjectHideFlags: 0
@@ -3963,6 +3964,18 @@ PrefabInstance:
     - target: {fileID: 3785205150403104431, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
       propertyPath: m_fontSizeBase
       value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 4467674855862590620, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -24.4436
+      objectReference: {fileID: 0}
+    - target: {fileID: 4467674855862590620, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 4.88872
+      objectReference: {fileID: 0}
+    - target: {fileID: 4467674855862590620, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 19.55488
       objectReference: {fileID: 0}
     - target: {fileID: 4945101611003450528, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size

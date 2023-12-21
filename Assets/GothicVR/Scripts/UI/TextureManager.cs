@@ -16,6 +16,7 @@ public class TextureManager : SingletonBehaviour<TextureManager>
     public Material arrowmaterial;
     public Material fillermaterial;
     public Material skymaterial;
+    public Material mapmaterial;
 
     public Material GothicLoadingMenuMaterial;
     public Material LoadingBarBackgroundMaterial;
@@ -88,6 +89,9 @@ public class TextureManager : SingletonBehaviour<TextureManager>
 
         var skytexture = AssetCache.TryGetTexture("SKYDAY_LAYER1_A0-C.TEX");
         skymaterial.mainTexture = skytexture;
+
+        var maptexture = AssetCache.TryGetTexture("MAP_WORLD_ORC-C.TEX");
+        mapmaterial.mainTexture = maptexture;
     }
 
     public void SetTexture(string texture, Material material)

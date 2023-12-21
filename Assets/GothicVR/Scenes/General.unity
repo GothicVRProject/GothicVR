@@ -123,6 +123,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &439340588 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5047691667112071443, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+  m_PrefabInstance: {fileID: 1263267810}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &668062117 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
@@ -136,6 +141,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1353668847}
     m_Modifications:
+    - target: {fileID: 100025301, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: MapObject
+      value: 
+      objectReference: {fileID: 439340588}
     - target: {fileID: 100025301, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: MenuGameObject
       value: 
@@ -192,6 +201,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3286136463054414637, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286136463054414637, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_PositionInput.m_UseReference
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5047691667112071443, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5909935042513295518, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7694937965089565025, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7775121018924269947, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: moveSpeedController
       value: 
@@ -200,6 +229,30 @@ PrefabInstance:
       propertyPath: turnSettingDropdownController
       value: 
       objectReference: {fileID: 1263267811}
+    - target: {fileID: 8168129907220293027, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8297259775699111474, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -31.573797
+      objectReference: {fileID: 0}
+    - target: {fileID: 8297259775699111474, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 6.3147597
+      objectReference: {fileID: 0}
+    - target: {fileID: 8297259775699111474, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 25.259039
+      objectReference: {fileID: 0}
+    - target: {fileID: 8297259775699111474, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -155
+      objectReference: {fileID: 0}
+    - target: {fileID: 8297259775699111474, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 56
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
