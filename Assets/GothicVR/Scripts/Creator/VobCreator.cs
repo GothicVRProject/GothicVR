@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
 using ZenKit.Vobs;
+using Debug = UnityEngine.Debug;
 using Quaternion = System.Numerics.Quaternion;
 using Vector3 = System.Numerics.Vector3;
 
@@ -39,11 +41,15 @@ namespace GVR.Creator
             VirtualObjectType.oCItem,
             VirtualObjectType.oCMobLadder,
             VirtualObjectType.oCZoneMusic,
+            VirtualObjectType.oCZoneMusicDefault,
             VirtualObjectType.zCVobSound,
             VirtualObjectType.zCVobSoundDaytime
         };
 
-        private static int totalVObs;
+        private static int _totalVObs;
+        private static int _vobsPerFrame;
+        private static int _createdCount;
+        private static List<GameObject> _cullingVobObjects = new();
 
         static VobCreator()
         {
@@ -68,28 +74,31 @@ namespace GVR.Creator
                     sound.SetActive(true);
             }
         }
-        
-        private static int GetTotalVobCount(List<IVirtualObject> vobs)
-        {
-            int count = vobs.Count;
-
-            foreach (var vob in vobs)
-            {
-                count += GetTotalVobCount(vob.Children);
-            }
-
-            return count;
-        }
 
         public static async Task CreateAsync(GameObject rootTeleport, GameObject rootNonTeleport, WorldData world,
             int vobsPerFrame)
         {
             if (!FeatureFlags.I.createVobs)
                 return;
+            
+            PreCreateVobs(world, rootTeleport, rootNonTeleport, vobsPerFrame);
+            
+            var watch = Stopwatch.StartNew();
+            await CreateVobs(world.vobs);
+            watch.Stop();
+            Debug.Log($"watchVobs={watch.Elapsed}");
 
-            var cullingVobObjects = new List<GameObject>();
+            PostCreateVobs();
+        }
 
-            totalVObs = GetTotalVobCount(world.vobs);
+        private static void PreCreateVobs(WorldData world, GameObject rootTeleport, GameObject rootNonTeleport, int vobsPerFrame)
+        {
+            // HINT - We assume there is only one nested level. At least works in G1 world.zen
+            _totalVObs = world.vobs.Count + (int)world.vobs.Sum(i => (decimal)i.ChildCount);
+
+            _createdCount = 0;
+            _cullingVobObjects.Clear();
+            _vobsPerFrame = vobsPerFrame;
 
             var vobRootTeleport = new GameObject("Vobs");
             var vobRootNonTeleport = new GameObject("Vobs");
@@ -101,12 +110,11 @@ namespace GVR.Creator
 
             CreateParentVobObjectTeleport(vobRootTeleport);
             CreateParentVobObjectNonTeleport(vobRootNonTeleport);
-
-            var allVobs = new List<IVirtualObject>();
-            AddVobsToList(world.vobs, ref allVobs);
-
-            var count = 0;
-            foreach (var vob in allVobs)
+        }
+        
+        private static async Task CreateVobs(List<IVirtualObject> vobs)
+        {
+            foreach (var vob in vobs)
             {
                 GameObject go = null;
                 
@@ -115,13 +123,13 @@ namespace GVR.Creator
                     case VirtualObjectType.oCItem:
                     {
                         var obj = CreateItem((Item)vob);
-                        cullingVobObjects.Add(obj);
+                        _cullingVobObjects.Add(obj);
                         break;
                     }
                     case VirtualObjectType.oCMobContainer:
                     {
                         var obj = CreateMobContainer((Container)vob);
-                        cullingVobObjects.Add(obj);
+                        _cullingVobObjects.Add(obj);
                         break;
                     }
                     case VirtualObjectType.zCVobSound:
@@ -137,6 +145,7 @@ namespace GVR.Creator
                         break;
                     }
                     case VirtualObjectType.oCZoneMusic:
+                    case VirtualObjectType.oCZoneMusicDefault:
                     {
                         go = CreateZoneMusic((ZoneMusic)vob);
                         break;
@@ -150,7 +159,7 @@ namespace GVR.Creator
                     case VirtualObjectType.oCMobLadder:
                     {
                         var obj = CreateLadder(vob);
-                        cullingVobObjects.Add(obj);
+                        _cullingVobObjects.Add(obj);
                         break;
                     }
                     case VirtualObjectType.oCTriggerChangeLevel:
@@ -158,28 +167,16 @@ namespace GVR.Creator
                         go = CreateTriggerChangeLevel((TriggerChangeLevel)vob);
                         break;
                     }
-                    case VirtualObjectType.zCVobScreenFX:
-                    case VirtualObjectType.zCVobAnimate:
-                    case VirtualObjectType.zCTriggerWorldStart:
-                    case VirtualObjectType.zCTriggerList:
-                    case VirtualObjectType.oCCSTrigger:
-                    case VirtualObjectType.oCTriggerScript:
-                    case VirtualObjectType.zCVobLensFlare:
-                    case VirtualObjectType.zCVobLight:
-                    case VirtualObjectType.zCMoverController:
-                    case VirtualObjectType.zCPFXController:
-                    {
-                        // FIXME - not yet implemented.
-                        break;
-                    }
-                    // Do nothing
-                    case VirtualObjectType.zCVobLevelCompo:
-                    {
-                        break;
-                    }
                     case VirtualObjectType.zCVob:
                     {
                         GameObject obj;
+
+                        if (vob.Visual == null)
+                        {
+                            CreateDebugObject(vob);
+                            break;
+                        }
+                            
                         switch (vob.Visual!.Type)
                         {
                             case VisualType.Decal:
@@ -192,31 +189,67 @@ namespace GVR.Creator
                                 obj = CreateDefaultMesh(vob);
                                 break;
                         }
-                        cullingVobObjects.Add(obj);
+                        _cullingVobObjects.Add(obj);
                         break;
                     }
                     case VirtualObjectType.oCMobInter:
-                    default:
+                    case VirtualObjectType.oCMobDoor:
+                    case VirtualObjectType.oCMobSwitch:
+                    case VirtualObjectType.oCMobFire:
+                    case VirtualObjectType.oCMOB:
+                    case VirtualObjectType.zCVobStair:
+                    case VirtualObjectType.oCMobBed:
+                    case VirtualObjectType.oCMobWheel:
                     {
                         var obj = CreateDefaultMesh(vob);
-                        cullingVobObjects.Add(obj);
+                        _cullingVobObjects.Add(obj);
                         break;
+                    }
+                    case VirtualObjectType.zCVobScreenFX:
+                    case VirtualObjectType.zCVobAnimate:
+                    case VirtualObjectType.zCTriggerWorldStart:
+                    case VirtualObjectType.zCTriggerList:
+                    case VirtualObjectType.oCCSTrigger:
+                    case VirtualObjectType.oCTriggerScript:
+                    case VirtualObjectType.zCVobLensFlare:
+                    case VirtualObjectType.zCVobLight:
+                    case VirtualObjectType.zCMoverController:
+                    case VirtualObjectType.zCPFXController:
+                    case VirtualObjectType.zCMover: 
+                    case VirtualObjectType.zCVobLevelCompo:
+                    case VirtualObjectType.zCZoneZFog:
+                    case VirtualObjectType.zCZoneZFogDefault:
+                    case VirtualObjectType.zCZoneVobFarPlane:
+                    case VirtualObjectType.zCZoneVobFarPlaneDefault:
+                    {
+                        // FIXME - not yet implemented.
+                        break;
+                    }
+                    default:
+                    {
+                        throw new Exception($"VobType={vob.Type} not yet handled. And we didn't know we need to do so. ;-)");
                     }
                 }
                 
                 AddToMobInteractableList(vob, go);
                 
-                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / totalVObs);
+                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / _totalVObs);
 
-                if (++count % vobsPerFrame == 0)
+                if (++_createdCount % _vobsPerFrame == 0)
                     await Task.Yield(); // Wait for the next frame
+                
+                // Recursive creating sub-vobs
+                await CreateVobs(vob.Children);
             }
+        }
 
-            var nonNullCullingGroupItems = cullingVobObjects.Where(i => i != null).ToArray();
+        private static void PostCreateVobs()
+        {
+            var nonNullCullingGroupItems = _cullingVobObjects.Where(i => i != null).ToArray();
             VobMeshCullingManager.I.PrepareVobCulling(nonNullCullingGroupItems);
             VobSoundCullingManager.I.PrepareSoundCulling(LookupCache.vobSoundsAndDayTime);
             
-            // TODO - Not implemented warnings - print them once only.
+            // TODO - warnings about "not implemented" - print them once only.
             foreach (var var in new[]{
                          PxWorld.PxVobType.PxVob_zCVobScreenFX,
                          PxWorld.PxVobType.PxVob_zCVobAnimate,
@@ -297,15 +330,6 @@ namespace GVR.Creator
                 case VirtualObjectType.oCMobWheel:
                     GameData.VobsInteractable.Add(go.GetComponent<VobProperties>());
                     break;
-            }
-        }
-
-        private static void AddVobsToList(List<IVirtualObject> vobs, ref List<IVirtualObject> allVobs)
-        {
-            foreach (var vob in vobs)
-            {
-                allVobs.Add(vob);
-                AddVobsToList(vob.Children, ref allVobs);
             }
         }
 
@@ -880,6 +904,17 @@ namespace GVR.Creator
         private static void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, UnityEngine.Quaternion rotation)
         {
             obj.transform.SetLocalPositionAndRotation(position, rotation);
+        }
+
+        /// <summary>
+        /// Some object are kind of null. We have Position only. this method is to compare with Gothic Spacer and remove if not needed later.
+        /// </summary>
+        private static GameObject CreateDebugObject(IVirtualObject vob)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            go.name = "Empty DEBUG object. Check with Spacer if buggy.";
+            SetPosAndRot(go, vob.Position, vob.Rotation);
+            return go;
         }
     }
 }
