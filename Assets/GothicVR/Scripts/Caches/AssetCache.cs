@@ -5,27 +5,25 @@ using System.Linq;
 using GVR.Extensions;
 using GVR.Phoenix.Interface;
 using JetBrains.Annotations;
-using PxCs.Data.Animation;
 using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Sound;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
-using ZenKit.Materialized;
-using ModelScript = ZenKit.Materialized.ModelScript;
-using Font = ZenKit.Materialized.Font;
+using ZenKit;
+using Font = ZenKit.Font;
 using Object = UnityEngine.Object;
 using Texture = ZenKit.Texture;
-using TextureFormat = UnityEngine.TextureFormat;
+using TextureFormat = ZenKit.TextureFormat;
 
 namespace GVR.Caches
 {
     public static class AssetCache
     {
         private static readonly Dictionary<string, Texture2D> TextureCache = new();
-        private static readonly Dictionary<string, ModelScript> MdsCache = new();
-        private static readonly Dictionary<string, ModelAnimation> AnimCache = new();
+        private static readonly Dictionary<string, IModelScript> MdsCache = new();
+        private static readonly Dictionary<string, IModelAnimation> AnimCache = new();
         private static readonly Dictionary<string, PxModelHierarchyData> MdhCache = new();
         private static readonly Dictionary<string, PxModelData> MdlCache = new();
         private static readonly Dictionary<string, PxModelMeshData> MdmCache = new();
@@ -36,7 +34,7 @@ namespace GVR.Caches
         private static readonly Dictionary<string, PxVmSfxData> SfxDataCache = new();
         private static readonly Dictionary<string, PxVmPfxData> PfxDataCache = new();
         private static readonly Dictionary<string, PxSoundData<float>> SoundCache = new();
-        private static readonly Dictionary<string, Font> FontCache = new();
+        private static readonly Dictionary<string, IFont> FontCache = new();
 
         private static readonly string[] MisplacedMdmArmors =
         {
@@ -74,7 +72,7 @@ namespace GVR.Caches
             Texture2D texture;
 
             // Workaround for Unity and DXT1 Mipmaps.
-            if (zkTexture.Format == ZenKit.TextureFormat.Dxt1 && zkTexture.MipmapCount == 1)
+            if (zkTexture.Format == TextureFormat.Dxt1 && zkTexture.MipmapCount == 1)
             {
                 texture = GenerateDxt1Mipmaps(zkTexture);
             }
@@ -87,7 +85,7 @@ namespace GVR.Caches
                 texture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, format, (int)zkTexture.MipmapCount, false);
                 for (var i = 0; i < zkTexture.MipmapCount; i++)
                 {
-                    if (format == TextureFormat.RGBA32)
+                    if (format == UnityEngine.TextureFormat.RGBA32)
                         // RGBA is uncompressed format.
                         texture.SetPixelData(zkTexture.AllMipmapsRgba[i], i);
                     else
@@ -110,11 +108,11 @@ namespace GVR.Caches
         /// </summary>
         private static Texture2D GenerateDxt1Mipmaps(Texture zkTexture)
         {
-            var dxtTexture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, TextureFormat.DXT1, false);
+            var dxtTexture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, UnityEngine.TextureFormat.DXT1, false);
             dxtTexture.SetPixelData(zkTexture.AllMipmapsRaw[0], 0);
             dxtTexture.Apply(false);
 
-            var texture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, TextureFormat.RGB24, true);
+            var texture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, UnityEngine.TextureFormat.RGB24, true);
             texture.SetPixels(dxtTexture.GetPixels());
             texture.Apply(true, true);
             Object.Destroy(dxtTexture);
@@ -122,19 +120,19 @@ namespace GVR.Caches
             return texture;
         }
 
-        public static ModelScript TryGetMds(string key)
+        public static IModelScript TryGetMds(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (MdsCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = new ZenKit.ModelScript(GameData.Vfs, $"{preparedKey}.mds").Materialize();
+            var newData = new ModelScript(GameData.Vfs, $"{preparedKey}.mds").Cache();
             MdsCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public static ModelAnimation TryGetAnimation(string mdsKey, string animKey)
+        public static IModelAnimation TryGetAnimation(string mdsKey, string animKey)
         {
             var preparedMdsKey = GetPreparedKey(mdsKey);
             var preparedAnimKey = GetPreparedKey(animKey);
@@ -142,7 +140,7 @@ namespace GVR.Caches
             if (AnimCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = new ZenKit.ModelAnimation(GameData.Vfs, $"{preparedKey}.man").Materialize();
+            var newData = new ModelAnimation(GameData.Vfs, $"{preparedKey}.man").Cache();
             AnimCache[preparedKey] = newData;
 
             return newData;
@@ -312,13 +310,13 @@ namespace GVR.Caches
             return wavFile;
         }
 
-        public static Font TryGetFont(string key)
+        public static IFont TryGetFont(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (FontCache.TryGetValue(preparedKey, out var data))
                 return data;
             
-            var fontData = new ZenKit.Font(GameData.Vfs, $"{preparedKey}.fnt").Materialize();
+            var fontData = new Font(GameData.Vfs, $"{preparedKey}.fnt").Cache();
             FontCache[preparedKey] = fontData;
 
             return fontData;

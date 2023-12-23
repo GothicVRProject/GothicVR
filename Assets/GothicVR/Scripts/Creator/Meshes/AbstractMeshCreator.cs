@@ -407,7 +407,7 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh, ZenKit.Material materialData)
+        protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh, IMaterial materialData)
         {
             if (materialData.DisableCollision ||
                 materialData.Group == MaterialGroup.Water)
@@ -482,7 +482,7 @@ namespace GVR.Creator.Meshes
             return material;
         }
 
-        protected Material GetWaterMaterial(ZenKit.Material materialData)
+        protected Material GetWaterMaterial(IMaterial materialData)
         {
             var shader = Shader.Find(WaterShader);
             Material material = new Material(shader);

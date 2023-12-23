@@ -1,10 +1,10 @@
-﻿using GVR.Debugging;
+﻿using System.Collections.Generic;
+using System.Linq;
+using GVR.Caches;
+using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Manager;
 using GVR.Phoenix.Data;
-using System.Collections.Generic;
-using System.Linq;
-using GVR.Caches;
 using GVR.Phoenix.Interface;
 using GVR.World;
 using UnityEngine;
@@ -112,7 +112,7 @@ namespace GVR.Creator
             var waypointEdgesObj = new GameObject(string.Format("Edges"));
             waypointEdgesObj.SetParent(parent);
 
-            for (var i = 0; i < world.wayNet.Edges.Length; i++)
+            for (var i = 0; i < world.wayNet.Edges.Count; i++)
             {
                 var edge = world.wayNet.Edges[i];
                 var startPos = world.wayNet.Points[(int)edge.A].Position.ToUnityVector();

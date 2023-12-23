@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using ZenKit;
 using ZenKit.Vobs;
-using Material = ZenKit.Material;
-using Vector2 = UnityEngine.Vector2;
-using WayNet = ZenKit.Materialized.WayNet;
 
 namespace GVR.Phoenix.Data
 {
@@ -18,7 +16,7 @@ namespace GVR.Phoenix.Data
         public class SubMeshData
         {
             public int materialIndex;
-            public Material material;
+            public IMaterial material;
 
             public List<Vector3> vertices = new();
             public List<int> triangles = new();
@@ -26,7 +24,7 @@ namespace GVR.Phoenix.Data
             public List<Vector3> normals = new();
         }
 
-        public List<VirtualObject> vobs;
-        public WayNet wayNet;
+        public List<IVirtualObject> vobs;
+        public IWayNet wayNet;
     }
 }

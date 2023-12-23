@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GVR.Extensions;
 using GVR.Manager;
-using GVR.Manager.Culling;
 using GVR.Phoenix.Data;
-using PxCs.Interface;
+using UnityEditor;
 using UnityEngine;
 using ZenKit;
 using Material = UnityEngine.Material;
@@ -59,7 +57,7 @@ namespace GVR.Creator.Meshes
                 // Don't set alpha clipped as occluders.
                 if (meshRenderer.sharedMaterial.shader.name == AlphaToCoverageShaderName)
                 {
-                    UnityEditor.GameObjectUtility.SetStaticEditorFlags(subMeshObj, (UnityEditor.StaticEditorFlags)(int.MaxValue & ~(int)UnityEditor.StaticEditorFlags.OccluderStatic));
+                    GameObjectUtility.SetStaticEditorFlags(subMeshObj, (StaticEditorFlags)(int.MaxValue & ~(int)StaticEditorFlags.OccluderStatic));
                 }
 #endif
 

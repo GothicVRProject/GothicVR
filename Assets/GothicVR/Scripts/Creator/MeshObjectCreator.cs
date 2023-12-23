@@ -51,7 +51,7 @@ namespace GVR.Creator
             return VobMeshCreator.CreateVob(objectName, mdm, mdh, position, rotation, parent, rootGo);
         }
 
-        public static GameObject CreateVobDecal(VirtualObject vob, VisualDecal decal, GameObject parent)
+        public static GameObject CreateVobDecal(IVirtualObject vob, VisualDecal decal, GameObject parent)
         {
             return VobMeshCreator.CreateVobDecal(vob, decal, parent);
         }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
+  m_IndirectSpecularColor: {r: 0.172768, g: 0.21589169, b: 0.29782546, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -350,8 +350,6 @@ MonoBehaviour:
   enableMusic: 1
   enableSoundCulling: 1
   enableVobParticles: 0
-  enableFineGrainedWorldMeshCreation: 0
-  enableWorldCulling: 0
 --- !u!1 &394991343
 GameObject:
   m_ObjectHideFlags: 0

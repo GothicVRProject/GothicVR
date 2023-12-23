@@ -69,7 +69,7 @@ namespace GVR.Creator
             }
         }
         
-        private static int GetTotalVobCount(List<VirtualObject> vobs)
+        private static int GetTotalVobCount(List<IVirtualObject> vobs)
         {
             int count = vobs.Count;
 
@@ -102,7 +102,7 @@ namespace GVR.Creator
             CreateParentVobObjectTeleport(vobRootTeleport);
             CreateParentVobObjectNonTeleport(vobRootNonTeleport);
 
-            var allVobs = new List<VirtualObject>();
+            var allVobs = new List<IVirtualObject>();
             AddVobsToList(world.vobs, ref allVobs);
 
             var count = 0;
@@ -234,7 +234,7 @@ namespace GVR.Creator
             }
         }
 
-        private static GameObject GetPrefab(VirtualObject vob)
+        private static GameObject GetPrefab(IVirtualObject vob)
         {
             GameObject go;
             string name = vob.Name;
@@ -280,7 +280,7 @@ namespace GVR.Creator
             return go;
         }
 
-        private static void AddToMobInteractableList(VirtualObject vob, GameObject go)
+        private static void AddToMobInteractableList(IVirtualObject vob, GameObject go)
         {
             if (go == null)
                 return;
@@ -300,7 +300,7 @@ namespace GVR.Creator
             }
         }
 
-        private static void AddVobsToList(List<VirtualObject> vobs, ref List<VirtualObject> allVobs)
+        private static void AddVobsToList(List<IVirtualObject> vobs, ref List<IVirtualObject> allVobs)
         {
             foreach (var vob in vobs)
             {
@@ -546,7 +546,7 @@ namespace GVR.Creator
         /// Basically a free point where NPCs can do something like sitting on a bench etc.
         /// @see for more information: https://ataulien.github.io/Inside-Gothic/objects/spot/
         /// </summary>
-        private static GameObject CreateSpot(VirtualObject vob)
+        private static GameObject CreateSpot(IVirtualObject vob)
         {
             // FIXME - change to a Prefab in the future.
             var vobObj = GetPrefab(vob);
@@ -573,7 +573,7 @@ namespace GVR.Creator
             return vobObj;
         }
 
-        private static GameObject CreateLadder(VirtualObject vob)
+        private static GameObject CreateLadder(IVirtualObject vob)
         {
             // FIXME - use Prefab instead. And be cautious of settings!
             var vobObj = CreateDefaultMesh(vob, true);
@@ -605,7 +605,7 @@ namespace GVR.Creator
             return MeshObjectCreator.CreateVob(item.visual, mrm, default, default, false, parent: go);
         }
 
-        private static GameObject CreateDecal(VirtualObject vob)
+        private static GameObject CreateDecal(IVirtualObject vob)
         {
             if (!FeatureFlags.I.enableDecals)
                 return null;
@@ -619,7 +619,7 @@ namespace GVR.Creator
         /// Please check description at worldofgothic for more details:
         /// https://www.worldofgothic.de/modifikation/index.php?go=particelfx
         /// </summary>
-        private static GameObject CreatePfx(VirtualObject vob)
+        private static GameObject CreatePfx(IVirtualObject vob)
         {
             if (!FeatureFlags.I.enableVobParticles)
                 return null;
@@ -820,7 +820,7 @@ namespace GVR.Creator
             return pfxGo;
         }
 
-        private static GameObject CreateDefaultMesh(VirtualObject vob, bool nonTeleport = false)
+        private static GameObject CreateDefaultMesh(IVirtualObject vob, bool nonTeleport = false)
         {
             var parent = nonTeleport ? parentGosNonTeleport[vob.Type] : parentGosTeleport[vob.Type];
             var meshName = vob.ShowVisual ? vob.Visual!.Name : vob.Name;

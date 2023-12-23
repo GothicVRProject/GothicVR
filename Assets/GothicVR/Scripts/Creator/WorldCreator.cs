@@ -10,10 +10,8 @@ using GVR.Phoenix.Data;
 using GVR.Phoenix.Interface;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
 using UnityEngine.XR.Interaction.Toolkit;
-using ZenKit.Materialized;
-using Mesh = ZenKit.Materialized.Mesh;
+using ZenKit;
 using Vector3 = System.Numerics.Vector3;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
@@ -76,8 +74,8 @@ namespace GVR.Creator
         {
             var zkWorld = new ZenKit.World(GameData.Vfs, worldName);
             var zkMesh = zkWorld.Mesh;
-            var zkBspTree = zkWorld.BspTree.Materialize();
-            var zkWayNet = zkWorld.WayNet.Materialize();
+            var zkBspTree = zkWorld.BspTree.Cache();
+            var zkWayNet = zkWorld.WayNet.Cache();
 
             if (zkWorld.RootObjects.IsEmpty())
                 throw new ArgumentException($"World >{worldName}< couldn't be found.");
@@ -107,7 +105,7 @@ namespace GVR.Creator
         /// We also need to put the triangle indices in in Reverse() order to make Unity
         /// draw mesh elements right (instead of upside down)
         /// </summary>
-        private static Dictionary<int, WorldData.SubMeshData> CreateSubMeshesForUnity(ZenKit.Mesh zkMesh, BspTree zkBspTree)
+        private static Dictionary<int, WorldData.SubMeshData> CreateSubMeshesForUnity(IMesh zkMesh, IBspTree zkBspTree)
         {
             var zkMaterials = zkMesh.Materials;
             var zkPolygons = zkMesh.Polygons;
@@ -137,7 +135,7 @@ namespace GVR.Creator
                 //     continue;
 
                 // As we always use element 0 and i+1, we skip it in the loop.
-                for (var i=1; i < polygon.PositionIndices.Length - 1; i++)
+                for (var i=1; i < polygon.PositionIndices.Count - 1; i++)
                 {
                     // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
                     AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, 0);
@@ -157,11 +155,11 @@ namespace GVR.Creator
             return subMeshes;
         }
 
-        private static void AddEntry(Vector3[] zkPositions, ZenKit.Vertex[] features, ZenKit.Polygon polygon, WorldData.SubMeshData currentSubMesh, int index)
+        private static void AddEntry(List<Vector3> zkPositions, List<Vertex> features, IPolygon polygon, WorldData.SubMeshData currentSubMesh, int index)
         {
             // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
             var positionIndex = polygon.PositionIndices[index];
-            currentSubMesh.vertices.Add(zkPositions[positionIndex].ToUnityVector());
+            currentSubMesh.vertices.Add(zkPositions[(int)positionIndex].ToUnityVector());
 
             // This triangle (index where Vector 3 lies inside vertices, points to the newly added vertex (Vector3) as we don't reuse vertices.
             currentSubMesh.triangles.Add(currentSubMesh.vertices.Count - 1);

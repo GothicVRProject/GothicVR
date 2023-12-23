@@ -55,7 +55,7 @@ namespace GVR.Phoenix.Interface
         }
 
 
-        private static void SetWayPointData(List<ZenKit.Materialized.WayPoint> wayPoints)
+        private static void SetWayPointData(List<IWayPoint> wayPoints)
         {
             WayPoints.Clear();
             foreach (var wp in wayPoints)

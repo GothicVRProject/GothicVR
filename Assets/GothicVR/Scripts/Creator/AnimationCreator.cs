@@ -4,10 +4,9 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.Npc.Actions;
-using PxCs.Data.Animation;
 using PxCs.Data.Model;
 using UnityEngine;
-using ZenKit.Materialized;
+using ZenKit;
 using Animation = UnityEngine.Animation;
 
 namespace GVR.Creator
@@ -39,7 +38,7 @@ namespace GVR.Creator
             animationComp.Play(mdsAnimationKeyName);
         }
 
-        private static AnimationClip LoadAnimationClip(ModelAnimation pxAnimation, PxModelHierarchyData mdh, GameObject rootBone, bool repeat, string clipName)
+        private static AnimationClip LoadAnimationClip(IModelAnimation pxAnimation, PxModelHierarchyData mdh, GameObject rootBone, bool repeat, string clipName)
         {
             var clip = new AnimationClip
             {
@@ -142,7 +141,7 @@ namespace GVR.Creator
             }
         }
 
-        private static void AddClipEvents(AnimationClip clip, ModelScript mds, ModelAnimation zkAnimation, string animationName)
+        private static void AddClipEvents(AnimationClip clip, IModelScript mds, IModelAnimation zkAnimation, string animationName)
         {
             var anim = mds.Animations.First(i => i.Name.EqualsIgnoreCase(animationName));
 

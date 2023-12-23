@@ -47,7 +47,7 @@ namespace GVR.Creator.Meshes
                 return Create(objectName, mdm, mdh, position, rotation, parent, rootGo);
         }
 
-        public GameObject CreateVobDecal(VirtualObject vob, VisualDecal decal, GameObject parent)
+        public GameObject CreateVobDecal(IVirtualObject vob, VisualDecal decal, GameObject parent)
         {
             // G1: One Decal has no value to recognize what it is. Most likely a setup bug to ignore at this point.
             if (!vob.Name.IsEmpty())
