@@ -2,18 +2,18 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using JetBrains.Annotations;
-using PxCs.Data.Mesh;
-using PxCs.Data.Model;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using ZenKit;
 using ZenKit.Vobs;
+using Material = UnityEngine.Material;
 
 namespace GVR.Creator.Meshes
 {
     public class VobMeshCreator : AbstractMeshCreator
     {
-        public GameObject CreateVob(string objectName, PxMultiResolutionMeshData mrm, Vector3 position,
+        public GameObject CreateVob(string objectName, IMultiResolutionMesh mrm, Vector3 position,
             Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             var go = Create(objectName, mrm, position, rotation, withCollider, parent, rootGo);
@@ -23,23 +23,23 @@ namespace GVR.Creator.Meshes
             return go;
         }
 
-        public GameObject CreateVob(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation,
+        public GameObject CreateVob(string objectName, IModel mdl, Vector3 position, Quaternion rotation,
             GameObject parent = null, GameObject rootGo = null)
         {
-            var go = CreateVob(objectName, mdl.mesh, mdl.hierarchy, position, rotation, parent, rootGo);
+            var go = CreateVob(objectName, mdl.Mesh, mdl.Hierarchy, position, rotation, parent, rootGo);
 
             AddZsCollider(go);
 
             return go;
         }
 
-        public GameObject CreateVob(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh,
+        public GameObject CreateVob(string objectName, IModelMesh mdm, IModelHierarchy mdh,
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             // Check if there are completely empty elements without any texture.
             // G1: e.g. Harp, Flute, and WASH_SLOT (usage moved to a FreePoint within daedalus functions)
-            var noMeshTextures = mdm.meshes.All(mesh => mesh.mesh.subMeshes.All(subMesh => subMesh.material.texture == ""));
-            var noAttachmentTextures = mdm.attachments.All(att => att.Value.materials.All(mat => mat.texture == ""));
+            var noMeshTextures = mdm.Meshes.All(mesh => mesh.Mesh.SubMeshes.All(subMesh => subMesh.Material.Texture.IsEmpty()));
+            var noAttachmentTextures = mdm.Attachments.All(att => att.Value.Materials.All(mat => mat.Texture.IsEmpty()));
 
             if (noMeshTextures && noAttachmentTextures)
                 return null;

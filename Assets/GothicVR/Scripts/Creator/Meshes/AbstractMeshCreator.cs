@@ -6,6 +6,7 @@ using PxCs.Data.Mesh;
 using PxCs.Data.Model;
 using PxCs.Data.Struct;
 using PxCs.Interface;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using ZenKit;
@@ -24,62 +25,63 @@ namespace GVR.Creator.Meshes
         protected const string AlphaToCoverageShaderName = "Unlit/Unlit-AlphaToCoverage";
         protected const float DecalOpacity = 0.75f;
         
-        protected GameObject Create(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        protected GameObject Create(string objectName, IModelMesh mdm, IModelHierarchy mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
             rootGo.SetParent(parent, true, true);
 
-            var nodeObjects = new GameObject[mdh.nodes!.Length];
+            var nodeObjects = new GameObject[mdh.Nodes.Count];
 
             // Create empty GameObjects from hierarchy
             {
-                for (var i = 0; i < mdh.nodes.Length; i++)
+                for (var i = 0; i < mdh.Nodes.Count ; i++)
                 {
-                    var node = mdh.nodes[i];
+                    var node = mdh.Nodes[i];
                     // We attached some Components to root of bones. Therefore reusing it.
-                    if (node.name == "BIP01")
+                    if (node.Name.EqualsIgnoreCase("BIP01"))
                     {
                         var bip01 = rootGo.FindChildRecursively("BIP01");
                         if (bip01 != null)
                             nodeObjects[i] = rootGo.FindChildRecursively("BIP01");
                         else
-                            nodeObjects[i] = new GameObject(mdh.nodes[i].name);
+                            nodeObjects[i] = new GameObject(mdh.Nodes[i].Name);
                     }
                     else
                     {
-                        nodeObjects[i] = new GameObject(mdh.nodes[i].name);
+                        nodeObjects[i] = new GameObject(mdh.Nodes[i].Name);
                     }
                 }
 
                 // Now set parents
-                for (var i = 0; i < mdh.nodes.Length; i++)
+                for (var i = 0; i < mdh.Nodes.Count; i++)
                 {
-                    var node = mdh.nodes[i];
+                    var node = mdh.Nodes[i];
                     var nodeObj = nodeObjects[i];
 
-                    SetPosAndRot(nodeObj, node.transform);
+                    SetPosAndRot(nodeObj, node.Transform);
 
-                    if (node.parentIndex == -1)
+                    if (node.ParentIndex == -1)
                         nodeObj.SetParent(rootGo);
                     else
-                        nodeObj.SetParent(nodeObjects[node.parentIndex]);
+                        nodeObj.SetParent(nodeObjects[node.ParentIndex]);
                 }
 
                 for (var i = 0; i < nodeObjects.Length; i++)
                 {
-                    if (mdh.nodes[i].parentIndex == -1)
-                        nodeObjects[i].transform.localPosition = mdh.rootTranslation.ToUnityVector();
+                    if (mdh.Nodes[i].ParentIndex == -1)
+                        nodeObjects[i].transform.localPosition = mdh.RootTranslation.ToUnityVector();
                     else
-                        SetPosAndRot(nodeObjects[i], mdh.nodes[i].transform);
+                        SetPosAndRot(nodeObjects[i], mdh.Nodes[i].Transform);
                 }
             }
 
             //// Fill GameObjects with Meshes from "original" Mesh
-            foreach (var softSkinMesh in mdm.meshes!)
+            int meshCounter = 0;
+            foreach (var softSkinMesh in mdm.Meshes)
             {
-                var mesh = softSkinMesh.mesh;
+                var mesh = softSkinMesh.Mesh;
 
-                var meshObj = new GameObject("ZM_0");
+                var meshObj = new GameObject($"ZM_{meshCounter}");
                 meshObj.SetParent(rootGo);
 
                 var meshFilter = meshObj.AddComponent<MeshFilter>();
@@ -96,7 +98,7 @@ namespace GVR.Creator.Meshes
                 CreateBonesData(rootGo, nodeObjects, meshRenderer, softSkinMesh);
             }
 
-            var attachments = GetFilteredAttachments(mdm.attachments);
+            var attachments = GetFilteredAttachments(mdm.Attachments);
 
             // Fill GameObjects with Meshes from attachments
             foreach (var subMesh in attachments)
@@ -107,7 +109,7 @@ namespace GVR.Creator.Meshes
 
                 PrepareMeshRenderer(meshRenderer, subMesh.Value);
                 PrepareMeshFilter(meshFilter, subMesh.Value);
-                PrepareMeshCollider(meshObj, meshFilter.mesh, subMesh.Value.materials);
+                PrepareMeshCollider(meshObj, meshFilter.mesh, subMesh.Value.Materials);
             }
 
             SetPosAndRot(rootGo, position, rotation);
@@ -123,12 +125,12 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// There are some objects (e.g. NPCs) where we want to skip specific attachments. This method can be overridden for this feature.
         /// </summary>
-        protected virtual Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
+        protected virtual Dictionary<string, IMultiResolutionMesh> GetFilteredAttachments(Dictionary<string, IMultiResolutionMesh> attachments)
         {
             return attachments;
         }
 
-        protected GameObject Create(string objectName, PxMultiResolutionMeshData mrm, Vector3 position, Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+        protected GameObject Create(string objectName, IMultiResolutionMesh mrm, Vector3 position, Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             if (mrm == null)
             {
@@ -138,7 +140,7 @@ namespace GVR.Creator.Meshes
             
             // If there is no texture for any of the meshes, just skip this item.
             // G1: Some skull decorations are without texture.
-            if (mrm.materials!.All(m => m.texture.IsEmpty()))
+            if (mrm.Materials.All(m => m.Texture.IsEmpty()))
                 return null;
 
             rootGo ??= new GameObject();
@@ -153,12 +155,12 @@ namespace GVR.Creator.Meshes
             PrepareMeshFilter(meshFilter, mrm);
 
             if (withCollider)
-                PrepareMeshCollider(rootGo, meshFilter.mesh, mrm.materials);
+                PrepareMeshCollider(rootGo, meshFilter.mesh, mrm.Materials);
 
             return rootGo;
         }
 
-        protected void SetPosAndRot(GameObject obj, PxMatrix4x4Data matrix)
+        protected void SetPosAndRot(GameObject obj, System.Numerics.Matrix4x4 matrix)
         {
             SetPosAndRot(obj, matrix.ToUnityMatrix());
         }
@@ -178,7 +180,7 @@ namespace GVR.Creator.Meshes
             obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
-        protected void PrepareMeshRenderer(Renderer rend, PxMultiResolutionMeshData mrmData)
+        protected void PrepareMeshRenderer(Renderer rend, IMultiResolutionMesh mrmData)
         {
             if (null == mrmData)
             {
@@ -186,23 +188,23 @@ namespace GVR.Creator.Meshes
                 return;
             }
 
-            var finalMaterials = new List<Material>(mrmData.subMeshes.Length);
+            var finalMaterials = new List<Material>(mrmData.SubMeshes.Count);
 
-            foreach (var subMesh in mrmData.subMeshes)
+            foreach (var subMesh in mrmData.SubMeshes)
             {
-                var materialData = subMesh.material;
+                var materialData = subMesh.Material;
 
-                var texture = GetTexture(materialData.texture);
+                var texture = GetTexture(materialData.Texture);
                 if (null == texture)
                 {
 
-                    if (materialData.texture.EndsWith(".TGA"))
+                    if (materialData.Texture.EndsWithIgnoreCase(".TGA"))
                     {
-                        Debug.LogError("This is supposed to be a decal: " + materialData.texture);
+                        Debug.LogError("This is supposed to be a decal: " + materialData.Texture);
                     }
                     else
                     {
-                        Debug.LogError("Couldn't get texture from name: " + materialData.texture);
+                        Debug.LogError("Couldn't get texture from name: " + materialData.Texture);
                     }
                 }
 
@@ -211,9 +213,9 @@ namespace GVR.Creator.Meshes
                 rend.material = material;
 
                 // No texture to add.
-                if (materialData.texture.IsEmpty())
+                if (materialData.Texture.IsEmpty())
                 {
-                    Debug.LogWarning("No texture was set for: " + materialData.name);
+                    Debug.LogWarning("No texture was set for: " + materialData.Name);
                     return;
                 }
 
@@ -225,7 +227,7 @@ namespace GVR.Creator.Meshes
             rend.SetMaterials(finalMaterials);
         }
 
-        protected void PrepareMeshFilter(MeshFilter meshFilter, PxMultiResolutionMeshData mrmData)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData)
         {
             /*
              * Ok, brace yourself:
@@ -252,46 +254,46 @@ namespace GVR.Creator.Meshes
                 Debug.LogError("No mesh data could be added to filter: " + meshFilter.transform.parent.name);
                 return;
             }
-            mesh.subMeshCount = mrmData.subMeshes.Length;
+            mesh.subMeshCount = mrmData.SubMeshes.Count;
 
-            var verticesAndUvSize = mrmData.subMeshes.Sum(i => i.triangles.Length) * 3;
+            var verticesAndUvSize = mrmData.SubMeshes.Sum(i => i.Triangles.Count) * 3;
             var preparedVertices = new List<Vector3>(verticesAndUvSize);
             var preparedUVs = new List<Vector2>(verticesAndUvSize);
 
             // 2-dimensional arrays (as there are segregated by submeshes)
-            var preparedTriangles = new List<List<int>>(mrmData.subMeshes.Length);
+            var preparedTriangles = new List<List<int>>(mrmData.SubMeshes.Count);
 
-            foreach (var subMesh in mrmData.subMeshes)
+            foreach (var subMesh in mrmData.SubMeshes)
             {
-                var vertices = mrmData.positions;
-                var triangles = subMesh.triangles;
-                var wedges = subMesh.wedges;
+                var vertices = mrmData.Positions;
+                var triangles = subMesh.Triangles;
+                var wedges = subMesh.Wedges;
 
                 // every triangle is attached to a new vertex.
                 // Therefore new submesh triangles start referencing their vertices with an offset from previous runs.
                 var verticesIndexOffset = preparedVertices.Count;
 
-                var subMeshTriangles = new List<int>(triangles.Length * 3);
-                for (var i = 0; i < triangles.Length; i++)
+                var subMeshTriangles = new List<int>(triangles.Count * 3);
+                for (var i = 0; i < triangles.Count; i++)
                 {
                     // One triangle is made of 3 elements for Unity. We therefore need to prepare 3 elements within one loop.
                     var preparedIndex = i * 3 + verticesIndexOffset;
 
-                    var index1 = wedges[triangles[i].c];
-                    var index2 = wedges[triangles[i].b];
-                    var index3 = wedges[triangles[i].a];
+                    var index1 = wedges[triangles[i].Wedge2];
+                    var index2 = wedges[triangles[i].Wedge1];
+                    var index3 = wedges[triangles[i].Wedge0];
 
-                    preparedVertices.Add(vertices[index1.index].ToUnityVector());
-                    preparedVertices.Add(vertices[index2.index].ToUnityVector());
-                    preparedVertices.Add(vertices[index3.index].ToUnityVector());
+                    preparedVertices.Add(vertices[index1.Index].ToUnityVector());
+                    preparedVertices.Add(vertices[index2.Index].ToUnityVector());
+                    preparedVertices.Add(vertices[index3.Index].ToUnityVector());
 
                     subMeshTriangles.Add(preparedIndex);
                     subMeshTriangles.Add(preparedIndex + 1);
                     subMeshTriangles.Add(preparedIndex + 2);
 
-                    preparedUVs.Add(index1.texture.ToUnityVector());
-                    preparedUVs.Add(index2.texture.ToUnityVector());
-                    preparedUVs.Add(index3.texture.ToUnityVector());
+                    preparedUVs.Add(index1.Texture.ToUnityVector());
+                    preparedUVs.Add(index2.Texture.ToUnityVector());
+                    preparedUVs.Add(index3.Texture.ToUnityVector());
                 }
                 preparedTriangles.Add(subMeshTriangles);
             }
@@ -302,14 +304,14 @@ namespace GVR.Creator.Meshes
             // @see: https://answers.unity.com/questions/531968/submesh-vertices.html
             mesh.SetVertices(preparedVertices);
             mesh.SetUVs(0, preparedUVs);
-            for (var i = 0; i < mrmData.subMeshes.Length; i++)
+            for (var i = 0; i < mrmData.SubMeshes.Count; i++)
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
         }
 
 
-        protected void PrepareMeshFilter(MeshFilter meshFilter, PxSoftSkinMeshData soft)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, ISoftSkinMesh soft)
         {
             /*
              * Ok, brace yourself:
@@ -330,55 +332,55 @@ namespace GVR.Creator.Meshes
              *  uvs = [wedge[0].texture], [wedge[2].texture], [wedge[1].texture]
              */
             var mesh = new Mesh();
-            var pxMesh = soft.mesh;
-            var weights = soft.weights;
+            var zkMesh = soft.Mesh;
+            var weights = soft.Weights;
 
             meshFilter.mesh = mesh;
-            mesh.subMeshCount = soft!.mesh!.subMeshes!.Length;
+            mesh.subMeshCount = soft!.Mesh.SubMeshes.Count;
 
-            var verticesAndUvSize = pxMesh!.subMeshes!.Sum(i => i.triangles!.Length) * 3;
+            var verticesAndUvSize = zkMesh.SubMeshes.Sum(i => i.Triangles!.Count) * 3;
             var preparedVertices = new List<Vector3>(verticesAndUvSize);
             var preparedUVs = new List<Vector2>(verticesAndUvSize);
             var preparedBoneWeights = new List<BoneWeight>(verticesAndUvSize);
 
             // 2-dimensional arrays (as there are segregated by submeshes)
-            var preparedTriangles = new List<List<int>>(pxMesh.subMeshes.Length);
+            var preparedTriangles = new List<List<int>>(zkMesh.SubMeshes.Count);
 
-            foreach (var subMesh in pxMesh.subMeshes)
+            foreach (var subMesh in zkMesh.SubMeshes)
             {
-                var vertices = pxMesh.positions;
-                var triangles = subMesh.triangles;
-                var wedges = subMesh.wedges;
+                var vertices = zkMesh.Positions;
+                var triangles = subMesh.Triangles;
+                var wedges = subMesh.Wedges;
 
                 // every triangle is attached to a new vertex.
                 // Therefore new submesh triangles start referencing their vertices with an offset from previous runs.
                 var verticesIndexOffset = preparedVertices.Count;
 
-                var subMeshTriangles = new List<int>(triangles!.Length * 3);
-                for (var i = 0; i < triangles.Length; i++)
+                var subMeshTriangles = new List<int>(triangles.Count * 3);
+                for (var i = 0; i < triangles.Count; i++)
                 {
                     // One triangle is made of 3 elements for Unity. We therefore need to prepare 3 elements within one loop.
                     var preparedIndex = i * 3 + verticesIndexOffset;
 
-                    var index1 = wedges![triangles[i].c];
-                    var index2 = wedges[triangles[i].b];
-                    var index3 = wedges[triangles[i].a];
+                    var index1 = wedges![triangles[i].Wedge2];
+                    var index2 = wedges[triangles[i].Wedge1];
+                    var index3 = wedges[triangles[i].Wedge0];
 
-                    preparedVertices.Add(vertices![index1.index].ToUnityVector());
-                    preparedVertices.Add(vertices[index2.index].ToUnityVector());
-                    preparedVertices.Add(vertices[index3.index].ToUnityVector());
+                    preparedVertices.Add(vertices![index1.Index].ToUnityVector());
+                    preparedVertices.Add(vertices[index2.Index].ToUnityVector());
+                    preparedVertices.Add(vertices[index3.Index].ToUnityVector());
 
                     subMeshTriangles.Add(preparedIndex);
                     subMeshTriangles.Add(preparedIndex + 1);
                     subMeshTriangles.Add(preparedIndex + 2);
 
-                    preparedUVs.Add(index1.texture.ToUnityVector());
-                    preparedUVs.Add(index2.texture.ToUnityVector());
-                    preparedUVs.Add(index3.texture.ToUnityVector());
+                    preparedUVs.Add(index1.Texture.ToUnityVector());
+                    preparedUVs.Add(index2.Texture.ToUnityVector());
+                    preparedUVs.Add(index3.Texture.ToUnityVector());
 
-                    preparedBoneWeights.Add(weights[index1.index].ToBoneWeight(soft.nodes));
-                    preparedBoneWeights.Add(weights[index2.index].ToBoneWeight(soft.nodes));
-                    preparedBoneWeights.Add(weights[index3.index].ToBoneWeight(soft.nodes));
+                    preparedBoneWeights.Add(weights[index1.Index].ToBoneWeight(soft.Nodes));
+                    preparedBoneWeights.Add(weights[index2.Index].ToBoneWeight(soft.Nodes));
+                    preparedBoneWeights.Add(weights[index3.Index].ToBoneWeight(soft.Nodes));
                 }
                 preparedTriangles.Add(subMeshTriangles);
             }
@@ -391,7 +393,7 @@ namespace GVR.Creator.Meshes
             mesh.SetUVs(0, preparedUVs);
 
             mesh.boneWeights = preparedBoneWeights.ToArray();
-            for (var i = 0; i < pxMesh.subMeshes.Length; i++)
+            for (var i = 0; i < zkMesh.SubMeshes.Count; i++)
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
@@ -424,10 +426,10 @@ namespace GVR.Creator.Meshes
         /// <summary>
         /// Check if Collider needs to be added.
         /// </summary>
-        protected void PrepareMeshCollider(GameObject obj, Mesh mesh, PxMaterialData[] materialDatas)
+        protected void PrepareMeshCollider(GameObject obj, Mesh mesh, List<IMaterial> materialDatas)
         {
-            var anythingDisableCollission = materialDatas.Any(i => i.disableCollision);
-            var anythingWater = materialDatas.Any(i => i.group == PxMaterial.PxMaterialGroup.PxMaterialGroup_Water);
+            var anythingDisableCollission = materialDatas.Any(i => i.DisableCollision);
+            var anythingWater = materialDatas.Any(i => i.Group == MaterialGroup.Water);
 
             if (anythingDisableCollission || anythingWater)
             {
@@ -444,14 +446,14 @@ namespace GVR.Creator.Meshes
         /// @see https://docs.unity3d.com/ScriptReference/Mesh-bindposes.html
         /// @see https://forum.unity.com/threads/some-explanations-on-bindposes.86185/
         /// </summary>
-        private void CreateBonesData(GameObject rootObj, GameObject[] nodeObjects, SkinnedMeshRenderer renderer, PxSoftSkinMeshData mesh)
+        private void CreateBonesData(GameObject rootObj, GameObject[] nodeObjects, SkinnedMeshRenderer renderer, ISoftSkinMesh mesh)
         {
-            var meshBones = new Transform[mesh.nodes!.Length];
-            var bindPoses = new Matrix4x4[mesh.nodes!.Length];
+            var meshBones = new Transform[mesh.Nodes.Count];
+            var bindPoses = new Matrix4x4[mesh.Nodes.Count];
 
-            for (var i = 0; i < mesh.nodes.Length; i++)
+            for (var i = 0; i < mesh.Nodes.Count; i++)
             {
-                var nodeIndex = mesh.nodes[i];
+                var nodeIndex = mesh.Nodes[i];
 
                 meshBones[i] = nodeObjects[nodeIndex].transform;
                 bindPoses[i] = meshBones[i].worldToLocalMatrix * rootObj.transform.localToWorldMatrix;

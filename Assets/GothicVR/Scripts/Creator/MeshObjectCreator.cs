@@ -5,6 +5,7 @@ using PxCs.Data.Model;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit;
 using ZenKit.Vobs;
 
 namespace GVR.Creator
@@ -33,19 +34,19 @@ namespace GVR.Creator
             NpcMeshCreator.CreateNpcWeapon(npcGo, itemData, mainFlag, flags);
         }
 
-        public static GameObject CreateVob(string objectName, PxMultiResolutionMeshData mrm, Vector3 position,
+        public static GameObject CreateVob(string objectName, IMultiResolutionMesh mrm, Vector3 position,
             Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
             return VobMeshCreator.CreateVob(objectName, mrm, position, rotation, withCollider, parent, rootGo);
         }
 
-        public static GameObject CreateVob(string objectName, PxModelData mdl, Vector3 position, Quaternion rotation,
+        public static GameObject CreateVob(string objectName, IModel mdl, Vector3 position, Quaternion rotation,
             GameObject parent = null, GameObject rootGo = null)
         {
             return VobMeshCreator.CreateVob(objectName, mdl, position, rotation, parent, rootGo);
         }
 
-        public static GameObject CreateVob(string objectName, PxModelMeshData mdm, PxModelHierarchyData mdh,
+        public static GameObject CreateVob(string objectName, IModelMesh mdm, IModelHierarchy mdh,
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             return VobMeshCreator.CreateVob(objectName, mdm, mdh, position, rotation, parent, rootGo);

@@ -844,7 +844,7 @@ namespace GVR.Creator
             var parent = nonTeleport ? parentGosNonTeleport[vob.Type] : parentGosTeleport[vob.Type];
             var meshName = vob.ShowVisual ? vob.Visual!.Name : vob.Name;
 
-            if (meshName == string.Empty)
+            if (meshName.IsEmpty())
                 return null;
 
             // MDL

@@ -13,7 +13,7 @@ namespace GVR.Creator
 {
     public static class AnimationCreator
     {
-        public static void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
+        public static void PlayAnimation(string mdsName, string animationName, IModelHierarchy mdh, GameObject go, bool repeat = false)
         {
             var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var animationComp = go.GetComponent<Animation>();
@@ -38,7 +38,7 @@ namespace GVR.Creator
             animationComp.Play(mdsAnimationKeyName);
         }
 
-        private static AnimationClip LoadAnimationClip(IModelAnimation pxAnimation, PxModelHierarchyData mdh, GameObject rootBone, bool repeat, string clipName)
+        private static AnimationClip LoadAnimationClip(IModelAnimation pxAnimation, IModelHierarchy mdh, GameObject rootBone, bool repeat, string clipName)
         {
             var clip = new AnimationClip
             {
@@ -48,7 +48,7 @@ namespace GVR.Creator
             };
 
             var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.NodeCount);
-            var boneNames = pxAnimation.NodeIndices.Select(nodeIndex => mdh.nodes![nodeIndex].name).ToArray();
+            var boneNames = pxAnimation.NodeIndices.Select(nodeIndex => mdh.Nodes[(int)nodeIndex].Name).ToArray();
 
             // Initialize array
             for (var boneId = 0; boneId < boneNames.Length; boneId++)

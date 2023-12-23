@@ -24,11 +24,11 @@ namespace GVR.Caches
         private static readonly Dictionary<string, Texture2D> TextureCache = new();
         private static readonly Dictionary<string, IModelScript> MdsCache = new();
         private static readonly Dictionary<string, IModelAnimation> AnimCache = new();
-        private static readonly Dictionary<string, PxModelHierarchyData> MdhCache = new();
-        private static readonly Dictionary<string, PxModelData> MdlCache = new();
-        private static readonly Dictionary<string, PxModelMeshData> MdmCache = new();
-        private static readonly Dictionary<string, PxMultiResolutionMeshData> MrmCache = new();
-        private static readonly Dictionary<string, PxMorphMeshData> MmbCache = new();
+        private static readonly Dictionary<string, IModelHierarchy> MdhCache = new();
+        private static readonly Dictionary<string, IModel> MdlCache = new();
+        private static readonly Dictionary<string, IModelMesh> MdmCache = new();
+        private static readonly Dictionary<string, IMultiResolutionMesh> MrmCache = new();
+        private static readonly Dictionary<string, IMorphMesh> MmbCache = new();
         private static readonly Dictionary<string, PxVmItemData> ItemDataCache = new();
         private static readonly Dictionary<string, PxVmMusicData> MusicDataCache = new();
         private static readonly Dictionary<string, PxVmSfxData> SfxDataCache = new();
@@ -146,37 +146,65 @@ namespace GVR.Caches
             return newData;
         }
 
-        public static PxModelHierarchyData TryGetMdh(string key)
+        public static IModelHierarchy TryGetMdh(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (MdhCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxModelHierarchy.LoadFromVfs(GameData.VfsPtr, $"{preparedKey}.mdh");
+            IModelHierarchy newData = null;
+            try
+            {
+                newData = new ModelHierarchy(GameData.Vfs, $"{preparedKey}.mdh").Cache();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
             MdhCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public static PxModelData TryGetMdl(string key)
+        [CanBeNull]
+        public static IModel TryGetMdl(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (MdlCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxModel.LoadModelFromVfs(GameData.VfsPtr, $"{preparedKey}.mdl");
+            IModel newData = null;
+            try
+            {
+                newData = new Model(GameData.Vfs, $"{preparedKey}.mdl").Cache();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
             MdlCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public static PxModelMeshData TryGetMdm(string key)
+        public static IModelMesh TryGetMdm(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (MdmCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxModelMesh.LoadModelMeshFromVfs(GameData.VfsPtr, $"{preparedKey}.mdm");
+            IModelMesh newData = null;
+            try
+            {
+                newData = new ModelMesh(GameData.Vfs, $"{preparedKey}.mdm").Cache();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
             MdmCache[preparedKey] = newData;
 
             FixArmorTriangles(preparedKey, newData);
@@ -187,40 +215,40 @@ namespace GVR.Caches
         /// <summary>
         /// Some armor mdm's have wrong triangles. This function corrects them hard coded until we find a proper solution.
         /// </summary>
-        private static void FixArmorTriangles(string key, PxModelMeshData mdm)
+        private static void FixArmorTriangles(string key, IModelMesh mdm)
         {
             if (!MisplacedMdmArmors.Contains(key, StringComparer.OrdinalIgnoreCase))
                 return;
 
-            foreach (var mesh in mdm.meshes!)
+            foreach (var mesh in mdm.Meshes)
             {
-                for (var i = 0; i < mesh.mesh!.positions!.Length; i++)
+                for (var i = 0; i < mesh.Mesh.Positions.Count; i++)
                 {
-                    var curPos = mesh.mesh.positions[i];
-                    mesh.mesh.positions[i] = new(curPos.X + 0.5f, curPos.Y - 0.5f, curPos.Z + 13f);
+                    var curPos = mesh.Mesh.Positions[i];
+                    mesh.Mesh.Positions[i] = new(curPos.X + 0.5f, curPos.Y - 0.5f, curPos.Z + 13f);
                 }
             }
         }
 
-        public static PxMultiResolutionMeshData TryGetMrm(string key)
+        public static IMultiResolutionMesh TryGetMrm(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (MrmCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxMultiResolutionMesh.GetMRMFromVfs(GameData.VfsPtr, $"{preparedKey}.mrm");
+            var newData = new MultiResolutionMesh(GameData.Vfs, $"{preparedKey}.mrm").Cache();
             MrmCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public static PxMorphMeshData TryGetMmb(string key)
+        public static IMorphMesh TryGetMmb(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (MmbCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxMorphMesh.LoadMorphMeshFromVfs(GameData.VfsPtr, $"{preparedKey}.mmb");
+            var newData = new MorphMesh(GameData.Vfs, $"{preparedKey}.mmb").Cache();
             MmbCache[preparedKey] = newData;
 
             return newData;

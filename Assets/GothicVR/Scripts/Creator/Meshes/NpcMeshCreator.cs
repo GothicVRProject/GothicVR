@@ -7,6 +7,7 @@ using PxCs.Data.Mesh;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit;
 
 namespace GVR.Creator.Meshes
 {
@@ -44,7 +45,7 @@ namespace GVR.Creator.Meshes
             return npcGo;
         }
 
-        private void AddHead(string npcName, GameObject npcGo, PxMorphMeshData morphMesh)
+        private void AddHead(string npcName, GameObject npcGo, IMorphMesh morphMesh)
         {
             var headGo = npcGo.FindChildRecursively("BIP01 HEAD");
 
@@ -57,8 +58,8 @@ namespace GVR.Creator.Meshes
             var headMeshFilter = headGo.AddComponent<MeshFilter>();
             var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(headMeshRenderer, morphMesh.mesh);
-            PrepareMeshFilter(headMeshFilter, morphMesh.mesh);
+            PrepareMeshRenderer(headMeshRenderer, morphMesh.Mesh);
+            PrepareMeshFilter(headMeshFilter, morphMesh.Mesh);
         }
 
         /// <summary>
@@ -89,9 +90,9 @@ namespace GVR.Creator.Meshes
             return base.GetTexture(finalTextureName);
         }
         
-        protected override Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
+        protected override Dictionary<string, IMultiResolutionMesh> GetFilteredAttachments(Dictionary<string, IMultiResolutionMesh> attachments)
         {
-            Dictionary<string, PxMultiResolutionMeshData> newAttachments = new(attachments);
+            Dictionary<string, IMultiResolutionMesh> newAttachments = new(attachments);
 
             // Remove head as it will be loaded later.
             if (newAttachments.Remove("BIP01 HEAD"))
@@ -166,8 +167,8 @@ namespace GVR.Creator.Meshes
             var meshFilter = weaponGo.AddComponent<MeshFilter>();
             var meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(meshRenderer, mms.mesh);
-            PrepareMeshFilter(meshFilter, mms.mesh);
+            PrepareMeshRenderer(meshRenderer, mms.Mesh);
+            PrepareMeshFilter(meshFilter, mms.Mesh);
         }
     }
 }
