@@ -82,12 +82,7 @@ namespace GVR.Creator
                 return;
             
             PreCreateVobs(world, rootTeleport, rootNonTeleport, vobsPerFrame);
-            
-            var watch = Stopwatch.StartNew();
             await CreateVobs(world.vobs);
-            watch.Stop();
-            Debug.Log($"watchVobs={watch.Elapsed}");
-
             PostCreateVobs();
         }
 
