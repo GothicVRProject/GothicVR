@@ -1,3 +1,4 @@
+using System;
 using GVR.Caches;
 using GVR.Creator;
 using GVR.Phoenix.Interface.Vm;
@@ -15,25 +16,31 @@ namespace GVR.Npc.Actions.AnimationActions
             Done
         }
 
-        protected Vector3 movingLocation;
         protected WalkState walkState = WalkState.Initial;
-        
+
         protected AbstractWalkAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
         
-        
         /// <summary>
-        /// As we use legacy animations, we can't use RootMotion. We therefore need to rebuild it.
+        /// We need to define the final destination spot within overriding class.
         /// </summary>
+        protected abstract Vector3 GetWalkDestination();
+        
         public override void Tick(Transform transform)
         {
+            base.Tick(transform);
+
+            if (isFinished)
+                return;
+
             switch (walkState)
             {
                 case WalkState.Initial:
-                    StartRotation(transform);
+                    walkState = WalkState.Rotate;
+                    HandleRotation(transform, GetWalkDestination());
                     return;
                 case WalkState.Rotate:
-                    HandleRotation(transform);
+                    HandleRotation(transform, GetWalkDestination());
                     return;
                 case WalkState.Walk:
                     HandleWalk(transform);
@@ -46,62 +53,47 @@ namespace GVR.Npc.Actions.AnimationActions
             }
         }
 
-        private void StartRotation(Transform transform)
-        {
-            // FIXME - we need to evaluate if we turn right or left. Then choose TurnR/TurnL properly.
-            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            AnimationCreator.PlayAnimation(props.baseMdsName, "t_WalkWTurnR", mdh, npcGo, true);
-            
-            walkState = WalkState.Rotate;
-        }
-        
-        private void HandleRotation(Transform transform)
-        {
-            var singleStep = 1.0f * Time.deltaTime;
-            var targetDirection = movingLocation - transform.position;
-
-            // If we set TargetDirection of >y< to 0, then we rotate left/right only.
-            targetDirection.y = 0;
-            var newDirection = Vector3.RotateTowards(transform.forward, targetDirection, singleStep, 0.0f);
-            var newRotation = Quaternion.LookRotation(newDirection);
-
-            // Rotation is done.
-            if (transform.rotation == newRotation)
-            {
-                StartWalkAnimation();
-                return;
-            }
-
-            transform.rotation = newRotation;
-        }
-        
         private string GetWalkModeAnimationString()
         {
-            switch (props.walkMode)
+            switch (Props.walkMode)
             {
                 case VmGothicEnums.WalkMode.Walk:
                     return "S_WALKL";
                 default:
-                    Debug.LogWarning($"Animation of type {props.walkMode} not yet implemented.");
+                    Debug.LogWarning($"Animation of type {Props.walkMode} not yet implemented.");
                     return "";
             }
         }
-        
-        private void StartWalkAnimation()
+
+        private void StartWalk()
         {
             var animName = GetWalkModeAnimationString();
-            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            AnimationCreator.PlayAnimation(props.baseMdsName, animName, mdh, npcGo, true);
+            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
+            AnimationCreator.PlayAnimation(Props.baseMdsName, animName, mdh, NpcGo, true);
 
             walkState = WalkState.Walk;
         }
-        
+
         private void HandleWalk(Transform transform)
         {
-            var step =  1f * Time.deltaTime; // calculate distance to move
-            var newPos = Vector3.MoveTowards(transform.position, movingLocation, step);
-            
-            transform.position = newPos;
+            HandleRootMotion(transform);
+        }
+        
+        private void HandleRotation(Transform transform, Vector3 destination)
+        {
+            var sameHeightDirection = new Vector3(destination.x, transform.position.y, destination.z);
+            var direction = (sameHeightDirection - transform.position).normalized;
+            var dot = Vector3.Dot(direction, transform.forward);
+
+            if (Math.Abs(dot - 1f) < 0.0001f)
+            {
+                StartWalk();
+                walkState = WalkState.Walk;
+                return;
+            }
+
+            var lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * 100);
         }
     }
 }

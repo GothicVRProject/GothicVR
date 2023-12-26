@@ -14,8 +14,8 @@ namespace GVR.Player.Climb
 
         [SerializeField] private Sprite sprite;
 
-        private GameObject reticle;
-        private Image reticleImage;
+        private GameObject teleportIndicatorReticle;
+        private Image teleportIndicatorReticleImage;
 
         private bool isHittingObject = false;
         private GameObject zsPos0GO;
@@ -54,18 +54,18 @@ namespace GVR.Player.Climb
                 float yDifferenceToZsPos0 = Mathf.Abs(playerPosition.y - zsPos0Position.y);
                 float yDifferenceToZsPos1 = Mathf.Abs(playerPosition.y - zsPos1Position.y);
 
-                reticle.SetActive(true);
+                teleportIndicatorReticle.SetActive(true);
 
                 // Teleport the player to the closer zs_pos position based on y-level
                 if (yDifferenceToZsPos0 < yDifferenceToZsPos1)
                 {
-                    reticle.SetParent(zsPos0GO, true, true);
-                    reticleImage.rectTransform.localRotation = Quaternion.AngleAxis(0, Vector3.forward);
+                    teleportIndicatorReticle.SetParent(zsPos0GO, true, true);
+                    teleportIndicatorReticleImage.rectTransform.localRotation = Quaternion.AngleAxis(0, Vector3.forward);
                 }
                 else
                 {
-                    reticle.SetParent(zsPos1GO, true, true);
-                    reticleImage.rectTransform.localRotation = Quaternion.AngleAxis(180, Vector3.forward);
+                    teleportIndicatorReticle.SetParent(zsPos1GO, true, true);
+                    teleportIndicatorReticleImage.rectTransform.localRotation = Quaternion.AngleAxis(180, Vector3.forward);
                 }
 
                 isHittingObject = true;
@@ -78,16 +78,16 @@ namespace GVR.Player.Climb
         private void OnRaycastExit(SelectExitEventArgs args)
         {
             isHittingObject = false;
-            reticle.transform.parent = null;
-            reticleImage.fillAmount = 0;
-            reticle.SetActive(false);
+            teleportIndicatorReticle.transform.parent = null;
+            teleportIndicatorReticleImage.fillAmount = 0;
+            teleportIndicatorReticle.SetActive(false);
         }
 
         private void Update()
         {
             if (isHittingObject)
             {
-                reticleImage.fillAmount = (Time.time - hitTime) / teleportDelay;
+                teleportIndicatorReticleImage.fillAmount = (Time.time - hitTime) / teleportDelay;
                 // Check if the delay duration has passed since the hit
                 if (Time.time - hitTime >= teleportDelay)
                 {
@@ -133,23 +133,25 @@ namespace GVR.Player.Climb
 
         private void CreateReticle()
         {
-            reticle = new GameObject("Reticle");
+            teleportIndicatorReticle = new GameObject("Reticle");
 
             var canvas = new GameObject("Canvas");
-            canvas.SetParent(reticle);
+            canvas.SetParent(teleportIndicatorReticle);
             canvas.AddComponent<Canvas>();
             var image = new GameObject("Image");
             image.SetParent(canvas);
 
 
-            reticleImage = image.AddComponent<Image>();
+            teleportIndicatorReticleImage = image.AddComponent<Image>();
 
-            reticleImage.sprite = sprite;
-            reticleImage.rectTransform.sizeDelta = new Vector2(1f, 1f);
-            reticleImage.material = TextureManager.I.arrowmaterial;
-            reticleImage.type = Image.Type.Filled;
-            reticleImage.fillMethod = Image.FillMethod.Vertical;
-            Destroy(reticle.GetComponent<Collider>());
+            teleportIndicatorReticleImage.sprite = sprite;
+            teleportIndicatorReticleImage.rectTransform.sizeDelta = new Vector2(1f, 1f);
+            teleportIndicatorReticleImage.material = TextureManager.I.arrowmaterial;
+            teleportIndicatorReticleImage.type = Image.Type.Filled;
+            teleportIndicatorReticleImage.fillMethod = Image.FillMethod.Vertical;
+            Destroy(teleportIndicatorReticle.GetComponent<Collider>());
+
+            teleportIndicatorReticle.SetActive(false);
         }
     }
 }

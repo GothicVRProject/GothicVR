@@ -22,8 +22,8 @@ namespace GVR.Extensions
         {
             var result = go.transform.Find(name);
 
-            // The child object was found
-            if (result != null)
+            // The child object was found and isn't ourself
+            if (result != null && result != go.transform)
                 return result.gameObject;
 
             // Search recursively in the children of the current object

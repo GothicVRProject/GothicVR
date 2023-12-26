@@ -24,7 +24,7 @@ namespace GothicVR.Vob
         {
             HourEventCallback(GameTime.I.GetCurrentDateTime());
 
-            StartCoroutine();
+            StartCoroutineInternal();
             GameTime.I.hourChangeCallback.AddListener(HourEventCallback);
         }
 
@@ -58,10 +58,10 @@ namespace GothicVR.Vob
             HourEventCallback(GameTime.I.GetCurrentDateTime());
             
             if (gameObject.activeSelf)
-                StartCoroutine();
+                StartCoroutineInternal();
         }
         
-        private void StartCoroutine()
+        private void StartCoroutineInternal()
         {
             // Either it's not yet initialized (no clip) or it's no random loop
             if (audioSource1.clip == null || properties.soundDaytimeData.mode != PxWorld.PxVobSoundMode.PxVobSoundModeRandom)
@@ -112,7 +112,7 @@ namespace GothicVR.Vob
             activeAudio = audioSource2;
         }
 
-        protected IEnumerator ReplayRandomSound()
+        private IEnumerator ReplayRandomSound()
         {
             while (true)
             {

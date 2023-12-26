@@ -1,6 +1,5 @@
 using GVR.Caches;
 using GVR.Creator;
-using GVR.Creator.Meshes;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -12,9 +11,17 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
+            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
+
             // FIXME - We need to handle both mds and mdh options! (base vs overlay)
-            AnimationCreator.PlayAnimation(props.baseMdsName, action.str0, mdh, npcGo);
+            AnimationCreator.PlayAnimation(Props.baseMdsName, Action.String0, mdh, NpcGo);
+        }
+
+        public override void Tick(Transform transform)
+        {
+            base.Tick(transform);
+
+            HandleRootMotion(transform);
         }
     }
 }

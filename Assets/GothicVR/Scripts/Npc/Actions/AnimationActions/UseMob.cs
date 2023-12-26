@@ -15,6 +15,8 @@ namespace GVR.Npc.Actions.AnimationActions
         private const string mobUseString = "T_{0}_{1}_{2}_2_{3}";
         private GameObject mobGo;
         private GameObject slotGo;
+        private Vector3 destination;
+
 
         public UseMob(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
@@ -29,14 +31,13 @@ namespace GVR.Npc.Actions.AnimationActions
 
             mobGo = mob;
             slotGo = slotPos;
-            movingLocation = slotPos.transform.position;
         }
 
         [CanBeNull]
         private GameObject GetNearestMob()
         {
-            var pos = npcGo.transform.position;
-            return VobHelper.GetFreeInteractableWithin10M(pos, action.str0)?.gameObject;
+            var pos = NpcGo.transform.position;
+            return VobHelper.GetFreeInteractableWithin10M(pos, Action.String0)?.gameObject;
         }
         
         [CanBeNull]
@@ -45,7 +46,7 @@ namespace GVR.Npc.Actions.AnimationActions
             if (mob == null)
                 return null;
             
-            var pos = npcGo.transform.position;
+            var pos = NpcGo.transform.position;
             var slotPos = VobHelper.GetNearestSlot(mob.gameObject, pos);
 
             return slotPos;
@@ -65,19 +66,19 @@ namespace GVR.Npc.Actions.AnimationActions
                 return;
 
             walkState = WalkState.Done;
-            props.bodyState = VmGothicEnums.BodyState.BS_MOBINTERACT;
+            Props.bodyState = VmGothicEnums.BodyState.BS_MOBINTERACT;
             
-            npcGo.transform.position = mobGo.transform.position;
-            npcGo.transform.rotation = mobGo.transform.rotation;
+            NpcGo.transform.position = mobGo.transform.position;
+            NpcGo.transform.rotation = mobGo.transform.rotation;
 
             var mobVisualName = mobGo.GetComponent<VobProperties>().visualScheme;
             var slotPositionName = GetSlotPositionTag(slotGo.name);
             
             // FIXME - Somewhat hardcoded. Needs more love in the future!
-            var animName = string.Format(mobUseString, mobVisualName, slotPositionName, "S0", $"S{action.i0}");
+            var animName = string.Format(mobUseString, mobVisualName, slotPositionName, "S0", $"S{Action.Int0}");
             
-            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            AnimationCreator.PlayAnimation(props.baseMdsName, animName, mdh, npcGo);
+            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
+            AnimationCreator.PlayAnimation(Props.baseMdsName, animName, mdh, NpcGo);
         }
 
         private string GetSlotPositionTag(string name)
@@ -89,11 +90,16 @@ namespace GVR.Npc.Actions.AnimationActions
             else
                 return "";
         }
-        
+
+        protected override Vector3 GetWalkDestination()
+        {
+            return destination;
+        }
+
         /// <summary>
         /// Only after the Mob is reached and final animation is done, we will close the loop.
         /// </summary>
-        public override void AnimationEventEndCallback()
+        public override void AnimationEndEventCallback()
         {
             if (walkState == WalkState.Done)
                 isFinished = true;

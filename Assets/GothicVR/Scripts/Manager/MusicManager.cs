@@ -39,7 +39,6 @@ namespace GVR.Manager
 
         private static AudioSource musicSource;
 
-        private static GameObject backgroundMusic;
 
         // This multiplier is used to increase the buffer size and reduce the number times PrepareData is called
         // also affects the delay of the music, it doesn't sound so harsh when switching
@@ -49,8 +48,8 @@ namespace GVR.Manager
 
         private void Start()
         {
-            backgroundMusic = GameObject.Find("BackgroundMusic");
-            musicSource = backgroundMusic.AddComponent<AudioSource>();
+            var backgroundMusic = GameObject.Find("BackgroundMusic");
+            backgroundMusic.TryGetComponent<AudioSource>(out musicSource);
         }
 
 
@@ -198,7 +197,7 @@ namespace GVR.Manager
             pendingTags = tags;
             hasPending = true;
 
-            if (FeatureFlags.I.ShowMusicLogs)
+            if (FeatureFlags.I.showMusicLogs)
                 Debug.Log($"Playing music: theme >{musicName}< from file >{theme.file}<");
         }
 
@@ -209,7 +208,7 @@ namespace GVR.Manager
             pendingTheme = theme;
             hasPending = true;
 
-            if (FeatureFlags.I.ShowMusicLogs)
+            if (FeatureFlags.I.showMusicLogs)
                 Debug.Log($"[Music] Playing music: theme >{musicName}< from file >{theme.file}<");
         }
 

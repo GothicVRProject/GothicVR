@@ -14,6 +14,7 @@ using GVR.Vob.WayNet;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace GVR.Creator
 {
@@ -23,9 +24,6 @@ namespace GVR.Creator
 
         // Hint - If this scale ratio isn't looking well, feel free to change it.
         private const float fatnessScale = 0.1f;
-        private const int DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY = 1;
-        private const int DEBUG_BLOODWYN_INSTANCE_ID = 6596;
-        private static int debugNpcsSpawned;
 
         private static GameObject GetRootGo()
         {
@@ -64,7 +62,7 @@ namespace GVR.Creator
         {
             return GetProperties(npcPtr).gameObject;
         }
-        
+
         /// <summary>
         /// Original Gothic uses this function to spawn an NPC instance into the world.
         /// 
@@ -74,14 +72,7 @@ namespace GVR.Creator
         /// </summary>
         public static void ExtWldInsertNpc(int npcInstance, string spawnPoint)
         {
-            if (++debugNpcsSpawned > DEBUG_SPAWN_AMOUNT_OF_NPCS_ONLY)
-                return;
-
-            // if (npcInstance != DEBUG_BLOODWYN_INSTANCE_ID)
-            //     return;
-            
-            
-            var newNpc = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Npc"));
+            var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             var props = newNpc.GetComponent<NpcProperties>();
             
             // Humans are singletons.
@@ -99,17 +90,25 @@ namespace GVR.Creator
                 props.Copy(origProps);
             }
 
+            if (FeatureFlags.I.npcToSpawn.Any() && !FeatureFlags.I.npcToSpawn.Contains(props.npc.id))
+            {
+                Object.Destroy(newNpc);
+                return;
+            }
+
             newNpc.name = props.npc!.names[0];
             
             var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
-            NpcMeshCreator.CreateNpc(newNpc.name, props.mdmName, mdhName, props.BodyData.Head, props.BodyData, newNpc);
+            NpcMeshCreator.CreateNpc(newNpc.name, props.mdmName, mdhName, props.BodyData, newNpc);
             newNpc.SetParent(GetRootGo());
 
             foreach (var equippedItem in props.EquippedItems)
                 NpcMeshCreator.EquipWeapon(newNpc, equippedItem, equippedItem.mainFlag, equippedItem.flags);
             
             SetSpawnPoint(newNpc, spawnPoint, props.npc);
-            StartRoutine(newNpc);
+
+            if (FeatureFlags.I.enableNpcRoutines)
+                StartRoutine(newNpc);
         }
 
         private static void SetSpawnPoint(GameObject npcGo, string spawnPoint, PxVmNpcData pxNpc)
@@ -135,6 +134,12 @@ namespace GVR.Creator
             }
             
             npcGo.transform.position = initialSpawnPoint.Position;
+
+            if (initialSpawnPoint.GetType() == typeof(WayPoint))
+                npcGo.GetComponent<NpcProperties>().currentWayPoint = (WayPoint)initialSpawnPoint;
+            else
+                npcGo.GetComponent<NpcProperties>().currentFreePoint = (FreePoint)initialSpawnPoint;
+            
         }
         
         public static void ExtTaMin(VmGothicExternals.ExtTaMinData data)
@@ -183,7 +188,7 @@ namespace GVR.Creator
 
             props.BodyData = data;
             
-            if (FeatureFlags.I.CreateNpcArmor && data.Armor >= 0)
+            if (data.Armor >= 0)
             {
                 var armorData = AssetCache.TryGetItemData((uint)data.Armor);
                 props.EquippedItems.Add(AssetCache.TryGetItemData((uint)data.Armor));
@@ -266,59 +271,9 @@ namespace GVR.Creator
         private static void StartRoutine(GameObject npc)
         {
             var routineComp = npc.GetComponent<Routine>();
-            var firstRoutine = routineComp.routines.FirstOrDefault();
+            var firstRoutine = routineComp.routines.First();
 
-            npc.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action);
-        }
-        
-        public static void DebugAddIdleAnimationToAllNpc()
-        {
-            // DebugDanceAll();
-            DebugThorus();
-            DebugMeatBug();
-
-        }
-
-        private static void DebugDanceAll()
-        {
-            var npcs = LookupCache.NpcCache.Values
-                .Where(i => i.name != "Thorus")
-                .Where(i => i.name != "Fleischwanze")
-                .Where(i => i.name != "Meatbug");
-            
-            foreach (var props in npcs)
-            {
-                var mdsName = props.baseMdsName;
-                var mdh = AssetCache.TryGetMdh(props.baseMdhName);
-                var animationName = mdsName.ToLower() == "humans.mds" ? "T_1HSFREE" : "S_DANCE1";
-                AnimationCreator.PlayAnimation(mdsName, animationName, mdh, props.gameObject);
-            }
-        }
-        
-        private static void DebugThorus()
-        {
-            foreach (var props in LookupCache.NpcCache.Values.Where(i => i.name == "Thorus"))
-            {
-                var routineComp = props.GetComponent<Routine>();
-                var firstRoutine = routineComp.routines.FirstOrDefault();
-
-                props.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action);
-            }
-        }
-
-        private static void DebugMeatBug()
-        {
-            var x = LookupCache.NpcCache.Values.Where(i => i.name == "Fleischwanze").Count();
-            
-            foreach (var props in LookupCache.NpcCache.Values.Where(i => i.name == "Fleischwanze"))
-            {
-                var mds = AssetCache.TryGetMds(props.baseMdsName);
-                var mdh = AssetCache.TryGetMdh(props.baseMdhName);
-                
-                var animNames = mds.animations.Select(i => i.name).ToArray();
-                
-                AnimationCreator.PlayAnimation(props.baseMdsName, "s_FistRunL", mdh, props.gameObject);
-            }
+            npc.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action, firstRoutine.waypoint);
         }
     }
 }

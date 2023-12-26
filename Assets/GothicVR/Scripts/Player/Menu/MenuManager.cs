@@ -1,3 +1,4 @@
+using GVR.GothicVR.Scripts.UI;
 using GVR.Manager;
 using UnityEngine;
 
@@ -9,13 +10,16 @@ namespace GVR.Player.Menu
         public GameObject SettingsMenu;
         public GameObject TeleportMenu;
         public GameObject MovementMenu;
-        public GameObject UIMenu;
+        public GameObject SoundMenu;
 
         [SerializeField]
         private MoveSpeedController moveSpeedController;
 
         [SerializeField]
         private TurnSettingDropdownController turnSettingDropdownController;
+
+        [SerializeField] private AudioMixerHandler musicVolumeHandler;
+        [SerializeField] private AudioMixerHandler soundEffectsVolumeHandler;
 
         void Awake()
         {
@@ -29,12 +33,14 @@ namespace GVR.Player.Menu
 
             moveSpeedController.ChangeMoveSpeed(PlayerPrefs.GetFloat(ConstantsManager.moveSpeedPlayerPref));
             turnSettingDropdownController.DropdownItemSelected(PlayerPrefs.GetInt(ConstantsManager.turnSettingPlayerPref));
+            musicVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(ConstantsManager.musicVolumePlayerPref, 1f));
+            soundEffectsVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(ConstantsManager.soundEffectsVolumePlayerPref, 1f));
         }
 
         public void PlayFunction()
         {
 #pragma warning disable CS4014 // It's intended, that this async call is not awaited.
-            GvrSceneManager.I.LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint);
+            GvrSceneManager.I.LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint, true);
 #pragma warning restore CS4014
         }
 
@@ -44,7 +50,7 @@ namespace GVR.Player.Menu
             SettingsMenu.SetActive(menu == SettingsMenu);
             TeleportMenu.SetActive(menu == TeleportMenu);
             MovementMenu.SetActive(menu == MovementMenu);
-            UIMenu.SetActive(menu == UIMenu);
+            SoundMenu.SetActive(menu == SoundMenu);
         }
 
         public void QuitGameFunction()

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.172768, g: 0.21589169, b: 0.29782546, a: 1}
+  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -298,7 +298,8 @@ Transform:
   m_LocalPosition: {x: -64.25522, y: -4.23999, z: 28.957176}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1139202468}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &235819215
@@ -313,32 +314,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12af35efb7c45ea4fb4752d0328ebf2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SkipMainMenu: 0
+  skipMainMenu: 0
   useXRDeviceSimulator: 0
+  createWaypoints: 1
+  vobItemsDynamicAttach: 1
   createWayPointMeshes: 0
   createWaypointEdgeMeshes: 0
-  drawVobCullingGizmos: 0
-  CreateVobs: 1
-  CreateWaypoints: 1
-  spawnAtSpecificFreePoint: 
-  EnableDayTime: 1
-  SunMovementPerformanceValue: 0
-  StartHour: 17
-  StartMinute: 59
-  EnableVobFPMesh: 0
-  EnableDecals: 0
-  CreateOcNpcs: 0
-  EnableNpcRoutines: 0
-  CreateNpcArmor: 0
-  CreateExampleAnimation: 0
-  CreateDebugIdleAnimations: 0
-  ShowPhoenixDebugMessages: 0
-  ShowZspyLogs: 0
-  ShowPhoenixVfsFileNotFoundErrors: 0
-  ShowMusicLogs: 0
-  EnableSounds: 1
-  EnableMusic: 1
-  enableSoundCulling: 1
+  enableDayTime: 1
+  sunMovementPerformanceValue: 1
+  startHour: 8
+  startMinute: 0
+  createVobs: 1
+  enableDecals: 0
   vobCulling: 1
   vobCullingSmall:
     maxObjectSize: 1.2
@@ -349,6 +336,20 @@ MonoBehaviour:
   vobCullingLarge:
     maxObjectSize: 100
     cullingDistance: 200
+  spawnAtSpecificFreePoint: 
+  drawFreePointMeshes: 0
+  drawVobCullingGizmos: 0
+  createOcNpcs: 0
+  enableNpcRoutines: 0
+  npcToSpawn: 
+  showPhoenixDebugMessages: 0
+  showZspyLogs: 0
+  showPhoenixVfsFileNotFoundErrors: 0
+  showMusicLogs: 0
+  enableSounds: 1
+  enableMusic: 1
+  enableSoundCulling: 1
+  enableVobParticles: 0
   enableFineGrainedWorldMeshCreation: 0
   enableWorldCulling: 0
 --- !u!1 &394991343
@@ -1182,6 +1183,53 @@ Transform:
   - {fileID: 1283201086}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1139202467
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1139202468}
+  - component: {fileID: 1139202469}
+  m_Layer: 0
+  m_Name: Debug
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1139202468
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1139202467}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.024404084, y: 0.22812265, z: -0.009119246, w: -0.97328377}
+  m_LocalPosition: {x: -10.855823, y: 4.417434, z: -11.762644}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 235819214}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1139202469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1139202467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f23917a2fb44c7e94eee3fae8187f18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugStart: 
+  debugEnd: 
+  pathDistanceCalculation: []
 --- !u!1 &1280490518
 GameObject:
   m_ObjectHideFlags: 0
@@ -1235,6 +1283,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1283201086}
+  - component: {fileID: 1283201087}
   m_Layer: 0
   m_Name: BackgroundMusic
   m_TagString: Untagged
@@ -1257,6 +1306,102 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1103036566}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1283201087
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283201085}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: -7086137813456189328, guid: 118dcb5485ad4894fb619aab7e1f8708, type: 2}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1300502570
 GameObject:
   m_ObjectHideFlags: 0

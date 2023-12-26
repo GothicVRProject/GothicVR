@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using AOT;
 using GVR.Debugging;
+using GVR.Extensions;
 using GVR.Manager;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
@@ -70,6 +71,7 @@ namespace GVR.Bootstrap
             SetLanguage();
             LoadGothicVM(g1Dir);
             LoadSfxVM(g1Dir);
+            LoadPfxVm(g1Dir);
             LoadMusicVM(g1Dir);
             LoadMusic();
             LoadFonts();
@@ -90,14 +92,14 @@ namespace GVR.Bootstrap
                     Debug.LogWarning(message);
                     break;
                 case PxLogging.Level.error:
-                    var isVfsMessage = message.StartsWith("failed to find vfs entry");
-                    if (isVfsMessage && !FeatureFlags.I.ShowPhoenixVfsFileNotFoundErrors)
+                    var isVfsMessage = message.ContainsIgnoreCase("failed to find vfs entry");
+                    if (isVfsMessage && !FeatureFlags.I.showPhoenixVfsFileNotFoundErrors)
                         break;
 
                     Debug.LogError(message);
                     break;
                 default:
-                    if (!FeatureFlags.I.ShowPhoenixDebugMessages)
+                    if (!FeatureFlags.I.showPhoenixDebugMessages)
                         break;
 
                     Debug.Log(message);
@@ -147,6 +149,13 @@ namespace GVR.Bootstrap
             GameData.VmSfxPtr = vmPtr;
         }
 
+        private static void LoadPfxVm(string g1Dir)
+        {
+            var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/PARTICLEFX.DAT"));
+            var vmPtr = VmGothicExternals.LoadVm(fullPath);
+            GameData.VmPfxPtr = vmPtr;
+        }
+
         private void LoadMusicVM(string G1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
@@ -158,7 +167,7 @@ namespace GVR.Bootstrap
         {
             var music = MusicManager.I;
             music.Create();
-            music.SetEnabled(FeatureFlags.I.EnableMusic);
+            music.SetEnabled(FeatureFlags.I.enableMusic);
             music.SetMusic("SYS_MENU");
             Debug.Log("Loading music");
         }

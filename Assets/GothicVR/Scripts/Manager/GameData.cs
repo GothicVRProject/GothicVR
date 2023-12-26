@@ -5,6 +5,7 @@ using GVR.Phoenix.Data;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Properties;
 using GVR.Vob.WayNet;
+using GVR.World;
 using PxCs.Data.WayNet;
 using PxCs.Interface;
 using UnityEngine.SceneManagement;
@@ -15,7 +16,8 @@ namespace GVR.Phoenix.Interface
     {
         public static IntPtr VfsPtr;
         public static IntPtr VmGothicPtr;
-        public static IntPtr VmSfxPtr;
+        public static IntPtr VmSfxPtr; // Sound FX
+        public static IntPtr VmPfxPtr; // Particle FX
         public static IntPtr VmMusicPtr;
 
         private static WorldData worldInternal;
@@ -32,6 +34,8 @@ namespace GVR.Phoenix.Interface
 
         public static readonly Dictionary<string, WayPoint> WayPoints = new();
         public static readonly Dictionary<string, FreePoint> FreePoints = new();
+        // Reorganized waypoints from world data.
+        public static Dictionary<string, DijkstraWaypoint> DijkstraWaypoints = new();
         public static readonly List<VobProperties> VobsInteractable = new(); 
         
         // FIXME Find a better place for the NPC routines. E.g. on the NPCs itself? But we e.g. need to have a static NPCObject List to do so.
@@ -65,6 +69,12 @@ namespace GVR.Phoenix.Interface
             {
                 PxVm.pxVmDestroy(VmSfxPtr);
                 VmSfxPtr = IntPtr.Zero;
+            }
+
+            if (VmPfxPtr != IntPtr.Zero)
+            {
+                PxVm.pxVmDestroy(VmPfxPtr);
+                VmPfxPtr = IntPtr.Zero;
             }
 
             if (VmMusicPtr != IntPtr.Zero)

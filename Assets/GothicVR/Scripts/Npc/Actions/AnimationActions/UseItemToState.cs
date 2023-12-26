@@ -20,42 +20,42 @@ namespace GVR.Npc.Actions.AnimationActions
         public override void Start()
         {
             // Nothing in hand && new item shall be put into hand
-            if (props.itemAnimationState < 0 && action.i0 >= 0)
+            if (Props.itemAnimationState < 0 && Action.Int0 >= 0)
             {
-                StartItemStateAnimation(action.i0);
-                props.hasItemEquipped = true;
+                StartItemStateAnimation(Action.Int0);
+                Props.hasItemEquipped = true;
             }
             // Something in hand && item shall be removed
-            else if (props.itemAnimationState >= 0 && action.i0 < 0)
+            else if (Props.itemAnimationState >= 0 && Action.Int0 < 0)
             {
-                EndItemStateAnimation(props.itemAnimationState);
-                props.hasItemEquipped = false;
+                EndItemStateAnimation(Props.itemAnimationState);
+                Props.hasItemEquipped = false;
             }
 
-            props.itemAnimationState = action.i0;
-            props.currentItem = action.ui0;
+            Props.itemAnimationState = Action.Int0;
+            Props.currentItem = Action.Uint0;
         }
 
         private void StartItemStateAnimation(int itemAnimationState)
         {
-            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            var item = AssetCache.TryGetItemData(action.ui0);
+            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
+            var item = AssetCache.TryGetItemData(Action.Uint0);
 
             // e.g. T_POTION_STAND_2_S0
             var animationName = string.Format(animationStartScheme, item.schemeName, itemAnimationState);
             
-            AnimationCreator.PlayAnimation(props.baseMdsName, animationName, mdh, npcGo);
+            AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, mdh, NpcGo);
         }
 
         private void EndItemStateAnimation(int itemAnimationState)
         {
-            var mdh = AssetCache.TryGetMdh(props.overlayMdhName);
-            var item = AssetCache.TryGetItemData(action.ui0);
+            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
+            var item = AssetCache.TryGetItemData(Action.Uint0);
 
             // e.g. T_POTION_S0_2_STAND
             var animationName = string.Format(animationEndScheme, item.schemeName, itemAnimationState);
             
-            AnimationCreator.PlayAnimation(props.baseMdsName, animationName, mdh, npcGo);
+            AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, mdh, NpcGo);
         }
 
         public override void AnimationEventCallback(PxEventTagData data)
@@ -79,17 +79,17 @@ namespace GVR.Npc.Actions.AnimationActions
         
         private void InsertItem(string slot)
         {
-            var slotGo = npcGo.FindChildRecursively(slot);
-            VobCreator.CreateItem(props.currentItem, slotGo);
+            var slotGo = NpcGo.FindChildRecursively(slot);
+            VobCreator.CreateItem(Props.currentItem, slotGo);
 
-            props.usedItemSlot = slot;
+            Props.usedItemSlot = slot;
         }
 
         private void DestroyItem()
         {
             // FIXME - This is called to late. Feels like the animation for T_*_S0_2_Stand is glued with another.
             // FIXME - So that frame y is more like frame x+y, where y is the frames count from previous call.
-            var slotGo = npcGo.FindChildRecursively(props.usedItemSlot);
+            var slotGo = NpcGo.FindChildRecursively(Props.usedItemSlot);
             var item = slotGo!.transform.GetChild(0);
             Object.Destroy(item.gameObject);
         }

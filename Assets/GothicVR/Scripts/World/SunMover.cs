@@ -15,7 +15,7 @@ public class SunMover : MonoBehaviour
         sun = gameObject; // aka this
 
         var gameTime = GameTime.I;
-        sunPerformanceSetting = FeatureFlags.I.SunMovementPerformanceValue;
+        sunPerformanceSetting = FeatureFlags.I.sunMovementPerformanceValue;
         switch (sunPerformanceSetting)
         {
             case FeatureFlags.SunMovementPerformance.EveryIngameSecond:

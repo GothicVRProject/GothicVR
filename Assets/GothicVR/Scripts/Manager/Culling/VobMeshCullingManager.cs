@@ -231,16 +231,24 @@ namespace GVR.Manager.Culling
         {
             var transf = go.transform;
 
-            if (transf.TryGetComponent<MeshFilter>(out var mesh0)) // Lookup: /
-                return mesh0.mesh;
-            else if (transf.GetChild(0).TryGetComponent<MeshFilter>(out var mesh1)) // Lookup: /BIP 01
-                return mesh1.mesh;
-            else if (transf.GetChild(0).GetChild(0).TryGetComponent<MeshFilter>(out var mesh2)) // Lookup: /BIP 01/...
-                return mesh2.mesh;
-            else if (transf.childCount > 1 && transf.GetChild(1).TryGetComponent<MeshFilter>(out var mesh3)) // Lookup: /ZM_0
-                return mesh3.mesh;
-            else
+            try
+            {
+                if (transf.TryGetComponent<MeshFilter>(out var mesh0)) // Lookup: /
+                    return mesh0.mesh;
+                else if (transf.GetChild(0).TryGetComponent<MeshFilter>(out var mesh1)) // Lookup: /BIP 01
+                    return mesh1.mesh;
+                else if (transf.GetChild(0).GetChild(0).TryGetComponent<MeshFilter>(out var mesh2)) // Lookup: /BIP 01/...
+                    return mesh2.mesh;
+                else if (transf.childCount > 1 && transf.GetChild(1).TryGetComponent<MeshFilter>(out var mesh3)) // Lookup: /ZM_0
+                    return mesh3.mesh;
+                else
+                    return null;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
                 return null;
+            }
         }
 
         /// <summary>

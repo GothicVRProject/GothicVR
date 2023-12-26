@@ -13,7 +13,7 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            waitSeconds = action.f0;
+            waitSeconds = Action.Float0;
         }
 
         public override bool IsFinished()
@@ -23,7 +23,7 @@ namespace GVR.Npc.Actions.AnimationActions
             return waitSeconds <= 0f;
         }
 
-        public override void AnimationEventEndCallback()
+        public override void AnimationEndEventCallback()
         {
             throw new NotImplementedException("This method is not needed and shouldn't be called.");
         }

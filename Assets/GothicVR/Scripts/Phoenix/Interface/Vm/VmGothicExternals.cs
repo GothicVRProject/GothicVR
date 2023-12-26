@@ -193,21 +193,22 @@ namespace GVR.Phoenix.Interface.Vm
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void PrintDebug(IntPtr vmPtr)
         {
-            if (!FeatureFlags.I.ShowZspyLogs)
+            var message = PxVm.VmStackPopString(vmPtr);
+            
+            if (!FeatureFlags.I.showZspyLogs)
                 return;
             
-            var message = PxVm.VmStackPopString(vmPtr);
             Debug.Log($"[zspy]: {message}");
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void PrintDebugCh(IntPtr vmPtr)
         {
-            if (!FeatureFlags.I.ShowZspyLogs)
-                return;
-            
             var message = PxVm.VmStackPopString(vmPtr);
             var channel = PxVm.pxVmStackPopInt(vmPtr);
+
+            if (!FeatureFlags.I.showZspyLogs)
+                return;
             
             Debug.Log($"[zspy,{channel}]: {message}");
         }
@@ -215,21 +216,22 @@ namespace GVR.Phoenix.Interface.Vm
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void PrintDebugInst(IntPtr vmPtr)
         {
-            if (!FeatureFlags.I.ShowZspyLogs)
+            var message = PxVm.VmStackPopString(vmPtr);
+
+            if (!FeatureFlags.I.showZspyLogs)
                 return;
 
-            var message = PxVm.VmStackPopString(vmPtr);
             Debug.Log($"[zspy]: {message}");
         }
         
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void PrintDebugInstCh(IntPtr vmPtr)
         {
-            if (!FeatureFlags.I.ShowZspyLogs)
-                return;
-            
             var message = PxVm.VmStackPopString(vmPtr);
             var channel = PxVm.pxVmStackPopInt(vmPtr);
+
+            if (!FeatureFlags.I.showZspyLogs)
+                return;
             
             Debug.Log($"[zspy,{channel}]: {message}");
         }
@@ -618,10 +620,10 @@ namespace GVR.Phoenix.Interface.Vm
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Npc_IsOnFP(IntPtr vmPtr)
         {
-            var vobNamePrefix = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
+            var vobNamePart = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
             var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
 
-            var res = NpcHelper.ExtIsNpcOnFp(npcPtr, vobNamePrefix);
+            var res = NpcHelper.ExtIsNpcOnFp(npcPtr, vobNamePart);
 
             PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(res));
         }

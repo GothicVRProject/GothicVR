@@ -8,9 +8,13 @@ using UnityEngine;
 
 namespace GVR.Creator.Meshes
 {
-    public abstract class WorldMeshCreator : MeshCreator
+    public class WorldMeshCreator : AbstractMeshCreator
     {
-        public static async Task<GameObject> CreateAsync(WorldData world, GameObject parent, int meshesPerFrame)
+        // As we subclass the main Mesh Creator, we need to have a parent-child inheritance instance.
+        // Needed e.g. for overwriting PrepareMeshRenderer() to change specific behaviour.
+        private static readonly WorldMeshCreator Self = new();
+
+        public static async Task CreateAsync(WorldData world, GameObject parent, int meshesPerFrame)
         {
             var meshObj = new GameObject()
             {
@@ -54,9 +58,9 @@ namespace GVR.Creator.Meshes
                     var meshFilter = subSubMeshObj.AddComponent<MeshFilter>();
                     var meshRenderer = subSubMeshObj.AddComponent<MeshRenderer>();
 
-                    PrepareMeshRenderer(meshRenderer, subSubMesh);
-                    PrepareMeshFilter(meshFilter, subSubMesh);
-                    PrepareMeshCollider(subSubMeshObj, meshFilter.sharedMesh, subSubMesh.material);
+                    Self.PrepareMeshRenderer(meshRenderer, subSubMesh);
+                    Self.PrepareMeshFilter(meshFilter, subSubMesh);
+                    Self.PrepareMeshCollider(subSubMeshObj, meshFilter.sharedMesh, subSubMesh.material);
 
 #if UNITY_EDITOR
                     // Don't set transparent meshes as occluders.
@@ -84,7 +88,7 @@ namespace GVR.Creator.Meshes
                 WorldCullingManager.I.PrepareWorldCulling(worldMeshesForCulling);
             }
 
-            return meshObj;
+            return;
         }
     }
 }

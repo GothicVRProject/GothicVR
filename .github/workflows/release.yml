@@ -27,14 +27,14 @@ jobs:
     steps:
       # Checkout
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           lfs: true
           fetch-depth: 0
           clean: true
 
       # Cache
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: Library
           key: Library-${{ matrix.targetPlatform }}
@@ -51,7 +51,7 @@ jobs:
 
       # Build
       - name: Build project
-        uses: game-ci/unity-builder@v2
+        uses: game-ci/unity-builder@v3
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -60,7 +60,7 @@ jobs:
           versioning: Tag
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
-          buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
+          buildMethod: GVR.Editor.Builds.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
 
       # Zip
       - name: zip
@@ -70,16 +70,16 @@ jobs:
 #        run: pwd && ls -lah && ls -lah build && ls -lah build/${{ matrix.targetDevice }}
 
       # Release
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: build/${{ matrix.targetDevice }}/${{ matrix.targetDevice }}.zip
-          asset_name: GothicVR-${{ matrix.targetDevice }}.zip
-          asset_content_type: application/zip
+#      - name: Upload Release Asset
+#        id: upload-release-asset 
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ github.event.release.upload_url }}
+#          asset_path: build/${{ matrix.targetDevice }}/${{ matrix.targetDevice }}.zip
+#          asset_name: GothicVR-${{ matrix.targetDevice }}.zip
+#          asset_content_type: application/zip
 
 
 #      - uses: actions/upload-artifact@v2
