@@ -13,6 +13,7 @@ using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
 using Debug = UnityEngine.Debug;
+using Logger = ZenKit.Logger;
 
 namespace GVR.Bootstrap
 {
@@ -110,11 +111,11 @@ namespace GVR.Bootstrap
             }
         }
 
-        [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]
+        [MonoPInvokeCallback(typeof(Logger.Callback))]
         public static void ZenKitLoggerCallback(LogLevel level, string name, string message)
         {
             // Using fastest string concatenation as we might have a lot of logs here.
-            var messageString = string.Concat("level=", level, "name=", name, "message=", message);
+            var messageString = string.Concat("level=", level, ", name=", name, ", message=", message);
             
             switch (level)
             {
@@ -180,14 +181,15 @@ namespace GVR.Bootstrap
         }
 
         
-        private void LoadGothicVM(string G1Dir)
+        private void LoadGothicVM(string g1Dir)
         {
-            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
+            var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
             var vmPtr = VmGothicExternals.LoadVm(fullPath);
+            GameData.VmGothicPtr = vmPtr;
+
+            GameData.GothicVm = new DaedalusVm(fullPath);
 
             VmGothicExternals.RegisterExternals(vmPtr);
-
-            GameData.VmGothicPtr = vmPtr;
         }
 
         private void LoadSfxVM(string G1Dir)

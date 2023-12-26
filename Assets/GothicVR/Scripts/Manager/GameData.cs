@@ -15,10 +15,15 @@ namespace GVR.Phoenix.Interface
 {
     public static class GameData
     {
+        public static Vfs Vfs;
+        public static DaedalusVm GothicVm;
+        
         [Obsolete("Use new ZenKit API instead.")]
         public static IntPtr VfsPtr;
-        public static Vfs Vfs;
+        
+        [Obsolete("Use new ZenKit API instead.")]
         public static IntPtr VmGothicPtr;
+
         public static IntPtr VmSfxPtr; // Sound FX
         public static IntPtr VmPfxPtr; // Particle FX
         public static IntPtr VmMusicPtr;
@@ -70,6 +75,10 @@ namespace GVR.Phoenix.Interface
 
         public static void Dispose()
         {
+            // Needs to be reset as Unity won't clear static variables when closing game in EditorMode.
+            Vfs = null;
+            GothicVm = null;
+            
             if (VfsPtr != IntPtr.Zero)
             {
                 PxVfs.pxVfsDestroy(VfsPtr);

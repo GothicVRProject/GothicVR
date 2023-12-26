@@ -9,6 +9,7 @@ using GVR.Npc;
 using PxCs.Extensions;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit;
 using Random = UnityEngine.Random;
 
 namespace GVR.Phoenix.Interface.Vm
@@ -39,6 +40,13 @@ namespace GVR.Phoenix.Interface.Vm
         
         public static void RegisterExternals(IntPtr vmPtr)
         {
+            GameData.GothicVm.RegisterExternalDefault(DefaultExternal);
+            
+            
+            /*
+             * Legacy!
+             */
+            
             // Basic
             PxVm.pxVmRegisterExternalDefault(vmPtr, DefaultExternal);
             PxVm.pxVmRegisterExternal(vmPtr, "ConcatStrings", ConcatStrings);
@@ -106,6 +114,25 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_WasInState", Npc_WasInState);
         }
 
+        
+        
+        
+        
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalDefaultFunction))]
+        public static void DefaultExternal(DaedalusVm vm, DaedalusSymbol sym)
+        {
+            // FIXME: Once GVR is fully released, we can safely throw an exception as it tells us: The game will not work until you implement this missing function.
+            //throw new NotImplementedException("External >" + value + "< not registered but required by DaedalusVM.");
+            Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM.");
+        }
+        
+        
+        
+        
+        
+        
+        
+        
 #region Default
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalDefaultCallback))]

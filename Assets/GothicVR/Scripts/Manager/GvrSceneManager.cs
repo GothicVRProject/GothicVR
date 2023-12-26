@@ -75,9 +75,9 @@ namespace GVR.Manager
                 return;
             else
                 debugFreshlyDoneLoading = false;
-            
+
             if (FeatureFlags.I.createOcNpcs)
-                PxVm.CallFunction(GameData.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
+                GameData.GothicVm.Call("STARTUP_SUB_OLDCAMP");
         }
 
         private async Task LoadMainMenu()
