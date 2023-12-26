@@ -20,8 +20,8 @@ namespace GVR
             
             if (SettingsManager.CheckIfGothic1InstallationExists())
             {
-                PhoenixBootstrapper.I.invalidInstallationDirMessage.SetActive(false);
-                PhoenixBootstrapper.I.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
+                GVRBootstrapper.I.invalidInstallationDirMessage.SetActive(false);
+                GVRBootstrapper.I.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
             }
         }
     }

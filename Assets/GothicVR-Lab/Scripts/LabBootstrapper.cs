@@ -14,7 +14,7 @@ namespace GVR.GothicVR_Lab.Scripts
     {
         private void Awake()
         {
-            PhoenixBootstrapper.SetLanguage();
+            GVRBootstrapper.SetLanguage();
 
             var vdfsPath = Path.GetFullPath($"{SettingsManager.GameSettings.GothicIPath}/Data");
             GameData.VfsPtr = VfsBridge.LoadVfsInDirectory(vdfsPath);

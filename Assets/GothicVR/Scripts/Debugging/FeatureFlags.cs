@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
+using ZenKit;
 
 namespace GVR.Debugging
 {
@@ -18,6 +19,7 @@ namespace GVR.Debugging
         [FormerlySerializedAs("SkipMainMenu")]
         [Header("__________Developer__________")]
         [Tooltip("This will be used within Editor mode only. No effect for Standalone.")]
+        public LogLevel zenKitLogLevel;
         public bool skipMainMenu;
         public bool useXRDeviceSimulator;
 

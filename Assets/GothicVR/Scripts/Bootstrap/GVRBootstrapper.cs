@@ -16,7 +16,7 @@ using Debug = UnityEngine.Debug;
 
 namespace GVR.Bootstrap
 {
-    public class PhoenixBootstrapper : SingletonBehaviour<PhoenixBootstrapper>
+    public class GVRBootstrapper : SingletonBehaviour<GVRBootstrapper>
     {
         private bool isBootstrapped;
         public GameObject invalidInstallationDirMessage;
@@ -25,6 +25,7 @@ namespace GVR.Bootstrap
         private void Start()
         {
             PxLogging.pxLoggerSet(PxLoggerCallback);
+            ZenKit.Logger.Set(FeatureFlags.I.zenKitLogLevel, ZenKitLoggerCallback);
 
             // Just in case we forgot to disable it in scene view. ;-)
             invalidInstallationDirMessage.SetActive(false);
@@ -105,6 +106,30 @@ namespace GVR.Bootstrap
                         break;
 
                     Debug.Log(message);
+                    break;
+            }
+        }
+
+        [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]
+        public static void ZenKitLoggerCallback(LogLevel level, string name, string message)
+        {
+            // Using fastest string concatenation as we might have a lot of logs here.
+            var messageString = string.Concat("level=", level, "name=", name, "message=", message);
+            
+            switch (level)
+            {
+                case LogLevel.Error:
+                    var isVfsMessage = message.ContainsIgnoreCase("failed to find vfs entry");
+                    if (isVfsMessage && !FeatureFlags.I.showPhoenixVfsFileNotFoundErrors)
+                        break;
+
+                    Debug.LogError(messageString);
+                    break;
+                case LogLevel.Warning:
+                    Debug.LogWarning(messageString);
+                    break;
+                default:
+                    Debug.Log(messageString);
                     break;
             }
         }

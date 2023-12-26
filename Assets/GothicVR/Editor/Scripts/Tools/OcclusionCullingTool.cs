@@ -37,7 +37,7 @@ namespace GVR.Editor.Tools
             if (SettingsManager.GameSettings == null)
                 SettingsManager.LoadGameSettings();
 
-            PhoenixBootstrapper.SetLanguage();
+            GVRBootstrapper.SetLanguage();
 
             string fullPath = Path.GetFullPath(Path.Join(SettingsManager.GameSettings.GothicIPath, "Data"));
             _vfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);

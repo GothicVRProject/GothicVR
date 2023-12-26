@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using ZenKit;
 
 namespace GVR.Editor.Tools
 {
@@ -32,7 +33,8 @@ namespace GVR.Editor.Tools
 
             // Enums (Handled as Int internally)
             new (nameof(FeatureFlags.sunMovementPerformanceValue), typeof(int), FeatureFlags.SunMovementPerformance.EveryIngameMinute),
-
+            new (nameof(FeatureFlags.zenKitLogLevel), typeof(int), LogLevel.Error),
+            
             // Special types
             new (nameof(FeatureFlags.vobCullingSmall), typeof(FeatureFlags.VobCullingGroupSetting),
                 new FeatureFlags.VobCullingGroupSetting{ maxObjectSize = 1.2f, cullingDistance = 50f}),
@@ -80,6 +82,9 @@ namespace GVR.Editor.Tools
                     case "Int32":
                     case "SunMovementPerformance":
                         field.SetValue(featureFlags, 0);
+                        break;
+                    case "LogLevel":
+                        field.SetValue(featureFlags, LogLevel.Error);
                         break;
                     case "String":
                             field.SetValue(featureFlags, "");
