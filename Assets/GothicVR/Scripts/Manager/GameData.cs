@@ -78,6 +78,7 @@ namespace GVR.Phoenix.Interface
             // Needs to be reset as Unity won't clear static variables when closing game in EditorMode.
             Vfs = null;
             GothicVm = null;
+            World = null;
             
             if (VfsPtr != IntPtr.Zero)
             {

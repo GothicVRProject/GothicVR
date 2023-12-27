@@ -73,7 +73,7 @@ namespace GVR.Creator
         private static WorldData LoadWorld(string worldName)
         {
             var zkWorld = new ZenKit.World(GameData.Vfs, worldName);
-            var zkMesh = zkWorld.Mesh;
+            var zkMesh = zkWorld.Mesh.Cache();
             var zkBspTree = zkWorld.BspTree.Cache();
             var zkWayNet = zkWorld.WayNet.Cache();
 
@@ -84,13 +84,14 @@ namespace GVR.Creator
 
             WorldData world = new()
             {
+                world = zkWorld,
                 vobs = zkWorld.RootObjects,
                 wayNet = zkWayNet
             };
 
             var subMeshes = CreateSubMeshesForUnity(zkMesh, zkBspTree);
             world.subMeshes = subMeshes;
-
+            
             return world;
         }
 

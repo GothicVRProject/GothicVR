@@ -11,6 +11,9 @@ namespace GVR.Phoenix.Data
     /// </summary>
     public class WorldData
     {
+        // We need to store it as we need the pointer to it for load+save of un-cached vobs.
+        public IWorld world;
+        
         public Dictionary<int, SubMeshData> subMeshes;
 
         public class SubMeshData
