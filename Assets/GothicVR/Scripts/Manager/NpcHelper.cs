@@ -10,6 +10,7 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Properties;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit.Daedalus;
 
 namespace GVR.Manager
 {
@@ -17,17 +18,17 @@ namespace GVR.Manager
     {
         private const float fpLookupDistance = 20f; // meter
 
-        public static bool ExtIsMobAvailable(IntPtr npcPtr, string vobName)
+        public static bool ExtIsMobAvailable(NpcInstance npcInstance, string vobName)
         {
-            var npc = GetNpc(npcPtr);
+            var npc = GetNpc(npcInstance);
             var vob = VobHelper.GetFreeInteractableWithin10M(npc.transform.position, vobName);
 
             return (vob != null);
         }
         
-        public static bool ExtWldIsFPAvailable(IntPtr npcPtr, string fpNamePart)
+        public static bool ExtWldIsFPAvailable(NpcInstance npc, string fpNamePart)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             var npcGo = props.gameObject;
             var freePoints = WayNetHelper.FindFreePointsWithName(npcGo.transform.position, fpNamePart, fpLookupDistance);
 
@@ -51,9 +52,9 @@ namespace GVR.Manager
             return WayNetHelper.FindNearestWayPoint(pos).Name;
         }
 
-        public static bool ExtIsNextFpAvailable(IntPtr npcPtr, string fpNamePart)
+        public static bool ExtIsNextFpAvailable(NpcInstance npc, string fpNamePart)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             var pos = props.transform.position;
             var fp = WayNetHelper.FindNearestFreePoint(pos, fpNamePart);
 
@@ -86,10 +87,10 @@ namespace GVR.Manager
             return freePoint.Name.ContainsIgnoreCase(vobNamePart);
         }
 
-        public static bool ExtWldDetectNpcEx(IntPtr npcPtr, int npcInstance, int aiState, int guild, bool ignorePlayer)
+        public static bool ExtWldDetectNpcEx(NpcInstance npc, int npcInstance, int aiState, int guild, bool ignorePlayer)
         {
-            var npc = GetNpc(npcPtr);
-            var npcPos = npc.transform.position;
+            var npcGo = GetNpc(npc);
+            var npcPos = npcGo.transform.position;
             
             // FIXME - currently hard coded with 20m, but needs to be imported from Phoenix: daedalus_classes.h::c_npc::senses and senses_range
             float distance = 20f; // 20m
@@ -101,7 +102,7 @@ namespace GVR.Manager
             
             var foundNpc = LookupCache.NpcCache.Values
                 .Where(i => Vector3.Distance(i.gameObject.transform.position, npcPos) <= distance)
-                .Where(i => i.gameObject != npc)
+                .Where(i => i.gameObject != npcGo)
                 .OrderBy(i => Vector3.Distance(i.gameObject.transform.position, npcPos))
                 .FirstOrDefault();
 
@@ -116,10 +117,20 @@ namespace GVR.Manager
                 return 0;
         }
         
-        
+
+        private static GameObject GetNpc(NpcInstance npc)
+        {
+            return GetProperties(npc).gameObject;
+        }
+
         private static GameObject GetNpc(IntPtr npcPtr)
         {
             return GetProperties(npcPtr).gameObject;
+        }
+
+        private static NpcProperties GetProperties(NpcInstance npc)
+        {
+            return LookupCache.NpcCache[npc.Index];
         }
         
         private static NpcProperties GetProperties(IntPtr npcPtr)

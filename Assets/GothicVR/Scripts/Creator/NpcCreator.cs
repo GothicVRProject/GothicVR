@@ -43,7 +43,13 @@ namespace GVR.Creator
         {
             return GetProperties(npcPtr).gameObject;
         }
-        
+
+        private static NpcProperties GetProperties(NpcInstance npc)
+        {
+            return LookupCache.NpcCache[npc.Index];
+        }
+
+        [Obsolete]
         private static NpcProperties GetProperties(IntPtr npcPtr)
         {
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
@@ -57,7 +63,12 @@ namespace GVR.Creator
 
             return props;
         }
-        
+
+        private static GameObject GetNpcGo(NpcInstance npcInstance)
+        {
+            return GetProperties(npcInstance).gameObject;
+        }
+
         /// <summary>
         /// Return cached GameObject based on lookup through IntPtr
         /// </summary>
@@ -65,6 +76,7 @@ namespace GVR.Creator
         {
             return GetProperties(npcPtr).gameObject;
         }
+
 
         /// <summary>
         /// Original Gothic uses this function to spawn an NPC instance into the world.
@@ -90,7 +102,7 @@ namespace GVR.Creator
             if (LookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<NpcProperties>()))
             {
                 props.npcInstance = GameData.GothicVm.InitInstance<NpcInstance>(npcSymbol);
-                
+
                 var pxNpc = PxVm.InitializeNpc(GameData.VmGothicPtr, (uint)npcInstance);
                 props.npc = pxNpc;
             }
@@ -155,30 +167,30 @@ namespace GVR.Creator
             
         }
         
-        public static void ExtTaMin(VmGothicExternals.ExtTaMinData data)
+        public static void ExtTaMin(NpcInstance npcInstance, int startH, int startM, int stopH, int stopM, int action, string waypoint)
         {
-            var npc = GetNpcGo(data.Npc);
+            var npc = GetNpcGo(npcInstance);
             
             // If we put h=24, DateTime will throw an error instead of rolling.
-            var stop_hFormatted = data.StopH == 24 ? 0 : data.StopH;
+            var stop_hFormatted = (stopH == 24) ? 0 : stopH;
 
             RoutineData routine = new()
             {
-                start_h = data.StartH,
-                start_m = data.StartM,
-                start = new(1, 1, 1, data.StartH, data.StartM, 0),
-                stop_h = data.StopH,
-                stop_m = data.StopM,
-                stop = new(1, 1, 1, stop_hFormatted, data.StopM, 0),
-                action = data.Action,
-                waypoint = data.Waypoint
+                start_h = startH,
+                start_m = startM,
+                start = new(1, 1, 1, startH, startM, 0),
+                stop_h = stopH,
+                stop_m = stopM,
+                stop = new(1, 1, 1, stop_hFormatted, stopM, 0),
+                action = action,
+                waypoint = waypoint
             };
 
             npc.GetComponent<Routine>().routines.Add(routine);
 
             // Add element if key not yet exists.
-            GameData.npcRoutines.TryAdd(data.Npc, new());
-            GameData.npcRoutines[data.Npc].Add(routine);
+            GameData.npcRoutines.TryAdd(npcInstance.Index, new());
+            GameData.npcRoutines[npcInstance.Index].Add(routine);
         }
         
         public static void ExtMdlSetVisual(IntPtr npcPtr, string visual)
@@ -253,9 +265,9 @@ namespace GVR.Creator
             props.perceptionTime = time;
         }
 
-        public static void ExtNpcSetTalentValue(IntPtr npcPtr, VmGothicEnums.Talent talent, int level)
+        public static void ExtNpcSetTalentValue(NpcInstance npc, VmGothicEnums.Talent talent, int level)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.Talents[talent] = level;
         }
 

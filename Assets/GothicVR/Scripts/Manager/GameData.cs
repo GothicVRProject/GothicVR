@@ -47,7 +47,7 @@ namespace GVR.Phoenix.Interface
         public static readonly List<VobProperties> VobsInteractable = new(); 
         
         // FIXME Find a better place for the NPC routines. E.g. on the NPCs itself? But we e.g. need to have a static NPCObject List to do so.
-        public static Dictionary<IntPtr, List<RoutineData>> npcRoutines = new();
+        public static Dictionary<uint, List<RoutineData>> npcRoutines = new();
 
         public static Scene? WorldScene;
 

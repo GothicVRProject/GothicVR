@@ -10,6 +10,7 @@ using PxCs.Extensions;
 using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
+using ZenKit.Daedalus;
 using Random = UnityEngine.Random;
 
 namespace GVR.Phoenix.Interface.Vm
@@ -41,12 +42,50 @@ namespace GVR.Phoenix.Interface.Vm
 
         public static void RegisterExternals()
         {
-            GameData.GothicVm.RegisterExternalDefault(DefaultExternal);
-            GameData.GothicVm.RegisterExternal<int, string>("Wld_InsertNpc", Wld_InsertNpc);
-            GameData.GothicVm.RegisterExternal<IntPtr, int, int>("Npc_SetTalentValue", Npc_SetTalentValue);
+            var vm = GameData.GothicVm;
+            vm.RegisterExternalDefault(DefaultExternal);
+
+            // AI
+            // Apply Options
+            // Doc
+            // Helper
+            vm.RegisterExternal<int, int>("Hlp_Random", Hlp_Random);
+            vm.RegisterExternal<int, string, string>("Hlp_StrCmp", Hlp_StrCmp);
+            // vm.RegisterExternal<int, ItemInstance, int>("Hlp_IsItem", Hlp_IsItem); // Not yet implemented
+
+            // Info
+            // Log
+            // Model
+            // Mission
+            // Mob
+            // NPC
+            vm.RegisterExternal<NpcInstance, int, int>("Npc_SetTalentValue", Npc_SetTalentValue);
+
+            // Print
+            vm.RegisterExternal<string>("PrintDebug", PrintDebug);
+            vm.RegisterExternal<int, string>("PrintDebugCh", PrintDebugCh);
+            vm.RegisterExternal<string>("PrintDebugInst", PrintDebugInst);
+            vm.RegisterExternal<int, string>("PrintDebugInstCh", PrintDebugInstCh);
+
+            // Sound
+            // Day Routine
+            // vm.RegisterExternal<NpcInstance, int, int, int, int, int, string>("TA_MIN", TA_MIN);
+
+            // World
+            vm.RegisterExternal<int, string>("Wld_InsertNpc", Wld_InsertNpc);
+            vm.RegisterExternal<int, NpcInstance, string>("Wld_IsFPAvailable", Wld_IsFPAvailable);
+            vm.RegisterExternal<int, NpcInstance, string>("Wld_IsMobAvailable", Wld_IsMobAvailable);
+            vm.RegisterExternal<int, NpcInstance, int, int, int, int>("Wld_DetectNpcEx", Wld_DetectNpcEx);
+            vm.RegisterExternal<int, NpcInstance, string>("Wld_IsNextFPAvailable", Wld_IsNextFPAvailable);
+
+            // Misc
+            vm.RegisterExternal<string, string, string>("ConcatStrings", ConcatStrings);
+            vm.RegisterExternal<string, int>("IntToString", IntToString);
+            vm.RegisterExternal<string, float>("FloatToString", FloatToString);
+            vm.RegisterExternal<int, float>("FloatToInt", FloatToInt);
+            vm.RegisterExternal<float, int>("IntToFloat", IntToFloat);
         }
 
-                
         [MonoPInvokeCallback(typeof(DaedalusVm.ExternalDefaultFunction))]
         public static void DefaultExternal(DaedalusVm vm, DaedalusSymbol sym)
         {
@@ -55,17 +94,188 @@ namespace GVR.Phoenix.Interface.Vm
             Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM.");
         }
 
+
+
+        #region Print
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void PrintDebug(string message)
+        {
+            if (!FeatureFlags.I.showZspyLogs)
+                return;
+
+            Debug.Log($"[zspy]: {message}");
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void PrintDebugCh(int channel, string message)
+        {
+            if (!FeatureFlags.I.showZspyLogs)
+                return;
+
+            Debug.Log($"[zspy,{channel}]: {message}");
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void PrintDebugInst(string message)
+        {
+            if (!FeatureFlags.I.showZspyLogs)
+                return;
+
+            Debug.Log($"[zspy]: {message}");
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void PrintDebugInstCh(int channel, string message)
+        {
+            if (!FeatureFlags.I.showZspyLogs)
+                return;
+
+            Debug.Log($"[zspy,{channel}]: {message}");
+        }
+
+        #endregion
+        #region NPC
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void Npc_SetTalentValue(NpcInstance npc, int talent, int level)
+        {
+            NpcCreator.ExtNpcSetTalentValue(npc, (VmGothicEnums.Talent)talent, level);
+        }
+
+        #endregion
+        #region Day Routine
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void TA_MIN(NpcInstance npc, int startH, int startM, int stopH, int stopM, int action, string waypoint)
+        {
+            NpcCreator.ExtTaMin(npc, startH, startM, stopH, stopM, action, waypoint);
+        }
+
+        #endregion
+        #region World
+
         [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
         public static void Wld_InsertNpc(int npcInstance, string spawnPoint)
         {
             NpcCreator.ExtWldInsertNpc(npcInstance, spawnPoint);
         }
-        
+
         [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
-        public static void Npc_SetTalentValue(IntPtr npcPtr, int talent, int level)
+        public static int Wld_IsFPAvailable(NpcInstance npc, string fpName)
         {
-            NpcCreator.ExtNpcSetTalentValue(npcPtr, (VmGothicEnums.Talent)talent, level);
+
+            var response = NpcHelper.ExtWldIsFPAvailable(npc, fpName);
+            return Convert.ToInt32(response);
         }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static int Wld_IsMobAvailable(NpcInstance npc, string vobName)
+        {
+            var res = NpcHelper.ExtIsMobAvailable(npc, vobName);
+            return Convert.ToInt32(res);
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static int Wld_DetectNpcEx(NpcInstance npc, int npcInstance, int aiState, int guild, int detectPlayer)
+        {
+            // Logic from Daedalus mentions, that the player will be ignored if 0. Not "detect" if 1.
+            var ignorePlayer = !Convert.ToBoolean(detectPlayer);
+
+            var res = NpcHelper.ExtWldDetectNpcEx(npc, npcInstance, aiState, guild, ignorePlayer);
+
+            return Convert.ToInt32(res);
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static int Wld_IsNextFPAvailable(NpcInstance npc, string fpNamePart)
+        {
+            var result = NpcHelper.ExtIsNextFpAvailable(npc, fpNamePart);
+            return Convert.ToInt32(result);
+        }
+
+        #endregion
+        #region Misc
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static string ConcatStrings(string str1, string str2)
+        {
+            return str1 + str2;
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static string IntToString(int x)
+        {
+            return x.ToString();
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static string FloatToString(float x)
+        {
+            return x.ToString(CultureInfo.InvariantCulture);
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static int FloatToInt(float x)
+        {
+            return (int)x;
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static float IntToFloat(int x)
+        {
+            return x;
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static int Hlp_StrCmp(string s1, string s2)
+        {
+            return (s1 == s2) ? 1 : 0;
+        }
+
+        #endregion
+
+        // [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        // public static int Hlp_IsItem(ItemInstance item, int instanceName)
+        // {
+            // TODO - Needs to be reimplemented.
+        //     var compareItemSymbol = PxVm.pxVmStackPopInt(vmPtr);
+        //     var itemRef = PxVm.pxVmStackPopInstance(vmPtr);
+        //
+        //     var compareItemRef = AssetCache.TryGetItemData((uint)compareItemSymbol);
+        //
+        //     bool result;
+        //     if (compareItemRef == null)
+        //         result = false;
+        //     else
+        //         result = compareItemRef.instancePtr == itemRef;
+        //
+        //     PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(result));
+        // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         [Obsolete("Use new ZenKit logic instead.")]
@@ -73,20 +283,6 @@ namespace GVR.Phoenix.Interface.Vm
         {
             // Basic
             PxVm.pxVmRegisterExternalDefault(vmPtr, DefaultExternal);
-            PxVm.pxVmRegisterExternal(vmPtr, "ConcatStrings", ConcatStrings);
-            PxVm.pxVmRegisterExternal(vmPtr, "IntToString", IntToString);
-            PxVm.pxVmRegisterExternal(vmPtr, "FloatToString", FloatToString);
-            PxVm.pxVmRegisterExternal(vmPtr, "FloatToInt", FloatToInt);
-            PxVm.pxVmRegisterExternal(vmPtr, "IntToFloat", IntToFloat);
-            PxVm.pxVmRegisterExternal(vmPtr, "Hlp_Random", Hlp_Random);
-            PxVm.pxVmRegisterExternal(vmPtr, "Hlp_StrCmp", Hlp_StrCmp);
-            PxVm.pxVmRegisterExternal(vmPtr, "Hlp_IsItem", Hlp_IsItem);
-
-            // Debug
-            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebug", PrintDebug);
-            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugCh", PrintDebugCh);
-            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInst", PrintDebugInst);
-            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInstCh", PrintDebugInstCh);
 
             PxVm.pxVmRegisterExternal(vmPtr, "AI_StandUp", AI_StandUp);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_SetWalkMode", AI_SetWalkMode);
@@ -99,13 +295,7 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "AI_UseMob", AI_UseMob);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_GoToNextFP", AI_GoToNextFP);
 
-            PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
-            PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsMobAvailable", Wld_IsMobAvailable);
-            PxVm.pxVmRegisterExternal(vmPtr, "Wld_DetectNpcEx", Wld_DetectNpcEx);
-            PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsNextFPAvailable", Wld_IsNextFPAvailable);
-
             // NPC visuals
-            PxVm.pxVmRegisterExternal(vmPtr, "TA_MIN", TA_MIN);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisual", Mdl_SetVisual);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_ApplyOverlayMds", Mdl_ApplyOverlayMds);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisualBody", Mdl_SetVisualBody);
@@ -131,7 +321,6 @@ namespace GVR.Phoenix.Interface.Vm
             // PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItem", Npc_RemoveInvItem);
             // PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItems", Npc_RemoveInvItems);
             PxVm.pxVmRegisterExternal(vmPtr, "EquipItem", EquipItem);
-            PxVm.pxVmRegisterExternal(vmPtr, "Npc_SetTalentValue", Npc_SetTalentValue);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_GetNearestWP", Npc_GetNearestWP);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_IsOnFP", Npc_IsOnFP);
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_WasInState", Npc_WasInState);
@@ -149,208 +338,14 @@ namespace GVR.Phoenix.Interface.Vm
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void ConcatStrings(IntPtr vmPtr)
+        public static int Hlp_Random(int n0)
         {
-            var str2 = PxVm.VmStackPopString(vmPtr);
-            var str1 = PxVm.VmStackPopString(vmPtr);
-            
-            PxVm.pxVmStackPushString(vmPtr, str1 + str2);
-        }
-        
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void IntToString(IntPtr vmPtr)
-        {
-            var val = PxVm.pxVmStackPopInt(vmPtr);
-            PxVm.pxVmStackPushString(vmPtr, val.ToString());
+            return Random.Range(0, n0 - 1);
         }
 
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void FloatToString(IntPtr vmPtr)
-        {
-            var val = PxVm.pxVmStackPopFloat(vmPtr);
-            PxVm.pxVmStackPushString(vmPtr, val.ToString(CultureInfo.InvariantCulture));
-        }
 
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void FloatToInt(IntPtr vmPtr)
-        {
-            var val = PxVm.pxVmStackPopFloat(vmPtr);
-            PxVm.pxVmStackPushInt(vmPtr, (int)val);
-        }
-
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void IntToFloat(IntPtr vmPtr)
-        {
-            var val = PxVm.pxVmStackPopInt(vmPtr);
-            PxVm.pxVmStackPushFloat(vmPtr, val);
-        }
-
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void Hlp_Random(IntPtr vmPtr)
-        {
-            var max = PxVm.pxVmStackPopInt(vmPtr);
-            var rand = Random.Range(0, max - 1);
-            
-            PxVm.pxVmStackPushInt(vmPtr, rand);
-        }
-
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void Hlp_StrCmp(IntPtr vmPtr)
-        {
-            var str2 = PxVm.pxVmStackPopString(vmPtr);
-            var str1 = PxVm.pxVmStackPopString(vmPtr);
-
-            var equal = (str1 == str2) ? 1 : 0;
-            
-            PxVm.pxVmStackPushInt(vmPtr, equal);
-        }
-
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void Hlp_IsItem(IntPtr vmPtr)
-        {
-            var compareItemSymbol = PxVm.pxVmStackPopInt(vmPtr);
-            var itemRef = PxVm.pxVmStackPopInstance(vmPtr);
-
-            var compareItemRef = AssetCache.TryGetItemData((uint)compareItemSymbol);
-
-            bool result;
-            if (compareItemRef == null)
-                result = false;
-            else
-                result = compareItemRef.instancePtr == itemRef;
-            
-            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(result));
-        }
-
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void PrintDebug(IntPtr vmPtr)
-        {
-            var message = PxVm.VmStackPopString(vmPtr);
-            
-            if (!FeatureFlags.I.showZspyLogs)
-                return;
-            
-            Debug.Log($"[zspy]: {message}");
-        }
-        
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void PrintDebugCh(IntPtr vmPtr)
-        {
-            var message = PxVm.VmStackPopString(vmPtr);
-            var channel = PxVm.pxVmStackPopInt(vmPtr);
-
-            if (!FeatureFlags.I.showZspyLogs)
-                return;
-            
-            Debug.Log($"[zspy,{channel}]: {message}");
-        }
-        
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void PrintDebugInst(IntPtr vmPtr)
-        {
-            var message = PxVm.VmStackPopString(vmPtr);
-
-            if (!FeatureFlags.I.showZspyLogs)
-                return;
-
-            Debug.Log($"[zspy]: {message}");
-        }
-        
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void PrintDebugInstCh(IntPtr vmPtr)
-        {
-            var message = PxVm.VmStackPopString(vmPtr);
-            var channel = PxVm.pxVmStackPopInt(vmPtr);
-
-            if (!FeatureFlags.I.showZspyLogs)
-                return;
-            
-            Debug.Log($"[zspy,{channel}]: {message}");
-        }
         
 #endregion
-
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void Wld_IsFPAvailable(IntPtr vmPtr)
-        {
-            var fpName = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
-            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-
-            var response = NpcHelper.ExtWldIsFPAvailable(npcPtr, fpName);
-            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(response));
-        }
-
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void Wld_IsMobAvailable(IntPtr vmPtr)
-        {
-            var vobName = PxVm.pxVmStackPopString(vmPtr).MarshalAsString();
-            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-
-            var res = NpcHelper.ExtIsMobAvailable(npcPtr, vobName);
-
-            PxVm.pxVmStackPushInt(vmPtr , Convert.ToInt32(res));
-        }
-
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void Wld_DetectNpcEx(IntPtr vmPtr)
-        {
-            var detectPlayer = PxVm.pxVmStackPopInt(vmPtr);
-            var guild = PxVm.pxVmStackPopInt(vmPtr);
-            var aiState = PxVm.pxVmStackPopInt(vmPtr);
-            var npcInstance = PxVm.pxVmStackPopInt(vmPtr);
-            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-
-            // Logic from Daedalus mentions, that the player will be ignored if 0. Not "detect" if 1.
-            var ignorePlayer = !Convert.ToBoolean(detectPlayer);
-            
-            var res = NpcHelper.ExtWldDetectNpcEx(npcPtr, npcInstance, aiState, guild, ignorePlayer);
-            
-            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(res));
-        }
-        
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void Wld_IsNextFPAvailable(IntPtr vmPtr)
-        {
-            var fpNamePart = PxVm.VmStackPopString(vmPtr);
-            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-
-            var result = NpcHelper.ExtIsNextFpAvailable(npcPtr, fpNamePart);
-            
-            PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(result));
-        }
-
-        public struct ExtTaMinData
-        {
-            public IntPtr Npc;
-            public int StartH;
-            public int StartM;
-            public int StopH;
-            public int StopM;
-            public int Action;
-            public string Waypoint;
-        }
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void TA_MIN(IntPtr vmPtr)
-        {
-            var waypoint = PxVm.VmStackPopString(vmPtr);
-            var action = PxVm.pxVmStackPopInt(vmPtr);
-            var stopM = PxVm.pxVmStackPopInt(vmPtr);
-            var stopH = PxVm.pxVmStackPopInt(vmPtr);
-            var startM = PxVm.pxVmStackPopInt(vmPtr);
-            var startH = PxVm.pxVmStackPopInt(vmPtr);
-            var npc = PxVm.pxVmStackPopInstance(vmPtr);
-
-            NpcCreator.ExtTaMin(new()
-            {
-                Npc = npc,
-                StartH = startH,
-                StartM = startM,
-                StopH = stopH,
-                StopM = stopM,
-                Action = action,
-                Waypoint = waypoint
-            });
-        }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void AI_StandUp(IntPtr vmPtr)
