@@ -6,12 +6,17 @@ using GVR.Vob.WayNet;
 using PxCs.Data.Vm;
 using UnityEngine;
 using UnityEngine.Serialization;
+using ZenKit.Daedalus;
 
 namespace GVR.Properties
 {
     public class NpcProperties : AbstractProperties
     {
+        public NpcInstance npcInstance;
+            
+            
         public IntPtr npcPtr;
+        [Obsolete("Use ZenKit instead.")]
         public PxVmNpcData npc;
         public AudioSource npcSound;
         public GameObject rootMotionGo;

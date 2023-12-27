@@ -14,7 +14,10 @@ using GVR.Vob.WayNet;
 using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit;
+using ZenKit.Daedalus;
 using Object = UnityEngine.Object;
+using WayPoint = GVR.Vob.WayNet.WayPoint;
 
 namespace GVR.Creator
 {
@@ -74,10 +77,20 @@ namespace GVR.Creator
         {
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             var props = newNpc.GetComponent<NpcProperties>();
+
+            var npcSymbol = GameData.GothicVm.GetSymbolByIndex((uint)npcInstance);
+            
+            if (npcSymbol == null)
+            {
+                Debug.LogError($"Npc with ID {npcInstance} not found.");
+                return;
+            }
             
             // Humans are singletons.
             if (LookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<NpcProperties>()))
             {
+                props.npcInstance = GameData.GothicVm.InitInstance<NpcInstance>(npcSymbol);
+                
                 var pxNpc = PxVm.InitializeNpc(GameData.VmGothicPtr, (uint)npcInstance);
                 props.npc = pxNpc;
             }

@@ -37,16 +37,40 @@ namespace GVR.Phoenix.Interface.Vm
 
             return bufferPtr;
         }
-        
-        public static void RegisterExternals(IntPtr vmPtr)
+
+
+        public static void RegisterExternals()
         {
             GameData.GothicVm.RegisterExternalDefault(DefaultExternal);
-            
-            
-            /*
-             * Legacy!
-             */
-            
+            GameData.GothicVm.RegisterExternal<int, string>("Wld_InsertNpc", Wld_InsertNpc);
+            GameData.GothicVm.RegisterExternal<IntPtr, int, int>("Npc_SetTalentValue", Npc_SetTalentValue);
+        }
+
+                
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalDefaultFunction))]
+        public static void DefaultExternal(DaedalusVm vm, DaedalusSymbol sym)
+        {
+            // FIXME: Once GVR is fully released, we can safely throw an exception as it tells us: The game will not work until you implement this missing function.
+            //throw new NotImplementedException("External >" + value + "< not registered but required by DaedalusVM.");
+            Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM.");
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void Wld_InsertNpc(int npcInstance, string spawnPoint)
+        {
+            NpcCreator.ExtWldInsertNpc(npcInstance, spawnPoint);
+        }
+        
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void Npc_SetTalentValue(IntPtr npcPtr, int talent, int level)
+        {
+            NpcCreator.ExtNpcSetTalentValue(npcPtr, (VmGothicEnums.Talent)talent, level);
+        }
+
+
+        [Obsolete("Use new ZenKit logic instead.")]
+        public static void RegisterLegacyExternals(IntPtr vmPtr)
+        {
             // Basic
             PxVm.pxVmRegisterExternalDefault(vmPtr, DefaultExternal);
             PxVm.pxVmRegisterExternal(vmPtr, "ConcatStrings", ConcatStrings);
@@ -62,9 +86,9 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebug", PrintDebug);
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugCh", PrintDebugCh);
             PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInst", PrintDebugInst);
-            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInstCh", PrintDebugInstCh); 
+            PxVm.pxVmRegisterExternal(vmPtr, "PrintDebugInstCh", PrintDebugInstCh);
 
-            PxVm.pxVmRegisterExternal(vmPtr, "AI_StandUp", AI_StandUp); 
+            PxVm.pxVmRegisterExternal(vmPtr, "AI_StandUp", AI_StandUp);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_SetWalkMode", AI_SetWalkMode);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_GotoWP", AI_GotoWP);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_AlignToWP", AI_AlignToWP);
@@ -74,13 +98,12 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "AI_Wait", AI_Wait);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_UseMob", AI_UseMob);
             PxVm.pxVmRegisterExternal(vmPtr, "AI_GoToNextFP", AI_GoToNextFP);
-            
-            PxVm.pxVmRegisterExternal(vmPtr, "Wld_InsertNpc", Wld_InsertNpc);
+
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsFPAvailable", Wld_IsFPAvailable);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsMobAvailable", Wld_IsMobAvailable);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_DetectNpcEx", Wld_DetectNpcEx);
             PxVm.pxVmRegisterExternal(vmPtr, "Wld_IsNextFPAvailable", Wld_IsNextFPAvailable);
-                
+
             // NPC visuals
             PxVm.pxVmRegisterExternal(vmPtr, "TA_MIN", TA_MIN);
             PxVm.pxVmRegisterExternal(vmPtr, "Mdl_SetVisual", Mdl_SetVisual);
@@ -114,24 +137,6 @@ namespace GVR.Phoenix.Interface.Vm
             PxVm.pxVmRegisterExternal(vmPtr, "Npc_WasInState", Npc_WasInState);
         }
 
-        
-        
-        
-        
-        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalDefaultFunction))]
-        public static void DefaultExternal(DaedalusVm vm, DaedalusSymbol sym)
-        {
-            // FIXME: Once GVR is fully released, we can safely throw an exception as it tells us: The game will not work until you implement this missing function.
-            //throw new NotImplementedException("External >" + value + "< not registered but required by DaedalusVM.");
-            Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM.");
-        }
-        
-        
-        
-        
-        
-        
-        
         
 #region Default
 
@@ -264,16 +269,6 @@ namespace GVR.Phoenix.Interface.Vm
         }
         
 #endregion
-
-
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void Wld_InsertNpc(IntPtr vmPtr)
-        {
-            var spawnpoint = PxVm.VmStackPopString(vmPtr);
-            var npcInstance = PxVm.pxVmStackPopInt(vmPtr);
-            
-            NpcCreator.ExtWldInsertNpc(npcInstance, spawnpoint);
-        }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
         public static void Wld_IsFPAvailable(IntPtr vmPtr)
@@ -622,16 +617,6 @@ namespace GVR.Phoenix.Interface.Vm
             
             // FIXME - In OpenGothic it adds MDS overlays based on skill level.
             // NpcCreator.ExtNpcSetTalentSkill(npcPtr, talent, level);
-        }
-
-        [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
-        public static void Npc_SetTalentValue(IntPtr vmPtr)
-        {
-            var level = PxVm.pxVmStackPopInt(vmPtr);
-            var talent = (VmGothicEnums.Talent)PxVm.pxVmStackPopInt(vmPtr);
-            var npcPtr = PxVm.pxVmStackPopInstance(vmPtr);
-            
-            NpcCreator.ExtNpcSetTalentValue(npcPtr, talent, level);
         }
 
         [MonoPInvokeCallback(typeof(PxVm.PxVmExternalCallback))]
