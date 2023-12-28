@@ -31,7 +31,7 @@ namespace GVR.Properties
         public string overlayMdsName;
         public string overlayMdhName => overlayMdsName;
         
-        public List<PxVmItemData> EquippedItems = new();
+        public List<ItemInstance> EquippedItems = new();
         public VmGothicExternals.ExtSetVisualBodyData BodyData;
         
         // Perceptions

@@ -190,7 +190,6 @@ namespace GVR.Bootstrap
             GameData.GothicVm = new DaedalusVm(fullPath);
 
             VmGothicExternals.RegisterExternals();
-            VmGothicExternals.RegisterLegacyExternals(vmPtr);
         }
 
         private void LoadSfxVM(string G1Dir)

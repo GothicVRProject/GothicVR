@@ -66,9 +66,9 @@ namespace GVR.Demo
 			
 			foreach (var item in content)
 			{
-				var pxItem = AssetCache.TryGetItemData(item.name);
+				var itemInstance = AssetCache.TryGetItemData(item.name);
 
-				var mrm = AssetCache.TryGetMrm(pxItem?.visual);
+				var mrm = AssetCache.TryGetMrm(itemInstance.Visual);
 				var itemObj = MeshObjectCreator.CreateVob(item.name, mrm, default, default, true, itemsObj);
 			}
 		}

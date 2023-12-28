@@ -12,6 +12,7 @@ using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
+using ZenKit.Daedalus;
 using Font = ZenKit.Font;
 using Object = UnityEngine.Object;
 using Texture = ZenKit.Texture;
@@ -29,7 +30,7 @@ namespace GVR.Caches
         private static readonly Dictionary<string, IModelMesh> MdmCache = new();
         private static readonly Dictionary<string, IMultiResolutionMesh> MrmCache = new();
         private static readonly Dictionary<string, IMorphMesh> MmbCache = new();
-        private static readonly Dictionary<string, PxVmItemData> ItemDataCache = new();
+        private static readonly Dictionary<string, ItemInstance> ItemDataCache = new();
         private static readonly Dictionary<string, PxVmMusicData> MusicDataCache = new();
         private static readonly Dictionary<string, PxVmSfxData> SfxDataCache = new();
         private static readonly Dictionary<string, PxVmPfxData> PfxDataCache = new();
@@ -270,27 +271,27 @@ namespace GVR.Caches
         /// Hint: Instances only need to be initialized once on phoenix.
         /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
         /// </summary>
-        public static PxVmItemData TryGetItemData(uint instanceId)
+        public static ItemInstance TryGetItemData(uint instanceId)
         {
-            var symbol = PxDaedalusScript.GetSymbol(GameData.VmGothicPtr, instanceId);
+            var symbol = GameData.GothicVm.GetSymbolByIndex(instanceId);
 
             if (symbol == null)
                 return null;
 
-            return TryGetItemData(symbol.name);
+            return TryGetItemData(symbol.Name);
         }
 
         /// <summary>
         /// Hint: Instances only need to be initialized once on phoenix.
         /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
         /// </summary>
-        public static PxVmItemData TryGetItemData(string key)
+        public static ItemInstance TryGetItemData(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (ItemDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxVm.InitializeItem(GameData.VmGothicPtr, preparedKey);
+            var newData = GameData.GothicVm.InitInstance<ItemInstance>(preparedKey);
             ItemDataCache[preparedKey] = newData;
 
             return newData;

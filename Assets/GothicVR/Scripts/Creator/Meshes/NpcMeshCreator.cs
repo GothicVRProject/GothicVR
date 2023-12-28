@@ -8,6 +8,7 @@ using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
+using ZenKit.Daedalus;
 
 namespace GVR.Creator.Meshes
 {
@@ -101,28 +102,28 @@ namespace GVR.Creator.Meshes
             return newAttachments;
         }
 
-        public void CreateNpcWeapon(GameObject npcGo, PxVmItemData itemData, PxVm.PxVmItemFlags mainFlag, PxVm.PxVmItemFlags flags)
+        public void CreateNpcWeapon(GameObject npcGo, ItemInstance itemData, VmGothicEnums.ItemFlags mainFlag, VmGothicEnums.ItemFlags flags)
         {
             switch (mainFlag)
             {
-                case PxVm.PxVmItemFlags.ITEM_KAT_NF:
+                case VmGothicEnums.ItemFlags.ITEM_KAT_NF:
                     EquipMeleeWeapon(npcGo, itemData);
                     return;
-                case PxVm.PxVmItemFlags.ITEM_KAT_FF:
+                case VmGothicEnums.ItemFlags.ITEM_KAT_FF:
                     EquipRangeWeapon(npcGo, itemData);
                     return;
             }
         }
 
-        private void EquipMeleeWeapon(GameObject npcGo, PxVmItemData itemData)
+        private void EquipMeleeWeapon(GameObject npcGo, ItemInstance itemData)
         {
-            var mrm = AssetCache.TryGetMrm(itemData.visual);
+            var mrm = AssetCache.TryGetMrm(itemData.Visual);
 
             string slotName;
-            switch (itemData.flags)
+            switch ((VmGothicEnums.ItemFlags)itemData.Flags)
             {
-                case PxVm.PxVmItemFlags.ITEM_2HD_AXE:
-                case PxVm.PxVmItemFlags.ITEM_2HD_SWD:
+                case VmGothicEnums.ItemFlags.ITEM_2HD_AXE:
+                case VmGothicEnums.ItemFlags.ITEM_2HD_SWD:
                     slotName = "ZS_LONGSWORD";
                     break;
                 default:
@@ -145,12 +146,12 @@ namespace GVR.Creator.Meshes
             PrepareMeshFilter(meshFilter, mrm);
         }
 
-        private void EquipRangeWeapon(GameObject npcGo, PxVmItemData itemData)
+        private void EquipRangeWeapon(GameObject npcGo, ItemInstance itemData)
         {
             string slotName;
-            switch (itemData.flags)
+            switch ((VmGothicEnums.ItemFlags)itemData.Flags)
             {
-                case PxVm.PxVmItemFlags.ITEM_CROSSBOW:
+                case VmGothicEnums.ItemFlags.ITEM_CROSSBOW:
                     slotName = "ZS_CROSSBOW";
                     break;
                 default:
@@ -162,7 +163,7 @@ namespace GVR.Creator.Meshes
             if (weaponGo == null)
                 return;
 
-            var mms = AssetCache.TryGetMmb(itemData.visual);
+            var mms = AssetCache.TryGetMmb(itemData.Visual);
 
             var meshFilter = weaponGo.AddComponent<MeshFilter>();
             var meshRenderer = weaponGo.AddComponent<MeshRenderer>();

@@ -24,6 +24,7 @@ using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
+using ZenKit.Daedalus;
 using ZenKit.Vobs;
 using Debug = UnityEngine.Debug;
 using Quaternion = System.Numerics.Quaternion;
@@ -390,9 +391,9 @@ namespace GVR.Creator
                 return null;
             }
 
-            if (item.visual!.ToLower().EndsWith(".mms"))
+            if (item.Visual.EndsWithIgnoreCase(".mms"))
             {
-                Debug.LogError($"Item {item.visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
+                Debug.LogError($"Item {item.Visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
                 return null;
             }
 
@@ -612,16 +613,16 @@ namespace GVR.Creator
             return vobObj;
         }
         
-        private static GameObject CreateItemMesh(Item vob, PxVmItemData item, GameObject go)
+        private static GameObject CreateItemMesh(Item vob, ItemInstance item, GameObject go)
         {
-            var mrm = AssetCache.TryGetMrm(item.visual);
-            return MeshObjectCreator.CreateVob(item.visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
+            var mrm = AssetCache.TryGetMrm(item.Visual);
+            return MeshObjectCreator.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
         }
         
-        private static GameObject CreateItemMesh(PxVmItemData item, GameObject go)
+        private static GameObject CreateItemMesh(ItemInstance item, GameObject go)
         {
-            var mrm = AssetCache.TryGetMrm(item.visual);
-            return MeshObjectCreator.CreateVob(item.visual, mrm, default, default, false, parent: go);
+            var mrm = AssetCache.TryGetMrm(item.Visual);
+            return MeshObjectCreator.CreateVob(item.Visual, mrm, default, default, false, parent: go);
         }
 
         private static GameObject CreateDecal(IVirtualObject vob)

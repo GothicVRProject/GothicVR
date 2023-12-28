@@ -6,6 +6,7 @@ using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
+using ZenKit.Daedalus;
 using ZenKit.Vobs;
 
 namespace GVR.Creator
@@ -28,8 +29,8 @@ namespace GVR.Creator
             return NpcMeshCreator.CreateNpc(npcName, mdmName, mdhName, bodyData, root);
         }
 
-        public static void EquipNpcWeapon(GameObject npcGo, PxVmItemData itemData, PxVm.PxVmItemFlags mainFlag,
-            PxVm.PxVmItemFlags flags)
+        public static void EquipNpcWeapon(GameObject npcGo, ItemInstance itemData, VmGothicEnums.ItemFlags mainFlag,
+            VmGothicEnums.ItemFlags flags)
         {
             NpcMeshCreator.CreateNpcWeapon(npcGo, itemData, mainFlag, flags);
         }

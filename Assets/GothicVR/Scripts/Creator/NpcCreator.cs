@@ -128,7 +128,7 @@ namespace GVR.Creator
             newNpc.SetParent(GetRootGo());
 
             foreach (var equippedItem in props.EquippedItems)
-                MeshObjectCreator.EquipNpcWeapon(newNpc, equippedItem, equippedItem.mainFlag, equippedItem.flags);
+                MeshObjectCreator.EquipNpcWeapon(newNpc, equippedItem, (VmGothicEnums.ItemFlags)equippedItem.MainFlag, (VmGothicEnums.ItemFlags)equippedItem.Flags);
             
             SetSpawnPoint(newNpc, spawnPoint, props.npc);
 
@@ -193,23 +193,21 @@ namespace GVR.Creator
             GameData.npcRoutines[npcInstance.Index].Add(routine);
         }
         
-        public static void ExtMdlSetVisual(IntPtr npcPtr, string visual)
+        public static void ExtMdlSetVisual(NpcInstance npc, string visual)
         {
-            var props = GetProperties(npcPtr);
-
+            var props = GetProperties(npc);
             props.baseMdsName = visual;
         }
 
-        public static void ExtApplyOverlayMds(IntPtr npcPtr, string overlayName)
+        public static void ExtApplyOverlayMds(NpcInstance npc, string overlayName)
         {
-            var props = GetProperties(npcPtr);
-
+            var props = GetProperties(npc);
             props.overlayMdsName = overlayName;
         }
 
         public static void ExtSetVisualBody(VmGothicExternals.ExtSetVisualBodyData data)
         {
-            var props = GetProperties(data.NpcPtr);
+            var props = GetProperties(data.Npc);
 
             props.BodyData = data;
             
@@ -217,7 +215,7 @@ namespace GVR.Creator
             {
                 var armorData = AssetCache.TryGetItemData((uint)data.Armor);
                 props.EquippedItems.Add(AssetCache.TryGetItemData((uint)data.Armor));
-                props.mdmName = armorData.visualChange;
+                props.mdmName = armorData.VisualChange;
             }
             else
             {
@@ -225,43 +223,43 @@ namespace GVR.Creator
             }
         }
 
-        public static void ExtMdlSetModelScale(IntPtr npcPtr, Vector3 scale)
+        public static void ExtMdlSetModelScale(NpcInstance npc, Vector3 scale)
         {
-            var npc = GetNpcGo(npcPtr);
+            var npcGo = GetNpcGo(npc);
 
             // FIXME - If fatness is applied before, we reset it here. We need to do proper Vector multiplication here.
-            npc.transform.localScale = scale;
+            npcGo.transform.localScale = scale;
         }
 
-        public static void ExtSetModelFatness(IntPtr npcPtr, float fatness)
+        public static void ExtSetModelFatness(NpcInstance npc, float fatness)
         {
-            var npc = GetNpcGo(npcPtr);
-            var oldScale = npc.transform.localScale;
+            var npcGo = GetNpcGo(npc);
+            var oldScale = npcGo.transform.localScale;
             var bonusFat = fatness * fatnessScale;
             
-            npc.transform.localScale = new(oldScale.x + bonusFat, oldScale.y, oldScale.z + bonusFat);
+            npcGo.transform.localScale = new(oldScale.x + bonusFat, oldScale.y, oldScale.z + bonusFat);
         }
 
-        public static IntPtr ExtHlpGetNpc(int instanceId)
+        public static NpcInstance ExtHlpGetNpc(int instanceId)
         {
             if (!LookupCache.NpcCache.TryGetValue((uint)instanceId, out var properties))
             {
                 Debug.LogError($"Couldn't find NPC {instanceId} inside cache.");
-                return IntPtr.Zero;
+                return null;
             }
 
-            return properties.npcPtr;
+            return properties.npcInstance;
         }
 
-        public static void ExtNpcPerceptionEnable(IntPtr npcPtr, VmGothicEnums.PerceptionType perception, int function)
+        public static void ExtNpcPerceptionEnable(NpcInstance npc, VmGothicEnums.PerceptionType perception, int function)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.Perceptions[perception] = function;
         }
 
-        public static void ExtNpcSetPerceptionTime(IntPtr npcPtr, float time)
+        public static void ExtNpcSetPerceptionTime(NpcInstance npc, float time)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.perceptionTime = time;
         }
 
@@ -271,23 +269,17 @@ namespace GVR.Creator
             props.Talents[talent] = level;
         }
 
-        public static void ExtCreateInvItems(IntPtr npcPtr, uint itemId, int amount)
+        public static void ExtCreateInvItems(NpcInstance npc, uint itemId, int amount)
         {
-            var props = GetProperties(npcPtr);
-            
-            if (!props.Items.TryGetValue(itemId, out _))
-            {
-                props.Items.Add(itemId, amount);
-            }
-            else
-            {
-                props.Items[itemId] += amount;
-            }
+            var props = GetProperties(npc);
+
+            props.Items.TryAdd(itemId, amount);
+            props.Items[itemId] += amount;
         }
         
-        public static void ExtEquipItem(IntPtr npcPtr, int itemId)
+        public static void ExtEquipItem(NpcInstance npc, int itemId)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             var itemData = AssetCache.TryGetItemData((uint)itemId);
 
             props.EquippedItems.Add(itemData);
