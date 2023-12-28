@@ -168,7 +168,7 @@ namespace GVR.Phoenix.Interface.Vm
         [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
         public static void AI_StartState(NpcInstance npc, int function, int stateBehaviour, string wayPointName)
         {
-            NpcHelper.ExtAiStartState(npc, (uint)function, Convert.ToBoolean(stateBehaviour), wayPointName);
+            NpcHelper.ExtAiStartState(npc, function, Convert.ToBoolean(stateBehaviour), wayPointName);
         }
 
         [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]

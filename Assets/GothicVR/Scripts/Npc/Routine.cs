@@ -32,7 +32,7 @@ namespace GVR.Npc
         {
             var npcRoutine = routines.First(item => item.start <= time && time < item.stop);
 
-            GetComponent<AiHandler>().StartRoutine((uint)npcRoutine.action, npcRoutine.waypoint);
+            GetComponent<AiHandler>().StartRoutine(npcRoutine.action, npcRoutine.waypoint);
         }
     }
 }

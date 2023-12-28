@@ -13,6 +13,7 @@ using GVR.Properties;
 using GVR.Vob.WayNet;
 using PxCs.Data.Vm;
 using PxCs.Interface;
+using Unity.VisualScripting;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;
@@ -55,12 +56,6 @@ namespace GVR.Creator
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
             var props = LookupCache.NpcCache[symbolIndex];
 
-            // Workaround: When calling PxVm.InitializeNpc(), phoenix will start executing all of the INSTANCEs methods.
-            // But some of them like Hlp_GetNpc() need the IntPtr before it's being returned by InitializeNpc().
-            // But Phoenix gives us the Pointer via other External calls. We then set it asap.
-            if (props.npcPtr == IntPtr.Zero)
-                props.npcPtr = npcPtr;
-
             return props;
         }
 
@@ -89,7 +84,6 @@ namespace GVR.Creator
         {
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             var props = newNpc.GetComponent<NpcProperties>();
-
             var npcSymbol = GameData.GothicVm.GetSymbolByIndex((uint)npcInstance);
             
             if (npcSymbol == null)
@@ -101,10 +95,8 @@ namespace GVR.Creator
             // Humans are singletons.
             if (LookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<NpcProperties>()))
             {
-                props.npcInstance = GameData.GothicVm.InitInstance<NpcInstance>(npcSymbol);
-
-                var pxNpc = PxVm.InitializeNpc(GameData.VmGothicPtr, (uint)npcInstance);
-                props.npc = pxNpc;
+                props.npcInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol);
+                GameData.GothicVm.InitInstance(props.npcInstance);
             }
             // Monsters are used multiple times.
             else
@@ -115,13 +107,13 @@ namespace GVR.Creator
                 props.Copy(origProps);
             }
 
-            if (FeatureFlags.I.npcToSpawn.Any() && !FeatureFlags.I.npcToSpawn.Contains(props.npc.id))
+            if (FeatureFlags.I.npcToSpawn.Any() && !FeatureFlags.I.npcToSpawn.Contains(props.npcInstance.Id))
             {
                 Object.Destroy(newNpc);
                 return;
             }
 
-            newNpc.name = props.npc!.names[0];
+            newNpc.name = props.npcInstance.GetName(NpcNameSlot.Slot0);
             
             var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
             MeshObjectCreator.CreateNpc(newNpc.name, props.mdmName, mdhName, props.BodyData, newNpc);
@@ -130,17 +122,17 @@ namespace GVR.Creator
             foreach (var equippedItem in props.EquippedItems)
                 MeshObjectCreator.EquipNpcWeapon(newNpc, equippedItem, (VmGothicEnums.ItemFlags)equippedItem.MainFlag, (VmGothicEnums.ItemFlags)equippedItem.Flags);
             
-            SetSpawnPoint(newNpc, spawnPoint, props.npc);
+            SetSpawnPoint(newNpc, spawnPoint, props.npcInstance);
 
             if (FeatureFlags.I.enableNpcRoutines)
                 StartRoutine(newNpc);
         }
 
-        private static void SetSpawnPoint(GameObject npcGo, string spawnPoint, PxVmNpcData pxNpc)
+        private static void SetSpawnPoint(GameObject npcGo, string spawnPoint, NpcInstance npc)
         {
-            var npcRoutine = pxNpc.routine;
-            PxVm.CallFunction(GameData.VmGothicPtr, (uint)npcRoutine, pxNpc.instancePtr);
-            
+            var npcRoutine = npc.DailyRoutine;
+            GameData.GothicVm.Call(npcRoutine);
+
             WayNetPoint initialSpawnPoint;
             if (npcGo.GetComponent<Routine>().routines.Any())
             {
@@ -154,7 +146,7 @@ namespace GVR.Creator
 
             if (initialSpawnPoint == null)
             {
-                Debug.LogWarning(string.Format("spawnpoint={0} couldn't be found.", spawnPoint));
+                Debug.LogWarning(string.Format("spawnPoint={0} couldn't be found.", spawnPoint));
                 return;
             }
             
@@ -248,6 +240,7 @@ namespace GVR.Creator
                 return null;
             }
 
+
             return properties.npcInstance;
         }
 
@@ -290,7 +283,7 @@ namespace GVR.Creator
             var routineComp = npc.GetComponent<Routine>();
             var firstRoutine = routineComp.routines.First();
 
-            npc.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action, firstRoutine.waypoint);
+            npc.GetComponent<AiHandler>().StartRoutine(firstRoutine.action, firstRoutine.waypoint);
         }
     }
 }

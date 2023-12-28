@@ -138,12 +138,6 @@ namespace GVR.Manager
             var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
             var props = LookupCache.NpcCache[symbolIndex];
 
-            // Workaround: When calling PxVm.InitializeNpc(), phoenix will start executing all of the INSTANCEs methods.
-            // But some of them like Hlp_GetNpc() need the IntPtr before it's being returned by InitializeNpc().
-            // But Phoenix gives us the Pointer via other External calls. We then set it asap.
-            if (props.npcPtr == IntPtr.Zero)
-                props.npcPtr = npcPtr;
-
             return props;
         }
         
@@ -211,11 +205,11 @@ namespace GVR.Manager
                 props.gameObject));
         }
 
-        public static void ExtAiStartState(NpcInstance npc, uint action, bool stopCurrentState, string wayPointName)
+        public static void ExtAiStartState(NpcInstance npc, int action, bool stopCurrentState, string wayPointName)
         {
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new StartState(
-                new(AnimationAction.Type.AIStartState, uint0: action, bool0: stopCurrentState, string0: wayPointName),
+                new(AnimationAction.Type.AIStartState, int0: action, bool0: stopCurrentState, string0: wayPointName),
                 props.gameObject));
         }
 

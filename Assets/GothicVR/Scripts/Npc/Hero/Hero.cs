@@ -2,6 +2,7 @@
 using GVR.Properties;
 using GVR.Util;
 using PxCs.Interface;
+using ZenKit.Daedalus;
 
 namespace GVR.Npc.Hero
 {
@@ -10,8 +11,10 @@ namespace GVR.Npc.Hero
 
         private void Start()
         {
-            var hero = PxVm.InitializeNpc(GameData.VmGothicPtr, "hero");
-            GetComponent<NpcProperties>().npc = hero;
+            var hero = GameData.GothicVm.AllocInstance<NpcInstance>("hero");
+            GameData.GothicVm.InitInstance(hero);
+
+            GetComponent<NpcProperties>().npcInstance = hero;
         }
     }
 }
