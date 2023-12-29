@@ -382,14 +382,7 @@ namespace GVR.Creator
             var item = AssetCache.TryGetItemData(itemName);
 
             if (item == null)
-            {
-                // eItMiCello is commented out on misc.d file. No need for an error log entry.
-                if ("itmicello".Equals(itemName.ToLower()))
-                    return null;
-                
-                Debug.LogError($"Item {itemName} not found.");
                 return null;
-            }
 
             if (item.Visual.EndsWithIgnoreCase(".mms"))
             {

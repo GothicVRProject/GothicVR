@@ -291,10 +291,24 @@ namespace GVR.Caches
             if (ItemDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = GameData.GothicVm.InitInstance<ItemInstance>(preparedKey);
-            ItemDataCache[preparedKey] = newData;
+            try
+            {
+                var newData = GameData.GothicVm.InitInstance<ItemInstance>(preparedKey);
+                ItemDataCache[preparedKey] = newData;
 
-            return newData;
+                return newData;
+            }
+            catch (Exception)
+            {
+                ItemDataCache[preparedKey] = null;
+                
+                // eItMiCello is commented out on misc.d file. No need for an error log entry.
+                if ("itmicello".EqualsIgnoreCase(key))
+                    return null;
+                
+                Debug.LogError($"Item >{key}< not found.");
+                return null;
+            }
         }
 
         /// <summary>
