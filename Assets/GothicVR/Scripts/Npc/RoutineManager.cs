@@ -15,12 +15,10 @@ namespace GVR.Npc
     /// </summary>
     public class RoutineManager : SingletonBehaviour<RoutineManager>
     {
-        GameTime gameTime;
         Dictionary<DateTime, List<Routine>> npcStartTimeDict = new();
 
         private void OnEnable()
         {
-            gameTime = GameTime.I;
             GVREvents.GameTimeMinuteChangeCallback.AddListener(Invoke);
         }
 

@@ -119,9 +119,6 @@ namespace GVR.Creator
                 MeshObjectCreator.EquipNpcWeapon(newNpc, equippedItem, (VmGothicEnums.ItemFlags)equippedItem.MainFlag, (VmGothicEnums.ItemFlags)equippedItem.Flags);
             
             SetSpawnPoint(newNpc, spawnPoint, props.npcInstance);
-
-            if (FeatureFlags.I.enableNpcRoutines)
-                StartRoutine(newNpc);
         }
 
         private static void SetSpawnPoint(GameObject npcGo, string spawnPoint, NpcInstance npc)
@@ -272,14 +269,6 @@ namespace GVR.Creator
             var itemData = AssetCache.TryGetItemData((uint)itemId);
 
             props.EquippedItems.Add(itemData);
-        }
-        
-        private static void StartRoutine(GameObject npc)
-        {
-            var routineComp = npc.GetComponent<Routine>();
-            var firstRoutine = routineComp.routines.First();
-
-            npc.GetComponent<AiHandler>().StartRoutine(firstRoutine.action, firstRoutine.waypoint);
         }
     }
 }

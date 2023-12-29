@@ -62,14 +62,14 @@ namespace GVR.Phoenix.Interface.Vm
             vm.RegisterExternal<int, int>("Hlp_Random", Hlp_Random);
             vm.RegisterExternal<int, string, string>("Hlp_StrCmp", Hlp_StrCmp);
             // vm.RegisterExternal<int, ItemInstance, int>("Hlp_IsItem", Hlp_IsItem); // Not yet implemented
-            vm.RegisterExternal<int, int>("Hlp_GetNpc", Hlp_GetNpc);
+            vm.RegisterExternal<NpcInstance, int>("Hlp_GetNpc", Hlp_GetNpc);
 
             // Info
             // Log
             // Model
             vm.RegisterExternal<NpcInstance, string>("Mdl_SetVisual", Mdl_SetVisual);
             vm.RegisterExternal<NpcInstance, string>("Mdl_ApplyOverlayMds", Mdl_ApplyOverlayMds);
-            // vm.RegisterExternal<NpcInstance, string, int, int , string, int, int ,int>("Mdl_SetVisualBody", Mdl_SetVisualBody);
+            vm.RegisterExternal<NpcInstance, string, int, int , string, int, int ,int>("Mdl_SetVisualBody", Mdl_SetVisualBody);
             vm.RegisterExternal<NpcInstance, float, float, float>("Mdl_SetModelScale", Mdl_SetModelScale);
             vm.RegisterExternal<NpcInstance, float>("Mdl_SetModelFatness", Mdl_SetModelFatness);
 
@@ -243,11 +243,9 @@ namespace GVR.Phoenix.Interface.Vm
         // }
 
         [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
-        public static int Hlp_GetNpc(int instanceId)
+        public static NpcInstance Hlp_GetNpc(int instanceId)
         {
-            var npc = NpcCreator.ExtHlpGetNpc(instanceId);
-
-            return (int)npc.Index;
+            return NpcCreator.ExtHlpGetNpc(instanceId);
         }
 
         #endregion
@@ -289,22 +287,22 @@ namespace GVR.Phoenix.Interface.Vm
             public int TeethTexNr;
             public int Armor;
         }
-        // [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
-        // public static void Mdl_SetVisualBody(NpcInstance npc, string body, int bodyTexNr, int bodyTexColor, string head, int headTexNr, int teethTexNr, int armor)
-        // {
-        //     NpcCreator.ExtSetVisualBody(new ()
-        //         {
-        //             Npc = npc,
-        //             Body = body,
-        //             BodyTexNr = bodyTexNr,
-        //             BodyTexColor = bodyTexColor,
-        //             Head = head,
-        //             HeadTexNr = headTexNr,
-        //             TeethTexNr = teethTexNr,
-        //             Armor = armor
-        //         }
-        //     );
-        // }
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void Mdl_SetVisualBody(NpcInstance npc, string body, int bodyTexNr, int bodyTexColor, string head, int headTexNr, int teethTexNr, int armor)
+        {
+            NpcCreator.ExtSetVisualBody(new ()
+                {
+                    Npc = npc,
+                    Body = body,
+                    BodyTexNr = bodyTexNr,
+                    BodyTexColor = bodyTexColor,
+                    Head = head,
+                    HeadTexNr = headTexNr,
+                    TeethTexNr = teethTexNr,
+                    Armor = armor
+                }
+            );
+        }
 
         [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
         public static void Mdl_SetModelScale(NpcInstance npc, float x, float y, float z)
