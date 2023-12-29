@@ -1,10 +1,8 @@
-﻿using GVR.Extensions;
+﻿using GVR.Globals;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
-using GVR.Phoenix.Interface;
 using GVR.Properties;
 using PxCs.Data.Event;
-using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
 

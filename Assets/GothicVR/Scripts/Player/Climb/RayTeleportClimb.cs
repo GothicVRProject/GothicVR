@@ -1,5 +1,5 @@
 using GVR.Extensions;
-using GVR.Manager;
+using GVR.Globals;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -37,7 +37,7 @@ namespace GVR.Player.Climb
         {
             // Check if the interactable GameObject has the tag "Climbable"
             if (args.interactableObject != null &&
-                args.interactableObject.transform.CompareTag(ConstantsManager.ClimbableTag))
+                args.interactableObject.transform.CompareTag(Constants.ClimbableTag))
             {
                 // Show a message in the logs
                 var hitObject = args.interactableObject.transform.gameObject;

@@ -3,9 +3,8 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Debugging;
 using GVR.Extensions;
-using GVR.Manager;
+using GVR.Globals;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Interface;
 using GVR.World;
 using UnityEngine;
 
@@ -96,7 +95,7 @@ namespace GVR.Creator
                 if (!FeatureFlags.I.createWayPointMeshes)
                     Object.Destroy(wpObject.GetComponent<MeshRenderer>());
 
-                wpObject.tag = ConstantsManager.SpotTag;
+                wpObject.tag = Constants.SpotTag;
                 wpObject.name = waypoint.Name;
                 wpObject.transform.position = waypoint.Position.ToUnityVector();
 

@@ -1,6 +1,7 @@
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Properties;

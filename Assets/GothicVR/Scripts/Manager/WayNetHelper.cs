@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using GVR.Extensions;
-using GVR.Phoenix.Interface;
+using GVR.Globals;
 using GVR.Vob.WayNet;
 using GVR.World;
 using JetBrains.Annotations;

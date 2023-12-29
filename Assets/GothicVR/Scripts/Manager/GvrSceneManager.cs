@@ -4,9 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
-using GVR.Phoenix.Interface;
+using GVR.Globals;
 using GVR.Util;
-using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -57,7 +56,7 @@ namespace GVR.Manager
             try
             {
                 if (FeatureFlags.I.skipMainMenu)
-                    await LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint, true);
+                    await LoadWorld(Constants.selectedWorld, Constants.selectedWaypoint, true);
                 else
                     await LoadMainMenu();
             }
@@ -83,7 +82,7 @@ namespace GVR.Manager
         private async Task LoadMainMenu()
         {
             TextureManager.I.LoadLoadingDefaultTextures();
-            await LoadNewWorldScene(ConstantsManager.SceneMainMenu);
+            await LoadNewWorldScene(Constants.SceneMainMenu);
         }
 
         public async Task LoadWorld(string worldName, string startVob, bool newGame = false)
@@ -144,7 +143,7 @@ namespace GVR.Manager
             generalScene = SceneManager.GetSceneByName(generalSceneName);
             if (generalScene.isLoaded)
             {
-                SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName(ConstantsManager.SceneBootstrap));
+                SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName(Constants.SceneBootstrap));
                 SceneManager.UnloadSceneAsync(generalScene);
 
                 sceneGeneralUnloaded.Invoke();
@@ -153,7 +152,7 @@ namespace GVR.Manager
 
             SetLoadingTextureForWorld(worldName, newGame);
 
-            SceneManager.LoadScene(ConstantsManager.SceneLoading, new LoadSceneParameters(LoadSceneMode.Additive));
+            SceneManager.LoadScene(Constants.SceneLoading, new LoadSceneParameters(LoadSceneMode.Additive));
 
             // Delay for magic number amount to make sure that bar can be found
             // 1 and 2 caused issues for the 3rd time showing the loading scene in editor
@@ -171,7 +170,7 @@ namespace GVR.Manager
 
         private void HideLoadingScene()
         {
-            SceneManager.UnloadSceneAsync(ConstantsManager.SceneLoading);
+            SceneManager.UnloadSceneAsync(Constants.SceneLoading);
 
             LoadingManager.I.ResetProgress();
         }
@@ -180,13 +179,13 @@ namespace GVR.Manager
         {
             switch (scene.name)
             {
-                case ConstantsManager.SceneBootstrap:
+                case Constants.SceneBootstrap:
                     break;
-                case ConstantsManager.SceneLoading:
+                case Constants.SceneLoading:
                     LoadingManager.I.SetBarFromScene(scene);
                     LoadingManager.I.SetMaterialForLoading(scene);
                     break;
-                case ConstantsManager.SceneGeneral:
+                case Constants.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
                     TeleportPlayerToSpot();
 
@@ -196,7 +195,7 @@ namespace GVR.Manager
                     // FIXME - Move to UnityEvent once existing
                     XRDeviceSimulatorManager.I.PrepareForScene(scene);
                     break;
-                case ConstantsManager.SceneMainMenu:
+                case Constants.SceneMainMenu:
                     var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
                     sphere.GetComponent<MeshRenderer>().material = TextureManager.I.LoadingSphereMaterial;
                     SceneManager.SetActiveScene(scene);
@@ -213,7 +212,7 @@ namespace GVR.Manager
 
         private void OnSceneUnloaded(Scene scene)
         {
-            if (scene.name == ConstantsManager.SceneLoading && !generalSceneLoaded)
+            if (scene.name == Constants.SceneLoading && !generalSceneLoaded)
             {
                 generalScene = SceneManager.LoadScene(generalSceneName, new LoadSceneParameters(LoadSceneMode.Additive));
                 generalSceneLoaded = true;
@@ -222,7 +221,7 @@ namespace GVR.Manager
 
         private void SetSpawnPoint(Scene worldScene)
         {
-            var spots = GameObject.FindGameObjectsWithTag(ConstantsManager.SpotTag);
+            var spots = GameObject.FindGameObjectsWithTag(Constants.SpotTag);
 
             // Spawn at specifically named point.
             if (!string.IsNullOrWhiteSpace(FeatureFlags.I.spawnAtSpecificFreePoint))

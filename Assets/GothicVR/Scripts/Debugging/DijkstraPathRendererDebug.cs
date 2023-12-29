@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.Manager;
-using GVR.Phoenix.Interface;
 using JetBrains.Annotations;
 using UnityEngine;
 

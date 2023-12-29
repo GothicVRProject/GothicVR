@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator.Meshes;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.Manager;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Interface;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -38,8 +38,8 @@ namespace GVR.Creator
             teleportGo.SetParent(worldGo);
             nonTeleportGo.SetParent(worldGo);
 
-            await WorldMeshCreator.CreateAsync(world, teleportGo, ConstantsManager.MeshPerFrame);
-            await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, ConstantsManager.VObPerFrame);
+            await WorldMeshCreator.CreateAsync(world, teleportGo, Constants.MeshPerFrame);
+            await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, Constants.VObPerFrame);
             WaynetCreator.Create(worldGo, world);
 
             // Set the global variable to the result of the coroutine
@@ -187,7 +187,7 @@ namespace GVR.Creator
             GameData.VfsPtr = vfsPtr;
             GameData.World = LoadWorld(worldScene.name);
 
-            await WorldMeshCreator.CreateAsync(GameData.World, new GameObject("World"), ConstantsManager.MeshPerFrame);
+            await WorldMeshCreator.CreateAsync(GameData.World, new GameObject("World"), Constants.MeshPerFrame);
         }
 #endif
     }

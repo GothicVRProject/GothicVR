@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using UnityEngine;
-using GVR.Bootstrap;
+using UnityEngine.Networking;
 
 namespace GVR.Manager.Settings
 {
@@ -87,20 +87,20 @@ namespace GVR.Manager.Settings
         /// </summary>
         private static void CopyGameSettingsForAndroidBuild()
         {
-            string GameSettingsPath = System.IO.Path.Combine(Application.streamingAssetsPath, $"{SETTINGS_FILE_NAME}");
+            string GameSettingsPath = Path.Combine(Application.streamingAssetsPath, $"{SETTINGS_FILE_NAME}");
             string result = "";
             if (GameSettingsPath.Contains("://") || GameSettingsPath.Contains(":///"))
             {
-                UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(GameSettingsPath);
+                UnityWebRequest www = UnityWebRequest.Get(GameSettingsPath);
                 www.SendWebRequest();
                 // Wait until async download is done
                 while (!www.isDone) { }
                 result = www.downloadHandler.text;
             }
             else
-                result = System.IO.File.ReadAllText(GameSettingsPath);
+                result = File.ReadAllText(GameSettingsPath);
 
-            string FinalPath = System.IO.Path.Combine(Application.persistentDataPath, $"{SETTINGS_FILE_NAME}");
+            string FinalPath = Path.Combine(Application.persistentDataPath, $"{SETTINGS_FILE_NAME}");
             File.WriteAllText(FinalPath, result);
         }
     }

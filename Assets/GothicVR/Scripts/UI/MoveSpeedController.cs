@@ -1,7 +1,7 @@
+using GVR.Globals;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
-using GVR.Manager;
 
 public class MoveSpeedController : MonoBehaviour
 {
@@ -10,13 +10,13 @@ public class MoveSpeedController : MonoBehaviour
     {
         Slider speedslider = transform.GetComponent<Slider>();
         speedslider.onValueChanged.AddListener(ChangeMoveSpeed);
-        speedslider.value = PlayerPrefs.GetFloat(ConstantsManager.moveSpeedPlayerPref, ConstantsManager.moveSpeed);
+        speedslider.value = PlayerPrefs.GetFloat(Constants.moveSpeedPlayerPref, Constants.moveSpeed);
     }
 
     public void ChangeMoveSpeed(float moveSpeed)
     {
-        PlayerPrefs.SetFloat(ConstantsManager.moveSpeedPlayerPref, moveSpeed);
-        ConstantsManager.moveSpeed = moveSpeed;
+        PlayerPrefs.SetFloat(Constants.moveSpeedPlayerPref, moveSpeed);
+        Constants.moveSpeed = moveSpeed;
 
         if (!movecontroller)
             return;

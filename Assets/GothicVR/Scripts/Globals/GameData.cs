@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 using ZenKit;
 using WayPoint = GVR.Vob.WayNet.WayPoint;
 
-namespace GVR.Phoenix.Interface
+namespace GVR.Globals
 {
     public static class GameData
     {

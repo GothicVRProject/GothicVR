@@ -1,7 +1,8 @@
 using System;
 using System.IO;
-using GVR.Bootstrap;
 using GVR.Creator;
+using GVR.Globals;
+using GVR.Manager;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
 using PxCs.Interface;

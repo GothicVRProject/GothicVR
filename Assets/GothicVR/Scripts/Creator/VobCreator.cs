@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,17 +8,16 @@ using GVR.Caches;
 using GVR.Debugging;
 using GVR.Demo;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Manager.Culling;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Properties;
 using GVR.Vob;
 using GVR.Vob.WayNet;
 using JetBrains.Annotations;
-using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -416,7 +414,7 @@ namespace GVR.Creator
             grabComp.attachTransform = itemGrabComp.attachPoint1.transform;
             grabComp.secondaryAttachTransform = itemGrabComp.attachPoint2.transform;
 
-            vobObj.layer = ConstantsManager.ItemLayer;
+            vobObj.layer = Constants.ItemLayer;
 
             colliderComp.convex = true;
             grabComp.selectEntered.AddListener(itemGrabComp.SelectEntered);
@@ -516,7 +514,7 @@ namespace GVR.Creator
             go.SetParent(parentGosNonTeleport[vob.Type], true, true);
             go.name = vob.Name;
 
-            go.layer = ConstantsManager.IgnoreRaycastLayer;
+            go.layer = Constants.IgnoreRaycastLayer;
 
             var min = vob.BoundingBox.Min.ToUnityVector();
             var max = vob.BoundingBox.Max.ToUnityVector();
@@ -534,7 +532,7 @@ namespace GVR.Creator
             var vobObj = new GameObject(vob.Name);
             vobObj.SetParent(parentGosTeleport[vob.Type]);
 
-            vobObj.layer = ConstantsManager.IgnoreRaycastLayer;
+            vobObj.layer = Constants.IgnoreRaycastLayer;
 
             var trigger = vobObj.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
@@ -596,7 +594,7 @@ namespace GVR.Creator
             var meshColliderComp = vobObj.GetComponentInChildren<MeshCollider>();
 
             meshColliderComp.convex = true; // We need to set it to overcome Physics.ClosestPoint warnings.
-            meshGo.tag = ConstantsManager.ClimbableTag;
+            meshGo.tag = Constants.ClimbableTag;
             rigidbodyComp.isKinematic = true;
             grabComp.throwOnDetach = false; // Throws errors and isn't needed as we don't want to move the kinematic ladder when released.
             grabComp.trackPosition = false;

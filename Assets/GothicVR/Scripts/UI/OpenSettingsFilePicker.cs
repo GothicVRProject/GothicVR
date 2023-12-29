@@ -1,7 +1,7 @@
-using UnityEngine;
-using SFB;
+using GVR.Manager;
 using GVR.Manager.Settings;
-using GVR.Bootstrap;
+using SFB;
+using UnityEngine;
 
 namespace GVR
 {

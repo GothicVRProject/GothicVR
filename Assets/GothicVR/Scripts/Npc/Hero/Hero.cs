@@ -1,7 +1,6 @@
-﻿using GVR.Phoenix.Interface;
+﻿using GVR.Globals;
 using GVR.Properties;
 using GVR.Util;
-using PxCs.Interface;
 using ZenKit.Daedalus;
 
 namespace GVR.Npc.Hero

@@ -3,7 +3,7 @@ using System.IO;
 using AOT;
 using GVR.Debugging;
 using GVR.Extensions;
-using GVR.Manager;
+using GVR.Globals;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
@@ -15,7 +15,7 @@ using ZenKit;
 using Debug = UnityEngine.Debug;
 using Logger = ZenKit.Logger;
 
-namespace GVR.Bootstrap
+namespace GVR.Manager
 {
     public class GVRBootstrapper : SingletonBehaviour<GVRBootstrapper>
     {
@@ -26,7 +26,7 @@ namespace GVR.Bootstrap
         private void Start()
         {
             PxLogging.pxLoggerSet(PxLoggerCallback);
-            ZenKit.Logger.Set(FeatureFlags.I.zenKitLogLevel, ZenKitLoggerCallback);
+            Logger.Set(FeatureFlags.I.zenKitLogLevel, ZenKitLoggerCallback);
 
             // Just in case we forgot to disable it in scene view. ;-)
             invalidInstallationDirMessage.SetActive(false);
