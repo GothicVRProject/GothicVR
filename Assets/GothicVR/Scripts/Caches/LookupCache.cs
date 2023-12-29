@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GVR.Globals;
 using GVR.Manager;
 using GVR.Properties;
 using TMPro;
@@ -34,7 +35,7 @@ namespace GVR.Caches
         
         static LookupCache()
         {
-            GvrSceneManager.I.sceneGeneralUnloaded.AddListener(delegate
+            GVREvents.GeneralSceneUnloaded.AddListener(delegate
             {
                 vobSoundsAndDayTime.Clear();
             });

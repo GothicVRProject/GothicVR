@@ -1,4 +1,5 @@
-﻿using UnityEngine.Events;
+﻿using System;
+using UnityEngine.Events;
 
 namespace GVR.Globals
 {
@@ -10,26 +11,15 @@ namespace GVR.Globals
         public static readonly UnityEvent LoadingSceneLoaded = new();
         public static readonly UnityEvent LoadingSceneUnloaded = new();
 
+        // Hint: Scene general is always loaded >after< world is fully filled with vobs etc.
         public static readonly UnityEvent GeneralSceneLoaded = new();
         public static readonly UnityEvent GeneralSceneUnloaded = new();
         
         public static readonly UnityEvent WorldSceneLoaded = new();
         public static readonly UnityEvent WorldSceneUnloaded = new();
-
         
-        public static void Dispose()
-        {
-            MainMenuSceneLoaded.RemoveAllListeners();
-            MainMenuSceneUnloaded.RemoveAllListeners();
-            
-            LoadingSceneLoaded.RemoveAllListeners();
-            LoadingSceneUnloaded.RemoveAllListeners();
-
-            GeneralSceneLoaded.RemoveAllListeners();
-            GeneralSceneUnloaded.RemoveAllListeners();
-            
-            WorldSceneLoaded.RemoveAllListeners();
-            WorldSceneUnloaded.RemoveAllListeners();
-        }
+        public static readonly UnityEvent<DateTime> GameTimeSecondChangeCallback = new();
+        public static readonly UnityEvent<DateTime> GameTimeMinuteChangeCallback = new();
+        public static readonly UnityEvent<DateTime> GameTimeHourChangeCallback = new();
     }
 }

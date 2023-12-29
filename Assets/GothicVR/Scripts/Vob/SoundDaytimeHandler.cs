@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
+using GVR.Globals;
 using GVR.World;
-using PxCs.Interface;
 using UnityEngine;
 using ZenKit.Vobs;
 using Random = UnityEngine.Random;
@@ -26,14 +26,14 @@ namespace GothicVR.Vob
             HourEventCallback(GameTime.I.GetCurrentDateTime());
 
             StartCoroutineInternal();
-            GameTime.I.hourChangeCallback.AddListener(HourEventCallback);
+            GVREvents.GameTimeHourChangeCallback.AddListener(HourEventCallback);
         }
 
         private void OnDisable()
         {
             // Coroutines are stopped when GameObject gets disabled. But we need to restart during OnEnable() manually.
             isCoroutineRunning = false;
-            GameTime.I.hourChangeCallback.RemoveListener(HourEventCallback);
+            GVREvents.GameTimeHourChangeCallback.RemoveListener(HourEventCallback);
         }
 
         public void PrepareSoundHandling()

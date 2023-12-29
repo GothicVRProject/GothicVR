@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using GVR.Debugging;
+using GVR.Globals;
 using GVR.Manager;
 using GVR.Util;
 using UnityEngine;
@@ -12,10 +13,6 @@ namespace GVR.World
     {
         public static readonly DateTime MIN_TIME = new(1, 1, 1, 0, 0, 0);
         public static readonly DateTime MAX_TIME = new(1, 1, 1, 23, 59, 59);
-
-        public UnityEvent<DateTime> secondChangeCallback = new();
-        public UnityEvent<DateTime> minuteChangeCallback = new();
-        public UnityEvent<DateTime> hourChangeCallback = new();
 
         private int secondsInMinute = 0;
         private int minutesInHour = 0;
@@ -40,8 +37,8 @@ namespace GVR.World
                     FeatureFlags.I.startHour, FeatureFlags.I.startMinute, time.Second);
             minutesInHour = FeatureFlags.I.startMinute;
 
-            GvrSceneManager.I.sceneGeneralLoaded.AddListener(WorldLoaded);
-            GvrSceneManager.I.sceneGeneralUnloaded.AddListener(WorldUnloaded);
+            GVREvents.GeneralSceneLoaded.AddListener(WorldLoaded);
+            GVREvents.GeneralSceneUnloaded.AddListener(WorldUnloaded);
         }
 
         private void WorldLoaded()
@@ -69,7 +66,7 @@ namespace GVR.World
                 if (time > MAX_TIME)
                     time = MIN_TIME;
 
-                secondChangeCallback.Invoke(time);
+                GVREvents.GameTimeSecondChangeCallback.Invoke(time);
                 RaiseMinuteAndHourEvent();
                 yield return new WaitForSeconds(ONE_INGAME_SECOND);
             }
@@ -80,7 +77,7 @@ namespace GVR.World
             if (secondsInMinute%60==0)
             {
                 secondsInMinute = 0;
-                minuteChangeCallback.Invoke(time);
+                GVREvents.GameTimeMinuteChangeCallback.Invoke(time);
                 RaiseHourEvent();
             }
         }
@@ -90,7 +87,7 @@ namespace GVR.World
             if (minutesInHour % 60 == 0)
             {
                 minutesInHour = 0;
-                hourChangeCallback.Invoke(time);
+                GVREvents.GameTimeHourChangeCallback.Invoke(time);
             }
         }
     }

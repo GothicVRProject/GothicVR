@@ -7,7 +7,6 @@ using GVR.Debugging;
 using GVR.Globals;
 using GVR.Util;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 
@@ -15,8 +14,6 @@ namespace GVR.Manager
 {
     public class GvrSceneManager : SingletonBehaviour<GvrSceneManager>
     {
-        public static UnityEvent StartWorldLoading = new(); // Basically to clear caches etc.
-
         public GameObject interactionManager;
         
         private const string generalSceneName = "General";
@@ -29,13 +26,6 @@ namespace GVR.Manager
 
         private GameObject startPoint;
         private GameObject player;
-
-
-        // Hint: Scene general is always loaded >after< world is fully filled with vobs etc.
-        [NonSerialized]
-        public readonly UnityEvent sceneGeneralLoaded = new();
-        [NonSerialized]
-        public readonly UnityEvent sceneGeneralUnloaded = new();
 
         private bool debugFreshlyDoneLoading;
         
@@ -102,7 +92,6 @@ namespace GVR.Manager
             var watch = Stopwatch.StartNew();
 
             GameData.Reset();
-            StartWorldLoading.Invoke();
             
             await ShowLoadingScene(worldName, newGame);
             var newWorldScene = await LoadNewWorldScene(newWorldName);
@@ -146,7 +135,7 @@ namespace GVR.Manager
                 SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName(Constants.SceneBootstrap));
                 SceneManager.UnloadSceneAsync(generalScene);
 
-                sceneGeneralUnloaded.Invoke();
+                GVREvents.GeneralSceneUnloaded.Invoke();
                 generalSceneLoaded = false;
             }
 
@@ -189,7 +178,7 @@ namespace GVR.Manager
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
                     TeleportPlayerToSpot();
 
-                    sceneGeneralLoaded.Invoke();
+                    GVREvents.GeneralSceneLoaded.Invoke();
                     
                     WorldCreator.PostCreate();
                     // FIXME - Move to UnityEvent once existing

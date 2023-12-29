@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Debugging;
-using GVR.Extensions;
+using GVR.Globals;
 using GVR.Util;
 using UnityEngine;
 
@@ -45,8 +45,8 @@ namespace GVR.Manager.Culling
 
         private void Start()
         {
-            GvrSceneManager.I.sceneGeneralUnloaded.AddListener(PreWorldCreate);
-            GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostWorldCreate);
+            GVREvents.GeneralSceneUnloaded.AddListener(PreWorldCreate);
+            GVREvents.GeneralSceneLoaded.AddListener(PostWorldCreate);
 
             // Unity demands CullingGroups to be created in Awake() or Start() earliest.
             vobCullingGroupSmall = new();

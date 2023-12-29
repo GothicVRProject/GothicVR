@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GVR.Debugging;
+using GVR.Globals;
 using GVR.Manager;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Util;
@@ -20,12 +21,12 @@ namespace GVR.Npc
         private void OnEnable()
         {
             gameTime = GameTime.I;
-            gameTime.minuteChangeCallback.AddListener(Invoke);
+            GVREvents.GameTimeMinuteChangeCallback.AddListener(Invoke);
         }
 
         private void OnDisable()
         {
-            gameTime.minuteChangeCallback.RemoveListener(Invoke);
+            GVREvents.GameTimeMinuteChangeCallback.RemoveListener(Invoke);
         }
 
         private void Start()
@@ -34,7 +35,7 @@ namespace GVR.Npc
             if (!FeatureFlags.I.enableNpcRoutines)
                 return;
             
-            GvrSceneManager.I.sceneGeneralLoaded.AddListener(WorldLoadedEvent);
+            GVREvents.GeneralSceneLoaded.AddListener(WorldLoadedEvent);
         }
 
         private void WorldLoadedEvent()
