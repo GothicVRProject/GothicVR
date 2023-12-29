@@ -12,6 +12,7 @@ using GVR.Properties;
 using GVR.Vob.WayNet;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit;
 using ZenKit.Daedalus;
 using Object = UnityEngine.Object;
 using WayPoint = GVR.Vob.WayNet.WayPoint;
@@ -118,14 +119,25 @@ namespace GVR.Creator
             foreach (var equippedItem in props.EquippedItems)
                 MeshObjectCreator.EquipNpcWeapon(newNpc, equippedItem, (VmGothicEnums.ItemFlags)equippedItem.MainFlag, (VmGothicEnums.ItemFlags)equippedItem.Flags);
             
-            SetSpawnPoint(newNpc, spawnPoint, props.npcInstance);
+            var npcRoutine = props.npcInstance.DailyRoutine;
+            GameData.GothicVm.Call(npcRoutine, props.npcInstance);
+            
+            if (FeatureFlags.I.enableNpcRoutines)
+                StartRoutine(newNpc);
+            
+            SetSpawnPoint(newNpc, spawnPoint);
         }
 
-        private static void SetSpawnPoint(GameObject npcGo, string spawnPoint, NpcInstance npc)
+        private static void StartRoutine(GameObject npc)
         {
-            var npcRoutine = npc.DailyRoutine;
-            GameData.GothicVm.Call(npcRoutine);
+            var routineComp = npc.GetComponent<Routine>();
+            var firstRoutine = routineComp.routines.First();
 
+            npc.GetComponent<AiHandler>().StartRoutine(firstRoutine.action, firstRoutine.waypoint);
+        }
+        
+        private static void SetSpawnPoint(GameObject npcGo, string spawnPoint)
+        {
             WayNetPoint initialSpawnPoint;
             if (npcGo.GetComponent<Routine>().routines.Any())
             {

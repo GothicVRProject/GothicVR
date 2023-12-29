@@ -105,7 +105,7 @@ namespace GVR.Phoenix.Interface.Vm
 
             // Sound
             // Day Routine
-            // vm.RegisterExternal<NpcInstance, int, int, int, int, int, string>("TA_MIN", TA_MIN);
+            vm.RegisterExternal<NpcInstance, int, int, int, int, int, string>("TA_MIN", TA_MIN);
 
             // World
             vm.RegisterExternal<int, string>("Wld_InsertNpc", Wld_InsertNpc);
