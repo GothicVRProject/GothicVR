@@ -77,9 +77,6 @@ namespace GVR.Creator
         public static async Task CreateAsync(GameObject rootTeleport, GameObject rootNonTeleport, WorldData world,
             int vobsPerFrame)
         {
-            if (!FeatureFlags.I.createVobs)
-                return;
-            
             PreCreateVobs(world, rootTeleport, rootNonTeleport, vobsPerFrame);
             await CreateVobs(world.vobs);
             PostCreateVobs();

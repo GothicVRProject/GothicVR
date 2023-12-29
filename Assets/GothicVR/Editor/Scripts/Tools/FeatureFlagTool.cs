@@ -18,6 +18,7 @@ namespace GVR.Editor.Tools
         private static readonly List<Tuple<string, Type, object>> ProductionFlags = new()
         {
             // Booleans
+            new(nameof(FeatureFlags.createWorldMesh), typeof(bool), true),
             new(nameof(FeatureFlags.createVobs), typeof(bool), true),
             new (nameof(FeatureFlags.createWaypoints), typeof(bool), true),
             new (nameof(FeatureFlags.enableDayTime), typeof(bool), true),

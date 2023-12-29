@@ -317,6 +317,7 @@ MonoBehaviour:
   zenKitLogLevel: 0
   skipMainMenu: 0
   useXRDeviceSimulator: 0
+  createWorldMesh: 1
   createWaypoints: 1
   vobItemsDynamicAttach: 1
   createWayPointMeshes: 0
@@ -983,15 +984,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5af2db35bcd07048bbaf0db2b54d4d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  secondChangeCallback:
-    m_PersistentCalls:
-      m_Calls: []
-  minuteChangeCallback:
-    m_PersistentCalls:
-      m_Calls: []
-  hourChangeCallback:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!4 &936232198
 Transform:
   m_ObjectHideFlags: 0

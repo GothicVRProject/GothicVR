@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator.Meshes;
+using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
 using GVR.Manager;
@@ -38,8 +39,12 @@ namespace GVR.Creator
             teleportGo.SetParent(worldGo);
             nonTeleportGo.SetParent(worldGo);
 
-            await WorldMeshCreator.CreateAsync(world, teleportGo, Constants.MeshPerFrame);
-            await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, Constants.VObPerFrame);
+            if (FeatureFlags.I.createWorldMesh)
+                await WorldMeshCreator.CreateAsync(world, teleportGo, Constants.MeshPerFrame);
+    
+            if (FeatureFlags.I.createVobs)
+                await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, Constants.VObPerFrame);
+    
             WaynetCreator.Create(worldGo, world);
 
             // Set the global variable to the result of the coroutine

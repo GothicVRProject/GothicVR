@@ -24,6 +24,7 @@ namespace GVR.Debugging
         public bool useXRDeviceSimulator;
 
         [Header("__________World__________")]
+        public bool createWorldMesh;
         public bool createWaypoints;
         [Tooltip("True will render all pickables with dynamic attach points")]
         public bool vobItemsDynamicAttach;
