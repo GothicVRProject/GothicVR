@@ -647,7 +647,7 @@ namespace GVR.Creator
 
             particleSystem.Stop();
 
-            var gravity = pfx.flyGravity.Split();
+            var gravity = pfx.FlyGravityS.Split();
             float gravityX = 1f, gravityY = 1f, gravityZ = 1f;
             if (gravity.Length == 3)
             {
@@ -660,21 +660,21 @@ namespace GVR.Creator
             // Main module
             {
                 var mainModule = particleSystem.main;
-                var minLifeTime = (pfx.lspPartAvg - pfx.lspPartVar) / 1000; // I assume we need to change milliseconds to seconds.
-                var maxLifeTime = (pfx.lspPartAvg + pfx.lspPartVar) / 1000;
+                var minLifeTime = (pfx.LspPartAvg - pfx.LspPartVar) / 1000; // I assume we need to change milliseconds to seconds.
+                var maxLifeTime = (pfx.LspPartAvg + pfx.LspPartVar) / 1000;
                 mainModule.duration = 1f; // I assume pfx data wants a cycle being 1 second long.
                 mainModule.startLifetime = new (minLifeTime, maxLifeTime);
-                mainModule.loop = pfx.ppsIsLooping;
+                mainModule.loop = Convert.ToBoolean(pfx.PpsIsLooping);
 
-                var minSpeed = (pfx.velAvg - pfx.velVar) / 1000;
-                var maxSpeed = (pfx.velAvg + pfx.velVar) / 1000;
+                var minSpeed = (pfx.VelAvg - pfx.VelVar) / 1000;
+                var maxSpeed = (pfx.VelAvg + pfx.VelVar) / 1000;
                 mainModule.startSpeed = new(minSpeed, maxSpeed);
             }
 
             // Emission module
             {
                 var emissionModule = particleSystem.emission;
-                emissionModule.rateOverTime = new ParticleSystem.MinMaxCurve(pfx.ppsValue);
+                emissionModule.rateOverTime = new ParticleSystem.MinMaxCurve(pfx.PpsValue);
             }
 
             // Force over Lifetime module
@@ -694,8 +694,8 @@ namespace GVR.Creator
                 var colorOverTime = particleSystem.colorOverLifetime;
                 colorOverTime.enabled = true;
                 var gradient = new Gradient();
-                var colorStart = pfx.visTexColorStart.Split();
-                var colorEnd = pfx.visTexColorEnd.Split();
+                var colorStart = pfx.VisTexColorStartS.Split();
+                var colorEnd = pfx.VisTexColorEndS.Split();
                 gradient.SetKeys(
                     new GradientColorKey[]
                     {
@@ -709,8 +709,8 @@ namespace GVR.Creator
                     },
                     new GradientAlphaKey[]
                     {
-                        new GradientAlphaKey(pfx.visAlphaStart / 255, 0),
-                        new GradientAlphaKey(pfx.visAlphaEnd / 255, 1),
+                        new GradientAlphaKey(pfx.VisAlphaStart / 255, 0),
+                        new GradientAlphaKey(pfx.VisAlphaEnd / 255, 1),
                     });
                 colorOverTime.color = gradient;
             }
@@ -721,14 +721,14 @@ namespace GVR.Creator
                 sizeOverTime.enabled = true;
 
                 AnimationCurve curve = new AnimationCurve();
-                var shapeScaleKeys = pfx.shpScaleKeys.Split();
-                if (shapeScaleKeys.Length > 1 && pfx.shpScaleKeys != "")
+                var shapeScaleKeys = pfx.ShpScaleKeysS.Split();
+                if (shapeScaleKeys.Length > 1 && !pfx.ShpScaleKeysS.IsEmpty())
                 {
                     var curveTime = 0f;
 
-                    for (var i = 0; i < shapeScaleKeys.Length; i++)
+                    foreach (var key in shapeScaleKeys)
                     {
-                        curve.AddKey(curveTime, float.Parse(shapeScaleKeys[i]) / 100 * float.Parse(pfx.shpDim));
+                        curve.AddKey(curveTime, float.Parse(key) / 100 * float.Parse(pfx.ShpDimS));
                         curveTime += 1f / shapeScaleKeys.Length;
                     }
 
@@ -743,10 +743,10 @@ namespace GVR.Creator
                 var standardShader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
                 var material = new Material(standardShader);
                 rendererModule.material = material;
-                TextureManager.I.SetTexture(pfx.visName, rendererModule.material);
+                TextureManager.I.SetTexture(pfx.VisNameS, rendererModule.material);
                 // renderer.material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest; // First check with no change.
 
-                switch (pfx.visAlphaFunc.ToUpper())
+                switch (pfx.VisAlphaFuncS.ToUpper())
                 {
                     case "BLEND":
                         rendererModule.material.ToTransparentMode(); // e.g. leaves.pfx.
@@ -755,13 +755,13 @@ namespace GVR.Creator
                         rendererModule.material.ToAdditiveMode();
                         break;
                     default:
-                        Debug.LogWarning($"Particle AlphaFunc {pfx.visAlphaFunc} not yet handled.");
+                        Debug.LogWarning($"Particle AlphaFunc {pfx.VisAlphaFuncS} not yet handled.");
                         break;
                 }
                 // makes the material render both faces
                 rendererModule.material.SetInt("_Cull", (int)CullMode.Off);
 
-                switch (pfx.visOrientation)
+                switch (pfx.VisOrientationS)
                 {
                     case "NONE":
                         rendererModule.alignment = ParticleSystemRenderSpace.View;
@@ -773,7 +773,7 @@ namespace GVR.Creator
                         rendererModule.alignment = ParticleSystemRenderSpace.Velocity;
                         break;
                     default:
-                        Debug.LogWarning($"visOrientation {pfx.visOrientation} not yet handled.");
+                        Debug.LogWarning($"visOrientation {pfx.VisOrientationS} not yet handled.");
                         break;
                 }
             }
@@ -781,7 +781,7 @@ namespace GVR.Creator
             // Shape module
             {
                 var shapeModule = particleSystem.shape;
-                switch (pfx.shpType.ToUpper())
+                switch (pfx.ShpTypeS.ToUpper())
                 {
                     case "SPHERE":
                         shapeModule.shapeType = ParticleSystemShapeType.Sphere;
@@ -793,34 +793,31 @@ namespace GVR.Creator
                         shapeModule.shapeType = ParticleSystemShapeType.Mesh;
                         break;
                     default:
-                        Debug.LogWarning($"Particle ShapeType {pfx.shpType} not yet handled.");
+                        Debug.LogWarning($"Particle ShapeType {pfx.ShpTypeS} not yet handled.");
                         break;
                 }
 
-                var shapeDimensions = pfx.shpDim.Split();
+                var shapeDimensions = pfx.ShpDimS.Split();
                 switch (shapeDimensions.Length)
                 {
                     case 1:
                         shapeModule.radius = float.Parse(shapeDimensions[0], CultureInfo.InvariantCulture) / 100; // cm in m
                         break;
                     default:
-                        Debug.LogWarning($"shpDim >{pfx.shpDim}< not yet handled");
+                        Debug.LogWarning($"shpDim >{pfx.ShpDimS}< not yet handled");
                         break;
                 }
 
-                shapeModule.rotation = new(pfx.dirAngleElev, 0, 0);
+                shapeModule.rotation = new(pfx.DirAngleElev, 0, 0);
 
-                var shapeOffsetVec = pfx.shpOffsetVec.Split();
+                var shapeOffsetVec = pfx.ShpOffsetVecS.Split();
                 if (float.TryParse(shapeOffsetVec[0], out var x) && float.TryParse(shapeOffsetVec[1], out var y) &&
                     float.TryParse(shapeOffsetVec[2], out var z))
                     shapeModule.position = new UnityEngine.Vector3(x / 100, y / 100, z / 100);
-                else
-                    Debug.LogError(
-                        "One or more of the shape offset vector components could not be parsed into a float");
 
                 shapeModule.alignToDirection = true;
 
-                shapeModule.radiusThickness = pfx.shpIsVolume ? 1f : 0f;
+                shapeModule.radiusThickness = Convert.ToBoolean(pfx.ShpIsVolume) ? 1f : 0f;
             }
 
             particleSystem.Play();

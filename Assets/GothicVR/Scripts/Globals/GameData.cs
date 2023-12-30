@@ -18,6 +18,7 @@ namespace GVR.Globals
         public static Vfs Vfs;
         public static DaedalusVm GothicVm;
         public static DaedalusVm SfxVm; // Sound FX
+        public static DaedalusVm PfxVm; // Particle FX
         
         [Obsolete("Use new ZenKit API instead.")]
         public static IntPtr VfsPtr;
@@ -25,7 +26,6 @@ namespace GVR.Globals
         [Obsolete("Use new ZenKit API instead.")]
         public static IntPtr VmGothicPtr;
 
-        public static IntPtr VmPfxPtr; // Particle FX
         public static IntPtr VmMusicPtr;
 
         private static WorldData worldInternal;
@@ -92,12 +92,6 @@ namespace GVR.Globals
             {
                 PxVm.pxVmDestroy(VmGothicPtr);
                 VmGothicPtr = IntPtr.Zero;
-            }
-
-            if (VmPfxPtr != IntPtr.Zero)
-            {
-                PxVm.pxVmDestroy(VmPfxPtr);
-                VmPfxPtr = IntPtr.Zero;
             }
 
             if (VmMusicPtr != IntPtr.Zero)

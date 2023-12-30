@@ -31,7 +31,7 @@ namespace GVR.Caches
         private static readonly Dictionary<string, ItemInstance> ItemDataCache = new();
         private static readonly Dictionary<string, PxVmMusicData> MusicDataCache = new();
         private static readonly Dictionary<string, SoundEffectInstance> SfxDataCache = new();
-        private static readonly Dictionary<string, PxVmPfxData> PfxDataCache = new();
+        private static readonly Dictionary<string, ParticleEffectInstance> PfxDataCache = new();
         private static readonly Dictionary<string, PxSoundData<float>> SoundCache = new();
         private static readonly Dictionary<string, IFont> FontCache = new();
 
@@ -333,13 +333,21 @@ namespace GVR.Caches
         /// <summary>
         /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
         /// </summary>
-        public static PxVmPfxData TryGetPfxData(string key)
+        public static ParticleEffectInstance TryGetPfxData(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (PfxDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxVm.InitializePfx(GameData.VmPfxPtr, preparedKey);
+            ParticleEffectInstance newData = null;
+            try
+            {
+                newData = GameData.PfxVm.InitInstance<ParticleEffectInstance>(preparedKey);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
             PfxDataCache[preparedKey] = newData;
 
             return newData;

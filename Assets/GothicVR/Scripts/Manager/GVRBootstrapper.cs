@@ -201,8 +201,7 @@ namespace GVR.Manager
         private static void LoadPfxVm(string g1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/PARTICLEFX.DAT"));
-            var vmPtr = VmGothicExternals.LoadVm(fullPath);
-            GameData.VmPfxPtr = vmPtr;
+            GameData.PfxVm = new DaedalusVm(fullPath);
         }
 
         private void LoadMusicVM(string G1Dir)
