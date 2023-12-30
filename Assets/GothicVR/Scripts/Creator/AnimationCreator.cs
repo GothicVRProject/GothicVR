@@ -4,7 +4,6 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.Npc.Actions;
-using PxCs.Data.Model;
 using UnityEngine;
 using ZenKit;
 using Animation = UnityEngine.Animation;
@@ -145,15 +144,15 @@ namespace GVR.Creator
         {
             var anim = mds.Animations.First(i => i.Name.EqualsIgnoreCase(animationName));
 
-            foreach (var pxEvent in anim.EventTags)
+            foreach (var zkEvent in anim.EventTags)
             {
-                var clampedFrame = ClampFrame(pxEvent.Frame, anim.FirstFrame, (int)zkAnimation.FrameCount, anim.LastFrame);
+                var clampedFrame = ClampFrame(zkEvent.Frame, anim.FirstFrame, zkAnimation.FrameCount, anim.LastFrame);
                 
                 AnimationEvent animEvent = new()
                 {
                     time = clampedFrame / clip.frameRate,
                     functionName = nameof(IAnimationCallbacks.AnimationCallback),
-                    stringParameter = JsonUtility.ToJson(pxEvent) // As we can't add a custom object, we serialize data.
+                    stringParameter = JsonUtility.ToJson(zkEvent) // As we can't add a custom object, we serialize data.
                  };
                 
                 clip.AddEvent(animEvent);

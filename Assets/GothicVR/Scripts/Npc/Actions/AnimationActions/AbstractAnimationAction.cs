@@ -1,9 +1,9 @@
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Properties;
-using PxCs.Data.Event;
-using PxCs.Interface;
 using UnityEngine;
+using ZenKit;
+using EventType = ZenKit.EventType;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
@@ -27,21 +27,21 @@ namespace GVR.Npc.Actions.AnimationActions
         /// <summary>
         /// We just set the audio by default.
         /// </summary>
-        public virtual void AnimationSfxEventCallback(PxEventSfxData sfxData)
+        public virtual void AnimationSfxEventCallback(IEventSoundEffect sfxData)
         {
-            var clip = VobHelper.GetSoundClip(sfxData.name);
+            var clip = VobHelper.GetSoundClip(sfxData.Name);
             Props.npcSound.clip = clip;
-            Props.npcSound.maxDistance = sfxData.range.ToMeter();
+            Props.npcSound.maxDistance = sfxData.Range.ToMeter();
             Props.npcSound.Play();
 
-            if (sfxData.emptySlot)
-                Debug.LogWarning($"PxEventSfxData.emptySlot not yet implemented: {sfxData.name}");
+            if (sfxData.EmptySlot)
+                Debug.LogWarning($"PxEventSfxData.emptySlot not yet implemented: {sfxData.Name}");
         }
         
-        public virtual void AnimationEventCallback(PxEventTagData data)
+        public virtual void AnimationEventCallback(IEventTag data)
         {
             // FIXME - I have no clue about this inventory_torch event, but it gets called quite often.
-            if (data.type == PxModelScript.PxEventTagType.inventory_torch)
+            if (data.Type == EventType.TorchInventory)
                 return;
             
             Debug.LogError($"Animation for {Action.ActionType} is not yet implemented.");

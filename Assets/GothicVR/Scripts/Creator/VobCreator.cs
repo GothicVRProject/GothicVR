@@ -18,7 +18,6 @@ using GVR.Properties;
 using GVR.Vob;
 using GVR.Vob.WayNet;
 using JetBrains.Annotations;
-using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -242,16 +241,16 @@ namespace GVR.Creator
             
             // TODO - warnings about "not implemented" - print them once only.
             foreach (var var in new[]{
-                         PxWorld.PxVobType.PxVob_zCVobScreenFX,
-                         PxWorld.PxVobType.PxVob_zCVobAnimate,
-                         PxWorld.PxVobType.PxVob_zCTriggerWorldStart,
-                         PxWorld.PxVobType.PxVob_zCTriggerList,
-                         PxWorld.PxVobType.PxVob_oCCSTrigger,
-                         PxWorld.PxVobType.PxVob_oCTriggerScript,
-                         PxWorld.PxVobType.PxVob_zCVobLensFlare,
-                         PxWorld.PxVobType.PxVob_zCVobLight,
-                         PxWorld.PxVobType.PxVob_zCMoverController,
-                         PxWorld.PxVobType.PxVob_zCPFXController
+                         VirtualObjectType.zCVobScreenFX,
+                         VirtualObjectType.zCVobAnimate,
+                         VirtualObjectType.zCTriggerWorldStart,
+                         VirtualObjectType.zCTriggerList,
+                         VirtualObjectType.oCCSTrigger,
+                         VirtualObjectType.oCTriggerScript,
+                         VirtualObjectType.zCVobLensFlare,
+                         VirtualObjectType.zCVobLight,
+                         VirtualObjectType.zCMoverController,
+                         VirtualObjectType.zCPFXController
                      })
             {
                 Debug.LogWarning($"{var} not yet implemented.");
@@ -342,7 +341,7 @@ namespace GVR.Creator
         /// </summary>
         private static void CreateParentVobObjectNonTeleport(GameObject root)
         {
-            var allTypes = (VirtualObjectType[])Enum.GetValues(typeof(PxWorld.PxVobType));
+            var allTypes = (VirtualObjectType[])Enum.GetValues(typeof(VirtualObjectType));
             foreach (var type in allTypes.Intersect(nonTeleportTypes))
             {
                 var newGo = new GameObject(type.ToString());

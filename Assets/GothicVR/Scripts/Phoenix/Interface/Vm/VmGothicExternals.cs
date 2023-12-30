@@ -5,7 +5,6 @@ using GVR.Creator;
 using GVR.Debugging;
 using GVR.Globals;
 using GVR.Manager;
-using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;
@@ -18,27 +17,6 @@ namespace GVR.Phoenix.Interface.Vm
     /// </summary>
     public static class VmGothicExternals
     {
-        public static IntPtr LoadVm(string fullDatFilePath)
-        {
-            var bufferPtr = LoadBuffer(fullDatFilePath);
-            var vmPtr = PxVm.pxVmLoad(bufferPtr);
-            PxBuffer.pxBufferDestroy(bufferPtr); // Data isn't needed any longer.
-
-            return vmPtr;
-        }
-
-        private static IntPtr LoadBuffer(string fullDatFilePath)
-        {
-            var bufferPtr = PxBuffer.pxBufferMmap(fullDatFilePath);
-
-            if (bufferPtr == IntPtr.Zero)
-                throw new ArgumentNullException(
-                    $"No buffer loaded. Are you asking for the wrong file?: >{fullDatFilePath}<");
-
-            return bufferPtr;
-        }
-
-
         public static void RegisterExternals()
         {
             var vm = GameData.GothicVm;

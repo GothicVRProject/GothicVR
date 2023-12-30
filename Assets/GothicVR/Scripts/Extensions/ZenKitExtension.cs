@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+using ZenKit;
+using TextureFormat = UnityEngine.TextureFormat;
 
 namespace GVR.Extensions
 {
@@ -45,5 +49,43 @@ namespace GVR.Extensions
             };
         }
 
+        public static BoneWeight ToBoneWeight(this List<SoftSkinWeightEntry> weights, List<int> nodeMapping)
+        {
+            if (weights == null)
+                throw new ArgumentNullException("Weights are null.");
+            if (weights.Count == 0 || weights.Count > 4)
+                throw new ArgumentOutOfRangeException($"Only 1...4 weights are currently supported but >{weights.Count}< provided.");
+
+            var data = new BoneWeight();
+
+            for (var i = 0; i < weights.Count; i++)
+            {
+                var index = Array.IndexOf(nodeMapping.ToArray(), weights[i].NodeIndex);
+                if (index == -1)
+                    throw new ArgumentException($"No matching node index found in nodeMapping for weights[{i}].nodeIndex.");
+
+                switch (i)
+                {
+                    case 0:
+                        data.boneIndex0 = index;
+                        data.weight0 = weights[i].Weight;
+                        break;
+                    case 1:
+                        data.boneIndex1 = index;
+                        data.weight1 = weights[i].Weight;
+                        break;
+                    case 2:
+                        data.boneIndex2 = index;
+                        data.weight2 = weights[i].Weight;
+                        break;
+                    case 3:
+                        data.boneIndex3 = index;
+                        data.weight3 = weights[i].Weight;
+                        break;
+                }
+            }
+
+            return data;
+        }
     }
 }

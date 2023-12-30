@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Vob.WayNet;
-using PxCs.Data.Vm;
 using UnityEngine;
-using UnityEngine.Serialization;
 using ZenKit.Daedalus;
 
 namespace GVR.Properties

@@ -7,8 +7,6 @@ using GVR.Globals;
 using GVR.Manager.Settings;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Util;
-using PxCs.Helper;
-using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
 using Debug = UnityEngine.Debug;
@@ -24,7 +22,6 @@ namespace GVR.Manager
 
         private void Start()
         {
-            PxLogging.pxLoggerSet(PxLoggerCallback);
             Logger.Set(FeatureFlags.I.zenKitLogLevel, ZenKitLoggerCallback);
 
             // Just in case we forgot to disable it in scene view. ;-)
@@ -82,30 +79,6 @@ namespace GVR.Manager
 
         }
 
-        [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]
-        public static void PxLoggerCallback(PxLogging.Level level, string message)
-        {
-            switch (level)
-            {
-                case PxLogging.Level.warn:
-                    Debug.LogWarning(message);
-                    break;
-                case PxLogging.Level.error:
-                    var isVfsMessage = message.ContainsIgnoreCase("failed to find vfs entry");
-                    if (isVfsMessage && !FeatureFlags.I.showPhoenixVfsFileNotFoundErrors)
-                        break;
-
-                    Debug.LogError(message);
-                    break;
-                default:
-                    if (!FeatureFlags.I.showPhoenixDebugMessages)
-                        break;
-
-                    Debug.Log(message);
-                    break;
-            }
-        }
-
         [MonoPInvokeCallback(typeof(Logger.Callback))]
         public static void ZenKitLoggerCallback(LogLevel level, string name, string message)
         {
@@ -156,11 +129,9 @@ namespace GVR.Manager
             {
                 case "cs":
                 case "pl":
-                    PxEncoding.SetEncoding(PxEncoding.SupportedEncodings.CentralEurope);
                     StringEncodingController.SetEncoding(StringEncoding.CentralEurope);
                     break;
                 case "ru":
-                    PxEncoding.SetEncoding(PxEncoding.SupportedEncodings.EastEurope);
                     StringEncodingController.SetEncoding(StringEncoding.EastEurope);
                     break;
                 case "de":
@@ -169,7 +140,6 @@ namespace GVR.Manager
                 case "fr":
                 case "it":
                 default:
-                    PxEncoding.SetEncoding(PxEncoding.SupportedEncodings.WestEurope);
                     StringEncodingController.SetEncoding(StringEncoding.WestEurope);
                     break;
             }

@@ -1,14 +1,11 @@
-using System;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
-using GVR.Npc;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Properties;
-using PxCs.Interface;
 using UnityEngine;
 using ZenKit.Daedalus;
 

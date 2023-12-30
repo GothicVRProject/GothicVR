@@ -1,9 +1,5 @@
 ﻿using GVR.Creator.Meshes;
 using GVR.Phoenix.Interface.Vm;
-using PxCs.Data.Mesh;
-using PxCs.Data.Model;
-using PxCs.Data.Vm;
-using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;

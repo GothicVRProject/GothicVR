@@ -1,6 +1,4 @@
 using GVR.Properties;
-using PxCs.Data.Vm;
-using UnityEngine;
 using ZenKit.Daedalus;
 
 namespace GVR.Vob

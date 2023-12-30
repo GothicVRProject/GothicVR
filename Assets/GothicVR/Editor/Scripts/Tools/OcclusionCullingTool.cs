@@ -1,11 +1,8 @@
 using System;
-using System.IO;
 using GVR.Creator;
 using GVR.Globals;
 using GVR.Manager;
 using GVR.Manager.Settings;
-using GVR.Phoenix.Interface;
-using PxCs.Interface;
 using UnityEditor;
 using UnityEngine;
 
@@ -53,14 +50,7 @@ namespace GVR.Editor.Tools
 
         private void OnDestroy()
         {
-            if (_vfsPtr == IntPtr.Zero)
-                return;
-
-            PxVfs.DestroyVfs(_vfsPtr);
-            _vfsPtr = IntPtr.Zero;
-
-            // Hint: If window closes as the game is started, we must not! clear GameData.I.VdfPtr as it would crash the game.
-            // Therefore just leave it as it is...
+            GameData.Dispose();
         }
     }
 }

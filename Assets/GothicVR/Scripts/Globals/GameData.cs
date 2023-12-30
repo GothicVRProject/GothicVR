@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GVR.Extensions;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Properties;
 using GVR.Vob.WayNet;
 using GVR.World;
-using PxCs.Interface;
 using UnityEngine.SceneManagement;
 using ZenKit;
 using WayPoint = GVR.Vob.WayNet.WayPoint;

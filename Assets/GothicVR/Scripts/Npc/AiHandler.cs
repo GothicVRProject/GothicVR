@@ -2,7 +2,6 @@
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Properties;
-using PxCs.Data.Event;
 using UnityEngine;
 using ZenKit;
 
@@ -110,13 +109,13 @@ namespace GVR.Npc
 
         public void AnimationCallback(string pxEventTagDataParam)
         {
-            var eventData = JsonUtility.FromJson<PxEventTagData>(pxEventTagDataParam);
+            var eventData = JsonUtility.FromJson<IEventTag>(pxEventTagDataParam);
             properties.currentAction.AnimationEventCallback(eventData);
         }
 
         public void AnimationSfxCallback(string pxEventSfxDataParam)
         {
-            var eventData = JsonUtility.FromJson<PxEventSfxData>(pxEventSfxDataParam);
+            var eventData = JsonUtility.FromJson<IEventSoundEffect>(pxEventSfxDataParam);
             properties.currentAction.AnimationSfxEventCallback(eventData);
         }
         

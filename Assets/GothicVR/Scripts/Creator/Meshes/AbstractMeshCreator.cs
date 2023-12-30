@@ -2,15 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
-using PxCs.Data.Mesh;
-using PxCs.Data.Model;
-using PxCs.Data.Struct;
-using PxCs.Interface;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using ZenKit;
 using Material = UnityEngine.Material;
+using Matrix4x4 = System.Numerics.Matrix4x4;
 using Mesh = UnityEngine.Mesh;
 using TextureFormat = UnityEngine.TextureFormat;
 
@@ -160,19 +156,14 @@ namespace GVR.Creator.Meshes
             return rootGo;
         }
 
-        protected void SetPosAndRot(GameObject obj, System.Numerics.Matrix4x4 matrix)
+        protected void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
         {
             SetPosAndRot(obj, matrix.ToUnityMatrix());
         }
 
-        protected void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
+        protected void SetPosAndRot(GameObject obj, UnityEngine.Matrix4x4 matrix)
         {
             SetPosAndRot(obj, matrix.GetPosition() / 100, matrix.rotation);
-        }
-
-        protected void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
-        {
-            SetPosAndRot(obj, position, rotation.ToUnityMatrix().rotation);
         }
 
         protected void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
@@ -449,7 +440,7 @@ namespace GVR.Creator.Meshes
         private void CreateBonesData(GameObject rootObj, GameObject[] nodeObjects, SkinnedMeshRenderer renderer, ISoftSkinMesh mesh)
         {
             var meshBones = new Transform[mesh.Nodes.Count];
-            var bindPoses = new Matrix4x4[mesh.Nodes.Count];
+            var bindPoses = new UnityEngine.Matrix4x4[mesh.Nodes.Count];
 
             for (var i = 0; i < mesh.Nodes.Count; i++)
             {

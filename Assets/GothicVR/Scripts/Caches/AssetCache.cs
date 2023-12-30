@@ -7,8 +7,6 @@ using GVR.Data;
 using GVR.Extensions;
 using GVR.Globals;
 using JetBrains.Annotations;
-using PxCs.Data.Sound;
-using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;

@@ -4,11 +4,8 @@ using GVR.Creator.Sounds;
 using GVR.Data;
 using GVR.Extensions;
 using GVR.Globals;
-using GVR.Phoenix.Interface;
-using GVR.Phoenix.Util;
 using GVR.Properties;
 using JetBrains.Annotations;
-using PxCs.Data.Sound;
 using UnityEngine;
 
 namespace GVR.GothicVR.Scripts.Manager

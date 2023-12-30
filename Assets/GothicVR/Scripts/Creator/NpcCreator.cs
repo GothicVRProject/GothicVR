@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using GVR.Caches;
 using GVR.Debugging;
@@ -10,7 +9,6 @@ using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Properties;
 using GVR.Vob.WayNet;
-using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;
