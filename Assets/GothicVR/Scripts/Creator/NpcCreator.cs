@@ -22,6 +22,7 @@ namespace GVR.Creator
     public static class NpcCreator
     {
         private static GameObject npcRootGo;
+        private static DaedalusVm vm => GameData.GothicVm;
 
         // Hint - If this scale ratio isn't looking well, feel free to change it.
         private const float fatnessScale = 0.1f;
@@ -81,7 +82,7 @@ namespace GVR.Creator
         {
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             var props = newNpc.GetComponent<NpcProperties>();
-            var npcSymbol = GameData.GothicVm.GetSymbolByIndex((uint)npcInstance);
+            var npcSymbol = vm.GetSymbolByIndex((uint)npcInstance);
             
             if (npcSymbol == null)
             {
@@ -92,8 +93,8 @@ namespace GVR.Creator
             // Humans are singletons.
             if (LookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<NpcProperties>()))
             {
-                props.npcInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol);
-                GameData.GothicVm.InitInstance(props.npcInstance);
+                props.npcInstance = vm.AllocInstance<NpcInstance>(npcSymbol);
+                vm.InitInstance(props.npcInstance);
             }
             // Monsters are used multiple times.
             else
@@ -120,7 +121,8 @@ namespace GVR.Creator
                 MeshObjectCreator.EquipNpcWeapon(newNpc, equippedItem, (VmGothicEnums.ItemFlags)equippedItem.MainFlag, (VmGothicEnums.ItemFlags)equippedItem.Flags);
             
             var npcRoutine = props.npcInstance.DailyRoutine;
-            GameData.GothicVm.Call(npcRoutine, props.npcInstance);
+            vm.GlobalSelf = props.npcInstance;
+            vm.Call(npcRoutine);
             
             if (FeatureFlags.I.enableNpcRoutines)
                 StartRoutine(newNpc);

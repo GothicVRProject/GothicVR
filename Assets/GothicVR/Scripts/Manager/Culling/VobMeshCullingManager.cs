@@ -239,19 +239,9 @@ namespace GVR.Manager.Culling
             {
                 if (transf.TryGetComponent<ParticleSystemRenderer>(out var particleRenderer))
                     return particleRenderer.bounds;
-                else if (transf.TryGetComponent<MeshFilter>(out var mesh0)) // Lookup: /
-                    return mesh0.mesh.bounds;
-                else if (transf.GetChild(0).TryGetComponent<MeshFilter>(out var mesh1)) // Lookup: /BIP 01
-                    return mesh1.mesh.bounds;
-                else if (transf.GetChild(0).GetChild(0)
-                         .TryGetComponent<MeshFilter>(out var mesh2)) // Lookup: /BIP 01/...
-                    return mesh2.mesh.bounds;
-                else if (transf.childCount > 1 &&
-                         transf.GetChild(1).TryGetComponent<MeshFilter>(out var mesh3)) // Lookup: /ZM_0
-                    return mesh3.mesh.bounds;
-                // FIXME - We need to have something different for Particles.
                 else
-                    return null;
+                    // Example lookups: /, /BIP 01, /BIP 01/..., /ZM_0
+                    return transf.GetComponentInChildren<MeshFilter>().mesh.bounds;
             }
             catch (Exception e)
             {
