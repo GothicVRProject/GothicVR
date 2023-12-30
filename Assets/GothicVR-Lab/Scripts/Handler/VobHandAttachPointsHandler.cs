@@ -51,8 +51,7 @@ namespace GVR.Lab.Handler
              * 3. Load Vob name list
              * 4. Fill dropdown
              */
-            List<string> itemNames = new();
-            PxVm.pxVmEnumerateInstancesByClassName(GameData.VmGothicPtr, "C_Item", (string name) => itemNames.Add(name));
+            var itemNames = GameData.GothicVm.GetInstanceSymbols("C_Item").Select(i => i.Name).ToList();
 
             items = itemNames
                 .ToDictionary(itemName => itemName, AssetCache.TryGetItemData);

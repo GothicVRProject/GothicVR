@@ -23,9 +23,6 @@ namespace GVR.Globals
         
         [Obsolete("Use new ZenKit API instead.")]
         public static IntPtr VfsPtr;
-        
-        [Obsolete("Use new ZenKit API instead.")]
-        public static IntPtr VmGothicPtr;
 
         private static WorldData worldInternal;
         public static WorldData World

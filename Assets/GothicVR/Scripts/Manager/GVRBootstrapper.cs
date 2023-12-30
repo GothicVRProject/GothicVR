@@ -179,9 +179,6 @@ namespace GVR.Manager
         private static void LoadGothicVm(string g1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
-            var vmPtr = VmGothicExternals.LoadVm(fullPath);
-            GameData.VmGothicPtr = vmPtr;
-
             GameData.GothicVm = new DaedalusVm(fullPath);
 
             VmGothicExternals.RegisterExternals();

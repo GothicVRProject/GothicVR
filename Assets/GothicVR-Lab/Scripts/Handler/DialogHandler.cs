@@ -5,6 +5,7 @@ using GVR.Globals;
 using GVR.Phoenix.Interface.Vm;
 using PxCs.Interface;
 using UnityEngine;
+using ZenKit.Daedalus;
 
 namespace GVR.Lab.Handler
 {
@@ -25,7 +26,9 @@ namespace GVR.Lab.Handler
             newNpc.name = "Bloodwyn";
             newNpc.SetParent(bloodwynSlotGo);
 
-            var pxNpc = PxVm.InitializeNpc(GameData.VmGothicPtr, (uint)bloodwynInstanceInstanceId);
+            var npcSymbol = GameData.GothicVm.GetSymbolByIndex((uint)bloodwynInstanceInstanceId);
+            var npcInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol!);
+            GameData.GothicVm.InitInstance(npcInstance);
 
             var mdmName = "Hum_GRDM_ARMOR.asc";
             var mdhName = "Humans_Militia.mds";
