@@ -7,6 +7,7 @@ using GVR.Manager.Settings;
 using GVR.Util;
 using PxCs.Data.Vm;
 using UnityEngine;
+using ZenKit.Daedalus;
 
 namespace GVR.Manager
 {
@@ -32,7 +33,7 @@ namespace GVR.Manager
         private bool hasPending;
         private bool reloadTheme;
 
-        private PxVmMusicData pendingTheme;
+        private MusicThemeInstance pendingTheme;
 
         private int bufferSize = 2048;
         private short[] shortBuffer;
@@ -109,15 +110,15 @@ namespace GVR.Manager
                 return;
 
             hasPending = false;
-            PxVmMusicData theme = pendingTheme;
-            Tags tags = pendingTags;
+            var theme = pendingTheme;
+            var tags = pendingTags;
 
-            DMMixer.DMusicSetMusicVolume(mixer, pendingTheme.vol);
+            DMMixer.DMusicSetMusicVolume(mixer, pendingTheme.Vol);
 
             if (!reloadTheme)
                 return;
 
-            var pattern = DMDirectMusic.DMusicLoadFile(directmusic, theme.file, theme.file.Length);
+            var pattern = DMDirectMusic.DMusicLoadFile(directmusic, theme.File, theme.File.Length);
 
             DMMusic.DMusicAddPattern(music, pattern);
 
@@ -192,13 +193,13 @@ namespace GVR.Manager
 
             var theme = AssetCache.TryGetMusic(musicName);
 
-            reloadTheme = pendingTheme.file != theme.file;
+            reloadTheme = pendingTheme.File != theme.File;
             pendingTheme = theme;
             pendingTags = tags;
             hasPending = true;
 
             if (FeatureFlags.I.showMusicLogs)
-                Debug.Log($"Playing music: theme >{musicName}< from file >{theme.file}<");
+                Debug.Log($"Playing music: theme >{musicName}< from file >{theme.File}<");
         }
 
         public void SetMusic(string musicName)
@@ -209,7 +210,7 @@ namespace GVR.Manager
             hasPending = true;
 
             if (FeatureFlags.I.showMusicLogs)
-                Debug.Log($"[Music] Playing music: theme >{musicName}< from file >{theme.file}<");
+                Debug.Log($"[Music] Playing music: theme >{musicName}< from file >{theme.File}<");
         }
 
         private void StopMusic()

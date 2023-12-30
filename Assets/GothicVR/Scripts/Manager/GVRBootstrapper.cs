@@ -73,7 +73,7 @@ namespace GVR.Manager
             LoadGothicVm(g1Dir);
             LoadSfxVm(g1Dir);
             LoadPfxVm(g1Dir);
-            LoadMusicVM(g1Dir);
+            LoadMusicVv(g1Dir);
             LoadMusic();
             LoadFonts();
             
@@ -199,11 +199,10 @@ namespace GVR.Manager
             GameData.PfxVm = new DaedalusVm(fullPath);
         }
 
-        private static void LoadMusicVM(string g1Dir)
+        private static void LoadMusicVv(string g1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
-            var vmPtr = VmGothicExternals.LoadVm(fullPath);
-            GameData.VmMusicPtr = vmPtr;
+            GameData.MusicVm = new DaedalusVm(fullPath);
         }
 
         private static void LoadMusic()

@@ -39,7 +39,7 @@ namespace GVR.Editor.Tools
                 SettingsManager.LoadGameSettings();
 
             GVRBootstrapper.SetLanguage();
-            GVRBootstrapper.MountVfs(SettingsManager.GameSettings!.GothicIPath);
+            GVRBootstrapper.MountVfs(SettingsManager.GameSettings.GothicIPath);
 
             WorldCreator.LoadEditorWorld();
         }

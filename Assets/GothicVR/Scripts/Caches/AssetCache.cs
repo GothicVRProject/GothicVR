@@ -6,7 +6,6 @@ using GVR.Extensions;
 using GVR.Globals;
 using JetBrains.Annotations;
 using PxCs.Data.Sound;
-using PxCs.Data.Vm;
 using PxCs.Interface;
 using UnityEngine;
 using ZenKit;
@@ -29,7 +28,7 @@ namespace GVR.Caches
         private static readonly Dictionary<string, IMultiResolutionMesh> MrmCache = new();
         private static readonly Dictionary<string, IMorphMesh> MmbCache = new();
         private static readonly Dictionary<string, ItemInstance> ItemDataCache = new();
-        private static readonly Dictionary<string, PxVmMusicData> MusicDataCache = new();
+        private static readonly Dictionary<string, MusicThemeInstance> MusiThemeCache = new();
         private static readonly Dictionary<string, SoundEffectInstance> SfxDataCache = new();
         private static readonly Dictionary<string, ParticleEffectInstance> PfxDataCache = new();
         private static readonly Dictionary<string, PxSoundData<float>> SoundCache = new();
@@ -255,14 +254,22 @@ namespace GVR.Caches
             return newData;
         }
 
-        public static PxVmMusicData TryGetMusic(string key)
+        public static MusicThemeInstance TryGetMusic(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (MusicDataCache.TryGetValue(preparedKey, out var data))
+            if (MusiThemeCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxVm.InitializeMusic(GameData.VmMusicPtr, preparedKey);
-            MusicDataCache[preparedKey] = newData;
+            MusicThemeInstance newData = null;
+            try
+            {
+                newData = GameData.MusicVm.InitInstance<MusicThemeInstance>(preparedKey);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+            MusiThemeCache[preparedKey] = newData;
 
             return newData;
         }
