@@ -5,36 +5,37 @@ using UnityEngine;
 
 public class TextureManager : SingletonBehaviour<TextureManager>
 {
-    public Material MainMenuImageBackgroundMaterial;
-    public Material MainMenuBackgroundMaterial;
-    public Material MainMenuTextImageMaterial;
+    public Material mainMenuImageBackgroundMaterial;
+     public Material mainMenuBackgroundMaterial;
+    public Material mainMenuTextImageMaterial;
 
-    public Material backgroundmaterial;
-    public Material buttonmaterial;
-    public Material slidermaterial;
-    public Material sliderpositionmaterial;
-    public Material arrowmaterial;
-    public Material fillermaterial;
-    public Material skymaterial;
+    public Material backgroundMaterial;
+    public Material buttonMaterial;
+    public Material sliderMaterial;
+    public Material sliderPositionMaterial;
+    public Material arrowMaterial;
+    public Material fillerMaterial;
+    public Material skyMaterial;
 
-    public Material GothicLoadingMenuMaterial;
-    public Material LoadingBarBackgroundMaterial;
-    public Material LoadingBarMaterial;
-    public Material LoadingSphereMaterial;
+    public Material gothicLoadingMenuMaterial;
+    public Material loadingBarBackgroundMaterial;
+    public Material loadingBarMaterial;
+    public Material loadingSphereMaterial;
 
     private const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
 
     private void Start()
     {
 
-        MainMenuImageBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
-        MainMenuBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
-        MainMenuTextImageMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
+        mainMenuImageBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        mainMenuBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        mainMenuTextImageMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
 
-        GothicLoadingMenuMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
-        LoadingBarBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
-        LoadingBarMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        gothicLoadingMenuMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        loadingBarBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        loadingBarMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
 
+        // These elements get their material assigned in Editor already.
         // TODO: remove the middleman materials and use these for settings menu
         // backgroundmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
         // buttonmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
@@ -43,51 +44,25 @@ public class TextureManager : SingletonBehaviour<TextureManager>
         // arrowmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
         // fillermaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
 
-        LoadingSphereMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
-        LoadingSphereMaterial.color = new Color(.25f, .25f, .25f, 1f); // dark gray
+        loadingSphereMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
+        loadingSphereMaterial.color = new Color(.25f, .25f, .25f, 1f); // dark gray
     }
 
     public void LoadLoadingDefaultTextures()
     {
-
-        var mainMenuImageBackgroundTexture = AssetCache.TryGetTexture("STARTSCREEN.TGA");
-        MainMenuImageBackgroundMaterial.mainTexture = mainMenuImageBackgroundTexture;
-
-        var mainMenuImageTexture = AssetCache.TryGetTexture("MENU_INGAME.TGA");
-        MainMenuBackgroundMaterial.mainTexture = mainMenuImageTexture;
-
-        var mainMenuTextImageTexture = AssetCache.TryGetTexture("MENU_GOTHIC.TGA");
-        MainMenuTextImageMaterial.mainTexture = mainMenuTextImageTexture;
-
-        var loadingBackgroundTexture = AssetCache.TryGetTexture("LOADING.TGA");
-        GothicLoadingMenuMaterial.mainTexture = loadingBackgroundTexture;
-
-        var progressBackgroundTexture = AssetCache.TryGetTexture("PROGRESS.TGA");
-        LoadingBarBackgroundMaterial.mainTexture = progressBackgroundTexture;
-
-        var progressTexture = AssetCache.TryGetTexture("PROGRESS_BAR.TGA");
-        LoadingBarMaterial.mainTexture = progressTexture;
-
-        var backgroundtexture = AssetCache.TryGetTexture("LOG_PAPER.TGA");
-        backgroundmaterial.mainTexture = backgroundtexture;
-
-        var buttontexture = AssetCache.TryGetTexture("INV_SLOT.TGA");
-        buttonmaterial.mainTexture = buttontexture;
-
-        var slidertexture = AssetCache.TryGetTexture("MENU_SLIDER_BACK.TGA");
-        slidermaterial.mainTexture = slidertexture;
-
-        var sliderpositiontexture = AssetCache.TryGetTexture("MENU_SLIDER_POS.TGA");
-        sliderpositionmaterial.mainTexture = sliderpositiontexture;
-
-        var fillertexture = AssetCache.TryGetTexture("MENU_BUTTONBACK-C.TEX");
-        fillermaterial.mainTexture = fillertexture;
-
-        var arrowtexture = AssetCache.TryGetTexture("U.TGA");
-        arrowmaterial.mainTexture = arrowtexture;
-
-        var skytexture = AssetCache.TryGetTexture("SKYDAY_LAYER1_A0-C.TEX");
-        skymaterial.mainTexture = skytexture;
+        mainMenuImageBackgroundMaterial.mainTexture = AssetCache.TryGetTexture("STARTSCREEN.TGA");
+        mainMenuBackgroundMaterial.mainTexture = AssetCache.TryGetTexture("MENU_INGAME.TGA");
+        mainMenuTextImageMaterial.mainTexture = AssetCache.TryGetTexture("MENU_GOTHIC.TGA");
+        gothicLoadingMenuMaterial.mainTexture = AssetCache.TryGetTexture("LOADING.TGA");
+        loadingBarBackgroundMaterial.mainTexture = AssetCache.TryGetTexture("PROGRESS.TGA");
+        loadingBarMaterial.mainTexture = AssetCache.TryGetTexture("PROGRESS_BAR.TGA");
+        backgroundMaterial.mainTexture = AssetCache.TryGetTexture("LOG_PAPER.TGA");
+        buttonMaterial.mainTexture = AssetCache.TryGetTexture("INV_SLOT.TGA");
+        sliderMaterial.mainTexture = AssetCache.TryGetTexture("MENU_SLIDER_BACK.TGA");
+        sliderPositionMaterial.mainTexture = AssetCache.TryGetTexture("MENU_SLIDER_POS.TGA");
+        fillerMaterial.mainTexture = AssetCache.TryGetTexture("MENU_BUTTONBACK.TGA");
+        arrowMaterial.mainTexture = AssetCache.TryGetTexture("U.TGA");
+        skyMaterial.mainTexture = AssetCache.TryGetTexture("SKYDAY_LAYER1_A0.TGA");
     }
 
     public void SetTexture(string texture, Material material)
@@ -95,7 +70,7 @@ public class TextureManager : SingletonBehaviour<TextureManager>
         material.mainTexture = AssetCache.TryGetTexture(texture);
     }
 
-    private Material GetEmptyMaterial(MaterialExtension.BlendMode blendMode = MaterialExtension.BlendMode.Opaque)
+    private Material GetEmptyMaterial(MaterialExtension.BlendMode blendMode)
     {
         var standardShader = Shader.Find(defaultShader);
         var material = new Material(standardShader);
