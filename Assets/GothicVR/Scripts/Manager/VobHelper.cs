@@ -63,12 +63,9 @@ namespace GVR.GothicVR.Scripts.Manager
                 var sfxData = AssetCache.TryGetSfxData(soundName);
 
                 if (sfxData == null)
-                {
-                    Debug.LogError($"No sfx data returned for {soundName}");
                     return null;
-                }
 
-                wavFile = AssetCache.TryGetSound(sfxData.file);
+                wavFile = AssetCache.TryGetSound(sfxData.File);
             }
 
             if (wavFile == null)

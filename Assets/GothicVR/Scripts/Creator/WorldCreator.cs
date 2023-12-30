@@ -72,7 +72,7 @@ namespace GVR.Creator
 
             // TODO - For some reason the referenced skybox in scene is reset to default once game starts.
             // We therefore need to reset it now again.
-            RenderSettings.skybox = TextureManager.I.skymaterial;
+            RenderSettings.skybox = TextureManager.I.skyMaterial;
         }
 
         private static WorldData LoadWorld(string worldName)

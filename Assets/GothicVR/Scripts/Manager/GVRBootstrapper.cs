@@ -73,8 +73,8 @@ namespace GVR.Manager
 
             MountVfs(g1Dir);
             SetLanguage();
-            LoadGothicVM(g1Dir);
-            LoadSfxVM(g1Dir);
+            LoadGothicVm(g1Dir);
+            LoadSfxVm(g1Dir);
             LoadPfxVm(g1Dir);
             LoadMusicVM(g1Dir);
             LoadMusic();
@@ -181,7 +181,7 @@ namespace GVR.Manager
         }
 
         
-        private void LoadGothicVM(string g1Dir)
+        private void LoadGothicVm(string g1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
             var vmPtr = VmGothicExternals.LoadVm(fullPath);
@@ -192,11 +192,10 @@ namespace GVR.Manager
             VmGothicExternals.RegisterExternals();
         }
 
-        private void LoadSfxVM(string G1Dir)
+        private void LoadSfxVm(string g1Dir)
         {
-            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
-            var vmPtr = VmGothicExternals.LoadVm(fullPath);
-            GameData.VmSfxPtr = vmPtr;
+            var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
+            GameData.SfxVm = new DaedalusVm(fullPath);
         }
 
         private static void LoadPfxVm(string g1Dir)

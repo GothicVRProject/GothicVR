@@ -154,7 +154,7 @@ namespace GVR.Manager
                 return;
 
             string textureString = newGame ? "LOADING.TGA" : $"LOADING_{worldName.Split('.')[0].ToUpper()}.TGA";
-            TextureManager.I.SetTexture(textureString, TextureManager.I.GothicLoadingMenuMaterial);
+            TextureManager.I.SetTexture(textureString, TextureManager.I.gothicLoadingMenuMaterial);
         }
 
         private void HideLoadingScene()
@@ -186,7 +186,7 @@ namespace GVR.Manager
                     break;
                 case Constants.SceneMainMenu:
                     var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
-                    sphere.GetComponent<MeshRenderer>().material = TextureManager.I.LoadingSphereMaterial;
+                    sphere.GetComponent<MeshRenderer>().material = TextureManager.I.loadingSphereMaterial;
                     SceneManager.SetActiveScene(scene);
 
                     // FIXME - Move to UnityEvent once existing

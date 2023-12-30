@@ -146,7 +146,7 @@ namespace GVR.Player.Climb
 
             teleportIndicatorReticleImage.sprite = sprite;
             teleportIndicatorReticleImage.rectTransform.sizeDelta = new Vector2(1f, 1f);
-            teleportIndicatorReticleImage.material = TextureManager.I.arrowmaterial;
+            teleportIndicatorReticleImage.material = TextureManager.I.arrowMaterial;
             teleportIndicatorReticleImage.type = Image.Type.Filled;
             teleportIndicatorReticleImage.fillMethod = Image.FillMethod.Vertical;
             Destroy(teleportIndicatorReticle.GetComponent<Collider>());

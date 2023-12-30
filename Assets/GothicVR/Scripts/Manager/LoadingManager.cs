@@ -91,10 +91,10 @@ namespace GVR.Manager
         public void SetMaterialForLoading(Scene scene)
         {
             var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
-            sphere.GetComponent<MeshRenderer>().material = TextureManager.I.LoadingSphereMaterial;
-            sphere.FindChildRecursively("LoadingImage").GetComponent<Image>().material = TextureManager.I.GothicLoadingMenuMaterial;
-            sphere.FindChildRecursively("ProgressBackground").gameObject.GetComponent<Image>().material = TextureManager.I.LoadingBarBackgroundMaterial;
-            sphere.FindChildRecursively("ProgressBar").gameObject.GetComponent<Image>().material = TextureManager.I.LoadingBarMaterial;
+            sphere.GetComponent<MeshRenderer>().material = TextureManager.I.loadingSphereMaterial;
+            sphere.FindChildRecursively("LoadingImage").GetComponent<Image>().material = TextureManager.I.gothicLoadingMenuMaterial;
+            sphere.FindChildRecursively("ProgressBackground").gameObject.GetComponent<Image>().material = TextureManager.I.loadingBarBackgroundMaterial;
+            sphere.FindChildRecursively("ProgressBar").gameObject.GetComponent<Image>().material = TextureManager.I.loadingBarMaterial;
         }
     }
 }

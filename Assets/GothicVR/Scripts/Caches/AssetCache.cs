@@ -30,7 +30,7 @@ namespace GVR.Caches
         private static readonly Dictionary<string, IMorphMesh> MmbCache = new();
         private static readonly Dictionary<string, ItemInstance> ItemDataCache = new();
         private static readonly Dictionary<string, PxVmMusicData> MusicDataCache = new();
-        private static readonly Dictionary<string, PxVmSfxData> SfxDataCache = new();
+        private static readonly Dictionary<string, SoundEffectInstance> SfxDataCache = new();
         private static readonly Dictionary<string, PxVmPfxData> PfxDataCache = new();
         private static readonly Dictionary<string, PxSoundData<float>> SoundCache = new();
         private static readonly Dictionary<string, IFont> FontCache = new();
@@ -62,7 +62,7 @@ namespace GVR.Caches
             {
                 zkTexture = new Texture(GameData.Vfs, $"{preparedKey}-C.TEX");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.LogWarning($"Texture {key} couldn't be found.");
                 return null;
@@ -145,6 +145,7 @@ namespace GVR.Caches
             return newData;
         }
 
+        [CanBeNull]
         public static IModelHierarchy TryGetMdh(string key)
         {
             var preparedKey = GetPreparedKey(key);
@@ -188,6 +189,7 @@ namespace GVR.Caches
             return newData;
         }
 
+        [CanBeNull]
         public static IModelMesh TryGetMdm(string key)
         {
             var preparedKey = GetPreparedKey(key);
@@ -283,42 +285,46 @@ namespace GVR.Caches
         /// Hint: Instances only need to be initialized once on phoenix.
         /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
         /// </summary>
+        [CanBeNull]
         public static ItemInstance TryGetItemData(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (ItemDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
+            ItemInstance newData = null;
             try
             {
-                var newData = GameData.GothicVm.InitInstance<ItemInstance>(preparedKey);
-                ItemDataCache[preparedKey] = newData;
-
-                return newData;
+                newData = GameData.GothicVm.InitInstance<ItemInstance>(preparedKey);
             }
             catch (Exception)
             {
-                ItemDataCache[preparedKey] = null;
-                
-                // eItMiCello is commented out on misc.d file. No need for an error log entry.
-                if ("itmicello".EqualsIgnoreCase(key))
-                    return null;
-                
-                Debug.LogError($"Item >{key}< not found.");
-                return null;
+                // ignored
             }
+            ItemDataCache[preparedKey] = newData;
+
+            return newData;
         }
 
         /// <summary>
         /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
         /// </summary>
-        public static PxVmSfxData TryGetSfxData(string key)
+        [CanBeNull]
+        public static SoundEffectInstance TryGetSfxData(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (SfxDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxVm.InitializeSfx(GameData.VmSfxPtr, preparedKey);
+            SoundEffectInstance newData = null;
+            try
+            {
+                newData = GameData.SfxVm.InitInstance<SoundEffectInstance>(preparedKey);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
             SfxDataCache[preparedKey] = newData;
 
             return newData;

@@ -17,6 +17,7 @@ namespace GVR.Globals
     {
         public static Vfs Vfs;
         public static DaedalusVm GothicVm;
+        public static DaedalusVm SfxVm; // Sound FX
         
         [Obsolete("Use new ZenKit API instead.")]
         public static IntPtr VfsPtr;
@@ -24,7 +25,6 @@ namespace GVR.Globals
         [Obsolete("Use new ZenKit API instead.")]
         public static IntPtr VmGothicPtr;
 
-        public static IntPtr VmSfxPtr; // Sound FX
         public static IntPtr VmPfxPtr; // Particle FX
         public static IntPtr VmMusicPtr;
 
@@ -77,8 +77,10 @@ namespace GVR.Globals
         {
             // Needs to be reset as Unity won't clear static variables when closing game in EditorMode.
             Vfs = null;
-            GothicVm = null;
             World = null;
+            GothicVm = null;
+            SfxVm = null;
+            
             
             if (VfsPtr != IntPtr.Zero)
             {
@@ -90,12 +92,6 @@ namespace GVR.Globals
             {
                 PxVm.pxVmDestroy(VmGothicPtr);
                 VmGothicPtr = IntPtr.Zero;
-            }
-
-            if (VmSfxPtr != IntPtr.Zero)
-            {
-                PxVm.pxVmDestroy(VmSfxPtr);
-                VmSfxPtr = IntPtr.Zero;
             }
 
             if (VmPfxPtr != IntPtr.Zero)
