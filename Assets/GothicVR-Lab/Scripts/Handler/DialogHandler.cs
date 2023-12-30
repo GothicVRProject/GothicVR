@@ -26,7 +26,7 @@ namespace GVR.Lab.Handler
             newNpc.name = "Bloodwyn";
             newNpc.SetParent(bloodwynSlotGo);
 
-            var npcSymbol = GameData.GothicVm.GetSymbolByIndex((uint)bloodwynInstanceInstanceId);
+            var npcSymbol = GameData.GothicVm.GetSymbolByIndex((int)bloodwynInstanceInstanceId);
             var npcInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol!);
             GameData.GothicVm.InitInstance(npcInstance);
 

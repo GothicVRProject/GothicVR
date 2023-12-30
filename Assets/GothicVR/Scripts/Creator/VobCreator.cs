@@ -355,7 +355,7 @@ namespace GVR.Creator
         /// <summary>
         /// Render item inside GameObject
         /// </summary>
-        public static GameObject CreateItem(uint itemId, GameObject go)
+        public static GameObject CreateItem(int itemId, GameObject go)
         {
             var item = AssetCache.TryGetItemData(itemId);
 

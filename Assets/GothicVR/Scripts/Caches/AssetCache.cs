@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using GVR.Creator.Sounds;
+using GVR.Data;
 using GVR.Extensions;
 using GVR.Globals;
 using JetBrains.Annotations;
@@ -31,7 +33,7 @@ namespace GVR.Caches
         private static readonly Dictionary<string, MusicThemeInstance> MusiThemeCache = new();
         private static readonly Dictionary<string, SoundEffectInstance> SfxDataCache = new();
         private static readonly Dictionary<string, ParticleEffectInstance> PfxDataCache = new();
-        private static readonly Dictionary<string, PxSoundData<float>> SoundCache = new();
+        private static readonly Dictionary<string, SoundData> SoundCache = new();
         private static readonly Dictionary<string, IFont> FontCache = new();
 
         private static readonly string[] MisplacedMdmArmors =
@@ -278,7 +280,7 @@ namespace GVR.Caches
         /// Hint: Instances only need to be initialized once on phoenix.
         /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
         /// </summary>
-        public static ItemInstance TryGetItemData(uint instanceId)
+        public static ItemInstance TryGetItemData(int instanceId)
         {
             var symbol = GameData.GothicVm.GetSymbolByIndex(instanceId);
 
@@ -360,16 +362,16 @@ namespace GVR.Caches
             return newData;
         }
 
-        public static PxSoundData<float> TryGetSound(string key)
+        public static SoundData TryGetSound(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (SoundCache.TryGetValue(preparedKey, out var data))
                 return data;
+            
+            var newData = SoundCreator.GetSoundArrayFromVfs($"{preparedKey}.wav");
+            SoundCache[preparedKey] = newData;
 
-            var wavFile = PxSound.GetSoundArrayFromVfs<float>(GameData.VfsPtr, $"{preparedKey}.wav");
-            SoundCache[preparedKey] = wavFile;
-
-            return wavFile;
+            return newData;
         }
 
         public static IFont TryGetFont(string key)

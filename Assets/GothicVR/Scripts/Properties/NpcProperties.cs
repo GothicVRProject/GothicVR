@@ -61,7 +61,7 @@ namespace GVR.Properties
         public AbstractAnimationAction currentAction;
 
         public bool hasItemEquipped;
-        public uint currentItem;
+        public int currentItem;
         public string usedItemSlot;
         public int itemAnimationState = -1; // We need to start with an "invalid" value as >0< is an allowed state value like in >t_Potion_Stand_2_S0<
 

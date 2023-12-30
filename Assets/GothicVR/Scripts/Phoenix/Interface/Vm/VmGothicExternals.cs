@@ -172,7 +172,7 @@ namespace GVR.Phoenix.Interface.Vm
         [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
         public static void AI_UseItemToState(NpcInstance npc, int itemId, int expectedInventoryCount)
         {
-            NpcHelper.ExtAiUseItemToState(npc, (uint)itemId, expectedInventoryCount);
+            NpcHelper.ExtAiUseItemToState(npc, itemId, expectedInventoryCount);
         }
 
         [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]

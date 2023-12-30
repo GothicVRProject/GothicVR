@@ -123,22 +123,9 @@ namespace GVR.Manager
             return GetProperties(npc).gameObject;
         }
 
-        private static GameObject GetNpc(IntPtr npcPtr)
-        {
-            return GetProperties(npcPtr).gameObject;
-        }
-
         private static NpcProperties GetProperties(NpcInstance npc)
         {
             return LookupCache.NpcCache[npc.Index];
-        }
-        
-        private static NpcProperties GetProperties(IntPtr npcPtr)
-        {
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
-            var props = LookupCache.NpcCache[symbolIndex];
-
-            return props;
         }
         
         public static void ExtAiWait(NpcInstance npc, float seconds)
@@ -231,11 +218,11 @@ namespace GVR.Manager
         /// * ItFoBeer is of visual_scheme = Potion
         /// * expected state is t_Potion_Stand_2_S0 --> s_Potion_S0
         /// </summary>
-        public static void ExtAiUseItemToState(NpcInstance npc, uint itemId, int animationState)
+        public static void ExtAiUseItemToState(NpcInstance npc, int itemId, int animationState)
         {
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new UseItemToState(
-                new(AnimationAction.Type.AIUseItemToState, uint0: itemId, int0: animationState),
+                new(AnimationAction.Type.AIUseItemToState, int0: itemId, int1: animationState),
                 props.gameObject));
         }
 
@@ -248,14 +235,6 @@ namespace GVR.Manager
         public static VmGothicEnums.BodyState ExtGetBodyState(NpcInstance npc)
         {
             return GetProperties(npc).bodyState;
-        }
-        
-        private static AiHandler GetAi(IntPtr npcPtr)
-        {
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
-            var props = LookupCache.NpcCache[symbolIndex];
-
-            return props.GetComponent<AiHandler>();
         }
     }
 }

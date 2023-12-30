@@ -67,7 +67,7 @@ namespace GVR.Npc
             properties.npcInstance.Wp = wayPointName;
             properties.stateStart = action;
 
-            var routineSymbol = vm.GetSymbolByIndex((uint)action);
+            var routineSymbol = vm.GetSymbolByIndex(action);
             
             var symbolLoop = vm.GetSymbolByName($"{routineSymbol.Name}_Loop");
             if (symbolLoop != null)

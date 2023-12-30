@@ -15,7 +15,7 @@ namespace GVR.Caches
         /// <summary>
         /// [symbolIndex] = Properties-Component
         /// </summary>
-        public static readonly Dictionary<uint, NpcProperties> NpcCache = new();
+        public static readonly Dictionary<int, NpcProperties> NpcCache = new();
 
         /// <summary>
         /// Already created AnimationData (Clips + RootMotions) can be reused.

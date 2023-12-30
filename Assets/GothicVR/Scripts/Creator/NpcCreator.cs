@@ -38,38 +38,15 @@ namespace GVR.Creator
             return npcRootGo;
         }
 
-        private static GameObject GetNpc(IntPtr npcPtr)
-        {
-            return GetProperties(npcPtr).gameObject;
-        }
-
         private static NpcProperties GetProperties(NpcInstance npc)
         {
             return LookupCache.NpcCache[npc.Index];
-        }
-
-        [Obsolete]
-        private static NpcProperties GetProperties(IntPtr npcPtr)
-        {
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
-            var props = LookupCache.NpcCache[symbolIndex];
-
-            return props;
         }
 
         private static GameObject GetNpcGo(NpcInstance npcInstance)
         {
             return GetProperties(npcInstance).gameObject;
         }
-
-        /// <summary>
-        /// Return cached GameObject based on lookup through IntPtr
-        /// </summary>
-        private static GameObject GetNpcGo(IntPtr npcPtr)
-        {
-            return GetProperties(npcPtr).gameObject;
-        }
-
 
         /// <summary>
         /// Original Gothic uses this function to spawn an NPC instance into the world.
@@ -82,7 +59,7 @@ namespace GVR.Creator
         {
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             var props = newNpc.GetComponent<NpcProperties>();
-            var npcSymbol = vm.GetSymbolByIndex((uint)npcInstance);
+            var npcSymbol = vm.GetSymbolByIndex(npcInstance);
             
             if (npcSymbol == null)
             {
@@ -91,7 +68,7 @@ namespace GVR.Creator
             }
             
             // Humans are singletons.
-            if (LookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<NpcProperties>()))
+            if (LookupCache.NpcCache.TryAdd(npcInstance, newNpc.GetComponent<NpcProperties>()))
             {
                 props.npcInstance = vm.AllocInstance<NpcInstance>(npcSymbol);
                 vm.InitInstance(props.npcInstance);
@@ -99,7 +76,7 @@ namespace GVR.Creator
             // Monsters are used multiple times.
             else
             {
-                var origNpc = LookupCache.NpcCache[(uint)npcInstance];
+                var origNpc = LookupCache.NpcCache[npcInstance];
                 var origProps = origNpc.GetComponent<NpcProperties>();
                 // Clone Properties as they're required from the first instance.
                 props.Copy(origProps);
@@ -212,8 +189,8 @@ namespace GVR.Creator
             
             if (data.Armor >= 0)
             {
-                var armorData = AssetCache.TryGetItemData((uint)data.Armor);
-                props.EquippedItems.Add(AssetCache.TryGetItemData((uint)data.Armor));
+                var armorData = AssetCache.TryGetItemData(data.Armor);
+                props.EquippedItems.Add(AssetCache.TryGetItemData(data.Armor));
                 props.mdmName = armorData.VisualChange;
             }
             else
@@ -241,7 +218,7 @@ namespace GVR.Creator
 
         public static NpcInstance ExtHlpGetNpc(int instanceId)
         {
-            if (!LookupCache.NpcCache.TryGetValue((uint)instanceId, out var properties))
+            if (!LookupCache.NpcCache.TryGetValue(instanceId, out var properties))
             {
                 Debug.LogError($"Couldn't find NPC {instanceId} inside cache.");
                 return null;
@@ -280,7 +257,7 @@ namespace GVR.Creator
         public static void ExtEquipItem(NpcInstance npc, int itemId)
         {
             var props = GetProperties(npc);
-            var itemData = AssetCache.TryGetItemData((uint)itemId);
+            var itemData = AssetCache.TryGetItemData(itemId);
 
             props.EquippedItems.Add(itemData);
         }
