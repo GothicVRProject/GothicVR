@@ -180,16 +180,15 @@ namespace GVR.Creator
         /// <summary>
         /// Loads the world for occlusion culling.
         /// </summary>
-        public static async void LoadEditorWorld(IntPtr vfsPtr)
+        public static async void LoadEditorWorld()
         {
-            Scene worldScene = EditorSceneManager.GetActiveScene();
+            Scene worldScene = SceneManager.GetActiveScene();
             if (Path.GetDirectoryName(worldScene.path) != "Assets\\GothicVR\\Scenes\\Worlds")
             {
                 Debug.LogWarning($"Open a world scene, from Assets/GothicVR/Scenes/Worlds.");
                 return;
             }
 
-            GameData.VfsPtr = vfsPtr;
             GameData.World = LoadWorld(worldScene.name);
 
             await WorldMeshCreator.CreateAsync(GameData.World, new GameObject("World"), Constants.MeshPerFrame);

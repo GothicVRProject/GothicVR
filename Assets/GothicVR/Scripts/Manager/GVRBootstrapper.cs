@@ -5,7 +5,6 @@ using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
 using GVR.Manager.Settings;
-using GVR.Phoenix.Interface;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Util;
 using PxCs.Helper;
@@ -49,6 +48,10 @@ namespace GVR.Manager
             if (SettingsManager.CheckIfGothic1InstallationExists())
             {
                 BootGothicVR(g1Dir);
+                
+#pragma warning disable CS4014 // It's intended, that this async call is not awaited.
+                GvrSceneManager.I.LoadStartupScenes();
+#pragma warning restore CS4014
             }
             else
             {
@@ -61,16 +64,10 @@ namespace GVR.Manager
             }
         }
         
-        public void BootGothicVR(string g1Dir)
+        public static void BootGothicVR(string g1Dir)
         {
             var watch = Stopwatch.StartNew();
             
-            // FIXME - We currently don't load from within _WORK directory which is required for e.g. mods who use it.
-            var fullPath = Path.GetFullPath(Path.Join(g1Dir, "Data"));
-
-            // Holy grail of everything! If this pointer is zero, we have nothing but a plain empty wormhole.
-            GameData.VfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);
-
             MountVfs(g1Dir);
             SetLanguage();
             LoadGothicVm(g1Dir);
@@ -79,12 +76,10 @@ namespace GVR.Manager
             LoadMusicVM(g1Dir);
             LoadMusic();
             LoadFonts();
+            
             watch.Stop();
             Debug.Log($"Time spent for Bootstrapping Phoenix: {watch.Elapsed}");
 
-#pragma warning disable CS4014 // It's intended, that this async call is not awaited.
-            GvrSceneManager.I.LoadStartupScenes();
-#pragma warning restore CS4014
         }
 
         [MonoPInvokeCallback(typeof(PxLogging.PxLogCallback))]
@@ -138,7 +133,7 @@ namespace GVR.Manager
         /// <summary>
         /// Holy grail of everything! If this pointer is zero, we have nothing but a plain empty wormhole.
         /// </summary>
-        private static void MountVfs(string g1Dir)
+        public static void MountVfs(string g1Dir)
         {
             GameData.Vfs = new Vfs();
 
@@ -181,7 +176,7 @@ namespace GVR.Manager
         }
 
         
-        private void LoadGothicVm(string g1Dir)
+        private static void LoadGothicVm(string g1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
             var vmPtr = VmGothicExternals.LoadVm(fullPath);
@@ -192,7 +187,7 @@ namespace GVR.Manager
             VmGothicExternals.RegisterExternals();
         }
 
-        private void LoadSfxVm(string g1Dir)
+        private static void LoadSfxVm(string g1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/SFX.DAT"));
             GameData.SfxVm = new DaedalusVm(fullPath);
@@ -204,14 +199,14 @@ namespace GVR.Manager
             GameData.PfxVm = new DaedalusVm(fullPath);
         }
 
-        private void LoadMusicVM(string G1Dir)
+        private static void LoadMusicVM(string g1Dir)
         {
-            var fullPath = Path.GetFullPath(Path.Join(G1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
+            var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
             var vmPtr = VmGothicExternals.LoadVm(fullPath);
             GameData.VmMusicPtr = vmPtr;
         }
 
-        private void LoadMusic()
+        private static void LoadMusic()
         {
             var music = MusicManager.I;
             music.Create();
@@ -219,7 +214,7 @@ namespace GVR.Manager
             music.SetMusic("SYS_MENU");
         }
 
-        private void LoadFonts()
+        private static void LoadFonts()
         {
             FontManager.I.Create();
         }

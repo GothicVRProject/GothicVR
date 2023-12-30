@@ -39,12 +39,9 @@ namespace GVR.Editor.Tools
                 SettingsManager.LoadGameSettings();
 
             GVRBootstrapper.SetLanguage();
+            GVRBootstrapper.MountVfs(SettingsManager.GameSettings!.GothicIPath);
 
-            string fullPath = Path.GetFullPath(Path.Join(SettingsManager.GameSettings.GothicIPath, "Data"));
-            _vfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);
-
-            GameData.VfsPtr = _vfsPtr;
-            WorldCreator.LoadEditorWorld(_vfsPtr);
+            WorldCreator.LoadEditorWorld();
         }
 
         private void OnGUI()

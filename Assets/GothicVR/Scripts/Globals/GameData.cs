@@ -81,12 +81,6 @@ namespace GVR.Globals
             GothicVm = null;
             SfxVm = null;
             
-            
-            if (VfsPtr != IntPtr.Zero)
-            {
-                PxVfs.pxVfsDestroy(VfsPtr);
-                VfsPtr = IntPtr.Zero;
-            }
 
             if (VmGothicPtr != IntPtr.Zero)
             {
