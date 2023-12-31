@@ -51,7 +51,7 @@ namespace GVR.Creator
 
         static VobCreator()
         {
-            GVREvents.GeneralSceneLoaded.AddListener(PostWorldLoaded);
+            GvrEvents.GeneralSceneLoaded.AddListener(PostWorldLoaded);
         }
 
         private static void PostWorldLoaded()

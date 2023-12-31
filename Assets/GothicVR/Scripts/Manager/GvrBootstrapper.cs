@@ -9,12 +9,13 @@ using GVR.Phoenix.Interface.Vm;
 using GVR.Util;
 using UnityEngine;
 using ZenKit;
+using ZenKit.Daedalus;
 using Debug = UnityEngine.Debug;
 using Logger = ZenKit.Logger;
 
 namespace GVR.Manager
 {
-    public class GVRBootstrapper : SingletonBehaviour<GVRBootstrapper>
+    public class GvrBootstrapper : SingletonBehaviour<GvrBootstrapper>
     {
         private bool isBootstrapped;
         public GameObject invalidInstallationDirMessage;
@@ -150,6 +151,11 @@ namespace GVR.Manager
         {
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
             GameData.GothicVm = new DaedalusVm(fullPath);
+            
+            // If we don't set it early, other calls within VM will fail.
+            // TODO - Could be moved to a separate Hero.cs class and set during GvrEvents.GeneralSceneLoaded event.
+            var hero = GameData.GothicVm.InitInstance<NpcInstance>("hero");
+            GameData.GothicVm.GlobalHero = hero;
 
             VmGothicExternals.RegisterExternals();
         }

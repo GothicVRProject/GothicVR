@@ -233,5 +233,22 @@ namespace GVR.Manager
         {
             return GetProperties(npc).bodyState;
         }
+        
+        /// <summary>
+        /// Return position distance in cm.
+        /// </summary>
+        public static int ExtNpcGetDistToNpc(NpcInstance npc1, NpcInstance npc2)
+        {
+            var npc1Pos = LookupCache.NpcCache[npc1.Index].gameObject.transform.position;
+
+            Vector3 npc2Pos;
+            // If hero
+            if (npc2.Id == 0)
+                npc2Pos = Camera.main!.transform.position;
+            else
+                npc2Pos = LookupCache.NpcCache[npc2.Index].gameObject.transform.position;
+
+            return (int)(Vector3.Distance(npc1Pos, npc2Pos) * 100);
+        }
     }
 }

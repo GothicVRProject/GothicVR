@@ -26,6 +26,11 @@ namespace GVR.Creator
         private static GameObject teleportGo;
         private static GameObject nonTeleportGo;
 
+        static WorldCreator()
+        {
+            GvrEvents.GeneralSceneLoaded.AddListener(WorldLoaded);
+        }
+        
         public static async Task CreateAsync(string worldName)
         {
             var world = LoadWorld(worldName);
@@ -49,30 +54,6 @@ namespace GVR.Creator
 
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
-        }
-
-
-        /// <summary>
-        /// Logic to be called after world (i.e. general scene) is fully loaded.
-        /// </summary>
-        public static void PostCreate()
-        {
-            var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
-
-            // If we load a new scene, just remove the existing one.
-            if (worldGo.TryGetComponent(out TeleportationArea teleportArea))
-                GameObject.Destroy(teleportArea);
-
-            // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
-            var teleportationArea = teleportGo.AddComponent<TeleportationArea>();
-            if (interactionManager != null)
-            {
-                teleportationArea.interactionManager = interactionManager;
-            }
-
-            // TODO - For some reason the referenced skybox in scene is reset to default once game starts.
-            // We therefore need to reset it now again.
-            RenderSettings.skybox = TextureManager.I.skyMaterial;
         }
 
         private static WorldData LoadWorld(string worldName)
@@ -176,6 +157,29 @@ namespace GVR.Creator
             currentSubMesh.normals.Add(feature.Normal.ToUnityVector());
         }
 
+        /// <summary>
+        /// Logic to be called after world (i.e. general scene) is fully loaded.
+        /// </summary>
+        private static void WorldLoaded()
+        {
+            var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
+
+            // If we load a new scene, just remove the existing one.
+            if (worldGo.TryGetComponent(out TeleportationArea teleportArea))
+                GameObject.Destroy(teleportArea);
+
+            // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
+            var teleportationArea = teleportGo.AddComponent<TeleportationArea>();
+            if (interactionManager != null)
+            {
+                teleportationArea.interactionManager = interactionManager;
+            }
+
+            // TODO - For some reason the referenced skybox in scene is reset to default once game starts.
+            // We therefore need to reset it now again.
+            RenderSettings.skybox = TextureManager.I.skyMaterial;
+        }
+        
 #if UNITY_EDITOR
         /// <summary>
         /// Loads the world for occlusion culling.

@@ -37,8 +37,8 @@ namespace GVR.World
                     FeatureFlags.I.startHour, FeatureFlags.I.startMinute, time.Second);
             minutesInHour = FeatureFlags.I.startMinute;
 
-            GVREvents.GeneralSceneLoaded.AddListener(WorldLoaded);
-            GVREvents.GeneralSceneUnloaded.AddListener(WorldUnloaded);
+            GvrEvents.GeneralSceneLoaded.AddListener(WorldLoaded);
+            GvrEvents.GeneralSceneUnloaded.AddListener(WorldUnloaded);
         }
 
         private void WorldLoaded()
@@ -66,7 +66,7 @@ namespace GVR.World
                 if (time > MAX_TIME)
                     time = MIN_TIME;
 
-                GVREvents.GameTimeSecondChangeCallback.Invoke(time);
+                GvrEvents.GameTimeSecondChangeCallback.Invoke(time);
                 RaiseMinuteAndHourEvent();
                 yield return new WaitForSeconds(ONE_INGAME_SECOND);
             }
@@ -77,7 +77,7 @@ namespace GVR.World
             if (secondsInMinute%60==0)
             {
                 secondsInMinute = 0;
-                GVREvents.GameTimeMinuteChangeCallback.Invoke(time);
+                GvrEvents.GameTimeMinuteChangeCallback.Invoke(time);
                 RaiseHourEvent();
             }
         }
@@ -87,7 +87,7 @@ namespace GVR.World
             if (minutesInHour % 60 == 0)
             {
                 minutesInHour = 0;
-                GVREvents.GameTimeHourChangeCallback.Invoke(time);
+                GvrEvents.GameTimeHourChangeCallback.Invoke(time);
             }
         }
     }

@@ -74,6 +74,7 @@ namespace GVR.Phoenix.Interface.Vm
             // PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItem", Npc_RemoveInvItem);
             // PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItems", Npc_RemoveInvItems);
             vm.RegisterExternal<NpcInstance, int>("EquipItem", EquipItem);
+            vm.RegisterExternal<int, NpcInstance, NpcInstance>("Npc_GetDistToNpc", Npc_GetDistToNpc);
 
             // Print
             vm.RegisterExternal<string>("PrintDebug", PrintDebug);
@@ -490,8 +491,14 @@ namespace GVR.Phoenix.Interface.Vm
             NpcCreator.ExtEquipItem(npc, itemId);
         }
 
-        #endregion
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static int Npc_GetDistToNpc(NpcInstance npc1, NpcInstance npc2)
+        {
+            return NpcHelper.ExtNpcGetDistToNpc(npc1, npc2);
+        }
 
+        #endregion
+        
         #region Day Routine
 
         [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]

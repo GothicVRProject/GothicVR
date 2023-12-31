@@ -35,8 +35,8 @@ namespace GVR.Editor.Tools
             if (SettingsManager.GameSettings == null)
                 SettingsManager.LoadGameSettings();
 
-            GVRBootstrapper.SetLanguage();
-            GVRBootstrapper.MountVfs(SettingsManager.GameSettings.GothicIPath);
+            GvrBootstrapper.SetLanguage();
+            GvrBootstrapper.MountVfs(SettingsManager.GameSettings.GothicIPath);
 
             WorldCreator.LoadEditorWorld();
         }

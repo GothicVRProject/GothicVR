@@ -26,14 +26,14 @@ namespace GothicVR.Vob
             HourEventCallback(GameTime.I.GetCurrentDateTime());
 
             StartCoroutineInternal();
-            GVREvents.GameTimeHourChangeCallback.AddListener(HourEventCallback);
+            GvrEvents.GameTimeHourChangeCallback.AddListener(HourEventCallback);
         }
 
         private void OnDisable()
         {
             // Coroutines are stopped when GameObject gets disabled. But we need to restart during OnEnable() manually.
             isCoroutineRunning = false;
-            GVREvents.GameTimeHourChangeCallback.RemoveListener(HourEventCallback);
+            GvrEvents.GameTimeHourChangeCallback.RemoveListener(HourEventCallback);
         }
 
         public void PrepareSoundHandling()

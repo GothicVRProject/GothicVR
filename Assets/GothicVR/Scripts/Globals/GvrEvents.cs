@@ -3,7 +3,11 @@ using UnityEngine.Events;
 
 namespace GVR.Globals
 {
-    public static class GVREvents
+    /// <summary>
+    /// Loading/Unloading order of scenes:
+    /// https://github.com/GothicVRProject/GothicVR/blob/main/Docs/development/diagrams/SceneLoading.drawio.png
+    /// </summary>
+    public static class GvrEvents
     {
         public static readonly UnityEvent MainMenuSceneLoaded = new();
         public static readonly UnityEvent MainMenuSceneUnloaded = new();

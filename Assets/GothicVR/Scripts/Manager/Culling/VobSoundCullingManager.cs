@@ -18,8 +18,8 @@ namespace GVR.Manager.Culling
         
         private void Start()
         {
-            GVREvents.GeneralSceneUnloaded.AddListener(PreWorldCreate);
-            GVREvents.GeneralSceneLoaded.AddListener(PostWorldCreate);
+            GvrEvents.GeneralSceneUnloaded.AddListener(PreWorldCreate);
+            GvrEvents.GeneralSceneLoaded.AddListener(PostWorldCreate);
 
             // Unity demands CullingGroups to be created in Awake() or Start() earliest.
             soundCullingGroup = new();

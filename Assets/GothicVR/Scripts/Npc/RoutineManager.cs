@@ -19,12 +19,12 @@ namespace GVR.Npc
 
         private void OnEnable()
         {
-            GVREvents.GameTimeMinuteChangeCallback.AddListener(Invoke);
+            GvrEvents.GameTimeMinuteChangeCallback.AddListener(Invoke);
         }
 
         private void OnDisable()
         {
-            GVREvents.GameTimeMinuteChangeCallback.RemoveListener(Invoke);
+            GvrEvents.GameTimeMinuteChangeCallback.RemoveListener(Invoke);
         }
 
         private void Start()
@@ -33,7 +33,7 @@ namespace GVR.Npc
             if (!FeatureFlags.I.enableNpcRoutines)
                 return;
             
-            GVREvents.GeneralSceneLoaded.AddListener(WorldLoadedEvent);
+            GvrEvents.GeneralSceneLoaded.AddListener(WorldLoadedEvent);
         }
 
         private void WorldLoadedEvent()

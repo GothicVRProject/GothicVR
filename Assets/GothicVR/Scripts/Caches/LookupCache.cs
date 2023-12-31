@@ -35,7 +35,7 @@ namespace GVR.Caches
         
         static LookupCache()
         {
-            GVREvents.GeneralSceneUnloaded.AddListener(delegate
+            GvrEvents.GeneralSceneUnloaded.AddListener(delegate
             {
                 vobSoundsAndDayTime.Clear();
             });

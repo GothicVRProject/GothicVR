@@ -9,7 +9,7 @@ namespace GVR.GothicVR_Lab.Scripts
     {
         private void Awake()
         {
-            GVRBootstrapper.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
+            GvrBootstrapper.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
         }
 
         private void OnDestroy()

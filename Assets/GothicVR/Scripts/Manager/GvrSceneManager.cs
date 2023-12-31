@@ -135,7 +135,7 @@ namespace GVR.Manager
                 SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName(Constants.SceneBootstrap));
                 SceneManager.UnloadSceneAsync(generalScene);
 
-                GVREvents.GeneralSceneUnloaded.Invoke();
+                GvrEvents.GeneralSceneUnloaded.Invoke();
                 generalSceneLoaded = false;
             }
 
@@ -178,19 +178,14 @@ namespace GVR.Manager
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
                     TeleportPlayerToSpot();
 
-                    GVREvents.GeneralSceneLoaded.Invoke();
-                    
-                    WorldCreator.PostCreate();
-                    // FIXME - Move to UnityEvent once existing
-                    XRDeviceSimulatorManager.I.PrepareForScene(scene);
+                    GvrEvents.GeneralSceneLoaded.Invoke();
                     break;
                 case Constants.SceneMainMenu:
                     var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
                     sphere.GetComponent<MeshRenderer>().material = TextureManager.I.loadingSphereMaterial;
                     SceneManager.SetActiveScene(scene);
 
-                    // FIXME - Move to UnityEvent once existing
-                    XRDeviceSimulatorManager.I.PrepareForScene(scene);
+                    GvrEvents.MainMenuSceneLoaded.Invoke();
                     break;
                 // any World
                 default:
