@@ -502,5 +502,15 @@ namespace GVR.Creator.Meshes
 
             return material;
         }
+
+        protected static bool IsTransparentShader(Shader shader)
+        {
+            if (shader == null)
+            {
+                return false;
+            }
+
+            return shader.name is AlphaToCoverageShaderName or WaterShader;
+        }
     }
 }

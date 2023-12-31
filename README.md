@@ -22,7 +22,7 @@ For instructions on playing the game or adding contributions, please check our [
 
 
 ## How to contribute
-We're always looking for people with knowledge and/or spirit. Feel free to reach out to us via gothicVR(at)outlook.com or visit us at our Discord server [Gothic VR](https://discord.gg/3EzACMVx).
+We're always looking for people with knowledge and/or spirit. Feel free to reach out to us via gothicVR(at)outlook.com or visit us at our Discord server [Gothic VR](https://discord.gg/StV9pbkBer).
 
 ## Workflow/Gameflow
 

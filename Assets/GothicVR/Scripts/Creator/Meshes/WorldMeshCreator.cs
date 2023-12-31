@@ -52,19 +52,13 @@ namespace GVR.Creator.Meshes
                 Self.PrepareMeshRenderer(meshRenderer, subMesh);
                 Self.PrepareMeshFilter(meshFilter, subMesh);
                 Self.PrepareMeshCollider(subMeshObj, meshFilter.sharedMesh, subMesh.material);
-
-#if UNITY_EDITOR
-                // Don't set alpha clipped as occluders.
-                if (meshRenderer.sharedMaterial.shader.name == AlphaToCoverageShaderName)
-                {
+                
+                // Don't set transparent meshes as occluders.
+                if (IsTransparentShader(meshRenderer.sharedMaterial.shader))
                     GameObjectUtility.SetStaticEditorFlags(subMeshObj, (StaticEditorFlags)(int.MaxValue & ~(int)StaticEditorFlags.OccluderStatic));
-                }
-#endif
 
                 if (LoadingManager.I)
-                {
                     LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
-                }
 
                 if (++meshesCreated % meshesPerFrame == 0)
                     await Task.Yield(); // Yield to allow other operations to run in the frame
