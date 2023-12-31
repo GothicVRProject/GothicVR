@@ -12,22 +12,22 @@ namespace GVR.Phoenix.Data
     public class WorldData
     {
         // We need to store it as we need the pointer to it for load+save of un-cached vobs.
-        public IWorld world;
+        // ReSharper disable once NotAccessedField.Global
+        public ZenKit.World World;
+        public List<IVirtualObject> Vobs;
+        public CachedWayNet WayNet;
         
-        public Dictionary<int, SubMeshData> subMeshes;
+        public Dictionary<int, SubMeshData> SubMeshes;
 
         public class SubMeshData
         {
-            public int materialIndex;
-            public IMaterial material;
+            public IMaterial Material;
 
-            public List<Vector3> vertices = new();
-            public List<int> triangles = new();
-            public List<Vector2> uvs = new() ;
-            public List<Vector3> normals = new();
+            public readonly List<Vector3> Vertices = new();
+            public readonly List<int> Triangles = new();
+            public readonly List<Vector2> Uvs = new() ;
+            public readonly List<Vector3> Normals = new();
         }
 
-        public List<IVirtualObject> vobs;
-        public IWayNet wayNet;
     }
 }

@@ -27,20 +27,20 @@ namespace GVR.Creator.Meshes
             meshObj.SetParent(parent);
 
             // Track the progress of each sub-mesh creation separately
-            int numSubMeshes = world.subMeshes.Values.Count;
+            int numSubMeshes = world.SubMeshes.Values.Count;
             int meshesCreated = 0;
 
-            foreach (var subMesh in world.subMeshes.Values)
+            foreach (var subMesh in world.SubMeshes.Values)
             {
                 // No texture to add.
                 // For G1 this is: material.name == [KEINE, KEINETEXTUREN, DEFAULT, BRETT2, BRETT1, SUMPFWAASER, S:PSIT01_ABODEN]
                 // Removing these removes tiny slices of walls on the ground. If anyone finds them, I owe them a beer.
-                if (subMesh.material.Texture.IsEmpty() || subMesh.triangles.IsEmpty())
+                if (subMesh.Material.Texture.IsEmpty() || subMesh.Triangles.IsEmpty())
                     continue;
 
                 var subMeshObj = new GameObject()
                 {
-                    name = subMesh.material.Name,
+                    name = subMesh.Material.Name,
                     isStatic = true
                 };
 
@@ -51,7 +51,7 @@ namespace GVR.Creator.Meshes
 
                 Self.PrepareMeshRenderer(meshRenderer, subMesh);
                 Self.PrepareMeshFilter(meshFilter, subMesh);
-                Self.PrepareMeshCollider(subMeshObj, meshFilter.sharedMesh, subMesh.material);
+                Self.PrepareMeshCollider(subMeshObj, meshFilter.sharedMesh, subMesh.Material);
                 
                 // Don't set transparent meshes as occluders.
                 if (IsTransparentShader(meshRenderer.sharedMaterial.shader))
@@ -67,7 +67,7 @@ namespace GVR.Creator.Meshes
 
         protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
-            var bMaterial = subMesh.material;
+            var bMaterial = subMesh.Material;
             var texture = GetTexture(bMaterial.Texture);
 
             if (null == texture)
@@ -79,10 +79,10 @@ namespace GVR.Creator.Meshes
             }
 
             Material material;
-            switch (subMesh.material.Group)
+            switch (subMesh.Material.Group)
             {
                 case MaterialGroup.Water:
-                    material = GetWaterMaterial(subMesh.material);
+                    material = GetWaterMaterial(subMesh.Material);
                     break;
                 default:
                     material = GetDefaultMaterial(texture != null && texture.format == TextureFormat.RGBA32);
@@ -106,12 +106,12 @@ namespace GVR.Creator.Meshes
             var mesh = new Mesh();
             meshFilter.sharedMesh = mesh;
 
-            if (subMesh.triangles.Count % 3 != 0)
+            if (subMesh.Triangles.Count % 3 != 0)
                 Debug.LogError("Triangle count is not a multiple of 3");
 
-            mesh.SetVertices(subMesh.vertices);
-            mesh.SetTriangles(subMesh.triangles, 0);
-            mesh.SetUVs(0, subMesh.uvs);
+            mesh.SetVertices(subMesh.Vertices);
+            mesh.SetTriangles(subMesh.Triangles, 0);
+            mesh.SetUVs(0, subMesh.Uvs);
         }
     }
 }

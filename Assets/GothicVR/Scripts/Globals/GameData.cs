@@ -27,7 +27,7 @@ namespace GVR.Globals
             {
                 worldInternal = value;
                 if (value != null)
-                    SetWayPointData(value.wayNet.Points);
+                    SetWayPointData(value.WayNet.Points);
             }
         }
 

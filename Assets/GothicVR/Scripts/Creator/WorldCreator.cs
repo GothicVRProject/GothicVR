@@ -52,6 +52,9 @@ namespace GVR.Creator
     
             WaynetCreator.Create(worldGo, world);
 
+            // As we already added cached world mesh and waypoints to unity GOs, we can safely remove them to free some megabytes.
+            GameData.World.SubMeshes = null;
+            
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
         }
@@ -70,13 +73,13 @@ namespace GVR.Creator
 
             WorldData world = new()
             {
-                world = zkWorld,
-                vobs = zkWorld.RootObjects,
-                wayNet = zkWayNet
+                World = zkWorld,
+                Vobs = zkWorld.RootObjects,
+                WayNet = (CachedWayNet)zkWayNet
             };
 
             var subMeshes = CreateSubMeshesForUnity(zkMesh, zkBspTree);
-            world.subMeshes = subMeshes;
+            world.SubMeshes = subMeshes;
             
             return world;
         }
@@ -105,8 +108,7 @@ namespace GVR.Creator
             {
                 subMeshes.Add(materialIndex, new()
                 {
-                    materialIndex = materialIndex,
-                    material = zkMaterials[materialIndex]
+                    Material = zkMaterials[materialIndex]
                 });
             }
 
@@ -134,9 +136,9 @@ namespace GVR.Creator
             // To have easier to read code above, we reverse the arrays now at the end.
             foreach (var subMesh in subMeshes)
             {
-                subMesh.Value.vertices.Reverse();
-                subMesh.Value.uvs.Reverse();
-                subMesh.Value.normals.Reverse();
+                subMesh.Value.Vertices.Reverse();
+                subMesh.Value.Uvs.Reverse();
+                subMesh.Value.Normals.Reverse();
             }
 
             return subMeshes;
@@ -146,15 +148,15 @@ namespace GVR.Creator
         {
             // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
             var positionIndex = polygon.PositionIndices[index];
-            currentSubMesh.vertices.Add(zkPositions[(int)positionIndex].ToUnityVector());
+            currentSubMesh.Vertices.Add(zkPositions[(int)positionIndex].ToUnityVector());
 
             // This triangle (index where Vector 3 lies inside vertices, points to the newly added vertex (Vector3) as we don't reuse vertices.
-            currentSubMesh.triangles.Add(currentSubMesh.vertices.Count - 1);
+            currentSubMesh.Triangles.Add(currentSubMesh.Vertices.Count - 1);
 
             var featureIndex = polygon.FeatureIndices[index];
             var feature = features[(int)featureIndex];
-            currentSubMesh.uvs.Add(feature.Texture.ToUnityVector());
-            currentSubMesh.normals.Add(feature.Normal.ToUnityVector());
+            currentSubMesh.Uvs.Add(feature.Texture.ToUnityVector());
+            currentSubMesh.Normals.Add(feature.Normal.ToUnityVector());
         }
 
         /// <summary>

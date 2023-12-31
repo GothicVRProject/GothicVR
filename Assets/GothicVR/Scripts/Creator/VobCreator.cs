@@ -77,14 +77,14 @@ namespace GVR.Creator
             int vobsPerFrame)
         {
             PreCreateVobs(world, rootTeleport, rootNonTeleport, vobsPerFrame);
-            await CreateVobs(world.vobs);
+            await CreateVobs(world.Vobs);
             PostCreateVobs();
         }
 
         private static void PreCreateVobs(WorldData world, GameObject rootTeleport, GameObject rootNonTeleport, int vobsPerFrame)
         {
             // HINT - We assume there is only one nested level. At least works in G1 world.zen
-            _totalVObs = world.vobs.Count + (int)world.vobs.Sum(i => (decimal)i.ChildCount);
+            _totalVObs = world.Vobs.Count + (int)world.Vobs.Sum(i => (decimal)i.ChildCount);
 
             _createdCount = 0;
             _cullingVobObjects.Clear();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace GVR.Creator.Sounds
 {
@@ -160,7 +161,8 @@ namespace GVR.Creator.Sounds
             // Clean up resources here if needed
         }
 
-        private static byte[]? DecodeBlock(Stream stream, int source)
+        [CanBeNull]
+        private static byte[] DecodeBlock(Stream stream, int source)
         {
             if (source >= dataSize / blockAlign)
                 return null;
@@ -291,7 +293,7 @@ namespace GVR.Creator.Sounds
         private static ushort blockAlign;
         private static int offset;
         private static int dataSize;
-        private static byte[]? header;
+        [CanBeNull] private static byte[] header;
         private static int cacheNo = -1;
         private static byte[] cache;
 

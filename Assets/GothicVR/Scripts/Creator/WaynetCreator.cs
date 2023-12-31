@@ -33,8 +33,8 @@ namespace GVR.Creator
         private static void CreateDijkstraWaypointEntries(WorldData world)
         {
             Dictionary<string, DijkstraWaypoint> dijkstraWaypoints = new();
-            var wayEdges = world.wayNet.Edges;
-            var wayPoints = world.wayNet.Points;
+            var wayEdges = world.WayNet.Edges;
+            var wayPoints = world.WayNet.Points;
 
             // Using LINQ to transform wayEdges into DijkstraWaypoints.
             dijkstraWaypoints = wayEdges.SelectMany(edge => new[]
@@ -86,7 +86,7 @@ namespace GVR.Creator
             var waypointsObj = new GameObject(string.Format("Waypoints"));
             waypointsObj.SetParent(parent);
 
-            foreach (var waypoint in world.wayNet.Points)
+            foreach (var waypoint in world.WayNet.Points)
             {
                 var wpObject = PrefabCache.TryGetObject(PrefabCache.PrefabType.WayPoint);
 
@@ -111,11 +111,11 @@ namespace GVR.Creator
             var waypointEdgesObj = new GameObject(string.Format("Edges"));
             waypointEdgesObj.SetParent(parent);
 
-            for (var i = 0; i < world.wayNet.Edges.Count; i++)
+            for (var i = 0; i < world.WayNet.Edges.Count; i++)
             {
-                var edge = world.wayNet.Edges[i];
-                var startPos = world.wayNet.Points[(int)edge.A].Position.ToUnityVector();
-                var endPos = world.wayNet.Points[(int)edge.B].Position.ToUnityVector();
+                var edge = world.WayNet.Edges[i];
+                var startPos = world.WayNet.Points[(int)edge.A].Position.ToUnityVector();
+                var endPos = world.WayNet.Points[(int)edge.B].Position.ToUnityVector();
                 var lineObj = new GameObject();
 
                 lineObj.AddComponent<LineRenderer>();
