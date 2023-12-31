@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace GVR.Lab.Handler
 {
-    public class LockableHandler : MonoBehaviour
+    public class LockableHandler : MonoBehaviour, IHandler
     {
         public GameObject chestsGo;
         public GameObject doorsGo;
 
-        private void Start()
+        public void Bootstrap()
         {
             var chestName = "CHESTBIG_OCCHESTLARGELOCKED.MDS";
             var mdh = AssetCache.TryGetMdh(chestName);

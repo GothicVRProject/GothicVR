@@ -8,7 +8,7 @@ using ZenKit.Daedalus;
 
 namespace GVR.Lab.Handler
 {
-    public class DialogHandler : MonoBehaviour
+    public class NpcHandler : MonoBehaviour, IHandler
     {
         public GameObject bloodwynSlotGo;
         public BloodwynInstanceId bloodwynInstanceInstanceId;
@@ -19,7 +19,7 @@ namespace GVR.Lab.Handler
         }
 
 
-        private void Start()
+        public void Bootstrap()
         {
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             newNpc.name = "Bloodwyn";
