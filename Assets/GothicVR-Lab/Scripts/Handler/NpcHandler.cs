@@ -1,8 +1,10 @@
+using System.Linq;
 using GVR.Caches;
 using GVR.Creator;
 using GVR.Extensions;
 using GVR.Globals;
 using GVR.Phoenix.Interface.Vm;
+using GVR.Properties;
 using UnityEngine;
 using ZenKit.Daedalus;
 
@@ -22,13 +24,16 @@ namespace GVR.Lab.Handler
         public void Bootstrap()
         {
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
-            newNpc.name = "Bloodwyn";
             newNpc.SetParent(bloodwynSlotGo);
 
             var npcSymbol = GameData.GothicVm.GetSymbolByIndex((int)bloodwynInstanceInstanceId);
             var npcInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol!);
-            GameData.GothicVm.InitInstance(npcInstance);
+            LookupCache.NpcCache[npcInstance.Index] = newNpc.GetComponent<NpcProperties>();
 
+            GameData.GothicVm.InitInstance(npcInstance);
+            
+            newNpc.name = npcInstance.GetName(NpcNameSlot.Slot0);
+            
             var mdmName = "Hum_GRDM_ARMOR.asc";
             var mdhName = "Humans_Militia.mds";
             var body = new VmGothicExternals.ExtSetVisualBodyData()

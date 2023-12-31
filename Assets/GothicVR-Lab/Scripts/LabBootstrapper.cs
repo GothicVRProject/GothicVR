@@ -1,3 +1,4 @@
+using GVR.Caches;
 using GVR.Globals;
 using GVR.Lab.Handler;
 using GVR.Manager;
@@ -40,6 +41,9 @@ namespace GVR.GothicVR_Lab.Scripts
         private void OnDestroy()
         {
             GameData.Dispose();
+            AssetCache.Dispose();
+            LookupCache.Dispose();
+            PrefabCache.Dispose();
         }
     }
 }

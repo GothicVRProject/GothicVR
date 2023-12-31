@@ -394,5 +394,23 @@ namespace GVR.Caches
             else
                 return lowerKey.Replace(extension, "");
         }
+
+        public static void Dispose()
+        {
+            TextureCache.Clear();
+            MdsCache.Clear();
+            AnimCache.Clear();
+            MdhCache.Clear();
+            MdlCache.Clear();
+            MdmCache.Clear();
+            MrmCache.Clear();
+            MmbCache.Clear();
+            ItemDataCache.Clear();
+            MusiThemeCache.Clear();
+            SfxDataCache.Clear();
+            PfxDataCache.Clear();
+            SoundCache.Clear();
+            FontCache.Clear();
+        }
     }
 }

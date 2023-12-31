@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using AOT;
+using GVR.Caches;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
@@ -32,6 +33,9 @@ namespace GVR.Manager
         private void OnApplicationQuit()
         {
             GameData.Dispose();
+            AssetCache.Dispose();
+            LookupCache.Dispose();
+            PrefabCache.Dispose();
         }
 
         private void Update()
