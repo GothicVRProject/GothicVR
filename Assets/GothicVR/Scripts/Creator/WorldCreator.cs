@@ -51,9 +51,6 @@ namespace GVR.Creator
                 await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, Constants.VObPerFrame);
     
             WaynetCreator.Create(worldGo, world);
-
-            // As we already added cached world mesh and waypoints to unity GOs, we can safely remove them to free some megabytes.
-            GameData.World.SubMeshes = null;
             
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
@@ -112,17 +109,16 @@ namespace GVR.Creator
                 });
             }
 
-            // Currently LeafPolygonIndices aren't distinct. We therefore need to rearrange them this way.
+            // LeafPolygonIndices aren't distinct. We therefore need to rearrange them this way.
             // Alternatively we could also loop through all Nodes and fetch where Front==Back==-1 (aka Leaf)
             foreach (var leafPolygonIndex in zkBspTree.LeafPolygonIndices.Distinct())
             {
-                var polygon = zkPolygons[(int)leafPolygonIndex];
-                var currentSubMesh = subMeshes[(int)polygon.MaterialIndex];
+                var polygon = zkPolygons[leafPolygonIndex];
+                var currentSubMesh = subMeshes[polygon.MaterialIndex];
 
-                // DEBUG for faster testing
-                // if (currentSubMesh.material.Name != "S:UTEMP01_OTWABILDVIELE") // only 112 triangles, MaterialIndex=1956
-                //     continue;
-
+                if (polygon.IsPortal)
+                    continue;
+                
                 // As we always use element 0 and i+1, we skip it in the loop.
                 for (var i=1; i < polygon.PositionIndices.Count - 1; i++)
                 {
@@ -159,11 +155,11 @@ namespace GVR.Creator
             currentSubMesh.Normals.Add(feature.Normal.ToUnityVector());
         }
 
-        /// <summary>
-        /// Logic to be called after world (i.e. general scene) is fully loaded.
-        /// </summary>
         private static void WorldLoaded()
         {
+            // As we already added stored world mesh and waypoints in Unity GOs, we can safely remove them to free MBs.
+            GameData.World.SubMeshes = null;
+            
             var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
 
             // If we load a new scene, just remove the existing one.
