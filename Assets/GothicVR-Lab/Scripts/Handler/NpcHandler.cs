@@ -5,6 +5,7 @@ using GVR.Extensions;
 using GVR.Globals;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Properties;
+using TMPro;
 using UnityEngine;
 using ZenKit.Daedalus;
 
@@ -12,28 +13,42 @@ namespace GVR.Lab.Handler
 {
     public class NpcHandler : MonoBehaviour, IHandler
     {
+        public TMP_Dropdown animationsDropdown;
         public GameObject bloodwynSlotGo;
         public BloodwynInstanceId bloodwynInstanceInstanceId;
-
         public enum BloodwynInstanceId
         {
             Deu = 6596
         }
 
+        private string bloodwynInstanceName = "Bloodwyn";
+        private NpcInstance bloodwynInstance;
+        private string[] animations = {
+            "T_LGUARD_2_STAND", "T_STAND_2_LGUARD", "T_LGUARD_SCRATCH", "T_LGUARD_STRETCH", "T_LGUARD_CHANGELEG",
+            "T_HGUARD_2_STAND", "T_STAND_2_HGUARD", "T_HGUARD_LOOKAROUND"
+        };
 
         public void Bootstrap()
+        {
+            animationsDropdown.options = animations.Select(item => new TMP_Dropdown.OptionData(item)).ToList();
+
+            BootstrapBloodwyn();
+        }
+
+        private void BootstrapBloodwyn()
         {
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             newNpc.SetParent(bloodwynSlotGo);
 
             var npcSymbol = GameData.GothicVm.GetSymbolByIndex((int)bloodwynInstanceInstanceId);
-            var npcInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol!);
-            LookupCache.NpcCache[npcInstance.Index] = newNpc.GetComponent<NpcProperties>();
+            bloodwynInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol!);
+            var properties = newNpc.GetComponent<NpcProperties>();
+            LookupCache.NpcCache[bloodwynInstance.Index] = properties;
 
-            GameData.GothicVm.InitInstance(npcInstance);
-            
-            newNpc.name = npcInstance.GetName(NpcNameSlot.Slot0);
-            
+            GameData.GothicVm.InitInstance(bloodwynInstance);
+
+            newNpc.name = bloodwynInstance.GetName(NpcNameSlot.Slot0);
+
             var mdmName = "Hum_GRDM_ARMOR.asc";
             var mdhName = "Humans_Militia.mds";
             var body = new VmGothicExternals.ExtSetVisualBodyData()
@@ -49,5 +64,11 @@ namespace GVR.Lab.Handler
 
             MeshObjectCreator.CreateNpc(newNpc.name, mdmName, mdhName, body, newNpc);
         }
+
+        public void AnimationStartClick()
+        {
+            VmGothicExternals.AI_PlayAni(bloodwynInstance, animationsDropdown.options[animationsDropdown.value].text);
+        }
+
     }
 }
