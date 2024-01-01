@@ -19,6 +19,9 @@ namespace GVR.Npc.Actions.AnimationActions
 
         protected WalkState walkState = WalkState.Initial;
 
+        private float prevWalkVelocityUpAddition;
+
+
         protected AbstractWalkAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
         
@@ -95,6 +98,43 @@ namespace GVR.Npc.Actions.AnimationActions
 
             var lookRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * 100);
+        }
+
+        /// <summary>
+        /// As we use legacy animations, we can't use RootMotion. We therefore need to rebuild it.
+        /// </summary>
+        private void HandleRootMotion(Transform transform)
+        {
+            /*
+             * root
+             *  /BIP01/ <- animation root
+             *    /BIP01/... <- animation bones
+             *  /RootCollider/ <- gets transform.pos+rot from /BIP01
+             */
+
+            // The whole RootMotion needs to be copied over to the NPCs Collider to ensure we have proper collision detection during animation time.
+            var bip01Transform = NpcGo.FindChildRecursively("BIP01").transform;
+
+            Props.rootMotionGo.transform.SetLocalPositionAndRotation(bip01Transform.localPosition, bip01Transform.localRotation);
+
+
+            /*
+             * On top of collision, we also need to handle physics. This is done by changing root's position with dynamic rigidbody's velocity.
+             * Hint: If an NPC walks up, the +y velocity isn't enough. Therefore we add up some force to help the NPC to not fall through the ground.
+             * FIXME - There will be better solutions like setting it static to a value of ~+2f etc. Need to check later!
+             */
+            var velocity = Props.rootMotionGo.GetComponent<Rigidbody>().velocity;
+            if (velocity.y > 0.0f)
+            {
+                velocity.y += prevWalkVelocityUpAddition;
+                prevWalkVelocityUpAddition += 0.1f;
+            }
+            else
+            {
+                prevWalkVelocityUpAddition = 0f;
+            }
+
+            NpcGo.transform.localPosition += velocity * Time.deltaTime;
         }
 
         /// <summary>
