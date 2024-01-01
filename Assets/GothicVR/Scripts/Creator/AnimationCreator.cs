@@ -66,6 +66,8 @@ namespace GVR.Creator
                 curves[boneName].AddRange(Enumerable.Range(0, 7).Select(i => new AnimationCurve()).ToArray());
             }
 
+            Vector3 rootBoneStartCorrection = Vector3.zero;
+
             // Add KeyFrames from PxSamples
             for (var i = 0; i < pxAnimation.Samples.Count; i++)
             {
@@ -76,19 +78,24 @@ namespace GVR.Creator
                 var sample = pxAnimation.Samples[i];
                 var boneId = i % pxAnimation.NodeCount;
                 var boneName = boneNames[boneId];
-
                 var boneList = curves[boneName];
-                var uPosition = sample.Position.ToUnityVector();
+                var isRootBone = boneName.EqualsIgnoreCase("BIP01");
 
-                // We add 6 properties for location and rotation.
-                boneList[0].AddKey(time, uPosition.x);
+                // Some animations don't start with BIP01=(0,0,0).
+                // Therefore we need to calculate the offset.
+                // Otherwise e.g. walking will hick up as NPC will _spawn_ slightly in front of last animation loop.
+                if (time == 0.0f && isRootBone)
+                    rootBoneStartCorrection = sample.Position.ToUnityVector();
 
-                // NPCs animation starts higher than on the ground. Adjust it for all bones to come.
-                if (boneName.EqualsIgnoreCase("BIP01"))
-                    boneList[1].AddKey(time, 0.0f);
+                Vector3 uPosition;
+                if (isRootBone)
+                    uPosition = sample.Position.ToUnityVector() - rootBoneStartCorrection;
                 else
-                    boneList[1].AddKey(time, uPosition.y);
+                    uPosition = sample.Position.ToUnityVector();
 
+                // We add 7 properties for location and rotation.
+                boneList[0].AddKey(time, uPosition.x);
+                boneList[1].AddKey(time, uPosition.y);
                 boneList[2].AddKey(time, uPosition.z);
                 boneList[3].AddKey(time, -sample.Rotation.W); // It's important to have this value with a -1. Otherwise animation is inversed.
                 boneList[4].AddKey(time, sample.Rotation.X);

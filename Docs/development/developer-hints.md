@@ -48,6 +48,11 @@ It includes:
 
 ![Root motion handling](./diagrams/Animation-root-motion-handling.drawio.png)
 
+**Root motion corrections:**
+Gothic animations don't necessarily start at BIP01=(0,0,0)
+Therefore we need to calculate the offset. I.e. first frame's BIP01 is handled as (0,0,0) and followings will be subtracted with it.
+(Otherwise e.g. walking will hick up as NPC will _spawn_ slightly in front of last animation loop.)
+
 ## Gothic assets loading
 
 We fully rely on phoenix and phoenix-shared-interface to import gothic assets. To consume data within Unity (C#) we leverage phoenix-csharp-interface as C -> C# interface.
