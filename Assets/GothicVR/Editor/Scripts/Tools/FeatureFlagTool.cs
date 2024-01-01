@@ -7,6 +7,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using ZenKit;
+using ZenKit.Vobs;
 
 namespace GVR.Editor.Tools
 {
@@ -99,8 +100,11 @@ namespace GVR.Editor.Tools
                             case "Int32":
                                 ((List<int>)field.GetValue(featureFlags)).Clear();
                                 break;
+                            case nameof(VirtualObjectType):
+                                ((List<VirtualObjectType>)field.GetValue(featureFlags)).Clear();
+                                break;
                             default:
-                                Debug.LogError($"Unsupported field type {field.FieldType.Name}");
+                                Debug.LogError($"Unsupported field type >{field.FieldType.GenericTypeArguments[0].Name}<");
                                 break;
                         }
                         break;

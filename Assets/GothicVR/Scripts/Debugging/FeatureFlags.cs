@@ -4,6 +4,7 @@ using GVR.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
 using ZenKit;
+using ZenKit.Vobs;
 
 namespace GVR.Debugging
 {
@@ -18,8 +19,6 @@ namespace GVR.Debugging
 
         [FormerlySerializedAs("SkipMainMenu")]
         [Header("__________Developer__________")]
-        [Tooltip("This will be used within Editor mode only. No effect for Standalone.")]
-        public LogLevel zenKitLogLevel;
         public bool skipMainMenu;
         public bool useXRDeviceSimulator;
 
@@ -40,7 +39,6 @@ namespace GVR.Debugging
         [Range(0, 59)] public int startMinute;
         
         [Header("__________VOB__________")]
-        [Tooltip("Only for Debug purposes. It'll not change functionality itself.")]
         public bool createVobs;
         public bool enableDecals;
         public bool vobCulling;
@@ -53,7 +51,8 @@ namespace GVR.Debugging
         public string spawnAtSpecificFreePoint;
         public bool drawFreePointMeshes;
         public bool drawVobCullingGizmos;
-        
+        [Tooltip("Set the VirtualObjectTypes to spawn only. (Ignored if empty)")]
+        public List<VirtualObjectType> vobTypeToSpawn;
         
         [Header("__________NPCs__________")]
         public bool createOcNpcs;
@@ -62,12 +61,6 @@ namespace GVR.Debugging
         [Header("__________NPCs - Developer__________")]
         [Tooltip("Add the Daedalus ids for NPCs to spawn. Take them from C_NPC instances. (Ignored if empty)")]
         public List<int> npcToSpawn;
-
-        [Header("__________SPAMmy debug messages__________")]
-        public bool showPhoenixDebugMessages;
-        public bool showZspyLogs;
-        public bool showPhoenixVfsFileNotFoundErrors;
-        public bool showMusicLogs;
 
         [Header("__________Audio__________")]
         public bool enableSounds;
@@ -78,11 +71,13 @@ namespace GVR.Debugging
         [Tooltip("Looks already quite good for leaves.pfy in the forest, but fire is awkward.")]
         public bool enableVobParticles;
 
-        // Not yet implemented. Left here for future use.
-        // [Header("__________Performance: NPC Culling__________")]
-        // public bool npcCulling;
-        // public VobCullingGroupSetting npcVobCullingSetting;
-        
+        [Header("__________Debug messages__________")]
+        public LogLevel zenKitLogLevel;
+        public bool showZspyLogs;
+        public bool showPhoenixVfsFileNotFoundErrors;
+        public bool showMusicLogs;
+
+
         [Serializable]
         public class VobCullingGroupSetting
         {

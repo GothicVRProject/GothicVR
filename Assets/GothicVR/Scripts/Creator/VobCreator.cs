@@ -107,120 +107,126 @@ namespace GVR.Creator
             foreach (var vob in vobs)
             {
                 GameObject go = null;
-                
-                switch (vob.Type)
-                {
-                    case VirtualObjectType.oCItem:
-                    {
-                        var obj = CreateItem((Item)vob);
-                        _cullingVobObjects.Add(obj);
-                        break;
-                    }
-                    case VirtualObjectType.oCMobContainer:
-                    {
-                        var obj = CreateMobContainer((Container)vob);
-                        _cullingVobObjects.Add(obj);
-                        break;
-                    }
-                    case VirtualObjectType.zCVobSound:
-                    {
-                        var obj = CreateSound((Sound)vob);
-                        LookupCache.vobSoundsAndDayTime.Add(obj);
-                        break;
-                    }
-                    case VirtualObjectType.zCVobSoundDaytime:
-                    {
-                        var obj = CreateSoundDaytime((SoundDaytime)vob);
-                        LookupCache.vobSoundsAndDayTime.Add(obj);
-                        break;
-                    }
-                    case VirtualObjectType.oCZoneMusic:
-                    case VirtualObjectType.oCZoneMusicDefault:
-                    {
-                        go = CreateZoneMusic((ZoneMusic)vob);
-                        break;
-                    }
-                    case VirtualObjectType.zCVobSpot:
-                    case VirtualObjectType.zCVobStartpoint:
-                    {
-                        go = CreateSpot(vob);
-                        break;
-                    }
-                    case VirtualObjectType.oCMobLadder:
-                    {
-                        var obj = CreateLadder(vob);
-                        _cullingVobObjects.Add(obj);
-                        break;
-                    }
-                    case VirtualObjectType.oCTriggerChangeLevel:
-                    {
-                        go = CreateTriggerChangeLevel((TriggerChangeLevel)vob);
-                        break;
-                    }
-                    case VirtualObjectType.zCVob:
-                    {
-                        GameObject obj;
 
-                        if (vob.Visual == null)
+                // Debug - Skip loading if not wanted.
+                if (FeatureFlags.I.vobTypeToSpawn.IsEmpty() || FeatureFlags.I.vobTypeToSpawn.Contains(vob.Type))
+                {
+                    switch (vob.Type)
+                    {
+                        case VirtualObjectType.oCItem:
                         {
-                            CreateDebugObject(vob);
+                            var obj = CreateItem((Item)vob);
+                            _cullingVobObjects.Add(obj);
                             break;
                         }
-                            
-                        switch (vob.Visual!.Type)
+                        case VirtualObjectType.oCMobContainer:
                         {
-                            case VisualType.Decal:
-                                obj = CreateDecal(vob);
-                                break;
-                            case VisualType.ParticleEffect:
-                                obj = CreatePfx(vob);
-                                break;
-                            default:
-                                obj = CreateDefaultMesh(vob);
-                                break;
+                            var obj = CreateMobContainer((Container)vob);
+                            _cullingVobObjects.Add(obj);
+                            break;
                         }
-                        _cullingVobObjects.Add(obj);
-                        break;
-                    }
-                    case VirtualObjectType.oCMobInter:
-                    case VirtualObjectType.oCMobDoor:
-                    case VirtualObjectType.oCMobSwitch:
-                    case VirtualObjectType.oCMobFire:
-                    case VirtualObjectType.oCMOB:
-                    case VirtualObjectType.zCVobStair:
-                    case VirtualObjectType.oCMobBed:
-                    case VirtualObjectType.oCMobWheel:
-                    {
-                        var obj = CreateDefaultMesh(vob);
-                        _cullingVobObjects.Add(obj);
-                        break;
-                    }
-                    case VirtualObjectType.zCVobScreenFX:
-                    case VirtualObjectType.zCVobAnimate:
-                    case VirtualObjectType.zCTriggerWorldStart:
-                    case VirtualObjectType.zCTriggerList:
-                    case VirtualObjectType.oCCSTrigger:
-                    case VirtualObjectType.oCTriggerScript:
-                    case VirtualObjectType.zCVobLensFlare:
-                    case VirtualObjectType.zCVobLight:
-                    case VirtualObjectType.zCMoverController:
-                    case VirtualObjectType.zCPFXController:
-                    case VirtualObjectType.zCMover: 
-                    case VirtualObjectType.zCVobLevelCompo:
-                    case VirtualObjectType.zCZoneZFog:
-                    case VirtualObjectType.zCZoneZFogDefault:
-                    case VirtualObjectType.zCZoneVobFarPlane:
-                    case VirtualObjectType.zCZoneVobFarPlaneDefault:
-                    {
-                        // FIXME - not yet implemented.
-                        break;
-                    }
-                    default:
-                    {
-                        throw new Exception($"VobType={vob.Type} not yet handled. And we didn't know we need to do so. ;-)");
+                        case VirtualObjectType.zCVobSound:
+                        {
+                            var obj = CreateSound((Sound)vob);
+                            LookupCache.vobSoundsAndDayTime.Add(obj);
+                            break;
+                        }
+                        case VirtualObjectType.zCVobSoundDaytime:
+                        {
+                            var obj = CreateSoundDaytime((SoundDaytime)vob);
+                            LookupCache.vobSoundsAndDayTime.Add(obj);
+                            break;
+                        }
+                        case VirtualObjectType.oCZoneMusic:
+                        case VirtualObjectType.oCZoneMusicDefault:
+                        {
+                            go = CreateZoneMusic((ZoneMusic)vob);
+                            break;
+                        }
+                        case VirtualObjectType.zCVobSpot:
+                        case VirtualObjectType.zCVobStartpoint:
+                        {
+                            go = CreateSpot(vob);
+                            break;
+                        }
+                        case VirtualObjectType.oCMobLadder:
+                        {
+                            var obj = CreateLadder(vob);
+                            _cullingVobObjects.Add(obj);
+                            break;
+                        }
+                        case VirtualObjectType.oCTriggerChangeLevel:
+                        {
+                            go = CreateTriggerChangeLevel((TriggerChangeLevel)vob);
+                            break;
+                        }
+                        case VirtualObjectType.zCVob:
+                        {
+                            GameObject obj;
+
+                            if (vob.Visual == null)
+                            {
+                                CreateDebugObject(vob);
+                                break;
+                            }
+
+                            switch (vob.Visual!.Type)
+                            {
+                                case VisualType.Decal:
+                                    obj = CreateDecal(vob);
+                                    break;
+                                case VisualType.ParticleEffect:
+                                    obj = CreatePfx(vob);
+                                    break;
+                                default:
+                                    obj = CreateDefaultMesh(vob);
+                                    break;
+                            }
+
+                            _cullingVobObjects.Add(obj);
+                            break;
+                        }
+                        case VirtualObjectType.oCMobInter:
+                        case VirtualObjectType.oCMobDoor:
+                        case VirtualObjectType.oCMobSwitch:
+                        case VirtualObjectType.oCMobFire:
+                        case VirtualObjectType.oCMOB:
+                        case VirtualObjectType.zCVobStair:
+                        case VirtualObjectType.oCMobBed:
+                        case VirtualObjectType.oCMobWheel:
+                        {
+                            var obj = CreateDefaultMesh(vob);
+                            _cullingVobObjects.Add(obj);
+                            break;
+                        }
+                        case VirtualObjectType.zCVobScreenFX:
+                        case VirtualObjectType.zCVobAnimate:
+                        case VirtualObjectType.zCTriggerWorldStart:
+                        case VirtualObjectType.zCTriggerList:
+                        case VirtualObjectType.oCCSTrigger:
+                        case VirtualObjectType.oCTriggerScript:
+                        case VirtualObjectType.zCVobLensFlare:
+                        case VirtualObjectType.zCVobLight:
+                        case VirtualObjectType.zCMoverController:
+                        case VirtualObjectType.zCPFXController:
+                        case VirtualObjectType.zCMover:
+                        case VirtualObjectType.zCVobLevelCompo:
+                        case VirtualObjectType.zCZoneZFog:
+                        case VirtualObjectType.zCZoneZFogDefault:
+                        case VirtualObjectType.zCZoneVobFarPlane:
+                        case VirtualObjectType.zCZoneVobFarPlaneDefault:
+                        {
+                            // FIXME - not yet implemented.
+                            break;
+                        }
+                        default:
+                        {
+                            throw new Exception(
+                                $"VobType={vob.Type} not yet handled. And we didn't know we need to do so. ;-)");
+                        }
                     }
                 }
-                
+
                 AddToMobInteractableList(vob, go);
                 
                 LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / _totalVObs);
