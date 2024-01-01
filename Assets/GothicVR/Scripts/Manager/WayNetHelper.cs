@@ -145,6 +145,7 @@ namespace GVR.Manager
                 waypoint = previousNodes[waypoint.Name];
             }
 
+            path.Reverse();
             return path.ToArray();
         }
 
