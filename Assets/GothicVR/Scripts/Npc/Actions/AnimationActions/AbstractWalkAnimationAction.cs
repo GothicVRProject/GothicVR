@@ -108,33 +108,14 @@ namespace GVR.Npc.Actions.AnimationActions
             /*
              * root
              *  /BIP01/ <- animation root
-             *    /BIP01/... <- animation bones
-             *  /RootCollider/ <- gets transform.pos+rot from /BIP01
+             *    /ColliderRootMotion <- Moved with animation as inside BIP01, but physics are applied and merged to root
+             *    /... <- animation bones
              */
 
-            // The whole RootMotion needs to be copied over to the NPCs Collider to ensure we have proper collision detection during animation time.
-            var bip01Transform = NpcGo.FindChildRecursively("BIP01").transform;
-
-            Props.rootMotionGo.transform.SetLocalPositionAndRotation(bip01Transform.localPosition, bip01Transform.localRotation);
-
-
-            /*
-             * On top of collision, we also need to handle physics. This is done by changing root's position with dynamic rigidbody's velocity.
-             * Hint: If an NPC walks up, the +y velocity isn't enough. Therefore we add up some force to help the NPC to not fall through the ground.
-             * FIXME - There will be better solutions like setting it static to a value of ~+2f etc. Need to check later!
-             */
-            var velocity = Props.rootMotionGo.GetComponent<Rigidbody>().velocity;
-            if (velocity.y > 0.0f)
-            {
-                velocity.y += prevWalkVelocityUpAddition;
-                prevWalkVelocityUpAddition += 0.1f;
-            }
-            else
-            {
-                prevWalkVelocityUpAddition = 0f;
-            }
-
-            NpcGo.transform.localPosition += velocity * Time.deltaTime;
+            // Apply physics based position change to root.
+            NpcGo.transform.localPosition += Props.colliderRootMotion.localPosition;
+            // Empty physics based diff. Next frame physics will be recalculated.
+            Props.colliderRootMotion.localPosition = Vector3.zero;
         }
 
         /// <summary>
@@ -144,10 +125,10 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             base.AnimationEndEventCallback();
 
-            var bip01Transform = NpcGo.FindChildRecursively("BIP01").transform;
-            var root = NpcGo.transform;
-            root.position = bip01Transform.position;
-            bip01Transform.localPosition = Vector3.zero;
+            NpcGo.transform.localPosition = Props.bip01.position;
+            Props.bip01.localPosition = Vector3.zero;
+            Props.colliderRootMotion.localPosition = Vector3.zero;
+
 
             // root.SetLocalPositionAndRotation(
             //     root.localPosition + bip01Transform.localPosition,

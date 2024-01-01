@@ -13,7 +13,8 @@ namespace GVR.Properties
             
             
         public AudioSource npcSound;
-        public GameObject rootMotionGo;
+        public Transform bip01;
+        public Transform colliderRootMotion;
 
         public FreePoint currentFreePoint;
         public WayPoint currentWayPoint;
