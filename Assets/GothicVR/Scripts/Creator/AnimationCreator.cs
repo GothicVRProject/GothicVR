@@ -18,18 +18,25 @@ namespace GVR.Creator
             var animationComp = go.GetComponent<Animation>();
             
             var mds = AssetCache.TryGetMds(mdsName);
-            var zkAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
+            var modelAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
+            var anim = mds.Animations.First(i => i.Name.EqualsIgnoreCase(animationName));
+
+            if (anim.Direction == AnimationDirection.Backward)
+            {
+                Debug.LogError($"Backwards animations not yet handled. Called for >{animationName}< from >{mdsName}<");
+                return;
+            }
 
             // Try to load from cache
             if (!LookupCache.AnimationClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
             {
-                clip = LoadAnimationClip(zkAnimation, mdh, go, repeat, mdsAnimationKeyName);
+                clip = LoadAnimationClip(modelAnimation, mdh, go, repeat, mdsAnimationKeyName);
                 LookupCache.AnimationClipCache[mdsAnimationKeyName] = clip;
             }
 
             if (animationComp[mdsAnimationKeyName] == null)
             {
-                AddClipEvents(clip, mds, zkAnimation, animationName);
+                AddClipEvents(clip, modelAnimation, anim);
                 AddClipEndEvent(clip);
                 animationComp.AddClip(clip, mdsAnimationKeyName);
             }
@@ -140,27 +147,25 @@ namespace GVR.Creator
             }
         }
 
-        private static void AddClipEvents(AnimationClip clip, IModelScript mds, IModelAnimation zkAnimation, string animationName)
+        private static void AddClipEvents(AnimationClip clip, IModelAnimation modelAnimation, IAnimation anim)
         {
-            var anim = mds.Animations.First(i => i.Name.EqualsIgnoreCase(animationName));
-
             foreach (var zkEvent in anim.EventTags)
             {
-                var clampedFrame = ClampFrame(zkEvent.Frame, anim.FirstFrame, zkAnimation.FrameCount, anim.LastFrame);
-                
+                var clampedFrame = ClampFrame(zkEvent.Frame, anim.FirstFrame, modelAnimation.FrameCount, anim.LastFrame);
+
                 AnimationEvent animEvent = new()
                 {
                     time = clampedFrame / clip.frameRate,
                     functionName = nameof(IAnimationCallbacks.AnimationCallback),
                     stringParameter = JsonUtility.ToJson(zkEvent) // As we can't add a custom object, we serialize data.
                  };
-                
+
                 clip.AddEvent(animEvent);
             }
 
             foreach (var sfxEvent in anim.SoundEffects)
             {
-                var clampedFrame = ClampFrame(sfxEvent.Frame, anim.FirstFrame, (int)zkAnimation.FrameCount, anim.LastFrame);
+                var clampedFrame = ClampFrame(sfxEvent.Frame, anim.FirstFrame, (int)modelAnimation.FrameCount, anim.LastFrame);
                 AnimationEvent animEvent = new()
                 {
                     time = clampedFrame / clip.frameRate,

@@ -250,5 +250,14 @@ namespace GVR.Manager
 
             return (int)(Vector3.Distance(npc1Pos, npc2Pos) * 100);
         }
+
+        public static void ExtAiDrawWeapon(NpcInstance npc)
+        {
+            var props = GetProperties(npc);
+
+            props.AnimationQueue.Enqueue(new DrawWeapon(
+                new(AnimationAction.Type.AIDrawWeapon),
+                props.gameObject));
+        }
     }
 }

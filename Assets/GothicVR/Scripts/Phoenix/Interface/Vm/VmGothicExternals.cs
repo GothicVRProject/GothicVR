@@ -33,6 +33,8 @@ namespace GVR.Phoenix.Interface.Vm
             vm.RegisterExternal<NpcInstance, float>("AI_Wait", AI_Wait);
             vm.RegisterExternal<int, NpcInstance, string, int>("AI_UseMob", AI_UseMob);
             vm.RegisterExternal<NpcInstance, string>("AI_GoToNextFP", AI_GoToNextFP);
+            vm.RegisterExternal<NpcInstance>("AI_DrawWeapon", AI_DrawWeapon);
+
 
             // Apply Options
             // Doc
@@ -173,6 +175,12 @@ namespace GVR.Phoenix.Interface.Vm
         public static void AI_GoToNextFP(NpcInstance npc, string fpNamePart)
         {
             NpcHelper.ExtAiGoToNextFp(npc, fpNamePart);
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void AI_DrawWeapon(NpcInstance npc)
+        {
+            NpcHelper.ExtAiDrawWeapon(npc);
         }
 
         #endregion
