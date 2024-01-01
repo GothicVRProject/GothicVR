@@ -1,6 +1,7 @@
 using System;
 using GVR.Caches;
 using GVR.Creator;
+using GVR.Extensions;
 using GVR.Phoenix.Interface.Vm;
 using UnityEngine;
 
@@ -30,7 +31,7 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             base.Tick(transform);
 
-            if (isFinished)
+            if (IsFinishedFlag)
                 return;
 
             switch (walkState)
@@ -94,6 +95,23 @@ namespace GVR.Npc.Actions.AnimationActions
 
             var lookRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * 100);
+        }
+
+        /// <summary>
+        /// We need to alter rootNode's position once walk animation is done.
+        /// </summary>
+        public override void AnimationEndEventCallback()
+        {
+            base.AnimationEndEventCallback();
+
+            var bip01Transform = NpcGo.FindChildRecursively("BIP01").transform;
+            var root = NpcGo.transform;
+            root.position = bip01Transform.position;
+            bip01Transform.localPosition = Vector3.zero;
+
+            // root.SetLocalPositionAndRotation(
+            //     root.localPosition + bip01Transform.localPosition,
+            //     root.localRotation * bip01Transform.localRotation);
         }
     }
 }

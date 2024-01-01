@@ -13,7 +13,7 @@ namespace GVR.Npc.Actions.AnimationActions
         protected readonly GameObject NpcGo;
         protected readonly NpcProperties Props;
 
-        protected bool isFinished;
+        protected bool IsFinishedFlag;
 
         public AbstractAnimationAction(AnimationAction action, GameObject npcGo)
         {
@@ -52,16 +52,7 @@ namespace GVR.Npc.Actions.AnimationActions
         /// </summary>
         public virtual void AnimationEndEventCallback()
         {
-            var bip01Transform = NpcGo.FindChildRecursively("BIP01").transform;
-            var root = NpcGo.transform;
-            root.position = bip01Transform.position;
-            bip01Transform.localPosition = Vector3.zero;
-
-            // root.SetLocalPositionAndRotation(
-            //     root.localPosition + bip01Transform.localPosition,
-            //     root.localRotation * bip01Transform.localRotation);
-
-            isFinished = true;
+            IsFinishedFlag = true;
         }
 
         public virtual void OnCollisionEnter(Collision coll)
@@ -125,7 +116,7 @@ namespace GVR.Npc.Actions.AnimationActions
         /// </summary>
         public virtual bool IsFinished()
         {
-            return isFinished;
+            return IsFinishedFlag;
         }
     }
 }
