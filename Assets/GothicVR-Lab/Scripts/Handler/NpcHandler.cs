@@ -22,7 +22,6 @@ namespace GVR.Lab.Handler
             Deu = 6596
         }
 
-        private string bloodwynInstanceName = "Bloodwyn";
         private NpcInstance bloodwynInstance;
         private string[] animations = {
             "T_LGUARD_2_STAND", "T_STAND_2_LGUARD", "T_LGUARD_SCRATCH", "T_LGUARD_STRETCH", "T_LGUARD_CHANGELEG",

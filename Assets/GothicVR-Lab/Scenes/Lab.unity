@@ -16921,7 +16921,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animationsDropdown: {fileID: 999036247}
   bloodwynSlotGo: {fileID: 576832278}
-  bloodwynInstanceId: 0
+  bloodwynInstanceId: 6596
 --- !u!1001 &1828376156
 PrefabInstance:
   m_ObjectHideFlags: 0
