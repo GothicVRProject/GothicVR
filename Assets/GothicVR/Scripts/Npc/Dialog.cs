@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Globals;
+using GVR.GothicVR.Scripts.Manager;
 using UnityEngine;
 using ZenKit.Daedalus;
 
@@ -14,8 +15,6 @@ namespace GVR.Npc
             if (!other.CompareTag("Player"))
                 return;
 
-            Debug.Log("Player collission");
-
             // TODO Call dialog
             var selectableDialogs = new List<InfoInstance>();
 
@@ -27,15 +26,19 @@ namespace GVR.Npc
                     continue;
                 }
 
-                var result = GameData.GothicVm.Call<int>(dialog.Condition);
-                if (result == 1)
+                if (dialog.Condition != 0)
                 {
-                    selectableDialogs.Add(dialog);
+                    var result = GameData.GothicVm.Call<int>(dialog.Condition);
+                    if (result == 1)
+                    {
+                        selectableDialogs.Add(dialog);
+                    }
                 }
             }
             
             selectableDialogs = selectableDialogs.OrderBy(d => d.Nr).ToList();
             
+            DialogHelper.DrawDialogs(selectableDialogs);
             // Next:
             // 1. Print entries
             // 2. Execute entry with audio and subtitles
