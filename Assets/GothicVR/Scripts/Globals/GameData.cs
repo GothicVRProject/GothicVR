@@ -7,6 +7,7 @@ using GVR.Vob.WayNet;
 using GVR.World;
 using UnityEngine.SceneManagement;
 using ZenKit;
+using ZenKit.Daedalus;
 using WayPoint = GVR.Vob.WayNet.WayPoint;
 
 namespace GVR.Globals
@@ -18,7 +19,7 @@ namespace GVR.Globals
         public static DaedalusVm SfxVm; // Sound FX
         public static DaedalusVm PfxVm; // Particle FX
         public static DaedalusVm MusicVm;
-
+        
         private static WorldData worldInternal;
         public static WorldData World
         {
@@ -35,7 +36,9 @@ namespace GVR.Globals
         public static readonly Dictionary<string, FreePoint> FreePoints = new();
         // Reorganized waypoints from world data.
         public static Dictionary<string, DijkstraWaypoint> DijkstraWaypoints = new();
-        public static readonly List<VobProperties> VobsInteractable = new(); 
+        public static readonly List<VobProperties> VobsInteractable = new();
+
+        public static List<InfoInstance> Dialogs = new();
         
         // FIXME Find a better place for the NPC routines. E.g. on the NPCs itself? But we e.g. need to have a static NPCObject List to do so.
         public static Dictionary<int, List<RoutineData>> npcRoutines = new();
@@ -72,6 +75,7 @@ namespace GVR.Globals
             GothicVm = null;
             SfxVm = null;
             MusicVm = null;
+            Dialogs = null;
         }
     }
 }

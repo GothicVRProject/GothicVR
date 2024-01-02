@@ -13,6 +13,7 @@ namespace GVR.Npc
             Debug.Log("Player collission");
 
             // TODO Call dialog
+            
 
         }
     }

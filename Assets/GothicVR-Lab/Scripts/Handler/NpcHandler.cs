@@ -15,7 +15,8 @@ namespace GVR.Lab.Handler
     {
         public TMP_Dropdown animationsDropdown;
         public GameObject bloodwynSlotGo;
-        public BloodwynInstanceId bloodwynInstanceInstanceId;
+        public BloodwynInstanceId bloodwynInstanceId;
+        
         public enum BloodwynInstanceId
         {
             Deu = 6596
@@ -40,13 +41,14 @@ namespace GVR.Lab.Handler
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             newNpc.SetParent(bloodwynSlotGo);
 
-            var npcSymbol = GameData.GothicVm.GetSymbolByIndex((int)bloodwynInstanceInstanceId);
+            var npcSymbol = GameData.GothicVm.GetSymbolByIndex((int)bloodwynInstanceId);
             bloodwynInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol!);
             var properties = newNpc.GetComponent<NpcProperties>();
             LookupCache.NpcCache[bloodwynInstance.Index] = properties;
 
-            GameData.GothicVm.InitInstance(bloodwynInstance);
-
+           GameData.GothicVm.InitInstance(bloodwynInstance);
+            
+            properties.Dialogs = GameData.Dialogs.Where(dialog => dialog.Npc == bloodwynInstance.Index).ToList();
             newNpc.name = bloodwynInstance.GetName(NpcNameSlot.Slot0);
 
             var mdmName = "Hum_GRDM_ARMOR.asc";

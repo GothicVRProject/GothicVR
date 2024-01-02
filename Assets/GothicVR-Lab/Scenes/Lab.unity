@@ -3317,7 +3317,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12af35efb7c45ea4fb4752d0328ebf2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  zenKitLogLevel: 0
   skipMainMenu: 0
   useXRDeviceSimulator: 0
   createWorldMesh: 0
@@ -3344,17 +3343,18 @@ MonoBehaviour:
   spawnAtSpecificFreePoint: 
   drawFreePointMeshes: 0
   drawVobCullingGizmos: 0
+  vobTypeToSpawn: 
   createOcNpcs: 0
   enableNpcRoutines: 0
   npcToSpawn: 
-  showPhoenixDebugMessages: 0
-  showZspyLogs: 0
-  showPhoenixVfsFileNotFoundErrors: 0
-  showMusicLogs: 0
   enableSounds: 0
   enableMusic: 0
   enableSoundCulling: 0
   enableVobParticles: 0
+  zenKitLogLevel: 0
+  showZspyLogs: 0
+  showPhoenixVfsFileNotFoundErrors: 0
+  showMusicLogs: 0
 --- !u!114 &464842616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9134,7 +9134,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6598815579406187037, guid: 9091ce98b82392b47966b14082b43688, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

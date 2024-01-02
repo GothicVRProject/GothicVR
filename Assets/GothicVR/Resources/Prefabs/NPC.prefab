@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4778879049934742964}
   - component: {fileID: 3046509075852218844}
   - component: {fileID: 418615690}
-  - component: {fileID: 123521218895422301}
   - component: {fileID: 9042877295681826828}
   m_Layer: 0
   m_Name: NPC
@@ -97,18 +96,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fee73244aacb72e4898c65e81d38f9ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &123521218895422301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2202926895728732233}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b485183a82257e47a2eea67e7716ef2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!111 &9042877295681826828
@@ -267,6 +254,7 @@ GameObject:
   - component: {fileID: 3620496381512049433}
   - component: {fileID: 8720130747125307888}
   - component: {fileID: 957202922675155714}
+  - component: {fileID: 712981900298770246}
   m_Layer: 0
   m_Name: ColliderRootMotion
   m_TagString: Untagged
@@ -352,3 +340,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   properties: {fileID: 4778879049934742964}
+--- !u!114 &712981900298770246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3647559741746323219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b485183a82257e47a2eea67e7716ef2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

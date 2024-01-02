@@ -10,14 +10,15 @@ namespace GVR.Properties
     public class NpcProperties : AbstractProperties
     {
         public NpcInstance npcInstance;
-            
-            
+        
         public AudioSource npcSound;
         public Transform bip01;
         public Transform colliderRootMotion;
 
         public FreePoint currentFreePoint;
         public WayPoint currentWayPoint;
+
+        public List<InfoInstance> Dialogs = new();
             
         // Visual
         public string mdmName;
