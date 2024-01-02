@@ -50,6 +50,11 @@ namespace GVR.Lab.Handler
             properties.Dialogs = GameData.Dialogs.Where(dialog => dialog.Npc == bloodwynInstance.Index).ToList();
             newNpc.name = bloodwynInstance.GetName(NpcNameSlot.Slot0);
 
+            // Need to be set for later usage (e.g. Bloodwyn checks your inventory if enough ore is there)
+            var hero = GameData.GothicVm.InitInstance<NpcInstance>("hero");
+            GameData.GothicVm.GlobalOther = hero;
+            GameData.GothicVm.GlobalSelf = bloodwynInstance;
+
             var mdmName = "Hum_GRDM_ARMOR.asc";
             var mdhName = "Humans_Militia.mds";
             var body = new VmGothicExternals.ExtSetVisualBodyData()
@@ -71,5 +76,9 @@ namespace GVR.Lab.Handler
             VmGothicExternals.AI_PlayAni(bloodwynInstance, animationsDropdown.options[animationsDropdown.value].text);
         }
 
+        public void DialogClick(int dialogId)
+        {
+            GameData.GothicVm.Call(dialogId);
+        }
     }
 }

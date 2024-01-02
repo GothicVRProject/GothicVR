@@ -4,6 +4,7 @@ using AOT;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Globals;
+using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using UnityEngine;
 using ZenKit;
@@ -34,7 +35,7 @@ namespace GVR.Phoenix.Interface.Vm
             vm.RegisterExternal<int, NpcInstance, string, int>("AI_UseMob", AI_UseMob);
             vm.RegisterExternal<NpcInstance, string>("AI_GoToNextFP", AI_GoToNextFP);
             vm.RegisterExternal<NpcInstance>("AI_DrawWeapon", AI_DrawWeapon);
-
+            vm.RegisterExternal<NpcInstance, NpcInstance, string>("AI_Output", AI_Output);
 
             // Apply Options
             // Doc
@@ -181,6 +182,11 @@ namespace GVR.Phoenix.Interface.Vm
         public static void AI_DrawWeapon(NpcInstance npc)
         {
             NpcHelper.ExtAiDrawWeapon(npc);
+        }
+
+        public static void AI_Output(NpcInstance self, NpcInstance target, string outputName)
+        {
+            DialogHelper.ExtAiOutput(self, target, outputName);
         }
 
         #endregion
