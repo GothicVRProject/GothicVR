@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ZenKit;
+using ZenKit.Util;
 using TextureFormat = UnityEngine.TextureFormat;
 
 namespace GVR.Extensions
@@ -18,9 +19,31 @@ namespace GVR.Extensions
             };
         }
 
-        public static Quaternion ToUnityQuaternion(this System.Numerics.Quaternion numericsQuaternion)
+        /// <summary>
+        /// According to this blog post, we can transform 3x3 into 4x4 matrix:
+        /// @see https://forum.unity.com/threads/convert-3x3-rotation-matrix-to-euler-angles.1086392/#post-7002275
+        /// Hint: m33 needs to be 1 to work properly
+        /// </summary>
+        public static Quaternion ToUnityQuaternion(this Matrix3x3 matrix)
         {
-            return new Quaternion(numericsQuaternion.X, numericsQuaternion.Y, numericsQuaternion.Z, numericsQuaternion.W);
+            var unityMatrix = new Matrix4x4
+            {
+                m00 = matrix.M11,
+                m01 = matrix.M12,
+                m02 = matrix.M13,
+
+                m10 = matrix.M21,
+                m11 = matrix.M22,
+                m12 = matrix.M23,
+
+                m20 = matrix.M31,
+                m21 = matrix.M32,
+                m22 = matrix.M33,
+
+                m33 = 1
+            };
+
+            return unityMatrix.rotation;
         }
         
         public static Matrix4x4 ToUnityMatrix(this System.Numerics.Matrix4x4 matrix)
