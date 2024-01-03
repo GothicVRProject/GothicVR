@@ -22,6 +22,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
 using ZenKit.Daedalus;
+using ZenKit.Util;
 using ZenKit.Vobs;
 using Debug = UnityEngine.Debug;
 using Quaternion = System.Numerics.Quaternion;
@@ -882,7 +883,7 @@ namespace GVR.Creator
             return null;
         }
         
-        private static void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
+        private static void SetPosAndRot(GameObject obj, Vector3 position, Matrix3x3 rotation)
         {
             SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityQuaternion());
         }
