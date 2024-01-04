@@ -101,7 +101,7 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
             var dialogItem = dialogItems[i];
             var dialogOption = dialogOptions[i];
 
-            dialogItem.GetComponent<Button>().onClick.AddListener(() => DialogClick(dialogOption.Index));
+            dialogItem.GetComponent<Button>().onClick.AddListener(() => DialogClick(dialogOption.Information));
             dialogItem.FindChildRecursively("Label").GetComponent<TMP_Text>().text = dialogOption.Description;
         }
     }
@@ -120,15 +120,12 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
         var lastItem = dialogItems.Last();
         for (var i = 0; i < newItemsToCreate; i++)
         {
-            var newItem = Instantiate(lastItem);
+            var newItem = Instantiate(lastItem, lastItem.transform.parent, false);
             dialogItems.Add(newItem);
-            newItem.SetParent(lastItem.transform.parent.gameObject, true, true);
-            newItem.name = $"D{dialogItems.Count:00}";
-            // FIXME - We need to handle this kind of UI magic more transparent somewhere else...
-            newItem.transform.position += new Vector3(0, -10, 0);
 
-            // To ensure we always set location below previous one.
-            lastItem = newItem;
+            newItem.name = $"Item{dialogItems.Count:00}";
+            // FIXME - We need to handle this kind of UI magic more transparent somewhere else...
+            newItem.transform.localPosition += new Vector3(0, -50 * dialogItems.Count-1, 0);
         }
     }
 
