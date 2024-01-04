@@ -75,10 +75,5 @@ namespace GVR.Lab.Handler
         {
             VmGothicExternals.AI_PlayAni(bloodwynInstance, animationsDropdown.options[animationsDropdown.value].text);
         }
-
-        public void DialogClick(int dialogId)
-        {
-            GameData.GothicVm.Call(dialogId);
-        }
     }
 }

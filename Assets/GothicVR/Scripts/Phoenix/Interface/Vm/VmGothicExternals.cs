@@ -36,6 +36,7 @@ namespace GVR.Phoenix.Interface.Vm
             vm.RegisterExternal<NpcInstance, string>("AI_GoToNextFP", AI_GoToNextFP);
             vm.RegisterExternal<NpcInstance>("AI_DrawWeapon", AI_DrawWeapon);
             vm.RegisterExternal<NpcInstance, NpcInstance, string>("AI_Output", AI_Output);
+            vm.RegisterExternal<NpcInstance>("AI_StopProcessInfos", AI_StopProcessInfos);
 
             // Apply Options
             // Doc
@@ -187,6 +188,11 @@ namespace GVR.Phoenix.Interface.Vm
         public static void AI_Output(NpcInstance self, NpcInstance target, string outputName)
         {
             DialogHelper.ExtAiOutput(self, target, outputName);
+        }
+
+        public static void AI_StopProcessInfos(NpcInstance npc)
+        {
+            DialogHelper.ExtAiStopProcessInfos(npc);
         }
 
         #endregion
