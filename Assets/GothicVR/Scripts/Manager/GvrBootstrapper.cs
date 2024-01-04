@@ -80,7 +80,6 @@ namespace GVR.Manager
 
         }
 
-        [MonoPInvokeCallback(typeof(Logger.Callback))]
         public static void ZenKitLoggerCallback(LogLevel level, string name, string message)
         {
             // Using fastest string concatenation as we might have a lot of logs here.
