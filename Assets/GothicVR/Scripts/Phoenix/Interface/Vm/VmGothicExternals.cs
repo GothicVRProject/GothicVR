@@ -47,7 +47,11 @@ namespace GVR.Phoenix.Interface.Vm
             vm.RegisterExternal<NpcInstance, int>("Hlp_GetNpc", Hlp_GetNpc);
 
             // Info
+            vm.RegisterExternal<int>("Info_ClearChoices", Info_ClearChoices);
+            vm.RegisterExternal<int, string, int>("Info_AddChoice", Info_AddChoice);
+
             // Log
+
             // Model
             vm.RegisterExternal<NpcInstance, string>("Mdl_SetVisual", Mdl_SetVisual);
             vm.RegisterExternal<NpcInstance, string>("Mdl_ApplyOverlayMds", Mdl_ApplyOverlayMds);
@@ -56,7 +60,9 @@ namespace GVR.Phoenix.Interface.Vm
             vm.RegisterExternal<NpcInstance, float>("Mdl_SetModelFatness", Mdl_SetModelFatness);
 
             // Mission
+
             // Mob
+
             // NPC
             vm.RegisterExternal<NpcInstance, int, int>("Npc_SetTalentValue", Npc_SetTalentValue);
             vm.RegisterExternal<NpcInstance, int>("CreateInvItem", CreateInvItem);
@@ -87,6 +93,7 @@ namespace GVR.Phoenix.Interface.Vm
             vm.RegisterExternal<int, string>("PrintDebugInstCh", PrintDebugInstCh);
 
             // Sound
+
             // Day Routine
             vm.RegisterExternal<NpcInstance, int, int, int, int, int, string>("TA_MIN", TA_MIN);
 
@@ -251,7 +258,17 @@ namespace GVR.Phoenix.Interface.Vm
 
         #region Info
 
-        //
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void Info_ClearChoices(int info)
+        {
+            DialogHelper.ExtInfoClearChoices(info);
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void Info_AddChoice(int info, string text, int function)
+        {
+            DialogHelper.ExtInfoAddChoice(info, text, function);
+        }
 
         #endregion
 

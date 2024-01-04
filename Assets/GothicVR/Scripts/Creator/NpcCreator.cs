@@ -71,7 +71,10 @@ namespace GVR.Creator
                 props.npcInstance = vm.AllocInstance<NpcInstance>(npcSymbol);
                 vm.InitInstance(props.npcInstance);
 
-                props.Dialogs = GameData.Dialogs.Where(dialog => dialog.Npc == props.npcInstance.Index).ToList();
+                props.Dialogs = GameData.Dialogs.Instances
+                    .Where(dialog => dialog.Npc == props.npcInstance.Index)
+                    .OrderByDescending(dialog => dialog.Important)
+                    .ToList();
             }
             // Monsters are used multiple times.
             else

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Data;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Util;
@@ -89,6 +90,21 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
     public void HideDialog()
     {
         dialogGameObject.SetActive(false);
+    }
+
+    public void FillDialog(List<DialogOption> dialogOptions)
+    {
+        CreateAdditionalDialogOptions(dialogOptions.Count);
+        ClearDialogOptions();
+
+        for (var i = 0; i < dialogOptions.Count; i++)
+        {
+            var dialogItem = dialogItems[i];
+            var dialogOption = dialogOptions[i];
+
+            dialogItem.GetComponent<Button>().onClick.AddListener(() => DialogClick(dialogOption.Function));
+            dialogItem.FindChildRecursively("Label").GetComponent<TMP_Text>().text = dialogOption.Text;
+        }
     }
 
     public void FillDialog(List<InfoInstance> dialogOptions)

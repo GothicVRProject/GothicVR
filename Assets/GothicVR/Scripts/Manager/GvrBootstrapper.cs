@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using AOT;
 using GVR.Caches;
+using GVR.Data;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
@@ -171,9 +173,11 @@ namespace GVR.Manager
         /// </summary>
         private static void LoadDialogs()
         {
-            GameData.Dialogs = GameData.GothicVm.GetInstanceSymbols("C_Info")
+            var infoInstances = GameData.GothicVm.GetInstanceSymbols("C_Info")
                 .Select(symbol => GameData.GothicVm.InitInstance<InfoInstance>(symbol))
                 .ToList();
+
+            infoInstances.ForEach(i => GameData.Dialogs.Instances.Add(i));
         }
 
         private static void LoadSfxVm(string g1Dir)

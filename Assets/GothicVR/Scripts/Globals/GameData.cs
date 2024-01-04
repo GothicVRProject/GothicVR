@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using GVR.Data;
 using GVR.Extensions;
 using GVR.Phoenix.Data;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Properties;
 using GVR.Vob.WayNet;
 using GVR.World;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.SceneManagement;
 using ZenKit;
 using ZenKit.Daedalus;
@@ -38,8 +40,25 @@ namespace GVR.Globals
         public static Dictionary<string, DijkstraWaypoint> DijkstraWaypoints = new();
         public static readonly List<VobProperties> VobsInteractable = new();
 
-        public static List<InfoInstance> Dialogs = new();
-        
+        public static class Dialogs
+        {
+            public static List<InfoInstance> Instances = new();
+            public static bool IsInDialog;
+
+            public static class CurrentDialog
+            {
+                public static InfoInstance Instance;
+                public static List<DialogOption> Options = new();
+            }
+
+            public static void Dispose()
+            {
+                IsInDialog = false;
+                CurrentDialog.Instance = null;
+                CurrentDialog.Options.Clear();
+            }
+        }
+
         // FIXME Find a better place for the NPC routines. E.g. on the NPCs itself? But we e.g. need to have a static NPCObject List to do so.
         public static Dictionary<int, List<RoutineData>> npcRoutines = new();
 
@@ -75,7 +94,8 @@ namespace GVR.Globals
             GothicVm = null;
             SfxVm = null;
             MusicVm = null;
-            Dialogs = null;
+
+            Dialogs.Dispose();
         }
     }
 }

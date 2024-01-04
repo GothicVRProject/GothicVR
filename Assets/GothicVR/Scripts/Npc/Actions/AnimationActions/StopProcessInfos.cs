@@ -1,3 +1,4 @@
+using GVR.GothicVR.Scripts.Manager;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -12,12 +13,8 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            ControllerManager.I.HideDialog();
-        }
-
-        public override bool IsFinished()
-        {
-            return true;
+            DialogHelper.StopDialog();
+            IsFinishedFlag = true;
         }
     }
 }

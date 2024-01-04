@@ -15,33 +15,7 @@ namespace GVR.Npc
             if (!other.CompareTag("Player"))
                 return;
 
-            // TODO Call dialog
-            var selectableDialogs = new List<InfoInstance>();
-
-            foreach (var dialog in properties.Dialogs)
-            {
-                if (dialog.Permanent == 1)
-                {
-                    selectableDialogs.Add(dialog);
-                    continue;
-                }
-
-                if (dialog.Condition != 0)
-                {
-                    var result = GameData.GothicVm.Call<int>(dialog.Condition);
-                    if (result == 1)
-                    {
-                        selectableDialogs.Add(dialog);
-                    }
-                }
-            }
-            
-            selectableDialogs = selectableDialogs.OrderBy(d => d.Nr).ToList();
-            
-            DialogHelper.DrawDialogs(selectableDialogs);
-            // Next:
-            // 1. Print entries
-            // 2. Execute entry with audio and subtitles
+            DialogHelper.StartDialog(properties);
         }
     }
 }

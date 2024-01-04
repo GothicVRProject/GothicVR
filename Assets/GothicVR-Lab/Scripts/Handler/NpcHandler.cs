@@ -47,7 +47,10 @@ namespace GVR.Lab.Handler
 
            GameData.GothicVm.InitInstance(bloodwynInstance);
             
-            properties.Dialogs = GameData.Dialogs.Where(dialog => dialog.Npc == bloodwynInstance.Index).ToList();
+            properties.Dialogs = GameData.Dialogs.Instances
+                .Where(dialog => dialog.Npc == bloodwynInstance.Index)
+                .OrderByDescending(dialog => dialog.Important)
+                .ToList();
             newNpc.name = bloodwynInstance.GetName(NpcNameSlot.Slot0);
 
             // Need to be set for later usage (e.g. Bloodwyn checks your inventory if enough ore is there)

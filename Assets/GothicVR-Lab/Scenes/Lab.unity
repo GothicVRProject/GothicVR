@@ -3352,7 +3352,7 @@ MonoBehaviour:
   enableSoundCulling: 0
   enableVobParticles: 0
   zenKitLogLevel: 3
-  showZspyLogs: 0
+  showZspyLogs: 1
   showPhoenixVfsFileNotFoundErrors: 0
   showMusicLogs: 0
 --- !u!114 &464842616
