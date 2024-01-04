@@ -1,34 +1,23 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using GVR.Extensions;
-using GVR.GothicVR.Scripts.Manager;
-using GVR.Util;
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
-using ZenKit.Daedalus;
+using GVR.Manager;
 
-public class ControllerManager : SingletonBehaviour<ControllerManager>
+public class ControllerManager : MonoBehaviour
 {
     public GameObject raycastLeft;
     public GameObject raycastRight;
     public GameObject directLeft;
     public GameObject directRight;
     public GameObject MenuGameObject;
-    public GameObject dialogGameObject;
-    public List<GameObject> dialogItems;
+
     private InputAction leftPrimaryButtonAction;
     private InputAction leftSecondaryButtonAction;
 
     private InputAction rightPrimaryButtonAction;
     private InputAction rightSecondaryButtonAction;
 
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
-
         leftPrimaryButtonAction = new InputAction("primaryButton", binding: "<XRController>{LeftHand}/primaryButton");
         leftSecondaryButtonAction = new InputAction("secondaryButton", binding: "<XRController>{LeftHand}/secondaryButton");
 
@@ -81,68 +70,7 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
             MenuGameObject.SetActive(false);
     }
 
-    public void ShowDialog()
+    public void ShowInventory()
     {
-        dialogGameObject.SetActive(true);
-    }
-
-    public void HideDialog()
-    {
-        dialogGameObject.SetActive(false);
-    }
-
-    public void FillDialog(List<InfoInstance> dialogOptions)
-    {
-        CreateAdditionalDialogOptions(dialogOptions.Count);
-        ClearDialogOptions();
-
-        for (var i = 0; i < dialogOptions.Count; i++)
-        {
-            var dialogItem = dialogItems[i];
-            var dialogOption = dialogOptions[i];
-
-            dialogItem.GetComponent<Button>().onClick.AddListener(() => DialogClick(dialogOption.Index));
-            dialogItem.FindChildRecursively("Label").GetComponent<TMP_Text>().text = dialogOption.Description;
-        }
-    }
-
-    /// <summary>
-    /// We won't know the maximum amount of element from the start of the game.
-    /// Therefore we start with one entry only and create more if needed now.
-    /// </summary>
-    private void CreateAdditionalDialogOptions(int currentItemsNeeded)
-    {
-        var newItemsToCreate = currentItemsNeeded - dialogItems.Count;
-
-        if (newItemsToCreate <= 0)
-            return;
-
-        var lastItem = dialogItems.Last();
-        for (var i = 0; i < newItemsToCreate; i++)
-        {
-            var newItem = Instantiate(lastItem);
-            dialogItems.Add(newItem);
-            newItem.SetParent(lastItem.transform.parent.gameObject, true, true);
-            newItem.name = $"D{dialogItems.Count:00}";
-            // FIXME - We need to handle this kind of UI magic more transparent somewhere else...
-            newItem.transform.position += new Vector3(0, -10, 0);
-
-            // To ensure we always set location below previous one.
-            lastItem = newItem;
-        }
-    }
-
-    private void ClearDialogOptions()
-    {
-        foreach (var item in dialogItems)
-        {
-            item.GetComponent<Button>().onClick.RemoveAllListeners();
-            item.FindChildRecursively("Label").GetComponent<TMP_Text>().text = "";
-        }
-    }
-
-    public void DialogClick(int dialogId)
-    {
-        DialogHelper.SelectionClicked(dialogId);
     }
 }

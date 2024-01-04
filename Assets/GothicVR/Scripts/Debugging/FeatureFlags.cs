@@ -17,6 +17,7 @@ namespace GVR.Debugging
             EveryIngameHour
         };
 
+        [FormerlySerializedAs("SkipMainMenu")]
         [Header("__________Developer__________")]
         public bool skipMainMenu;
         public bool useXRDeviceSimulator;
