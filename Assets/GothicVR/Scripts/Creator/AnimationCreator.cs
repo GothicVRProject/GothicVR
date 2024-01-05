@@ -49,7 +49,14 @@ namespace GVR.Creator
         {
             var animationComp = go.GetComponent<Animation>();
 
-            // FIXME - Not perfect as the NPC will freeze where it stopped. We need to find a way to set NPC to a state before the animation.
+            // Rewind workaround to actually set NPC to first frame of the animation.
+            // @see: https://forum.unity.com/threads/animation-rewind-not-working.4756/
+            if (!animationComp.isPlaying)
+                return;
+
+            animationComp.Rewind();
+            animationComp.Play();
+            animationComp.Sample();
             animationComp.Stop();
         }
 
