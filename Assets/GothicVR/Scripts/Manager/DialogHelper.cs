@@ -66,12 +66,13 @@ namespace GVR.GothicVR.Scripts.Manager
         public static void ExtAiOutput(NpcInstance self, NpcInstance target, string outputName)
         {
             var isHero = self.Id == 0;
-            var props = GetProperties(isHero ? target : self);
-            var npcId = isHero ? target.Id : self.Id;
+            // Always the NPC we're talking to!
+            var npcProps = GetProperties(isHero ? target : self);
+            var speakerId = self.Id;
 
-            props.AnimationQueue.Enqueue(new Output(
-                new(AnimationAction.Type.AIOutput, int0: npcId, string0: outputName),
-                props.gameObject));
+            npcProps.AnimationQueue.Enqueue(new Output(
+                new(AnimationAction.Type.AIOutput, int0: speakerId, string0: outputName),
+                npcProps.gameObject));
         }
 
         /// <summary>

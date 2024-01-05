@@ -3353,7 +3353,7 @@ MonoBehaviour:
   enableVobParticles: 0
   zenKitLogLevel: 3
   showZspyLogs: 1
-  showPhoenixVfsFileNotFoundErrors: 0
+  showZenKitVfsFileNotFoundErrors: 0
   showMusicLogs: 0
 --- !u!114 &464842616
 MonoBehaviour:

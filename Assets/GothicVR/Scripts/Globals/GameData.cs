@@ -44,6 +44,7 @@ namespace GVR.Globals
             public static List<InfoInstance> Instances = new();
             public static bool IsInDialog;
 
+            public static int GestureCount = 0;
             public static class CurrentDialog
             {
                 public static InfoInstance Instance;
@@ -55,6 +56,7 @@ namespace GVR.Globals
                 IsInDialog = false;
                 CurrentDialog.Instance = null;
                 CurrentDialog.Options.Clear();
+                GestureCount = 0;
             }
         }
 

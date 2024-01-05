@@ -41,7 +41,16 @@ namespace GVR.Creator
                 animationComp.AddClip(clip, mdsAnimationKeyName);
             }
 
+            animationComp.Stop();
             animationComp.Play(mdsAnimationKeyName);
+        }
+
+        public static void StopAnimation(GameObject go)
+        {
+            var animationComp = go.GetComponent<Animation>();
+
+            // FIXME - Not perfect as the NPC will freeze where it stopped. We need to find a way to set NPC to a state before the animation.
+            animationComp.Stop();
         }
 
         private static AnimationClip LoadAnimationClip(IModelAnimation pxAnimation, IModelHierarchy mdh, GameObject rootBone, bool repeat, string clipName)
