@@ -35,14 +35,14 @@ namespace GVR.Npc.Actions.AnimationActions
             AnimationEndEventCallback();
 
             walkState = WalkState.Done;
-            isFinished = true;
+            IsFinishedFlag = true;
         }
 
         public override void AnimationEndEventCallback()
         {
             base.AnimationEndEventCallback();
 
-            isFinished = false;
+            IsFinishedFlag = false;
         }
 
         protected override Vector3 GetWalkDestination()

@@ -135,6 +135,41 @@ namespace GVR.Phoenix.Interface.Vm
             BS_MOD_BURNING = 1024,
             BS_MOD_CONTROLLED = 2048,
             BS_MOD_TRANSFORMED = 4096
+        }
+
+        [Flags]
+        public enum ItemFlags
+        {
+            // Item categories
+            ITEM_KAT_NONE    = 1 <<  0, // misc
+            ITEM_KAT_NF      = 1 <<  1, // melee weapons
+            ITEM_KAT_FF      = 1 <<  2, // distant-combat weapons
+            ITEM_KAT_MUN     = 1 <<  3, // munition (->MultiSlot)
+            ITEM_KAT_ARMOR   = 1 <<  4, // armor and helmets
+            ITEM_KAT_FOOD    = 1 <<  5, // food (->MultiSlot)
+            ITEM_KAT_DOCS    = 1 <<  6, // documents
+            ITEM_KAT_POTIONS = 1 <<  7, // potions
+            ITEM_KAT_LIGHT   = 1 <<  8, // light sources
+            ITEM_KAT_RUNE    = 1 <<  9, // runes and scrolls
+            ITEM_KAT_MAGIC   = 1 << 31, // rings and amulets
+            ITEM_KAT_KEYS    = ITEM_KAT_NONE,
+
+            // Item flags
+            ITEM_BURN    = 1 << 10, // can be burnt (i.e. torch)
+            ITEM_MISSION = 1 << 12, // mission item
+            ITEM_MULTI   = 1 << 21, // is multi
+            ITEM_TORCH   = 1 << 28, // use like a torch
+            ITEM_THROW   = 1 << 29, // item can be thrown
+
+            // Item weapon flags
+            ITEM_SWD      = 1 << 14, // use like sword
+            ITEM_AXE      = 1 << 15, // use like axe
+            ITEM_2HD_SWD  = 1 << 16, // use like two handed weapon
+            ITEM_2HD_AXE  = 1 << 17, // use like two handed axe
+            ITEM_BOW      = 1 << 19, // use like bow
+            ITEM_CROSSBOW = 1 << 20, // use like crossbow
+            ITEM_AMULET   = 1 << 22, // use like amulet
+            ITEM_RING     = 1 << 11  // use like ring
+        };
     }
-}
 }

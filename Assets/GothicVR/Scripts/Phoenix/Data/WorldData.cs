@@ -1,10 +1,7 @@
-﻿using PxCs.Data;
-using PxCs.Data.Mesh;
-using PxCs.Data.Vob;
-using PxCs.Data.WayNet;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using ZenKit;
+using ZenKit.Vobs;
 
 namespace GVR.Phoenix.Data
 {
@@ -14,31 +11,23 @@ namespace GVR.Phoenix.Data
     /// </summary>
     public class WorldData
     {
-        public int[] vertexIndices; // index to vertices. 3 indices form one triangle.
-        public int[] materialIndices; // each key (index) of a vertex_index has a material index in here.
-        public int[] featureIndices; // Each vertex_index has a feature index.
-
-        public System.Numerics.Vector3[] vertices;
-        public PxFeatureData[] features;
-        public PxMaterialData[] materials;
-
-        public Dictionary<int, List<SubMeshData>> subMeshes;
+        // We need to store it as we need the pointer to it for load+save of un-cached vobs.
+        // ReSharper disable once NotAccessedField.Global
+        public ZenKit.World World;
+        public List<IVirtualObject> Vobs;
+        public CachedWayNet WayNet;
+        
+        public Dictionary<int, SubMeshData> SubMeshes;
 
         public class SubMeshData
         {
-            public int materialIndex;
-            public PxMaterialData material;
+            public IMaterial Material;
 
-            public List<Vector3> vertices = new();
-            public List<int> triangles = new();
-            public List<Vector2> uvs = new() ;
-            public List<Vector3> normals = new();
+            public readonly List<Vector3> Vertices = new();
+            public readonly List<int> Triangles = new();
+            public readonly List<Vector2> Uvs = new() ;
+            public readonly List<Vector3> Normals = new();
         }
 
-        public PxVobData[] vobs;
-
-        public PxWayPointData[] waypoints;
-        public Dictionary<string, PxWayPointData> waypointsDict;
-        public PxWayEdgeData[] waypointEdges;
     }
 }

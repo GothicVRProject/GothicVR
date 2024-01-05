@@ -1,15 +1,13 @@
-using System;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
-using GVR.Npc;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Properties;
-using PxCs.Interface;
 using UnityEngine;
+using ZenKit.Daedalus;
 
 namespace GVR.Manager
 {
@@ -17,17 +15,17 @@ namespace GVR.Manager
     {
         private const float fpLookupDistance = 20f; // meter
 
-        public static bool ExtIsMobAvailable(IntPtr npcPtr, string vobName)
+        public static bool ExtIsMobAvailable(NpcInstance npcInstance, string vobName)
         {
-            var npc = GetNpc(npcPtr);
+            var npc = GetNpc(npcInstance);
             var vob = VobHelper.GetFreeInteractableWithin10M(npc.transform.position, vobName);
 
             return (vob != null);
         }
         
-        public static bool ExtWldIsFPAvailable(IntPtr npcPtr, string fpNamePart)
+        public static bool ExtWldIsFPAvailable(NpcInstance npc, string fpNamePart)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             var npcGo = props.gameObject;
             var freePoints = WayNetHelper.FindFreePointsWithName(npcGo.transform.position, fpNamePart, fpLookupDistance);
 
@@ -44,16 +42,16 @@ namespace GVR.Manager
             return false;
         }
 
-        public static string ExtGetNearestWayPoint(IntPtr npcPtr)
+        public static string ExtGetNearestWayPoint(NpcInstance npc)
         {
-            var pos = GetProperties(npcPtr).transform.position;
+            var pos = GetProperties(npc).transform.position;
 
             return WayNetHelper.FindNearestWayPoint(pos).Name;
         }
 
-        public static bool ExtIsNextFpAvailable(IntPtr npcPtr, string fpNamePart)
+        public static bool ExtIsNextFpAvailable(NpcInstance npc, string fpNamePart)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             var pos = props.transform.position;
             var fp = WayNetHelper.FindNearestFreePoint(pos, fpNamePart);
 
@@ -68,17 +66,17 @@ namespace GVR.Manager
                 return true;
         }
 
-        public static IntPtr ExtGetEquippedArmor(IntPtr npcPtr)
+        public static ItemInstance ExtGetEquippedArmor(NpcInstance npc)
         {
-            var armor = GetProperties(npcPtr).EquippedItems
-                .FirstOrDefault(i => i.mainFlag == PxVm.PxVmItemFlags.ITEM_KAT_ARMOR);
+            var armor = GetProperties(npc).EquippedItems
+                .FirstOrDefault(i => i.MainFlag == (int)VmGothicEnums.ItemFlags.ITEM_KAT_ARMOR);
 
-            return armor?.instancePtr ?? IntPtr.Zero;
+            return armor;
         }
         
-        public static bool ExtIsNpcOnFp(IntPtr npcPtr, string vobNamePart)
+        public static bool ExtIsNpcOnFp(NpcInstance npc, string vobNamePart)
         {
-            var freePoint = GetProperties(npcPtr).currentFreePoint;
+            var freePoint = GetProperties(npc).currentFreePoint;
 
             if (freePoint == null)
                 return false;
@@ -86,10 +84,10 @@ namespace GVR.Manager
             return freePoint.Name.ContainsIgnoreCase(vobNamePart);
         }
 
-        public static bool ExtWldDetectNpcEx(IntPtr npcPtr, int npcInstance, int aiState, int guild, bool ignorePlayer)
+        public static bool ExtWldDetectNpcEx(NpcInstance npc, int npcInstance, int aiState, int guild, bool ignorePlayer)
         {
-            var npc = GetNpc(npcPtr);
-            var npcPos = npc.transform.position;
+            var npcGo = GetNpc(npc);
+            var npcPos = npcGo.transform.position;
             
             // FIXME - currently hard coded with 20m, but needs to be imported from Phoenix: daedalus_classes.h::c_npc::senses and senses_range
             float distance = 20f; // 20m
@@ -101,121 +99,112 @@ namespace GVR.Manager
             
             var foundNpc = LookupCache.NpcCache.Values
                 .Where(i => Vector3.Distance(i.gameObject.transform.position, npcPos) <= distance)
-                .Where(i => i.gameObject != npc)
+                .Where(i => i.gameObject != npcGo)
                 .OrderBy(i => Vector3.Distance(i.gameObject.transform.position, npcPos))
                 .FirstOrDefault();
 
             return (foundNpc != null);
         }
 
-        public static int ExtNpcHasItems(IntPtr npcPtr, uint itemId)
+        public static int ExtNpcHasItems(NpcInstance npc, uint itemId)
         {
-            if (GetProperties(npcPtr).Items.TryGetValue(itemId, out var amount))
+            if (GetProperties(npc).Items.TryGetValue(itemId, out var amount))
                 return amount;
             else
                 return 0;
         }
         
-        
-        private static GameObject GetNpc(IntPtr npcPtr)
+
+        private static GameObject GetNpc(NpcInstance npc)
         {
-            return GetProperties(npcPtr).gameObject;
+            return GetProperties(npc).gameObject;
+        }
+
+        private static NpcProperties GetProperties(NpcInstance npc)
+        {
+            return LookupCache.NpcCache[npc.Index];
         }
         
-        private static NpcProperties GetProperties(IntPtr npcPtr)
+        public static void ExtAiWait(NpcInstance npc, float seconds)
         {
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
-            var props = LookupCache.NpcCache[symbolIndex];
-
-            // Workaround: When calling PxVm.InitializeNpc(), phoenix will start executing all of the INSTANCEs methods.
-            // But some of them like Hlp_GetNpc() need the IntPtr before it's being returned by InitializeNpc().
-            // But Phoenix gives us the Pointer via other External calls. We then set it asap.
-            if (props.npcPtr == IntPtr.Zero)
-                props.npcPtr = npcPtr;
-
-            return props;
-        }
-        
-        public static void ExtAiWait(IntPtr npcPtr, float seconds)
-        {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new Wait(
                 new(AnimationAction.Type.AIWait, float0: seconds),
                 props.gameObject));
         }
 
-        public static void ExtAiUseMob(IntPtr npcPtr, string target, int state)
+        public static void ExtAiUseMob(NpcInstance npc, string target, int state)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new UseMob(
                 new(AnimationAction.Type.AIUseMob, string0: target, int0: state),
                 props.gameObject));
         }
         
-        public static void ExtAiStandUp(IntPtr npcPtr)
+        public static void ExtAiStandUp(NpcInstance npc)
         {
-            // FIXME - from docu:
+            // FIXME - Implement remaining tasks from G1 documentation:
             // * Ist der Nsc in einem Animatinsstate, wird die passende Rücktransition abgespielt.
             // * Benutzt der NSC gerade ein MOBSI, poppt er ins stehen.
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new StandUp(
                 new(AnimationAction.Type.AIStandUp),
                 props.gameObject));
         }
         
-        public static void ExtAiSetWalkMode(IntPtr npcPtr, VmGothicEnums.WalkMode walkMode)
+        public static void ExtAiSetWalkMode(NpcInstance npc, VmGothicEnums.WalkMode walkMode)
         {
-            GetProperties(npcPtr).walkMode = walkMode;
+            GetProperties(npc).walkMode = walkMode;
         }
 
-        public static void ExtAiGotoWP(IntPtr npcPtr, string point)
+        public static void ExtAiGotoWP(NpcInstance npc, string wayPointName)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new GoToWp(
-                new(AnimationAction.Type.AIGoToWP, string0: point),
+                new(AnimationAction.Type.AIGoToWP, string0: wayPointName),
                 props.gameObject));
         }
 
-        public static void ExtAiGoToNextFp(IntPtr npcPtr, string fpNamePart)
+        public static void ExtAiGoToNextFp(NpcInstance npc, string fpNamePart)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new GoToNextFp(
                 new(AnimationAction.Type.AIGoToNextFp, string0: fpNamePart),
                 props.gameObject));
         }
 
-        public static void ExtAiAlignToWP(IntPtr npcPtr)
+        public static void ExtAiAlignToWP(NpcInstance npc)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new AlignToWp(
                 new(AnimationAction.Type.AIAlignToWp),
                 props.gameObject));
         }
         
-        public static void ExtAiPlayAni(IntPtr npcPtr, string name)
+        public static void ExtAiPlayAni(NpcInstance npc, string name)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new PlayAni(
                 new(AnimationAction.Type.AIPlayAni, string0: name),
                 props.gameObject));
         }
 
-        public static void ExtAiStartState(IntPtr npcPtr, uint action, bool stopCurrentState, string wayPointName)
+        public static void ExtAiStartState(NpcInstance npc, int action, bool stopCurrentState, string wayPointName)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new StartState(
-                new(AnimationAction.Type.AIStartState, uint0: action, bool0: stopCurrentState, string0: wayPointName),
+                new(AnimationAction.Type.AIStartState, int0: action, bool0: stopCurrentState, string0: wayPointName),
                 props.gameObject));
         }
 
-        public static float ExtNpcGetStateTime(IntPtr npcPtr)
+        public static float ExtNpcGetStateTime(NpcInstance npc)
         {
-            return GetProperties(npcPtr).stateTime;
+            return GetProperties(npc).stateTime;
         }
 
-        public static void ExtNpcSetStateTime(IntPtr npcPtr, int seconds)
+        public static void ExtNpcSetStateTime(NpcInstance npc, int seconds)
         {
-            GetProperties(npcPtr).stateTime = seconds;
+            GetProperties(npc).stateTime = seconds;
         }
         
         /// <summary>
@@ -226,31 +215,49 @@ namespace GVR.Manager
         /// * ItFoBeer is of visual_scheme = Potion
         /// * expected state is t_Potion_Stand_2_S0 --> s_Potion_S0
         /// </summary>
-        public static void ExtAiUseItemToState(IntPtr npcPtr, uint itemId, int animationState)
+        public static void ExtAiUseItemToState(NpcInstance npc, int itemId, int animationState)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new UseItemToState(
-                new(AnimationAction.Type.AIUseItemToState, uint0: itemId, int0: animationState),
+                new(AnimationAction.Type.AIUseItemToState, int0: itemId, int1: animationState),
                 props.gameObject));
         }
 
-        public static bool ExtNpcWasInState(IntPtr npcPtr, uint action)
+        public static bool ExtNpcWasInState(NpcInstance npc, uint action)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             return props.prevStateStart == action;
         }
 
-        public static VmGothicEnums.BodyState ExtGetBodyState(IntPtr npcPtr)
+        public static VmGothicEnums.BodyState ExtGetBodyState(NpcInstance npc)
         {
-            return GetProperties(npcPtr).bodyState;
+            return GetProperties(npc).bodyState;
         }
         
-        private static AiHandler GetAi(IntPtr npcPtr)
+        /// <summary>
+        /// Return position distance in cm.
+        /// </summary>
+        public static int ExtNpcGetDistToNpc(NpcInstance npc1, NpcInstance npc2)
         {
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
-            var props = LookupCache.NpcCache[symbolIndex];
+            var npc1Pos = LookupCache.NpcCache[npc1.Index].gameObject.transform.position;
 
-            return props.GetComponent<AiHandler>();
+            Vector3 npc2Pos;
+            // If hero
+            if (npc2.Id == 0)
+                npc2Pos = Camera.main!.transform.position;
+            else
+                npc2Pos = LookupCache.NpcCache[npc2.Index].gameObject.transform.position;
+
+            return (int)(Vector3.Distance(npc1Pos, npc2Pos) * 100);
+        }
+
+        public static void ExtAiDrawWeapon(NpcInstance npc)
+        {
+            var props = GetProperties(npc);
+
+            props.AnimationQueue.Enqueue(new DrawWeapon(
+                new(AnimationAction.Type.AIDrawWeapon),
+                props.gameObject));
         }
     }
 }

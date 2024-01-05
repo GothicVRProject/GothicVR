@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace GVR.Manager
+namespace GVR.Globals
 {
-    public static class ConstantsManager
+    public static class Constants
     {
         public const float NpcWalkingSpeed = 1f;
         public const float NpcRotationSpeed = 3f;

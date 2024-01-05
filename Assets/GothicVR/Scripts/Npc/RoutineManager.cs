@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using GVR.Debugging;
+using GVR.Globals;
+using GVR.Manager;
 using GVR.Phoenix.Data.Vm.Gothic;
 using GVR.Util;
 using GVR.World;
@@ -13,18 +15,16 @@ namespace GVR.Npc
     /// </summary>
     public class RoutineManager : SingletonBehaviour<RoutineManager>
     {
-        GameTime gameTime;
         Dictionary<DateTime, List<Routine>> npcStartTimeDict = new();
 
         private void OnEnable()
         {
-            gameTime = GameTime.I;
-            gameTime.minuteChangeCallback.AddListener(Invoke);
+            GvrEvents.GameTimeMinuteChangeCallback.AddListener(Invoke);
         }
 
         private void OnDisable()
         {
-            gameTime.minuteChangeCallback.RemoveListener(Invoke);
+            GvrEvents.GameTimeMinuteChangeCallback.RemoveListener(Invoke);
         }
 
         private void Start()
@@ -32,8 +32,16 @@ namespace GVR.Npc
             //Init starting position
             if (!FeatureFlags.I.enableNpcRoutines)
                 return;
-            DateTime StartTime = new(1, 1, 1, 15, 0, 0);
-            Invoke(StartTime);
+            
+            GvrEvents.GeneralSceneLoaded.AddListener(WorldLoadedEvent);
+        }
+
+        private void WorldLoadedEvent()
+        {
+            var time = new DateTime(1, 1, 1,
+                FeatureFlags.I.startHour, FeatureFlags.I.startMinute, 0);
+            
+            Invoke(time);
         }
 
         public void Subscribe(Routine npcID, List<RoutineData> routines)

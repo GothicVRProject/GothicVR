@@ -1,6 +1,4 @@
-using System;
-using GVR.Manager;
-using Unity.VisualScripting;
+using GVR.Globals;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -27,7 +25,7 @@ namespace GVR.Player.Climb
         {
             base.OnSelectEntered(args);
 
-            if (args.interactableObject.transform.CompareTag(ConstantsManager.ClimbableTag))
+            if (args.interactableObject.transform.CompareTag(Constants.ClimbableTag))
                 ClimbHandActivated.Invoke(controllerName);
         }
 
@@ -35,7 +33,7 @@ namespace GVR.Player.Climb
         {
             base.OnSelectExited(args);
 
-            if (args.interactableObject.transform.CompareTag(ConstantsManager.ClimbableTag))
+            if (args.interactableObject.transform.CompareTag(Constants.ClimbableTag))
                 ClimbHandDeactivated.Invoke(controllerName);
         }
     }

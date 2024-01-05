@@ -1,11 +1,11 @@
 using System.Linq;
 using GVR.Caches;
+using GVR.Creator.Sounds;
+using GVR.Data;
 using GVR.Extensions;
-using GVR.Phoenix.Interface;
-using GVR.Phoenix.Util;
+using GVR.Globals;
 using GVR.Properties;
 using JetBrains.Annotations;
-using PxCs.Data.Sound;
 using UnityEngine;
 
 namespace GVR.GothicVR.Scripts.Manager
@@ -42,7 +42,7 @@ namespace GVR.GothicVR.Scripts.Manager
         
         public static AudioClip GetSoundClip(string soundName)
         {
-            PxSoundData<float> wavFile;
+            SoundData soundData;
 
             // FIXME - move to EqualsIgnoreCase()
             if (soundName.ToLower() == "nosound.wav")
@@ -55,28 +55,25 @@ namespace GVR.GothicVR.Scripts.Manager
             // FIXME - Move to EndsWithIgnoreCase()
             if (soundName.ToLower().EndsWith(".wav"))
             {
-                wavFile = AssetCache.TryGetSound(soundName);
+                soundData = AssetCache.TryGetSound(soundName);
             }
             else
             {
                 var sfxData = AssetCache.TryGetSfxData(soundName);
 
                 if (sfxData == null)
-                {
-                    Debug.LogError($"No sfx data returned for {soundName}");
                     return null;
-                }
 
-                wavFile = AssetCache.TryGetSound(sfxData.file);
+                soundData = AssetCache.TryGetSound(sfxData.File);
             }
 
-            if (wavFile == null)
+            if (soundData == null)
             {
                 Debug.LogError($"No .wav data returned for {soundName}");
                 return null;
             }
             
-            return SoundConverter.ToAudioClip(wavFile);
+            return SoundCreator.ToAudioClip(soundData);
         }
     }
 }

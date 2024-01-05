@@ -6,6 +6,8 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using ZenKit;
+using ZenKit.Vobs;
 
 namespace GVR.Editor.Tools
 {
@@ -17,6 +19,7 @@ namespace GVR.Editor.Tools
         private static readonly List<Tuple<string, Type, object>> ProductionFlags = new()
         {
             // Booleans
+            new(nameof(FeatureFlags.createWorldMesh), typeof(bool), true),
             new(nameof(FeatureFlags.createVobs), typeof(bool), true),
             new (nameof(FeatureFlags.createWaypoints), typeof(bool), true),
             new (nameof(FeatureFlags.enableDayTime), typeof(bool), true),
@@ -32,7 +35,8 @@ namespace GVR.Editor.Tools
 
             // Enums (Handled as Int internally)
             new (nameof(FeatureFlags.sunMovementPerformanceValue), typeof(int), FeatureFlags.SunMovementPerformance.EveryIngameMinute),
-
+            new (nameof(FeatureFlags.zenKitLogLevel), typeof(int), LogLevel.Error),
+            
             // Special types
             new (nameof(FeatureFlags.vobCullingSmall), typeof(FeatureFlags.VobCullingGroupSetting),
                 new FeatureFlags.VobCullingGroupSetting{ maxObjectSize = 1.2f, cullingDistance = 50f}),
@@ -43,7 +47,7 @@ namespace GVR.Editor.Tools
         };
 
 
-        [MenuItem("GothicVR/Tools/FeatureFlags - Set Production ready state")]
+        [MenuItem("GothicVR/Tools/FeatureFlags - Set Production ready state", priority = 1)]
         public static void SetFeatureFlags()
         {
             var scene = SceneManager.GetSceneByName("Bootstrap");
@@ -81,6 +85,9 @@ namespace GVR.Editor.Tools
                     case "SunMovementPerformance":
                         field.SetValue(featureFlags, 0);
                         break;
+                    case "LogLevel":
+                        field.SetValue(featureFlags, LogLevel.Error);
+                        break;
                     case "String":
                             field.SetValue(featureFlags, "");
                             break;
@@ -93,8 +100,11 @@ namespace GVR.Editor.Tools
                             case "Int32":
                                 ((List<int>)field.GetValue(featureFlags)).Clear();
                                 break;
+                            case nameof(VirtualObjectType):
+                                ((List<VirtualObjectType>)field.GetValue(featureFlags)).Clear();
+                                break;
                             default:
-                                Debug.LogError($"Unsupported field type {field.FieldType.Name}");
+                                Debug.LogError($"Unsupported field type >{field.FieldType.GenericTypeArguments[0].Name}<");
                                 break;
                         }
                         break;

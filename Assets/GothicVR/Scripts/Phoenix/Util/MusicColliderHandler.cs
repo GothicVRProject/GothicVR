@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using GVR.Creator;
 using GVR.Debugging;
+using GVR.Globals;
 using GVR.Manager;
 using UnityEngine;
 
@@ -15,7 +15,7 @@ namespace GVR.Phoenix.Util
             if (!FeatureFlags.I.enableMusic)
                 return;
 
-            if (!other.CompareTag(ConstantsManager.PlayerTag))
+            if (!other.CompareTag(Constants.PlayerTag))
                 return;
 
             musicZones.Add(gameObject.name);
@@ -28,7 +28,7 @@ namespace GVR.Phoenix.Util
             if (!FeatureFlags.I.enableMusic)
                 return;
             
-            if (!other.CompareTag(ConstantsManager.PlayerTag))
+            if (!other.CompareTag(Constants.PlayerTag))
                 return;
 
             musicZones.Remove(gameObject.name);

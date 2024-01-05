@@ -1,20 +1,20 @@
-using System;
 using System.Collections.Generic;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Vob.WayNet;
-using PxCs.Data.Vm;
 using UnityEngine;
-using UnityEngine.Serialization;
+using ZenKit.Daedalus;
 
 namespace GVR.Properties
 {
     public class NpcProperties : AbstractProperties
     {
-        public IntPtr npcPtr;
-        public PxVmNpcData npc;
+        public NpcInstance npcInstance;
+            
+            
         public AudioSource npcSound;
-        public GameObject rootMotionGo;
+        public Transform bip01;
+        public Transform colliderRootMotion;
 
         public FreePoint currentFreePoint;
         public WayPoint currentWayPoint;
@@ -26,7 +26,7 @@ namespace GVR.Properties
         public string overlayMdsName;
         public string overlayMdhName => overlayMdsName;
         
-        public List<PxVmItemData> EquippedItems = new();
+        public List<ItemInstance> EquippedItems = new();
         public VmGothicExternals.ExtSetVisualBodyData BodyData;
         
         // Perceptions
@@ -46,9 +46,9 @@ namespace GVR.Properties
         public VmGothicEnums.BodyState bodyState;
         
         public uint prevStateStart;
-        public uint stateStart;
-        public uint stateLoop;
-        public uint stateEnd;
+        public int stateStart;
+        public int stateLoop;
+        public int stateEnd;
 
         // State time is activated within AI_StartState()
         // e.g. used to handle random wait loops for idle eating animations (eat a cheese only every n-m seconds)
@@ -59,7 +59,7 @@ namespace GVR.Properties
         public AbstractAnimationAction currentAction;
 
         public bool hasItemEquipped;
-        public uint currentItem;
+        public int currentItem;
         public string usedItemSlot;
         public int itemAnimationState = -1; // We need to start with an "invalid" value as >0< is an allowed state value like in >t_Potion_Stand_2_S0<
 
@@ -77,8 +77,7 @@ namespace GVR.Properties
         public void Copy(NpcProperties other)
         {
             isClonedFromAnother = true;
-            npcPtr = other.npcPtr;
-            npc = other.npc;
+            npcInstance = other.npcInstance;
 
             mdmName = other.mdmName;
             baseMdsName = other.baseMdsName;
