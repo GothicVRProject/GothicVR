@@ -18,7 +18,7 @@ using ZenKit.Daedalus;
 
 namespace GVR.Lab.Handler
 {
-    public class VobHandAttachPointsHandler: MonoBehaviour
+    public class VobHandAttachPointsHandler: MonoBehaviour, IHandler
     {
         public TMP_Dropdown vobCategoryDropdown;
         public TMP_Dropdown vobItemDropdown;
@@ -42,7 +42,7 @@ namespace GVR.Lab.Handler
         private Dictionary<string, ItemInstance> items = new();
         private VobItemAttachPoints attachPoints;
 
-        private void Start()
+        public void Bootstrap()
         {
             /*
              * 1. Load Vdfs

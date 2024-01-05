@@ -23,7 +23,7 @@ namespace GVR.Npc.Actions.AnimationActions
              */
             if (destination == "" || Props.currentWayPoint.Name == destination)
             {
-                isFinished = true;
+                IsFinishedFlag = true;
                 return;
             }
             
@@ -46,7 +46,7 @@ namespace GVR.Npc.Actions.AnimationActions
             if (route.Count == 0)
             {
                 walkState = WalkState.Done;
-                isFinished = true;
+                IsFinishedFlag = true;
             }
             else
                 walkState = WalkState.Initial;
@@ -61,7 +61,7 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             base.AnimationEndEventCallback();
 
-            isFinished = false;
+            IsFinishedFlag = false;
         }
     }
 }

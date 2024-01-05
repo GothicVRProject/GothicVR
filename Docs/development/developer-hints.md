@@ -31,11 +31,27 @@ QueueActions (animations) can become quite complex (e.g. AI_UseMob() requires 1/
 We therefore put them into Command pattern ([wiki](https://en.wikipedia.org/wiki/Command_pattern)).
 It means, that every QueueAction handles it's state on it's own and tells the Queue owner, when it's done and another Action can be triggered.
 
-![Animation ](./diagrams/Npc-Ai-Queue.drawio.png)
+![Animation](./diagrams/Npc-Ai-Queue.drawio.png)
 
 More information about AnimationQueue mechanism at [ataulien/Inside-Gothic - Action-Queue](https://ataulien.github.io/Inside-Gothic/ActionQueue/)
 
+### Root motion handling
 
+Gothic delivers root motions via BIP01 bone. We use this information to leverage
+physics based walking.
+
+It includes:
+1. BIP01 and sub-bones will be handled by Animation component
+2. Inside BIP01 is a Collider/Rigidbody element, which walks with the animation, but physics based (as not directly handled via animation)
+3. This Rigidbody's physics based movement (e.g. grounding) is copied to root (on top of BIP01) to provide this change to the whole animated object
+4. In the end, the full BIP01 root motion is copied to root, to ensure the animated object isn't snapping back to 0.
+
+![Root motion handling](./diagrams/Animation-root-motion-handling.drawio.png)
+
+**Root motion corrections:**
+Gothic animations don't necessarily start at BIP01=(0,0,0)
+Therefore we need to calculate the offset. I.e. first frame's BIP01 is handled as (0,0,0) and followings will be subtracted with it.
+(Otherwise e.g. walking will hick up as NPC will _spawn_ slightly in front of last animation loop.)
 
 ## Gothic assets loading
 

@@ -102,7 +102,7 @@ namespace GVR.Npc.Actions.AnimationActions
         public override void AnimationEndEventCallback()
         {
             if (walkState == WalkState.Done)
-                isFinished = true;
+                IsFinishedFlag = true;
         }
     }
 }

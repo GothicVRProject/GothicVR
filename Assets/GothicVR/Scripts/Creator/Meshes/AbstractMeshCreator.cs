@@ -72,12 +72,12 @@ namespace GVR.Creator.Meshes
             }
 
             //// Fill GameObjects with Meshes from "original" Mesh
-            int meshCounter = 0;
+            var meshCounter = 0;
             foreach (var softSkinMesh in mdm.Meshes)
             {
                 var mesh = softSkinMesh.Mesh;
 
-                var meshObj = new GameObject($"ZM_{meshCounter}");
+                var meshObj = new GameObject($"ZM_{meshCounter++}");
                 meshObj.SetParent(rootGo);
 
                 var meshFilter = meshObj.AddComponent<MeshFilter>();

@@ -40,5 +40,13 @@ namespace GVR.Caches
                 vobSoundsAndDayTime.Clear();
             });
         }
+
+        public static void Dispose()
+        {
+            NpcCache.Clear();
+            AnimationClipCache.Clear();
+            fontCache.Clear();
+            vobSoundsAndDayTime.Clear();
+        }
     }
 }

@@ -67,9 +67,6 @@ namespace GVR.Manager
 
         public static DijkstraWaypoint[] FindFastestPath(string startWaypoint, string endWaypoint)
         {
-            // Start the timer
-            var watch = Stopwatch.StartNew();
-
             // Get the start and end waypoints from the DijkstraWaypoints dictionary
             var startDijkstraWaypoint = GameData.DijkstraWaypoints[startWaypoint];
             var endDijkstraWaypoint = GameData.DijkstraWaypoints[endWaypoint];
@@ -148,30 +145,7 @@ namespace GVR.Manager
                 waypoint = previousNodes[waypoint.Name];
             }
 
-            for (var i = 0; i < path.Count; i++)
-            {
-                Debug.Log("[" + i + "]" + path[i].Name);
-            }
-
-            // Debug log printing.
-            {
-                var testing = previousNodes
-                    .Where(x => x.Value != null)
-                    .Select(x => x)
-                    .ToList();
-
-                path.Reverse();
-
-                // Stop the timer
-                watch.Stop();
-                // Print the time elapsed
-                Debug.Log($"Time spent for finding the path: {watch.Elapsed}");
-                // debug amount of nodes checked
-                Debug.Log("Nodes checked: " + testing.Count);
-                // debug amount of nodes in path
-                Debug.Log("Nodes in path: " + path.Count);
-            }
-
+            path.Reverse();
             return path.ToArray();
         }
 
