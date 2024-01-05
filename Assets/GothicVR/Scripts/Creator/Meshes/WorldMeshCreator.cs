@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using GVR.Extensions;
 using GVR.Manager;
@@ -101,6 +102,52 @@ namespace GVR.Creator.Meshes
             }
 
             material.mainTexture = texture;
+
+            if (bMaterial.DisableLightmap == true || subMesh.LightMap.Image == null)
+                return;
+
+            var lightMap = subMesh.LightMap;
+            var zkTexture = lightMap.Image;
+
+            var format = zkTexture.Format.AsUnityTextureFormat();
+
+
+            Texture2D textureLightmap;
+            if (zkTexture.MipmapCount == 1 && format == TextureFormat.DXT1)
+            {
+                // Unity doesn't want to create mips for DXT1 textures. Recreate them as RGB24.
+                var dxtTexture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, UnityEngine.TextureFormat.DXT1, false);
+                dxtTexture.SetPixelData(zkTexture.AllMipmapsRaw[0], 0);
+                dxtTexture.Apply(false);
+
+                textureLightmap = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, UnityEngine.TextureFormat.RGB24, true);
+                textureLightmap.SetPixels(dxtTexture.GetPixels());
+                textureLightmap.Apply(true, true);
+                UnityEngine.Object.Destroy(dxtTexture);
+            }
+            else
+            {
+                var updateMipmaps = zkTexture.MipmapCount == 1; // Let Unity generate Mipmaps if they aren't provided by Gothic texture itself.
+
+                // Use Gothic's mips if provided.
+                textureLightmap = new Texture2D(zkTexture.Width, zkTexture.Height, format, zkTexture.MipmapCount, false);
+                for (var i = 0; i < zkTexture.MipmapCount; i++)
+                {
+                    if (format == UnityEngine.TextureFormat.RGBA32)
+                        // RGBA is uncompressed format.
+                        textureLightmap.SetPixelData(zkTexture.AllMipmapsRgba[i], i);
+                    else
+                        // Raw means "compressed data provided by Gothic texture"
+                        textureLightmap.SetPixelData(zkTexture.AllMipmapsRaw[i], i);
+                }
+
+                textureLightmap.Apply(updateMipmaps, true);
+            }
+
+            textureLightmap.filterMode = FilterMode.Trilinear;
+
+            material.mainTexture = textureLightmap;
+
         }
 
         private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
@@ -114,6 +161,7 @@ namespace GVR.Creator.Meshes
             mesh.SetVertices(subMesh.Vertices);
             mesh.SetTriangles(subMesh.Triangles, 0);
             mesh.SetUVs(0, subMesh.Uvs);
+            mesh.SetNormals(subMesh.Normals);
         }
     }
 }

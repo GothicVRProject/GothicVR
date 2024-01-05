@@ -97,6 +97,7 @@ namespace GVR.Creator
             var zkPolygons = zkMesh.Polygons;
             var zkPositions = zkMesh.Positions;
             var zkFeatures = zkMesh.Features;
+            var zkLightmaps = zkMesh.LightMap;
 
             // As we know the exact size of SubMeshes (aka size of Materials), we will prefill them now.
             Dictionary<int, WorldData.SubMeshData> subMeshes = new(zkMaterials.Count);
@@ -104,7 +105,7 @@ namespace GVR.Creator
             {
                 subMeshes.Add(materialIndex, new()
                 {
-                    Material = zkMaterials[materialIndex]
+                    Material = zkMaterials[materialIndex],
                 });
             }
 
@@ -122,9 +123,9 @@ namespace GVR.Creator
                 for (var i=1; i < polygon.PositionIndices.Count - 1; i++)
                 {
                     // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
-                    AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, 0);
-                    AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, i);
-                    AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, i+1);
+                    AddEntry(zkPositions, zkFeatures, zkLightmaps, polygon, currentSubMesh, 0);
+                    AddEntry(zkPositions, zkFeatures, zkLightmaps, polygon, currentSubMesh, i);
+                    AddEntry(zkPositions, zkFeatures, zkLightmaps, polygon, currentSubMesh, i + 1);
                 }
             }
 
@@ -139,7 +140,7 @@ namespace GVR.Creator
             return subMeshes;
         }
 
-        private static void AddEntry(List<Vector3> zkPositions, List<Vertex> features, IPolygon polygon, WorldData.SubMeshData currentSubMesh, int index)
+        private static void AddEntry(List<Vector3> zkPositions, List<Vertex> features, List<ILightMap> lightMaps, IPolygon polygon, WorldData.SubMeshData currentSubMesh, int index)
         {
             // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
             var positionIndex = polygon.PositionIndices[index];
@@ -152,6 +153,11 @@ namespace GVR.Creator
             var feature = features[(int)featureIndex];
             currentSubMesh.Uvs.Add(feature.Texture.ToUnityVector());
             currentSubMesh.Normals.Add(feature.Normal.ToUnityVector());
+
+            if(polygon.LightMapIndex != -1)
+            {
+                currentSubMesh.LightMap = lightMaps[(int)polygon.LightMapIndex];
+            }
         }
 
         private static void WorldLoaded()

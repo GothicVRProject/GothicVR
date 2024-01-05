@@ -22,6 +22,7 @@ namespace GVR.World
         public class SubMeshData
         {
             public IMaterial Material;
+            public ILightMap LightMap = new CachedLightMap(); //we give it a default value so it doesnt crash at runtime when creating the world
 
             public readonly List<Vector3> Vertices = new();
             public readonly List<int> Triangles = new();
