@@ -3,7 +3,7 @@ using GVR.Caches;
 using GVR.Creator;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
-using GVR.Phoenix.Interface.Vm;
+using GVR.Vm;
 using GVR.Properties;
 using JetBrains.Annotations;
 using UnityEngine;

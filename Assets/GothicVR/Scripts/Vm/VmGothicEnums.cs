@@ -1,6 +1,6 @@
 using System;
 
-namespace GVR.Phoenix.Interface.Vm
+namespace GVR.Vm
 {
     public static class VmGothicEnums
     {

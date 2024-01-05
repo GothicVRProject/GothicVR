@@ -12,11 +12,10 @@ using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Manager.Culling;
-using GVR.Phoenix.Data;
-using GVR.Phoenix.Util;
 using GVR.Properties;
 using GVR.Vob;
 using GVR.Vob.WayNet;
+using GVR.World;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -25,7 +24,6 @@ using ZenKit.Daedalus;
 using ZenKit.Util;
 using ZenKit.Vobs;
 using Debug = UnityEngine.Debug;
-using Quaternion = System.Numerics.Quaternion;
 using Vector3 = System.Numerics.Vector3;
 
 namespace GVR.Creator
@@ -888,7 +886,7 @@ namespace GVR.Creator
             SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityQuaternion());
         }
 
-        private static void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, UnityEngine.Quaternion rotation)
+        private static void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, Quaternion rotation)
         {
             obj.transform.SetLocalPositionAndRotation(position, rotation);
         }

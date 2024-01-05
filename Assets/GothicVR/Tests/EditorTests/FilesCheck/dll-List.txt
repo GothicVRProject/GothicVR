@@ -1,5 +1,11 @@
+ZenKit.dll
+zenkitcapi.dll
+libzenkitcapi.so
+I18N.dll
+I18N.MidEast.dll
 I18N.West.dll
-libphoenix-shared.dll
-libphoenix-shared.so
-PxCs.dll
+I18N.Other.dll
 link.xml
+DMCs.dll
+libdmusic-shared.dll
+libdmusic-shared.so

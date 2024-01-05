@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using GVR.Caches;
 using GVR.Extensions;
-using GVR.Phoenix.Interface.Vm;
+using GVR.Vm;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;

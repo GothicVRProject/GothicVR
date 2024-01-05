@@ -2,10 +2,8 @@ using System;
 using System.Collections;
 using GVR.Debugging;
 using GVR.Globals;
-using GVR.Manager;
 using GVR.Util;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace GVR.World
 {
