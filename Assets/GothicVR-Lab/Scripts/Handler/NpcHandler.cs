@@ -44,6 +44,7 @@ namespace GVR.Lab.Handler
             bloodwynInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol!);
             var properties = newNpc.GetComponent<NpcProperties>();
             LookupCache.NpcCache[bloodwynInstance.Index] = properties;
+            properties.npcInstance = bloodwynInstance;
 
            GameData.GothicVm.InitInstance(bloodwynInstance);
             
@@ -52,11 +53,18 @@ namespace GVR.Lab.Handler
                 .OrderByDescending(dialog => dialog.Important)
                 .ToList();
             newNpc.name = bloodwynInstance.GetName(NpcNameSlot.Slot0);
-
-            // Need to be set for later usage (e.g. Bloodwyn checks your inventory if enough ore is there)
-            var hero = GameData.GothicVm.InitInstance<NpcInstance>("hero");
-            GameData.GothicVm.GlobalOther = hero;
             GameData.GothicVm.GlobalSelf = bloodwynInstance;
+
+            // Hero
+            {
+                // Need to be set for later usage (e.g. Bloodwyn checks your inventory if enough nuggets are carried)
+                var heroGo = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
+                heroGo.SetParent(bloodwynSlotGo);
+                var heroInstance = GameData.GothicVm.InitInstance<NpcInstance>("hero");
+                LookupCache.NpcCache[heroInstance.Index] = properties;
+                GameData.GothicVm.GlobalOther = heroInstance;
+            }
+
 
             var mdmName = "Hum_GRDM_ARMOR.asc";
             var mdhName = "Humans_Militia.mds";

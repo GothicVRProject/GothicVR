@@ -21,15 +21,15 @@ namespace GVR.GothicVR.Scripts.Manager
             // We are already inside a sub-dialog
             if (GameData.Dialogs.CurrentDialog.Options.Any())
             {
-                ControllerManager.I.FillDialog(GameData.Dialogs.CurrentDialog.Options);
+                ControllerManager.I.FillDialog(properties.npcInstance.Index, GameData.Dialogs.CurrentDialog.Options);
                 ControllerManager.I.ShowDialog();
             }
             // There is at least one important entry, the NPC wants to talk to the hero about.
             else if (TryGetImportant(properties.Dialogs, out var infoInstance))
             {
                 GameData.Dialogs.CurrentDialog.Instance = infoInstance;
-                ControllerManager.I.HideDialog();
-                GameData.GothicVm.Call(infoInstance.Information);
+
+                CallInformation(properties.npcInstance.Index, infoInstance.Information, true);
             }
             else
             {
@@ -45,14 +45,9 @@ namespace GVR.GothicVR.Scripts.Manager
                 }
 
                 selectableDialogs = selectableDialogs.OrderBy(d => d.Nr).ToList();
-                ControllerManager.I.FillDialog(selectableDialogs);
+                ControllerManager.I.FillDialog(properties.npcInstance.Index, selectableDialogs);
                 ControllerManager.I.ShowDialog();
             }
-
-            // We always want to have a method to get the dialog menu back once all dialog lines are talked.
-            properties.AnimationQueue.Enqueue(new StartProcessInfos(
-                new(AnimationAction.Type.UnityStartProcessInfos),
-                properties.gameObject));
         }
 
         /// <summary>
@@ -84,7 +79,6 @@ namespace GVR.GothicVR.Scripts.Manager
         /// </summary>
         public static void ExtInfoClearChoices(int info)
         {
-            GameData.Dialogs.CurrentDialog.Instance = null;
             GameData.Dialogs.CurrentDialog.Options.Clear();
         }
 
@@ -122,10 +116,9 @@ namespace GVR.GothicVR.Scripts.Manager
                 props.gameObject));
         }
 
-        public static void SelectionClicked(int dialogId)
+        public static void SelectionClicked(int npcInstanceIndex, int dialogId, bool isMainDialog)
         {
-            ControllerManager.I.HideDialog();
-            GameData.GothicVm.Call(dialogId);
+            CallInformation(npcInstanceIndex, dialogId, isMainDialog);
         }
 
         public static void StopDialog()
@@ -135,6 +128,23 @@ namespace GVR.GothicVR.Scripts.Manager
             GameData.Dialogs.IsInDialog = false;
 
             ControllerManager.I.HideDialog();
+        }
+
+        private static void CallInformation(int npcInstanceIndex, int information, bool isMainDialog)
+        {
+            var npcProperties = LookupCache.NpcCache[npcInstanceIndex];
+
+            // If a C_Info is clicked, then set a new CurrentInstance.
+            if (isMainDialog)
+                GameData.Dialogs.CurrentDialog.Instance = npcProperties.Dialogs.First(d => d.Index == information);
+
+            ControllerManager.I.HideDialog();
+            GameData.GothicVm.Call(information);
+
+            // We always want to have a method to get the dialog menu back once all dialog lines are talked.
+            npcProperties.AnimationQueue.Enqueue(new StartProcessInfos(
+                new(AnimationAction.Type.UnityStartProcessInfos, int0: information),
+                npcProperties.gameObject));
         }
 
         private static GameObject GetNpc(NpcInstance npc)

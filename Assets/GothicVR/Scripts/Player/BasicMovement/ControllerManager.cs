@@ -92,7 +92,7 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
         dialogGameObject.SetActive(false);
     }
 
-    public void FillDialog(List<DialogOption> dialogOptions)
+    public void FillDialog(int npcInstanceIndex, List<DialogOption> dialogOptions)
     {
         CreateAdditionalDialogOptions(dialogOptions.Count);
         ClearDialogOptions();
@@ -102,12 +102,13 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
             var dialogItem = dialogItems[i];
             var dialogOption = dialogOptions[i];
 
-            dialogItem.GetComponent<Button>().onClick.AddListener(() => DialogClick(dialogOption.Function));
+            dialogItem.GetComponent<Button>().onClick.AddListener(
+                () => OnDialogClick(npcInstanceIndex, dialogOption.Function, false));
             dialogItem.FindChildRecursively("Label").GetComponent<TMP_Text>().text = dialogOption.Text;
         }
     }
 
-    public void FillDialog(List<InfoInstance> dialogOptions)
+    public void FillDialog(int npcInstanceIndex, List<InfoInstance> dialogOptions)
     {
         CreateAdditionalDialogOptions(dialogOptions.Count);
         ClearDialogOptions();
@@ -117,7 +118,8 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
             var dialogItem = dialogItems[i];
             var dialogOption = dialogOptions[i];
 
-            dialogItem.GetComponent<Button>().onClick.AddListener(() => DialogClick(dialogOption.Information));
+            dialogItem.GetComponent<Button>().onClick.AddListener(
+                () => OnDialogClick(npcInstanceIndex, dialogOption.Information, true));
             dialogItem.FindChildRecursively("Label").GetComponent<TMP_Text>().text = dialogOption.Description;
         }
     }
@@ -139,9 +141,9 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
             var newItem = Instantiate(lastItem, lastItem.transform.parent, false);
             dialogItems.Add(newItem);
 
-            newItem.name = $"Item{dialogItems.Count:00}";
+            newItem.name = $"Item{dialogItems.Count-1:00}";
             // FIXME - We need to handle this kind of UI magic more transparent somewhere else...
-            newItem.transform.localPosition += new Vector3(0, -50 * dialogItems.Count-1, 0);
+            newItem.transform.localPosition += new Vector3(0, -50 * (dialogItems.Count - 1), 0);
         }
     }
 
@@ -154,8 +156,8 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
         }
     }
 
-    public void DialogClick(int dialogId)
+    private void OnDialogClick(int npcInstanceIndex, int dialogId, bool isMainDialog)
     {
-        DialogHelper.SelectionClicked(dialogId);
+        DialogHelper.SelectionClicked(npcInstanceIndex, dialogId, isMainDialog);
     }
 }
