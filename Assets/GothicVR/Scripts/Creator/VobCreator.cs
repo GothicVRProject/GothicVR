@@ -24,6 +24,7 @@ using ZenKit.Daedalus;
 using ZenKit.Util;
 using ZenKit.Vobs;
 using Debug = UnityEngine.Debug;
+using ZenKitLight = ZenKit.Vobs.Light;
 using Vector3 = System.Numerics.Vector3;
 
 namespace GVR.Creator
@@ -118,6 +119,11 @@ namespace GVR.Creator
                             _cullingVobObjects.Add(obj);
                             break;
                         }
+                        case VirtualObjectType.zCVobLight:
+                        {
+                            var obj = CreateLight((ZenKitLight)vob);
+                            break;
+                        }
                         case VirtualObjectType.oCMobContainer:
                         {
                             var obj = CreateMobContainer((Container)vob);
@@ -205,7 +211,6 @@ namespace GVR.Creator
                         case VirtualObjectType.oCCSTrigger:
                         case VirtualObjectType.oCTriggerScript:
                         case VirtualObjectType.zCVobLensFlare:
-                        case VirtualObjectType.zCVobLight:
                         case VirtualObjectType.zCMoverController:
                         case VirtualObjectType.zCPFXController:
                         case VirtualObjectType.zCMover:
@@ -253,7 +258,6 @@ namespace GVR.Creator
                          VirtualObjectType.oCCSTrigger,
                          VirtualObjectType.oCTriggerScript,
                          VirtualObjectType.zCVobLensFlare,
-                         VirtualObjectType.zCVobLight,
                          VirtualObjectType.zCMoverController,
                          VirtualObjectType.zCPFXController
                      })
@@ -420,6 +424,30 @@ namespace GVR.Creator
             colliderComp.convex = true;
             grabComp.selectEntered.AddListener(itemGrabComp.SelectEntered);
             grabComp.selectExited.AddListener(itemGrabComp.SelectExited);
+
+            return vobObj;
+        }
+
+        [CanBeNull]
+        private static GameObject CreateLight(ZenKitLight vob)
+        {
+            var vobObj = new GameObject(vob.Name);
+            var parent = parentGosTeleport[vob.Type];
+            vobObj.SetParent(parent);
+            SetPosAndRot(vobObj, vob.Position, vob.Rotation);
+            vobObj.layer = Constants.IgnoreRaycastLayer;
+
+            var lightComp = vobObj.AddComponent<UnityEngine.Light>();
+            lightComp.color = new Color(vob.Color.R, vob.Color.G, vob.Color.B, vob.Color.A);
+            lightComp.type = vob.LightType == ZenKit.Vobs.LightType.Point
+                ? UnityEngine.LightType.Point
+                : UnityEngine.LightType.Spot;
+            lightComp.range = vob.Range / 100;
+            lightComp.spotAngle = vob.ConeAngle;
+            lightComp.intensity = 0.001f;
+            lightComp.shadows = LightShadows.Hard;
+
+            lightComp.renderMode = LightRenderMode.ForcePixel;
 
             return vobObj;
         }

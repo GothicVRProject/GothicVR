@@ -16,7 +16,7 @@ namespace GVR.Creator.Meshes
     {
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
-        protected const string DefaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        protected const string DefaultShader = "Universal Render Pipeline/Simple Lit"; // "Unlit/Transparent Cutout";
         protected const string WaterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
         protected const string AlphaToCoverageShaderName = "Unlit/Unlit-AlphaToCoverage";
         protected const float DecalOpacity = 0.75f;
@@ -250,6 +250,7 @@ namespace GVR.Creator.Meshes
             var verticesAndUvSize = mrmData.SubMeshes.Sum(i => i.Triangles.Count) * 3;
             var preparedVertices = new List<Vector3>(verticesAndUvSize);
             var preparedUVs = new List<Vector2>(verticesAndUvSize);
+            var preparedNormals = new List<Vector3>(verticesAndUvSize);
 
             // 2-dimensional arrays (as there are segregated by submeshes)
             var preparedTriangles = new List<List<int>>(mrmData.SubMeshes.Count);
@@ -285,6 +286,10 @@ namespace GVR.Creator.Meshes
                     preparedUVs.Add(index1.Texture.ToUnityVector());
                     preparedUVs.Add(index2.Texture.ToUnityVector());
                     preparedUVs.Add(index3.Texture.ToUnityVector());
+
+                    preparedNormals.Add(index1.Normal.ToUnityVector());
+                    preparedNormals.Add(index2.Normal.ToUnityVector());
+                    preparedNormals.Add(index3.Normal.ToUnityVector());
                 }
                 preparedTriangles.Add(subMeshTriangles);
             }
@@ -295,6 +300,7 @@ namespace GVR.Creator.Meshes
             // @see: https://answers.unity.com/questions/531968/submesh-vertices.html
             mesh.SetVertices(preparedVertices);
             mesh.SetUVs(0, preparedUVs);
+            mesh.SetNormals(preparedNormals);
             for (var i = 0; i < mrmData.SubMeshes.Count; i++)
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
@@ -332,6 +338,7 @@ namespace GVR.Creator.Meshes
             var verticesAndUvSize = zkMesh.SubMeshes.Sum(i => i.Triangles!.Count) * 3;
             var preparedVertices = new List<Vector3>(verticesAndUvSize);
             var preparedUVs = new List<Vector2>(verticesAndUvSize);
+            var preparedNormals = new List<Vector3>(verticesAndUvSize);
             var preparedBoneWeights = new List<BoneWeight>(verticesAndUvSize);
 
             // 2-dimensional arrays (as there are segregated by submeshes)
@@ -369,6 +376,10 @@ namespace GVR.Creator.Meshes
                     preparedUVs.Add(index2.Texture.ToUnityVector());
                     preparedUVs.Add(index3.Texture.ToUnityVector());
 
+                    preparedNormals.Add(index1.Normal.ToUnityVector());
+                    preparedNormals.Add(index2.Normal.ToUnityVector());
+                    preparedNormals.Add(index3.Normal.ToUnityVector());
+
                     preparedBoneWeights.Add(weights[index1.Index].ToBoneWeight(soft.Nodes));
                     preparedBoneWeights.Add(weights[index2.Index].ToBoneWeight(soft.Nodes));
                     preparedBoneWeights.Add(weights[index3.Index].ToBoneWeight(soft.Nodes));
@@ -382,7 +393,7 @@ namespace GVR.Creator.Meshes
             // @see: https://answers.unity.com/questions/531968/submesh-vertices.html
             mesh.SetVertices(preparedVertices);
             mesh.SetUVs(0, preparedUVs);
-
+            mesh.SetNormals(preparedNormals);
             mesh.boneWeights = preparedBoneWeights.ToArray();
             for (var i = 0; i < zkMesh.SubMeshes.Count; i++)
             {
