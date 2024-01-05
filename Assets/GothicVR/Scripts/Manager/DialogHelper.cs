@@ -136,7 +136,8 @@ namespace GVR.GothicVR.Scripts.Manager
 
             // If a C_Info is clicked, then set a new CurrentInstance.
             if (isMainDialog)
-                GameData.Dialogs.CurrentDialog.Instance = npcProperties.Dialogs.First(d => d.Index == information);
+                GameData.Dialogs.CurrentDialog.Instance = npcProperties.Dialogs
+                    .First(d => d.Information == information);
 
             ControllerManager.I.HideDialog();
             GameData.GothicVm.Call(information);
