@@ -104,7 +104,7 @@ namespace GVR.Creator.Meshes
                 var meshRenderer = meshObj.AddComponent<MeshRenderer>();
 
                 PrepareMeshRenderer(meshRenderer, subMesh.Value);
-                PrepareMeshFilter(meshFilter, subMesh.Value);
+                PrepareMeshFilter(meshFilter, subMesh.Value, false);
                 PrepareMeshCollider(meshObj, meshFilter.mesh, subMesh.Value.Materials);
             }
 
@@ -148,7 +148,7 @@ namespace GVR.Creator.Meshes
             var meshRenderer = rootGo.AddComponent<MeshRenderer>();
 
             PrepareMeshRenderer(meshRenderer, mrm);
-            PrepareMeshFilter(meshFilter, mrm);
+            PrepareMeshFilter(meshFilter, mrm, false);
 
             if (withCollider)
                 PrepareMeshCollider(rootGo, meshFilter.mesh, mrm.Materials);
@@ -218,7 +218,7 @@ namespace GVR.Creator.Meshes
             rend.SetMaterials(finalMaterials);
         }
 
-        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, bool isDynamic)
         {
             /*
              * Ok, brace yourself:
@@ -239,6 +239,11 @@ namespace GVR.Creator.Meshes
              *  uvs = [wedge[0].texture], [wedge[2].texture], [wedge[1].texture]
              */
             var mesh = new Mesh();
+
+            // MorphMeshes will change the vertices. This call optimizes performance.
+            if (isDynamic)
+                mesh.MarkDynamic();
+
             meshFilter.mesh = mesh;
             if (null == mrmData)
             {
