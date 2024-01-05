@@ -6,7 +6,7 @@ using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
 using GVR.Manager.Settings;
-using GVR.Phoenix.Interface.Vm;
+using GVR.Vm;
 using GVR.Util;
 using UnityEngine;
 using ZenKit;
@@ -80,7 +80,7 @@ namespace GVR.Manager
             LoadFonts();
             
             watch.Stop();
-            Debug.Log($"Time spent for Bootstrapping Phoenix: {watch.Elapsed}");
+            Debug.Log($"Time spent for Bootstrapping ZenKit: {watch.Elapsed}");
 
         }
 
@@ -93,7 +93,7 @@ namespace GVR.Manager
             {
                 case LogLevel.Error:
                     var isVfsMessage = message.ContainsIgnoreCase("failed to find vfs entry");
-                    if (isVfsMessage && !FeatureFlags.I.showPhoenixVfsFileNotFoundErrors)
+                    if (isVfsMessage && !FeatureFlags.I.showZenKitVfsFileNotFoundErrors)
                         break;
 
                     Debug.LogError(messageString);

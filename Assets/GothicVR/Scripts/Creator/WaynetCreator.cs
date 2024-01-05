@@ -4,7 +4,6 @@ using GVR.Caches;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
-using GVR.Phoenix.Data;
 using GVR.World;
 using UnityEngine;
 

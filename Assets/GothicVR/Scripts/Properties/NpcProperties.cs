@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using GVR.Npc.Actions.AnimationActions;
-using GVR.Phoenix.Interface.Vm;
+using GVR.Vm;
 using GVR.Vob.WayNet;
 using UnityEngine;
 using ZenKit.Daedalus;

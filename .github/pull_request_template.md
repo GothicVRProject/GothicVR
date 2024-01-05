@@ -5,7 +5,7 @@
 
 
 # Checklist
-(Please judge for yourself which entry is valuable for your PR)
+(Please remove entries which aren't needed for your PR)
 
 ## Scene
 * [ ] FeatureFlags reverted to right value
@@ -16,4 +16,4 @@
 * [ ] Tested with Pico / Quest
 
 ## Dependencies
-* [ ] If libphoenix-shared.dll is changed, .so is also changed
+* [ ] If ZenKit.dll is changed, zenkitcapi.dll and libzenkitcapi.so are also changed

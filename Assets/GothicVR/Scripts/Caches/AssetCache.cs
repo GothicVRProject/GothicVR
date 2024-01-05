@@ -80,7 +80,7 @@ namespace GVR.Caches
                 var updateMipmaps = zkTexture.MipmapCount == 1; // Let Unity generate Mipmaps if they aren't provided by Gothic texture itself.
 
                 // Use Gothic's mips if provided.
-                texture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, format, (int)zkTexture.MipmapCount, false);
+                texture = new Texture2D(zkTexture.Width, zkTexture.Height, format, zkTexture.MipmapCount, false);
                 for (var i = 0; i < zkTexture.MipmapCount; i++)
                 {
                     if (format == UnityEngine.TextureFormat.RGBA32)
@@ -275,7 +275,7 @@ namespace GVR.Caches
         }
 
         /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix.
+        /// Hint: Instances only need to be initialized once in ZenKit.
         /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
         /// </summary>
         public static ItemInstance TryGetItemData(int instanceId)
@@ -289,7 +289,7 @@ namespace GVR.Caches
         }
 
         /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix.
+        /// Hint: Instances only need to be initialized once in ZenKit.
         /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
         /// </summary>
         [CanBeNull]
@@ -314,7 +314,7 @@ namespace GVR.Caches
         }
 
         /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
+        /// Hint: Instances only need to be initialized once in ZenKit and don't need to be deleted during runtime.
         /// </summary>
         [CanBeNull]
         public static SoundEffectInstance TryGetSfxData(string key)
@@ -338,7 +338,7 @@ namespace GVR.Caches
         }
 
         /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
+        /// Hint: Instances only need to be initialized once in ZenKit and don't need to be deleted during runtime.
         /// </summary>
         public static ParticleEffectInstance TryGetPfxData(string key)
         {

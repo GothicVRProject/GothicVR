@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GVR.Phoenix.Data.Vm.Gothic;
+using GVR.Manager;
 using UnityEngine;
 
-namespace GVR.Npc
+namespace GVR.Npc.Routines
 {
     public class Routine : MonoBehaviour
     {

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using GVR.Extensions;
-using GVR.Phoenix.Data;
-using GVR.Phoenix.Data.Vm.Gothic;
+using GVR.Npc.Routines;
 using GVR.Properties;
 using GVR.Vob.WayNet;
 using GVR.World;

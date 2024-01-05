@@ -1,9 +1,7 @@
-using GVR.Demo;
-using GVR.Util;
-using GVR.World;
 using System;
 using GVR.Debugging;
 using GVR.Globals;
+using GVR.World;
 using UnityEngine;
 
 public class SunMover : MonoBehaviour

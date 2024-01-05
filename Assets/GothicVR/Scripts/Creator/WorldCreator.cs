@@ -8,14 +8,13 @@ using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
 using GVR.Manager;
-using GVR.Phoenix.Data;
+using GVR.World;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using ZenKit;
 using Vector3 = System.Numerics.Vector3;
 #if UNITY_EDITOR
-using UnityEditor.SceneManagement;
 #endif
 
 namespace GVR.Creator

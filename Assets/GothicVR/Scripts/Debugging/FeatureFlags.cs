@@ -17,7 +17,6 @@ namespace GVR.Debugging
             EveryIngameHour
         };
 
-        [FormerlySerializedAs("SkipMainMenu")]
         [Header("__________Developer__________")]
         public bool skipMainMenu;
         public bool useXRDeviceSimulator;
@@ -74,7 +73,7 @@ namespace GVR.Debugging
         [Header("__________Debug messages__________")]
         public LogLevel zenKitLogLevel;
         public bool showZspyLogs;
-        public bool showPhoenixVfsFileNotFoundErrors;
+        public bool showZenKitVfsFileNotFoundErrors;
         public bool showMusicLogs;
 
 

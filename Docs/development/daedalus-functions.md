@@ -11,7 +11,7 @@ Current state can be one of the following:
 
 If you work on a function, please update it's status here, so that we don't do duplicate work.
 
-Currently, every Daedalus function is registered in the [VmGothicBridge](https://github.com/GothicVRProject/GothicVR/blob/main/Assets/GothicVR/Scripts/Phoenix/Interface/Vm/VmGothicBridge.cs#LL41C2-L45C2) and new ones should be added there too. A good starting point for getting an idea on how to implement a specific function is the [OpenGothic](https://github.com/Try/OpenGothic) project's [implementations](https://github.com/Try/OpenGothic/blob/6dfea2c567848ee235ebfa1a8d439c285398e528/game/game/gamescript.h#L223) of them.
+Currently, every Daedalus function is registered in the `VmGothicExternals` and new ones should be added there too. A good starting point for getting an idea on how to implement a specific function is the [OpenGothic](https://github.com/Try/OpenGothic) project's [implementations](https://github.com/Try/OpenGothic/blob/6dfea2c567848ee235ebfa1a8d439c285398e528/game/game/gamescript.h#L223) of them.
 
 If you got any notes, assumed complexity or something else to add, feel free to edit this page and the table below!
 
@@ -19,19 +19,21 @@ If you got any notes, assumed complexity or something else to add, feel free to 
 
 This section gives a technical overview for understanding how the external Daedalus functions work in the application's context. It is divided in the initialization and the workflow when the game is running.
 
-When the game is booted, the `VmGothicBridge.LoadGothicVM(G1Dir: string)` call initializes the phoenix VM. The call looks as follows:
+When the game is booted, the `GvrBootstrapper.LoadGothicVM(g1Dir: string)` call initializes the ZenKit VM. The call looks as follows:
 
-![VM initialization](../assets/diagrams/phoenixvm_init.png)
+![VM initialization](./diagrams/Daedalus-vm-external-init.drawio.png)
 
-As can be seen, the `VmGothicBridge` is GothicVR's internal layer for communicating with the phoenix VM; which handles the execution of the Gothic Daedalus scripts.
+As can be seen, the `VmGothicExternals` is GothicVR's internal layer for communicating with the ZenKit VM; which handles the execution of the Gothic Daedalus scripts.
 
-The Daedalus scripting language used by Gothic has a list of external functions that can be called from within each script. These can be used e.g. to spawn NPCs, add items to the inventory or handle dialogs. These functions have to be implemented by us, so that they can interact with our project's code. For this to work, the phoenix VM is able to register our own implementations for each function that will be executed when being called from a Daedalus script. In the above diagram you can see that the `VmGothicBridge` registers each single function with the `pxVmRegisterExternal(...)` method on the static `PxVm` object.
+The Daedalus scripting language used by Gothic has a list of external functions that can be called from within each script. These can be used e.g. to spawn NPCs, add items to the inventory or handle dialogs.
+These functions have to be implemented by us, so that they can interact with our project's code. For this to work, the ZenKit VM is able to register our own implementations for each function that will be executed when being called from a Daedalus script.
+In the above diagram you can see that the `VmGothicExternals` registers each single function with the `RegisterExternal<>("", ...)` method.
 
-When executing the Daedalus scripts, the phoenix VM will then look up which of our functions is registered for the specific one being called. It will then execute our registered function and pass the `vmPtr` object which can be used to retrieve the function's parameters. The process is being described in the following diagram:
+When executing the Daedalus scripts, the ZenKit VM will then look up which of our functions is registered for the specific one being called. It will then execute our registered function and pass the `vmPtr` object which can be used to retrieve the function's parameters. The process is being described in the following diagram:
 
-![External function execution from VM](../assets/diagrams/phoenixvm_execution.png)
+![External function execution from VM](./diagrams/Daedalus-vm-external-execution.drawio.png)
 
-The above call will be executed when the invocation of an external function is found in a Daedalus script while evaluating it in the phoenix VM.
+The above call will be executed when the invocation of an external function is found in a Daedalus script while evaluating it in the ZenKit VM.
 
 > *Note*: When no Daedalus function with the same name is explicitly registered, the default handler `DefaultExternal` is called which currently logs the function's name so that missing functions can be easily identified in the game's logs.
 
