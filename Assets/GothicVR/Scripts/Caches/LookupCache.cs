@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GVR.Globals;
 using GVR.Manager;
 using GVR.Properties;
 using TMPro;
@@ -14,7 +15,7 @@ namespace GVR.Caches
         /// <summary>
         /// [symbolIndex] = Properties-Component
         /// </summary>
-        public static readonly Dictionary<uint, NpcProperties> NpcCache = new();
+        public static readonly Dictionary<int, NpcProperties> NpcCache = new();
 
         /// <summary>
         /// Already created AnimationData (Clips + RootMotions) can be reused.
@@ -34,7 +35,7 @@ namespace GVR.Caches
         
         static LookupCache()
         {
-            GvrSceneManager.I.sceneGeneralUnloaded.AddListener(delegate
+            GvrEvents.GeneralSceneUnloaded.AddListener(delegate
             {
                 vobSoundsAndDayTime.Clear();
             });

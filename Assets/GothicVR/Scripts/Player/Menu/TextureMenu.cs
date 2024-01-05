@@ -19,9 +19,9 @@ namespace GVR.Player.Menu
             var mmb = MainMenuBackground.GetComponent<MeshRenderer>();
             var mmt = MainMenuText.GetComponent<MeshRenderer>();
 
-            mmib.material = TextureManager.I.MainMenuImageBackgroundMaterial;
-            mmb.material = TextureManager.I.MainMenuBackgroundMaterial;
-            mmt.material = TextureManager.I.MainMenuTextImageMaterial;
+            mmib.material = TextureManager.I.mainMenuImageBackgroundMaterial;
+            mmb.material = TextureManager.I.mainMenuBackgroundMaterial;
+            mmt.material = TextureManager.I.mainMenuTextImageMaterial;
         }
     }
 

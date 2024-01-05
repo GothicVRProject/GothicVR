@@ -3,22 +3,17 @@ using System.Text.RegularExpressions;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.Phoenix.Interface.Vm;
-using PxCs.Data.Mesh;
-using PxCs.Data.Vm;
-using PxCs.Interface;
 using UnityEngine;
+using ZenKit;
+using ZenKit.Daedalus;
 
 namespace GVR.Creator.Meshes
 {
     public class NpcMeshCreator : AbstractMeshCreator
     {
-        private static VmGothicExternals.ExtSetVisualBodyData tempBodyData;
+        private VmGothicExternals.ExtSetVisualBodyData tempBodyData;
 
-        // As we subclass the main Mesh Creator, we need to have a parent-child inheritance instance.
-        // Needed e.g. for NPCs to change head color while calling Create()
-        private static readonly NpcMeshCreator Self = new();
-
-        public static GameObject CreateNpc(string npcName, string mdmName, string mdhName,
+        public GameObject CreateNpc(string npcName, string mdmName, string mdhName,
             VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
         {
             tempBodyData = bodyData;
@@ -37,18 +32,18 @@ namespace GVR.Creator.Meshes
                 return null;
             }
             
-            var npcGo = Self.CreateInternal(npcName, mdm, mdh, default, default, null, root);
+            var npcGo = Create(npcName, mdm, mdh, default, default, null, root);
 
             if (!string.IsNullOrEmpty(bodyData.Head))
             {
                 var mmb = AssetCache.TryGetMmb(bodyData.Head);
-                Self.AddHead(npcName, npcGo, mmb);
+                AddHead(npcName, npcGo, mmb);
             }
 
             return npcGo;
         }
 
-        private void AddHead(string npcName, GameObject npcGo, PxMorphMeshData morphMesh)
+        private void AddHead(string npcName, GameObject npcGo, IMorphMesh morphMesh)
         {
             var headGo = npcGo.FindChildRecursively("BIP01 HEAD");
 
@@ -61,8 +56,8 @@ namespace GVR.Creator.Meshes
             var headMeshFilter = headGo.AddComponent<MeshFilter>();
             var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
 
-            Self.PrepareMeshRenderer(headMeshRenderer, morphMesh.mesh);
-            Self.PrepareMeshFilter(headMeshFilter, morphMesh.mesh);
+            PrepareMeshRenderer(headMeshRenderer, morphMesh.Mesh);
+            PrepareMeshFilter(headMeshFilter, morphMesh.Mesh);
         }
 
         /// <summary>
@@ -93,9 +88,9 @@ namespace GVR.Creator.Meshes
             return base.GetTexture(finalTextureName);
         }
         
-        protected override Dictionary<string, PxMultiResolutionMeshData> GetFilteredAttachments(Dictionary<string, PxMultiResolutionMeshData> attachments)
+        protected override Dictionary<string, IMultiResolutionMesh> GetFilteredAttachments(Dictionary<string, IMultiResolutionMesh> attachments)
         {
-            Dictionary<string, PxMultiResolutionMeshData> newAttachments = new(attachments);
+            Dictionary<string, IMultiResolutionMesh> newAttachments = new(attachments);
 
             // Remove head as it will be loaded later.
             if (newAttachments.Remove("BIP01 HEAD"))
@@ -104,28 +99,28 @@ namespace GVR.Creator.Meshes
             return newAttachments;
         }
 
-        public static void EquipWeapon(GameObject npcGo, PxVmItemData itemData, PxVm.PxVmItemFlags mainFlag, PxVm.PxVmItemFlags flags)
+        public void CreateNpcWeapon(GameObject npcGo, ItemInstance itemData, VmGothicEnums.ItemFlags mainFlag, VmGothicEnums.ItemFlags flags)
         {
             switch (mainFlag)
             {
-                case PxVm.PxVmItemFlags.ITEM_KAT_NF:
+                case VmGothicEnums.ItemFlags.ITEM_KAT_NF:
                     EquipMeleeWeapon(npcGo, itemData);
                     return;
-                case PxVm.PxVmItemFlags.ITEM_KAT_FF:
+                case VmGothicEnums.ItemFlags.ITEM_KAT_FF:
                     EquipRangeWeapon(npcGo, itemData);
                     return;
             }
         }
 
-        private static void EquipMeleeWeapon(GameObject npcGo, PxVmItemData itemData)
+        private void EquipMeleeWeapon(GameObject npcGo, ItemInstance itemData)
         {
-            var mrm = AssetCache.TryGetMrm(itemData.visual);
+            var mrm = AssetCache.TryGetMrm(itemData.Visual);
 
             string slotName;
-            switch (itemData.flags)
+            switch ((VmGothicEnums.ItemFlags)itemData.Flags)
             {
-                case PxVm.PxVmItemFlags.ITEM_2HD_AXE:
-                case PxVm.PxVmItemFlags.ITEM_2HD_SWD:
+                case VmGothicEnums.ItemFlags.ITEM_2HD_AXE:
+                case VmGothicEnums.ItemFlags.ITEM_2HD_SWD:
                     slotName = "ZS_LONGSWORD";
                     break;
                 default:
@@ -144,16 +139,16 @@ namespace GVR.Creator.Meshes
             if (!weaponGo.TryGetComponent<MeshRenderer>(out var meshRenderer))
                 meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
-            Self.PrepareMeshRenderer(meshRenderer, mrm);
-            Self.PrepareMeshFilter(meshFilter, mrm);
+            PrepareMeshRenderer(meshRenderer, mrm);
+            PrepareMeshFilter(meshFilter, mrm);
         }
 
-        private static void EquipRangeWeapon(GameObject npcGo, PxVmItemData itemData)
+        private void EquipRangeWeapon(GameObject npcGo, ItemInstance itemData)
         {
             string slotName;
-            switch (itemData.flags)
+            switch ((VmGothicEnums.ItemFlags)itemData.Flags)
             {
-                case PxVm.PxVmItemFlags.ITEM_CROSSBOW:
+                case VmGothicEnums.ItemFlags.ITEM_CROSSBOW:
                     slotName = "ZS_CROSSBOW";
                     break;
                 default:
@@ -165,13 +160,13 @@ namespace GVR.Creator.Meshes
             if (weaponGo == null)
                 return;
 
-            var mms = AssetCache.TryGetMmb(itemData.visual);
+            var mms = AssetCache.TryGetMmb(itemData.Visual);
 
             var meshFilter = weaponGo.AddComponent<MeshFilter>();
             var meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
-            Self.PrepareMeshRenderer(meshRenderer, mms.mesh);
-            Self.PrepareMeshFilter(meshFilter, mms.mesh);
+            PrepareMeshRenderer(meshRenderer, mms.Mesh);
+            PrepareMeshFilter(meshFilter, mms.Mesh);
         }
     }
 }

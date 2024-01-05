@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
+using GVR.Globals;
+using GVR.Util;
 using TMPro;
 using UnityEngine;
-using GVR.Manager;
-using GVR.Util;
-using System.Linq;
 
 namespace GVR.Player.Menu
 {
@@ -34,7 +34,7 @@ namespace GVR.Player.Menu
 
             WaypointSetDropdownValues();
             waypointDropdown.onValueChanged.AddListener(WaypointDropdownItemSelected);
-            waypointDropdown.value = waypoints.Keys.ToList().IndexOf(ConstantsManager.selectedWaypoint);
+            waypointDropdown.value = waypoints.Keys.ToList().IndexOf(Constants.selectedWaypoint);
         }
 
         public void WaypointSetDropdownValues()
@@ -49,7 +49,7 @@ namespace GVR.Player.Menu
 
         void WaypointDropdownItemSelected(int value)
         {
-            ConstantsManager.selectedWaypoint = waypoints.Keys.ElementAt(value);
+            Constants.selectedWaypoint = waypoints.Keys.ElementAt(value);
         }
     }
 }

@@ -4,32 +4,32 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.Npc.Actions;
-using PxCs.Data.Animation;
-using PxCs.Data.Model;
 using UnityEngine;
+using ZenKit;
+using Animation = UnityEngine.Animation;
 
 namespace GVR.Creator
 {
     public static class AnimationCreator
     {
-        public static void PlayAnimation(string mdsName, string animationName, PxModelHierarchyData mdh, GameObject go, bool repeat = false)
+        public static void PlayAnimation(string mdsName, string animationName, IModelHierarchy mdh, GameObject go, bool repeat = false)
         {
             var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var animationComp = go.GetComponent<Animation>();
             
             var mds = AssetCache.TryGetMds(mdsName);
-            var pxAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
+            var zkAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
 
             // Try to load from cache
             if (!LookupCache.AnimationClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
             {
-                clip = LoadAnimationClip(pxAnimation, mdh, go, repeat, mdsAnimationKeyName);
+                clip = LoadAnimationClip(zkAnimation, mdh, go, repeat, mdsAnimationKeyName);
                 LookupCache.AnimationClipCache[mdsAnimationKeyName] = clip;
             }
 
             if (animationComp[mdsAnimationKeyName] == null)
             {
-                AddClipEvents(clip, mds, pxAnimation, animationName);
+                AddClipEvents(clip, mds, zkAnimation, animationName);
                 AddClipEndEvent(clip);
                 animationComp.AddClip(clip, mdsAnimationKeyName);
             }
@@ -37,7 +37,7 @@ namespace GVR.Creator
             animationComp.Play(mdsAnimationKeyName);
         }
 
-        private static AnimationClip LoadAnimationClip(PxAnimationData pxAnimation, PxModelHierarchyData mdh, GameObject rootBone, bool repeat, string clipName)
+        private static AnimationClip LoadAnimationClip(IModelAnimation pxAnimation, IModelHierarchy mdh, GameObject rootBone, bool repeat, string clipName)
         {
             var clip = new AnimationClip
             {
@@ -46,8 +46,8 @@ namespace GVR.Creator
                 wrapMode = repeat ? WrapMode.Loop : WrapMode.Once
             };
 
-            var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.nodeCount);
-            var boneNames = pxAnimation.node_indices!.Select(nodeIndex => mdh.nodes![nodeIndex].name).ToArray();
+            var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.NodeCount);
+            var boneNames = pxAnimation.NodeIndices.Select(nodeIndex => mdh.Nodes[(int)nodeIndex].Name).ToArray();
 
             // Initialize array
             for (var boneId = 0; boneId < boneNames.Length; boneId++)
@@ -60,18 +60,18 @@ namespace GVR.Creator
             }
 
             // Add KeyFrames from PxSamples
-            for (var i = 0; i < pxAnimation.samples!.Length; i++)
+            for (var i = 0; i < pxAnimation.Samples.Count; i++)
             {
                 // We want to know what time it is for the animation.
                 // Therefore we need to know fps multiplied with current sample. As there are nodeCount samples before a new time starts,
                 // we need to add this to the calculation.
-                var time = (1 / pxAnimation.fps) * (int)(i / pxAnimation.nodeCount);
-                var sample = pxAnimation.samples[i];
-                var boneId = i % pxAnimation.nodeCount;
+                var time = (1 / pxAnimation.Fps) * (int)(i / pxAnimation.NodeCount);
+                var sample = pxAnimation.Samples[i];
+                var boneId = i % pxAnimation.NodeCount;
                 var boneName = boneNames[boneId];
 
                 var boneList = curves[boneName];
-                var uPosition = sample.position.ToUnityVector();
+                var uPosition = sample.Position.ToUnityVector();
 
                 // We add 6 properties for location and rotation.
                 boneList[0].AddKey(time, uPosition.x);
@@ -83,10 +83,10 @@ namespace GVR.Creator
                     boneList[1].AddKey(time, uPosition.y);
 
                 boneList[2].AddKey(time, uPosition.z);
-                boneList[3].AddKey(time, -sample.rotation.w); // It's important to have this value with a -1. Otherwise animation is inversed.
-                boneList[4].AddKey(time, sample.rotation.x);
-                boneList[5].AddKey(time, sample.rotation.y);
-                boneList[6].AddKey(time, sample.rotation.z);
+                boneList[3].AddKey(time, -sample.Rotation.W); // It's important to have this value with a -1. Otherwise animation is inversed.
+                boneList[4].AddKey(time, sample.Rotation.X);
+                boneList[5].AddKey(time, sample.Rotation.Y);
+                boneList[6].AddKey(time, sample.Rotation.Z);
             }
 
             foreach (var entry in curves)
@@ -104,7 +104,7 @@ namespace GVR.Creator
 
             // Add some final settings
             clip.EnsureQuaternionContinuity();
-            clip.frameRate = pxAnimation.fps;
+            clip.frameRate = pxAnimation.Fps;
 
             return clip;
         }
@@ -140,27 +140,27 @@ namespace GVR.Creator
             }
         }
 
-        private static void AddClipEvents(AnimationClip clip, PxModelScriptData mds, PxAnimationData pxAnimation, string animationName)
+        private static void AddClipEvents(AnimationClip clip, IModelScript mds, IModelAnimation zkAnimation, string animationName)
         {
-            var anim = mds.animations.First(i => i.name.EqualsIgnoreCase(animationName));
+            var anim = mds.Animations.First(i => i.Name.EqualsIgnoreCase(animationName));
 
-            foreach (var pxEvent in anim.events)
+            foreach (var zkEvent in anim.EventTags)
             {
-                var clampedFrame = ClampFrame(pxEvent.frame, anim.firstFrame, (int)pxAnimation.frameCount, anim.lastFrame);
+                var clampedFrame = ClampFrame(zkEvent.Frame, anim.FirstFrame, zkAnimation.FrameCount, anim.LastFrame);
                 
                 AnimationEvent animEvent = new()
                 {
                     time = clampedFrame / clip.frameRate,
                     functionName = nameof(IAnimationCallbacks.AnimationCallback),
-                    stringParameter = JsonUtility.ToJson(pxEvent) // As we can't add a custom object, we serialize data.
+                    stringParameter = JsonUtility.ToJson(zkEvent) // As we can't add a custom object, we serialize data.
                  };
                 
                 clip.AddEvent(animEvent);
             }
 
-            foreach (var sfxEvent in anim.sfx)
+            foreach (var sfxEvent in anim.SoundEffects)
             {
-                var clampedFrame = ClampFrame(sfxEvent.frame, anim.firstFrame, (int)pxAnimation.frameCount, anim.lastFrame);
+                var clampedFrame = ClampFrame(sfxEvent.Frame, anim.FirstFrame, (int)zkAnimation.FrameCount, anim.LastFrame);
                 AnimationEvent animEvent = new()
                 {
                     time = clampedFrame / clip.frameRate,
@@ -171,10 +171,8 @@ namespace GVR.Creator
                 clip.AddEvent(animEvent);
             }
 
-            foreach (var sfxEvent in anim.sfx)
-            {
-                Debug.LogWarning($"SFX events not yet implemented: {sfxEvent.name}");
-            }
+            if (anim.ParticleEffects.Any())
+                Debug.LogWarning($"SFX events not yet implemented. Tried to use for {anim.Name}");
         }
 
         /// <summary>

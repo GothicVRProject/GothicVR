@@ -1,9 +1,8 @@
 using System;
-using System.IO;
 using GVR.Creator;
+using GVR.Globals;
+using GVR.Manager;
 using GVR.Manager.Settings;
-using GVR.Phoenix.Interface;
-using PxCs.Interface;
 using UnityEditor;
 using UnityEngine;
 
@@ -31,44 +30,27 @@ namespace GVR.Editor.Tools
         {
             // Do not show Window when game is started.
             if (Application.isPlaying)
-            {
                 return;
-            }
 
             if (SettingsManager.GameSettings == null)
-            {
                 SettingsManager.LoadGameSettings();
-            }
 
-            string fullPath = Path.GetFullPath(Path.Join(SettingsManager.GameSettings.GothicIPath, "Data"));
-            _vfsPtr = VfsBridge.LoadVfsInDirectory(fullPath);
+            GvrBootstrapper.SetLanguage();
+            GvrBootstrapper.MountVfs(SettingsManager.GameSettings.GothicIPath);
 
-            GameData.VfsPtr = _vfsPtr;
-            WorldCreator.LoadEditorWorld(_vfsPtr);
+            WorldCreator.LoadEditorWorld();
         }
 
         private void OnGUI()
         {
             // Do not show Window when game is started.
             if (Application.isPlaying)
-            {
                 Close();
-                return;
-            }
         }
 
         private void OnDestroy()
         {
-            if (_vfsPtr == IntPtr.Zero)
-            {
-                return;
-            }
-
-            PxVfs.DestroyVfs(_vfsPtr);
-            _vfsPtr = IntPtr.Zero;
-
-            // Hint: If window closes as the game is started, we must not! clear GameData.I.VdfPtr as it would crash the game.
-            // Therefore just leave it as it is...
+            GameData.Dispose();
         }
     }
 }

@@ -3,21 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GVR.Bootstrap;
 using GVR.Caches;
-using GVR.Creator.Meshes;
+using GVR.Creator;
 using GVR.Data;
 using GVR.Extensions;
-using GVR.Manager.Settings;
-using GVR.Phoenix.Interface;
+using GVR.Globals;
 using GVR.Phoenix.Interface.Vm;
 using GVR.Vob;
-using PxCs.Data.Vm;
-using PxCs.Interface;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
+using ZenKit.Daedalus;
 
 namespace GVR.Lab.Handler
 {
@@ -42,7 +39,7 @@ namespace GVR.Lab.Handler
         private Transform attachPoint1;
         private Transform attachPoint2;
 
-        private Dictionary<string, PxVmItemData> pxItems = new();
+        private Dictionary<string, ItemInstance> items = new();
         private VobItemAttachPoints attachPoints;
 
         private void Start()
@@ -53,14 +50,13 @@ namespace GVR.Lab.Handler
              * 3. Load Vob name list
              * 4. Fill dropdown
              */
-            List<string> itemNames = new();
-            PxVm.pxVmEnumerateInstancesByClassName(GameData.VmGothicPtr, "C_Item", (string name) => itemNames.Add(name));
+            var itemNames = GameData.GothicVm.GetInstanceSymbols("C_Item").Select(i => i.Name).ToList();
 
-            pxItems = itemNames
+            items = itemNames
                 .ToDictionary(itemName => itemName, AssetCache.TryGetItemData);
 
-            vobCategoryDropdown.options = pxItems
-                .Select(item => item.Value.mainFlag.ToString())
+            vobCategoryDropdown.options = items
+                .Select(item => ((VmGothicEnums.ItemFlags)item.Value.MainFlag).ToString())
                 .Distinct()
                 .Select(flag => new TMP_Dropdown.OptionData(flag))
                 .ToList();
@@ -73,8 +69,8 @@ namespace GVR.Lab.Handler
 
         public void CategoryDropdownValueChanged()
         {
-            Enum.TryParse<PxVm.PxVmItemFlags>(vobCategoryDropdown.options[vobCategoryDropdown.value].text, out var category);
-            var items = pxItems.Where(item => item.Value.mainFlag == category).ToList();
+            Enum.TryParse<VmGothicEnums.ItemFlags>(vobCategoryDropdown.options[vobCategoryDropdown.value].text, out var category);
+            var items = this.items.Where(item => item.Value.MainFlag == (int)category).ToList();
             vobItemDropdown.options = items.Select(item => new TMP_Dropdown.OptionData(item.Key)).ToList();
         }
 
@@ -104,9 +100,9 @@ namespace GVR.Lab.Handler
         private GameObject CreateItem(string itemName)
         {
             var itemPrefab = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobItem);
-            var pxItem = AssetCache.TryGetItemData(itemName);
-            var mrm = AssetCache.TryGetMrm(pxItem.visual);
-            var itemGo = VobMeshCreator.Create(pxItem.visual, mrm, default, default, true, rootGo: itemPrefab, parent: itemSpawnSlot);
+            var item = AssetCache.TryGetItemData(itemName);
+            var mrm = AssetCache.TryGetMrm(item.Visual);
+            var itemGo = MeshObjectCreator.CreateVob(item.Visual, mrm, default, default, true, rootGo: itemPrefab, parent: itemSpawnSlot);
 
             var itemGrabComp = itemGo.GetComponent<ItemGrabInteractable>();
             var colliderComp = itemGo.GetComponent<MeshCollider>();

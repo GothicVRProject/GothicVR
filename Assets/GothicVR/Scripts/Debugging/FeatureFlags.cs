@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
+using ZenKit;
 
 namespace GVR.Debugging
 {
@@ -18,10 +19,12 @@ namespace GVR.Debugging
         [FormerlySerializedAs("SkipMainMenu")]
         [Header("__________Developer__________")]
         [Tooltip("This will be used within Editor mode only. No effect for Standalone.")]
+        public LogLevel zenKitLogLevel;
         public bool skipMainMenu;
         public bool useXRDeviceSimulator;
 
         [Header("__________World__________")]
+        public bool createWorldMesh;
         public bool createWaypoints;
         [Tooltip("True will render all pickables with dynamic attach points")]
         public bool vobItemsDynamicAttach;
@@ -74,11 +77,7 @@ namespace GVR.Debugging
         [Header("__________Experimental / Do not use in Production__________")]
         [Tooltip("Looks already quite good for leaves.pfy in the forest, but fire is awkward.")]
         public bool enableVobParticles;
-        [Tooltip("The current implementation costs more frames than it saves. But it's a potential starting point for further enhancements like gluing small related objects together. Stored here for future use.")]
-        public bool enableFineGrainedWorldMeshCreation;
-        [Tooltip("Experimental. Looks weird without proper distance shadow. Could save some frames if combined with well looking distance shadow.")]
-        public bool enableWorldCulling;
-        
+
         // Not yet implemented. Left here for future use.
         // [Header("__________Performance: NPC Culling__________")]
         // public bool npcCulling;

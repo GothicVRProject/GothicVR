@@ -1,3 +1,4 @@
+using GVR.Globals;
 using GVR.GothicVR.Scripts.UI;
 using GVR.Manager;
 using UnityEngine;
@@ -31,16 +32,16 @@ namespace GVR.Player.Menu
             if (moveSpeedController == null || turnSettingDropdownController == null)
                 return;
 
-            moveSpeedController.ChangeMoveSpeed(PlayerPrefs.GetFloat(ConstantsManager.moveSpeedPlayerPref));
-            turnSettingDropdownController.DropdownItemSelected(PlayerPrefs.GetInt(ConstantsManager.turnSettingPlayerPref));
-            musicVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(ConstantsManager.musicVolumePlayerPref, 1f));
-            soundEffectsVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(ConstantsManager.soundEffectsVolumePlayerPref, 1f));
+            moveSpeedController.ChangeMoveSpeed(PlayerPrefs.GetFloat(Constants.moveSpeedPlayerPref));
+            turnSettingDropdownController.DropdownItemSelected(PlayerPrefs.GetInt(Constants.turnSettingPlayerPref));
+            musicVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(Constants.musicVolumePlayerPref, 1f));
+            soundEffectsVolumeHandler.SliderUpdate(PlayerPrefs.GetFloat(Constants.soundEffectsVolumePlayerPref, 1f));
         }
 
         public void PlayFunction()
         {
 #pragma warning disable CS4014 // It's intended, that this async call is not awaited.
-            GvrSceneManager.I.LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint, true);
+            GvrSceneManager.I.LoadWorld(Constants.selectedWorld, Constants.selectedWaypoint, true);
 #pragma warning restore CS4014
         }
 

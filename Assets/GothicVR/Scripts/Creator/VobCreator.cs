@@ -5,50 +5,54 @@ using System.Linq;
 using System.Threading.Tasks;
 using GothicVR.Vob;
 using GVR.Caches;
-using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Demo;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Manager.Culling;
 using GVR.Phoenix.Data;
-using GVR.Phoenix.Interface;
 using GVR.Phoenix.Util;
 using GVR.Properties;
 using GVR.Vob;
 using GVR.Vob.WayNet;
 using JetBrains.Annotations;
-using PxCs.Data.Struct;
-using PxCs.Data.Vm;
-using PxCs.Data.Vob;
-using PxCs.Interface;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
+using ZenKit.Daedalus;
+using ZenKit.Util;
+using ZenKit.Vobs;
+using Debug = UnityEngine.Debug;
+using Quaternion = System.Numerics.Quaternion;
 using Vector3 = System.Numerics.Vector3;
 
 namespace GVR.Creator
 {
     public static class VobCreator
     {
-        private static Dictionary<PxWorld.PxVobType, GameObject> parentGosTeleport = new();
-        private static Dictionary<PxWorld.PxVobType, GameObject> parentGosNonTeleport = new();
+        private static Dictionary<VirtualObjectType, GameObject> parentGosTeleport = new();
+        private static Dictionary<VirtualObjectType, GameObject> parentGosNonTeleport = new();
 
-        private static PxWorld.PxVobType[] nonTeleportTypes =
+        private static VirtualObjectType[] nonTeleportTypes =
         {
-            PxWorld.PxVobType.PxVob_oCItem,
-            PxWorld.PxVobType.PxVob_oCMobLadder,
-            PxWorld.PxVobType.PxVob_oCZoneMusic,
-            PxWorld.PxVobType.PxVob_zCVobSound,
-            PxWorld.PxVobType.PxVob_zCVobSoundDaytime
+            VirtualObjectType.oCItem,
+            VirtualObjectType.oCMobLadder,
+            VirtualObjectType.oCZoneMusic,
+            VirtualObjectType.oCZoneMusicDefault,
+            VirtualObjectType.zCVobSound,
+            VirtualObjectType.zCVobSoundDaytime
         };
 
-        private static int totalVObs;
+        private static int _totalVObs;
+        private static int _vobsPerFrame;
+        private static int _createdCount;
+        private static List<GameObject> _cullingVobObjects = new();
 
         static VobCreator()
         {
-            GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostWorldLoaded);
+            GvrEvents.GeneralSceneLoaded.AddListener(PostWorldLoaded);
         }
 
         private static void PostWorldLoaded()
@@ -69,28 +73,23 @@ namespace GVR.Creator
                     sound.SetActive(true);
             }
         }
-        
-        private static int GetTotalVobCount(PxVobData[] vobs)
-        {
-            int count = vobs.Length;
-
-            foreach (var vob in vobs)
-            {
-                count += GetTotalVobCount(vob.childVobs);
-            }
-
-            return count;
-        }
 
         public static async Task CreateAsync(GameObject rootTeleport, GameObject rootNonTeleport, WorldData world,
             int vobsPerFrame)
         {
-            if (!FeatureFlags.I.createVobs)
-                return;
+            PreCreateVobs(world, rootTeleport, rootNonTeleport, vobsPerFrame);
+            await CreateVobs(world.Vobs);
+            PostCreateVobs();
+        }
 
-            var cullingVobObjects = new List<GameObject>();
+        private static void PreCreateVobs(WorldData world, GameObject rootTeleport, GameObject rootNonTeleport, int vobsPerFrame)
+        {
+            // HINT - We assume there is only one nested level. At least works in G1 world.zen
+            _totalVObs = world.Vobs.Count + (int)world.Vobs.Sum(i => (decimal)i.ChildCount);
 
-            totalVObs = GetTotalVobCount(world.vobs);
+            _createdCount = 0;
+            _cullingVobObjects.Clear();
+            _vobsPerFrame = vobsPerFrame;
 
             var vobRootTeleport = new GameObject("Vobs");
             var vobRootNonTeleport = new GameObject("Vobs");
@@ -102,170 +101,194 @@ namespace GVR.Creator
 
             CreateParentVobObjectTeleport(vobRootTeleport);
             CreateParentVobObjectNonTeleport(vobRootNonTeleport);
-
-            var allVobs = new List<PxVobData>();
-            AddVobsToList(world.vobs, allVobs);
-
-            var count = 0;
-            foreach (var vob in allVobs)
+        }
+        
+        private static async Task CreateVobs(List<IVirtualObject> vobs)
+        {
+            foreach (var vob in vobs)
             {
                 GameObject go = null;
                 
-                switch (vob.type)
+                switch (vob.Type)
                 {
-                    case PxWorld.PxVobType.PxVob_oCItem:
+                    case VirtualObjectType.oCItem:
                     {
-                        var obj = CreateItem((PxVobItemData)vob);
-                        cullingVobObjects.Add(obj);
+                        var obj = CreateItem((Item)vob);
+                        _cullingVobObjects.Add(obj);
                         break;
                     }
-                    case PxWorld.PxVobType.PxVob_oCMobContainer:
+                    case VirtualObjectType.oCMobContainer:
                     {
-                        var obj = CreateMobContainer((PxVobMobContainerData)vob);
-                        cullingVobObjects.Add(obj);
+                        var obj = CreateMobContainer((Container)vob);
+                        _cullingVobObjects.Add(obj);
                         break;
                     }
-                    case PxWorld.PxVobType.PxVob_zCVobSound:
+                    case VirtualObjectType.zCVobSound:
                     {
-                        var obj = CreateSound((PxVobSoundData)vob);
+                        var obj = CreateSound((Sound)vob);
                         LookupCache.vobSoundsAndDayTime.Add(obj);
                         break;
                     }
-                    case PxWorld.PxVobType.PxVob_zCVobSoundDaytime:
+                    case VirtualObjectType.zCVobSoundDaytime:
                     {
-                        var obj = CreateSoundDaytime((PxVobSoundDaytimeData)vob);
+                        var obj = CreateSoundDaytime((SoundDaytime)vob);
                         LookupCache.vobSoundsAndDayTime.Add(obj);
                         break;
                     }
-                    case PxWorld.PxVobType.PxVob_oCZoneMusic:
+                    case VirtualObjectType.oCZoneMusic:
+                    case VirtualObjectType.oCZoneMusicDefault:
                     {
-                        go = CreateZoneMusic((PxVobZoneMusicData)vob);
+                        go = CreateZoneMusic((ZoneMusic)vob);
                         break;
                     }
-                    case PxWorld.PxVobType.PxVob_zCVobSpot:
-                    case PxWorld.PxVobType.PxVob_zCVobStartpoint:
+                    case VirtualObjectType.zCVobSpot:
+                    case VirtualObjectType.zCVobStartpoint:
                     {
                         go = CreateSpot(vob);
                         break;
                     }
-                    case PxWorld.PxVobType.PxVob_oCMobLadder:
+                    case VirtualObjectType.oCMobLadder:
                     {
                         var obj = CreateLadder(vob);
-                        cullingVobObjects.Add(obj);
+                        _cullingVobObjects.Add(obj);
                         break;
                     }
-                    case PxWorld.PxVobType.PxVob_oCTriggerChangeLevel:
+                    case VirtualObjectType.oCTriggerChangeLevel:
                     {
-                        go = CreateTriggerChangeLevel((PxVobTriggerChangeLevelData)vob);
+                        go = CreateTriggerChangeLevel((TriggerChangeLevel)vob);
                         break;
                     }
-                    case PxWorld.PxVobType.PxVob_zCVobScreenFX:
-                    case PxWorld.PxVobType.PxVob_zCVobAnimate:
-                    case PxWorld.PxVobType.PxVob_zCTriggerWorldStart:
-                    case PxWorld.PxVobType.PxVob_zCTriggerList:
-                    case PxWorld.PxVobType.PxVob_oCCSTrigger:
-                    case PxWorld.PxVobType.PxVob_oCTriggerScript:
-                    case PxWorld.PxVobType.PxVob_zCVobLensFlare:
-                    case PxWorld.PxVobType.PxVob_zCVobLight:
-                    case PxWorld.PxVobType.PxVob_zCMoverController:
-                    case PxWorld.PxVobType.PxVob_zCPFXController:
-                    {
-                        // FIXME - not yet implemented.
-                        break;
-                    }
-                    // Do nothing
-                    case PxWorld.PxVobType.PxVob_zCVobLevelCompo:
-                    {
-                        break;
-                    }
-                    case PxWorld.PxVobType.PxVob_zCVob:
+                    case VirtualObjectType.zCVob:
                     {
                         GameObject obj;
-                        switch (vob.visualType)
+
+                        if (vob.Visual == null)
                         {
-                            case PxWorld.PxVobVisualType.PxVobVisualDecal:
+                            CreateDebugObject(vob);
+                            break;
+                        }
+                            
+                        switch (vob.Visual!.Type)
+                        {
+                            case VisualType.Decal:
                                 obj = CreateDecal(vob);
                                 break;
-                            case PxWorld.PxVobVisualType.PxVobVisualParticleSystem:
+                            case VisualType.ParticleEffect:
                                 obj = CreatePfx(vob);
                                 break;
                             default:
                                 obj = CreateDefaultMesh(vob);
                                 break;
                         }
-                        cullingVobObjects.Add(obj);
+                        _cullingVobObjects.Add(obj);
                         break;
                     }
-                    case PxWorld.PxVobType.PxVob_oCMobInter:
-                    default:
+                    case VirtualObjectType.oCMobInter:
+                    case VirtualObjectType.oCMobDoor:
+                    case VirtualObjectType.oCMobSwitch:
+                    case VirtualObjectType.oCMobFire:
+                    case VirtualObjectType.oCMOB:
+                    case VirtualObjectType.zCVobStair:
+                    case VirtualObjectType.oCMobBed:
+                    case VirtualObjectType.oCMobWheel:
                     {
                         var obj = CreateDefaultMesh(vob);
-                        cullingVobObjects.Add(obj);
+                        _cullingVobObjects.Add(obj);
                         break;
+                    }
+                    case VirtualObjectType.zCVobScreenFX:
+                    case VirtualObjectType.zCVobAnimate:
+                    case VirtualObjectType.zCTriggerWorldStart:
+                    case VirtualObjectType.zCTriggerList:
+                    case VirtualObjectType.oCCSTrigger:
+                    case VirtualObjectType.oCTriggerScript:
+                    case VirtualObjectType.zCVobLensFlare:
+                    case VirtualObjectType.zCVobLight:
+                    case VirtualObjectType.zCMoverController:
+                    case VirtualObjectType.zCPFXController:
+                    case VirtualObjectType.zCMover: 
+                    case VirtualObjectType.zCVobLevelCompo:
+                    case VirtualObjectType.zCZoneZFog:
+                    case VirtualObjectType.zCZoneZFogDefault:
+                    case VirtualObjectType.zCZoneVobFarPlane:
+                    case VirtualObjectType.zCZoneVobFarPlaneDefault:
+                    {
+                        // FIXME - not yet implemented.
+                        break;
+                    }
+                    default:
+                    {
+                        throw new Exception($"VobType={vob.Type} not yet handled. And we didn't know we need to do so. ;-)");
                     }
                 }
                 
                 AddToMobInteractableList(vob, go);
                 
-                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / totalVObs);
+                LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / _totalVObs);
 
-                if (++count % vobsPerFrame == 0)
+                if (++_createdCount % _vobsPerFrame == 0)
                     await Task.Yield(); // Wait for the next frame
+                
+                // Recursive creating sub-vobs
+                await CreateVobs(vob.Children);
             }
+        }
 
-            var nonNullCullingGroupItems = cullingVobObjects.Where(i => i != null).ToArray();
+        private static void PostCreateVobs()
+        {
+            var nonNullCullingGroupItems = _cullingVobObjects.Where(i => i != null).ToArray();
             VobMeshCullingManager.I.PrepareVobCulling(nonNullCullingGroupItems);
             VobSoundCullingManager.I.PrepareSoundCulling(LookupCache.vobSoundsAndDayTime);
             
-            // TODO - Not implemented warnings - print them once only.
+            // TODO - warnings about "not implemented" - print them once only.
             foreach (var var in new[]{
-                         PxWorld.PxVobType.PxVob_zCVobScreenFX,
-                         PxWorld.PxVobType.PxVob_zCVobAnimate,
-                         PxWorld.PxVobType.PxVob_zCTriggerWorldStart,
-                         PxWorld.PxVobType.PxVob_zCTriggerList,
-                         PxWorld.PxVobType.PxVob_oCCSTrigger,
-                         PxWorld.PxVobType.PxVob_oCTriggerScript,
-                         PxWorld.PxVobType.PxVob_zCVobLensFlare,
-                         PxWorld.PxVobType.PxVob_zCVobLight,
-                         PxWorld.PxVobType.PxVob_zCMoverController,
-                         PxWorld.PxVobType.PxVob_zCPFXController
+                         VirtualObjectType.zCVobScreenFX,
+                         VirtualObjectType.zCVobAnimate,
+                         VirtualObjectType.zCTriggerWorldStart,
+                         VirtualObjectType.zCTriggerList,
+                         VirtualObjectType.oCCSTrigger,
+                         VirtualObjectType.oCTriggerScript,
+                         VirtualObjectType.zCVobLensFlare,
+                         VirtualObjectType.zCVobLight,
+                         VirtualObjectType.zCMoverController,
+                         VirtualObjectType.zCPFXController
                      })
             {
                 Debug.LogWarning($"{var} not yet implemented.");
             }
         }
 
-        private static GameObject GetPrefab(PxVobData vob)
+        private static GameObject GetPrefab(IVirtualObject vob)
         {
             GameObject go;
-            string name = vob.vobName;
+            string name = vob.Name;
             
-            switch (vob.type)
+            switch (vob.Type)
             {
-                case PxWorld.PxVobType.PxVob_oCItem:
+                case VirtualObjectType.oCItem:
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobItem);
                     break;
-                case PxWorld.PxVobType.PxVob_zCVobSpot:
-                case PxWorld.PxVobType.PxVob_zCVobStartpoint:
+                case VirtualObjectType.zCVobSpot:
+                case VirtualObjectType.zCVobStartpoint:
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobSpot);
                     break;
-                case PxWorld.PxVobType.PxVob_zCVobSound:
+                case VirtualObjectType.zCVobSound:
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobSound);
                     break;
-                case PxWorld.PxVobType.PxVob_zCVobSoundDaytime:
+                case VirtualObjectType.zCVobSoundDaytime:
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobSoundDaytime);
                     break;
-                case PxWorld.PxVobType.PxVob_oCZoneMusic:
+                case VirtualObjectType.oCZoneMusic:
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobMusic);
                     break;
-                case PxWorld.PxVobType.PxVob_oCMOB:
-                case PxWorld.PxVobType.PxVob_oCMobFire:
-                case PxWorld.PxVobType.PxVob_oCMobInter:
-                case PxWorld.PxVobType.PxVob_oCMobBed:
-                case PxWorld.PxVobType.PxVob_oCMobDoor:
-                case PxWorld.PxVobType.PxVob_oCMobContainer:
-                case PxWorld.PxVobType.PxVob_oCMobSwitch:
-                case PxWorld.PxVobType.PxVob_oCMobWheel:
+                case VirtualObjectType.oCMOB:
+                case VirtualObjectType.oCMobFire:
+                case VirtualObjectType.oCMobInter:
+                case VirtualObjectType.oCMobBed:
+                case VirtualObjectType.oCMobDoor:
+                case VirtualObjectType.oCMobContainer:
+                case VirtualObjectType.oCMobSwitch:
+                case VirtualObjectType.oCMobWheel:
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobInteractable);
                     break;
                 default:
@@ -276,43 +299,34 @@ namespace GVR.Creator
             
             // Fill Property data into prefab here
             // Can also be outsourced to a proper method if it becomes a lot.
-            go.GetComponent<VobProperties>().SetVisual(vob.visualName);
+            go.GetComponent<VobProperties>().SetVisual(vob.Name);
             
             return go;
         }
 
-        private static void AddToMobInteractableList(PxVobData vob, GameObject go)
+        private static void AddToMobInteractableList(IVirtualObject vob, GameObject go)
         {
             if (go == null)
                 return;
             
-            switch (vob.type)
+            switch (vob.Type)
             {
-                case PxWorld.PxVobType.PxVob_oCMOB:
-                case PxWorld.PxVobType.PxVob_oCMobFire:
-                case PxWorld.PxVobType.PxVob_oCMobInter:
-                case PxWorld.PxVobType.PxVob_oCMobBed:
-                case PxWorld.PxVobType.PxVob_oCMobDoor:
-                case PxWorld.PxVobType.PxVob_oCMobContainer:
-                case PxWorld.PxVobType.PxVob_oCMobSwitch:
-                case PxWorld.PxVobType.PxVob_oCMobWheel:
+                case VirtualObjectType.oCMOB:
+                case VirtualObjectType.oCMobFire:
+                case VirtualObjectType.oCMobInter:
+                case VirtualObjectType.oCMobBed:
+                case VirtualObjectType.oCMobDoor:
+                case VirtualObjectType.oCMobContainer:
+                case VirtualObjectType.oCMobSwitch:
+                case VirtualObjectType.oCMobWheel:
                     GameData.VobsInteractable.Add(go.GetComponent<VobProperties>());
                     break;
             }
         }
 
-        private static void AddVobsToList(PxVobData[] vobs, List<PxVobData> allVobs)
-        {
-            foreach (var vob in vobs)
-            {
-                allVobs.Add(vob);
-                AddVobsToList(vob.childVobs, allVobs);
-            }
-        }
-
         private static void CreateParentVobObjectTeleport(GameObject root)
         {
-            var allTypes = (PxWorld.PxVobType[])Enum.GetValues(typeof(PxWorld.PxVobType));
+            var allTypes = (VirtualObjectType[])Enum.GetValues(typeof(VirtualObjectType));
             foreach (var type in allTypes.Except(nonTeleportTypes))
             {
                 var newGo = new GameObject(type.ToString());
@@ -328,7 +342,7 @@ namespace GVR.Creator
         /// </summary>
         private static void CreateParentVobObjectNonTeleport(GameObject root)
         {
-            var allTypes = (PxWorld.PxVobType[])Enum.GetValues(typeof(PxWorld.PxVobType));
+            var allTypes = (VirtualObjectType[])Enum.GetValues(typeof(VirtualObjectType));
             foreach (var type in allTypes.Intersect(nonTeleportTypes))
             {
                 var newGo = new GameObject(type.ToString());
@@ -341,7 +355,7 @@ namespace GVR.Creator
         /// <summary>
         /// Render item inside GameObject
         /// </summary>
-        public static GameObject CreateItem(uint itemId, GameObject go)
+        public static GameObject CreateItem(int itemId, GameObject go)
         {
             var item = AssetCache.TryGetItemData(itemId);
 
@@ -349,32 +363,25 @@ namespace GVR.Creator
         }
         
         [CanBeNull]
-        private static GameObject CreateItem(PxVobItemData vob)
+        private static GameObject CreateItem(Item vob)
         {
             string itemName;
 
-            if (!string.IsNullOrEmpty(vob.instance))
-                itemName = vob.instance;
-            else if (!string.IsNullOrEmpty(vob.vobName))
-                itemName = vob.vobName;
+            if (!string.IsNullOrEmpty(vob.Instance))
+                itemName = vob.Instance;
+            else if (!string.IsNullOrEmpty(vob.Name))
+                itemName = vob.Name;
             else
                 throw new Exception("PxVobItemData -> no usable INSTANCE name found.");
 
             var item = AssetCache.TryGetItemData(itemName);
 
             if (item == null)
-            {
-                // eItMiCello is commented out on misc.d file. No need for an error log entry.
-                if ("itmicello".Equals(itemName.ToLower()))
-                    return null;
-                
-                Debug.LogError($"Item {itemName} not found.");
                 return null;
-            }
 
-            if (item.visual!.ToLower().EndsWith(".mms"))
+            if (item.Visual.EndsWithIgnoreCase(".mms"))
             {
-                Debug.LogError($"Item {item.visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
+                Debug.LogError($"Item {item.Visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
                 return null;
             }
 
@@ -384,7 +391,7 @@ namespace GVR.Creator
             if (vobObj == null)
             {
                 GameObject.Destroy(prefabInstance); // No mesh created. Delete the prefab instance again.
-                Debug.LogError($"There should be no! object which can't be found n:{vob.vobName} i:{vob.instance}. We need to use >PxVobItem.instance< to do it right!");
+                Debug.LogError($"There should be no! object which can't be found n:{vob.Name} i:{vob.Instance}. We need to use >PxVobItem.instance< to do it right!");
                 return null;
             }
 
@@ -404,7 +411,7 @@ namespace GVR.Creator
             grabComp.attachTransform = itemGrabComp.attachPoint1.transform;
             grabComp.secondaryAttachTransform = itemGrabComp.attachPoint2.transform;
 
-            vobObj.layer = ConstantsManager.ItemLayer;
+            vobObj.layer = Constants.ItemLayer;
 
             colliderComp.convex = true;
             grabComp.selectEntered.AddListener(itemGrabComp.SelectEntered);
@@ -414,39 +421,39 @@ namespace GVR.Creator
         }
 
         [CanBeNull]
-        private static GameObject CreateMobContainer(PxVobMobContainerData vob)
+        private static GameObject CreateMobContainer(Container vob)
         {
             var vobObj = CreateDefaultMesh(vob);
 
             if (vobObj == null)
             {
-                Debug.LogWarning($"{vob.vobName} - mesh for MobContainer not found.");
+                Debug.LogWarning($"{vob.Name} - mesh for MobContainer not found.");
                 return null;
             }
 
             var lootComp = vobObj.AddComponent<DemoContainerLoot>();
-            lootComp.SetContent(vob.contents);
+            lootComp.SetContent(vob.Contents);
 
             return vobObj;
         }
 
         // FIXME - change values for AudioClip based on Sfx and vob value (value overloads itself)
         [CanBeNull]
-        private static GameObject CreateSound(PxVobSoundData vob)
+        private static GameObject CreateSound(Sound vob)
         {
             if (!FeatureFlags.I.enableSounds)
                 return null;
 
             var go = GetPrefab(vob);
-            go.name = $"{vob.soundName}";
+            go.name = $"{vob.SoundName}";
             go.SetActive(false); // We don't want to have sound when we boot the game async for 30 seconds in non-spatial blend mode.
-            go.SetParent(parentGosNonTeleport[vob.type]);
-            SetPosAndRot(go, vob.position, vob.rotation);
+            go.SetParent(parentGosNonTeleport[vob.Type]);
+            SetPosAndRot(go, vob.Position, vob.Rotation);
             
             var source = go.GetComponent<AudioSource>();
 
             PrepareAudioSource(source, vob);
-            source.clip = VobHelper.GetSoundClip(vob.soundName);
+            source.clip = VobHelper.GetSoundClip(vob.SoundName);
 
             go.GetComponent<VobSoundProperties>().soundData = vob;
             go.GetComponent<SoundHandler>().PrepareSoundHandling();
@@ -462,24 +469,24 @@ namespace GVR.Creator
         ///     2. The sources will be toggled during gameplay when start/end time is reached.
         /// </summary>
         [CanBeNull]
-        private static GameObject CreateSoundDaytime(PxVobSoundDaytimeData vob)
+        private static GameObject CreateSoundDaytime(SoundDaytime vob)
         {
             if (!FeatureFlags.I.enableSounds)
                 return null;
 
             var go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobSoundDaytime);
-            go.name = $"{vob.soundName}-{vob.soundName2}";
+            go.name = $"{vob.SoundName}-{vob.SoundNameDaytime}";
             go.SetActive(false); // We don't want to have sound when we boot the game async for 30 seconds in non-spatial blend mode.
-            go.SetParent(parentGosNonTeleport[vob.type]);
-            SetPosAndRot(go, vob.position, vob.rotation);
+            go.SetParent(parentGosNonTeleport[vob.Type]);
+            SetPosAndRot(go, vob.Position, vob.Rotation);
             
             var sources = go.GetComponents<AudioSource>();
 
             PrepareAudioSource(sources[0], vob);
-            sources[0].clip = VobHelper.GetSoundClip(vob.soundName);
+            sources[0].clip = VobHelper.GetSoundClip(vob.SoundName);
 
             PrepareAudioSource(sources[1], vob);
-            sources[1].clip = VobHelper.GetSoundClip(vob.soundName2);
+            sources[1].clip = VobHelper.GetSoundClip(vob.SoundNameDaytime);
             
             go.GetComponent<VobSoundDaytimeProperties>().soundDaytimeData = vob;
             go.GetComponent<SoundDaytimeHandler>().PrepareSoundHandling();
@@ -487,27 +494,27 @@ namespace GVR.Creator
             return go;
         }
 
-        private static void PrepareAudioSource(AudioSource source, PxVobSoundData soundData)
+        private static void PrepareAudioSource(AudioSource source, Sound soundData)
         {
-            source.maxDistance = soundData.radius / 100f; // Gothic's values are in cm, Unity's in m.
-            source.volume = soundData.volume / 100f; // Gothic's volume is 0...100, Unity's is 0...1. 
+            source.maxDistance = soundData.Radius / 100f; // Gothic's values are in cm, Unity's in m.
+            source.volume = soundData.Volume / 100f; // Gothic's volume is 0...100, Unity's is 0...1.
 
             // Random sounds shouldn't play initially, but after certain time.
-            source.playOnAwake = (soundData.initiallyPlaying && soundData.mode != PxWorld.PxVobSoundMode.PxVobSoundModeRandom);
-            source.loop = (soundData.mode == PxWorld.PxVobSoundMode.PxVobSoundModeLoop);
-            source.spatialBlend = soundData.ambient3d ? 1f : 0f;
+            source.playOnAwake = (soundData.InitiallyPlaying && soundData.Mode != SoundMode.Random);
+            source.loop = (soundData.Mode == SoundMode.Loop);
+            source.spatialBlend = soundData.Ambient3d ? 1f : 0f;
         }
         
-        private static GameObject CreateZoneMusic(PxVobZoneMusicData vob)
+        private static GameObject CreateZoneMusic(ZoneMusic vob)
         {
             var go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobMusic);
-            go.SetParent(parentGosNonTeleport[vob.type], true, true);
-            go.name = vob.vobName;
+            go.SetParent(parentGosNonTeleport[vob.Type], true, true);
+            go.name = vob.Name;
 
-            go.layer = ConstantsManager.IgnoreRaycastLayer;
+            go.layer = Constants.IgnoreRaycastLayer;
 
-            var min = vob.boundingBox.min.ToUnityVector();
-            var max = vob.boundingBox.max.ToUnityVector();
+            var min = vob.BoundingBox.Min.ToUnityVector();
+            var max = vob.BoundingBox.Max.ToUnityVector();
 
             go.transform.position = (min + max) / 2f;
             go.transform.localScale = (max - min);
@@ -517,18 +524,18 @@ namespace GVR.Creator
             return go;
         }
 
-        private static GameObject CreateTriggerChangeLevel(PxVobTriggerChangeLevelData vob)
+        private static GameObject CreateTriggerChangeLevel(TriggerChangeLevel vob)
         {
-            var vobObj = new GameObject(vob.vobName);
-            vobObj.SetParent(parentGosTeleport[vob.type]);
+            var vobObj = new GameObject(vob.Name);
+            vobObj.SetParent(parentGosTeleport[vob.Type]);
 
-            vobObj.layer = ConstantsManager.IgnoreRaycastLayer;
+            vobObj.layer = Constants.IgnoreRaycastLayer;
 
             var trigger = vobObj.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
 
-            var min = vob.boundingBox.min.ToUnityVector();
-            var max = vob.boundingBox.max.ToUnityVector();
+            var min = vob.BoundingBox.Min.ToUnityVector();
+            var max = vob.BoundingBox.Max.ToUnityVector();
             vobObj.transform.position = (min + max) / 2f;
 
             vobObj.transform.localScale = (max - min);
@@ -536,8 +543,8 @@ namespace GVR.Creator
             if (FeatureFlags.I.createVobs)
             {
                 var triggerHandler = vobObj.AddComponent<ChangeLevelTriggerHandler>();
-                triggerHandler.levelName = vob.levelName;
-                triggerHandler.startVob = vob.startVob;
+                triggerHandler.levelName = vob.LevelName;
+                triggerHandler.startVob = vob.StartVob;
             }
 
             return vobObj;
@@ -547,7 +554,7 @@ namespace GVR.Creator
         /// Basically a free point where NPCs can do something like sitting on a bench etc.
         /// @see for more information: https://ataulien.github.io/Inside-Gothic/objects/spot/
         /// </summary>
-        private static GameObject CreateSpot(PxVobData vob)
+        private static GameObject CreateSpot(IVirtualObject vob)
         {
             // FIXME - change to a Prefab in the future.
             var vobObj = GetPrefab(vob);
@@ -558,23 +565,23 @@ namespace GVR.Creator
                 GameObject.Destroy(vobObj.GetComponent<MeshRenderer>());
             }
 
-            var fpName = vob.vobName != string.Empty ? vob.vobName : "START";
+            var fpName = vob.Name.IsEmpty() ? "START" : vob.Name;
             vobObj.name = fpName;
-            vobObj.SetParent(parentGosTeleport[vob.type]);
+            vobObj.SetParent(parentGosTeleport[vob.Type]);
 
             var freePointData = new FreePoint()
             {
                 Name = fpName,
-                Position = vob.position.ToUnityVector()
+                Position = vob.Position.ToUnityVector()
             };
             vobObj.GetComponent<VobSpotProperties>().fp = freePointData;
             GameData.FreePoints.Add(fpName, freePointData);
             
-            SetPosAndRot(vobObj, vob.position, vob.rotation);
+            SetPosAndRot(vobObj, vob.Position, vob.Rotation);
             return vobObj;
         }
 
-        private static GameObject CreateLadder(PxVobData vob)
+        private static GameObject CreateLadder(IVirtualObject vob)
         {
             // FIXME - use Prefab instead. And be cautious of settings!
             var vobObj = CreateDefaultMesh(vob, true);
@@ -584,7 +591,7 @@ namespace GVR.Creator
             var meshColliderComp = vobObj.GetComponentInChildren<MeshCollider>();
 
             meshColliderComp.convex = true; // We need to set it to overcome Physics.ClosestPoint warnings.
-            meshGo.tag = ConstantsManager.ClimbableTag;
+            meshGo.tag = Constants.ClimbableTag;
             rigidbodyComp.isKinematic = true;
             grabComp.throwOnDetach = false; // Throws errors and isn't needed as we don't want to move the kinematic ladder when released.
             grabComp.trackPosition = false;
@@ -594,53 +601,53 @@ namespace GVR.Creator
             return vobObj;
         }
         
-        private static GameObject CreateItemMesh(PxVobItemData vob, PxVmItemData item, GameObject go)
+        private static GameObject CreateItemMesh(Item vob, ItemInstance item, GameObject go)
         {
-            var mrm = AssetCache.TryGetMrm(item.visual);
-            return VobMeshCreator.Create(item.visual, mrm, vob.position.ToUnityVector(), vob.rotation, true, parentGosNonTeleport[vob.type], go);
+            var mrm = AssetCache.TryGetMrm(item.Visual);
+            return MeshObjectCreator.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
         }
         
-        private static GameObject CreateItemMesh(PxVmItemData item, GameObject go)
+        private static GameObject CreateItemMesh(ItemInstance item, GameObject go)
         {
-            var mrm = AssetCache.TryGetMrm(item.visual);
-            return VobMeshCreator.Create(item.visual, mrm, default, default, false, parent: go);
+            var mrm = AssetCache.TryGetMrm(item.Visual);
+            return MeshObjectCreator.CreateVob(item.Visual, mrm, default, default, false, parent: go);
         }
 
-        private static GameObject CreateDecal(PxVobData vob)
+        private static GameObject CreateDecal(IVirtualObject vob)
         {
             if (!FeatureFlags.I.enableDecals)
                 return null;
 
-            var parent = parentGosTeleport[vob.type];
+            var parent = parentGosTeleport[vob.Type];
 
-            return VobMeshCreator.CreateDecal(vob, parent);
+            return MeshObjectCreator.CreateVobDecal(vob, (VisualDecal)vob.Visual, parent);
         }
 
         /// <summary>
         /// Please check description at worldofgothic for more details:
         /// https://www.worldofgothic.de/modifikation/index.php?go=particelfx
         /// </summary>
-        private static GameObject CreatePfx(PxVobData vob)
+        private static GameObject CreatePfx(IVirtualObject vob)
         {
             if (!FeatureFlags.I.enableVobParticles)
                 return null;
 
             // FIXME - move to non-teleport
-            var parent = parentGosTeleport[vob.type];
+            var parent = parentGosTeleport[vob.Type];
 
             var pfxGo = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobPfx);
-            pfxGo.name = vob.visualName;
-            SetPosAndRot(pfxGo, vob.position, vob.rotation);
+            pfxGo.name = vob.Visual!.Name;
+            SetPosAndRot(pfxGo, vob.Position, vob.Rotation);
             pfxGo.SetParent(parent);
 
-            var pfx = AssetCache.TryGetPfxData(vob.visualName);
+            var pfx = AssetCache.TryGetPfxData(vob.Visual.Name);
             var particleSystem = pfxGo.GetComponent<ParticleSystem>();
 
             pfxGo.GetComponent<VobPfxProperties>().pfxData = pfx;
 
             particleSystem.Stop();
 
-            var gravity = pfx.flyGravity.Split();
+            var gravity = pfx.FlyGravityS.Split();
             float gravityX = 1f, gravityY = 1f, gravityZ = 1f;
             if (gravity.Length == 3)
             {
@@ -653,21 +660,21 @@ namespace GVR.Creator
             // Main module
             {
                 var mainModule = particleSystem.main;
-                var minLifeTime = (pfx.lspPartAvg - pfx.lspPartVar) / 1000; // I assume we need to change milliseconds to seconds.
-                var maxLifeTime = (pfx.lspPartAvg + pfx.lspPartVar) / 1000;
+                var minLifeTime = (pfx.LspPartAvg - pfx.LspPartVar) / 1000; // I assume we need to change milliseconds to seconds.
+                var maxLifeTime = (pfx.LspPartAvg + pfx.LspPartVar) / 1000;
                 mainModule.duration = 1f; // I assume pfx data wants a cycle being 1 second long.
                 mainModule.startLifetime = new (minLifeTime, maxLifeTime);
-                mainModule.loop = pfx.ppsIsLooping;
+                mainModule.loop = Convert.ToBoolean(pfx.PpsIsLooping);
 
-                var minSpeed = (pfx.velAvg - pfx.velVar) / 1000;
-                var maxSpeed = (pfx.velAvg + pfx.velVar) / 1000;
+                var minSpeed = (pfx.VelAvg - pfx.VelVar) / 1000;
+                var maxSpeed = (pfx.VelAvg + pfx.VelVar) / 1000;
                 mainModule.startSpeed = new(minSpeed, maxSpeed);
             }
 
             // Emission module
             {
                 var emissionModule = particleSystem.emission;
-                emissionModule.rateOverTime = new ParticleSystem.MinMaxCurve(pfx.ppsValue);
+                emissionModule.rateOverTime = new ParticleSystem.MinMaxCurve(pfx.PpsValue);
             }
 
             // Force over Lifetime module
@@ -687,8 +694,8 @@ namespace GVR.Creator
                 var colorOverTime = particleSystem.colorOverLifetime;
                 colorOverTime.enabled = true;
                 var gradient = new Gradient();
-                var colorStart = pfx.visTexColorStart.Split();
-                var colorEnd = pfx.visTexColorEnd.Split();
+                var colorStart = pfx.VisTexColorStartS.Split();
+                var colorEnd = pfx.VisTexColorEndS.Split();
                 gradient.SetKeys(
                     new GradientColorKey[]
                     {
@@ -702,8 +709,8 @@ namespace GVR.Creator
                     },
                     new GradientAlphaKey[]
                     {
-                        new GradientAlphaKey(pfx.visAlphaStart / 255, 0),
-                        new GradientAlphaKey(pfx.visAlphaEnd / 255, 1),
+                        new GradientAlphaKey(pfx.VisAlphaStart / 255, 0),
+                        new GradientAlphaKey(pfx.VisAlphaEnd / 255, 1),
                     });
                 colorOverTime.color = gradient;
             }
@@ -714,14 +721,14 @@ namespace GVR.Creator
                 sizeOverTime.enabled = true;
 
                 AnimationCurve curve = new AnimationCurve();
-                var shapeScaleKeys = pfx.shpScaleKeys.Split();
-                if (shapeScaleKeys.Length > 1 && pfx.shpScaleKeys != "")
+                var shapeScaleKeys = pfx.ShpScaleKeysS.Split();
+                if (shapeScaleKeys.Length > 1 && !pfx.ShpScaleKeysS.IsEmpty())
                 {
                     var curveTime = 0f;
 
-                    for (var i = 0; i < shapeScaleKeys.Length; i++)
+                    foreach (var key in shapeScaleKeys)
                     {
-                        curve.AddKey(curveTime, float.Parse(shapeScaleKeys[i]) / 100 * float.Parse(pfx.shpDim));
+                        curve.AddKey(curveTime, float.Parse(key) / 100 * float.Parse(pfx.ShpDimS));
                         curveTime += 1f / shapeScaleKeys.Length;
                     }
 
@@ -736,10 +743,10 @@ namespace GVR.Creator
                 var standardShader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
                 var material = new Material(standardShader);
                 rendererModule.material = material;
-                TextureManager.I.SetTexture(pfx.visName, rendererModule.material);
+                TextureManager.I.SetTexture(pfx.VisNameS, rendererModule.material);
                 // renderer.material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest; // First check with no change.
 
-                switch (pfx.visAlphaFunc.ToUpper())
+                switch (pfx.VisAlphaFuncS.ToUpper())
                 {
                     case "BLEND":
                         rendererModule.material.ToTransparentMode(); // e.g. leaves.pfx.
@@ -748,13 +755,13 @@ namespace GVR.Creator
                         rendererModule.material.ToAdditiveMode();
                         break;
                     default:
-                        Debug.LogWarning($"Particle AlphaFunc {pfx.visAlphaFunc} not yet handled.");
+                        Debug.LogWarning($"Particle AlphaFunc {pfx.VisAlphaFuncS} not yet handled.");
                         break;
                 }
                 // makes the material render both faces
                 rendererModule.material.SetInt("_Cull", (int)CullMode.Off);
 
-                switch (pfx.visOrientation)
+                switch (pfx.VisOrientationS)
                 {
                     case "NONE":
                         rendererModule.alignment = ParticleSystemRenderSpace.View;
@@ -766,7 +773,7 @@ namespace GVR.Creator
                         rendererModule.alignment = ParticleSystemRenderSpace.Velocity;
                         break;
                     default:
-                        Debug.LogWarning($"visOrientation {pfx.visOrientation} not yet handled.");
+                        Debug.LogWarning($"visOrientation {pfx.VisOrientationS} not yet handled.");
                         break;
                 }
             }
@@ -774,7 +781,7 @@ namespace GVR.Creator
             // Shape module
             {
                 var shapeModule = particleSystem.shape;
-                switch (pfx.shpType.ToUpper())
+                switch (pfx.ShpTypeS.ToUpper())
                 {
                     case "SPHERE":
                         shapeModule.shapeType = ParticleSystemShapeType.Sphere;
@@ -786,34 +793,31 @@ namespace GVR.Creator
                         shapeModule.shapeType = ParticleSystemShapeType.Mesh;
                         break;
                     default:
-                        Debug.LogWarning($"Particle ShapeType {pfx.shpType} not yet handled.");
+                        Debug.LogWarning($"Particle ShapeType {pfx.ShpTypeS} not yet handled.");
                         break;
                 }
 
-                var shapeDimensions = pfx.shpDim.Split();
+                var shapeDimensions = pfx.ShpDimS.Split();
                 switch (shapeDimensions.Length)
                 {
                     case 1:
                         shapeModule.radius = float.Parse(shapeDimensions[0], CultureInfo.InvariantCulture) / 100; // cm in m
                         break;
                     default:
-                        Debug.LogWarning($"shpDim >{pfx.shpDim}< not yet handled");
+                        Debug.LogWarning($"shpDim >{pfx.ShpDimS}< not yet handled");
                         break;
                 }
 
-                shapeModule.rotation = new(pfx.dirAngleElev, 0, 0);
+                shapeModule.rotation = new(pfx.DirAngleElev, 0, 0);
 
-                var shapeOffsetVec = pfx.shpOffsetVec.Split();
+                var shapeOffsetVec = pfx.ShpOffsetVecS.Split();
                 if (float.TryParse(shapeOffsetVec[0], out var x) && float.TryParse(shapeOffsetVec[1], out var y) &&
                     float.TryParse(shapeOffsetVec[2], out var z))
                     shapeModule.position = new UnityEngine.Vector3(x / 100, y / 100, z / 100);
-                else
-                    Debug.LogError(
-                        "One or more of the shape offset vector components could not be parsed into a float");
 
                 shapeModule.alignToDirection = true;
 
-                shapeModule.radiusThickness = pfx.shpIsVolume ? 1f : 0f;
+                shapeModule.radiusThickness = Convert.ToBoolean(pfx.ShpIsVolume) ? 1f : 0f;
             }
 
             particleSystem.Play();
@@ -821,12 +825,12 @@ namespace GVR.Creator
             return pfxGo;
         }
 
-        private static GameObject CreateDefaultMesh(PxVobData vob, bool nonTeleport = false)
+        private static GameObject CreateDefaultMesh(IVirtualObject vob, bool nonTeleport = false)
         {
-            var parent = nonTeleport ? parentGosNonTeleport[vob.type] : parentGosTeleport[vob.type];
-            var meshName = vob.showVisual ? vob.visualName : vob.vobName;
+            var parent = nonTeleport ? parentGosNonTeleport[vob.Type] : parentGosTeleport[vob.Type];
+            var meshName = vob.ShowVisual ? vob.Visual!.Name : vob.Name;
 
-            if (meshName == string.Empty)
+            if (meshName.IsEmpty())
                 return null;
 
             // MDL
@@ -834,7 +838,7 @@ namespace GVR.Creator
             if (mdl != null)
             {
                 var go = GetPrefab(vob);
-                var ret = VobMeshCreator.Create(meshName, mdl, vob.position.ToUnityVector(), vob.rotation.ToUnityMatrix().rotation, parent, go);
+                var ret = MeshObjectCreator.CreateVob(meshName, mdl, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), parent, go);
                 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
                 if (ret == null)
@@ -848,8 +852,8 @@ namespace GVR.Creator
             var mdm = AssetCache.TryGetMdm(meshName);
             if (mdh != null && mdm != null)
             {
-                return VobMeshCreator.Create(meshName, mdm, mdh, vob.position.ToUnityVector(),
-                    vob.rotation!.ToUnityMatrix().rotation, parent);
+                return MeshObjectCreator.CreateVob(meshName, mdm, mdh, vob.Position.ToUnityVector(),
+                    vob.Rotation.ToUnityQuaternion(), parent);
             }
 
             // MRM
@@ -857,10 +861,10 @@ namespace GVR.Creator
             if (mrm != null)
             {
                 // If the object is a dynamic one, it will collide.
-                var withCollider = vob.cdDynamic;
+                var withCollider = vob.CdDynamic;
 
                 var go = GetPrefab(vob);
-                var ret = VobMeshCreator.Create(meshName, mrm, vob.position.ToUnityVector(), vob.rotation, withCollider, parent, go);
+                var ret = MeshObjectCreator.CreateVob(meshName, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), withCollider, parent, go);
 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
                 if (ret == null)
@@ -873,18 +877,25 @@ namespace GVR.Creator
             return null;
         }
         
-        private static void SetPosAndRot(GameObject obj, Vector3 position, PxMatrix3x3Data rotation)
+        private static void SetPosAndRot(GameObject obj, Vector3 position, Matrix3x3 rotation)
         {
-            SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityMatrix().rotation);
+            SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityQuaternion());
         }
 
-        private static void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, Quaternion rotation)
+        private static void SetPosAndRot(GameObject obj, UnityEngine.Vector3 position, UnityEngine.Quaternion rotation)
         {
-            // FIXME - This isn't working - but really needed?
-            if (position.Equals(default) && rotation.Equals(default))
-                return;
-
             obj.transform.SetLocalPositionAndRotation(position, rotation);
+        }
+
+        /// <summary>
+        /// Some object are kind of null. We have Position only. this method is to compare with Gothic Spacer and remove if not needed later.
+        /// </summary>
+        private static GameObject CreateDebugObject(IVirtualObject vob)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            go.name = "Empty DEBUG object. Check with Spacer if buggy.";
+            SetPosAndRot(go, vob.Position, vob.Rotation);
+            return go;
         }
     }
 }
