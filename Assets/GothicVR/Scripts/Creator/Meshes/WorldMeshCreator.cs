@@ -52,10 +52,12 @@ namespace GVR.Creator.Meshes
                 Self.PrepareMeshRenderer(meshRenderer, subMesh);
                 Self.PrepareMeshFilter(meshFilter, subMesh);
                 Self.PrepareMeshCollider(subMeshObj, meshFilter.sharedMesh, subMesh.Material);
-                
+
+#if UNITY_EDITOR // Only needed for Occlusion Culling baking
                 // Don't set transparent meshes as occluders.
                 if (IsTransparentShader(meshRenderer.sharedMaterial.shader))
                     GameObjectUtility.SetStaticEditorFlags(subMeshObj, (StaticEditorFlags)(int.MaxValue & ~(int)StaticEditorFlags.OccluderStatic));
+#endif
 
                 if (LoadingManager.I)
                     LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
