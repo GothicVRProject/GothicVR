@@ -10,7 +10,7 @@ Fan project recreating the classic Gothic I and II experience in VR.
 ## Usage
 For instructions on playing the game or adding contributions, please check our [Docs](Docs).
 
-(🤫 Shortcut to the installation instructions: [here](Docs/setup/player.md). Thank me later. 😉) 
+(🤫 Shortcut to the installation instructions: [here](Docs/setup/player.md). Thank me later. 😉)
 
 
 ## Our Tenets (until you know better ones)
@@ -26,32 +26,32 @@ We're always looking for people with knowledge and/or spirit. Feel free to reach
 
 ## Workflow/Gameflow
 
-![data flow](Docs/development/diagrams/data-flow.png)
+![data flow](Docs/development/diagrams/data-flow.drawio.png)
 
 
-1. GothicVR requests data from PxCs.dll (.net standard 2.1 shared library which is cross-OS compatibel)
-2. The dll itself forwards request to libphoenix-shared.dll/.so as it includes the original phoenix parser library.
-3. phoenix-shared-interface loads the file system data.
+1. GothicVR requests data from ZenKit.dll (.net standard 2.1 shared library which is cross-OS compatibel).
+2. The dll itself forwards request to libzenkitcapi.dll/.so as it includes the original ZenKit parser library.
+3. ZenKitCAPI loads the file system data.
 4. The data is then returned to Unity to build Unity C# objects like Meshes.
 
 
 ## Dependencies
 GothicVR is using the following projects:
-* [phoenix](https://github.com/GothicKit/phoenix) (Gothic asset parser)
-* [phoenix-shared-interface](https://github.com/GothicKit/phoenix-shared-interface) (C++ -> C interface)
-* [phoenix-csharp-interface](https://github.com/GothicKit/phoenix-csharp-interface) (C# endpoint for C interface)
+* [ZenKit](https://github.com/GothicKit/ZenKit) (Gothic asset parser)
+* [ZenKitCAPI](https://github.com/GothicKit/ZenKitCAPI) (C++ -> C interface)
+* [ZenKitCS](https://github.com/GothicKit/ZenKitCS) (C# endpoint for C interface)
 
 
 ## Credits
 Big shoutout towards
-* [phoenix](https://github.com/GothicKit/phoenix) - Our single source of truth for parsing Gothic assets at runtime.
-* [OpenGothic](https://github.com/Try/OpenGothic) - Our reliable inspiration and code support on how to remake the classic Gothic games. 
+* [ZenKit](https://github.com/GothicKit/ZenKit) - Our single source of truth for parsing Gothic assets at runtime.
+* [OpenGothic](https://github.com/Try/OpenGothic) - Our reliable inspiration and code support on how to remake the classic Gothic games.
 
 
 ## FAQ
 
 **Q: Why do you use an external framework to parse Gothic assets?**  
-A: phoenix is a full Gothic asset parser and already used by OpenGothic. It is feature complete and works with Gothic1, Gothic2, and Gothic2 the Night of the Raven assets. Why reinventing the wheel? ¯\_(ツ)_/¯
+A: ZenKit is a full Gothic asset parser and already used by OpenGothic. It is feature complete and works with Gothic1, Gothic2, and Gothic2 the Night of the Raven assets. Why reinventing the wheel? ¯\_(ツ)_/¯
 
-**Q: Why do you integrate phoenix as shared library (DLL) instead of using its code directly?**  
-A: As phoenix is written in C++, we need a way to communicate with C#. The way to go is shared libraries as they can be used within C# via _DllImport_.
+**Q: Why do you integrate ZenKit as shared library (DLL) instead of using its code directly?**  
+A: As ZenKit is written in C++, we need a way to communicate with C#. The way to go is shared libraries as they can be used within C# via _DllImport_.

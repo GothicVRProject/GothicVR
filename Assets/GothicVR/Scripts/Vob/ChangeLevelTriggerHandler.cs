@@ -1,7 +1,7 @@
 using GVR.Manager;
 using UnityEngine;
 
-namespace GVR.Phoenix.Util
+namespace GVR.Vob
 {
     public class ChangeLevelTriggerHandler : MonoBehaviour
     {

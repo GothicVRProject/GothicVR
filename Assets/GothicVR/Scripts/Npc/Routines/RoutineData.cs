@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GVR.Phoenix.Data.Vm.Gothic
+namespace GVR.Npc.Routines
 {
     public class RoutineData
     {

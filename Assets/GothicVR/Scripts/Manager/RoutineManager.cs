@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using GVR.Debugging;
 using GVR.Globals;
-using GVR.Manager;
-using GVR.Phoenix.Data.Vm.Gothic;
+using GVR.Npc.Routines;
 using GVR.Util;
-using GVR.World;
 using UnityEngine;
 
-namespace GVR.Npc
+namespace GVR.Manager
 {
     /// <summary>
     /// Manages the Routines in a central spot. Routines Subscribe here. Calls the Routines when they are due.

@@ -4,7 +4,7 @@ using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
-using GVR.Phoenix.Interface.Vm;
+using GVR.Vm;
 using GVR.Properties;
 using UnityEngine;
 using ZenKit.Daedalus;
@@ -89,7 +89,7 @@ namespace GVR.Manager
             var npcGo = GetNpc(npc);
             var npcPos = npcGo.transform.position;
             
-            // FIXME - currently hard coded with 20m, but needs to be imported from Phoenix: daedalus_classes.h::c_npc::senses and senses_range
+            // FIXME - currently hard coded with 20m, but needs to be imported from ZenKit: daedalus_classes.h::c_npc::senses and senses_range
             float distance = 20f; // 20m
             
             // FIXME - Add Guild check

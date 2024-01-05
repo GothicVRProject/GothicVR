@@ -11,7 +11,7 @@ using ZenKit;
 using ZenKit.Daedalus;
 using Random = UnityEngine.Random;
 
-namespace GVR.Phoenix.Interface.Vm
+namespace GVR.Vm
 {
     /// <summary>
     /// Contains basic methods only available in Gothic Daedalus module.

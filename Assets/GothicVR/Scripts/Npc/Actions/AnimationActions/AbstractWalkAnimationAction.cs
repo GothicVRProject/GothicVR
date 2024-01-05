@@ -2,7 +2,7 @@ using System;
 using GVR.Caches;
 using GVR.Creator;
 using GVR.Extensions;
-using GVR.Phoenix.Interface.Vm;
+using GVR.Vm;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions

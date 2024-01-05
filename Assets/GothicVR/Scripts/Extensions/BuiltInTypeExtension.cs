@@ -37,13 +37,16 @@ namespace GVR.Extensions
         }
 
         /// <summary>
-        /// Phoenix delivers values mostly in cm. Convenient method to move to Meter.
+        /// ZenKit delivers values mostly in cm. Convenient method to move to Meter.
         /// </summary>
         public static int ToMeter(this int cmValue)
         {
             return cmValue / 100;
         }
 
+        /// <summary>
+        /// ZenKit delivers values mostly in cm. Convenient method to move to Meter.
+        /// </summary>
         public static float ToMeter(this float cmValue)
         {
             return cmValue / 100;
