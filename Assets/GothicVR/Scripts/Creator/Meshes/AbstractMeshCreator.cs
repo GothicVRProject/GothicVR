@@ -218,6 +218,8 @@ namespace GVR.Creator.Meshes
             rend.SetMaterials(finalMaterials);
         }
 
+        public static List<List<int>> DebugBloodwynVertexMapping = new();
+
         protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, bool isDynamic)
         {
             /*
@@ -259,9 +261,13 @@ namespace GVR.Creator.Meshes
             // 2-dimensional arrays (as there are segregated by submeshes)
             var preparedTriangles = new List<List<int>>(mrmData.SubMeshes.Count);
 
+            var vertices = mrmData.Positions;
+            DebugBloodwynVertexMapping = new(mrmData.PositionCount);
+            // Initialize
+            Enumerable.Range(0, mrmData.PositionCount).ToList().ForEach(i => DebugBloodwynVertexMapping.Add(new()));
+
             foreach (var subMesh in mrmData.SubMeshes)
             {
-                var vertices = mrmData.Positions;
                 var triangles = subMesh.Triangles;
                 var wedges = subMesh.Wedges;
 
@@ -282,6 +288,10 @@ namespace GVR.Creator.Meshes
                     preparedVertices.Add(vertices[index1.Index].ToUnityVector());
                     preparedVertices.Add(vertices[index2.Index].ToUnityVector());
                     preparedVertices.Add(vertices[index3.Index].ToUnityVector());
+
+                    DebugBloodwynVertexMapping[index1.Index].Add(preparedVertices.Count - 3);
+                    DebugBloodwynVertexMapping[index2.Index].Add(preparedVertices.Count - 2);
+                    DebugBloodwynVertexMapping[index3.Index].Add(preparedVertices.Count - 1);
 
                     subMeshTriangles.Add(preparedIndex);
                     subMeshTriangles.Add(preparedIndex + 1);
