@@ -81,10 +81,10 @@ namespace GVR.Caches
             var vertexCount = anim.Vertices.Count;
 
             var newData = new List<Vector3[]>(anim.FrameCount);
-            // Initialize
+            // Initialize - We set the VertexData for every frame to the original mesh value.
             Enumerable.Range(0, anim.FrameCount)
                 .ToList()
-                .ForEach(_ => newData.Add(new Vector3[vertexCount]));
+                .ForEach(_ => newData.Add(originalUnityVertexData));
 
 
             for (var i = 0; i < anim.SampleCount; i++)
@@ -94,9 +94,10 @@ namespace GVR.Caches
                 var morpMeshVectorAddition = anim.Samples[i].ToUnityVector();
 
                 // For each unityVector at current Frame, we set add MorphMesh data.
+                // Hint: If a vertex isn't named in the MorphMesh vertexIds, then we just leave it as original.
                 foreach (var unityVertexId in originalVertexMapping[currentZkVertexId])
                 {
-                    newData[currentFrame][unityVertexId] = originalUnityVertexData[unityVertexId] + morpMeshVectorAddition;
+                    newData[currentFrame][currentZkVertexId] = originalUnityVertexData[unityVertexId] + morpMeshVectorAddition;
                 }
             }
 

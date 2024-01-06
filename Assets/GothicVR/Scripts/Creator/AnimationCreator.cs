@@ -67,6 +67,11 @@ namespace GVR.Creator
             props.headMorph.StartAnimation(props.BodyData.Head, type);
         }
 
+        public static void StopHeadMorphAnimation(NpcProperties props)
+        {
+            props.headMorph.StopAnimation();
+        }
+
         private static AnimationClip LoadAnimationClip(IModelAnimation pxAnimation, IModelHierarchy mdh, GameObject rootBone, bool repeat, string clipName)
         {
             var clip = new AnimationClip

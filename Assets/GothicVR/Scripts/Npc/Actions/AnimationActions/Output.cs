@@ -72,7 +72,14 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             audioPlaySeconds -= Time.deltaTime;
 
-            return audioPlaySeconds <= 0f;
+            if (audioPlaySeconds <= 0f)
+            {
+                AnimationCreator.StopHeadMorphAnimation(Props);
+
+                return true;
+            }
+            else
+                return false;
         }
     }
 }
