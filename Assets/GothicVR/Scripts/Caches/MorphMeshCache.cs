@@ -86,27 +86,27 @@ namespace GVR.Caches
 
             var originalVertexMapping = HeadVertexMapping[preparedMmbKey];
             var originalUnityVertexData = UnityVertices[preparedMmbKey];
-            // Original vertex count from ZenKit data. (e.g. 100)
+            // Original vertex count from ZenKit data.
             var vertexCount = anim.Vertices.Count;
 
             var newData = new List<Vector3[]>(anim.FrameCount);
             // Initialize - We set the VertexData for every frame to the original mesh value.
             Enumerable.Range(0, anim.FrameCount)
                 .ToList()
-                .ForEach(_ => newData.Add(originalUnityVertexData));
+                .ForEach(_ => newData.Add((Vector3[])originalUnityVertexData.Clone()));
 
 
             for (var i = 0; i < anim.SampleCount; i++)
             {
                 var currentFrame = i / vertexCount;
-                var currentZkVertexId = i % vertexCount;
+                var currentZkVertexId = anim.Vertices[i % vertexCount];
                 var morpMeshVectorAddition = anim.Samples[i].ToUnityVector();
 
-                // For each unityVector at current Frame, we set add MorphMesh data.
+                // For each unityVector at current frame, we add MorphMesh data.
                 // Hint: If a vertex isn't named in the MorphMesh vertexIds, then we just leave it as original.
                 foreach (var unityVertexId in originalVertexMapping[currentZkVertexId])
                 {
-                    newData[currentFrame][currentZkVertexId] = originalUnityVertexData[unityVertexId] + morpMeshVectorAddition;
+                    newData[currentFrame][unityVertexId] = originalUnityVertexData[unityVertexId] + morpMeshVectorAddition;
                 }
             }
 
