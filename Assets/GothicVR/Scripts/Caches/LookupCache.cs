@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using GVR.Globals;
-using GVR.Manager;
 using GVR.Properties;
 using TMPro;
 using UnityEngine;
@@ -31,12 +30,12 @@ namespace GVR.Caches
         /// VobSounds and VobSoundsDayTime GOs.
         /// </summary>
         public static List<GameObject> vobSoundsAndDayTime = new();
-        
-        
+
         static LookupCache()
         {
             GvrEvents.GeneralSceneUnloaded.AddListener(delegate
             {
+                NpcCache.Clear();
                 vobSoundsAndDayTime.Clear();
             });
         }

@@ -39,6 +39,7 @@ namespace GVR.Manager
             AssetCache.Dispose();
             LookupCache.Dispose();
             PrefabCache.Dispose();
+            MorphMeshCache.Dispose();
         }
 
         private void Update()

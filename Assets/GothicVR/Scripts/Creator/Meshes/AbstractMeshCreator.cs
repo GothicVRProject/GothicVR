@@ -218,9 +218,7 @@ namespace GVR.Creator.Meshes
             rend.SetMaterials(finalMaterials);
         }
 
-        public static List<List<int>> DebugBloodwynVertexMapping = new();
-
-        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, bool isDynamic)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, bool isMorphMesh = false, string morphMeshName = "")
         {
             /*
              * Ok, brace yourself:
@@ -242,9 +240,13 @@ namespace GVR.Creator.Meshes
              */
             var mesh = new Mesh();
 
-            // MorphMeshes will change the vertices. This call optimizes performance.
-            if (isDynamic)
+            if (isMorphMesh)
+            {
+                // MorphMeshes will change the vertices. This call optimizes performance.
                 mesh.MarkDynamic();
+                MorphMeshCache.AddVertexMapping(morphMeshName, mrmData.PositionCount);
+                morphMeshName = MorphMeshCache.GetPreparedKey(morphMeshName); // So we don't need to recalculate every Add() call later.
+            }
 
             meshFilter.mesh = mesh;
             if (null == mrmData)
@@ -262,9 +264,6 @@ namespace GVR.Creator.Meshes
             var preparedTriangles = new List<List<int>>(mrmData.SubMeshes.Count);
 
             var vertices = mrmData.Positions;
-            DebugBloodwynVertexMapping = new(mrmData.PositionCount);
-            // Initialize
-            Enumerable.Range(0, mrmData.PositionCount).ToList().ForEach(i => DebugBloodwynVertexMapping.Add(new()));
 
             foreach (var subMesh in mrmData.SubMeshes)
             {
@@ -289,9 +288,13 @@ namespace GVR.Creator.Meshes
                     preparedVertices.Add(vertices[index2.Index].ToUnityVector());
                     preparedVertices.Add(vertices[index3.Index].ToUnityVector());
 
-                    DebugBloodwynVertexMapping[index1.Index].Add(preparedVertices.Count - 3);
-                    DebugBloodwynVertexMapping[index2.Index].Add(preparedVertices.Count - 2);
-                    DebugBloodwynVertexMapping[index3.Index].Add(preparedVertices.Count - 1);
+                    // We add mapping data to later reuse for IMorphAnimation samples
+                    if (isMorphMesh)
+                    {
+                        MorphMeshCache.HeadVertexMapping[morphMeshName][index1.Index].Add(preparedVertices.Count - 3);
+                        MorphMeshCache.HeadVertexMapping[morphMeshName][index2.Index].Add(preparedVertices.Count - 2);
+                        MorphMeshCache.HeadVertexMapping[morphMeshName][index3.Index].Add(preparedVertices.Count - 1);
+                    }
 
                     subMeshTriangles.Add(preparedIndex);
                     subMeshTriangles.Add(preparedIndex + 1);
@@ -314,6 +317,9 @@ namespace GVR.Creator.Meshes
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
+
+            if (isMorphMesh)
+                MorphMeshCache.UnityVertices.Add(morphMeshName, preparedVertices.ToArray());
         }
 
 

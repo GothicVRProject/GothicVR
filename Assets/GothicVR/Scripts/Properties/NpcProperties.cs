@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using GVR.Data;
+using GVR.Npc;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Vm;
 using GVR.Vob.WayNet;
@@ -15,6 +15,8 @@ namespace GVR.Properties
         public AudioSource npcSound;
         public Transform bip01;
         public Transform colliderRootMotion;
+        public Transform head;
+        public HeadMorph headMorph;
 
         public FreePoint currentFreePoint;
         public WayPoint currentWayPoint;

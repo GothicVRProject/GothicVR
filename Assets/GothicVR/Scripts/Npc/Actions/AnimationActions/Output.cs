@@ -25,9 +25,10 @@ namespace GVR.Npc.Actions.AnimationActions
             // Hero
             if (Action.Int0 == 0)
             {
-                // FIXME - Play sound file on Hero's AudioSource - Use global lookup for Hero's voice
                 // If NPC talked before, we stop it immediately (As some audio samples are shorter than the actual animation)
                 AnimationCreator.StopAnimation(NpcGo);
+
+                // FIXME - Play sound file on Hero's AudioSource - Use global lookup for Hero's AudioSource component
                 GameObject.Find("HeroVoice").GetComponent<AudioSource>().PlayOneShot(audioClip);
                 // FIXME - Show subtitles somewhere next to Hero (== ourself/main camera)
             }
@@ -41,8 +42,10 @@ namespace GVR.Npc.Actions.AnimationActions
 
                 // FIXME - We need to handle both mds and mdh options! (base vs overlay)
                 AnimationCreator.PlayAnimation(Props.baseMdsName, $"T_DIALOGGESTURE_{randomId:00}", mdh, NpcGo);
+                AnimationCreator.PlayHeadMorphAnimation(Props, HeadMorph.HeadMorphType.Viseme);
 
                 Props.npcSound.PlayOneShot(audioClip);
+
                 // FIXME - Show subtitles above NPC
             }
         }

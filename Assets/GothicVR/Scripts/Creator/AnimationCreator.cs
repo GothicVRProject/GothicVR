@@ -3,7 +3,9 @@ using System.IO;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
+using GVR.Npc;
 using GVR.Npc.Actions;
+using GVR.Properties;
 using UnityEngine;
 using ZenKit;
 using Animation = UnityEngine.Animation;
@@ -58,6 +60,11 @@ namespace GVR.Creator
             animationComp.Play();
             animationComp.Sample();
             animationComp.Stop();
+        }
+
+        public static void PlayHeadMorphAnimation(NpcProperties props, HeadMorph.HeadMorphType type)
+        {
+            props.headMorph.StartAnimation(props.BodyData.Head, type);
         }
 
         private static AnimationClip LoadAnimationClip(IModelAnimation pxAnimation, IModelHierarchy mdh, GameObject rootBone, bool repeat, string clipName)

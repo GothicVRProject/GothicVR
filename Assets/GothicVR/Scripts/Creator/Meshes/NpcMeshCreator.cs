@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using GVR.Caches;
 using GVR.Extensions;
+using GVR.Npc;
+using GVR.Properties;
 using GVR.Vm;
 using UnityEngine;
 using ZenKit;
@@ -53,11 +55,16 @@ namespace GVR.Creator.Meshes
                 return;
             }
 
+            var props = npcGo.GetComponent<NpcProperties>();
+
+            // Cache it for faster use during runtime
+            props.head = headGo.transform;
+            props.headMorph = headGo.AddComponent<HeadMorph>();
+
             var headMeshFilter = headGo.AddComponent<MeshFilter>();
             var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
-
             PrepareMeshRenderer(headMeshRenderer, morphMesh.Mesh);
-            PrepareMeshFilter(headMeshFilter, morphMesh.Mesh, true);
+            PrepareMeshFilter(headMeshFilter, morphMesh.Mesh, true, morphMesh.Name);
         }
 
         /// <summary>

@@ -44,6 +44,7 @@ namespace GVR.GothicVR_Lab.Scripts
             AssetCache.Dispose();
             LookupCache.Dispose();
             PrefabCache.Dispose();
+            MorphMeshCache.Dispose();
         }
     }
 }

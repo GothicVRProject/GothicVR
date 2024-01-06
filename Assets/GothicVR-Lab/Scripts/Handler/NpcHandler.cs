@@ -4,13 +4,14 @@ using GVR.Creator;
 using GVR.Creator.Meshes;
 using GVR.Extensions;
 using GVR.Globals;
-using GVR.Vm;
 using GVR.Properties;
+using GVR.Vm;
 using TMPro;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;
 using Mesh = UnityEngine.Mesh;
+using Vector3 = UnityEngine.Vector3;
 
 namespace GVR.Lab.Handler
 {
@@ -82,73 +83,11 @@ namespace GVR.Lab.Handler
             };
 
             MeshObjectCreator.CreateNpc(newNpc.name, mdmName, mdhName, body, newNpc);
-
-            // TODO - MorphMesh test only
-            mmb = AssetCache.TryGetMmb("Hum_Head_Bald");
-            head = GameObject.Find("BIP01 HEAD");
-            mesh = head.GetComponent<MeshFilter>().mesh;
-            anim = mmb.Animations.First(anim => anim.Name.EqualsIgnoreCase("VISEME"));
         }
 
         public void AnimationStartClick()
         {
             VmGothicExternals.AI_PlayAni(bloodwynInstance, animationsDropdown.options[animationsDropdown.value].text);
-        }
-
-
-        private IMorphMesh mmb;
-        private GameObject head;
-        private IMorphAnimation anim;
-        private Mesh mesh;
-
-        private float frame;
-        private int lastFrame = -1;
-
-        private void Update()
-        {
-            if (mmb == null)
-                return;
-
-            var vertices = mesh.vertices;
-            var vertexMapping = AbstractMeshCreator.DebugBloodwynVertexMapping;
-
-            frame += Time.deltaTime;
-
-            // Do not show a frame twice.
-            if (lastFrame == (int)frame)
-                return;
-
-            // It's a hack to show only one new frame each second.
-            lastFrame = (int)frame;
-
-            var frameIndexOffset = (int)frame * anim.Vertices.Count;
-
-            foreach (var vertexId in anim.Vertices)
-            {
-                var vertexElementsFromMapping = vertexMapping[vertexId];
-                var vertexValue = anim.Samples[vertexId + frameIndexOffset];
-
-                foreach (var vertexMappingId in vertexElementsFromMapping)
-                {
-                    // Test: Just check if Morph mesh is working after all - Big head mode
-                    // vertices[vertexMappingId] = vertices[vertexMappingId] * 1.1f;
-
-                    // Test: Do the animations "additive" - Open mouth mode
-                    // vertices[vertexMappingId] += vertexValue.ToUnityVector();
-
-                    // Test: Set the head vertex to new MorphMesh value - Tiny head mode
-                    vertices[vertexMappingId] = vertexValue.ToUnityVector();
-                }
-            }
-
-            mesh.vertices = vertices;
-
-            // This Vignette has only 16 frames.
-            if (frame > 15)
-            {
-                Debug.Log("Last frame reached.");
-                frame = 0;
-            }
         }
     }
 }
