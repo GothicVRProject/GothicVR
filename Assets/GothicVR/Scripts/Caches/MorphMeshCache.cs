@@ -24,13 +24,13 @@ namespace GVR.Caches
         ///                       | Array index is former vertexId
         ///                             | Data is new vertexIds from Unity mesh
         /// </summary>
-        public static readonly Dictionary<string, List<List<int>>> HeadVertexMapping = new();
+        private static readonly Dictionary<string, List<List<int>>> HeadVertexMapping = new();
 
         /// <summary>
         /// We also store the vertices migrated from ZenKit to Unity. They basically differentiate by:
         /// No vertex is reused for different triangles. Every time a vertex is needed, it got duplicated for Unity usage.
         /// </summary>
-        public static readonly Dictionary<string, Vector3[]> UnityVertices = new();
+        private static readonly Dictionary<string, Vector3[]> UnityVertices = new();
 
         /// <summary>
         /// Save CPU cycles during runtime by caching the Morph values for every frame.
@@ -54,6 +54,15 @@ namespace GVR.Caches
                 .ForEach(_ => HeadVertexMapping[preparedKey].Add(new List<int>()));
         }
 
+        public static void AddVertexMappingEntry(string preparedMorphMeshName, int originalVertexIndex, int additionalUnityVertexIndex)
+        {
+            HeadVertexMapping[preparedMorphMeshName][originalVertexIndex].Add(additionalUnityVertexIndex);
+        }
+
+        public static void SetUnityVerticesForVertexMapping(string preparedMorphMeshName, Vector3[] unityVertices)
+        {
+            UnityVertices.Add(preparedMorphMeshName, unityVertices);
+        }
 
         /// <summary>
         /// Cache and return MorphAnimation samples.

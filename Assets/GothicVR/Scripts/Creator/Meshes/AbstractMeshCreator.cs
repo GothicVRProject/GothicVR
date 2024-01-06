@@ -291,9 +291,9 @@ namespace GVR.Creator.Meshes
                     // We add mapping data to later reuse for IMorphAnimation samples
                     if (isMorphMesh)
                     {
-                        MorphMeshCache.HeadVertexMapping[morphMeshName][index1.Index].Add(preparedVertices.Count - 3);
-                        MorphMeshCache.HeadVertexMapping[morphMeshName][index2.Index].Add(preparedVertices.Count - 2);
-                        MorphMeshCache.HeadVertexMapping[morphMeshName][index3.Index].Add(preparedVertices.Count - 1);
+                        MorphMeshCache.AddVertexMappingEntry(morphMeshName, index1.Index, preparedVertices.Count - 3);
+                        MorphMeshCache.AddVertexMappingEntry(morphMeshName, index2.Index, preparedVertices.Count - 2);
+                        MorphMeshCache.AddVertexMappingEntry(morphMeshName, index3.Index, preparedVertices.Count - 1);
                     }
 
                     subMeshTriangles.Add(preparedIndex);
@@ -319,7 +319,7 @@ namespace GVR.Creator.Meshes
             }
 
             if (isMorphMesh)
-                MorphMeshCache.UnityVertices.Add(morphMeshName, preparedVertices.ToArray());
+                MorphMeshCache.SetUnityVerticesForVertexMapping(morphMeshName, preparedVertices.ToArray());
         }
 
 
