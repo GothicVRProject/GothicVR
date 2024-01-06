@@ -52,7 +52,7 @@ namespace GVR.Npc
             morphMetadata = AssetCache.TryGetMmb(headName);
             morphAnimationMetadata = morphMetadata.Animations.First(anim => anim.Name.EqualsIgnoreCase(animationName));
             morphFrameData = MorphMeshCache.TryGetHeadMorphData(headName, animationName);
-
+            
             isAnimationRunning = true;
         }
 
@@ -60,17 +60,32 @@ namespace GVR.Npc
         {
             isAnimationRunning = false;
 
+            time = 0.0f;
+            previousFrame = -1;
             morphMetadata = null;
             morphAnimationMetadata = null;
             morphFrameData = null;
         }
 
+        private float time;
+        private int previousFrame = -1;
         private void Update()
         {
             if (!isAnimationRunning)
                 return;
 
-            var x = 2;
+            time += Time.deltaTime;
+
+            var newFrame = (int)(time * (morphAnimationMetadata.FrameCount / morphAnimationMetadata.Speed) % morphAnimationMetadata.FrameCount);
+            
+            if (newFrame == previousFrame)
+                return;
+            
+            mesh.vertices = morphFrameData[newFrame];
+            
+            previousFrame = newFrame;
+            
+            Debug.Log($"AnimateMorph Frame {newFrame}");
             //
             // frame += Time.deltaTime;
             //
