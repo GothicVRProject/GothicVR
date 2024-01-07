@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GVR.Caches;
+using GVR.Data.ZkEvents;
 using GVR.Extensions;
 using GVR.Npc;
 using GVR.Npc.Actions;
@@ -192,7 +193,7 @@ namespace GVR.Creator
                 {
                     time = clampedFrame / clip.frameRate,
                     functionName = nameof(IAnimationCallbacks.AnimationCallback),
-                    stringParameter = JsonUtility.ToJson(zkEvent) // As we can't add a custom object, we serialize data.
+                    stringParameter = JsonUtility.ToJson(new SerializableEventTag(zkEvent)) // As we can't add a custom object, we serialize the data object.
                  };
 
                 clip.AddEvent(animEvent);
@@ -205,7 +206,7 @@ namespace GVR.Creator
                 {
                     time = clampedFrame / clip.frameRate,
                     functionName = nameof(IAnimationCallbacks.AnimationSfxCallback),
-                    stringParameter = JsonUtility.ToJson(sfxEvent) // As we can't add a custom object, we serialize data.
+                    stringParameter = JsonUtility.ToJson(new SerializableEventSoundEffect(sfxEvent)) // As we can't add a custom object, we serialize the data object.
                 };
                 
                 clip.AddEvent(animEvent);

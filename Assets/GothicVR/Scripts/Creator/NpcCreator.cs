@@ -88,6 +88,7 @@ namespace GVR.Creator
             if (FeatureFlags.I.npcToSpawn.Any() && !FeatureFlags.I.npcToSpawn.Contains(props.npcInstance.Id))
             {
                 Object.Destroy(newNpc);
+                LookupCache.NpcCache.Remove(props.npcInstance.Index);
                 return;
             }
 
@@ -187,6 +188,12 @@ namespace GVR.Creator
         {
             var props = GetProperties(npc);
             props.overlayMdsName = overlayName;
+        }
+
+        public static void ExtNpcSetTalentSkill(NpcInstance npc, VmGothicEnums.Talent talent, int level)
+        {
+            // FIXME - TBD.
+            // FIXME - In OpenGothic it adds MDS overlays based on skill level.
         }
 
         public static void ExtSetVisualBody(VmGothicExternals.ExtSetVisualBodyData data)

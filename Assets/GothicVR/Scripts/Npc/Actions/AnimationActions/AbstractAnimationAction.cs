@@ -1,8 +1,8 @@
+using GVR.Data.ZkEvents;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Properties;
 using UnityEngine;
-using ZenKit;
 using EventType = ZenKit.EventType;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -27,7 +27,7 @@ namespace GVR.Npc.Actions.AnimationActions
         /// <summary>
         /// We just set the audio by default.
         /// </summary>
-        public virtual void AnimationSfxEventCallback(IEventSoundEffect sfxData)
+        public virtual void AnimationSfxEventCallback(SerializableEventSoundEffect sfxData)
         {
             var clip = VobHelper.GetSoundClip(sfxData.Name);
             Props.npcSound.clip = clip;
@@ -38,7 +38,7 @@ namespace GVR.Npc.Actions.AnimationActions
                 Debug.LogWarning($"PxEventSfxData.emptySlot not yet implemented: {sfxData.Name}");
         }
         
-        public virtual void AnimationEventCallback(IEventTag data)
+        public virtual void AnimationEventCallback(SerializableEventTag data)
         {
             // FIXME - I have no clue about this inventory_torch event, but it gets called quite often.
             if (data.Type == EventType.TorchInventory)

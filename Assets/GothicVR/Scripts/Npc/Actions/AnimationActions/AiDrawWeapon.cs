@@ -1,8 +1,8 @@
 using GVR.Caches;
 using GVR.Creator;
+using GVR.Data.ZkEvents;
 using GVR.Extensions;
 using UnityEngine;
-using ZenKit;
 using EventType = ZenKit.EventType;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -25,7 +25,7 @@ namespace GVR.Npc.Actions.AnimationActions
 
         // FIXME - 1Hand hardcoded so far. We need to get the information from inventory system itself.
         // FIXME - Sound is hardcoded as well. We need to get material from weapon dynamically of wood or metal.
-        public override void AnimationEventCallback(IEventTag data)
+        public override void AnimationEventCallback(SerializableEventTag data)
         {
             switch (data.Type)
             {
@@ -36,7 +36,7 @@ namespace GVR.Npc.Actions.AnimationActions
                     // FIXME - Handle proper sound effect based on metal or wood weapon
                     // "DRAWSOUND_ME.WAV" --> metal
                     // "DRAWSOUND_WO.WAV" --> wood
-                    AnimationSfxEventCallback(new CachedEventSoundEffect()
+                    AnimationSfxEventCallback(new SerializableEventSoundEffect()
                     {
                         Name = "DRAWSOUND_ME.WAV",
                         Range = 2000f

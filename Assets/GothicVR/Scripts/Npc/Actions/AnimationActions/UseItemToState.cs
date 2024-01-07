@@ -1,9 +1,9 @@
 using System;
 using GVR.Caches;
 using GVR.Creator;
+using GVR.Data.ZkEvents;
 using GVR.Extensions;
 using UnityEngine;
-using ZenKit;
 using EventType = ZenKit.EventType;
 using Object = UnityEngine.Object;
 
@@ -59,7 +59,7 @@ namespace GVR.Npc.Actions.AnimationActions
             AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, mdh, NpcGo);
         }
 
-        public override void AnimationEventCallback(IEventTag data)
+        public override void AnimationEventCallback(SerializableEventTag data)
         {
             switch (data.Type)
             {

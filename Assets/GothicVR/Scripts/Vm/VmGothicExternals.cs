@@ -75,7 +75,7 @@ namespace GVR.Vm
             vm.RegisterExternal<int, NpcInstance>("Npc_GetStateTime", Npc_GetStateTime);
             vm.RegisterExternal<NpcInstance, int>("Npc_SetStateTime", Npc_SetStateTime);
             vm.RegisterExternal<ItemInstance, NpcInstance>("Npc_GetEquippedArmor", Npc_GetEquippedArmor);
-            // vm.RegisterExternal<NpcInstance, VmGothicEnums.Talent, int>("Npc_SetTalentSkill", Npc_SetTalentSkill);
+            vm.RegisterExternal<NpcInstance, int, int>("Npc_SetTalentSkill", Npc_SetTalentSkill);
             vm.RegisterExternal<string, NpcInstance>("Npc_GetNearestWP", Npc_GetNearestWP);
             vm.RegisterExternal<int, NpcInstance, string>("Npc_IsOnFP", Npc_IsOnFP);
             vm.RegisterExternal<int, NpcInstance, int>("Npc_WasInState", Npc_WasInState);
@@ -472,13 +472,11 @@ namespace GVR.Vm
         }
 
         
-        public static void Npc_SetTalentSkill(NpcInstance npc, VmGothicEnums.Talent talent, int level)
+        public static void Npc_SetTalentSkill(NpcInstance npc, int talent, int level)
         {
-            // FIXME - In OpenGothic it adds MDS overlays based on skill level.
-            // NpcCreator.ExtNpcSetTalentSkill(npcPtr, talent, level);
+            NpcCreator.ExtNpcSetTalentSkill(npc, (VmGothicEnums.Talent)talent, level);
         }
 
-        
         public static string Npc_GetNearestWP(NpcInstance npc)
         {
             return NpcHelper.ExtGetNearestWayPoint(npc);

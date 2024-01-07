@@ -1,4 +1,5 @@
-﻿using GVR.Globals;
+﻿using GVR.Data.ZkEvents;
+using GVR.Globals;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Properties;
@@ -107,13 +108,13 @@ namespace GVR.Npc
 
         public void AnimationCallback(string pxEventTagDataParam)
         {
-            var eventData = JsonUtility.FromJson<IEventTag>(pxEventTagDataParam);
+            var eventData = JsonUtility.FromJson<SerializableEventTag>(pxEventTagDataParam);
             properties.currentAction.AnimationEventCallback(eventData);
         }
 
         public void AnimationSfxCallback(string pxEventSfxDataParam)
         {
-            var eventData = JsonUtility.FromJson<IEventSoundEffect>(pxEventSfxDataParam);
+            var eventData = JsonUtility.FromJson<SerializableEventSoundEffect>(pxEventSfxDataParam);
             properties.currentAction.AnimationSfxEventCallback(eventData);
         }
         
