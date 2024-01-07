@@ -78,6 +78,7 @@ namespace GVR.Npc
 
             var tickPerFrame = 1f / morphAnimationMetadata.Speed;
             
+            // IMorphAnimation.Speed is in milliseconds. We therefore multiply current time by 1000.
             var newFrame = (time * 1000 * morphAnimationMetadata.Speed % morphAnimationMetadata.FrameCount);
             
             var currentMorph = morphFrameData[(int)newFrame];
@@ -85,7 +86,8 @@ namespace GVR.Npc
                 morphFrameData[(int)newFrame == morphAnimationMetadata.FrameCount - 1 ? 0 : (int)newFrame + 1];
 
             // FIXME - We currently calculate this morph interpolation every time the morph is played. We could also cache it.
-            // FIXME - e.g. cache it with 60 frames in mind. This would mean more memory is needed, but less CPU cycles.
+            // FIXME - e.g. cache it with 60, 30, 15 frames in mind (for each distance culling).
+            // FIXME - This would mean more memory is needed, but less CPU cycles.
             var interpolatedMorph = new Vector3[currentMorph.Length];
             for (var i = 0; i < currentMorph.Length; i++)
             {
