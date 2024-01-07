@@ -101,12 +101,17 @@ namespace GVR.Creator
                 MeshObjectCreator.EquipNpcWeapon(newNpc, equippedItem, (VmGothicEnums.ItemFlags)equippedItem.MainFlag, (VmGothicEnums.ItemFlags)equippedItem.Flags);
             
             var npcRoutine = props.npcInstance.DailyRoutine;
-            vm.GlobalSelf = props.npcInstance;
-            vm.Call(npcRoutine);
-            
-            if (FeatureFlags.I.enableNpcRoutines)
-                StartRoutine(newNpc);
-            
+
+            // e.g. Monsters have no routine and therefore no further routine handling needed.
+            if (npcRoutine != 0)
+            {
+                vm.GlobalSelf = props.npcInstance;
+                vm.Call(npcRoutine);
+
+                if (FeatureFlags.I.enableNpcRoutines)
+                    StartRoutine(newNpc);
+            }
+
             SetSpawnPoint(newNpc, spawnPoint);
         }
 

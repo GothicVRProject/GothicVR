@@ -58,7 +58,7 @@ namespace GVR.Debugging
         public bool enableNpcRoutines;
 
         [Header("__________NPCs - Developer__________")]
-        [Tooltip("Add the Daedalus ids for NPCs to spawn. Take them from C_NPC instances. (Ignored if empty)")]
+        [Tooltip("Add the Daedalus ids for NPCs to spawn. Take them from C_NPC instances. (Ignored if empty; No monsters to be named as they always have id=0)")]
         public List<int> npcToSpawn;
 
         [Header("__________Audio__________")]
