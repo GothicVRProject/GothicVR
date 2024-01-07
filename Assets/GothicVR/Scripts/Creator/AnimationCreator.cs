@@ -82,7 +82,7 @@ namespace GVR.Creator
             };
 
             var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.NodeCount);
-            var boneNames = pxAnimation.NodeIndices.Select(nodeIndex => mdh.Nodes[(int)nodeIndex].Name).ToArray();
+            var boneNames = pxAnimation.NodeIndices.Select(nodeIndex => mdh.Nodes[nodeIndex].Name).ToArray();
 
             // Initialize array
             for (var boneId = 0; boneId < boneNames.Length; boneId++)

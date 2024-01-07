@@ -63,14 +63,12 @@ namespace GVR.Npc
             mesh.vertices = MorphMeshCache.GetOriginalUnityVertices(headName);
 
             time = 0.0f;
-            previousFrame = -1;
             morphMetadata = null;
             morphAnimationMetadata = null;
             morphFrameData = null;
         }
 
         private float time;
-        private int previousFrame = -1;
         private void Update()
         {
             if (!isAnimationRunning)
@@ -78,54 +76,24 @@ namespace GVR.Npc
 
             time += Time.deltaTime;
 
-            var newFrame = (int)(time * (morphAnimationMetadata.FrameCount / morphAnimationMetadata.Speed) % morphAnimationMetadata.FrameCount);
+            var tickPerFrame = 1f / morphAnimationMetadata.Speed;
             
-            if (newFrame == previousFrame)
-                return;
+            var newFrame = (time * 1000 * morphAnimationMetadata.Speed % morphAnimationMetadata.FrameCount);
             
-            mesh.vertices = morphFrameData[newFrame];
+            var currentMorph = morphFrameData[(int)newFrame];
+            var nextMorph =
+                morphFrameData[(int)newFrame == morphAnimationMetadata.FrameCount - 1 ? 0 : (int)newFrame + 1];
+
+            // FIXME - We currently calculate this morph interpolation every time the morph is played. We could also cache it.
+            // FIXME - e.g. cache it with 60 frames in mind. This would mean more memory is needed, but less CPU cycles.
+            var interpolatedMorph = new Vector3[currentMorph.Length];
+            for (var i = 0; i < currentMorph.Length; i++)
+            {
+                interpolatedMorph[i] =
+                    Vector3.Lerp(currentMorph[i], nextMorph[i], newFrame - MathF.Truncate(newFrame));
+            }
             
-            previousFrame = newFrame;
-            
-            Debug.Log($"AnimateMorph Frame {newFrame}");
-            //
-            // frame += Time.deltaTime;
-            //
-            // // Do not show a frame twice.
-            // if (lastFrame == (int)frame)
-            //     return;
-            //
-            // // It's a hack to show only one new frame each second.
-            // lastFrame = (int)frame;
-            //
-            // var frameIndexOffset = (int)frame * anim.Vertices.Count;
-            //
-            // foreach (var vertexId in anim.Vertices)
-            // {
-            //     var vertexElementsFromMapping = vertexMapping[vertexId];
-            //     var vertexValue = anim.Samples[vertexId + frameIndexOffset];
-            //
-            //     foreach (var vertexMappingId in vertexElementsFromMapping)
-            //     {
-            //         // Test: Just check if Morph mesh is working after all - Big head mode
-            //         // vertices[vertexMappingId] = vertices[vertexMappingId] * 1.1f;
-            //
-            //         // Test: Do the animations "additive" - Open mouth mode
-            //         vertices[vertexMappingId] += vertexValue.ToUnityVector();
-            //
-            //         // Test: Set the head vertex to new MorphMesh value - Tiny head mode
-            //         // vertices[vertexMappingId] = vertexValue.ToUnityVector();
-            //     }
-            // }
-            //
-            // mesh.vertices = vertices;
-            //
-            // // This Vignette has only 16 frames.
-            // if (frame > 15)
-            // {
-            //     Debug.Log("Last frame reached.");
-            //     frame = 0;
-            // }
+            mesh.vertices = interpolatedMorph;
         }
     }
 }
