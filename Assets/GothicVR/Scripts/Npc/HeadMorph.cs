@@ -56,9 +56,11 @@ namespace GVR.Npc
             isAnimationRunning = true;
         }
 
-        public void StopAnimation()
+        public void StopAnimation(string headName)
         {
             isAnimationRunning = false;
+
+            mesh.vertices = MorphMeshCache.GetOriginalUnityVertices(headName);
 
             time = 0.0f;
             previousFrame = -1;

@@ -64,6 +64,13 @@ namespace GVR.Caches
             UnityVertices.Add(preparedMorphMeshName, unityVertices);
         }
 
+        public static Vector3[] GetOriginalUnityVertices(string morphMeshName)
+        {
+            var preparedKey = GetPreparedKey(morphMeshName);
+
+            return UnityVertices[preparedKey];
+        }
+
         /// <summary>
         /// Cache and return MorphAnimation samples.
         ///
