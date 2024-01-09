@@ -243,7 +243,7 @@ namespace GVR.Creator
             var nonNullCullingGroupItems = _cullingVobObjects.Where(i => i != null).ToArray();
             VobMeshCullingManager.I.PrepareVobCulling(nonNullCullingGroupItems);
             VobSoundCullingManager.I.PrepareSoundCulling(LookupCache.vobSoundsAndDayTime);
-            
+
             // TODO - warnings about "not implemented" - print them once only.
             foreach (var var in new[]{
                          VirtualObjectType.zCVobScreenFX,
@@ -376,18 +376,12 @@ namespace GVR.Creator
             else if (!string.IsNullOrEmpty(vob.Name))
                 itemName = vob.Name;
             else
-                throw new Exception("PxVobItemData -> no usable INSTANCE name found.");
+                throw new Exception("Vob Item -> no usable name found.");
 
             var item = AssetCache.TryGetItemData(itemName);
 
             if (item == null)
                 return null;
-
-            if (item.Visual.EndsWithIgnoreCase(".mms"))
-            {
-                Debug.LogError($"Item {item.Visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
-                return null;
-            }
 
             var prefabInstance = GetPrefab(vob);
             var vobObj = CreateItemMesh(vob, item, prefabInstance);
