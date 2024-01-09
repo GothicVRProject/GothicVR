@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using GVR.Globals;
+using GVR.GothicVR.Scripts.Manager;
 using UnityEngine;
+using ZenKit.Daedalus;
 
 namespace GVR.Npc
 {
@@ -10,10 +15,7 @@ namespace GVR.Npc
             if (!other.CompareTag("Player"))
                 return;
 
-            Debug.Log("Player collission");
-
-            // TODO Call dialog
-
+            DialogHelper.StartDialog(properties);
         }
     }
 }

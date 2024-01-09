@@ -104,7 +104,7 @@ namespace GVR.Creator.Meshes
                 var meshRenderer = meshObj.AddComponent<MeshRenderer>();
 
                 PrepareMeshRenderer(meshRenderer, subMesh.Value);
-                PrepareMeshFilter(meshFilter, subMesh.Value);
+                PrepareMeshFilter(meshFilter, subMesh.Value, false);
                 PrepareMeshCollider(meshObj, meshFilter.mesh, subMesh.Value.Materials);
             }
 
@@ -148,7 +148,7 @@ namespace GVR.Creator.Meshes
             var meshRenderer = rootGo.AddComponent<MeshRenderer>();
 
             PrepareMeshRenderer(meshRenderer, mrm);
-            PrepareMeshFilter(meshFilter, mrm);
+            PrepareMeshFilter(meshFilter, mrm, false);
 
             if (withCollider)
                 PrepareMeshCollider(rootGo, meshFilter.mesh, mrm.Materials);
@@ -218,7 +218,7 @@ namespace GVR.Creator.Meshes
             rend.SetMaterials(finalMaterials);
         }
 
-        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData)
+        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, bool isMorphMesh = false, string morphMeshName = "")
         {
             /*
              * Ok, brace yourself:
@@ -239,6 +239,15 @@ namespace GVR.Creator.Meshes
              *  uvs = [wedge[0].texture], [wedge[2].texture], [wedge[1].texture]
              */
             var mesh = new Mesh();
+
+            if (isMorphMesh)
+            {
+                // MorphMeshes will change the vertices. This call optimizes performance.
+                mesh.MarkDynamic();
+                MorphMeshCache.AddVertexMapping(morphMeshName, mrmData.PositionCount);
+                morphMeshName = MorphMeshCache.GetPreparedKey(morphMeshName); // So we don't need to recalculate every Add() call later.
+            }
+
             meshFilter.mesh = mesh;
             if (null == mrmData)
             {
@@ -254,9 +263,10 @@ namespace GVR.Creator.Meshes
             // 2-dimensional arrays (as there are segregated by submeshes)
             var preparedTriangles = new List<List<int>>(mrmData.SubMeshes.Count);
 
+            var vertices = mrmData.Positions;
+
             foreach (var subMesh in mrmData.SubMeshes)
             {
-                var vertices = mrmData.Positions;
                 var triangles = subMesh.Triangles;
                 var wedges = subMesh.Wedges;
 
@@ -277,6 +287,14 @@ namespace GVR.Creator.Meshes
                     preparedVertices.Add(vertices[index1.Index].ToUnityVector());
                     preparedVertices.Add(vertices[index2.Index].ToUnityVector());
                     preparedVertices.Add(vertices[index3.Index].ToUnityVector());
+
+                    // We add mapping data to later reuse for IMorphAnimation samples
+                    if (isMorphMesh)
+                    {
+                        MorphMeshCache.AddVertexMappingEntry(morphMeshName, index1.Index, preparedVertices.Count - 3);
+                        MorphMeshCache.AddVertexMappingEntry(morphMeshName, index2.Index, preparedVertices.Count - 2);
+                        MorphMeshCache.AddVertexMappingEntry(morphMeshName, index3.Index, preparedVertices.Count - 1);
+                    }
 
                     subMeshTriangles.Add(preparedIndex);
                     subMeshTriangles.Add(preparedIndex + 1);
@@ -299,6 +317,9 @@ namespace GVR.Creator.Meshes
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
+
+            if (isMorphMesh)
+                MorphMeshCache.SetUnityVerticesForVertexMapping(morphMeshName, preparedVertices.ToArray());
         }
 
 

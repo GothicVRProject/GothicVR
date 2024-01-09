@@ -7,10 +7,8 @@ using ZenKit;
 
 namespace GVR.Npc
 {
-    public class AiHandler : MonoBehaviour, IAnimationCallbacks
+    public class AiHandler : BasePlayerBehaviour, IAnimationCallbacks
     {
-        public NpcProperties properties;
-
         private static DaedalusVm vm => GameData.GothicVm;
 
         private void Start()
@@ -70,11 +68,11 @@ namespace GVR.Npc
             
             var symbolLoop = vm.GetSymbolByName($"{routineSymbol.Name}_Loop");
             if (symbolLoop != null)
-                properties.stateLoop = (int)symbolLoop.Index;
+                properties.stateLoop = symbolLoop.Index;
             
             var symbolEnd = vm.GetSymbolByName($"{routineSymbol.Name}_End");
             if (symbolEnd != null)
-                properties.stateEnd = (int)symbolEnd.Index;
+                properties.stateEnd = symbolEnd.Index;
             
             properties.currentLoopState = NpcProperties.LoopState.Start;
             vm.Call(action, properties.npcInstance);

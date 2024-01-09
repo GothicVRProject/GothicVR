@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using AOT;
 using GVR.Caches;
+using GVR.Data;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
@@ -36,6 +39,7 @@ namespace GVR.Manager
             AssetCache.Dispose();
             LookupCache.Dispose();
             PrefabCache.Dispose();
+            MorphMeshCache.Dispose();
         }
 
         private void Update()
@@ -73,6 +77,7 @@ namespace GVR.Manager
             MountVfs(g1Dir);
             SetLanguage();
             LoadGothicVm(g1Dir);
+            LoadDialogs();
             LoadSfxVm(g1Dir);
             LoadPfxVm(g1Dir);
             LoadMusicVv(g1Dir);
@@ -161,6 +166,18 @@ namespace GVR.Manager
             GameData.GothicVm.GlobalHero = hero;
 
             VmGothicExternals.RegisterExternals();
+        }
+
+        /// <summary>
+        /// We load all dialogs once and assign them to the appropriate NPCs once spawned.
+        /// </summary>
+        private static void LoadDialogs()
+        {
+            var infoInstances = GameData.GothicVm.GetInstanceSymbols("C_Info")
+                .Select(symbol => GameData.GothicVm.InitInstance<InfoInstance>(symbol))
+                .ToList();
+
+            infoInstances.ForEach(i => GameData.Dialogs.Instances.Add(i));
         }
 
         private static void LoadSfxVm(string g1Dir)

@@ -242,6 +242,10 @@ namespace GVR.Caches
             return newData;
         }
 
+        /// <summary>
+        /// MMS == MorphMesh
+        /// e.g. face animations during dialogs.
+        /// </summary>
         public static IMorphMesh TryGetMmb(string key)
         {
             var preparedKey = GetPreparedKey(key);

@@ -2164,11 +2164,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7387125324240799344, guid: efebdf03cb1ccd043827e933755e413e, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7387125324240799344, guid: efebdf03cb1ccd043827e933755e413e, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7387125324240799344, guid: efebdf03cb1ccd043827e933755e413e, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -2176,7 +2176,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7387125324240799344, guid: efebdf03cb1ccd043827e933755e413e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -30
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3317,7 +3317,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12af35efb7c45ea4fb4752d0328ebf2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  zenKitLogLevel: 0
   skipMainMenu: 0
   useXRDeviceSimulator: 0
   createWorldMesh: 0
@@ -3344,17 +3343,18 @@ MonoBehaviour:
   spawnAtSpecificFreePoint: 
   drawFreePointMeshes: 0
   drawVobCullingGizmos: 0
+  vobTypeToSpawn: 
   createOcNpcs: 0
   enableNpcRoutines: 0
   npcToSpawn: 
-  showPhoenixDebugMessages: 0
-  showZspyLogs: 0
-  showPhoenixVfsFileNotFoundErrors: 0
-  showMusicLogs: 0
   enableSounds: 0
   enableMusic: 0
   enableSoundCulling: 0
   enableVobParticles: 0
+  zenKitLogLevel: 3
+  showZspyLogs: 1
+  showZenKitVfsFileNotFoundErrors: 0
+  showMusicLogs: 0
 --- !u!114 &464842616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6287,31 +6287,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.675
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.028
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4.251
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9963035
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.085903145
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -6319,22 +6319,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -9.856
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3286136461781483605, guid: 4600f492db92202478d7c53019a519d0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3286136462967229777, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_UIScrollAction.m_Action.m_Id
-      value: b8e47076-a602-4b9e-a65a-738a54033e75
-      objectReference: {fileID: 0}
-    - target: {fileID: 3286136462967229777, guid: 4600f492db92202478d7c53019a519d0, type: 3}
-      propertyPath: m_IsTrackedAction.m_Action.m_Id
-      value: 3179e20d-7870-4f1d-ab63-d0a18a26edc9
+    - target: {fileID: 4690833909368871079, guid: 4600f492db92202478d7c53019a519d0, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 3040809140852676767, guid: 4600f492db92202478d7c53019a519d0, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4600f492db92202478d7c53019a519d0, type: 3}
@@ -9134,7 +9131,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6598815579406187037, guid: 9091ce98b82392b47966b14082b43688, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15654,7 +15651,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animationsDropdown: {fileID: 999036247}
   bloodwynSlotGo: {fileID: 576832278}
-  bloodwynInstanceInstanceId: 6596
+  bloodwynInstanceId: 6596
 --- !u!1001 &1828376156
 PrefabInstance:
   m_ObjectHideFlags: 0

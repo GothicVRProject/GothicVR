@@ -4,6 +4,7 @@ using AOT;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Globals;
+using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using UnityEngine;
 using ZenKit;
@@ -34,7 +35,8 @@ namespace GVR.Vm
             vm.RegisterExternal<int, NpcInstance, string, int>("AI_UseMob", AI_UseMob);
             vm.RegisterExternal<NpcInstance, string>("AI_GoToNextFP", AI_GoToNextFP);
             vm.RegisterExternal<NpcInstance>("AI_DrawWeapon", AI_DrawWeapon);
-
+            vm.RegisterExternal<NpcInstance, NpcInstance, string>("AI_Output", AI_Output);
+            vm.RegisterExternal<NpcInstance>("AI_StopProcessInfos", AI_StopProcessInfos);
 
             // Apply Options
             // Doc
@@ -45,7 +47,11 @@ namespace GVR.Vm
             vm.RegisterExternal<NpcInstance, int>("Hlp_GetNpc", Hlp_GetNpc);
 
             // Info
+            vm.RegisterExternal<int>("Info_ClearChoices", Info_ClearChoices);
+            vm.RegisterExternal<int, string, int>("Info_AddChoice", Info_AddChoice);
+
             // Log
+
             // Model
             vm.RegisterExternal<NpcInstance, string>("Mdl_SetVisual", Mdl_SetVisual);
             vm.RegisterExternal<NpcInstance, string>("Mdl_ApplyOverlayMds", Mdl_ApplyOverlayMds);
@@ -54,7 +60,9 @@ namespace GVR.Vm
             vm.RegisterExternal<NpcInstance, float>("Mdl_SetModelFatness", Mdl_SetModelFatness);
 
             // Mission
+
             // Mob
+
             // NPC
             vm.RegisterExternal<NpcInstance, int, int>("Npc_SetTalentValue", Npc_SetTalentValue);
             vm.RegisterExternal<NpcInstance, int>("CreateInvItem", CreateInvItem);
@@ -85,6 +93,7 @@ namespace GVR.Vm
             vm.RegisterExternal<int, string>("PrintDebugInstCh", PrintDebugInstCh);
 
             // Sound
+
             // Day Routine
             vm.RegisterExternal<NpcInstance, int, int, int, int, int, string>("TA_MIN", TA_MIN);
 
@@ -183,6 +192,16 @@ namespace GVR.Vm
             NpcHelper.ExtAiDrawWeapon(npc);
         }
 
+        public static void AI_Output(NpcInstance self, NpcInstance target, string outputName)
+        {
+            DialogHelper.ExtAiOutput(self, target, outputName);
+        }
+
+        public static void AI_StopProcessInfos(NpcInstance npc)
+        {
+            DialogHelper.ExtAiStopProcessInfos(npc);
+        }
+
         #endregion
 
         #region Apply Options
@@ -239,7 +258,17 @@ namespace GVR.Vm
 
         #region Info
 
-        //
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void Info_ClearChoices(int info)
+        {
+            DialogHelper.ExtInfoClearChoices(info);
+        }
+
+        [MonoPInvokeCallback(typeof(DaedalusVm.ExternalFuncV))]
+        public static void Info_AddChoice(int info, string text, int function)
+        {
+            DialogHelper.ExtInfoAddChoice(info, text, function);
+        }
 
         #endregion
 

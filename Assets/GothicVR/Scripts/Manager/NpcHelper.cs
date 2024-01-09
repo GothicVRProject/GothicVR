@@ -4,8 +4,8 @@ using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
-using GVR.Vm;
 using GVR.Properties;
+using GVR.Vm;
 using UnityEngine;
 using ZenKit.Daedalus;
 
@@ -114,7 +114,6 @@ namespace GVR.Manager
                 return 0;
         }
         
-
         private static GameObject GetNpc(NpcInstance npc)
         {
             return GetProperties(npc).gameObject;

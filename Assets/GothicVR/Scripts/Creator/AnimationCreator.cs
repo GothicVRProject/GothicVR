@@ -3,7 +3,9 @@ using System.IO;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
+using GVR.Npc;
 using GVR.Npc.Actions;
+using GVR.Properties;
 using UnityEngine;
 using ZenKit;
 using Animation = UnityEngine.Animation;
@@ -41,7 +43,33 @@ namespace GVR.Creator
                 animationComp.AddClip(clip, mdsAnimationKeyName);
             }
 
+            animationComp.Stop();
             animationComp.Play(mdsAnimationKeyName);
+        }
+
+        public static void StopAnimation(GameObject go)
+        {
+            var animationComp = go.GetComponent<Animation>();
+
+            // Rewind workaround to actually set NPC to first frame of the animation.
+            // @see: https://forum.unity.com/threads/animation-rewind-not-working.4756/
+            if (!animationComp.isPlaying)
+                return;
+
+            animationComp.Rewind();
+            animationComp.Play();
+            animationComp.Sample();
+            animationComp.Stop();
+        }
+
+        public static void PlayHeadMorphAnimation(NpcProperties props, HeadMorph.HeadMorphType type)
+        {
+            props.headMorph.StartAnimation(props.BodyData.Head, type);
+        }
+
+        public static void StopHeadMorphAnimation(NpcProperties props)
+        {
+            props.headMorph.StopAnimation(props.BodyData.Head);
         }
 
         private static AnimationClip LoadAnimationClip(IModelAnimation pxAnimation, IModelHierarchy mdh, GameObject rootBone, bool repeat, string clipName)
@@ -54,7 +82,7 @@ namespace GVR.Creator
             };
 
             var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.NodeCount);
-            var boneNames = pxAnimation.NodeIndices.Select(nodeIndex => mdh.Nodes[(int)nodeIndex].Name).ToArray();
+            var boneNames = pxAnimation.NodeIndices.Select(nodeIndex => mdh.Nodes[nodeIndex].Name).ToArray();
 
             // Initialize array
             for (var boneId = 0; boneId < boneNames.Length; boneId++)
