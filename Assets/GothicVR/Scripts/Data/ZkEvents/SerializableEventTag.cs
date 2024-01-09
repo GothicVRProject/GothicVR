@@ -11,7 +11,8 @@ namespace GVR.Data.ZkEvents
     {
         public int Frame;
         public EventType Type;
-        public Tuple<string, string> Slots;
+        public string Slot1;
+        public string Slot2;
         public string Item;
         public List<int> Frames;
         public FightMode FightMode;
@@ -21,7 +22,8 @@ namespace GVR.Data.ZkEvents
         {
             Frame = zkEventTag.Frame;
             Type = zkEventTag.Type;
-            Slots = zkEventTag.Slots;
+            Slot1 = zkEventTag.Slots.Item1; // Tuples aren't serialized by JsonUtility. Therefore separating its data now.
+            Slot2 = zkEventTag.Slots.Item2;
             Item = zkEventTag.Item;
             Frames = zkEventTag.Frames;
             FightMode = zkEventTag.FightMode;

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using GVR.Caches;
 using GVR.Creator;
 using GVR.Data.ZkEvents;
@@ -64,7 +65,7 @@ namespace GVR.Npc.Actions.AnimationActions
             switch (data.Type)
             {
                 case EventType.ItemInsert:
-                    InsertItem(data.Slots);
+                    InsertItem(data.Slot1, data.Slot2);
                     break;
                 case EventType.ItemDestroy:
                     DestroyItem();
@@ -78,17 +79,15 @@ namespace GVR.Npc.Actions.AnimationActions
             }
         }
         
-        private void InsertItem(Tuple<string, string> slots)
+        private void InsertItem(string slot1, string slot2)
         {
-            // FIXME - Slots not yet re-implemented.
-            
-            // foreach (var slot in slots)
-            // {
-            //     var slotGo = NpcGo.FindChildRecursively(slot);
-            //     VobCreator.CreateItem(Props.currentItem, slotGo);
-            //
-            //     Props.usedItemSlot = slot;
-            // }
+            if (slot2.Any())
+                throw new Exception("Slot 2 is set but not yet handled by InsertItem as AnimationEvent.");
+
+            var slotGo = NpcGo.FindChildRecursively(slot1);
+            VobCreator.CreateItem(Props.currentItem, slotGo);
+
+            Props.usedItemSlot = slot1;
         }
 
         private void DestroyItem()
