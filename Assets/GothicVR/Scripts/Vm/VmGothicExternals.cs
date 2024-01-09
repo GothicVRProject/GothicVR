@@ -43,7 +43,7 @@ namespace GVR.Vm
             // Helper
             vm.RegisterExternal<int, int>("Hlp_Random", Hlp_Random);
             vm.RegisterExternal<int, string, string>("Hlp_StrCmp", Hlp_StrCmp);
-            // vm.RegisterExternal<int, ItemInstance, int>("Hlp_IsItem", Hlp_IsItem); // Not yet implemented
+            vm.RegisterExternal<int, ItemInstance, int>("Hlp_IsItem", Hlp_IsItem);
             vm.RegisterExternal<NpcInstance, int>("Hlp_GetNpc", Hlp_GetNpc);
 
             // Info
@@ -230,25 +230,11 @@ namespace GVR.Vm
             return (s1 == s2) ? 1 : 0;
         }
 
-        // 
-        // public static int Hlp_IsItem(ItemInstance item, int instanceName)
-        // {
-        // TODO - Needs to be reimplemented.
-        //     var compareItemSymbol = PxVm.pxVmStackPopInt(vmPtr);
-        //     var itemRef = PxVm.pxVmStackPopInstance(vmPtr);
-        //
-        //     var compareItemRef = AssetCache.TryGetItemData((uint)compareItemSymbol);
-        //
-        //     bool result;
-        //     if (compareItemRef == null)
-        //         result = false;
-        //     else
-        //         result = compareItemRef.instancePtr == itemRef;
-        //
-        //     PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(result));
-        // }
+        public static int Hlp_IsItem(ItemInstance item, int itemIndexToCheck)
+        {
+            return Convert.ToInt32(item.Index == itemIndexToCheck);
+        }
 
-        
         public static NpcInstance Hlp_GetNpc(int instanceId)
         {
             return NpcCreator.ExtHlpGetNpc(instanceId);
