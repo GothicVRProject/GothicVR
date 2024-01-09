@@ -6,6 +6,8 @@ using GVR.Extensions;
 using GVR.Globals;
 using GVR.World;
 using UnityEngine;
+using ZenKit;
+using Material = UnityEngine.Material;
 
 namespace GVR.Creator
 {
@@ -14,34 +16,49 @@ namespace GVR.Creator
         public static void Create(GameObject root, WorldData world)
         {
             var waynetObj = new GameObject(string.Format("Waynet"));
+            waynetObj.SetParent(root);
 
-            waynetObj.transform.parent = root.transform;
 
+            SetWayPointCache(world.WayNet);
             CreateWaypoints(waynetObj, world);
-            CreateDijkstraWaypoints(world);
+            CreateDijkstraWaypoints(world.WayNet);
             CreateWaypointEdges(waynetObj, world);
         }
 
-        private static void CreateDijkstraWaypoints(WorldData world)
+        private static void SetWayPointCache(IWayNet wayNet)
         {
-            CreateDijkstraWaypointEntries(world);
+            GameData.WayPoints.Clear();
+
+            foreach (var wp in wayNet.Points)
+            {
+                GameData.WayPoints.Add(wp.Name, new ()
+                {
+                    Name = wp.Name,
+                    Position = wp.Position.ToUnityVector()
+                });
+            }
+        }
+
+        private static void CreateDijkstraWaypoints(IWayNet wayNet)
+        {
+            CreateDijkstraWaypointEntries(wayNet);
             AttachWaypointPositionToDijkstraEntries();
             CalculateDijkstraNeighbourDistances();
         }
 
-        private static void CreateDijkstraWaypointEntries(WorldData world)
+        private static void CreateDijkstraWaypointEntries(IWayNet wayNet)
         {
             Dictionary<string, DijkstraWaypoint> dijkstraWaypoints = new();
-            var wayEdges = world.WayNet.Edges;
-            var wayPoints = world.WayNet.Points;
+            var wayEdges = wayNet.Edges;
+            var wayPoints = wayNet.Points;
 
             // Using LINQ to transform wayEdges into DijkstraWaypoints.
             dijkstraWaypoints = wayEdges.SelectMany(edge => new[]
                 {
                     // For each edge, create two entries: one for each direction of the edge.
                     // 'a' is the source waypoint, 'b' is the destination waypoint.
-                    new { a = wayPoints[(int)edge.A], b = wayPoints[(int)edge.B] },
-                    new { a = wayPoints[(int)edge.B], b = wayPoints[(int)edge.A] }
+                    new { a = wayPoints[edge.A], b = wayPoints[edge.B] },
+                    new { a = wayPoints[edge.B], b = wayPoints[edge.A] }
                 })
                 .GroupBy(x => x.a.Name) // Group the entries by the name of the source waypoint.
                 .ToDictionary(g => g.Key, g => new DijkstraWaypoint(g.Key) // Transform each group into a DijkstraWaypoint.
@@ -79,9 +96,6 @@ namespace GVR.Creator
 
         private static void CreateWaypoints(GameObject parent, WorldData world)
         {
-            if (!FeatureFlags.I.createWaypoints)
-                return;
-
             var waypointsObj = new GameObject(string.Format("Waypoints"));
             waypointsObj.SetParent(parent);
 

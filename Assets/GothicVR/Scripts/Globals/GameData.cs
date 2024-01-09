@@ -20,21 +20,13 @@ namespace GVR.Globals
         public static DaedalusVm SfxVm; // Sound FX
         public static DaedalusVm PfxVm; // Particle FX
         public static DaedalusVm MusicVm;
-        
-        private static WorldData worldInternal;
-        public static WorldData World
-        {
-            get => worldInternal;
-            set
-            {
-                worldInternal = value;
-                if (value != null)
-                    SetWayPointData(value.WayNet.Points);
-            }
-        }
 
+        public static WorldData World;
+
+        // Lookup optimized WayNet data
         public static readonly Dictionary<string, WayPoint> WayPoints = new();
         public static readonly Dictionary<string, FreePoint> FreePoints = new();
+
         // Reorganized waypoints from world data.
         public static Dictionary<string, DijkstraWaypoint> DijkstraWaypoints = new();
         public static readonly List<VobProperties> VobsInteractable = new();
@@ -73,20 +65,6 @@ namespace GVR.Globals
             VobsInteractable.Clear();
         }
 
-
-        private static void SetWayPointData(List<IWayPoint> wayPoints)
-        {
-            WayPoints.Clear();
-            foreach (var wp in wayPoints)
-            {
-                WayPoints.Add(wp.Name, new ()
-                {
-                    Name = wp.Name,
-                    Position = wp.Position.ToUnityVector()
-                });
-            }
-        }
-
         public static void Dispose()
         {
             // Needs to be reset as Unity won't clear static variables when closing game in EditorMode.
@@ -95,6 +73,9 @@ namespace GVR.Globals
             GothicVm = null;
             SfxVm = null;
             MusicVm = null;
+            WayPoints.Clear();
+            FreePoints.Clear();
+            VobsInteractable.Clear();
 
             Dialogs.Dispose();
         }

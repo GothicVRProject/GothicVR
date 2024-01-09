@@ -317,7 +317,6 @@ MonoBehaviour:
   skipMainMenu: 0
   useXRDeviceSimulator: 0
   createWorldMesh: 1
-  createWaypoints: 1
   vobItemsDynamicAttach: 1
   createWayPointMeshes: 0
   createWaypointEdgeMeshes: 0
