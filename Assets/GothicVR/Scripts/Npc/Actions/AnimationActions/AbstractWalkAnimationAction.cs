@@ -72,8 +72,7 @@ namespace GVR.Npc.Actions.AnimationActions
         private void StartWalk()
         {
             var animName = GetWalkModeAnimationString();
-            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
-            AnimationCreator.PlayAnimation(Props.overlayMdsName, animName, mdh, NpcGo, true);
+            AnimationCreator.PlayAnimation(Props.overlayMdsName, animName, Props.overlayMdhName, NpcGo, true);
 
             walkState = WalkState.Walk;
         }

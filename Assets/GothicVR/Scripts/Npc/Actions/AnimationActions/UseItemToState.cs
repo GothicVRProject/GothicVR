@@ -40,24 +40,22 @@ namespace GVR.Npc.Actions.AnimationActions
 
         private void StartItemStateAnimation(int itemAnimationState)
         {
-            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
             var item = AssetCache.TryGetItemData(Action.Int0);
 
             // e.g. T_POTION_STAND_2_S0
             var animationName = string.Format(animationStartScheme, item.SchemeName, itemAnimationState);
             
-            AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, mdh, NpcGo);
+            AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, Props.overlayMdhName, NpcGo);
         }
 
         private void EndItemStateAnimation(int itemAnimationState)
         {
-            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
             var item = AssetCache.TryGetItemData(Action.Int0);
 
             // e.g. T_POTION_S0_2_STAND
             var animationName = string.Format(animationEndScheme, item.SchemeName, itemAnimationState);
             
-            AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, mdh, NpcGo);
+            AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, Props.overlayMdhName, NpcGo);
         }
 
         public override void AnimationEventCallback(SerializableEventTag data)

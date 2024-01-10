@@ -15,20 +15,19 @@ namespace GVR.Creator
 {
     public static class AnimationCreator
     {
-        public static void PlayAnimation(string mdsName, string animationName, IModelHierarchy mdh, GameObject go, bool repeat = false)
+        // FIXME - We need to handle both mds and mdh options! (base vs overlay)
+        public static void PlayAnimation(string mdsName, string animationName, string mdhName, GameObject go, bool repeat = false)
         {
             var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var animationComp = go.GetComponent<Animation>();
-            
+
             var mds = AssetCache.TryGetMds(mdsName);
             var modelAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
+            var mdh = AssetCache.TryGetMdh(mdhName);
             var anim = mds.Animations.First(i => i.Name.EqualsIgnoreCase(animationName));
 
             if (anim.Direction == AnimationDirection.Backward)
-            {
-                Debug.LogError($"Backwards animations not yet handled. Called for >{animationName}< from >{mdsName}<");
-                return;
-            }
+                Debug.LogWarning($"Backwards animations not yet handled. Called for >{animationName}< from >{mdsName}<. Currently playing Forward.");
 
             // Try to load from cache
             if (!LookupCache.AnimationClipCache.TryGetValue(mdsAnimationKeyName, out var clip))

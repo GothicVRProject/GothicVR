@@ -13,6 +13,7 @@ namespace GVR.Npc.Actions.AnimationActions
         private const float RotationSpeed = 0.5f;
 
         private float finalDirectionY;
+        private bool isRotateLeft;
 
         protected AbstractRotateAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
@@ -20,6 +21,31 @@ namespace GVR.Npc.Actions.AnimationActions
         public override void Start()
         {
             finalDirectionY = Props.CurrentWayNetPoint.Direction.y;
+
+            // Already aligned.
+            if (Math.Abs(NpcGo.transform.eulerAngles.y - finalDirectionY) < 1f)
+            {
+                IsFinishedFlag = true;
+                return;
+            }
+
+            AnimationCreator.PlayAnimation(Props.baseMdsName, GetRotateModeAnimationString(), Props.overlayMdhName, NpcGo, true);
+
+            // https://discussions.unity.com/t/determining-whether-to-rotate-left-or-right/44021
+            var cross = Vector3.Cross(Props.CurrentWayNetPoint.Direction, NpcGo.transform.forward);
+            isRotateLeft = (cross.y >= 0);
+        }
+
+        private string GetRotateModeAnimationString()
+        {
+            switch (Props.walkMode)
+            {
+                case VmGothicEnums.WalkMode.Walk:
+                    return (isRotateLeft ? "T_WALKWTURNL" : "T_WALKWTURNR");
+                default:
+                    Debug.LogWarning($"Animation of type {Props.walkMode} not yet implemented.");
+                    return "";
+            }
         }
 
         public override void Tick(Transform transform)
@@ -31,11 +57,18 @@ namespace GVR.Npc.Actions.AnimationActions
 
         private void HandleRotation(Transform npcTransform)
         {
-            npcTransform.eulerAngles += new Vector3(0, finalDirectionY * Time.deltaTime * RotationSpeed, 0); // We ignore y-axis.
+            // We use y-axis only.
+            if (isRotateLeft)
+                npcTransform.eulerAngles -= new Vector3(0, finalDirectionY * Time.deltaTime * RotationSpeed, 0);
+            else
+                npcTransform.eulerAngles += new Vector3(0, finalDirectionY * Time.deltaTime * RotationSpeed, 0);
 
             // Check if rotation is done.
             if (Math.Abs(npcTransform.eulerAngles.y - finalDirectionY) < 1f)
+            {
+                AnimationCreator.StopAnimation(NpcGo);
                 IsFinishedFlag = true;
+            }
         }
     }
 }

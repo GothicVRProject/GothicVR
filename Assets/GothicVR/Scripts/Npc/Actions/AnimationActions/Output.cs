@@ -35,13 +35,11 @@ namespace GVR.Npc.Actions.AnimationActions
             // NPC
             else
             {
-                var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
-
                 var gestureCount = GetDialogGestureCount();
                 var randomId = Random.Range(1, gestureCount+1);
 
                 // FIXME - We need to handle both mds and mdh options! (base vs overlay)
-                AnimationCreator.PlayAnimation(Props.baseMdsName, $"T_DIALOGGESTURE_{randomId:00}", mdh, NpcGo);
+                AnimationCreator.PlayAnimation(Props.baseMdsName, $"T_DIALOGGESTURE_{randomId:00}", Props.overlayMdhName, NpcGo);
                 AnimationCreator.PlayHeadMorphAnimation(Props, HeadMorph.HeadMorphType.Viseme);
 
                 Props.npcSound.PlayOneShot(audioClip);

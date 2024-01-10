@@ -77,8 +77,7 @@ namespace GVR.Npc.Actions.AnimationActions
             // FIXME - Somewhat hardcoded. Needs more love in the future!
             var animName = string.Format(mobUseString, mobVisualName, slotPositionName, "S0", $"S{Action.Int0}");
             
-            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
-            AnimationCreator.PlayAnimation(Props.baseMdsName, animName, mdh, NpcGo);
+            AnimationCreator.PlayAnimation(Props.baseMdsName, animName, Props.overlayMdhName, NpcGo);
         }
 
         private string GetSlotPositionTag(string name)
