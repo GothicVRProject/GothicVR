@@ -1,4 +1,5 @@
-﻿using GVR.Data.ZkEvents;
+﻿using GVR.Creator;
+using GVR.Data.ZkEvents;
 using GVR.Globals;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
@@ -38,23 +39,26 @@ namespace GVR.Npc
             // Queue is empty. Check if we want to start Looping
             if (properties.AnimationQueue.Count == 0)
             {
+                // We always need to set "self" before executing any Daedalus function.
+                vm.GlobalSelf = properties.npcInstance;
+
                 switch (properties.currentLoopState)
                 {
                     case NpcProperties.LoopState.Start:
                         if (properties.stateLoop == 0)
                             return;
                         properties.currentLoopState = NpcProperties.LoopState.Loop;
-                        GameData.GothicVm.Call((int)properties.stateLoop, properties.npcInstance);
+                        vm.Call(properties.stateLoop, properties.npcInstance);
                         break;
                     case NpcProperties.LoopState.Loop:
-                        GameData.GothicVm.Call((int)properties.stateLoop, properties.npcInstance);
+                        vm.Call(properties.stateLoop, properties.npcInstance);
                         break;
                 }
             }
             // Go on
             else
             {
-                Debug.Log($"Start playing {properties.AnimationQueue.Peek().GetType()}");
+                Debug.Log($"Start playing >{properties.AnimationQueue.Peek().GetType()}< on >{properties.gameObject.name}<({properties.npcInstance.Id})");
                 PlayNextAnimation(properties.AnimationQueue.Dequeue());
             }
         }
@@ -76,7 +80,10 @@ namespace GVR.Npc
                 properties.stateEnd = symbolEnd.Index;
             
             properties.currentLoopState = NpcProperties.LoopState.Start;
-            vm.Call(action, properties.npcInstance);
+
+            // We always need to set "self" before executing any Daedalus function.
+            vm.GlobalSelf = properties.npcInstance;
+            vm.Call(action);
         }
 
         /// <summary>
@@ -89,14 +96,18 @@ namespace GVR.Npc
             if (stopCurrentState)
             {
                 properties.currentLoopState = NpcProperties.LoopState.None;
-                // FIXME - Also stop current animation immediately!
+                AnimationCreator.StopAnimation(properties.gameObject);
             }
             else
             {
                 properties.currentLoopState = NpcProperties.LoopState.End;
                 
                 if (properties.stateEnd != 0)
-                    vm.Call(properties.stateEnd, properties.npcInstance);
+                {
+                    // We always need to set "self" before executing any Daedalus function.
+                    vm.GlobalSelf = properties.npcInstance;
+                    vm.Call(properties.stateEnd);
+                }
             }
         }
         

@@ -106,6 +106,7 @@ namespace GVR.Creator
             // e.g. Monsters have no routine and therefore no further routine handling needed.
             if (npcRoutine != 0)
             {
+                // We always need to set "self" before executing any Daedalus function.
                 vm.GlobalSelf = props.npcInstance;
                 vm.Call(npcRoutine);
 

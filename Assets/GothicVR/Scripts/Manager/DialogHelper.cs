@@ -141,6 +141,9 @@ namespace GVR.GothicVR.Scripts.Manager
                     .First(d => d.Information == information);
 
             ControllerManager.I.HideDialog();
+
+            // We always need to set "self" before executing any Daedalus function.
+            GameData.GothicVm.GlobalSelf = npcProperties.npcInstance;
             GameData.GothicVm.Call(information);
 
             // We always want to have a method to get the dialog menu back once all dialog lines are talked.
