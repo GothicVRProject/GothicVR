@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GVR.Caches;
 using GVR.Debugging;
@@ -10,6 +11,7 @@ using GVR.Properties;
 using GVR.Vm;
 using GVR.Vob.WayNet;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 using ZenKit;
 using ZenKit.Daedalus;
 using Object = UnityEngine.Object;
@@ -119,18 +121,17 @@ namespace GVR.Creator
 
         private static void StartRoutine(GameObject npc)
         {
-            var routineComp = npc.GetComponent<Routine>();
-            var firstRoutine = routineComp.routines.First();
+            var startRoutine = npc.GetComponent<Routine>().GetCurrentRoutine();
 
-            npc.GetComponent<AiHandler>().StartRoutine(firstRoutine.action, firstRoutine.waypoint);
+            npc.GetComponent<AiHandler>().StartRoutine(startRoutine.action, startRoutine.waypoint);
         }
         
         private static void SetSpawnPoint(GameObject npcGo, string spawnPoint)
         {
             WayNetPoint initialSpawnPoint;
-            if (npcGo.GetComponent<Routine>().routines.Any())
+            if (npcGo.GetComponent<Routine>().Routines.Any())
             {
-                var routineSpawnPointName = npcGo.GetComponent<Routine>().routines.First().waypoint;
+                var routineSpawnPointName = npcGo.GetComponent<Routine>().GetCurrentRoutine().waypoint;
                 initialSpawnPoint = WayNetHelper.GetWayNetPoint(routineSpawnPointName);
             }
             else
@@ -167,7 +168,7 @@ namespace GVR.Creator
                 waypoint = waypoint
             };
 
-            npc.GetComponent<Routine>().routines.Add(routine);
+            npc.GetComponent<Routine>().Routines.Add(routine);
 
             // Add element if key not yet exists.
             GameData.npcRoutines.TryAdd(npcInstance.Index, new());

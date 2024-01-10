@@ -55,6 +55,10 @@ namespace GVR.Npc.Actions.AnimationActions
             HandleRotation(transform);
         }
 
+        /// <summary>
+        /// Unfortunately it seems that G1 rotation animations have no root motions for the rotation (unlike walking).
+        /// We therefore need to set it manually here.
+        /// </summary>
         private void HandleRotation(Transform npcTransform)
         {
             // We use y-axis only.

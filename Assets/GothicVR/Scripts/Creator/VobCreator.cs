@@ -243,23 +243,6 @@ namespace GVR.Creator
             var nonNullCullingGroupItems = _cullingVobObjects.Where(i => i != null).ToArray();
             VobMeshCullingManager.I.PrepareVobCulling(nonNullCullingGroupItems);
             VobSoundCullingManager.I.PrepareSoundCulling(LookupCache.vobSoundsAndDayTime);
-
-            // TODO - warnings about "not implemented" - print them once only.
-            foreach (var var in new[]{
-                         VirtualObjectType.zCVobScreenFX,
-                         VirtualObjectType.zCVobAnimate,
-                         VirtualObjectType.zCTriggerWorldStart,
-                         VirtualObjectType.zCTriggerList,
-                         VirtualObjectType.oCCSTrigger,
-                         VirtualObjectType.oCTriggerScript,
-                         VirtualObjectType.zCVobLensFlare,
-                         VirtualObjectType.zCVobLight,
-                         VirtualObjectType.zCMoverController,
-                         VirtualObjectType.zCPFXController
-                     })
-            {
-                Debug.LogWarning($"{var} not yet implemented.");
-            }
         }
 
         private static GameObject GetPrefab(IVirtualObject vob)
