@@ -49,7 +49,10 @@ namespace GVR.Npc.Actions.AnimationActions
                 IsFinishedFlag = true;
             }
             else
-                walkState = WalkState.Initial;
+            {
+                // A new waypoint is destination, we therefore rotate NPC again.
+                walkState = WalkState.WalkAndRotate;
+            }
         }
 
         protected override Vector3 GetWalkDestination()
