@@ -42,6 +42,13 @@ namespace GVR.Caches
         private static readonly Dictionary<string, List<Vector3[]>> HeadAnimationMorphs = new();
 
 
+        public static bool IsMappingAlreadyCached(string morphMeshName)
+        {
+            var preparedKey = GetPreparedKey(morphMeshName);
+
+            return HeadVertexMapping.ContainsKey(preparedKey);
+        }
+
         public static void AddVertexMapping(string morphMeshName, int arraySize)
         {
             var preparedKey = GetPreparedKey(morphMeshName);

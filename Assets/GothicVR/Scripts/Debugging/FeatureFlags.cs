@@ -72,7 +72,6 @@ namespace GVR.Debugging
         [Header("__________Debug messages__________")]
         public LogLevel zenKitLogLevel;
         public bool showZspyLogs;
-        public bool showZenKitVfsFileNotFoundErrors;
         public bool showMusicLogs;
 
 

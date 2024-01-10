@@ -97,10 +97,6 @@ namespace GVR.Manager
             switch (level)
             {
                 case LogLevel.Error:
-                    var isVfsMessage = message.ContainsIgnoreCase("failed to find vfs entry");
-                    if (isVfsMessage && !FeatureFlags.I.showZenKitVfsFileNotFoundErrors)
-                        break;
-
                     Debug.LogError(messageString);
                     break;
                 case LogLevel.Warning:

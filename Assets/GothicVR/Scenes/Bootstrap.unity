@@ -349,7 +349,6 @@ MonoBehaviour:
   enableVobParticles: 0
   zenKitLogLevel: 0
   showZspyLogs: 0
-  showZenKitVfsFileNotFoundErrors: 0
   showMusicLogs: 0
 --- !u!1 &394991343
 GameObject:
