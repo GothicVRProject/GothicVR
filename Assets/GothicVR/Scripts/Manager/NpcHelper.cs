@@ -32,7 +32,7 @@ namespace GVR.Manager
             foreach (var fp in freePoints)
             {
                 // Kind of: If we're already standing on a FreePoint, then there is one available.
-                if (props.currentFreePoint == fp)
+                if (props.CurrentWayNetPoint == fp)
                     return true;
                 // Alternatively, we found a free one within range.
                 if (!fp.IsLocked)
@@ -58,7 +58,7 @@ namespace GVR.Manager
             if (fp == null)
                 return false;
             // Ignore if we're already on this FP.
-            else if (fp == props.currentFreePoint)
+            else if (fp == props.CurrentWayNetPoint)
                 return false;
             else if (fp.IsLocked)
                 return false;
@@ -76,7 +76,7 @@ namespace GVR.Manager
         
         public static bool ExtIsNpcOnFp(NpcInstance npc, string vobNamePart)
         {
-            var freePoint = GetProperties(npc).currentFreePoint;
+            var freePoint = GetProperties(npc).CurrentWayNetPoint;
 
             if (freePoint == null)
                 return false;
@@ -172,7 +172,15 @@ namespace GVR.Manager
                 props.gameObject));
         }
 
-        public static void ExtAiAlignToWP(NpcInstance npc)
+        public static void ExtAiAlignToFp(NpcInstance npc)
+        {
+            var props = GetProperties(npc);
+            props.AnimationQueue.Enqueue(new AlignToFp(
+                new(AnimationAction.Type.AIAlignToFp),
+                props.gameObject));
+        }
+
+        public static void ExtAiAlignToWp(NpcInstance npc)
         {
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new AlignToWp(

@@ -567,10 +567,11 @@ namespace GVR.Creator
             vobObj.name = fpName;
             vobObj.SetParent(parentGosTeleport[vob.Type]);
 
-            var freePointData = new FreePoint()
+            var freePointData = new FreePoint
             {
                 Name = fpName,
-                Position = vob.Position.ToUnityVector()
+                Position = vob.Position.ToUnityVector(),
+                Direction = vob.Rotation.ToUnityQuaternion().eulerAngles
             };
             vobObj.GetComponent<VobSpotProperties>().fp = freePointData;
             GameData.FreePoints.Add(fpName, freePointData);

@@ -34,6 +34,7 @@ namespace GVR.Vm
             vm.RegisterExternal<NpcInstance, float>("AI_Wait", AI_Wait);
             vm.RegisterExternal<int, NpcInstance, string, int>("AI_UseMob", AI_UseMob);
             vm.RegisterExternal<NpcInstance, string>("AI_GoToNextFP", AI_GoToNextFP);
+            vm.RegisterExternal<NpcInstance>("AI_AlignToFP", AI_AlignToFP);
             vm.RegisterExternal<NpcInstance>("AI_DrawWeapon", AI_DrawWeapon);
             vm.RegisterExternal<NpcInstance, NpcInstance, string>("AI_Output", AI_Output);
             vm.RegisterExternal<NpcInstance>("AI_StopProcessInfos", AI_StopProcessInfos);
@@ -123,55 +124,51 @@ namespace GVR.Vm
 
         #region AI
 
-        
         public static void AI_StandUp(NpcInstance npc)
         {
             NpcHelper.ExtAiStandUp(npc);
         }
 
-        
         public static void AI_SetWalkMode(NpcInstance npc, int walkMode)
         {
             NpcHelper.ExtAiSetWalkMode(npc, (VmGothicEnums.WalkMode)walkMode);
         }
 
-        
         public static void AI_GotoWP(NpcInstance npc, string wayPointName)
         {
             NpcHelper.ExtAiGotoWP(npc, wayPointName);
         }
 
+        public static void AI_AlignToFP(NpcInstance npc)
+        {
+            NpcHelper.ExtAiAlignToFp(npc);
+        }
         
         public static void AI_AlignToWP(NpcInstance npc)
         {
-            NpcHelper.ExtAiAlignToWP(npc);
+            NpcHelper.ExtAiAlignToWp(npc);
         }
 
-        
         public static void AI_PlayAni(NpcInstance npc, string name)
         {
             NpcHelper.ExtAiPlayAni(npc, name);
         }
 
-        
         public static void AI_StartState(NpcInstance npc, int function, int stateBehaviour, string wayPointName)
         {
             NpcHelper.ExtAiStartState(npc, function, Convert.ToBoolean(stateBehaviour), wayPointName);
         }
 
-        
         public static void AI_UseItemToState(NpcInstance npc, int itemId, int expectedInventoryCount)
         {
             NpcHelper.ExtAiUseItemToState(npc, itemId, expectedInventoryCount);
         }
 
-        
         public static void AI_Wait(NpcInstance npc, float seconds)
         {
             NpcHelper.ExtAiWait(npc, seconds);
         }
 
-        
         public static int AI_UseMob(NpcInstance npc, string target, int state)
         {
             NpcHelper.ExtAiUseMob(npc, target, state);
@@ -180,7 +177,6 @@ namespace GVR.Vm
             return 0;
         }
 
-        
         public static void AI_GoToNextFP(NpcInstance npc, string fpNamePart)
         {
             NpcHelper.ExtAiGoToNextFp(npc, fpNamePart);

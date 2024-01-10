@@ -4,6 +4,8 @@ using GVR.Caches;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
+using GVR.Manager;
+using GVR.Vob.WayNet;
 using GVR.World;
 using UnityEngine;
 using ZenKit;
@@ -31,10 +33,11 @@ namespace GVR.Creator
 
             foreach (var wp in wayNet.Points)
             {
-                GameData.WayPoints.Add(wp.Name, new ()
+                GameData.WayPoints.Add(wp.Name, new Vob.WayNet.WayPoint
                 {
                     Name = wp.Name,
-                    Position = wp.Position.ToUnityVector()
+                    Position = wp.Position.ToUnityVector(),
+                    Direction = wp.Direction.ToUnityVector()
                 });
             }
         }

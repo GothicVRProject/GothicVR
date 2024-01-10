@@ -27,7 +27,7 @@ namespace GVR.Npc.Actions.AnimationActions
             if (coll.gameObject.name != fp.Name)
                 return;
 
-            Props.currentFreePoint = fp;
+            Props.CurrentWayNetPoint = fp;
             fp.IsLocked = true;
 
             var animationComp = NpcGo.GetComponent<Animation>();
