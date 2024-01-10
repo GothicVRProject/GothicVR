@@ -204,9 +204,18 @@ namespace GVR.Manager
                 props.gameObject));
         }
 
-        public static float ExtNpcGetStateTime(NpcInstance npc)
+        /// <summary>
+        /// Daedalus needs an int value.
+        /// </summary>
+        public static int ExtNpcGetStateTime(NpcInstance npc)
         {
-            return GetProperties(npc).stateTime;
+            var props = GetProperties(npc);
+
+            // If there is no active running state, we immediately assume the current routine is running since the start of all beings.
+            if (!props.isStateTimeActive)
+                return int.MaxValue;
+            else
+                return (int)props.stateTime;
         }
 
         public static void ExtNpcSetStateTime(NpcInstance npc, int seconds)
@@ -246,6 +255,9 @@ namespace GVR.Manager
         /// </summary>
         public static int ExtNpcGetDistToNpc(NpcInstance npc1, NpcInstance npc2)
         {
+            if (npc1 == null || npc2 == null)
+                return int.MaxValue;
+
             var npc1Pos = LookupCache.NpcCache[npc1.Index].gameObject.transform.position;
 
             Vector3 npc2Pos;

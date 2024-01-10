@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using AOT;
+using GVR.Caches;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Globals;
@@ -45,6 +46,8 @@ namespace GVR.Vm
             vm.RegisterExternal<int, int>("Hlp_Random", Hlp_Random);
             vm.RegisterExternal<int, string, string>("Hlp_StrCmp", Hlp_StrCmp);
             vm.RegisterExternal<int, ItemInstance, int>("Hlp_IsItem", Hlp_IsItem);
+            vm.RegisterExternal<int, ItemInstance>("Hlp_IsValidItem", Hlp_IsValidItem);
+            vm.RegisterExternal<int, NpcInstance>("Hlp_IsValidNpc", Hlp_IsValidNpc);
             vm.RegisterExternal<NpcInstance, int>("Hlp_GetNpc", Hlp_GetNpc);
 
             // Info
@@ -102,6 +105,7 @@ namespace GVR.Vm
             vm.RegisterExternal<int, string>("Wld_InsertNpc", Wld_InsertNpc);
             vm.RegisterExternal<int, NpcInstance, string>("Wld_IsFPAvailable", Wld_IsFPAvailable);
             vm.RegisterExternal<int, NpcInstance, string>("Wld_IsMobAvailable", Wld_IsMobAvailable);
+            vm.RegisterExternal<int, NpcInstance, int, int, int>("Wld_DetectNpc", Wld_DetectNpc);
             vm.RegisterExternal<int, NpcInstance, int, int, int, int>("Wld_DetectNpcEx", Wld_DetectNpcEx);
             vm.RegisterExternal<int, NpcInstance, string>("Wld_IsNextFPAvailable", Wld_IsNextFPAvailable);
 
@@ -229,6 +233,16 @@ namespace GVR.Vm
         public static int Hlp_IsItem(ItemInstance item, int itemIndexToCheck)
         {
             return Convert.ToInt32(item.Index == itemIndexToCheck);
+        }
+
+        public static int Hlp_IsValidItem(ItemInstance item)
+        {
+            return Convert.ToInt32(item != null);
+        }
+
+        public static int Hlp_IsValidNpc(NpcInstance npc)
+        {
+            return Convert.ToInt32(npc != null);
         }
 
         public static NpcInstance Hlp_GetNpc(int instanceId)
@@ -438,7 +452,7 @@ namespace GVR.Vm
         public static int Npc_GetStateTime(NpcInstance npc)
         {
             var stateTime = NpcHelper.ExtNpcGetStateTime(npc);
-            return (int)stateTime;
+            return stateTime;
         }
 
         
@@ -550,7 +564,11 @@ namespace GVR.Vm
             return Convert.ToInt32(res);
         }
 
-        
+        public static int Wld_DetectNpc(NpcInstance npc, int npcInstance, int aiState, int guild)
+        {
+            return Wld_DetectNpcEx(npc, npcInstance, aiState, guild, 1);
+        }
+
         public static int Wld_DetectNpcEx(NpcInstance npc, int npcInstance, int aiState, int guild, int detectPlayer)
         {
             // Logic from Daedalus mentions, that the player will be ignored if 0. Not "detect" if 1.
