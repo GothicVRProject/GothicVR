@@ -246,7 +246,7 @@ namespace GVR.Creator
         private static GameObject GetPrefab(IVirtualObject vob)
         {
             GameObject go;
-            string name = vob.Name;
+            var name = vob.Name;
             
             switch (vob.Type)
             {
@@ -283,8 +283,8 @@ namespace GVR.Creator
             go.name = name;
             
             // Fill Property data into prefab here
-            // Can also be outsourced to a proper method if it becomes a lot.
-            go.GetComponent<VobProperties>().SetVisual(vob.Name);
+            if (vob.Visual != null)
+                go.GetComponent<VobProperties>().SetVisualScheme(vob.Visual.Name);
             
             return go;
         }
@@ -306,8 +306,8 @@ namespace GVR.Creator
                 case VirtualObjectType.oCMobWheel:
                     var propertiesComponent = go.GetComponent<VobProperties>();
 
-                    if (propertiesComponent)
-                        Debug.LogError($"VobProperties component missing on {go.name}");
+                    if (propertiesComponent == null)
+                        Debug.LogError($"VobProperties component missing on {go.name} ({vob.Type})");
 
                     GameData.VobsInteractable.Add(go.GetComponent<VobProperties>());
                     break;
@@ -818,11 +818,12 @@ namespace GVR.Creator
             if (meshName.IsEmpty())
                 return null;
 
+            var go = GetPrefab(vob);
+
             // MDL
             var mdl = AssetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                var go = GetPrefab(vob);
                 var ret = MeshObjectCreator.CreateVob(meshName, mdl, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), parent, go);
                 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
@@ -837,8 +838,14 @@ namespace GVR.Creator
             var mdm = AssetCache.TryGetMdm(meshName);
             if (mdh != null && mdm != null)
             {
-                return MeshObjectCreator.CreateVob(meshName, mdm, mdh, vob.Position.ToUnityVector(),
-                    vob.Rotation.ToUnityQuaternion(), parent);
+                var ret = MeshObjectCreator.CreateVob(meshName, mdm, mdh, vob.Position.ToUnityVector(),
+                    vob.Rotation.ToUnityQuaternion(), parent, go);
+
+                // A few objects are broken and have no meshes. We need to destroy them immediately again.
+                if (ret == null)
+                    GameObject.Destroy(go);
+
+                return ret;
             }
 
             // MRM
@@ -848,7 +855,6 @@ namespace GVR.Creator
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.CdDynamic;
 
-                var go = GetPrefab(vob);
                 var ret = MeshObjectCreator.CreateVob(meshName, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), withCollider, parent, go);
 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.

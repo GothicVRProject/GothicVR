@@ -12,7 +12,7 @@ namespace GVR.Npc.Actions.AnimationActions
 {
     public class UseMob : AbstractWalkAnimationAction
     {
-        private const string mobUseString = "T_{0}_{1}_{2}_2_{3}";
+        private const string mobUseString = "T_{0}{1}{2}_2_{3}";
         private GameObject mobGo;
         private GameObject slotGo;
         private Vector3 destination;
@@ -31,6 +31,7 @@ namespace GVR.Npc.Actions.AnimationActions
 
             mobGo = mob;
             slotGo = slotPos;
+            destination = slotGo.transform.position;
         }
 
         [CanBeNull]
@@ -51,8 +52,7 @@ namespace GVR.Npc.Actions.AnimationActions
 
             return slotPos;
         }
-        
-        
+
         public override void OnCollisionEnter(Collision collision)
         {
             if (walkState != WalkState.Walk)
@@ -65,29 +65,30 @@ namespace GVR.Npc.Actions.AnimationActions
             if (expectedGo == null)
                 return;
 
-            walkState = WalkState.Done;
+
+            AnimationCreator.StopAnimation(NpcGo);
             Props.bodyState = VmGothicEnums.BodyState.BS_MOBINTERACT;
-            
-            NpcGo.transform.position = mobGo.transform.position;
-            NpcGo.transform.rotation = mobGo.transform.rotation;
+
+            NpcGo.transform.SetPositionAndRotation(slotGo.transform.position, slotGo.transform.rotation);
 
             var mobVisualName = mobGo.GetComponent<VobProperties>().visualScheme;
             var slotPositionName = GetSlotPositionTag(slotGo.name);
-            
+
             // FIXME - Somewhat hardcoded. Needs more love in the future!
             var animName = string.Format(mobUseString, mobVisualName, slotPositionName, "S0", $"S{Action.Int0}");
-            
+
             AnimationCreator.PlayAnimation(Props.baseMdsName, animName, Props.overlayMdhName, NpcGo);
+            walkState = WalkState.Done;
         }
 
         private string GetSlotPositionTag(string name)
         {
             if (name.EndsWithIgnoreCase("_FRONT"))
-                return "FRONT";
+                return "_FRONT_";
             else if (name.EndsWithIgnoreCase("_BACK"))
-                return "BACK";
+                return "_BACK_";
             else
-                return "";
+                return "_";
         }
 
         protected override Vector3 GetWalkDestination()

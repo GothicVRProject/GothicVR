@@ -33,6 +33,7 @@ namespace GVR.Npc
             if (properties.isStateTimeActive)
                 properties.stateTime += Time.deltaTime;
 
+            // If we're not yet done, we won't handle further tasks (like dequeuing another Action)
             if (!properties.currentAction.IsFinished())
                 return;
             
