@@ -85,11 +85,8 @@ Shader "Unlit/SkyboxWithHorizonFog"
             fixed4 _Color, _Color2;
             fixed4 _FogColor, _FogColor2;
             float _Alpha1, _Alpha2, _Alpha3, _Alpha4;
-            float _FogCutoff, _Blend; // Add this line
-            float2 _Vector1;
-            float2 _Vector2;
-            float2 _Vector3;
-            float2 _Vector4;
+            float _FogCutoff, _Blend;
+            float2 _Vector1, _Vector2, _Vector3, _Vector4;
 
             v2f vert(appdata v)
             {
@@ -113,20 +110,20 @@ Shader "Unlit/SkyboxWithHorizonFog"
                 // uv for the sky
                 float2 skyUV = i.worldPos.xz / i.worldPos.y;
 
-                // skyUV = float2(skyUV.y, -skyUV.x) * 0.25; // 90 degrees rotation
-
                 float2 skyUV1 = skyUV + _Vector1.xy * _Time.x;
                 float2 skyUV2 = skyUV + _Vector2.xy * _Time.x;
+                float2 skyUV3 = skyUV + _Vector3.xy * _Time.x;
+                float2 skyUV4 = skyUV + _Vector4.xy * _Time.x;
 
                 //stars 1st layer
-                float3 stars1 = lerp(tex2D(_Sky1, skyUV1) * _Alpha1, tex2D(_Sky3, skyUV1) * _Alpha3, _Blend);
+                float3 stars1 = lerp(tex2D(_Sky1, skyUV1) * _Alpha1, tex2D(_Sky3, skyUV3) * _Alpha3, _Blend);
                 //stars 2nd layer
-                float3 stars2 = lerp(tex2D(_Sky2, skyUV2) * _Alpha2, tex2D(_Sky4, skyUV2) * _Alpha4, _Blend);
+                float3 stars2 = lerp(tex2D(_Sky2, skyUV2) * _Alpha2, tex2D(_Sky4, skyUV4) * _Alpha4, _Blend);
 
                 if (i.worldPos.y < 0)
                 {
                     stars1 = lerp(_Color, _Color2, _Blend);
-                    stars2 = lerp(_Color, _Color2, _Blend); //DAYTIME - _DayBottomColor
+                    stars2 = lerp(_Color, _Color2, _Blend); 
                 }
 
                 float3 combined = stars1 + stars2;
