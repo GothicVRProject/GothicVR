@@ -322,6 +322,7 @@ MonoBehaviour:
   createWayPointMeshes: 0
   createWaypointEdgeMeshes: 0
   enableDayTime: 1
+  TimeMultiplier: 1
   sunMovementPerformanceValue: 1
   startHour: 8
   startMinute: 0

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GVR.Util;
 using UnityEngine;
@@ -33,6 +33,8 @@ namespace GVR.Debugging
 
         [Header("__________DayTime__________")]
         public bool enableDayTime;
+        
+        [Range(0.5f, 300f)] public float TimeMultiplier;
         public SunMovementPerformance sunMovementPerformanceValue;
         [Range(0, 23)] public int startHour;
         [Range(0, 59)] public int startMinute;

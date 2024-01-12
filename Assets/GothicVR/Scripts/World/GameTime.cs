@@ -10,7 +10,7 @@ namespace GVR.World
     public class GameTime : SingletonBehaviour<GameTime>
     {
         public static readonly DateTime MIN_TIME = new(1, 1, 1, 0, 0, 0);
-        public static readonly DateTime MAX_TIME = new(1, 1, 1, 23, 59, 59);
+        public static readonly DateTime MAX_TIME = new(9999, 12, 31, 23, 59, 59);
 
         private int secondsInMinute = 0;
         private int minutesInHour = 0;
@@ -66,7 +66,7 @@ namespace GVR.World
 
                 GvrEvents.GameTimeSecondChangeCallback.Invoke(time);
                 RaiseMinuteAndHourEvent();
-                yield return new WaitForSeconds(ONE_INGAME_SECOND);
+                yield return new WaitForSeconds(ONE_INGAME_SECOND / FeatureFlags.I.TimeMultiplier);
             }
         }
         private void RaiseMinuteAndHourEvent()
