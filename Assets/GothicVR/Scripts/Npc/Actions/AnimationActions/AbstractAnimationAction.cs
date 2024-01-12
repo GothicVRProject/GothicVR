@@ -44,7 +44,7 @@ namespace GVR.Npc.Actions.AnimationActions
             if (data.Type == EventType.TorchInventory)
                 return;
             
-            Debug.LogError($"Animation for {Action.ActionType} is not yet implemented.");
+            Debug.LogError($"Animation >{data.Type}< for >{Action.ActionType}< is not yet implemented.");
         }
         
         /// <summary>

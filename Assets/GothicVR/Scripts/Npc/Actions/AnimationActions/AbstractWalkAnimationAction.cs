@@ -48,7 +48,7 @@ namespace GVR.Npc.Actions.AnimationActions
                     return;
                 case WalkState.WalkAndRotate:
                     HandleRotation(transform, GetWalkDestination(), true);
-                    break;
+                    return;
                 case WalkState.Done:
                     return; // NOP
                 default:

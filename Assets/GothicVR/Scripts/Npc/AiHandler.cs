@@ -82,6 +82,11 @@ namespace GVR.Npc
             
             properties.currentLoopState = NpcProperties.LoopState.Start;
 
+            // We need to properly start state time as e.g. ZS_Cook won't call AI_StartState() or Npc_SetStateTime()
+            // But it's required as it checks immediately how long the Cauldron is already been whirled.
+            properties.isStateTimeActive = true;
+            properties.stateTime = 0;
+
             // We always need to set "self" before executing any Daedalus function.
             vm.GlobalSelf = properties.npcInstance;
             vm.Call(action);

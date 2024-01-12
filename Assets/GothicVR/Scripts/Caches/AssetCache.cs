@@ -8,6 +8,7 @@ using GVR.Extensions;
 using GVR.Globals;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using ZenKit;
 using ZenKit.Daedalus;
 using Font = ZenKit.Font;
@@ -138,7 +139,17 @@ namespace GVR.Caches
             if (AnimCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = new ModelAnimation(GameData.Vfs, $"{preparedKey}.man").Cache();
+            IModelAnimation newData;
+            try
+            {
+                newData = new ModelAnimation(GameData.Vfs, $"{preparedKey}.man").Cache();
+            }
+            catch (Exception)
+            {
+                Debug.LogError($"Animation couldn't be loaded for: MDS: >{preparedMdsKey}<, Animation: {preparedAnimKey}");
+                throw;
+            }
+
             AnimCache[preparedKey] = newData;
 
             return newData;
