@@ -30,6 +30,25 @@ namespace GVR.Extensions
             return vector / 100;
         }
 
+        public static UnityEngine.Color ToUnityColor(this Vector3 vector3)
+        {
+            return new UnityEngine.Color()
+            {
+                r = vector3.X,
+                g = vector3.Y,
+                b = vector3.Z
+            };
+        }
+
+        public static UnityEngine.Color ToUnityColor(this UnityEngine.Vector3 vector3)
+        {
+            return new UnityEngine.Color()
+            {
+                r = vector3.x,
+                g = vector3.y,
+                b = vector3.z
+            };
+        }
 
         public static UnityEngine.Vector3[] ToUnityArray(this Vector3[] array)
         {

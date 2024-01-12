@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Globals;
+using GVR.GothicVR.Scripts.Manager;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -159,6 +160,7 @@ namespace GVR.Manager
 
         private void HideLoadingScene()
         {
+            SkyManager.I.InitSky();
             SceneManager.UnloadSceneAsync(Constants.SceneLoading);
 
             LoadingManager.I.ResetProgress();

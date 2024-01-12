@@ -172,9 +172,6 @@ namespace GVR.Creator
                 teleportationArea.interactionManager = interactionManager;
             }
 
-            // TODO - For some reason the referenced skybox in scene is reset to default once game starts.
-            // We therefore need to reset it now again.
-            RenderSettings.skybox = TextureManager.I.skyMaterial;
         }
         
 #if UNITY_EDITOR

@@ -88,5 +88,38 @@ namespace GVR.World
                 GvrEvents.GameTimeHourChangeCallback.Invoke(time);
             }
         }
+
+        public bool IsDay()
+        {
+            // 6:30 - 18:30
+            TimeSpan startOfDay = new TimeSpan(6, 30, 0);
+            TimeSpan endOfDay = new TimeSpan(18, 30, 0);
+
+            TimeSpan currentTime = time.TimeOfDay;
+
+            return currentTime >= startOfDay && currentTime <= endOfDay;
+        }
+
+        public float GetSkyTime()
+        {
+            TimeSpan currentTime = time.TimeOfDay;
+
+            double totalSecondsInADay = 24 * 60 * 60;
+
+            double secondsPassedSinceNoon;
+            if (currentTime < TimeSpan.FromHours(12))
+            {
+                secondsPassedSinceNoon = currentTime.TotalSeconds + 12 * 60 * 60;
+            }
+            else
+            {
+                secondsPassedSinceNoon = currentTime.TotalSeconds - 12 * 60 * 60;
+            }
+
+            // Calculate sky time as a float between 0 and 1
+            float skyTime = (float)(secondsPassedSinceNoon / totalSecondsInADay);
+
+            return skyTime;
+        }
     }
 }
