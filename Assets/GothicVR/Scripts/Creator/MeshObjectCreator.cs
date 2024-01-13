@@ -18,6 +18,7 @@ namespace GVR.Creator
     {
         private static readonly NpcMeshCreator NpcMeshCreator = new();
         private static readonly VobMeshCreator VobMeshCreator = new();
+        private static readonly MeshCreator MeshCreator = new();
 
         public static GameObject CreateNpc(string npcName, string mdmName, string mdhName,
             VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
@@ -52,6 +53,12 @@ namespace GVR.Creator
         public static GameObject CreateVobDecal(IVirtualObject vob, VisualDecal decal, GameObject parent)
         {
             return VobMeshCreator.CreateVobDecal(vob, decal, parent);
+        }
+        
+        public static GameObject CreateBarrier(string objectName, IMesh mesh, Vector3 position, Quaternion rotation,
+            GameObject parent = null)
+        {
+            return MeshCreator.Create(objectName, mesh, position, rotation,true, parent);
         }
     }
 }

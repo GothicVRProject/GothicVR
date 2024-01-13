@@ -1,0 +1,150 @@
+using System.Collections.Generic;
+using GVR.Extensions;
+using GVR.World;
+using UnityEngine;
+using ZenKit;
+using Material = UnityEngine.Material;
+using Mesh = UnityEngine.Mesh;
+
+namespace GVR.Creator.Meshes
+{
+    public class MeshCreator : AbstractMeshCreator
+    {
+        private static readonly MeshCreator Self = new();
+
+        public static GameObject Create(string objectName, IMesh msh, Vector3 position, Quaternion rotation,
+            bool isBarrier = false,
+            GameObject parent = null, GameObject rootGo = null)
+        {
+            rootGo ??= new GameObject();
+            rootGo.name = objectName;
+            rootGo.SetParent(parent);
+
+            var subMeshesData = new Dictionary<int, WorldData.SubMeshData>();
+            for (int i = 0; i < msh.MaterialCount; i++)
+            {
+                subMeshesData[i] = new WorldData.SubMeshData { Material = msh.Materials[i] };
+            }
+
+            foreach (var polygon in msh.Polygons)
+            {
+                var submesh = subMeshesData[polygon.MaterialIndex];
+                // As we always use element 0 and i+1, we skip it in the loop.
+                for (var i = 1; i < polygon.PositionIndices.Count - 1; i++)
+                {
+                    // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
+                    AddEntry(msh.Positions, msh.Features, polygon, submesh, 0);
+                    AddEntry(msh.Positions, msh.Features, polygon, submesh, i);
+                    AddEntry(msh.Positions, msh.Features, polygon, submesh, i + 1);
+                }
+            }
+
+            // To have easier to read code above, we reverse the arrays now at the end.
+            foreach (var subMesh in subMeshesData)
+            {
+                subMesh.Value.Vertices.Reverse();
+                subMesh.Value.Uvs.Reverse();
+                subMesh.Value.Normals.Reverse();
+            }
+
+            foreach (var subMesh in subMeshesData.Values)
+            {
+                // No texture to add.
+                // For G1 this is: material.name == [KEINE, KEINETEXTUREN, DEFAULT, BRETT2, BRETT1, SUMPFWAASER, S:PSIT01_ABODEN]
+                // Removing these removes tiny slices of walls on the ground. If anyone finds them, I owe them a beer. ;-)
+                if (subMesh.Material.Texture.IsEmpty() || subMesh.Triangles.IsEmpty())
+                    continue;
+
+                var subMeshObj = new GameObject()
+                {
+                    name = subMesh.Material.Name,
+                    isStatic = true
+                };
+
+                subMeshObj.SetParent(rootGo);
+
+                var meshFilter = subMeshObj.AddComponent<MeshFilter>();
+                var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
+
+                Self.PrepareMeshRenderer(meshRenderer, subMesh, isBarrier);
+                Self.PrepareMeshFilter(meshFilter, subMesh);
+            }
+
+            return rootGo;
+        }
+
+        protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh, bool isBarier = false)
+        {
+            var bMaterial = subMesh.Material;
+
+            Texture2D texture;
+
+            if (isBarier)
+                texture = GetTexture("Barriere");
+            else
+                texture = GetTexture(bMaterial.Texture);
+
+            if (null == texture)
+            {
+                if (bMaterial.Texture.EndsWithIgnoreCase(".TGA"))
+                    Debug.LogError($"This is supposed to be a decal: ${bMaterial.Texture}");
+                else
+                    Debug.LogError($"Couldn't get texture from name: {bMaterial.Texture}");
+            }
+
+            Material material;
+            switch (subMesh.Material.Group)
+            {
+                case MaterialGroup.Water:
+                    material = GetWaterMaterial(subMesh.Material);
+                    break;
+                default:
+                    material = new Material(Shader.Find("Unlit/Barrier"));
+                    break;
+            }
+
+            // No texture to add.
+            if (bMaterial.Texture.IsEmpty())
+            {
+                Debug.LogWarning($"No texture was set for: {bMaterial.Name}");
+                return;
+            }
+
+            material.mainTexture = texture;
+
+            var material2 = new Material(material);
+
+
+            rend.materials = new[] { material, material2 };
+        }
+
+        private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
+        {
+            var mesh = new Mesh();
+            meshFilter.sharedMesh = mesh;
+
+            if (subMesh.Triangles.Count % 3 != 0)
+                Debug.LogError("Triangle count is not a multiple of 3");
+
+            mesh.SetVertices(subMesh.Vertices);
+            mesh.SetTriangles(subMesh.Triangles, 0);
+            mesh.SetUVs(0, subMesh.Uvs);
+        }
+
+        private static void AddEntry(List<System.Numerics.Vector3> zkPositions, List<Vertex> features, IPolygon polygon,
+            WorldData.SubMeshData currentSubMesh, int index)
+        {
+            // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
+            var positionIndex = polygon.PositionIndices[index];
+            currentSubMesh.Vertices.Add(zkPositions[(int)positionIndex].ToUnityVector());
+
+            // This triangle (index where Vector 3 lies inside vertices, points to the newly added vertex (Vector3) as we don't reuse vertices.
+            currentSubMesh.Triangles.Add(currentSubMesh.Vertices.Count - 1);
+
+            var featureIndex = polygon.FeatureIndices[index];
+            var feature = features[(int)featureIndex];
+            currentSubMesh.Uvs.Add(feature.Texture.ToUnityVector());
+            currentSubMesh.Normals.Add(feature.Normal.ToUnityVector());
+        }
+    }
+}

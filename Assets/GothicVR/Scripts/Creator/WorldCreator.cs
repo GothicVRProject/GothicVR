@@ -7,6 +7,7 @@ using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
+using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.World;
 using UnityEngine;
@@ -48,6 +49,11 @@ namespace GVR.Creator
     
             if (FeatureFlags.I.createVobs)
                 await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, Constants.VObPerFrame);
+            
+            if (FeatureFlags.I.Barrier)
+            {
+                BarrierManager.I.CreateBarrier();
+            }
     
             WaynetCreator.Create(worldGo, world);
             
