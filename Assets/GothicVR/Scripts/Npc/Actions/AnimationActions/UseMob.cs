@@ -75,16 +75,12 @@ namespace GVR.Npc.Actions.AnimationActions
             return slotPos;
         }
 
-        public override void OnCollisionEnter(Collision collision)
+        public override void OnTriggerEnter(Collider coll)
         {
             if (walkState != WalkState.Walk)
                 return;
 
-            var expectedGo = collision.contacts
-                .Select(i => i.otherCollider.gameObject)
-                .FirstOrDefault(i => i == slotGo);
-
-            if (expectedGo == null)
+            if (coll.gameObject != slotGo)
                 return;
 
             StartMobUseAnimation();

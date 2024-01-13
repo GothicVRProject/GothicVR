@@ -95,9 +95,7 @@ namespace GVR.Creator.Meshes
                 // Used for event triggers with NPCs.
                 var coll = child.AddComponent<SphereCollider>();
 
-                // These two settings worked as trigger for a RigidBody without physical collision detection/movement stopping.
-                coll.isTrigger = false;
-                coll.providesContacts = true;
+                coll.isTrigger = true;
             }
         }
     }
