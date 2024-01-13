@@ -283,8 +283,7 @@ namespace GVR.Creator
             go.name = name;
             
             // Fill Property data into prefab here
-            if (vob.Visual != null)
-                go.GetComponent<VobProperties>().SetVisualScheme(vob.Visual.Name);
+            go.GetComponent<VobProperties>().SetData(vob);
             
             return go;
         }
@@ -345,11 +344,18 @@ namespace GVR.Creator
         /// <summary>
         /// Render item inside GameObject
         /// </summary>
-        public static GameObject CreateItem(int itemId, GameObject go)
+        public static void CreateItem(int itemId, GameObject go)
         {
             var item = AssetCache.TryGetItemData(itemId);
 
-            return CreateItemMesh(item, go);
+            CreateItemMesh(item, go);
+        }
+        
+        public static void CreateItem(string itemName, GameObject go)
+        {
+            var item = AssetCache.TryGetItemData(itemName);
+
+            CreateItemMesh(item, go);
         }
         
         [CanBeNull]

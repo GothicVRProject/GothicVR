@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GVR.Creator;
 using GVR.Extensions;
@@ -6,6 +7,8 @@ using GVR.Properties;
 using GVR.Vm;
 using JetBrains.Annotations;
 using UnityEngine;
+using ZenKit.Vobs;
+using EventType = ZenKit.EventType;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
@@ -132,9 +135,13 @@ namespace GVR.Npc.Actions.AnimationActions
             // Mobsi isn't in use any longer
             if (Props.currentInteractableStateId == -1)
             {
+                // e.g. Cauldron cooking doesn't call it automatically. We therefore need to force remove the whirling item from hand.
+                AnimationEventCallback(new() { Type = EventType.ItemDestroy });
+
                 Props.currentInteractable = null;
                 Props.currentInteractableSlot = null;
                 Props.bodyState = VmGothicEnums.BodyState.BS_STAND;
+
             }
             // Loop Mobsi animation until the same UseMob with -1 is called.
             else
@@ -188,6 +195,18 @@ namespace GVR.Npc.Actions.AnimationActions
             var animName = string.Format(MobTransitionAnimationString, mobVisualName, slotPositionName, from, to);
 
             AnimationCreator.PlayAnimation(Props.baseMdsName, animName, Props.overlayMdhName, NpcGo);
+        }
+        
+        protected override void InsertItem(string slot1, string slot2)
+        {
+            if (slot2.Any())
+                throw new Exception("Slot 2 is set but not yet handled by InsertItem as AnimationEvent.");
+
+            var slotGo = NpcGo.FindChildRecursively(slot1);
+            var item = ((InteractiveObject)mobGo.GetComponent<VobProperties>().Properties).Item;
+            VobCreator.CreateItem(item, slotGo);
+
+            Props.usedItemSlot = slot1;
         }
     }
 }

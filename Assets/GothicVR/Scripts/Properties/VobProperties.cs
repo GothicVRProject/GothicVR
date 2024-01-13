@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using ZenKit.Vobs;
 
 namespace GVR.Properties
 {
@@ -12,10 +13,14 @@ namespace GVR.Properties
         [field: SerializeField]
         public string visualScheme { get; private set; }
 
-        
-        public void SetVisualScheme(string visualName)
+        public IVirtualObject Properties;
+
+        public void SetData(IVirtualObject data)
         {
-            visualScheme = visualName.Split('_').First(); // e.g. BED_1_OC.ASC => BED
+            Properties = data;
+            
+            if (data.Visual != null)
+                visualScheme = data.Visual.Name.Split('_').First(); // e.g. BED_1_OC.ASC => BED
         }
     }
 }

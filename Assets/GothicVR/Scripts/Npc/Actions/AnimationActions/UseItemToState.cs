@@ -1,12 +1,6 @@
-using System;
-using System.Linq;
 using GVR.Caches;
 using GVR.Creator;
-using GVR.Data.ZkEvents;
-using GVR.Extensions;
 using UnityEngine;
-using EventType = ZenKit.EventType;
-using Object = UnityEngine.Object;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
@@ -56,45 +50,6 @@ namespace GVR.Npc.Actions.AnimationActions
             var animationName = string.Format(animationEndScheme, item.SchemeName, itemAnimationState);
             
             AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, Props.overlayMdhName, NpcGo);
-        }
-
-        public override void AnimationEventCallback(SerializableEventTag data)
-        {
-            switch (data.Type)
-            {
-                case EventType.ItemInsert:
-                    InsertItem(data.Slot1, data.Slot2);
-                    break;
-                case EventType.ItemDestroy:
-                    DestroyItem();
-                    break;
-                case EventType.TorchInventory:
-                    Debug.Log("PxEventTagType.inventory_torch: I assume this means: if torch is in inventory, then put it out. But not really sure. Need a NPC with real usage of it to predict right.");
-                    break;
-                default:
-                    Debug.LogWarning($"PxEventTagData.type {data.Type} not yet supported.");
-                    break;
-            }
-        }
-        
-        private void InsertItem(string slot1, string slot2)
-        {
-            if (slot2.Any())
-                throw new Exception("Slot 2 is set but not yet handled by InsertItem as AnimationEvent.");
-
-            var slotGo = NpcGo.FindChildRecursively(slot1);
-            VobCreator.CreateItem(Props.currentItem, slotGo);
-
-            Props.usedItemSlot = slot1;
-        }
-
-        private void DestroyItem()
-        {
-            // FIXME - This is called to late. Feels like the animation for T_*_S0_2_Stand is glued with another.
-            // FIXME - So that frame y is more like frame x+y, where y is the frames count from previous call.
-            var slotGo = NpcGo.FindChildRecursively(Props.usedItemSlot);
-            var item = slotGo!.transform.GetChild(0);
-            Object.Destroy(item.gameObject);
         }
     }
 }

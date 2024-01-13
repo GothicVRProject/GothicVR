@@ -18,6 +18,9 @@ namespace GVR.Data.ZkEvents
         public FightMode FightMode;
         public bool Attached;
 
+        public SerializableEventTag()
+        { }
+        
         public SerializableEventTag(IEventTag zkEventTag)
         {
             Frame = zkEventTag.Frame;
