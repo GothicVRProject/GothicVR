@@ -27,6 +27,8 @@ namespace GVR.Debugging
         [Tooltip("True will render all pickables with dynamic attach points")]
         public bool vobItemsDynamicAttach;
 
+        public bool Barrier;
+
         [Header("__________World - Developer__________")]
         public bool createWayPointMeshes;
         public bool createWaypointEdgeMeshes;
