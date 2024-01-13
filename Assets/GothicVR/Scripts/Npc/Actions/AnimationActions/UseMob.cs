@@ -1,13 +1,11 @@
 using System.Linq;
-using GVR.Caches;
 using GVR.Creator;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
-using GVR.Vm;
 using GVR.Properties;
+using GVR.Vm;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.SubsystemsImplementation;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
@@ -19,6 +17,7 @@ namespace GVR.Npc.Actions.AnimationActions
         private GameObject slotGo;
         private Vector3 destination;
 
+        private bool isStopUsingMob => Action.Int0 <= -1;
 
         public UseMob(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
@@ -149,28 +148,40 @@ namespace GVR.Npc.Actions.AnimationActions
 
         private void UpdateState()
         {
-            var newStateAddition = Props.currentInteractableStateId > Action.Int0 ? -1 : +1;
-            Props.currentInteractableStateId += newStateAddition;
+            // FIXME - We need to check. For Cauldron/Cook we have only t_s0_2_Stand, but not t_s1_2_s0 - But is it for all of them?
+            if (isStopUsingMob)
+            {
+                Props.currentInteractableStateId = -1;
+            }
+            else
+            {
+                var newStateAddition = Props.currentInteractableStateId > Action.Int0 ? -1 : +1;
+                Props.currentInteractableStateId += newStateAddition;
+            }
         }
 
         private void PlayTransitionAnimation()
         {
-            var nextStepChange = Props.currentInteractableStateId < Action.Int0 ? +1 : -1;
+            string from;
+            string to;
 
-            var from = Props.currentInteractableStateId.ToString();
-            var to = (Props.currentInteractableStateId + nextStepChange).ToString();
-
-            from = from switch
+            // FIXME - We need to check. For Cauldron/Cook we have only t_s0_2_Stand, but not t_s1_2_s0 - But is it for all of them?
+            if (isStopUsingMob)
             {
-                "-1" => "Stand",
-                _ => $"S{from}"
-            };
-
-            to = to switch
+                from = "S0";
+                to = "Stand";
+            }
+            else
             {
-                "-1" => "Stand",
-                _ => $"S{to}"
-            };
+                from = Props.currentInteractableStateId.ToString();
+                to = $"S{Props.currentInteractableStateId + 1}";
+
+                from = from switch
+                {
+                    "-1" => "Stand",
+                    _ => $"S{from}"
+                };
+            }
 
             var mobVisualName = mobGo.GetComponent<VobProperties>().visualScheme;
             var slotPositionName = GetSlotPositionTag(slotGo.name);
