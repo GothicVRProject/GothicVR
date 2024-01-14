@@ -25,7 +25,7 @@ namespace GVR.Creator.Meshes
             var meshColors = new List<Color>();
 
             float maxSkyY = msh.BoundingBox.Max.Y; // Assuming AxisAlignedBoundingBox has Min and Max as Vector3
-            float minSkyY = maxSkyY * 0.925f;
+            float minSkyY = maxSkyY * 0.96f;
 
             var subMeshesData = new Dictionary<int, WorldData.SubMeshData>();
             for (int i = 0; i < msh.MaterialCount; i++)
@@ -46,11 +46,11 @@ namespace GVR.Creator.Meshes
 
                     if (vertY > minSkyY)
                     {
-                        alpha = (int)(255.0f * (maxSkyY - vertY) / (maxSkyY - minSkyY));
+                        alpha = (int)(255.0f * 1 / (vertY / 8500.0f));
                     }
                     else
                     {
-                        alpha = (int)(255.0f * (vertY / 8000.0f));
+                        alpha = (int)(255.0f * 1 / (vertY / 13500.0f));
                     }
 
                     alpha = Math.Clamp(alpha, 0, 255);
