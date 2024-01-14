@@ -62,16 +62,20 @@ Shader "Unlit/Barrier"
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
+                o.color = v.color;
+
                 return o;
             }
 
             fixed4 frag(v2f i) : SV_Target
             {
-                // Sample the texture
                 fixed4 texColor = tex2D(_MainTex, i.uv);
-                return texColor;
+                return texColor * i.color.a;
+                float alpha = texColor.a * i.color.a; // this is to test how vertices look with alpha
+                return (1,0,0,alpha);
             }
             ENDCG
         }
     }
+    Fallback "Diffuse"
 }

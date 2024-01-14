@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using GVR.Extensions;
 using GVR.World;
 using UnityEngine;
@@ -20,6 +22,11 @@ namespace GVR.Creator.Meshes
             rootGo.name = objectName;
             rootGo.SetParent(parent);
 
+            var meshColors = new List<Color>();
+
+            float maxSkyY = msh.BoundingBox.Max.Y; // Assuming AxisAlignedBoundingBox has Min and Max as Vector3
+            float minSkyY = maxSkyY * 0.925f;
+
             var subMeshesData = new Dictionary<int, WorldData.SubMeshData>();
             for (int i = 0; i < msh.MaterialCount; i++)
             {
@@ -32,10 +39,26 @@ namespace GVR.Creator.Meshes
                 // As we always use element 0 and i+1, we skip it in the loop.
                 for (var i = 1; i < polygon.PositionIndices.Count - 1; i++)
                 {
+                    var vertFeature = msh.GetPosition(polygon.PositionIndices[i]);
+
+                    float vertY = vertFeature.Y;
+                    int alpha;
+
+                    if (vertY > minSkyY)
+                    {
+                        alpha = (int)(255.0f * (maxSkyY - vertY) / (maxSkyY - minSkyY));
+                    }
+                    else
+                    {
+                        alpha = (int)(255.0f * (vertY / 8000.0f));
+                    }
+
+                    alpha = Math.Clamp(alpha, 0, 255);
+
                     // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
-                    AddEntry(msh.Positions, msh.Features, polygon, submesh, 0);
-                    AddEntry(msh.Positions, msh.Features, polygon, submesh, i);
-                    AddEntry(msh.Positions, msh.Features, polygon, submesh, i + 1);
+                    AddEntry(msh.Positions, msh.Features, polygon, meshColors, alpha, submesh, 0);
+                    AddEntry(msh.Positions, msh.Features, polygon, meshColors, alpha, submesh, i);
+                    AddEntry(msh.Positions, msh.Features, polygon, meshColors, alpha, submesh, i + 1);
                 }
             }
 
@@ -45,6 +68,7 @@ namespace GVR.Creator.Meshes
                 subMesh.Value.Vertices.Reverse();
                 subMesh.Value.Uvs.Reverse();
                 subMesh.Value.Normals.Reverse();
+                meshColors.Reverse();
             }
 
             foreach (var subMesh in subMeshesData.Values)
@@ -67,7 +91,7 @@ namespace GVR.Creator.Meshes
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
                 Self.PrepareMeshRenderer(meshRenderer, subMesh, isBarrier);
-                Self.PrepareMeshFilter(meshFilter, subMesh);
+                Self.PrepareMeshFilter(meshFilter, subMesh, meshColors.ToArray());
             }
 
             return rootGo;
@@ -113,12 +137,16 @@ namespace GVR.Creator.Meshes
             material.mainTexture = texture;
 
             var material2 = new Material(material);
+            //
+            material2.SetFloat("_WaveIntensity", 1);
+
+            // rend.material = material;
 
 
             rend.materials = new[] { material, material2 };
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
+        private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh, Color[] colors = null)
         {
             var mesh = new Mesh();
             meshFilter.sharedMesh = mesh;
@@ -129,14 +157,18 @@ namespace GVR.Creator.Meshes
             mesh.SetVertices(subMesh.Vertices);
             mesh.SetTriangles(subMesh.Triangles, 0);
             mesh.SetUVs(0, subMesh.Uvs);
+            mesh.SetColors(colors);
         }
 
         private static void AddEntry(List<System.Numerics.Vector3> zkPositions, List<Vertex> features, IPolygon polygon,
+            List<Color> meshColors, float alpha,
             WorldData.SubMeshData currentSubMesh, int index)
         {
             // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
             var positionIndex = polygon.PositionIndices[index];
             currentSubMesh.Vertices.Add(zkPositions[(int)positionIndex].ToUnityVector());
+
+            meshColors.Add(new Color(1, 1, 1, alpha / 255f));
 
             // This triangle (index where Vector 3 lies inside vertices, points to the newly added vertex (Vector3) as we don't reuse vertices.
             currentSubMesh.Triangles.Add(currentSubMesh.Vertices.Count - 1);
