@@ -55,7 +55,10 @@ namespace GVR.Npc.Routines
                 .AddHours(FeatureFlags.I.startHour)
                 .AddMinutes(FeatureFlags.I.startMinute);
 
-            var newRoutine = Routines.First(item => item.start <= now && now < item.stop);
+            // There are routines where stop is lower than start. (e.g. now:8:00, routine:22:00-9:00), therefore the second check.
+            var newRoutine = Routines.First(item =>
+                // | item is between values                | day switchover
+                (item.start <= now && now < item.stop) || (item.stop < item.start && item.start >= now && item.stop > now));
             CurrentRoutine = newRoutine;
 
             return CurrentRoutine;
