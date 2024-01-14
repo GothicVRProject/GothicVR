@@ -53,7 +53,7 @@ namespace GVR.Npc.Routines
             // There are routines where stop is lower than start. (e.g. now:8:00, routine:22:00-9:00), therefore the second check.
             foreach (var routine in Routines)
             {
-                if (routine.normalizedStart <= normalizedNow && normalizedNow <= routine.normalizedEnd)
+                if (routine.normalizedStart <= normalizedNow && normalizedNow < routine.normalizedEnd)
                 {
                     newRoutine = routine;
                     break;
@@ -61,7 +61,7 @@ namespace GVR.Npc.Routines
                 // Handling the case where the time range spans across midnight
                 else if (routine.normalizedStart > routine.normalizedEnd)
                 {
-                    if (normalizedNow >= routine.normalizedStart || normalizedNow <= routine.normalizedEnd)
+                    if (routine.normalizedStart <= normalizedNow || normalizedNow < routine.normalizedEnd)
                     {
                         newRoutine = routine;
                         break;
