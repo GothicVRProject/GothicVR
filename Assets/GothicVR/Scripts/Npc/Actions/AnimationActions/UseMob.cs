@@ -93,6 +93,8 @@ namespace GVR.Npc.Actions.AnimationActions
             // AnimationCreator.StopAnimation(NpcGo);
             NpcGo.transform.SetPositionAndRotation(slotGo.transform.position, slotGo.transform.rotation);
 
+            PhysicsHelper.DisablePhysicsForNpc(Props);
+
             PlayTransitionAnimation();
         }
 
@@ -138,6 +140,7 @@ namespace GVR.Npc.Actions.AnimationActions
                 Props.currentInteractableSlot = null;
                 Props.bodyState = VmGothicEnums.BodyState.BS_STAND;
 
+                PhysicsHelper.EnablePhysicsForNpc(Props);
             }
             // Loop Mobsi animation until the same UseMob with -1 is called.
             else
