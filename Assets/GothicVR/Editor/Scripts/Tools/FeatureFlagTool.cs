@@ -30,6 +30,7 @@ namespace GVR.Editor.Tools
             new (nameof(FeatureFlags.vobItemsDynamicAttach), typeof(bool), true),
 
             // Ints
+            new (nameof(FeatureFlags.TimeMultiplier), typeof(float), 1),
             new (nameof(FeatureFlags.startHour), typeof(int), 8), // Official start time of G1 - new game
             new (nameof(FeatureFlags.startMinute), typeof(int), 0), // Official start time of G1 - new game
 
