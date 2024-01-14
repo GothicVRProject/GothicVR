@@ -10,7 +10,7 @@ namespace GVR.World
     public class GameTime : SingletonBehaviour<GameTime>
     {
         public static readonly DateTime MIN_TIME = new(1, 1, 1, 0, 0, 0);
-        public static readonly DateTime MAX_TIME = new(1, 1, 1, 23, 59, 59);
+        public static readonly DateTime MAX_TIME = new(9999, 12, 31, 23, 59, 59);
 
         private int secondsInMinute = 0;
         private int minutesInHour = 0;
@@ -66,7 +66,7 @@ namespace GVR.World
 
                 GvrEvents.GameTimeSecondChangeCallback.Invoke(time);
                 RaiseMinuteAndHourEvent();
-                yield return new WaitForSeconds(ONE_INGAME_SECOND);
+                yield return new WaitForSeconds(ONE_INGAME_SECOND / FeatureFlags.I.TimeMultiplier);
             }
         }
         private void RaiseMinuteAndHourEvent()
@@ -87,6 +87,39 @@ namespace GVR.World
                 minutesInHour = 0;
                 GvrEvents.GameTimeHourChangeCallback.Invoke(time);
             }
+        }
+
+        public bool IsDay()
+        {
+            // 6:30 - 18:30  -  values taken from gothic and regoth - https://github.com/REGoth-project/REGoth/blob/master/src/engine/GameClock.cpp#L126
+            TimeSpan startOfDay = new TimeSpan(6, 30, 0);
+            TimeSpan endOfDay = new TimeSpan(18, 30, 0);
+
+            TimeSpan currentTime = time.TimeOfDay;
+
+            return currentTime >= startOfDay && currentTime <= endOfDay;
+        }
+
+        public float GetSkyTime()
+        {
+            TimeSpan currentTime = time.TimeOfDay;
+
+            double totalSecondsInADay = 24 * 60 * 60;
+
+            double secondsPassedSinceNoon;
+            if (currentTime < TimeSpan.FromHours(12))
+            {
+                secondsPassedSinceNoon = currentTime.TotalSeconds + 12 * 60 * 60;
+            }
+            else
+            {
+                secondsPassedSinceNoon = currentTime.TotalSeconds - 12 * 60 * 60;
+            }
+
+            // Calculate sky time as a float between 0 and 1
+            float skyTime = (float)(secondsPassedSinceNoon / totalSecondsInADay);
+
+            return skyTime;
         }
     }
 }
