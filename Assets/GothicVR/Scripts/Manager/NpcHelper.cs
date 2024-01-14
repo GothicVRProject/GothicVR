@@ -156,14 +156,14 @@ namespace GVR.Manager
             GetProperties(npc).walkMode = walkMode;
         }
 
-        public static void ExtAiGotoWP(NpcInstance npc, string wayPointName)
+        public static void ExtAiGoToFp(NpcInstance npc, string freePointName)
         {
             var props = GetProperties(npc);
-            props.AnimationQueue.Enqueue(new GoToWp(
-                new(AnimationAction.Type.AIGoToWP, string0: wayPointName),
+            props.AnimationQueue.Enqueue(new GoToFp(
+                new(AnimationAction.Type.AIGoToFP, string0: freePointName),
                 props.gameObject));
         }
-
+        
         public static void ExtAiGoToNextFp(NpcInstance npc, string fpNamePart)
         {
             var props = GetProperties(npc);
@@ -171,7 +171,15 @@ namespace GVR.Manager
                 new(AnimationAction.Type.AIGoToNextFp, string0: fpNamePart),
                 props.gameObject));
         }
-
+        
+        public static void ExtAiGoToWp(NpcInstance npc, string wayPointName)
+        {
+            var props = GetProperties(npc);
+            props.AnimationQueue.Enqueue(new GoToWp(
+                new(AnimationAction.Type.AIGoToWP, string0: wayPointName),
+                props.gameObject));
+        }
+        
         public static void ExtAiAlignToFp(NpcInstance npc)
         {
             var props = GetProperties(npc);

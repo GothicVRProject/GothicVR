@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using AOT;
-using GVR.Caches;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Globals;
@@ -27,15 +26,16 @@ namespace GVR.Vm
             // AI
             vm.RegisterExternal<NpcInstance>("AI_StandUp", AI_StandUp);
             vm.RegisterExternal<NpcInstance, int>("AI_SetWalkMode", AI_SetWalkMode);
-            vm.RegisterExternal<NpcInstance, string>("AI_GotoWP", AI_GotoWP);
+            vm.RegisterExternal<NpcInstance>("AI_AlignToFP", AI_AlignToFP);
             vm.RegisterExternal<NpcInstance>("AI_AlignToWP", AI_AlignToWP);
+            vm.RegisterExternal<NpcInstance, string>("AI_GotoFP", AI_GotoFP);
+            vm.RegisterExternal<NpcInstance, string>("AI_GotoWP", AI_GotoWP);
             vm.RegisterExternal<NpcInstance, string>("AI_PlayAni", AI_PlayAni);
             vm.RegisterExternal<NpcInstance, int, int, string>("AI_StartState", AI_StartState);
             vm.RegisterExternal<NpcInstance, int, int>("AI_UseItemToState", AI_UseItemToState);
             vm.RegisterExternal<NpcInstance, float>("AI_Wait", AI_Wait);
             vm.RegisterExternal<int, NpcInstance, string, int>("AI_UseMob", AI_UseMob);
             vm.RegisterExternal<NpcInstance, string>("AI_GoToNextFP", AI_GoToNextFP);
-            vm.RegisterExternal<NpcInstance>("AI_AlignToFP", AI_AlignToFP);
             vm.RegisterExternal<NpcInstance>("AI_DrawWeapon", AI_DrawWeapon);
             vm.RegisterExternal<NpcInstance, NpcInstance, string>("AI_Output", AI_Output);
             vm.RegisterExternal<NpcInstance>("AI_StopProcessInfos", AI_StopProcessInfos);
@@ -138,11 +138,6 @@ namespace GVR.Vm
             NpcHelper.ExtAiSetWalkMode(npc, (VmGothicEnums.WalkMode)walkMode);
         }
 
-        public static void AI_GotoWP(NpcInstance npc, string wayPointName)
-        {
-            NpcHelper.ExtAiGotoWP(npc, wayPointName);
-        }
-
         public static void AI_AlignToFP(NpcInstance npc)
         {
             NpcHelper.ExtAiAlignToFp(npc);
@@ -151,6 +146,16 @@ namespace GVR.Vm
         public static void AI_AlignToWP(NpcInstance npc)
         {
             NpcHelper.ExtAiAlignToWp(npc);
+        }
+
+        public static void AI_GotoFP(NpcInstance npc, string freePointName)
+        {
+            NpcHelper.ExtAiGoToFp(npc, freePointName);
+        }
+        
+        public static void AI_GotoWP(NpcInstance npc, string wayPointName)
+        {
+            NpcHelper.ExtAiGoToWp(npc, wayPointName);
         }
 
         public static void AI_PlayAni(NpcInstance npc, string name)
