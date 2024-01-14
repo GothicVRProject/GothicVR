@@ -13,7 +13,7 @@ namespace GVR.Manager
     /// </summary>
     public class RoutineManager : SingletonBehaviour<RoutineManager>
     {
-        Dictionary<DateTime, List<Routine>> npcStartTimeDict = new();
+        Dictionary<int, List<Routine>> npcStartTimeDict = new();
 
         private void OnEnable()
         {
@@ -51,8 +51,8 @@ namespace GVR.Manager
             routines.Reverse();
             foreach (var routine in routines)
             {
-                npcStartTimeDict.TryAdd(routine.start, new());
-                npcStartTimeDict[routine.start].Add(npcID);
+                npcStartTimeDict.TryAdd(routine.normalizedStart, new());
+                npcStartTimeDict[routine.normalizedStart].Add(npcID);
             }
         }
 
@@ -60,14 +60,14 @@ namespace GVR.Manager
         {
             foreach (RoutineData routine in routines)
             {
-                if (!npcStartTimeDict.TryGetValue(routine.start, out List<Routine> routinesForStartPoint))
+                if (!npcStartTimeDict.TryGetValue(routine.normalizedStart, out List<Routine> routinesForStartPoint))
                     return;
 
                 routinesForStartPoint.Remove(routineInstance);
 
                 // Remove element if empty
-                if (npcStartTimeDict[routine.start].Count == 0)
-                    npcStartTimeDict.Remove(routine.start);
+                if (npcStartTimeDict[routine.normalizedStart].Count == 0)
+                    npcStartTimeDict.Remove(routine.normalizedStart);
             }
         }
 
@@ -77,8 +77,10 @@ namespace GVR.Manager
         /// </summary>
         private void Invoke(DateTime now)
         {
+            var normalizedNow = now.Hour % 24 * 60 + now.Minute;
+            
             Debug.Log($"RoutineManager.timeChanged={now}");
-            if (!npcStartTimeDict.TryGetValue(now, out var routineItems))
+            if (!npcStartTimeDict.TryGetValue(normalizedNow, out var routineItems))
                 return;
             
             foreach (var routineItem in routineItems)

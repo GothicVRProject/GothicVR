@@ -25,43 +25,54 @@ namespace GVR.Npc.Routines
 
         public void ChangeRoutine(DateTime time)
         {
-            var newRoutine = Routines.First(item => item.start <= time && time < item.stop);
-
-            // Already set and started.
-            if (newRoutine == GetCurrentRoutine())
+            if (!CalculateCurrentRoutine(time.Hour, time.Minute))
             {
-                Debug.LogWarning($"ChangeRoutine got called but the resulting routine was the same: NPC: >{gameObject.name}< WP: >{newRoutine.waypoint}<");
+                Debug.LogWarning("ChangeRoutine got called but the resulting routine was the same: " +
+                                 $"NPC: >{gameObject.name}< WP: >{CurrentRoutine.waypoint}<");
                 return;
             }
-
-            CurrentRoutine = newRoutine;
 
             GetComponent<AiHandler>().StartRoutine(CurrentRoutine.action, CurrentRoutine.waypoint);
         }
 
-
         /// <summary>
-        /// When loading and spawning NPC, we need to fetch the spawnpoint (WP) but not executing it.
+        /// Calculate new routine based on given timestamp.
+        /// Hints about normalization:
+        ///   1. Daedalus handles routines with a 00:00 as midnight (24:00)
+        ///   -> For the midnight topic, we normalize via %24
+        ///   2. Routines can span multiple days (e.g. 22:00 - 09:00)
+        ///   -> For the overnight topic, we leverage the second if when start > end
         /// </summary>
-        public RoutineData GetCurrentRoutine()
+        /// <returns>Whether the routine changed or not.</returns>
+        public bool CalculateCurrentRoutine(int currentHour, int currentMinute)
         {
-            // If we don't have a routine set as current right now, we do it now.
-            if (CurrentRoutine != null)
-                return CurrentRoutine;
+            var normalizedNow = currentHour % 24 * 60 + currentMinute;
 
-            // TODO - Will be changed to either 8am (new game) or value from loaded save game.
-            // TODO - Later: Use only this value if we set a debug value inside feature flags.
-            var now = DateTime.MinValue
-                .AddHours(FeatureFlags.I.startHour)
-                .AddMinutes(FeatureFlags.I.startMinute);
-
+            RoutineData newRoutine = null;
+            
             // There are routines where stop is lower than start. (e.g. now:8:00, routine:22:00-9:00), therefore the second check.
-            var newRoutine = Routines.First(item =>
-                // | item is between values                | day switchover
-                (item.start <= now && now < item.stop) || (item.stop < item.start && item.start >= now && item.stop > now));
+            foreach (var routine in Routines)
+            {
+                if (routine.normalizedStart <= normalizedNow && normalizedNow <= routine.normalizedEnd)
+                {
+                    newRoutine = routine;
+                    break;
+                }
+                // Handling the case where the time range spans across midnight
+                else if (routine.normalizedStart > routine.normalizedEnd)
+                {
+                    if (normalizedNow >= routine.normalizedStart || normalizedNow <= routine.normalizedEnd)
+                    {
+                        newRoutine = routine;
+                        break;
+                    }
+                }
+            }
+
+            var changed = CurrentRoutine != newRoutine;
             CurrentRoutine = newRoutine;
 
-            return CurrentRoutine;
+            return changed;
         }
     }
 }

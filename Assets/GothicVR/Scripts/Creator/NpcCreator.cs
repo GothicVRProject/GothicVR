@@ -113,25 +113,29 @@ namespace GVR.Creator
                 vm.Call(npcRoutine);
 
                 if (FeatureFlags.I.enableNpcRoutines)
-                    StartRoutine(newNpc);
+                    StartRoutineFirstTime(newNpc);
             }
 
             SetSpawnPoint(newNpc, spawnPoint);
         }
 
-        private static void StartRoutine(GameObject npc)
+        private static void StartRoutineFirstTime(GameObject npc)
         {
-            var startRoutine = npc.GetComponent<Routine>().GetCurrentRoutine();
+            // TODO - Will be changed to either 8am (new game) or value from loaded save game.
+            // TODO - Later: Use only this value if we set a debug value inside feature flags.
+            var routineComp = npc.GetComponent<Routine>();
+            routineComp.CalculateCurrentRoutine(FeatureFlags.I.startHour, FeatureFlags.I.startMinute);
 
+            var startRoutine = routineComp.CurrentRoutine;
             npc.GetComponent<AiHandler>().StartRoutine(startRoutine.action, startRoutine.waypoint);
         }
         
         private static void SetSpawnPoint(GameObject npcGo, string spawnPoint)
         {
             WayNetPoint initialSpawnPoint;
-            if (npcGo.GetComponent<Routine>().Routines.Any())
+            if (npcGo.GetComponent<Routine>().Routines.Any() && FeatureFlags.I.enableNpcRoutines)
             {
-                var routineSpawnPointName = npcGo.GetComponent<Routine>().GetCurrentRoutine().waypoint;
+                var routineSpawnPointName = npcGo.GetComponent<Routine>().CurrentRoutine.waypoint;
                 initialSpawnPoint = WayNetHelper.GetWayNetPoint(routineSpawnPointName);
             }
             else
@@ -141,7 +145,7 @@ namespace GVR.Creator
 
             if (initialSpawnPoint == null)
             {
-                Debug.LogWarning(string.Format("spawnPoint={0} couldn't be found.", spawnPoint));
+                Debug.LogWarning($"spawnPoint={spawnPoint} couldn't be found.");
                 return;
             }
             
@@ -153,17 +157,14 @@ namespace GVR.Creator
         {
             var npc = GetNpcGo(npcInstance);
             
-            // If we put h=24, DateTime will throw an error instead of rolling.
-            var stop_hFormatted = (stopH == 24) ? 0 : stopH;
-
             RoutineData routine = new()
             {
-                start_h = startH,
-                start_m = startM,
-                start = new(1, 1, 1, startH, startM, 0),
-                stop_h = stopH,
-                stop_m = stopM,
-                stop = new(1, 1, 1, stop_hFormatted, stopM, 0),
+                startH = startH,
+                startM = startM,
+                normalizedStart = (startH % 24) * 60 + startM,
+                stopH = stopH,
+                stopM = stopM,
+                normalizedEnd = (stopH % 24) * 60 + stopM,
                 action = action,
                 waypoint = waypoint
             };
