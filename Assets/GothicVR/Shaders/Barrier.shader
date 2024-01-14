@@ -4,6 +4,7 @@ Shader "Unlit/Barrier"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _WaveIntensity ("Wave Intensity", Float) = 0.0
+        _Blend("Blend factor", Float) = 0.0
     }
     SubShader
     {
@@ -42,7 +43,7 @@ Shader "Unlit/Barrier"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            float _WaveIntensity;
+            float _WaveIntensity, _Blend;
 
             v2f vert(appdata v)
             {
@@ -70,9 +71,7 @@ Shader "Unlit/Barrier"
             fixed4 frag(v2f i) : SV_Target
             {
                 fixed4 texColor = tex2D(_MainTex, i.uv);
-                return texColor * i.color.a;
-                float alpha = texColor.a * i.color.a; // this is to test how vertices look with alpha
-                return (1,0,0,alpha);
+                return lerp((0, 0, 0, 0), texColor * i.color.a, _Blend);
             }
             ENDCG
         }
