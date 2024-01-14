@@ -2,6 +2,10 @@ using UnityEngine;
 
 namespace GVR.Data
 {
+    /// <summary>
+    /// This class is mostly a copy of the data from the original game, but with some changes as to make transitions cleaner.
+    /// (E.g textures for transitional layers such as dawn and evening and night1, day1)
+    /// </summary>
     public class SkyState
     {
         public float time;
