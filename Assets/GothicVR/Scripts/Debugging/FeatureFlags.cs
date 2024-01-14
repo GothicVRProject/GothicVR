@@ -79,6 +79,7 @@ namespace GVR.Debugging
         public bool showZspyLogs;
         public bool showZenKitVfsFileNotFoundErrors;
         public bool showMusicLogs;
+        public bool showBarrierLogs;
 
 
         [Serializable]
