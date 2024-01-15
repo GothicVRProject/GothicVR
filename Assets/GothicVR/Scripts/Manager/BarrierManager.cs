@@ -75,6 +75,7 @@ namespace GVR.GothicVR.Scripts.Manager
 
             if (fadeIn)
             {
+                ApplyFadeToMaterials();
                 if (Time.time - timeUpdatedFade > TimeStepToUpdateFade)
                 {
                     fadeState++;
