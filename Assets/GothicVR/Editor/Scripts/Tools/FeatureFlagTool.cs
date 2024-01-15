@@ -28,8 +28,9 @@ namespace GVR.Editor.Tools
             new (nameof(FeatureFlags.vobCulling), typeof(bool), true),
             new (nameof(FeatureFlags.enableSoundCulling), typeof(bool), true),
             new (nameof(FeatureFlags.vobItemsDynamicAttach), typeof(bool), true),
+            new (nameof(FeatureFlags.showBarrier), typeof(bool), true),
 
-            // Ints
+            // Ints / Floats
             new (nameof(FeatureFlags.TimeMultiplier), typeof(float), 1),
             new (nameof(FeatureFlags.startHour), typeof(int), 8), // Official start time of G1 - new game
             new (nameof(FeatureFlags.startMinute), typeof(int), 0), // Official start time of G1 - new game

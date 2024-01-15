@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using GVR.Util;
 using UnityEngine;
-using UnityEngine.Serialization;
 using ZenKit;
 using ZenKit.Vobs;
 

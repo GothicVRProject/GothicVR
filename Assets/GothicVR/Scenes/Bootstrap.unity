@@ -319,7 +319,7 @@ MonoBehaviour:
   createWorldMesh: 1
   createWaypoints: 1
   vobItemsDynamicAttach: 1
-  showBarrier: 0
+  showBarrier: 1
   createWayPointMeshes: 0
   createWaypointEdgeMeshes: 0
   enableDayTime: 1
