@@ -98,22 +98,22 @@ namespace GVR.GothicVR.Scripts.Manager
                     fadeOut = true;
                 }
 
-                if (fadeOut)
-                {
-                    ApplyFadeToMaterials();
-                    if (Time.time - timeUpdatedFade > TimeStepToUpdateFade)
-                    {
-                        fadeState--;
-                        timeUpdatedFade = Time.time;
-                    }
+                if (!fadeOut)
+                    return;
 
-                    if (fadeState <= BarrierMinOpacity)
-                    {
-                        fadeState = BarrierMinOpacity;
-                        fadeIn = true;
-                        fadeOut = false;
-                        barrierFadeIn = false;
-                    }
+                ApplyFadeToMaterials();
+                if (Time.time - timeUpdatedFade > TimeStepToUpdateFade)
+                {
+                    fadeState--;
+                    timeUpdatedFade = Time.time;
+                }
+
+                if (fadeState <= BarrierMinOpacity)
+                {
+                    fadeState = BarrierMinOpacity;
+                    fadeIn = true;
+                    fadeOut = false;
+                    barrierFadeIn = false;
                 }
             }
         }
