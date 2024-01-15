@@ -91,7 +91,7 @@ namespace GVR.World
 
         public bool IsDay()
         {
-            // 6:30 - 18:30
+            // 6:30 - 18:30  -  values taken from gothic and regoth - https://github.com/REGoth-project/REGoth/blob/master/src/engine/GameClock.cpp#L126
             TimeSpan startOfDay = new TimeSpan(6, 30, 0);
             TimeSpan endOfDay = new TimeSpan(18, 30, 0);
 

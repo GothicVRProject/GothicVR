@@ -26,8 +26,8 @@ Shader "Unlit/SkyboxWithHorizonFog"
         [Header(Fog Settings)]
         _FogColor ("Fog Color", Color) = (1,1,1,1)
         _FogColor2 ("Fog Color for transition", Color) = (1,1,1,1)
-        _FogCutoff ("Fog Cutoff", Range(0.0, 1.0)) = 0.25 // Add this line
-        
+        _FogCutoff ("Fog Cutoff", Range(0.0, 1.0)) = 0.25
+
         _Blend ("Blend value", Range(0,1)) = 0
 
     }
@@ -53,7 +53,6 @@ Shader "Unlit/SkyboxWithHorizonFog"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            // make fog work
             #pragma multi_compile_fog
             #pragma shader_feature FUZZY
             #pragma multi_compile_instancing
@@ -78,7 +77,7 @@ Shader "Unlit/SkyboxWithHorizonFog"
                 float4 screenPosition : TEXCOORD4;
                 float4 screenSpaceLightPos0 : TEXCOORD5;
 
-                UNITY_VERTEX_OUTPUT_STEREO //Insert
+                UNITY_VERTEX_OUTPUT_STEREO
             };
 
             sampler2D _Sky1, _Sky2, _Sky3, _Sky4;
@@ -92,9 +91,9 @@ Shader "Unlit/SkyboxWithHorizonFog"
             {
                 v2f o;
 
-                UNITY_SETUP_INSTANCE_ID(v); //Insert
-                UNITY_INITIALIZE_OUTPUT(v2f, o); //Insert
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o); //Insert
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_OUTPUT(v2f, o);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
@@ -123,7 +122,7 @@ Shader "Unlit/SkyboxWithHorizonFog"
                 if (i.worldPos.y < 0)
                 {
                     stars1 = lerp(_Color, _Color2, _Blend);
-                    stars2 = lerp(_Color, _Color2, _Blend); 
+                    stars2 = lerp(_Color, _Color2, _Blend);
                 }
 
                 float3 combined = stars1 + stars2;

@@ -119,6 +119,9 @@ namespace GVR.GothicVR.Scripts.Manager
             DynamicGI.UpdateEnvironment();
         }
 
+        /// <summary>
+        /// Find the previous and next state indices based on the current master time.
+        /// </summary>
         private (int previousIndex, int nextIndex) FindNextStateIndex()
         {
             var nextIndex = stateList.FindLastIndex(x => x.time < masterTime);
