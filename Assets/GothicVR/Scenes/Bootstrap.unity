@@ -319,7 +319,7 @@ MonoBehaviour:
   createWorldMesh: 1
   createWaypoints: 1
   vobItemsDynamicAttach: 1
-  Barrier: 1
+  showBarrier: 0
   createWayPointMeshes: 0
   createWaypointEdgeMeshes: 0
   enableDayTime: 1
@@ -354,6 +354,7 @@ MonoBehaviour:
   showZspyLogs: 0
   showZenKitVfsFileNotFoundErrors: 0
   showMusicLogs: 0
+  showBarrierLogs: 0
 --- !u!1 &394991343
 GameObject:
   m_ObjectHideFlags: 0

@@ -50,7 +50,7 @@ namespace GVR.Creator
             if (FeatureFlags.I.createVobs)
                 await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, Constants.VObPerFrame);
             
-            if (FeatureFlags.I.Barrier)
+            if (FeatureFlags.I.showBarrier)
             {
                 BarrierManager.I.CreateBarrier();
             }
