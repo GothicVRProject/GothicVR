@@ -52,6 +52,7 @@ namespace GVR.GothicVR.Scripts.Manager
             for (int i = 0; i < thunderSoundSources.Length; i++)
             {
                 thunderSoundSources[i] = barrier.AddComponent<AudioSource>();
+                // AddThunder(i);
             }
         }
 
@@ -97,7 +98,7 @@ namespace GVR.GothicVR.Scripts.Manager
                     if (!activeThunder[i] && !thunderSoundSources[i].isPlaying &&
                         (Time.time - thunderTimer[i]) > thunderDelay[i])
                     {
-
+                        // StartCoroutine(polystripMeshes[i].RevealSegments());
                         thunderTimer[i] = Time.time;
                         thunderSoundSources[i].PlayOneShot(sound);
                     }
@@ -172,6 +173,17 @@ namespace GVR.GothicVR.Scripts.Manager
                 material2 = materials[1];
                 materialsCached = true;
             }
+        }
+
+        private void AddThunder(int i)
+        {
+            var thunderStrip = new GameObject("ThunderStrip");
+            thunderStrip.transform.SetParent(barrier.transform);
+            thunderStrip.transform.localPosition = new Vector3(-50, 400, -56);
+            thunderStrip.transform.localRotation = Quaternion.identity * Quaternion.Euler(0, i * 90, -90);
+            polystripMeshes[i] = thunderStrip.AddComponent<PolystripMeshCreator>();
+            polystripMeshes[i]
+                .CreatePolyStrip(11, new(0, 0, 0), new(0, 320, 100));
         }
     }
 }
