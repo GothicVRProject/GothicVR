@@ -160,7 +160,6 @@ namespace GVR.Manager
 
         private void HideLoadingScene()
         {
-            SkyManager.I.InitSky();
             SceneManager.UnloadSceneAsync(Constants.SceneLoading);
 
             LoadingManager.I.ResetProgress();
@@ -192,6 +191,7 @@ namespace GVR.Manager
                 // any World
                 default:
                     SceneManager.SetActiveScene(scene);
+                    GvrEvents.WorldSceneLoaded.Invoke();
                     break;
             }
         }

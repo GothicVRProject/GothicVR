@@ -50,6 +50,8 @@ namespace GVR.Creator
             if (FeatureFlags.I.createVobs)
                 await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, Constants.VObPerFrame);
             
+            SkyManager.I.InitSky();
+
             if (FeatureFlags.I.showBarrier)
             {
                 BarrierManager.I.CreateBarrier();
