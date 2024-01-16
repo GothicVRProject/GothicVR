@@ -17,6 +17,15 @@ namespace GVR.GothicVR.Scripts.Manager
 
         private bool barrierVisible;
 
+        private bool showThunder;
+        private PolystripMeshCreator[] polystripMeshes = new PolystripMeshCreator[4];
+        private bool[] activeThunder = { false, false, false, false };
+        private float[] thunderDelay = { 8, 6, 14, 2 }; // https://ataulien.github.io/Inside-Gothic/barrier/#thunder
+        private float[] thunderTimer = { 0, 0, 0, 0 };
+
+
+        private AudioSource[] thunderSoundSources = new AudioSource[4];
+
         private bool barrierFadeIn;
         private bool fadeIn = true;
         private bool fadeOut;
@@ -40,13 +49,17 @@ namespace GVR.GothicVR.Scripts.Manager
             var barrierMesh = AssetCache.TryGetMsh("MAGICFRONTIER_OUT.MSH");
             barrier = MeshObjectCreator.CreateBarrier("Barrier", barrierMesh, Vector3.zero, Quaternion.identity)
                 .GetAllDirectChildren()[0];
+            for (int i = 0; i < thunderSoundSources.Length; i++)
+            {
+                thunderSoundSources[i] = barrier.AddComponent<AudioSource>();
+            }
         }
 
         public void FixedUpdate()
         {
             RenderBarrier();
         }
-        
+
         /// <summary>
         /// Controls when and how much the barrier is visible
         /// </summary>
@@ -61,7 +74,7 @@ namespace GVR.GothicVR.Scripts.Manager
             if (nextActivation <= 0)
             {
                 barrierVisible = !barrierVisible;
-                nextActivation = TimeToStayHidden + Random.Range(0f, 5f * 60f);
+                nextActivation = TimeToStayHidden + Random.Range(-(5f * 60f), 5f * 60f);
                 barrierFadeIn = true;
             }
 
@@ -73,9 +86,31 @@ namespace GVR.GothicVR.Scripts.Manager
                 return;
             }
 
+            UpdateFadeState();
+
+            if (showThunder)
+            {
+                var sound = VobHelper.GetSoundClip("MFX_BARRIERE_AMBIENT");
+
+                for (int i = 0; i < 4; i++)
+                {
+                    if (!activeThunder[i] && !thunderSoundSources[i].isPlaying &&
+                        (Time.time - thunderTimer[i]) > thunderDelay[i])
+                    {
+
+                        thunderTimer[i] = Time.time;
+                        thunderSoundSources[i].PlayOneShot(sound);
+                    }
+                }
+            }
+        }
+
+        private void UpdateFadeState()
+        {
             if (fadeIn)
             {
                 ApplyFadeToMaterials();
+
                 if (Time.time - timeUpdatedFade > TimeStepToUpdateFade)
                 {
                     fadeState++;
@@ -87,6 +122,7 @@ namespace GVR.GothicVR.Scripts.Manager
                     fadeState = BarrierMaxOpacity;
                     fadeIn = false;
                     fadeTime = Time.time;
+                    showThunder = true;
                 }
             }
             else
@@ -96,12 +132,14 @@ namespace GVR.GothicVR.Scripts.Manager
                 {
                     fadeTime = Time.time;
                     fadeOut = true;
+                    showThunder = false;
                 }
 
                 if (!fadeOut)
                     return;
 
                 ApplyFadeToMaterials();
+
                 if (Time.time - timeUpdatedFade > TimeStepToUpdateFade)
                 {
                     fadeState--;
