@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.World;
 using UnityEngine;
 using ZenKit;
@@ -12,23 +13,22 @@ namespace GVR.Creator.Meshes
 {
     public class MeshCreator : AbstractMeshCreator
     {
-        private static readonly MeshCreator Self = new();
+        private const string BarrierTextureName = "Barriere";
 
-        public static GameObject Create(string objectName, IMesh msh, Vector3 position, Quaternion rotation,
-            bool isBarrier = false,
-            GameObject parent = null, GameObject rootGo = null)
+        public GameObject CreateBarrier(string objectName, IMesh msh)
         {
-            rootGo ??= new GameObject();
-            rootGo.name = objectName;
-            rootGo.SetParent(parent);
+            var rootGo = new GameObject
+            {
+                name = objectName
+            };
 
             var meshColors = new List<Color>();
 
-            float maxSkyY = msh.BoundingBox.Max.Y; // Assuming AxisAlignedBoundingBox has Min and Max as Vector3
-            float minSkyY = maxSkyY * 0.925f;
+            var maxSkyY = msh.BoundingBox.Max.Y; // Assuming AxisAlignedBoundingBox has Min and Max as Vector3
+            var minSkyY = maxSkyY * 0.925f;
 
             var subMeshesData = new Dictionary<int, WorldData.SubMeshData>();
-            for (int i = 0; i < msh.MaterialCount; i++)
+            for (var i = 0; i < msh.MaterialCount; i++)
             {
                 subMeshesData[i] = new WorldData.SubMeshData { Material = msh.Materials[i] };
             }
@@ -41,7 +41,7 @@ namespace GVR.Creator.Meshes
                 {
                     var vertFeature = msh.GetPosition(polygon.PositionIndices[i]);
 
-                    float vertY = vertFeature.Y;
+                    var vertY = vertFeature.Y;
                     int alpha;
 
                     if (vertY > minSkyY)
@@ -90,23 +90,18 @@ namespace GVR.Creator.Meshes
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
-                Self.PrepareMeshRenderer(meshRenderer, subMesh, isBarrier);
-                Self.PrepareMeshFilter(meshFilter, subMesh, meshColors.ToArray());
+                PrepareBarrierMeshRenderer(meshRenderer, subMesh);
+                PrepareBarrierMeshFilter(meshFilter, subMesh, meshColors.ToArray());
             }
 
             return rootGo;
         }
 
-        protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh, bool isBarier = false)
+        private void PrepareBarrierMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
             var bMaterial = subMesh.Material;
 
-            Texture2D texture;
-
-            if (isBarier)
-                texture = GetTexture("Barriere");
-            else
-                texture = GetTexture(bMaterial.Texture);
+            var texture = GetTexture(BarrierTextureName);
 
             if (null == texture)
             {
@@ -123,7 +118,7 @@ namespace GVR.Creator.Meshes
                     material = GetWaterMaterial(subMesh.Material);
                     break;
                 default:
-                    material = new Material(Shader.Find("Unlit/Barrier"));
+                    material = new Material(Constants.ShaderBarrier);
                     break;
             }
 
@@ -146,7 +141,7 @@ namespace GVR.Creator.Meshes
             rend.materials = new[] { material, material2 };
         }
 
-        private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh, Color[] colors = null)
+        private void PrepareBarrierMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh, Color[] colors = null)
         {
             var mesh = new Mesh();
             meshFilter.sharedMesh = mesh;

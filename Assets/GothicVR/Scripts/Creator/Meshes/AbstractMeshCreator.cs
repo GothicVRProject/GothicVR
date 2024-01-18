@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
+using GVR.Globals;
 using UnityEngine;
 using UnityEngine.Rendering;
 using ZenKit;
@@ -16,9 +17,6 @@ namespace GVR.Creator.Meshes
     {
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
-        protected const string DefaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
-        protected const string WaterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
-        protected const string AlphaToCoverageShaderName = "Unlit/Unlit-AlphaToCoverage";
         protected const float DecalOpacity = 0.75f;
         
         protected GameObject Create(string objectName, IModelMesh mdm, IModelHierarchy mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
@@ -482,24 +480,22 @@ namespace GVR.Creator.Meshes
 
         protected Material GetDefaultMaterial(bool isAlphaTest)
         {
-            var shader = Shader.Find(DefaultShader);
-            if (isAlphaTest)
-            {
-                shader = Shader.Find(AlphaToCoverageShaderName);
-            }
+            var shader = isAlphaTest ? Constants.ShaderUnlit : Constants.ShaderUnlitAlphaToCoverage;
             var material = new Material(shader);
+
             if (isAlphaTest)
             {
                 // Manually correct the render queue for alpha test, as Unity doesn't want to do it from the shader's render queue tag.
                 material.renderQueue = (int)RenderQueue.AlphaTest;
             }
+
             return material;
         }
 
         protected Material GetWaterMaterial(IMaterial materialData)
         {
-            var shader = Shader.Find(WaterShader);
-            Material material = new Material(shader);
+            var shader = Constants.ShaderWater;
+            var material = new Material(shader);
 
             // FIXME - Running water speed and direction is hardcoded based on material names
             // Needs to be improved by a better shader and the implementation of proper water material parameters
@@ -531,7 +527,7 @@ namespace GVR.Creator.Meshes
                 return false;
             }
 
-            return shader.name is AlphaToCoverageShaderName or WaterShader;
+            return shader == Constants.ShaderUnlitAlphaToCoverage || shader == Constants.ShaderWater;
         }
     }
 }

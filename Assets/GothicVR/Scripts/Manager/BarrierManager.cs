@@ -18,7 +18,6 @@ namespace GVR.GothicVR.Scripts.Manager
         private bool barrierVisible;
 
         private bool showThunder;
-        private PolystripMeshCreator[] polystripMeshes = new PolystripMeshCreator[4];
         private bool[] activeThunder = { false, false, false, false };
         private float[] thunderDelay = { 8, 6, 14, 2 }; // https://ataulien.github.io/Inside-Gothic/barrier/#thunder
         private float[] thunderTimer = { 0, 0, 0, 0 };
@@ -47,9 +46,9 @@ namespace GVR.GothicVR.Scripts.Manager
         public void CreateBarrier()
         {
             var barrierMesh = AssetCache.TryGetMsh("MAGICFRONTIER_OUT.MSH");
-            barrier = MeshObjectCreator.CreateBarrier("Barrier", barrierMesh, Vector3.zero, Quaternion.identity)
+            barrier = MeshCreatorFacade.CreateBarrier("Barrier", barrierMesh)
                 .GetAllDirectChildren()[0];
-            for (int i = 0; i < thunderSoundSources.Length; i++)
+            for (var i = 0; i < thunderSoundSources.Length; i++)
             {
                 thunderSoundSources[i] = barrier.AddComponent<AudioSource>();
                 // AddThunder(i);
@@ -98,7 +97,6 @@ namespace GVR.GothicVR.Scripts.Manager
                     if (!activeThunder[i] && !thunderSoundSources[i].isPlaying &&
                         (Time.time - thunderTimer[i]) > thunderDelay[i])
                     {
-                        // StartCoroutine(polystripMeshes[i].RevealSegments());
                         thunderTimer[i] = Time.time;
                         thunderSoundSources[i].PlayOneShot(sound);
                     }
@@ -181,9 +179,7 @@ namespace GVR.GothicVR.Scripts.Manager
             thunderStrip.transform.SetParent(barrier.transform);
             thunderStrip.transform.localPosition = new Vector3(-50, 400, -56);
             thunderStrip.transform.localRotation = Quaternion.identity * Quaternion.Euler(0, i * 90, -90);
-            polystripMeshes[i] = thunderStrip.AddComponent<PolystripMeshCreator>();
-            polystripMeshes[i]
-                .CreatePolyStrip(11, new(0, 0, 0), new(0, 320, 100));
+            MeshCreatorFacade.CreatePolyStrip(thunderStrip, 11, Vector3.zero, new(0, 320, 100));
         }
     }
 }
