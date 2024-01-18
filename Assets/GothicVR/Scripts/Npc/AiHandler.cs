@@ -59,7 +59,7 @@ namespace GVR.Npc
             // Go on
             else
             {
-                Debug.Log($"Start playing >{properties.AnimationQueue.Peek().GetType()}< on >{properties.gameObject.name}<({properties.npcInstance.Id})");
+                Debug.Log($"Start playing >{properties.AnimationQueue.Peek().GetType()}< on >{properties.gameObject.name}<");
                 PlayNextAnimation(properties.AnimationQueue.Dequeue());
             }
         }

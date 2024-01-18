@@ -94,7 +94,7 @@ namespace GVR.Creator
                 return;
             }
 
-            newNpc.name = props.npcInstance.GetName(NpcNameSlot.Slot0);
+            newNpc.name = $"{props.npcInstance.GetName(NpcNameSlot.Slot0)} ({props.npcInstance.Id})";
             
             var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
             MeshObjectCreator.CreateNpc(newNpc.name, props.mdmName, mdhName, props.BodyData, newNpc);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using AOT;
+using GVR.Caches;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Globals;
@@ -122,7 +123,16 @@ namespace GVR.Vm
         {
             // FIXME: Once GVR is fully released, we can safely throw an exception as it tells us: The game will not work until you implement this missing function.
             //throw new NotImplementedException("External >" + value + "< not registered but required by DaedalusVM.");
-            Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM.");
+            try
+            {
+                var npcName = LookupCache.NpcCache[GameData.GothicVm.GlobalSelf.Index].gameObject.name;
+                Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM (called on >{npcName}<).");
+            }
+            catch (Exception)
+            {
+                Debug.LogError("Bug in getting Npc. Fix or delete.");
+                Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM.");
+            }
         }
 
 
