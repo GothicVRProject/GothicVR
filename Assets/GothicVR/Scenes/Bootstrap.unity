@@ -321,6 +321,7 @@ MonoBehaviour:
   createWayPointMeshes: 0
   createWaypointEdgeMeshes: 0
   enableDayTime: 1
+  TimeMultiplier: 1
   sunMovementPerformanceValue: 1
   startHour: 8
   startMinute: 0
@@ -1610,6 +1611,7 @@ GameObject:
   - component: {fileID: 1896514225}
   - component: {fileID: 1896514223}
   - component: {fileID: 1896514226}
+  - component: {fileID: 1896514228}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -1766,6 +1768,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d8a5433ca9664e58a7e90654db1d382c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46e9095c72bc48bfb33591c93b3dc5f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &2044949334

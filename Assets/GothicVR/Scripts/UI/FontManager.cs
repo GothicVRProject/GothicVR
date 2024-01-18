@@ -49,13 +49,14 @@ namespace GVR.Manager
                     metrics = new GlyphMetrics
                     {
                         width = w,
-                        height = h,
-                        horizontalBearingY = h,
+                        height = -h,
+                        horizontalBearingY = 0,
                         horizontalBearingX = 0,
                         horizontalAdvance = w
                     },
                     index = (uint)i,
-                    sprite = newSprite
+                    sprite = newSprite,
+                    scale = -1
                 };
                 spriteAsset.spriteGlyphTable.Add(spriteGlyph);
                 var spriteCharacter = new TMP_SpriteCharacter((uint)i, spriteGlyph);

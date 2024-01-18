@@ -62,7 +62,6 @@ public class TextureManager : SingletonBehaviour<TextureManager>
         sliderPositionMaterial.mainTexture = AssetCache.TryGetTexture("MENU_SLIDER_POS.TGA");
         fillerMaterial.mainTexture = AssetCache.TryGetTexture("MENU_BUTTONBACK.TGA");
         arrowMaterial.mainTexture = AssetCache.TryGetTexture("U.TGA");
-        skyMaterial.mainTexture = AssetCache.TryGetTexture("SKYDAY_LAYER1_A0.TGA");
     }
 
     public void SetTexture(string texture, Material material)
