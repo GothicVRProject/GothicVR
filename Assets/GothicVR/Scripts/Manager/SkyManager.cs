@@ -14,48 +14,40 @@ namespace GVR.GothicVR.Scripts.Manager
     public class SkyManager : SingletonBehaviour<SkyManager>
     {
         private float masterTime;
+        private bool noSky = true;
         [SerializeField] private List<SkyState> stateList = new List<SkyState>();
 
-        protected void Start()
+        private void Start()
         {
-            var skyState3 = new SkyState();
-            skyState3.PresetDay1();
-            stateList.Add(skyState3);
-            var skyState4 = new SkyState();
-            skyState4.PresetDay2();
-            stateList.Add(skyState4);
-            var skyState5 = new SkyState();
-            skyState5.PresetEvening();
-            stateList.Add(skyState5);
-            var skyState6 = new SkyState();
-            skyState6.PresetNight0();
-            stateList.Add(skyState6);
-            var skyState7 = new SkyState();
-            skyState7.PresetNight1();
-            stateList.Add(skyState7);
-            var skyState8 = new SkyState();
-            skyState8.PresetNight2();
-            stateList.Add(skyState8);
-            var skyState1 = new SkyState();
-            skyState1.PresetDawn();
-            stateList.Add(skyState1);
-            var skyState2 = new SkyState();
-            skyState2.PresetDay0();
-            stateList.Add(skyState2);
-
-            RenderSettings.fog = true;
-            RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.ambientMode = AmbientMode.Flat;
-
             GvrEvents.GameTimeSecondChangeCallback.AddListener(Interpolate);
         }
 
         public void InitSky()
         {
-            Interpolate(new DateTime());
+            stateList.AddRange(new[]
+            {
+                CreatePresetState(new SkyState(), (state) => state.PresetDay1()),
+                CreatePresetState(new SkyState(), (state) => state.PresetDay2()),
+                CreatePresetState(new SkyState(), (state) => state.PresetEvening()),
+                CreatePresetState(new SkyState(), (state) => state.PresetNight0()),
+                CreatePresetState(new SkyState(), (state) => state.PresetNight1()),
+                CreatePresetState(new SkyState(), (state) => state.PresetNight2()),
+                CreatePresetState(new SkyState(), (state) => state.PresetDawn()),
+                CreatePresetState(new SkyState(), (state) => state.PresetDay0())
+            });
+
+            RenderSettings.fog = true;
+            RenderSettings.fogMode = FogMode.Linear;
+            RenderSettings.ambientMode = AmbientMode.Flat;
+            Interpolate();
         }
 
         private void Interpolate(DateTime _)
+        {
+            Interpolate();
+        }
+
+        private void Interpolate()
         {
             masterTime = GameTime.I.GetSkyTime(); // Current time
 
@@ -73,8 +65,11 @@ namespace GVR.GothicVR.Scripts.Manager
 
             lerpFraction = Mathf.Clamp01(lerpFraction);
 
-            if (lerpFraction > 1)
+            if (lerpFraction >= 1 && noSky == false)
+            {
+                noSky = false;
                 return; // finished blending
+            }
 
             var oldPolyColor = lastState.polyColor.ToUnityColor() / 255f;
             var newPolyColor = newState.polyColor.ToUnityColor() / 255f;
@@ -136,6 +131,12 @@ namespace GVR.GothicVR.Scripts.Manager
                 previousIndex = stateList.Count - 1;
 
             return (previousIndex, nextIndex);
+        }
+
+        private SkyState CreatePresetState(SkyState skyState, Action<SkyState> applyPreset)
+        {
+            applyPreset(skyState);
+            return skyState;
         }
     }
 }

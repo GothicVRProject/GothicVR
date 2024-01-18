@@ -102,7 +102,7 @@ namespace GVR.Lab.Handler
             var itemPrefab = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobItem);
             var item = AssetCache.TryGetItemData(itemName);
             var mrm = AssetCache.TryGetMrm(item.Visual);
-            var itemGo = MeshObjectCreator.CreateVob(item.Visual, mrm, default, default, true, rootGo: itemPrefab, parent: itemSpawnSlot);
+            var itemGo = MeshCreatorFacade.CreateVob(item.Visual, mrm, default, default, true, rootGo: itemPrefab, parent: itemSpawnSlot);
 
             var itemGrabComp = itemGo.GetComponent<ItemGrabInteractable>();
             var colliderComp = itemGo.GetComponent<MeshCollider>();

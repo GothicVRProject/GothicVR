@@ -82,7 +82,7 @@ namespace GVR.Lab.Handler
                 TeethTexNr = 1
             };
 
-            MeshObjectCreator.CreateNpc(newNpc.name, mdmName, mdhName, body, newNpc);
+            MeshCreatorFacade.CreateNpc(newNpc.name, mdmName, mdhName, body, newNpc);
         }
 
         public void AnimationStartClick()
