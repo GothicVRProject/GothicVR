@@ -480,7 +480,7 @@ namespace GVR.Creator.Meshes
 
         protected Material GetDefaultMaterial(bool isAlphaTest)
         {
-            var shader = isAlphaTest ? Constants.ShaderUnlit : Constants.ShaderUnlitAlphaToCoverage;
+            var shader = isAlphaTest ? Constants.ShaderUnlitAlphaToCoverage : Constants.ShaderUnlit;
             var material = new Material(shader);
 
             if (isAlphaTest)
