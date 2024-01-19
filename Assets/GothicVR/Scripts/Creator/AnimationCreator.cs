@@ -15,14 +15,32 @@ namespace GVR.Creator
 {
     public static class AnimationCreator
     {
-        // FIXME - We need to handle both mds and mdh options! (base vs overlay)
-        public static void PlayAnimation(string mdsName, string animationName, string mdhName, GameObject go, bool repeat = false)
+        /// <summary>
+        /// Handling animations for baseMds and overlayMds
+        /// </summary>
+        public static void PlayAnimation(string[] mdsNames, string animationName, GameObject go, bool repeat = false)
         {
+            // We assume, that we get mdsNames in this order: base, overlay. But we should always check for overlay first.
+            foreach (var mdsName in mdsNames.Reverse())
+            {
+                if (TryPlayAnimation(mdsName, animationName, go, repeat))
+                    return;
+            }
+        }
+
+        private static bool TryPlayAnimation(string mdsName, string animationName, GameObject go, bool repeat)
+        {
+            // For animations: mdhName == mdsName
+            var mdhName = mdsName;
+
+            var modelAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
+            if (modelAnimation == null)
+                return false;
+
             var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var animationComp = go.GetComponent<Animation>();
 
             var mds = AssetCache.TryGetMds(mdsName);
-            var modelAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
             var mdh = AssetCache.TryGetMdh(mdhName);
             var anim = mds.Animations.First(i => i.Name.EqualsIgnoreCase(animationName));
 
@@ -45,6 +63,8 @@ namespace GVR.Creator
 
             animationComp.Stop();
             animationComp.Play(mdsAnimationKeyName);
+
+            return true;
         }
 
         public static void StopAnimation(GameObject go)

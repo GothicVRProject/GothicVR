@@ -39,7 +39,7 @@ namespace GVR.Npc.Actions.AnimationActions
             // e.g. T_POTION_STAND_2_S0
             var animationName = string.Format(animationStartScheme, item.SchemeName, itemAnimationState);
             
-            AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, Props.overlayMdhName, NpcGo);
+            AnimationCreator.PlayAnimation(Props.mdsNames, animationName, NpcGo);
         }
 
         private void EndItemStateAnimation(int itemAnimationState)
@@ -49,7 +49,7 @@ namespace GVR.Npc.Actions.AnimationActions
             // e.g. T_POTION_S0_2_STAND
             var animationName = string.Format(animationEndScheme, item.SchemeName, itemAnimationState);
             
-            AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, Props.overlayMdhName, NpcGo);
+            AnimationCreator.PlayAnimation(Props.mdsNames, animationName, NpcGo);
         }
     }
 }

@@ -147,7 +147,7 @@ namespace GVR.Npc.Actions.AnimationActions
             {
                 var mobVisualName = mobGo.GetComponent<VobProperties>().visualScheme;
                 var animName = string.Format(MobLoopAnimationString, mobVisualName, Action.Int0);
-                AnimationCreator.PlayAnimation(Props.baseMdsName, animName, Props.overlayMdhName, NpcGo, true);
+                AnimationCreator.PlayAnimation(Props.mdsNames, animName, NpcGo, true);
             }
             IsFinishedFlag = true;
         }
@@ -193,7 +193,7 @@ namespace GVR.Npc.Actions.AnimationActions
             var slotPositionName = GetSlotPositionTag(slotGo.name);
             var animName = string.Format(MobTransitionAnimationString, mobVisualName, slotPositionName, from, to);
 
-            AnimationCreator.PlayAnimation(Props.baseMdsName, animName, Props.overlayMdhName, NpcGo);
+            AnimationCreator.PlayAnimation(Props.mdsNames, animName, NpcGo);
         }
         
         protected override void InsertItem(string slot1, string slot2)

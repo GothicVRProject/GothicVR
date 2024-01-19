@@ -63,6 +63,8 @@ namespace GVR.Npc.Actions.AnimationActions
             {
                 case VmGothicEnums.WalkMode.Walk:
                     return "S_WALKL";
+                case VmGothicEnums.WalkMode.Run:
+                    return "S_RUNL";
                 default:
                     Debug.LogWarning($"Animation of type {Props.walkMode} not yet implemented.");
                     return "";
@@ -72,7 +74,7 @@ namespace GVR.Npc.Actions.AnimationActions
         private void StartWalk()
         {
             var animName = GetWalkModeAnimationString();
-            AnimationCreator.PlayAnimation(Props.overlayMdsName, animName, Props.overlayMdhName, NpcGo, true);
+            AnimationCreator.PlayAnimation(Props.mdsNames, animName, NpcGo, true);
 
             walkState = WalkState.Walk;
         }

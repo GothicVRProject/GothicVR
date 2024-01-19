@@ -18,7 +18,7 @@ namespace GVR.Npc.Actions.AnimationActions
             // "t_1hRun_2_1h" --> undraw animation!
             // "t_Move_2_1hMove" --> drawing
             // "t_1h_2_1hRun"
-            AnimationCreator.PlayAnimation(Props.baseMdsName, "t_Move_2_1hMove", Props.overlayMdhName, NpcGo, true);
+            AnimationCreator.PlayAnimation(Props.mdsNames, "t_Move_2_1hMove", NpcGo, true);
         }
 
         // FIXME - 1Hand hardcoded so far. We need to get the information from inventory system itself.

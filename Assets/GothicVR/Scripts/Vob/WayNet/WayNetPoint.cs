@@ -12,5 +12,8 @@ namespace GVR.Vob.WayNet
         public Vector3 Position;
         public Vector3 Direction;
         public bool IsLocked;
+
+        public abstract bool IsFreePoint();
+        public bool IsWayPoint() => IsFreePoint();
     }
 }

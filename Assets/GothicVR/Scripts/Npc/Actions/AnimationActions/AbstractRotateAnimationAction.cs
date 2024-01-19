@@ -29,7 +29,7 @@ namespace GVR.Npc.Actions.AnimationActions
                 return;
             }
 
-            AnimationCreator.PlayAnimation(Props.baseMdsName, GetRotateModeAnimationString(), Props.overlayMdhName, NpcGo, true);
+            AnimationCreator.PlayAnimation(Props.mdsNames, GetRotateModeAnimationString(), NpcGo, true);
 
             // https://discussions.unity.com/t/determining-whether-to-rotate-left-or-right/44021
             var cross = Vector3.Cross(Props.CurrentWayNetPoint.Direction, NpcGo.transform.forward);

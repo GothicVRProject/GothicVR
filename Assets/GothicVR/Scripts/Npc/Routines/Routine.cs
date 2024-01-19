@@ -69,6 +69,10 @@ namespace GVR.Npc.Routines
                 }
             }
 
+            // e.g. Mud has a bug as there is no routine covering 8am. We therefore pick the last one as seen in original G1. (sit)
+            if (newRoutine == null)
+                newRoutine = Routines.Last();
+
             var changed = CurrentRoutine != newRoutine;
             CurrentRoutine = newRoutine;
 

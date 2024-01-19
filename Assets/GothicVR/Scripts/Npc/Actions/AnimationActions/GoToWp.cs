@@ -26,7 +26,7 @@ namespace GVR.Npc.Actions.AnimationActions
                 IsFinishedFlag = true;
                 return;
             }
-            
+
             route = new Stack<DijkstraWaypoint>(WayNetHelper.FindFastestPath(Props.CurrentWayNetPoint.Name, destination));
         }
         

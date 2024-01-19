@@ -11,7 +11,7 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            AnimationCreator.PlayAnimation(Props.baseMdsName, Action.String0, Props.overlayMdhName, NpcGo);
+            AnimationCreator.PlayAnimation(Props.mdsNames, Action.String0, NpcGo);
         }
     }
 }

@@ -141,15 +141,14 @@ namespace GVR.Caches
             if (AnimCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            IModelAnimation newData;
+            IModelAnimation newData = null;
             try
             {
                 newData = new ModelAnimation(GameData.Vfs, $"{preparedKey}.man").Cache();
             }
             catch (Exception)
             {
-                Debug.LogError($"Animation couldn't be loaded for: MDS: >{preparedMdsKey}<, Animation: {preparedAnimKey}");
-                throw;
+                // ignored
             }
 
             AnimCache[preparedKey] = newData;

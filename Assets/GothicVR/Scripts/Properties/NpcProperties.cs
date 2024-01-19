@@ -25,10 +25,12 @@ namespace GVR.Properties
         // Visual
         public string mdmName;
         public string baseMdsName;
-        public string baseMdhName => baseMdsName;
         public string overlayMdsName;
+        public string[] mdsNames => new[]{ baseMdsName, overlayMdsName };
+        public string baseMdhName => baseMdsName;
         public string overlayMdhName => overlayMdsName;
-        
+        public string[] mdhNames => new[]{ baseMdhName, overlayMdhName };
+
         public List<ItemInstance> EquippedItems = new();
         public VmGothicExternals.ExtSetVisualBodyData BodyData;
         
