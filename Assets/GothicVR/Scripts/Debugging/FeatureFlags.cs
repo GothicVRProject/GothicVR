@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using GVR.Util;
 using UnityEngine;
-using UnityEngine.Serialization;
 using ZenKit;
 using ZenKit.Vobs;
 
@@ -25,6 +24,7 @@ namespace GVR.Debugging
         public bool createWorldMesh;
         [Tooltip("True will render all pickables with dynamic attach points")]
         public bool vobItemsDynamicAttach;
+        public bool showBarrier;
 
         [Header("__________World - Developer__________")]
         public bool createWayPointMeshes;
@@ -75,6 +75,7 @@ namespace GVR.Debugging
         public LogLevel zenKitLogLevel;
         public bool showZspyLogs;
         public bool showMusicLogs;
+        public bool showBarrierLogs;
 
 
         [Serializable]

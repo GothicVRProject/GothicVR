@@ -27,8 +27,9 @@ namespace GVR.Editor.Tools
             new (nameof(FeatureFlags.vobCulling), typeof(bool), true),
             new (nameof(FeatureFlags.enableSoundCulling), typeof(bool), true),
             new (nameof(FeatureFlags.vobItemsDynamicAttach), typeof(bool), true),
+            new (nameof(FeatureFlags.showBarrier), typeof(bool), true),
 
-            // Ints
+            // Ints / Floats
             new (nameof(FeatureFlags.TimeMultiplier), typeof(float), 1),
             new (nameof(FeatureFlags.startHour), typeof(int), 8), // Official start time of G1 - new game
             new (nameof(FeatureFlags.startMinute), typeof(int), 0), // Official start time of G1 - new game
@@ -82,6 +83,7 @@ namespace GVR.Editor.Tools
                         field.SetValue(featureFlags, false);
                         break;
                     case "Int32":
+                    case "Single": // float
                     case "SunMovementPerformance":
                         field.SetValue(featureFlags, 0);
                         break;
@@ -109,7 +111,7 @@ namespace GVR.Editor.Tools
                         }
                         break;
                     default:
-                        Debug.LogError($"Unsupported field type {field.FieldType.Name}");
+                        Debug.LogError($"Unsupported field type >{field.FieldType.Name}< for >{field.Name}<");
                         break;
                 }
             }
@@ -126,12 +128,13 @@ namespace GVR.Editor.Tools
                 {
                     case "Boolean":
                     case "Int32":
+                    case "Single": // float
                     case "VobCullingGroupSetting":
                         var field = featureFlags.GetType().GetField(flag.Item1);
                         field.SetValue(featureFlags, flag.Item3);
                         break;
                     default:
-                        Debug.LogError($"Unsupported/Untested field type {flag.Item2.Name}");
+                        Debug.LogError($"Unsupported/Untested field type >{flag.Item2.Name}< for >{flag.Item1}<");
                         break;
                 }
             }

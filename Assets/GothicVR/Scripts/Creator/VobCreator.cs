@@ -595,13 +595,13 @@ namespace GVR.Creator
         private static GameObject CreateItemMesh(Item vob, ItemInstance item, GameObject go)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
-            return MeshObjectCreator.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
+            return MeshCreatorFacade.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
         }
         
         private static GameObject CreateItemMesh(ItemInstance item, GameObject go)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
-            return MeshObjectCreator.CreateVob(item.Visual, mrm, default, default, false, parent: go);
+            return MeshCreatorFacade.CreateVob(item.Visual, mrm, default, default, false, parent: go);
         }
 
         private static GameObject CreateDecal(IVirtualObject vob)
@@ -611,7 +611,7 @@ namespace GVR.Creator
 
             var parent = parentGosTeleport[vob.Type];
 
-            return MeshObjectCreator.CreateVobDecal(vob, (VisualDecal)vob.Visual, parent);
+            return MeshCreatorFacade.CreateVobDecal(vob, (VisualDecal)vob.Visual, parent);
         }
 
         /// <summary>
@@ -731,7 +731,7 @@ namespace GVR.Creator
             {
                 var rendererModule = pfxGo.GetComponent<ParticleSystemRenderer>();
                 // FIXME - Move to a cached constant value
-                var standardShader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+                var standardShader = Constants.ShaderUnlitParticles;
                 var material = new Material(standardShader);
                 rendererModule.material = material;
                 TextureManager.I.SetTexture(pfx.VisNameS, rendererModule.material);
@@ -830,7 +830,7 @@ namespace GVR.Creator
             var mdl = AssetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                var ret = MeshObjectCreator.CreateVob(meshName, mdl, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), parent, go);
+                var ret = MeshCreatorFacade.CreateVob(meshName, mdl, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), parent, go);
                 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
                 if (ret == null)
@@ -844,7 +844,7 @@ namespace GVR.Creator
             var mdm = AssetCache.TryGetMdm(meshName);
             if (mdh != null && mdm != null)
             {
-                var ret = MeshObjectCreator.CreateVob(meshName, mdm, mdh, vob.Position.ToUnityVector(),
+                var ret = MeshCreatorFacade.CreateVob(meshName, mdm, mdh, vob.Position.ToUnityVector(),
                     vob.Rotation.ToUnityQuaternion(), parent, go);
 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
@@ -861,7 +861,7 @@ namespace GVR.Creator
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.CdDynamic;
 
-                var ret = MeshObjectCreator.CreateVob(meshName, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), withCollider, parent, go);
+                var ret = MeshCreatorFacade.CreateVob(meshName, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), withCollider, parent, go);
 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
                 if (ret == null)

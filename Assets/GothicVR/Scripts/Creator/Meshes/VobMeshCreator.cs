@@ -1,6 +1,7 @@
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
+using GVR.Globals;
 using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -68,7 +69,7 @@ namespace GVR.Creator.Meshes
 
             // FIXME use Prefab!
             // https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@12.0/manual/creating-a-decal-projector-at-runtime.html
-            var standardShader = Shader.Find("Shader Graphs/Decal");
+            var standardShader = Constants.ShaderDecal;
             var material = new Material(standardShader);
             material.SetTexture(Shader.PropertyToID("Base_Map"), texture);
 

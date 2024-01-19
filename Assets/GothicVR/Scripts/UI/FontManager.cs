@@ -1,11 +1,11 @@
 using System;
 using System.Reflection;
 using GVR.Caches;
-using GVR.Extensions;
 using GVR.Util;
 using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore;
+using Constants = GVR.Globals.Constants;
 
 namespace GVR.Manager
 {
@@ -86,8 +86,8 @@ namespace GVR.Manager
             ShaderUtilities.GetShaderPropertyIDs();
 
             // Add a new material
-            Shader shader = Shader.Find("TextMeshPro/Sprite");
-            Material tempMaterial = new Material(shader);
+            var shader = Constants.ShaderTMPSprite;
+            var tempMaterial = new Material(shader);
             tempMaterial.SetTexture(ShaderUtilities.ID_MainTex, spriteSheet);
 
             return tempMaterial;

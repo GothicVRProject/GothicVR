@@ -136,7 +136,7 @@ namespace GVR.Creator
 
                 lineObj.AddComponent<LineRenderer>();
                 var lr = lineObj.GetComponent<LineRenderer>();
-                lr.material = new Material(Shader.Find("Standard"));
+                lr.material = new Material(Constants.ShaderStandard);
                 lr.startWidth = 0.1f;
                 lr.endWidth = 0.1f;
                 lr.SetPosition(0, startPos);
