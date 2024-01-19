@@ -33,7 +33,7 @@ namespace GVR.Npc.Actions.AnimationActions
             if (coll.gameObject.name != fp.Name)
                 return;
 
-            Props.CurrentWayNetPoint = fp;
+            Props.CurrentFreePoint = fp;
             fp.IsLocked = true;
 
             AnimationEndEventCallback();

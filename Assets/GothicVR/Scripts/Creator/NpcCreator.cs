@@ -150,7 +150,11 @@ namespace GVR.Creator
             }
             
             npcGo.transform.position = initialSpawnPoint.Position;
-            npcGo.GetComponent<NpcProperties>().CurrentWayNetPoint = initialSpawnPoint;
+
+            if (initialSpawnPoint.IsFreePoint())
+                npcGo.GetComponent<NpcProperties>().CurrentFreePoint = (FreePoint)initialSpawnPoint;
+            else
+                npcGo.GetComponent<NpcProperties>().CurrentWayPoint = (WayPoint)initialSpawnPoint;
         }
         
         public static void ExtTaMin(NpcInstance npcInstance, int startH, int startM, int stopH, int stopM, int action, string waypoint)

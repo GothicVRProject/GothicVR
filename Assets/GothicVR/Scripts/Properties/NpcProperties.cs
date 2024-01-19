@@ -18,7 +18,8 @@ namespace GVR.Properties
         public Transform head;
         public HeadMorph headMorph;
 
-        public WayNetPoint CurrentWayNetPoint;
+        public WayPoint CurrentWayPoint;
+        public FreePoint CurrentFreePoint;
 
         public List<InfoInstance> Dialogs = new();
             

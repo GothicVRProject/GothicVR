@@ -7,5 +7,10 @@ namespace GVR.Npc.Actions.AnimationActions
     {
         public AlignToFp(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
+
+        protected override Vector3 GetRotationDirection()
+        {
+            return Props.CurrentFreePoint.Direction;
+        }
     }
 }

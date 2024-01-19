@@ -21,13 +21,13 @@ namespace GVR.Npc.Actions.AnimationActions
              * 1. AI_StartState() can get called multiple times until it won't share the WP. (e.g. ZS_SLEEP -> ZS_StandAround())
              * 2. Happens (e.g.) during spawning. As we spawn NPCs onto their current WayPoints, they don't need to walk there from entrance of OC.
              */
-            if (destination == "" || Props.CurrentWayNetPoint.Name == destination)
+            if (destination == "" || Props.CurrentWayPoint.Name == destination)
             {
                 IsFinishedFlag = true;
                 return;
             }
 
-            route = new Stack<DijkstraWaypoint>(WayNetHelper.FindFastestPath(Props.CurrentWayNetPoint.Name, destination));
+            route = new Stack<DijkstraWaypoint>(WayNetHelper.FindFastestPath(Props.CurrentWayPoint.Name, destination));
         }
         
         public override void OnTriggerEnter(Collider coll)

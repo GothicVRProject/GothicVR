@@ -6,5 +6,10 @@ namespace GVR.Npc.Actions.AnimationActions
     {
         public AlignToWp(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
+
+        protected override Vector3 GetRotationDirection()
+        {
+            return Props.CurrentWayPoint.Direction;
+        }
     }
 }
