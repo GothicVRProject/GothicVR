@@ -95,11 +95,11 @@ namespace GVR.Npc
         /// <summary>
         /// Clear ZS functions. If stopCurrentState=true, then stop current animation and don't execute with ZS_*_End()
         /// </summary>
-        public void ClearState(bool stopCurrentState)
+        public void ClearState(bool stopCurrentStateImmediately)
         {
             properties.AnimationQueue.Clear();
 
-            if (stopCurrentState)
+            if (stopCurrentStateImmediately)
             {
                 properties.currentLoopState = NpcProperties.LoopState.None;
                 AnimationCreator.StopAnimation(properties.gameObject);
