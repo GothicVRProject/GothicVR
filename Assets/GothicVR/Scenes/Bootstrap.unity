@@ -323,7 +323,6 @@ MonoBehaviour:
   drawWaypointEdges: 0
   drawFreePoints: 0
   spawnAtSpecificWayNetPoint: 
-  enableDayTime: 1
   TimeMultiplier: 1
   sunMovementPerformanceValue: 1
   startHour: 8

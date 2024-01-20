@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GVR.Debugging;
 using GVR.Manager;
+using GVR.World;
 using UnityEngine;
 
 namespace GVR.Npc.Routines
@@ -23,9 +24,9 @@ namespace GVR.Npc.Routines
             RoutineManager.I.Unsubscribe(this, Routines);
         }
 
-        public void ChangeRoutine(DateTime time)
+        public void ChangeRoutine(DateTime now)
         {
-            if (!CalculateCurrentRoutine(time.Hour, time.Minute))
+            if (!CalculateCurrentRoutine())
             {
                 Debug.LogWarning("ChangeRoutine got called but the resulting routine was the same: " +
                                  $"NPC: >{gameObject.name}< WP: >{CurrentRoutine.waypoint}<");
@@ -44,9 +45,11 @@ namespace GVR.Npc.Routines
         ///   -> For the overnight topic, we leverage the second if when start > end
         /// </summary>
         /// <returns>Whether the routine changed or not.</returns>
-        public bool CalculateCurrentRoutine(int currentHour, int currentMinute)
+        public bool CalculateCurrentRoutine()
         {
-            var normalizedNow = currentHour % 24 * 60 + currentMinute;
+            var currentTime = GameTime.I.GetCurrentDateTime();
+            
+            var normalizedNow = currentTime.Hour % 24 * 60 + currentTime.Minute;
 
             RoutineData newRoutine = null;
             

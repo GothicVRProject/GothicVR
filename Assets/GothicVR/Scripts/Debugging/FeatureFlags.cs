@@ -34,7 +34,6 @@ namespace GVR.Debugging
         public string spawnAtSpecificWayNetPoint;
         
         [Header("__________DayTime__________")]
-        public bool enableDayTime;
         [Tooltip("Modifies how fast the in-game time passes")]
         [Range(0.5f, 300f)] public float TimeMultiplier;
         public SunMovementPerformance sunMovementPerformanceValue;

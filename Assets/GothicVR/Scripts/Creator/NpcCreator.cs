@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using GVR.Caches;
 using GVR.Debugging;
@@ -11,7 +10,6 @@ using GVR.Properties;
 using GVR.Vm;
 using GVR.Vob.WayNet;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 using ZenKit;
 using ZenKit.Daedalus;
 using Object = UnityEngine.Object;
@@ -104,30 +102,9 @@ namespace GVR.Creator
                 MeshCreatorFacade.EquipNpcWeapon(newNpc, equippedItem, (VmGothicEnums.ItemFlags)equippedItem.MainFlag, (VmGothicEnums.ItemFlags)equippedItem.Flags);
             
             var npcRoutine = props.npcInstance.DailyRoutine;
-
-            // e.g. Monsters have no routine and therefore no further routine handling needed.
-            if (npcRoutine != 0)
-            {
-                // We always need to set "self" before executing any Daedalus function.
-                vm.GlobalSelf = props.npcInstance;
-                vm.Call(npcRoutine);
-
-                if (FeatureFlags.I.enableNpcRoutines)
-                    StartRoutineFirstTime(newNpc);
-            }
+            NpcHelper.ExchangeRoutine(newNpc, props.npcInstance, npcRoutine);
 
             SetSpawnPoint(newNpc, spawnPoint);
-        }
-
-        private static void StartRoutineFirstTime(GameObject npc)
-        {
-            // TODO - Will be changed to either 8am (new game) or value from loaded save game.
-            // TODO - Later: Use only this value if we set a debug value inside feature flags.
-            var routineComp = npc.GetComponent<Routine>();
-            routineComp.CalculateCurrentRoutine(FeatureFlags.I.startHour, FeatureFlags.I.startMinute);
-
-            var startRoutine = routineComp.CurrentRoutine;
-            npc.GetComponent<AiHandler>().StartRoutine(startRoutine.action, startRoutine.waypoint);
         }
         
         private static void SetSpawnPoint(GameObject npcGo, string spawnPoint)

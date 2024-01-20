@@ -21,7 +21,6 @@ namespace GVR.Editor.Tools
             // Booleans
             new(nameof(FeatureFlags.createWorldMesh), typeof(bool), true),
             new(nameof(FeatureFlags.createVobs), typeof(bool), true),
-            new (nameof(FeatureFlags.enableDayTime), typeof(bool), true),
             new (nameof(FeatureFlags.enableSounds), typeof(bool), true),
             new (nameof(FeatureFlags.enableMusic), typeof(bool), true),
             new (nameof(FeatureFlags.vobCulling), typeof(bool), true),

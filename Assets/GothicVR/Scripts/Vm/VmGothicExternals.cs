@@ -31,6 +31,7 @@ namespace GVR.Vm
             vm.RegisterExternal<NpcInstance>("AI_AlignToWP", AI_AlignToWP);
             vm.RegisterExternal<NpcInstance, string>("AI_GotoFP", AI_GotoFP);
             vm.RegisterExternal<NpcInstance, string>("AI_GotoWP", AI_GotoWP);
+            vm.RegisterExternal<NpcInstance, NpcInstance>("AI_GotoWP", AI_GotoNpc);
             vm.RegisterExternal<NpcInstance, string>("AI_PlayAni", AI_PlayAni);
             vm.RegisterExternal<NpcInstance, int, int, string>("AI_StartState", AI_StartState);
             vm.RegisterExternal<NpcInstance, int, int>("AI_UseItemToState", AI_UseItemToState);
@@ -101,6 +102,7 @@ namespace GVR.Vm
 
             // Day Routine
             vm.RegisterExternal<NpcInstance, int, int, int, int, int, string>("TA_MIN", TA_MIN);
+            vm.RegisterExternal<NpcInstance, string>("Npc_ExchangeRoutine", Npc_ExchangeRoutine);
 
             // World
             vm.RegisterExternal<int, string>("Wld_InsertNpc", Wld_InsertNpc);
@@ -166,6 +168,11 @@ namespace GVR.Vm
         public static void AI_GotoWP(NpcInstance npc, string wayPointName)
         {
             NpcHelper.ExtAiGoToWp(npc, wayPointName);
+        }
+
+        public static void AI_GotoNpc(NpcInstance self, NpcInstance other)
+        {
+            NpcHelper.ExtAiGoToNpc(self, other);
         }
 
         public static void AI_PlayAni(NpcInstance npc, string name)
@@ -552,6 +559,11 @@ namespace GVR.Vm
             string waypoint)
         {
             NpcCreator.ExtTaMin(npc, startH, startM, stopH, stopM, action, waypoint);
+        }
+
+        public static void Npc_ExchangeRoutine(NpcInstance self, string routineName)
+        {
+            NpcHelper.ExtNpcExchangeRoutine(self, routineName);
         }
 
         #endregion

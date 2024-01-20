@@ -97,8 +97,6 @@ namespace GVR.Npc
         /// </summary>
         public void ClearState(bool stopCurrentStateImmediately)
         {
-            properties.AnimationQueue.Clear();
-
             if (stopCurrentStateImmediately)
             {
                 properties.currentLoopState = NpcProperties.LoopState.None;
@@ -115,8 +113,13 @@ namespace GVR.Npc
                     vm.Call(properties.stateEnd);
                 }
             }
+            
+            // Whenever we change routine, we reset some data to "start" from scratch as if the NPC got spawned.
+            properties.AnimationQueue.Clear();
+            properties.currentAction = new None(new(AnimationAction.Type.AINone), gameObject);
+            properties.stateTime = 0.0f;
         }
-        
+
         private void PlayNextAnimation(AbstractAnimationAction action)
         {
             properties.currentAction = action;

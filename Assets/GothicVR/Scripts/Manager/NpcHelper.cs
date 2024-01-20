@@ -1,9 +1,13 @@
 using System.Linq;
 using GVR.Caches;
+using GVR.Debugging;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
+using GVR.Npc;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
+using GVR.Npc.Routines;
 using GVR.Properties;
 using GVR.Vm;
 using UnityEngine;
@@ -179,6 +183,14 @@ namespace GVR.Manager
                 new(AnimationAction.Type.AIGoToWP, string0: wayPointName),
                 props.gameObject));
         }
+
+        public static void ExtAiGoToNpc(NpcInstance self, NpcInstance other)
+        {
+            var props = GetProperties(self);
+            props.AnimationQueue.Enqueue(new GoToNpc(
+                new(AnimationAction.Type.AIGoToNpc),
+                props.gameObject));
+        }
         
         public static void ExtAiAlignToFp(NpcInstance npc)
         {
@@ -285,6 +297,43 @@ namespace GVR.Manager
             props.AnimationQueue.Enqueue(new DrawWeapon(
                 new(AnimationAction.Type.AIDrawWeapon),
                 props.gameObject));
+        }
+
+        public static void ExtNpcExchangeRoutine(NpcInstance npcInstance, string routineName)
+        {
+            var formattedRoutineName = $"Rtn_{routineName}_{npcInstance.Id}";
+            var newRoutine = GameData.GothicVm.GetSymbolByName(formattedRoutineName);
+
+            if (newRoutine == null)
+            {
+                Debug.LogError($"Routine {formattedRoutineName} couldn't be found.");
+                return;
+            }
+
+            var npcGo = LookupCache.NpcCache[npcInstance.Index];
+            ExchangeRoutine(npcGo.gameObject, npcInstance, newRoutine.Index);
+        }
+
+        public static void ExchangeRoutine(GameObject go, NpcInstance npcInstance, int routineIndex)
+        {
+            // e.g. Monsters have no routine and therefore no further routine handling needed.
+            if (routineIndex == 0)
+                return;
+
+            var routineComp = go.GetComponent<Routine>();
+            routineComp.Routines.Clear();
+            
+            // We always need to set "self" before executing any Daedalus function.
+            GameData.GothicVm.GlobalSelf = npcInstance;
+            GameData.GothicVm.Call(routineIndex);
+            
+            if (!FeatureFlags.I.enableNpcRoutines)
+                return;
+
+            routineComp.CalculateCurrentRoutine();
+
+            var startRoutine = routineComp.CurrentRoutine;
+            go.GetComponent<AiHandler>().StartRoutine(startRoutine.action, startRoutine.waypoint);
         }
     }
 }
