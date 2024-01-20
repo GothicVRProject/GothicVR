@@ -39,7 +39,7 @@ namespace GVR.Creator.Sounds
         public static AudioClip ToAudioClip(SoundData wavFile)
         {
             var audioClip =
-                AudioClip.Create("Sound", wavFile.sound.Length, wavFile.channels, wavFile.sampleRate, false);
+                AudioClip.Create("Sound", wavFile.sound.Length/wavFile.channels, wavFile.channels, wavFile.sampleRate, false);
             audioClip.SetData(wavFile.sound, 0);
 
             return audioClip;
@@ -60,17 +60,29 @@ namespace GVR.Creator.Sounds
             var blockAlign = BitConverter.ToUInt16(fileBytes, 32);
             var bitDepth = BitConverter.ToUInt16(fileBytes, 34);
 
-            var headerOffset = 16 + 4 + subchunk1 + 4;
-            var subchunk2 = BitConverter.ToInt32(fileBytes, headerOffset);
+            // Calculate header offset and data size
+            var headerOffset = 20 + subchunk1;
+            var dataSizeOffset = headerOffset + 4;
+            if(dataSizeOffset + 4 > fileBytes.Length)
+                throw new ArgumentException("Invalid WAV file structure.");
 
+            var subchunk2 = BitConverter.ToInt32(fileBytes, dataSizeOffset);
+
+            // Ensure that subchunk2 does not exceed fileBytes length
+            var dataAvailable = fileBytes.Length - (dataSizeOffset + 4);
+            if(subchunk2 > dataAvailable)
+            {
+                subchunk2 = dataAvailable;
+            }
+            
             if (formatCode == "IMA ADPCM")
             {
                 return ConvertWavByteArrayToFloatArray(IMAADPCMDecoder.Decode(fileBytes));
             }
 
-            // Replace fileBytes with a byte array containing only the data section
+            // Copy WAV data section into a new array
             var data = new byte[subchunk2];
-            Array.Copy(fileBytes, headerOffset + 4, data, 0, subchunk2);
+            Array.Copy(fileBytes, dataSizeOffset + 4, data, 0, subchunk2);
 
             return new SoundData
             {
