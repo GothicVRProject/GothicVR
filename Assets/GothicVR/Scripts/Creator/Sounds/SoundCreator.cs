@@ -39,7 +39,7 @@ namespace GVR.Creator.Sounds
         public static AudioClip ToAudioClip(SoundData wavFile)
         {
             var audioClip =
-                AudioClip.Create("Sound", wavFile.sound.Length, wavFile.channels, wavFile.sampleRate, false);
+                AudioClip.Create("Sound", wavFile.sound.Length/wavFile.channels, wavFile.channels, wavFile.sampleRate, false);
             audioClip.SetData(wavFile.sound, 0);
 
             return audioClip;
