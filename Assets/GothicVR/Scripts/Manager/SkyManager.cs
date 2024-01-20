@@ -36,6 +36,25 @@ namespace GVR.GothicVR.Scripts.Manager
                 CreatePresetState(new SkyState(), (state) => state.PresetDay0())
             });
 
+            if (SettingsManager.GameSettings.GothicINISettings.ContainsKey("SKY_OUTDOOR"))
+            {
+                foreach (var state in stateList)
+                {
+                    if (state.time < 0.35 || state.time > 0.65)
+                    {
+                        var currentDay = GameTime.I.GetDay();
+                        var day = (currentDay + 1);
+
+                        // hacky way to use the proper color for the current day until animTex is implemented
+                        var colorValues =
+                            SettingsManager.GameSettings.GothicINISettings["SKY_OUTDOOR"]["zDayColor" + day % 2]
+                                .Split(' ').Select(float.Parse).ToArray();
+
+                        state.fogColor = new Vector3(colorValues[0], colorValues[1], colorValues[2]);
+                    }
+                }
+            }
+
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
             RenderSettings.ambientMode = AmbientMode.Flat;
