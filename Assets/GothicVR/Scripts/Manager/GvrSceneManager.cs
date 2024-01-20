@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
+using GVR.Extensions;
 using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Util;
@@ -207,39 +208,34 @@ namespace GVR.Manager
 
         private void SetSpawnPoint(Scene worldScene)
         {
-            var spots = GameObject.FindGameObjectsWithTag(Constants.SpotTag);
-
-            // Spawn at specifically named point.
-            if (!string.IsNullOrWhiteSpace(FeatureFlags.I.spawnAtSpecificFreePoint))
+            var debugSpawnPoint = FeatureFlags.I.spawnAtSpecificWayNetPoint;
+            // DEBUG - Spawn at specifically named point.
+            if (debugSpawnPoint.Any())
             {
-                // FIXME - Move to EqualsIgnoreCase() in the future
-                var fp = spots.FirstOrDefault(i =>
-                    i.name.Equals(FeatureFlags.I.spawnAtSpecificFreePoint, StringComparison.OrdinalIgnoreCase));
-
-                if (fp != null)
+                var point = WayNetHelper.GetWayNetPoint(debugSpawnPoint);
+                
+                if (point != null)
                 {
-                    startPoint = fp;
+                    startPoint = GameObject.Find(debugSpawnPoint);
                     return;
                 }
             }
             
-            for (int i = 0; i < spots.Length; i++)
+            var spots = GameObject.FindGameObjectsWithTag(Constants.SpotTag);
+            
+            // DEBUG - This _startVobAfterLoading_ is only used as debug method for the menu where we select the vob to spawn to.
+            // DEBUG - Normally we would spawn at START(_GOTHIC2) or whatever the loaded save file tells us.
+            var startPoint1 = spots.FirstOrDefault(go => go.name.EqualsIgnoreCase(startVobAfterLoading));
+            if (startPoint1 != null)
             {
-                if (spots[i].name == startVobAfterLoading)
-                {
-                    startPoint = spots[i];
-                }
+                startPoint = startPoint1;
+                return;
             }
-            if (startPoint == null)
-            {
-                for (int i = 0; i < spots.Length; i++)
-                {
-                    if ((spots[i].name == "START" || spots[i].name == "START_GOTHIC2") && spots[i].scene == worldScene)
-                    {
-                        startPoint = spots[i];
-                    }
-                }
-            }
+
+            var startPoint2 = spots.FirstOrDefault(
+                go => go.name.EqualsIgnoreCase("START") || go.name.EqualsIgnoreCase("START_GOTHIC2")
+            );
+            startPoint = startPoint2;
         }
 
         public void MoveToWorldScene(GameObject go)

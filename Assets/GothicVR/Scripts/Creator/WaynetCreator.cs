@@ -108,10 +108,9 @@ namespace GVR.Creator
 
                 // We remove the Renderer only if not wanted.
                 // TODO - Can be outsourced to a different Prefab-variant without Renderer for a fractal of additional performance. ;-)
-                if (!FeatureFlags.I.createWayPointMeshes)
+                if (!FeatureFlags.I.drawWayPoints)
                     Object.Destroy(wpObject.GetComponent<MeshRenderer>());
 
-                wpObject.tag = Constants.SpotTag;
                 wpObject.name = waypoint.Name;
                 wpObject.transform.position = waypoint.Position.ToUnityVector();
 
@@ -121,7 +120,7 @@ namespace GVR.Creator
 
         private static void CreateWaypointEdges(GameObject parent, WorldData world)
         {
-            if (!FeatureFlags.I.createWaypointEdgeMeshes)
+            if (!FeatureFlags.I.drawWaypointEdges)
                 return;
 
             var waypointEdgesObj = new GameObject(string.Format("Edges"));

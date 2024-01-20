@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
+  m_IndirectSpecularColor: {r: 0.172768, g: 0.21589169, b: 0.29782546, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -319,8 +319,10 @@ MonoBehaviour:
   createWorldMesh: 1
   vobItemsDynamicAttach: 1
   showBarrier: 1
-  createWayPointMeshes: 0
-  createWaypointEdgeMeshes: 0
+  drawWayPoints: 0
+  drawWaypointEdges: 0
+  drawFreePoints: 0
+  spawnAtSpecificWayNetPoint: 
   enableDayTime: 1
   TimeMultiplier: 1
   sunMovementPerformanceValue: 1
@@ -338,8 +340,6 @@ MonoBehaviour:
   vobCullingLarge:
     maxObjectSize: 100
     cullingDistance: 200
-  spawnAtSpecificFreePoint: 
-  drawFreePointMeshes: 0
   drawVobCullingGizmos: 0
   vobTypeToSpawn: 
   createOcNpcs: 0

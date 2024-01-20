@@ -26,10 +26,13 @@ namespace GVR.Debugging
         public bool vobItemsDynamicAttach;
         public bool showBarrier;
 
-        [Header("__________World - Developer__________")]
-        public bool createWayPointMeshes;
-        public bool createWaypointEdgeMeshes;
-
+        [Header("__________WayNet - Developer__________")]
+        public bool drawWayPoints;
+        public bool drawWaypointEdges;
+        public bool drawFreePoints;
+        [Tooltip("Leave blank if you want to spawn normal.")]
+        public string spawnAtSpecificWayNetPoint;
+        
         [Header("__________DayTime__________")]
         public bool enableDayTime;
         [Tooltip("Modifies how fast the in-game time passes")]
@@ -47,9 +50,6 @@ namespace GVR.Debugging
         public VobCullingGroupSetting vobCullingLarge;
 
         [Header("__________VOB - Developer__________")]
-        [Tooltip("Leave blank if you want to spawn normal.")]
-        public string spawnAtSpecificFreePoint;
-        public bool drawFreePointMeshes;
         public bool drawVobCullingGizmos;
         [Tooltip("Set the VirtualObjectTypes to spawn only. (Ignored if empty)")]
         public List<VirtualObjectType> vobTypeToSpawn;

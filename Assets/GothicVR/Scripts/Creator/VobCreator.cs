@@ -549,7 +549,7 @@ namespace GVR.Creator
             // FIXME - change to a Prefab in the future.
             var vobObj = GetPrefab(vob);
 
-            if (!FeatureFlags.I.drawFreePointMeshes)
+            if (!FeatureFlags.I.drawFreePoints)
             {
                 // Quick win: If we don't want to render the spots, we just remove the Renderer.
                 GameObject.Destroy(vobObj.GetComponent<MeshRenderer>());
