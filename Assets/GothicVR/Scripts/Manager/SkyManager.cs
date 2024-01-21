@@ -90,14 +90,14 @@ namespace GVR.GothicVR.Scripts.Manager
                 return; // finished blending
             }
 
-            var oldPolyColor = lastState.polyColor.ToUnityColor() / 255f;
-            var newPolyColor = newState.polyColor.ToUnityColor() / 255f;
+            var oldPolyColor = lastState.polyColor.ToUnityColor(255) / 255f;
+            var newPolyColor = newState.polyColor.ToUnityColor(255) / 255f;
 
-            var oldDomeColor = lastState.domeColor0.ToUnityColor() / 255f;
-            var newDomeColor = newState.domeColor0.ToUnityColor() / 255f;
+            var oldDomeColor = lastState.domeColor0.ToUnityColor(255) / 255f;
+            var newDomeColor = newState.domeColor0.ToUnityColor(255) / 255f;
 
-            var oldFogColor = lastState.fogColor.ToUnityColor() / 255f;
-            var newFogColor = newState.fogColor.ToUnityColor() / 255f;
+            var oldFogColor = lastState.fogColor.ToUnityColor(255) / 255f;
+            var newFogColor = newState.fogColor.ToUnityColor(255) / 255f;
 
 
             RenderSettings.ambientLight = Color.Lerp(oldPolyColor, newPolyColor, lerpFraction);
