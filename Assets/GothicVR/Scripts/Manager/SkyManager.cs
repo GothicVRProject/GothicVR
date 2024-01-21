@@ -63,24 +63,24 @@ namespace GVR.GothicVR.Scripts.Manager
 
         private void Interpolate(DateTime _)
         {
-            Interpolate();
-        }
-
-        private void Interpolate()
-        {
             masterTime = GameTime.I.GetSkyTime(); // Current time
 
-            var (previousIndex, nextIndex) = FindNextStateIndex();
+            var (previousIndex, currentIndex) = FindNextStateIndex();
 
             var lastState = stateList[previousIndex];
             var newState = stateList[nextIndex];
+            var currentState = stateList[currentIndex];
+            InterpolateSky(lastState, currentState, currentState.time, currentState.lerpDuration);
+        }
 
             float lerpDuration = 0.05f; // Duration over which to lerp
             float startTime = newState.time; // Starting time
 
+
+        private void InterpolateSky(SkyState lastState, SkyState newState, float startTime, float lerpDuration = 0.05f)
+        {
             // Calculate how far we are between the two ticks (0.0 to 1.0)
-            float endTime = startTime + lerpDuration;
-            float lerpFraction = (masterTime - startTime) / (endTime - startTime);
+            float lerpFraction = (masterTime - startTime) / lerpDuration;
 
             lerpFraction = Mathf.Clamp01(lerpFraction);
 

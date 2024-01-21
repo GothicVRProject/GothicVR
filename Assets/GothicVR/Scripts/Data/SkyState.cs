@@ -18,6 +18,8 @@ namespace GVR.Data
         public int cloudShadowOn;
         public SkyLayerData[] layer;
 
+        public float lerpDuration = 0.05f;
+
         public SkyState()
         {
             layer = new SkyLayerData[2];
