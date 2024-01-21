@@ -4,6 +4,7 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Creator.Sounds;
 using GVR.Data;
+using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
 using GVR.Manager.Settings;
@@ -255,7 +256,7 @@ namespace GVR.GothicVR.Scripts.Manager
             var module = rainParticleSystem.emission;
             module.rateOverTime = new ParticleSystem.MinMaxCurve(MAX_PARTICLE_COUNT * rainWeightAndVolume);
 
-            if (!rainParticleSound.isPlaying)
+            if (!rainParticleSound.isPlaying && FeatureFlags.I.enableSounds)
             {
                 rainParticleSound.Play();
             }
