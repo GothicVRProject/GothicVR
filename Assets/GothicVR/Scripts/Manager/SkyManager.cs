@@ -206,7 +206,8 @@ namespace GVR.GothicVR.Scripts.Manager
 
         private void UpdateRainTime(DateTime _)
         {
-            if (masterTime > 0.02f) // This function is called every hour but is run only once a day at 12:00 pm
+            if (masterTime > 0.02f || // This function is called every hour but is run only once a day at 12:00 pm
+                GameTime.I.GetDay() == 1) // Dont update if it is the first day 
                 return;
 
             rainState.time = Random.Range(0f, 1f);
