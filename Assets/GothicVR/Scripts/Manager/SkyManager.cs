@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GVR.Caches;
+using GVR.Creator.Sounds;
 using GVR.Data;
 using GVR.Extensions;
 using GVR.Globals;
+using GVR.Manager.Settings;
 using GVR.Util;
 using GVR.World;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Random = UnityEngine.Random;
 
 namespace GVR.GothicVR.Scripts.Manager
 {
@@ -15,11 +19,21 @@ namespace GVR.GothicVR.Scripts.Manager
     {
         private float masterTime;
         private bool noSky = true;
-        [SerializeField] private List<SkyState> stateList = new List<SkyState>();
+        private List<SkyState> stateList = new();
+
+        private SkyStateRain rainState = new();
+        private ParticleSystem rainParticleSystem;
+        private AudioSource rainParticleSound;
+        private float rainWeightAndVolume;
+        public bool IsRaining;
+
+        private const int MAX_PARTICLE_COUNT = 700;
 
         private void Start()
         {
             GvrEvents.GameTimeSecondChangeCallback.AddListener(Interpolate);
+            GvrEvents.GameTimeHourChangeCallback.AddListener(UpdateRainTime);
+            GvrEvents.GeneralSceneLoaded.AddListener(InitRainGO);
         }
 
         public void InitSky()
@@ -36,6 +50,18 @@ namespace GVR.GothicVR.Scripts.Manager
                 CreatePresetState(new SkyState(), (state) => state.PresetDay0())
             });
 
+
+            RenderSettings.fog = true;
+            RenderSettings.fogMode = FogMode.Linear;
+            RenderSettings.ambientMode = AmbientMode.Flat;
+            InitRainState();
+            noSky = true;
+
+            Interpolate(new DateTime());
+        }
+
+        private void UpdateStateTexAndFog(SkyState currentState)
+        {
             if (SettingsManager.GameSettings.GothicINISettings.ContainsKey("SKY_OUTDOOR"))
             {
                 var currentDay = GameTime.I.GetDay();
@@ -46,15 +72,20 @@ namespace GVR.GothicVR.Scripts.Manager
                     SettingsManager.GameSettings.GothicINISettings["SKY_OUTDOOR"]["zDayColor" + day % 2]
                         .Split(' ').Select(float.Parse).ToArray();
 
-                        state.fogColor = new Vector3(colorValues[0], colorValues[1], colorValues[2]);
+                foreach (var state in stateList)
+                {
+                    if (state.time < 0.35 || state.time > 0.65)
+                    {
+                        state.layer[0].texName = "SKYDAY_LAYER0_A" + day % 2 + ".TGA";
+                        if (state.time < 0.3 || state.time > 0.7)
+                        {
+                            state.layer[1].texName = "SKYDAY_LAYER1_A" + day % 2 + ".TGA";
+                            state.fogColor = new Vector3(colorValues[0], colorValues[1], colorValues[2]);
+                            state.domeColor0 = new Vector3(colorValues[0], colorValues[1], colorValues[2]);
+                        }
                     }
                 }
             }
-
-            RenderSettings.fog = true;
-            RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.ambientMode = AmbientMode.Flat;
-            Interpolate();
         }
 
         private void Interpolate(DateTime _)
@@ -65,10 +96,28 @@ namespace GVR.GothicVR.Scripts.Manager
 
             var lastState = stateList[previousIndex];
             var currentState = stateList[currentIndex];
+            IsRaining = masterTime > rainState.time && masterTime < rainState.endTime;
+
+            UpdateStateTexAndFog(currentState);
+
+            if (IsRaining)
+            {
+                UpdateRain(rainState.time);
+                InterpolateSky(currentState, rainState, rainState.time, rainState.lerpDuration);
+                return;
+            }
+
+            if (masterTime > rainState.time &&
+                masterTime < rainState.endTime + rainState.lerpDuration) // when rain is ending
+            {
+                UpdateRain(rainState.endTime);
+                InterpolateSky(rainState, currentState, rainState.endTime, rainState.lerpDuration);
+                return;
+            }
+
+            UpdateRain(rainState.time);
             InterpolateSky(lastState, currentState, currentState.time, currentState.lerpDuration);
         }
-
-
 
         private void InterpolateSky(SkyState lastState, SkyState newState, float startTime, float lerpDuration = 0.05f)
         {
@@ -126,6 +175,97 @@ namespace GVR.GothicVR.Scripts.Manager
             DynamicGI.UpdateEnvironment();
         }
 
+        private void InitRainState()
+        {
+            // values taken from the original game
+            rainState.time = 0.187f; // 16:30
+            rainState.endTime = 0.229f; // 17:30
+            rainState.lerpDuration = 0.01f;
+            rainState.polyColor = new Vector3(255.0f, 250.0f, 235.0f);
+            rainState.fogColor = new Vector3(72.0f, 72.0f, 72.0f);
+            rainState.domeColor0 = new Vector3(72.0f, 72.0f, 72.0f);
+            rainState.layer[0].texName = "SKYRAINCLOUDS.TGA";
+            rainState.layer[0].texAlpha = 255.0f;
+        }
+
+        private void InitRainGO()
+        {
+            // by default rainPFX is disabled so we need to find the parent and activate it
+            var rainParticlesGameObject = GameObject.Find("Rain").FindChildRecursively("RainParticles");
+            rainParticlesGameObject.SetActive(true);
+            rainParticleSystem = rainParticlesGameObject.GetComponent<ParticleSystem>();
+            rainParticleSystem.Stop();
+
+            rainParticleSound = rainParticlesGameObject.GetComponentInChildren<AudioSource>();
+            rainParticleSound.clip = SoundCreator.ToAudioClip(AssetCache.TryGetSound("RAIN_01.WAV"));
+            rainParticleSound.volume = 0;
+            rainParticleSound.Stop();
+        }
+
+
+        private void UpdateRainTime(DateTime _)
+        {
+            if (masterTime > 0.02f) // This function is called every hour but is run only once a day at 12:00 pm
+                return;
+
+            rainState.time = Random.Range(0f, 1f);
+
+            if (0.96f < rainState.time)
+            {
+                rainState.time = 0.96f;
+            }
+
+            rainState.endTime = Random.Range(0f, 0.06f) + 0.04f + rainState.time;
+
+            if (1.0f < rainState.endTime)
+            {
+                rainState.endTime = 1.0f;
+            }
+        }
+
+        private void UpdateRain(float stateTime, float lerpDuration = 0.01f)
+        {
+            if (rainParticleSound == null || rainParticleSystem == null)
+                return;
+
+            if (masterTime < rainState.time ||
+                masterTime > rainState.endTime + rainState.lerpDuration) // is not raining nor after rain
+            {
+                rainParticleSound.volume = 0;
+                rainParticleSound.Stop();
+                rainParticleSystem.Stop();
+                return;
+            }
+
+            var lerpFraction = (masterTime - stateTime) / lerpDuration;
+
+            lerpFraction = Mathf.Clamp01(lerpFraction);
+
+            if (IsRaining)
+            {
+                rainWeightAndVolume = lerpFraction;
+            }
+            else if (masterTime > rainState.time && masterTime < rainState.endTime + rainState.lerpDuration)
+            {
+                rainWeightAndVolume = 1 - lerpFraction;
+            }
+
+            rainParticleSound.volume = rainWeightAndVolume;
+
+            var module = rainParticleSystem.emission;
+            module.rateOverTime = new ParticleSystem.MinMaxCurve(MAX_PARTICLE_COUNT * rainWeightAndVolume);
+
+            if (!rainParticleSound.isPlaying)
+            {
+                rainParticleSound.Play();
+            }
+
+            if (!rainParticleSystem.isPlaying)
+            {
+                rainParticleSystem.Play();
+            }
+        }
+
         /// <summary>
         /// Find the previous and next state indices based on the current master time.
         /// </summary>
@@ -145,7 +285,7 @@ namespace GVR.GothicVR.Scripts.Manager
             return (previousIndex, nextIndex);
         }
 
-        private SkyState CreatePresetState(SkyState skyState, Action<SkyState> applyPreset)
+        private static SkyState CreatePresetState(SkyState skyState, Action<SkyState> applyPreset)
         {
             applyPreset(skyState);
             return skyState;
