@@ -13,7 +13,8 @@ namespace GVR.Globals
 
         // Custom GVR shaders
         public static readonly Shader ShaderUnlitAlphaToCoverage = Shader.Find("Unlit/Unlit-AlphaToCoverage");
-        public static readonly Shader ShaderWater = Shader.Find("Shader Graphs/Unlit_Both_ScrollY"); //Vince's moving texture water shader
+        // public static readonly Shader ShaderWater = Shader.Find("Shader Graphs/Unlit_Both_ScrollY"); //Vince's moving texture water shader
+        public static readonly Shader ShaderWater = Shader.Find("Unlit/Water"); //Vince's moving texture water shader
         public static readonly Shader ShaderBarrier = Shader.Find("Unlit/Barrier");
         public static readonly Shader ShaderThunder = Shader.Find("Unlit/ThunderShader");
 

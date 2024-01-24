@@ -197,7 +197,7 @@ namespace GVR.Creator.Meshes
                     }
                 }
 
-                var material = GetDefaultMaterial(texture != null && texture.format == TextureFormat.RGBA32);
+                var material = GetDefaultMaterial(materialData, texture != null && texture.format == TextureFormat.RGBA32);
 
                 rend.material = material;
 
@@ -478,15 +478,48 @@ namespace GVR.Creator.Meshes
             return AssetCache.TryGetTexture(name);
         }
 
-        protected Material GetDefaultMaterial(bool isAlphaTest)
+        protected Material GetDefaultMaterial(IMaterial zkMaterial, bool isAlphaTest)
         {
-            var shader = isAlphaTest ? Constants.ShaderUnlitAlphaToCoverage : Constants.ShaderUnlit;
-            var material = new Material(shader);
-
+            Shader shader;
+            Material material;
             if (isAlphaTest)
             {
+                shader = Constants.ShaderUnlitAlphaToCoverage;
+                material = new Material(shader);
+
                 // Manually correct the render queue for alpha test, as Unity doesn't want to do it from the shader's render queue tag.
                 material.renderQueue = (int)RenderQueue.AlphaTest;
+
+                return material;
+            }
+
+            if (zkMaterial.Group == MaterialGroup.Water)
+            {
+                return GetWaterMaterial(zkMaterial);
+            }
+
+            shader = Constants.ShaderUnlit;
+            material = new Material(shader);
+            switch (zkMaterial.AlphaFunction)
+            {
+                case AlphaFunction.Blend:
+                    material.ToTransparentMode();
+                    break;
+                case AlphaFunction.Multiply:
+                    material.ToMulMode();
+                    break;
+                case AlphaFunction.MultiplyAlt:
+                    material.ToMul2Mode();
+                    break;
+                case AlphaFunction.Add:
+                case AlphaFunction.Subtract:
+                    material.ToAdditiveMode();
+                    break;
+                case AlphaFunction.Default:
+                case AlphaFunction.None:
+                default:
+                    material.ToOpaqueMode();
+                    break;
             }
 
             return material;
@@ -497,25 +530,12 @@ namespace GVR.Creator.Meshes
             var shader = Constants.ShaderWater;
             var material = new Material(shader);
 
-            // FIXME - Running water speed and direction is hardcoded based on material names
-            // Needs to be improved by a better shader and the implementation of proper water material parameters
-
-            //JaXt0r's suggestion for a not so hardcoded running water implementation
-            //material.SetFloat("_ScrollSpeed", -900000 * materialData.animMapDir.ToUnityVector().SqrMagnitude());
-
-            switch (materialData.Name)
+            if (materialData.TextureAnimationMapping != AnimationMapping.None)
             {
-                case "OWODSEA2SWAMP": material.SetFloat("_ScrollSpeed", 0f); break;
-                case "NCWASSER": material.SetFloat("_ScrollSpeed", 0f); break;
-                case "OWODWATSTOP": material.SetFloat("_ScrollSpeed", (materialData.TextureAnimationFps / 75f)); break;
-                case "OWODWFALL": material.SetFloat("_ScrollSpeed", -(materialData.TextureAnimationFps / 10f)); break;
-                default: material.SetFloat("_ScrollSpeed", -(materialData.TextureAnimationFps / 75f)); break;
+                material.SetVector("_Scroll", materialData.TextureAnimationMappingDirection.ToUnityVector() * 1000);
             }
 
-            material.SetFloat("_Surface", 0);
-            material.SetInt("_ZWrite", 0);
-            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+            material.ToTransparentMode();
 
             return material;
         }

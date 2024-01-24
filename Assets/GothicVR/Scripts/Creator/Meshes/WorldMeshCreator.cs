@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using GVR.Caches;
 using GVR.Extensions;
 using GVR.Manager;
 using GVR.World;
@@ -53,6 +54,14 @@ namespace GVR.Creator.Meshes
                 Self.PrepareMeshFilter(meshFilter, subMesh);
                 Self.PrepareMeshCollider(subMeshObj, meshFilter.sharedMesh, subMesh.Material);
 
+                if (subMesh.Material.TextureAnimationFps > 0)
+                {
+                    var animator = subMeshObj.AddComponent<TextureAnimator>();
+                    animator.materialData = subMesh.Material;
+                    animator.targetMaterial = meshRenderer.material;
+                    animator.frames = AssetCache.TryGetAnimTextures(subMesh.Material.Texture);
+                }
+
 #if UNITY_EDITOR // Only needed for Occlusion Culling baking
                 // Don't set transparent meshes as occluders.
                 if (IsTransparentShader(meshRenderer.sharedMaterial.shader))
@@ -81,15 +90,7 @@ namespace GVR.Creator.Meshes
             }
 
             Material material;
-            switch (subMesh.Material.Group)
-            {
-                case MaterialGroup.Water:
-                    material = GetWaterMaterial(subMesh.Material);
-                    break;
-                default:
-                    material = GetDefaultMaterial(texture != null && texture.format == TextureFormat.RGBA32);
-                    break;
-            }
+            material = GetDefaultMaterial(bMaterial, texture != null && texture.format == TextureFormat.RGBA32);
 
             rend.material = material;
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using GVR.Creator.Sounds;
 using GVR.Data;
 using GVR.Extensions;
@@ -101,6 +102,32 @@ namespace GVR.Caches
             TextureCache[preparedKey] = texture;
 
             return texture;
+        }
+
+        public static Texture2D[] TryGetAnimTextures(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            List<Texture2D> textures = new List<Texture2D>();
+
+            if (!key.Contains("_A0") && !key.Contains("_a0"))
+                return textures.ToArray();
+
+            for (int id = 0;; ++id)
+            {
+                // Replace the frame number in the key with the current id
+                string frameKey = Regex.Replace(key, "_[Aa]0", $"_A{id}");
+
+                frameKey = frameKey.ToUpper();
+
+                Texture2D texture = TryGetTexture(frameKey);
+
+                if (texture == null)
+                    break;
+
+                textures.Add(texture);
+            }
+
+            return textures.ToArray();
         }
 
         /// <summary>
@@ -297,6 +324,7 @@ namespace GVR.Caches
             {
                 // ignored
             }
+
             MusiThemeCache[preparedKey] = newData;
 
             return newData;
@@ -336,6 +364,7 @@ namespace GVR.Caches
             {
                 // ignored
             }
+
             ItemDataCache[preparedKey] = newData;
 
             return newData;
@@ -360,6 +389,7 @@ namespace GVR.Caches
             {
                 // ignored
             }
+
             SfxDataCache[preparedKey] = newData;
 
             return newData;
@@ -383,6 +413,7 @@ namespace GVR.Caches
             {
                 // ignored
             }
+
             PfxDataCache[preparedKey] = newData;
 
             return newData;
@@ -393,7 +424,7 @@ namespace GVR.Caches
             var preparedKey = GetPreparedKey(key);
             if (SoundCache.TryGetValue(preparedKey, out var data))
                 return data;
-            
+
             var newData = SoundCreator.GetSoundArrayFromVfs($"{preparedKey}.wav");
             SoundCache[preparedKey] = newData;
 
@@ -405,7 +436,7 @@ namespace GVR.Caches
             var preparedKey = GetPreparedKey(key);
             if (FontCache.TryGetValue(preparedKey, out var data))
                 return data;
-            
+
             var fontData = new Font(GameData.Vfs, $"{preparedKey}.fnt").Cache();
             FontCache[preparedKey] = fontData;
 
