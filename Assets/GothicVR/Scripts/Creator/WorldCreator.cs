@@ -134,6 +134,7 @@ namespace GVR.Creator
                 subMesh.Value.Vertices.Reverse();
                 subMesh.Value.Uvs.Reverse();
                 subMesh.Value.Normals.Reverse();
+                subMesh.Value.Light.Reverse();
             }
 
             return subMeshes;
@@ -152,6 +153,7 @@ namespace GVR.Creator
             var feature = features[(int)featureIndex];
             currentSubMesh.Uvs.Add(feature.Texture.ToUnityVector());
             currentSubMesh.Normals.Add(feature.Normal.ToUnityVector());
+            currentSubMesh.Light.Add(new Color32((byte)(feature.Light >> 16), (byte)(feature.Light >> 8), (byte)(feature.Light), (byte)(feature.Light >> 24)));
         }
 
         private static void WorldLoaded()

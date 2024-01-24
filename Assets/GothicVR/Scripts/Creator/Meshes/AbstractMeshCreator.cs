@@ -16,9 +16,9 @@ namespace GVR.Creator.Meshes
     {
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
-        protected const string DefaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
+        protected const string DefaultShader = "Lit/World"; 
         protected const string WaterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
-        protected const string AlphaToCoverageShaderName = "Unlit/Unlit-AlphaToCoverage";
+        protected const string AlphaToCoverageShaderName = "Lit/AlphaToCoverage";
         protected const float DecalOpacity = 0.75f;
         
         protected GameObject Create(string objectName, IModelMesh mdm, IModelHierarchy mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
@@ -256,9 +256,10 @@ namespace GVR.Creator.Meshes
             }
             mesh.subMeshCount = mrmData.SubMeshes.Count;
 
-            var verticesAndUvSize = mrmData.SubMeshes.Sum(i => i.Triangles.Count) * 3;
-            var preparedVertices = new List<Vector3>(verticesAndUvSize);
-            var preparedUVs = new List<Vector2>(verticesAndUvSize);
+            var vertexCount = mrmData.SubMeshes.Sum(i => i.Triangles.Count) * 3;
+            var preparedVertices = new List<Vector3>(vertexCount);
+            var preparedUVs = new List<Vector2>(vertexCount);
+            List<Vector3> normals = new List<Vector3>(vertexCount);
 
             // 2-dimensional arrays (as there are segregated by submeshes)
             var preparedTriangles = new List<List<int>>(mrmData.SubMeshes.Count);
@@ -303,6 +304,9 @@ namespace GVR.Creator.Meshes
                     preparedUVs.Add(index1.Texture.ToUnityVector());
                     preparedUVs.Add(index2.Texture.ToUnityVector());
                     preparedUVs.Add(index3.Texture.ToUnityVector());
+                    normals.Add(index1.Normal.ToUnityVector());
+                    normals.Add(index2.Normal.ToUnityVector());
+                    normals.Add(index3.Normal.ToUnityVector());
                 }
                 preparedTriangles.Add(subMeshTriangles);
             }
@@ -313,6 +317,7 @@ namespace GVR.Creator.Meshes
             // @see: https://answers.unity.com/questions/531968/submesh-vertices.html
             mesh.SetVertices(preparedVertices);
             mesh.SetUVs(0, preparedUVs);
+            mesh.SetNormals(normals);
             for (var i = 0; i < mrmData.SubMeshes.Count; i++)
             {
                 mesh.SetTriangles(preparedTriangles[i], i);

@@ -27,6 +27,7 @@ namespace GVR.World
             public readonly List<int> Triangles = new();
             public readonly List<Vector2> Uvs = new() ;
             public readonly List<Vector3> Normals = new();
+            public readonly List<Color32> Light = new();
         }
 
     }

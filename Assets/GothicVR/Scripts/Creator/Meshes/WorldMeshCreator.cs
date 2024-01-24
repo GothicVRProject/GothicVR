@@ -114,6 +114,8 @@ namespace GVR.Creator.Meshes
             mesh.SetVertices(subMesh.Vertices);
             mesh.SetTriangles(subMesh.Triangles, 0);
             mesh.SetUVs(0, subMesh.Uvs);
+            mesh.SetNormals(subMesh.Normals);
+            mesh.SetColors(subMesh.Light);
         }
     }
 }

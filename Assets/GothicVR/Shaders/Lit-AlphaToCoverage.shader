@@ -1,4 +1,4 @@
-Shader "Unlit/Unlit-AlphaToCoverage"
+Shader "Lit/AlphaToCoverage"
 {
     Properties
     {
@@ -23,6 +23,7 @@ Shader "Unlit/Unlit-AlphaToCoverage"
             struct appdata
             {
                 float4 vertex : POSITION;
+                float3 normal : NORMAL;
                 float2 uv : TEXCOORD0;
                 
                 UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -30,12 +31,17 @@ Shader "Unlit/Unlit-AlphaToCoverage"
 
             struct v2f
             {
-                float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float3 normal : NORMAL;
+                float2 uv : TEXCOORD0;
                 float distance : TEXCOORD1;
 
                 UNITY_VERTEX_OUTPUT_STEREO
             };
+
+            float3 _SunDirection;
+            float3 _SunColor;
+            float3 _AmbientColor;
 
             CBUFFER_START(UnityPerMaterial)
                 TEXTURE2D(_MainTex);
@@ -58,6 +64,7 @@ Shader "Unlit/Unlit-AlphaToCoverage"
                 o.distance = length(toCamera);
                 o.vertex = TransformObjectToHClip(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                o.normal = TransformObjectToWorldNormal(v.normal);
                 return o;
             }
 
@@ -78,7 +85,11 @@ Shader "Unlit/Unlit-AlphaToCoverage"
                 col.a *= 1 + max(0, CalcMipLevel(i.uv * _MainTex_TexelSize.zw)) * _MipScale;
                 // Rescale alpha by partial derivative, faded by distance. This way, at a distance, the wide coverage is kept to reduce aliasing further.
                 col.a = lerp((col.a - _Cutoff) / max(fwidth(col.a), 0.0001) + 0.5, col.a, saturate(max(i.distance, 0.0001) / _DistanceFade));
-                return col;
+
+                half diffuseDot = saturate(dot(i.normal, -_SunDirection));
+                half3  diffuse = saturate(diffuseDot * _SunColor + _AmbientColor);
+
+                return half4(col.rgb * diffuse, col.a);
             }
             ENDHLSL
         }

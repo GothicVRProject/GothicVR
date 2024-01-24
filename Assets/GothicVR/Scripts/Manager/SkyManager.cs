@@ -13,8 +13,16 @@ namespace GVR.GothicVR.Scripts.Manager
 {
     public class SkyManager : SingletonBehaviour<SkyManager>
     {
+        public Transform SunDirection;
+        public Color SunColor;
+        public Color AmbientColor;
+
         private float masterTime;
         [SerializeField] private List<SkyState> stateList = new List<SkyState>();
+
+        private static readonly int SunDirectionShaderId = Shader.PropertyToID("_SunDirection");
+        private static readonly int SunColorShaderId = Shader.PropertyToID("_SunColor");
+        private static readonly int AmbientShaderId = Shader.PropertyToID("_AmbientColor");
 
         protected void Start()
         {
@@ -48,6 +56,11 @@ namespace GVR.GothicVR.Scripts.Manager
             RenderSettings.ambientMode = AmbientMode.Flat;
 
             GvrEvents.GameTimeSecondChangeCallback.AddListener(Interpolate);
+        }
+
+        private void OnValidate()
+        {
+            SetShaderProperties();
         }
 
         public void InitSky()
@@ -117,6 +130,18 @@ namespace GVR.GothicVR.Scripts.Manager
 
             RenderSettings.skybox.SetFloat("_Blend", lerpFraction);
             DynamicGI.UpdateEnvironment();
+
+            SetShaderProperties();
+        }
+
+        private void SetShaderProperties()
+        {
+            if (SunDirection)
+            {
+                Shader.SetGlobalVector(SunDirectionShaderId, SunDirection.forward);
+            }
+            Shader.SetGlobalColor(SunColorShaderId, SunColor);
+            Shader.SetGlobalColor(AmbientShaderId, AmbientColor);
         }
 
         /// <summary>
