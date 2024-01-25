@@ -25,19 +25,9 @@ namespace GVR.Creator.Sounds
             try
             {
                 var wavFile = node.Buffer.Bytes;
-                
-                var channels = BitConverter.ToUInt16(wavFile, 22);
-                var sampleRate = BitConverter.ToInt32(wavFile, 24);
-                
-                var floatArray = ConvertWavByteArrayToFloatArray(wavFile);
-                var soundArray = new float[floatArray.Length];
-                Array.Copy(floatArray, soundArray, floatArray.Length);
-                return new SoundData
-                {
-                    sound = soundArray,
-                    channels = channels,
-                    sampleRate = sampleRate
-                };
+
+                var soundData = ConvertWavByteArrayToFloatArray(wavFile);
+                return soundData;
             }
             catch (Exception e)
             {
@@ -48,20 +38,19 @@ namespace GVR.Creator.Sounds
 
         public static AudioClip ToAudioClip(SoundData wavFile)
         {
-            var audioClip = AudioClip.Create("Sound", wavFile.sound.Length, wavFile.channels, wavFile.sampleRate, false);
+            var audioClip =
+                AudioClip.Create("Sound", wavFile.sound.Length/wavFile.channels, wavFile.channels, wavFile.sampleRate, false);
             audioClip.SetData(wavFile.sound, 0);
-            
+
             return audioClip;
         }
-        
-        private static float[] ConvertWavByteArrayToFloatArray(byte[] fileBytes)
+
+        private static SoundData ConvertWavByteArrayToFloatArray(byte[] fileBytes)
         {
             var riff = Encoding.ASCII.GetString(fileBytes, 0, 4);
             var wave = Encoding.ASCII.GetString(fileBytes, 8, 4);
             var subchunk1 = BitConverter.ToInt32(fileBytes, 16);
             var audioFormat = BitConverter.ToUInt16(fileBytes, 20);
-
-            float[] data;
 
             var formatCode = FormatCode(audioFormat);
 
@@ -71,57 +60,77 @@ namespace GVR.Creator.Sounds
             var blockAlign = BitConverter.ToUInt16(fileBytes, 32);
             var bitDepth = BitConverter.ToUInt16(fileBytes, 34);
 
-            var headerOffset = 16 + 4 + subchunk1 + 4;
-            var subchunk2 = BitConverter.ToInt32(fileBytes, headerOffset);
+            // Calculate header offset and data size
+            var headerOffset = 20 + subchunk1;
+            var dataSizeOffset = headerOffset + 4;
+            if(dataSizeOffset + 4 > fileBytes.Length)
+                throw new ArgumentException("Invalid WAV file structure.");
 
+            var subchunk2 = BitConverter.ToInt32(fileBytes, dataSizeOffset);
+
+            // Ensure that subchunk2 does not exceed fileBytes length
+            var dataAvailable = fileBytes.Length - (dataSizeOffset + 4);
+            if(subchunk2 > dataAvailable)
+            {
+                subchunk2 = dataAvailable;
+            }
+            
             if (formatCode == "IMA ADPCM")
             {
                 return ConvertWavByteArrayToFloatArray(IMAADPCMDecoder.Decode(fileBytes));
             }
 
-            data = ConvertByteArrayToFloatArray(fileBytes, headerOffset, (BitDepth)bitDepth);
-            return data;
+            // Copy WAV data section into a new array
+            var data = new byte[subchunk2];
+            Array.Copy(fileBytes, dataSizeOffset + 4, data, 0, subchunk2);
+
+            return new SoundData
+            {
+                sound = ConvertByteArrayToFloatArray(data, 0, (BitDepth)bitDepth),
+                channels = channels,
+                sampleRate = sampleRate
+            };
         }
 
 
         private static float[] ConvertByteArrayToFloatArray(byte[] source, int headerOffset, BitDepth bit)
         {
-            if (bit == BitDepth.BIT8)
+            switch (bit)
             {
-                var wavSize = BitConverter.ToInt32(source, headerOffset);
-                headerOffset += sizeof(int);
-
-                var data = new float[wavSize];
-
-                var maxValue = sbyte.MaxValue;
-
-                for (var i = 0; i < wavSize; i++)
-                    data[i] = (float)source[i] / maxValue;
-
-                return data;
-            }
-            else if (bit == BitDepth.BIT16)
-            {
-                var bytesPerSample = sizeof(Int16); // block size = 2
-                var sampleCount = source.Length / bytesPerSample;
-
-                var data = new float[sampleCount];
-
-                var maxValue = Int16.MaxValue;
-
-                for (int i = 0; i < sampleCount; i++)
+                case BitDepth.BIT8:
                 {
-                    var offset = i * bytesPerSample;
-                    var sample = BitConverter.ToInt16(source, offset);
-                    var floatSample = (float)sample / maxValue;
-                    data[i] = floatSample;
-                }
+                    var wavSize = BitConverter.ToInt32(source, headerOffset);
 
-                return data;
-            }
-            else
-            {
-                throw new Exception(bit + " bit depth is not supported.");
+                    var data = new float[wavSize];
+
+                    var maxValue = sbyte.MaxValue;
+
+                    for (var i = 0; i < wavSize; i++)
+                        data[i] = (float)source[i] / maxValue;
+
+                    return data;
+                }
+                case BitDepth.BIT16:
+                {
+                    var bytesPerSample = sizeof(Int16); // block size = 2
+                    var sampleCount = source.Length / bytesPerSample;
+
+                    var data = new float[sampleCount];
+
+                    var maxValue = Int16.MaxValue;
+
+                    for (int i = 0; i < sampleCount; i++)
+                    {
+                        var offset = i * bytesPerSample;
+                        var sample = BitConverter.ToInt16(source, offset);
+                        var floatSample = (float)sample / maxValue;
+                        data[i] = floatSample;
+                    }
+
+                    return data;
+                }
+                default:
+                    throw new Exception(bit + " bit depth is not supported.");
             }
         }
 

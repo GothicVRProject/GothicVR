@@ -15,7 +15,7 @@ namespace GVR.Creator.Meshes
     {
         private VmGothicExternals.ExtSetVisualBodyData tempBodyData;
 
-        public GameObject CreateNpc(string npcName, string mdmName, string mdhName,
+        public void CreateNpc(string npcName, string mdmName, string mdhName,
             VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
         {
             tempBodyData = bodyData;
@@ -25,13 +25,13 @@ namespace GVR.Creator.Meshes
             if (mdm == null)
             {
                 Debug.LogError($"MDH from name >{mdmName}< for object >{root.name}< not found.");
-                return null;
+                return;
             }
             
             if (mdh == null)
             {
                 Debug.LogError($"MDH from name >{mdhName}< for object >{root.name}< not found.");
-                return null;
+                return;
             }
             
             var npcGo = Create(npcName, mdm, mdh, default, default, null, root);
@@ -41,8 +41,6 @@ namespace GVR.Creator.Meshes
                 var mmb = AssetCache.TryGetMmb(bodyData.Head);
                 AddHead(npcName, npcGo, mmb);
             }
-
-            return npcGo;
         }
 
         private void AddHead(string npcName, GameObject npcGo, IMorphMesh morphMesh)

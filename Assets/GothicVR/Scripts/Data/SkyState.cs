@@ -18,6 +18,8 @@ namespace GVR.Data
         public int cloudShadowOn;
         public SkyLayerData[] layer;
 
+        public float lerpDuration = 0.05f;
+
         public SkyState()
         {
             layer = new SkyLayerData[2];
@@ -56,11 +58,11 @@ namespace GVR.Data
             domeColor0 = fogColor;
             domeColor1 = new Vector3(255.0f, 255.0f, 255.0f);
 
-            layer[0].texName = "SKYDAY_LAYER1_A0.TGA";
-            layer[1].texName = "SKYDAY_LAYER0_A0.TGA";
+            layer[0].texName = "SKYDAY_LAYER0_A0.TGA";
+            layer[1].texName = "SKYDAY_LAYER1_A0.TGA";
 
-            layer[0].texAlpha = 0.0f;
-            layer[1].texAlpha = 255.0f;
+            layer[0].texAlpha = 255.0f;
+            layer[1].texAlpha = 0.0f;
 
             layer[1].texSpeed *= 0.2f;
 
@@ -77,11 +79,11 @@ namespace GVR.Data
             domeColor0 = fogColor;
             domeColor1 = new Vector3(255.0f, 255.0f, 255.0f);
 
-            layer[0].texName = "SKYDAY_LAYER1_A0.TGA";
-            layer[1].texName = "SKYDAY_LAYER0_A0.TGA";
+            layer[0].texName = "SKYDAY_LAYER0_A0.TGA";
+            layer[1].texName = "SKYDAY_LAYER1_A0.TGA";
 
-            layer[0].texAlpha = 215.0f;
-            layer[1].texAlpha = 255.0f;
+            layer[0].texAlpha = 255.0f;
+            layer[1].texAlpha = 215.0f;
 
             fogDist = 0.05f;
             sunOn = 1;
@@ -96,11 +98,11 @@ namespace GVR.Data
             domeColor0 = new Vector3(120.0f, 140.0f, 180.0f);
             domeColor1 = new Vector3(255.0f, 255.0f, 255.0f);
 
-            layer[0].texName = "SKYDAY_LAYER1_A0.TGA";
-            layer[1].texName = "SKYDAY_LAYER0_A0.TGA";
+            layer[0].texName = "SKYDAY_LAYER0_A0.TGA";
+            layer[1].texName = "SKYDAY_LAYER1_A0.TGA";
 
-            layer[0].texAlpha = 0.0f;
-            layer[1].texAlpha = 255.0f;
+            layer[0].texAlpha = 255.0f;
+            layer[1].texAlpha = 0.0f;
 
             fogDist = 0.05f;
             sunOn = 1;

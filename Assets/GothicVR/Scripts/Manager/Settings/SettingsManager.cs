@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -29,7 +30,9 @@ namespace GVR.Manager.Settings
 
         public static void LoadGameSettings()
         {
-            var settingsFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME}";
+            var rootPath = GetRootPath();
+
+            var settingsFilePath = $"{rootPath}/{SETTINGS_FILE_NAME}";
             if (!File.Exists(settingsFilePath))
             {
                 if (Application.platform == RuntimePlatform.Android)
@@ -43,14 +46,23 @@ namespace GVR.Manager.Settings
 
             // We ignore the "GothicIPath" field which is found in GameSettings for Android
             if (Application.platform == RuntimePlatform.Android)
-                GameSettings.GothicIPath = GetRootPath();
+                GameSettings.GothicIPath = rootPath;
 
-            var settingsDevFilePath = $"{GetRootPath()}/{SETTINGS_FILE_NAME_DEV}";
+            var settingsDevFilePath = $"{rootPath}/{SETTINGS_FILE_NAME_DEV}";
             if (File.Exists(settingsDevFilePath))
             {
                 var devJson = File.ReadAllText(settingsDevFilePath);
                 JsonUtility.FromJsonOverwrite(devJson, GameSettings);
             }
+
+            var iniFilePath = Path.Combine(GameSettings.GothicIPath, "system", "gothic.ini");
+            if (!File.Exists(iniFilePath))
+            {
+                Debug.Log("The gothic.ini file does not exist at the specified path :" + iniFilePath);
+                return;
+            }
+
+            GameSettings.GothicINISettings = ParseGothicINI(iniFilePath);
         }
 
         /// <summary>
@@ -102,6 +114,35 @@ namespace GVR.Manager.Settings
 
             string FinalPath = Path.Combine(Application.persistentDataPath, $"{SETTINGS_FILE_NAME}");
             File.WriteAllText(FinalPath, result);
+        }
+
+        private static Dictionary<string, Dictionary<string, string>> ParseGothicINI(string filePath)
+        {
+            var data = new Dictionary<string, Dictionary<string, string>>();
+            string currentSection = null;
+
+            foreach (var line in File.ReadLines(filePath))
+            {
+                string trimmedLine = line.Trim();
+                if (string.IsNullOrWhiteSpace(trimmedLine) || trimmedLine.StartsWith(";"))
+                    continue;
+
+                if (trimmedLine.StartsWith("[") && trimmedLine.EndsWith("]"))
+                {
+                    currentSection = trimmedLine.Substring(1, trimmedLine.Length - 2);
+                    data[currentSection] = new Dictionary<string, string>();
+                }
+                else
+                {
+                    var keyValue = trimmedLine.Split(new char[] { '=' }, 2);
+                    if (keyValue.Length == 2 && currentSection != null)
+                    {
+                        data[currentSection][keyValue[0].Trim()] = keyValue[1].Trim();
+                    }
+                }
+            }
+
+            return data;
         }
     }
 }

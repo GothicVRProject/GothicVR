@@ -11,6 +11,7 @@ using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;
 using Font = ZenKit.Font;
+using Mesh = ZenKit.Mesh;
 using Object = UnityEngine.Object;
 using Texture = ZenKit.Texture;
 using TextureFormat = ZenKit.TextureFormat;
@@ -20,6 +21,7 @@ namespace GVR.Caches
     public static class AssetCache
     {
         private static readonly Dictionary<string, Texture2D> TextureCache = new();
+        private static readonly Dictionary<string, IMesh> MshCache = new();
         private static readonly Dictionary<string, IModelScript> MdsCache = new();
         private static readonly Dictionary<string, IModelAnimation> AnimCache = new();
         private static readonly Dictionary<string, IModelHierarchy> MdhCache = new();
@@ -140,6 +142,28 @@ namespace GVR.Caches
 
             var newData = new ModelAnimation(GameData.Vfs, $"{preparedKey}.man").Cache();
             AnimCache[preparedKey] = newData;
+
+            return newData;
+        }
+
+        [CanBeNull]
+        public static IMesh TryGetMsh(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (MshCache.TryGetValue(preparedKey, out var data))
+                return data;
+
+            IMesh newData = null;
+            try
+            {
+                newData = new Mesh(GameData.Vfs, $"{preparedKey}.msh").Cache();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            MshCache[preparedKey] = newData;
 
             return newData;
         }

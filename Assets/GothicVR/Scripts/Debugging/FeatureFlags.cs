@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using GVR.Util;
 using UnityEngine;
-using UnityEngine.Serialization;
 using ZenKit;
 using ZenKit.Vobs;
 
@@ -26,6 +25,7 @@ namespace GVR.Debugging
         public bool createWaypoints;
         [Tooltip("True will render all pickables with dynamic attach points")]
         public bool vobItemsDynamicAttach;
+        public bool showBarrier;
 
         [Header("__________World - Developer__________")]
         public bool createWayPointMeshes;
@@ -81,6 +81,7 @@ namespace GVR.Debugging
         public bool showZspyLogs;
         public bool showZenKitVfsFileNotFoundErrors;
         public bool showMusicLogs;
+        public bool showBarrierLogs;
 
 
         [Serializable]

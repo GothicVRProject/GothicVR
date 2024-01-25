@@ -1,5 +1,6 @@
 using GVR.Caches;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.Util;
 using UnityEngine;
 
@@ -21,8 +22,6 @@ public class TextureManager : SingletonBehaviour<TextureManager>
     public Material loadingBarBackgroundMaterial;
     public Material loadingBarMaterial;
     public Material loadingSphereMaterial;
-
-    private const string defaultShader = "Universal Render Pipeline/Unlit"; // "Unlit/Transparent Cutout";
 
     private void Start()
     {
@@ -71,7 +70,7 @@ public class TextureManager : SingletonBehaviour<TextureManager>
 
     private Material GetEmptyMaterial(MaterialExtension.BlendMode blendMode)
     {
-        var standardShader = Shader.Find(defaultShader);
+        var standardShader = Constants.ShaderUnlit;
         var material = new Material(standardShader);
 
         switch (blendMode)
