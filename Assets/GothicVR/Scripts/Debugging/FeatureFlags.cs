@@ -38,6 +38,10 @@ namespace GVR.Debugging
         public SunMovementPerformance sunMovementPerformanceValue;
         [Range(0, 23)] public int startHour;
         [Range(0, 59)] public int startMinute;
+
+        [Header("__________Lighting__________")]
+        public Color FireLightColor = new Color(.7f, .7f, .6f, 1);
+        public float FireLightRange = 10;
         
         [Header("__________VOB__________")]
         public bool createVobs;

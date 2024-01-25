@@ -16,6 +16,8 @@ namespace GVR.GothicVR.Scripts.Manager
         public Transform SunDirection;
         public Color SunColor;
         public Color AmbientColor;
+        [Range(0,1)]
+        public float PointLightIntensity = .1f;
 
         private float masterTime;
         [SerializeField] private List<SkyState> stateList = new List<SkyState>();
@@ -23,6 +25,7 @@ namespace GVR.GothicVR.Scripts.Manager
         private static readonly int SunDirectionShaderId = Shader.PropertyToID("_SunDirection");
         private static readonly int SunColorShaderId = Shader.PropertyToID("_SunColor");
         private static readonly int AmbientShaderId = Shader.PropertyToID("_AmbientColor");
+        private static readonly int PointLightIntensityShaderId = Shader.PropertyToID("_PointLightIntensity");
 
         protected void Start()
         {
@@ -142,6 +145,7 @@ namespace GVR.GothicVR.Scripts.Manager
             }
             Shader.SetGlobalColor(SunColorShaderId, SunColor);
             Shader.SetGlobalColor(AmbientShaderId, AmbientColor);
+            Shader.SetGlobalFloat(PointLightIntensityShaderId, PointLightIntensity);
         }
 
         /// <summary>

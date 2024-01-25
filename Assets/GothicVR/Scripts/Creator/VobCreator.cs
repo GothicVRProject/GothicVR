@@ -66,7 +66,7 @@ namespace GVR.Creator
                 var soundLoc = sound.transform.position;
                 var soundDist = sound.GetComponent<AudioSource>().maxDistance;
                 var dist = UnityEngine.Vector3.Distance(loc, soundLoc);
-                
+
                 if (dist < soundDist)
                     sound.SetActive(true);
             }
@@ -100,7 +100,7 @@ namespace GVR.Creator
             CreateParentVobObjectTeleport(vobRootTeleport);
             CreateParentVobObjectNonTeleport(vobRootNonTeleport);
         }
-        
+
         private static async Task CreateVobs(List<IVirtualObject> vobs)
         {
             foreach (var vob in vobs)
@@ -113,91 +113,103 @@ namespace GVR.Creator
                     switch (vob.Type)
                     {
                         case VirtualObjectType.oCItem:
-                        {
-                            var obj = CreateItem((Item)vob);
-                            _cullingVobObjects.Add(obj);
-                            break;
-                        }
-                        case VirtualObjectType.oCMobContainer:
-                        {
-                            var obj = CreateMobContainer((Container)vob);
-                            _cullingVobObjects.Add(obj);
-                            break;
-                        }
-                        case VirtualObjectType.zCVobSound:
-                        {
-                            var obj = CreateSound((Sound)vob);
-                            LookupCache.vobSoundsAndDayTime.Add(obj);
-                            break;
-                        }
-                        case VirtualObjectType.zCVobSoundDaytime:
-                        {
-                            var obj = CreateSoundDaytime((SoundDaytime)vob);
-                            LookupCache.vobSoundsAndDayTime.Add(obj);
-                            break;
-                        }
-                        case VirtualObjectType.oCZoneMusic:
-                        case VirtualObjectType.oCZoneMusicDefault:
-                        {
-                            go = CreateZoneMusic((ZoneMusic)vob);
-                            break;
-                        }
-                        case VirtualObjectType.zCVobSpot:
-                        case VirtualObjectType.zCVobStartpoint:
-                        {
-                            go = CreateSpot(vob);
-                            break;
-                        }
-                        case VirtualObjectType.oCMobLadder:
-                        {
-                            var obj = CreateLadder(vob);
-                            _cullingVobObjects.Add(obj);
-                            break;
-                        }
-                        case VirtualObjectType.oCTriggerChangeLevel:
-                        {
-                            go = CreateTriggerChangeLevel((TriggerChangeLevel)vob);
-                            break;
-                        }
-                        case VirtualObjectType.zCVob:
-                        {
-                            GameObject obj;
-
-                            if (vob.Visual == null)
                             {
-                                CreateDebugObject(vob);
+                                var obj = CreateItem((Item)vob);
+                                _cullingVobObjects.Add(obj);
                                 break;
                             }
-
-                            switch (vob.Visual!.Type)
+                        case VirtualObjectType.zCVobLight:
                             {
-                                case VisualType.Decal:
-                                    obj = CreateDecal(vob);
-                                    break;
-                                case VisualType.ParticleEffect:
-                                    obj = CreatePfx(vob);
-                                    break;
-                                default:
-                                    obj = CreateDefaultMesh(vob);
-                                    break;
+                                GameObject obj = CreateLight((ZenKit.Vobs.Light)vob);
+                                _cullingVobObjects.Add(obj);
+                                break;
                             }
+                        case VirtualObjectType.oCMobContainer:
+                            {
+                                var obj = CreateMobContainer((Container)vob);
+                                _cullingVobObjects.Add(obj);
+                                break;
+                            }
+                        case VirtualObjectType.zCVobSound:
+                            {
+                                var obj = CreateSound((Sound)vob);
+                                LookupCache.vobSoundsAndDayTime.Add(obj);
+                                break;
+                            }
+                        case VirtualObjectType.zCVobSoundDaytime:
+                            {
+                                var obj = CreateSoundDaytime((SoundDaytime)vob);
+                                LookupCache.vobSoundsAndDayTime.Add(obj);
+                                break;
+                            }
+                        case VirtualObjectType.oCZoneMusic:
+                        case VirtualObjectType.oCZoneMusicDefault:
+                            {
+                                go = CreateZoneMusic((ZoneMusic)vob);
+                                break;
+                            }
+                        case VirtualObjectType.zCVobSpot:
+                        case VirtualObjectType.zCVobStartpoint:
+                            {
+                                go = CreateSpot(vob);
+                                break;
+                            }
+                        case VirtualObjectType.oCMobLadder:
+                            {
+                                var obj = CreateLadder(vob);
+                                _cullingVobObjects.Add(obj);
+                                break;
+                            }
+                        case VirtualObjectType.oCTriggerChangeLevel:
+                            {
+                                go = CreateTriggerChangeLevel((TriggerChangeLevel)vob);
+                                break;
+                            }
+                        case VirtualObjectType.zCVob:
+                            {
+                                GameObject obj;
 
-                            _cullingVobObjects.Add(obj);
-                            break;
-                        }
+                                if (vob.Visual == null)
+                                {
+                                    CreateDebugObject(vob);
+                                    break;
+                                }
+
+                                switch (vob.Visual!.Type)
+                                {
+                                    case VisualType.Decal:
+                                        obj = CreateDecal(vob);
+                                        break;
+                                    case VisualType.ParticleEffect:
+                                        obj = CreatePfx(vob);
+                                        break;
+                                    default:
+                                        obj = CreateDefaultMesh(vob);
+                                        break;
+                                }
+
+                                _cullingVobObjects.Add(obj);
+                                break;
+                            }
+                        case VirtualObjectType.oCMobFire:
+                            {
+                                CreateFire((ZenKit.Vobs.Fire)vob, out GameObject meshObject, out GameObject lightObject);
+                                _cullingVobObjects.Add(meshObject);
+                                _cullingVobObjects.Add(lightObject);
+                                break;
+                            }
                         case VirtualObjectType.oCMobInter:
                         case VirtualObjectType.oCMobDoor:
                         case VirtualObjectType.oCMobSwitch:
-                        case VirtualObjectType.oCMobFire:
                         case VirtualObjectType.oCMOB:
                         case VirtualObjectType.zCVobStair:
                         case VirtualObjectType.oCMobBed:
                         case VirtualObjectType.oCMobWheel:
-                        {
-                            var obj = CreateDefaultMesh(vob);
-                            _cullingVobObjects.Add(obj);
-                            break;
-                        }
+                            {
+                                var obj = CreateDefaultMesh(vob);
+                                _cullingVobObjects.Add(obj);
+                                break;
+                            }
                         case VirtualObjectType.zCVobScreenFX:
                         case VirtualObjectType.zCVobAnimate:
                         case VirtualObjectType.zCTriggerWorldStart:
@@ -205,7 +217,6 @@ namespace GVR.Creator
                         case VirtualObjectType.oCCSTrigger:
                         case VirtualObjectType.oCTriggerScript:
                         case VirtualObjectType.zCVobLensFlare:
-                        case VirtualObjectType.zCVobLight:
                         case VirtualObjectType.zCMoverController:
                         case VirtualObjectType.zCPFXController:
                         case VirtualObjectType.zCMover:
@@ -214,36 +225,84 @@ namespace GVR.Creator
                         case VirtualObjectType.zCZoneZFogDefault:
                         case VirtualObjectType.zCZoneVobFarPlane:
                         case VirtualObjectType.zCZoneVobFarPlaneDefault:
-                        {
-                            // FIXME - not yet implemented.
-                            break;
-                        }
+                            {
+                                // FIXME - not yet implemented.
+                                break;
+                            }
                         default:
-                        {
-                            throw new Exception(
-                                $"VobType={vob.Type} not yet handled. And we didn't know we need to do so. ;-)");
-                        }
+                            {
+                                throw new Exception(
+                                    $"VobType={vob.Type} not yet handled. And we didn't know we need to do so. ;-)");
+                            }
                     }
                 }
 
                 AddToMobInteractableList(vob, go);
-                
+
                 LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.VOb, 1f / _totalVObs);
 
                 if (++_createdCount % _vobsPerFrame == 0)
                     await Task.Yield(); // Wait for the next frame
-                
+
                 // Recursive creating sub-vobs
                 await CreateVobs(vob.Children);
             }
         }
 
+        /// <summary>
+        /// Creates the mesh and the light gameobject for a fire.
+        /// </summary>
+        /// <param name="meshObject">The mesh that belongs to the fire vob.</param>
+        /// <param name="lightObject">A separate gameobject that contains the point light, so that it can be culled separately.</param>
+        private static void CreateFire(ZenKit.Vobs.Fire vob, out GameObject meshObject, out GameObject lightObject)
+        {
+            meshObject = CreateDefaultMesh(vob);
+            lightObject = new GameObject($"Fire light {vob.Name} {vob.FocusName}", typeof(StationaryLight));
+            if (meshObject)
+            {
+                SetPosAndRot(meshObject, vob.Position, vob.Rotation);
+                GameObject slot = meshObject.FindChildRecursively(vob.Slot);
+                lightObject.transform.position = (slot ? slot : meshObject).transform.position;
+                ApplyFireOffset(vob, lightObject.transform);
+            }
+            else
+            {
+                meshObject = lightObject;
+                SetPosAndRot(meshObject, vob.Position, vob.Rotation);
+            }
+            GameObject parent = parentGosTeleport[vob.Type];
+            meshObject.SetParent(parent);
+
+            StationaryLight lightComp = lightObject.GetComponent<StationaryLight>();
+            lightComp.Type = UnityEngine.LightType.Point;
+            lightComp.Color = FeatureFlags.I.FireLightColor;
+            lightComp.Range = FeatureFlags.I.FireLightRange;
+            lightComp.Intensity = 1;
+
+            // Deactivate the light by default. The vob culling manager will enable them when in view.
+            if (FeatureFlags.I.vobCulling)
+            {
+                lightObject.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// Some fire slots have the light too low to cast light onto the mesh and the surroundings.
+        /// </summary>
+        private static void ApplyFireOffset(Fire vob, Transform lightTransform)
+        {
+            if (vob.Name == "OC_FIREPLACE_CAMPFIRE")
+            {
+                lightTransform.position+= new UnityEngine.Vector3(0, 1.5f);
+            }
+        }
+
         private static void PostCreateVobs()
         {
-            var nonNullCullingGroupItems = _cullingVobObjects.Where(i => i != null).ToArray();
-            VobMeshCullingManager.I.PrepareVobCulling(nonNullCullingGroupItems);
+            VobMeshCullingManager.I.PrepareVobCulling(_cullingVobObjects);
             VobSoundCullingManager.I.PrepareSoundCulling(LookupCache.vobSoundsAndDayTime);
-            
+            StationaryLight.InitStationaryLights();
+
             // TODO - warnings about "not implemented" - print them once only.
             foreach (var var in new[]{
                          VirtualObjectType.zCVobScreenFX,
@@ -266,7 +325,7 @@ namespace GVR.Creator
         {
             GameObject go;
             string name = vob.Name;
-            
+
             switch (vob.Type)
             {
                 case VirtualObjectType.oCItem:
@@ -298,13 +357,13 @@ namespace GVR.Creator
                 default:
                     return new GameObject(name);
             }
-            
+
             go.name = name;
-            
+
             // Fill Property data into prefab here
             // Can also be outsourced to a proper method if it becomes a lot.
             go.GetComponent<VobProperties>().SetVisual(vob.Name);
-            
+
             return go;
         }
 
@@ -312,7 +371,7 @@ namespace GVR.Creator
         {
             if (go == null)
                 return;
-            
+
             switch (vob.Type)
             {
                 case VirtualObjectType.oCMOB:
@@ -365,7 +424,7 @@ namespace GVR.Creator
 
             return CreateItemMesh(item, go);
         }
-        
+
         [CanBeNull]
         private static GameObject CreateItem(Item vob)
         {
@@ -425,6 +484,36 @@ namespace GVR.Creator
         }
 
         [CanBeNull]
+        private static GameObject CreateLight(ZenKit.Vobs.Light vob)
+        {
+            if (vob.LightStatic)
+            {
+                return null;
+            }
+
+            GameObject vobObj = new GameObject($"{vob.LightType} Light {vob.Name}");
+            GameObject parent = parentGosTeleport[vob.Type];
+            vobObj.SetParent(parent);
+            SetPosAndRot(vobObj, vob.Position, vob.Rotation);
+
+            StationaryLight lightComp = vobObj.AddComponent<StationaryLight>();
+            lightComp.Color = new Color(vob.Color.R * .01f, vob.Color.G * .01f, vob.Color.B * .01f, 1);
+            lightComp.Type = vob.LightType == ZenKit.Vobs.LightType.Point
+                ? UnityEngine.LightType.Point
+                : UnityEngine.LightType.Spot;
+            lightComp.Range = vob.Range * .01f;
+            lightComp.SpotAngle = vob.ConeAngle;
+            lightComp.Intensity = 1;
+
+            // Deactivate the light by default. The vob culling manager will enable them when in view.
+            if (FeatureFlags.I.vobCulling)
+            {
+                vobObj.SetActive(false);
+            }
+            return vobObj;
+        }
+
+        [CanBeNull]
         private static GameObject CreateMobContainer(Container vob)
         {
             var vobObj = CreateDefaultMesh(vob);
@@ -453,7 +542,7 @@ namespace GVR.Creator
             go.SetActive(false); // We don't want to have sound when we boot the game async for 30 seconds in non-spatial blend mode.
             go.SetParent(parentGosNonTeleport[vob.Type]);
             SetPosAndRot(go, vob.Position, vob.Rotation);
-            
+
             var source = go.GetComponent<AudioSource>();
 
             PrepareAudioSource(source, vob);
@@ -483,7 +572,7 @@ namespace GVR.Creator
             go.SetActive(false); // We don't want to have sound when we boot the game async for 30 seconds in non-spatial blend mode.
             go.SetParent(parentGosNonTeleport[vob.Type]);
             SetPosAndRot(go, vob.Position, vob.Rotation);
-            
+
             var sources = go.GetComponents<AudioSource>();
 
             PrepareAudioSource(sources[0], vob);
@@ -491,7 +580,7 @@ namespace GVR.Creator
 
             PrepareAudioSource(sources[1], vob);
             sources[1].clip = VobHelper.GetSoundClip(vob.SoundNameDaytime);
-            
+
             go.GetComponent<VobSoundDaytimeProperties>().soundDaytimeData = vob;
             go.GetComponent<SoundDaytimeHandler>().PrepareSoundHandling();
 
@@ -508,7 +597,7 @@ namespace GVR.Creator
             source.loop = (soundData.Mode == SoundMode.Loop);
             source.spatialBlend = soundData.Ambient3d ? 1f : 0f;
         }
-        
+
         private static GameObject CreateZoneMusic(ZoneMusic vob)
         {
             var go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobMusic);
@@ -580,7 +669,7 @@ namespace GVR.Creator
             };
             vobObj.GetComponent<VobSpotProperties>().fp = freePointData;
             GameData.FreePoints.Add(fpName, freePointData);
-            
+
             SetPosAndRot(vobObj, vob.Position, vob.Rotation);
             return vobObj;
         }
@@ -604,13 +693,13 @@ namespace GVR.Creator
 
             return vobObj;
         }
-        
+
         private static GameObject CreateItemMesh(Item vob, ItemInstance item, GameObject go)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
             return MeshObjectCreator.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
         }
-        
+
         private static GameObject CreateItemMesh(ItemInstance item, GameObject go)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
@@ -667,7 +756,7 @@ namespace GVR.Creator
                 var minLifeTime = (pfx.LspPartAvg - pfx.LspPartVar) / 1000; // I assume we need to change milliseconds to seconds.
                 var maxLifeTime = (pfx.LspPartAvg + pfx.LspPartVar) / 1000;
                 mainModule.duration = 1f; // I assume pfx data wants a cycle being 1 second long.
-                mainModule.startLifetime = new (minLifeTime, maxLifeTime);
+                mainModule.startLifetime = new(minLifeTime, maxLifeTime);
                 mainModule.loop = Convert.ToBoolean(pfx.PpsIsLooping);
 
                 var minSpeed = (pfx.VelAvg - pfx.VelVar) / 1000;
@@ -843,7 +932,7 @@ namespace GVR.Creator
             {
                 var go = GetPrefab(vob);
                 var ret = MeshObjectCreator.CreateVob(meshName, mdl, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), parent, go);
-                
+
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
                 if (ret == null)
                     GameObject.Destroy(go);
@@ -880,7 +969,7 @@ namespace GVR.Creator
             Debug.LogWarning($">{meshName}<'s has no mdl/mrm.");
             return null;
         }
-        
+
         private static void SetPosAndRot(GameObject obj, Vector3 position, Matrix3x3 rotation)
         {
             SetPosAndRot(obj, position.ToUnityVector(), rotation.ToUnityQuaternion());
