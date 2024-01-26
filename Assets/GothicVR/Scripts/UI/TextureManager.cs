@@ -17,6 +17,7 @@ public class TextureManager : SingletonBehaviour<TextureManager>
     public Material fillermaterial;
     public Material skymaterial;
     public Material mapmaterial;
+    public Material lettermaterial;
 
     public Material GothicLoadingMenuMaterial;
     public Material LoadingBarBackgroundMaterial;
@@ -92,6 +93,9 @@ public class TextureManager : SingletonBehaviour<TextureManager>
 
         var maptexture = AssetCache.TryGetTexture("MAP_WORLD_ORC-C.TEX");
         mapmaterial.mainTexture = maptexture;
+
+        var lettertexture = AssetCache.TryGetTexture("LETTERS-C.TEX");
+        lettermaterial.mainTexture = lettertexture;
     }
 
     public void SetTexture(string texture, Material material)

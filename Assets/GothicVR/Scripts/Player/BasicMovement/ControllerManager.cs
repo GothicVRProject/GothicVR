@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using GVR.Manager;
+using System.Collections;
+using Unity.VisualScripting;
+using GVR.Caches;
 
 public class ControllerManager : MonoBehaviour
 {
@@ -10,6 +12,12 @@ public class ControllerManager : MonoBehaviour
     public GameObject directRight;
     public GameObject MenuGameObject;
     public GameObject MapObject;
+    public float maprollspeed;
+    public float maprolloffset;
+
+    private Animator maproll;
+    AudioSource mapaudio;
+    AudioClip scrollsound;
 
     private InputAction leftPrimaryButtonAction;
     private InputAction leftSecondaryButtonAction;
@@ -36,6 +44,10 @@ public class ControllerManager : MonoBehaviour
 
         rightPrimaryButtonAction.Enable();
         rightSecondaryButtonAction.Enable();
+
+        maproll = MapObject.gameObject.GetComponent<Animator>();
+        mapaudio = MapObject.gameObject.GetComponent<AudioSource>();
+        scrollsound = GVR.GothicVR.Scripts.Manager.VobHelper.GetSoundClip("SCROLLROLL.WAV");
     }
 
     private void OnDestroy()
@@ -74,9 +86,29 @@ public class ControllerManager : MonoBehaviour
     public void ShowMap()
     {
         if (!MapObject.activeSelf)
-            MapObject.SetActive(true);
+            StartCoroutine(UnrollMap());
         else
-            MapObject.SetActive(false);
+            StartCoroutine(RollupMap());
+    }
+
+    public IEnumerator UnrollMap()
+    {
+        MapObject.SetActive(true);
+        maproll.enabled = true;
+        maproll.speed = maprollspeed;
+        maproll.Play("Unroll",- 1,0.0f);
+        mapaudio.PlayOneShot(scrollsound);
+        yield return new WaitForSeconds((maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length/ maprollspeed)* (maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length - maprolloffset) / maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length);
+        maproll.speed = 0f;
+    }
+    public IEnumerator RollupMap()
+    {
+        maproll.speed = maprollspeed;
+        maproll.Play("Roll",- 1, (1-(maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length-maprolloffset)/ maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length));
+        mapaudio.PlayOneShot(scrollsound);
+        yield return new WaitForSeconds((maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length / maprollspeed) * (maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length - maprolloffset) / maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length);
+        maproll.speed = 0f;
+        MapObject.SetActive(false);
     }
 
     public void ShowInventory()
