@@ -6,6 +6,8 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using ZenKit;
+using ZenKit.Vobs;
 
 namespace GVR.Editor.Tools
 {
@@ -17,6 +19,7 @@ namespace GVR.Editor.Tools
         private static readonly List<Tuple<string, Type, object>> ProductionFlags = new()
         {
             // Booleans
+            new(nameof(FeatureFlags.createWorldMesh), typeof(bool), true),
             new(nameof(FeatureFlags.createVobs), typeof(bool), true),
             new (nameof(FeatureFlags.createWaypoints), typeof(bool), true),
             new (nameof(FeatureFlags.enableDayTime), typeof(bool), true),
@@ -25,14 +28,17 @@ namespace GVR.Editor.Tools
             new (nameof(FeatureFlags.vobCulling), typeof(bool), true),
             new (nameof(FeatureFlags.enableSoundCulling), typeof(bool), true),
             new (nameof(FeatureFlags.vobItemsDynamicAttach), typeof(bool), true),
+            new (nameof(FeatureFlags.showBarrier), typeof(bool), true),
 
-            // Ints
+            // Ints / Floats
+            new (nameof(FeatureFlags.TimeMultiplier), typeof(float), 1),
             new (nameof(FeatureFlags.startHour), typeof(int), 8), // Official start time of G1 - new game
             new (nameof(FeatureFlags.startMinute), typeof(int), 0), // Official start time of G1 - new game
 
             // Enums (Handled as Int internally)
             new (nameof(FeatureFlags.sunMovementPerformanceValue), typeof(int), FeatureFlags.SunMovementPerformance.EveryIngameMinute),
-
+            new (nameof(FeatureFlags.zenKitLogLevel), typeof(int), LogLevel.Error),
+            
             // Special types
             new (nameof(FeatureFlags.vobCullingSmall), typeof(FeatureFlags.VobCullingGroupSetting),
                 new FeatureFlags.VobCullingGroupSetting{ maxObjectSize = 1.2f, cullingDistance = 50f}),
@@ -43,7 +49,7 @@ namespace GVR.Editor.Tools
         };
 
 
-        [MenuItem("GothicVR/Tools/FeatureFlags - Set Production ready state")]
+        [MenuItem("GothicVR/Tools/FeatureFlags - Set Production ready state", priority = 1)]
         public static void SetFeatureFlags()
         {
             var scene = SceneManager.GetSceneByName("Bootstrap");
@@ -78,8 +84,12 @@ namespace GVR.Editor.Tools
                         field.SetValue(featureFlags, false);
                         break;
                     case "Int32":
+                    case "Single": // float
                     case "SunMovementPerformance":
                         field.SetValue(featureFlags, 0);
+                        break;
+                    case "LogLevel":
+                        field.SetValue(featureFlags, LogLevel.Error);
                         break;
                     case "String":
                             field.SetValue(featureFlags, "");
@@ -93,13 +103,16 @@ namespace GVR.Editor.Tools
                             case "Int32":
                                 ((List<int>)field.GetValue(featureFlags)).Clear();
                                 break;
+                            case nameof(VirtualObjectType):
+                                ((List<VirtualObjectType>)field.GetValue(featureFlags)).Clear();
+                                break;
                             default:
-                                Debug.LogError($"Unsupported field type {field.FieldType.Name}");
+                                Debug.LogError($"Unsupported field type >{field.FieldType.GenericTypeArguments[0].Name}<");
                                 break;
                         }
                         break;
                     default:
-                        Debug.LogError($"Unsupported field type {field.FieldType.Name}");
+                        Debug.LogError($"Unsupported field type >{field.FieldType.Name}< for >{field.Name}<");
                         break;
                 }
             }
@@ -116,12 +129,13 @@ namespace GVR.Editor.Tools
                 {
                     case "Boolean":
                     case "Int32":
+                    case "Single": // float
                     case "VobCullingGroupSetting":
                         var field = featureFlags.GetType().GetField(flag.Item1);
                         field.SetValue(featureFlags, flag.Item3);
                         break;
                     default:
-                        Debug.LogError($"Unsupported/Untested field type {flag.Item2.Name}");
+                        Debug.LogError($"Unsupported/Untested field type >{flag.Item2.Name}< for >{flag.Item1}<");
                         break;
                 }
             }

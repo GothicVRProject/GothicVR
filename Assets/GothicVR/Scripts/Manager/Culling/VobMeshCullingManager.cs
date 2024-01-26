@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Debugging;
+using GVR.Globals;
 using GVR.Util;
 using UnityEngine;
 
@@ -44,8 +45,8 @@ namespace GVR.Manager.Culling
 
         private void Start()
         {
-            GvrSceneManager.I.sceneGeneralUnloaded.AddListener(PreWorldCreate);
-            GvrSceneManager.I.sceneGeneralLoaded.AddListener(PostWorldCreate);
+            GvrEvents.GeneralSceneUnloaded.AddListener(PreWorldCreate);
+            GvrEvents.GeneralSceneLoaded.AddListener(PostWorldCreate);
 
             // Unity demands CullingGroups to be created in Awake() or Start() earliest.
             vobCullingGroupSmall = new();
@@ -166,16 +167,19 @@ namespace GVR.Manager.Culling
 
             foreach (var obj in objects)
             {
-                var mesh = GetMesh(obj);
-                if (mesh == null)
+                // FIXME - Particles (like leaves in the forest) will be handled like big vobs, but could potentially
+                // FIXME - be handled as small ones as leaves shouldn't be visible from 100 of meters away.
+                var bounds = GetBounds(obj);
+                if (!bounds.HasValue)
                 {
-                    if (!obj.name.Equals("WASH_SLOT.ASC", StringComparison.OrdinalIgnoreCase)) // Wash slot is placed wrong in G1. Therefore skip.
+                    // Wash slot is placed wrong in G1. Therefore let's skip it.
+                    if (obj.name != "WASHSLOT")
                         Debug.LogError($"Couldn't find mesh for >{obj}< to be used for CullingGroup. Skipping...");
 
                     continue;
                 }
 
-                var sphere = GetSphere(obj, mesh);
+                var sphere = GetSphere(obj, bounds.Value);
                 var size = sphere.radius * 2;
 
                 if (size <= smallDim)
@@ -212,10 +216,10 @@ namespace GVR.Manager.Culling
             vobCullingGroupLarge.SetBoundingSpheres(vobSpheresLarge);
         }
 
-        private BoundingSphere GetSphere(GameObject go, Mesh mesh)
+        private BoundingSphere GetSphere(GameObject go, Bounds bounds)
         {
-            var bboxSize = mesh.bounds.size;
-            Vector3 worldCenter = go.transform.TransformPoint(mesh.bounds.center);
+            var bboxSize = bounds.size;
+            Vector3 worldCenter = go.transform.TransformPoint(bounds.center);
 
             var maxDimension = Mathf.Max(bboxSize.x, bboxSize.y, bboxSize.z); // Get biggest dim for calculation of object size group.
             var sphere = new BoundingSphere(worldCenter, maxDimension / 2); // Radius is half the size.
@@ -227,26 +231,21 @@ namespace GVR.Manager.Culling
         /// TODO If performance allows it, we could also look dynamically for all the existing meshes inside GO
         /// TODO and look for maximum value for largest mesh. But it should be fine for now.
         /// </summary>
-        private Mesh GetMesh(GameObject go)
+        private Bounds? GetBounds(GameObject go)
         {
             var transf = go.transform;
 
             try
             {
-                if (transf.TryGetComponent<MeshFilter>(out var mesh0)) // Lookup: /
-                    return mesh0.mesh;
-                else if (transf.GetChild(0).TryGetComponent<MeshFilter>(out var mesh1)) // Lookup: /BIP 01
-                    return mesh1.mesh;
-                else if (transf.GetChild(0).GetChild(0).TryGetComponent<MeshFilter>(out var mesh2)) // Lookup: /BIP 01/...
-                    return mesh2.mesh;
-                else if (transf.childCount > 1 && transf.GetChild(1).TryGetComponent<MeshFilter>(out var mesh3)) // Lookup: /ZM_0
-                    return mesh3.mesh;
+                if (transf.TryGetComponent<ParticleSystemRenderer>(out var particleRenderer))
+                    return particleRenderer.bounds;
                 else
-                    return null;
+                    // Example lookups: /, /BIP 01, /BIP 01/..., /ZM_0
+                    return transf.GetComponentInChildren<MeshFilter>().mesh.bounds;
             }
             catch (Exception e)
             {
-                Debug.Log(e);
+                Debug.LogError(e);
                 return null;
             }
         }

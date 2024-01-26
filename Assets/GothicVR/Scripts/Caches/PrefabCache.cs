@@ -7,7 +7,7 @@ namespace GVR.Caches
 {
     public static class PrefabCache
     {
-        private static Dictionary<PrefabType, GameObject> prefabCache = new();
+        private static readonly Dictionary<PrefabType, GameObject> Cache = new();
 
         public enum PrefabType
         {
@@ -43,14 +43,19 @@ namespace GVR.Caches
 
         public static GameObject TryGetObject(PrefabType type)
         {
-            if (prefabCache.TryGetValue(type, out var prefab))
+            if (Cache.TryGetValue(type, out var prefab))
                 return Object.Instantiate(prefab);
             
             var path = GetPath(type);
             var newPrefab = Resources.Load<GameObject>(path);
 
-            prefabCache[type] = newPrefab;
+            Cache[type] = newPrefab;
             return Object.Instantiate(newPrefab);
+        }
+
+        public static void Dispose()
+        {
+            Cache.Clear();
         }
     }
 }

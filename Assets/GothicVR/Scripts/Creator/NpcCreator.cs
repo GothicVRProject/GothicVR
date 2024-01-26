@@ -1,26 +1,26 @@
-using System;
 using System.Linq;
 using GVR.Caches;
-using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.Manager;
 using GVR.Npc;
-using GVR.Phoenix.Data.Vm.Gothic;
-using GVR.Phoenix.Interface;
-using GVR.Phoenix.Interface.Vm;
+using GVR.Npc.Routines;
 using GVR.Properties;
+using GVR.Vm;
 using GVR.Vob.WayNet;
-using PxCs.Data.Vm;
-using PxCs.Interface;
 using UnityEngine;
+using ZenKit;
+using ZenKit.Daedalus;
 using Object = UnityEngine.Object;
+using WayPoint = GVR.Vob.WayNet.WayPoint;
 
 namespace GVR.Creator
 {
     public static class NpcCreator
     {
         private static GameObject npcRootGo;
+        private static DaedalusVm vm => GameData.GothicVm;
 
         // Hint - If this scale ratio isn't looking well, feel free to change it.
         private const float fatnessScale = 0.1f;
@@ -36,31 +36,14 @@ namespace GVR.Creator
             return npcRootGo;
         }
 
-        private static GameObject GetNpc(IntPtr npcPtr)
+        private static NpcProperties GetProperties(NpcInstance npc)
         {
-            return GetProperties(npcPtr).gameObject;
+            return LookupCache.NpcCache[npc.Index];
         }
-        
-        private static NpcProperties GetProperties(IntPtr npcPtr)
-        {
-            var symbolIndex = PxVm.pxVmInstanceGetSymbolIndex(npcPtr);
-            var props = LookupCache.NpcCache[symbolIndex];
 
-            // Workaround: When calling PxVm.InitializeNpc(), phoenix will start executing all of the INSTANCEs methods.
-            // But some of them like Hlp_GetNpc() need the IntPtr before it's being returned by InitializeNpc().
-            // But Phoenix gives us the Pointer via other External calls. We then set it asap.
-            if (props.npcPtr == IntPtr.Zero)
-                props.npcPtr = npcPtr;
-
-            return props;
-        }
-        
-        /// <summary>
-        /// Return cached GameObject based on lookup through IntPtr
-        /// </summary>
-        private static GameObject GetNpcGo(IntPtr npcPtr)
+        private static GameObject GetNpcGo(NpcInstance npcInstance)
         {
-            return GetProperties(npcPtr).gameObject;
+            return GetProperties(npcInstance).gameObject;
         }
 
         /// <summary>
@@ -74,48 +57,69 @@ namespace GVR.Creator
         {
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             var props = newNpc.GetComponent<NpcProperties>();
+            var npcSymbol = vm.GetSymbolByIndex(npcInstance);
+            
+            if (npcSymbol == null)
+            {
+                Debug.LogError($"Npc with ID {npcInstance} not found.");
+                return;
+            }
             
             // Humans are singletons.
-            if (LookupCache.NpcCache.TryAdd((uint)npcInstance, newNpc.GetComponent<NpcProperties>()))
+            if (LookupCache.NpcCache.TryAdd(npcInstance, newNpc.GetComponent<NpcProperties>()))
             {
-                var pxNpc = PxVm.InitializeNpc(GameData.VmGothicPtr, (uint)npcInstance);
-                props.npc = pxNpc;
+                props.npcInstance = vm.AllocInstance<NpcInstance>(npcSymbol);
+                vm.InitInstance(props.npcInstance);
+
+                props.Dialogs = GameData.Dialogs.Instances
+                    .Where(dialog => dialog.Npc == props.npcInstance.Index)
+                    .OrderByDescending(dialog => dialog.Important)
+                    .ToList();
             }
             // Monsters are used multiple times.
             else
             {
-                var origNpc = LookupCache.NpcCache[(uint)npcInstance];
+                var origNpc = LookupCache.NpcCache[npcInstance];
                 var origProps = origNpc.GetComponent<NpcProperties>();
                 // Clone Properties as they're required from the first instance.
                 props.Copy(origProps);
             }
 
-            if (FeatureFlags.I.npcToSpawn.Any() && !FeatureFlags.I.npcToSpawn.Contains(props.npc.id))
+            if (FeatureFlags.I.npcToSpawn.Any() && !FeatureFlags.I.npcToSpawn.Contains(props.npcInstance.Id))
             {
                 Object.Destroy(newNpc);
                 return;
             }
 
-            newNpc.name = props.npc!.names[0];
+            newNpc.name = props.npcInstance.GetName(NpcNameSlot.Slot0);
             
             var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
-            NpcMeshCreator.CreateNpc(newNpc.name, props.mdmName, mdhName, props.BodyData, newNpc);
+            MeshCreatorFacade.CreateNpc(newNpc.name, props.mdmName, mdhName, props.BodyData, newNpc);
             newNpc.SetParent(GetRootGo());
 
             foreach (var equippedItem in props.EquippedItems)
-                NpcMeshCreator.EquipWeapon(newNpc, equippedItem, equippedItem.mainFlag, equippedItem.flags);
+                MeshCreatorFacade.EquipNpcWeapon(newNpc, equippedItem, (VmGothicEnums.ItemFlags)equippedItem.MainFlag, (VmGothicEnums.ItemFlags)equippedItem.Flags);
             
-            SetSpawnPoint(newNpc, spawnPoint, props.npc);
-
+            var npcRoutine = props.npcInstance.DailyRoutine;
+            vm.GlobalSelf = props.npcInstance;
+            vm.Call(npcRoutine);
+            
             if (FeatureFlags.I.enableNpcRoutines)
                 StartRoutine(newNpc);
+            
+            SetSpawnPoint(newNpc, spawnPoint);
         }
 
-        private static void SetSpawnPoint(GameObject npcGo, string spawnPoint, PxVmNpcData pxNpc)
+        private static void StartRoutine(GameObject npc)
         {
-            var npcRoutine = pxNpc.routine;
-            PxVm.CallFunction(GameData.VmGothicPtr, (uint)npcRoutine, pxNpc.instancePtr);
-            
+            var routineComp = npc.GetComponent<Routine>();
+            var firstRoutine = routineComp.routines.First();
+
+            npc.GetComponent<AiHandler>().StartRoutine(firstRoutine.action, firstRoutine.waypoint);
+        }
+        
+        private static void SetSpawnPoint(GameObject npcGo, string spawnPoint)
+        {
             WayNetPoint initialSpawnPoint;
             if (npcGo.GetComponent<Routine>().routines.Any())
             {
@@ -129,7 +133,7 @@ namespace GVR.Creator
 
             if (initialSpawnPoint == null)
             {
-                Debug.LogWarning(string.Format("spawnpoint={0} couldn't be found.", spawnPoint));
+                Debug.LogWarning(string.Format("spawnPoint={0} couldn't be found.", spawnPoint));
                 return;
             }
             
@@ -142,57 +146,55 @@ namespace GVR.Creator
             
         }
         
-        public static void ExtTaMin(VmGothicExternals.ExtTaMinData data)
+        public static void ExtTaMin(NpcInstance npcInstance, int startH, int startM, int stopH, int stopM, int action, string waypoint)
         {
-            var npc = GetNpcGo(data.Npc);
+            var npc = GetNpcGo(npcInstance);
             
             // If we put h=24, DateTime will throw an error instead of rolling.
-            var stop_hFormatted = data.StopH == 24 ? 0 : data.StopH;
+            var stop_hFormatted = (stopH == 24) ? 0 : stopH;
 
             RoutineData routine = new()
             {
-                start_h = data.StartH,
-                start_m = data.StartM,
-                start = new(1, 1, 1, data.StartH, data.StartM, 0),
-                stop_h = data.StopH,
-                stop_m = data.StopM,
-                stop = new(1, 1, 1, stop_hFormatted, data.StopM, 0),
-                action = data.Action,
-                waypoint = data.Waypoint
+                start_h = startH,
+                start_m = startM,
+                start = new(1, 1, 1, startH, startM, 0),
+                stop_h = stopH,
+                stop_m = stopM,
+                stop = new(1, 1, 1, stop_hFormatted, stopM, 0),
+                action = action,
+                waypoint = waypoint
             };
 
             npc.GetComponent<Routine>().routines.Add(routine);
 
             // Add element if key not yet exists.
-            GameData.npcRoutines.TryAdd(data.Npc, new());
-            GameData.npcRoutines[data.Npc].Add(routine);
+            GameData.npcRoutines.TryAdd(npcInstance.Index, new());
+            GameData.npcRoutines[npcInstance.Index].Add(routine);
         }
         
-        public static void ExtMdlSetVisual(IntPtr npcPtr, string visual)
+        public static void ExtMdlSetVisual(NpcInstance npc, string visual)
         {
-            var props = GetProperties(npcPtr);
-
+            var props = GetProperties(npc);
             props.baseMdsName = visual;
         }
 
-        public static void ExtApplyOverlayMds(IntPtr npcPtr, string overlayName)
+        public static void ExtApplyOverlayMds(NpcInstance npc, string overlayName)
         {
-            var props = GetProperties(npcPtr);
-
+            var props = GetProperties(npc);
             props.overlayMdsName = overlayName;
         }
 
         public static void ExtSetVisualBody(VmGothicExternals.ExtSetVisualBodyData data)
         {
-            var props = GetProperties(data.NpcPtr);
+            var props = GetProperties(data.Npc);
 
             props.BodyData = data;
             
             if (data.Armor >= 0)
             {
-                var armorData = AssetCache.TryGetItemData((uint)data.Armor);
-                props.EquippedItems.Add(AssetCache.TryGetItemData((uint)data.Armor));
-                props.mdmName = armorData.visualChange;
+                var armorData = AssetCache.TryGetItemData(data.Armor);
+                props.EquippedItems.Add(AssetCache.TryGetItemData(data.Armor));
+                props.mdmName = armorData.VisualChange;
             }
             else
             {
@@ -200,80 +202,67 @@ namespace GVR.Creator
             }
         }
 
-        public static void ExtMdlSetModelScale(IntPtr npcPtr, Vector3 scale)
+        public static void ExtMdlSetModelScale(NpcInstance npc, Vector3 scale)
         {
-            var npc = GetNpcGo(npcPtr);
+            var npcGo = GetNpcGo(npc);
 
             // FIXME - If fatness is applied before, we reset it here. We need to do proper Vector multiplication here.
-            npc.transform.localScale = scale;
+            npcGo.transform.localScale = scale;
         }
 
-        public static void ExtSetModelFatness(IntPtr npcPtr, float fatness)
+        public static void ExtSetModelFatness(NpcInstance npc, float fatness)
         {
-            var npc = GetNpcGo(npcPtr);
-            var oldScale = npc.transform.localScale;
+            var npcGo = GetNpcGo(npc);
+            var oldScale = npcGo.transform.localScale;
             var bonusFat = fatness * fatnessScale;
             
-            npc.transform.localScale = new(oldScale.x + bonusFat, oldScale.y, oldScale.z + bonusFat);
+            npcGo.transform.localScale = new(oldScale.x + bonusFat, oldScale.y, oldScale.z + bonusFat);
         }
 
-        public static IntPtr ExtHlpGetNpc(int instanceId)
+        public static NpcInstance ExtHlpGetNpc(int instanceId)
         {
-            if (!LookupCache.NpcCache.TryGetValue((uint)instanceId, out var properties))
+            if (!LookupCache.NpcCache.TryGetValue(instanceId, out var properties))
             {
                 Debug.LogError($"Couldn't find NPC {instanceId} inside cache.");
-                return IntPtr.Zero;
+                return null;
             }
 
-            return properties.npcPtr;
+
+            return properties.npcInstance;
         }
 
-        public static void ExtNpcPerceptionEnable(IntPtr npcPtr, VmGothicEnums.PerceptionType perception, int function)
+        public static void ExtNpcPerceptionEnable(NpcInstance npc, VmGothicEnums.PerceptionType perception, int function)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.Perceptions[perception] = function;
         }
 
-        public static void ExtNpcSetPerceptionTime(IntPtr npcPtr, float time)
+        public static void ExtNpcSetPerceptionTime(NpcInstance npc, float time)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.perceptionTime = time;
         }
 
-        public static void ExtNpcSetTalentValue(IntPtr npcPtr, VmGothicEnums.Talent talent, int level)
+        public static void ExtNpcSetTalentValue(NpcInstance npc, VmGothicEnums.Talent talent, int level)
         {
-            var props = GetProperties(npcPtr);
+            var props = GetProperties(npc);
             props.Talents[talent] = level;
         }
 
-        public static void ExtCreateInvItems(IntPtr npcPtr, uint itemId, int amount)
+        public static void ExtCreateInvItems(NpcInstance npc, uint itemId, int amount)
         {
-            var props = GetProperties(npcPtr);
-            
-            if (!props.Items.TryGetValue(itemId, out _))
-            {
-                props.Items.Add(itemId, amount);
-            }
-            else
-            {
-                props.Items[itemId] += amount;
-            }
+            var props = GetProperties(npc);
+
+            props.Items.TryAdd(itemId, amount);
+            props.Items[itemId] += amount;
         }
         
-        public static void ExtEquipItem(IntPtr npcPtr, int itemId)
+        public static void ExtEquipItem(NpcInstance npc, int itemId)
         {
-            var props = GetProperties(npcPtr);
-            var itemData = AssetCache.TryGetItemData((uint)itemId);
+            var props = GetProperties(npc);
+            var itemData = AssetCache.TryGetItemData(itemId);
 
             props.EquippedItems.Add(itemData);
-        }
-        
-        private static void StartRoutine(GameObject npc)
-        {
-            var routineComp = npc.GetComponent<Routine>();
-            var firstRoutine = routineComp.routines.First();
-
-            npc.GetComponent<AiHandler>().StartRoutine((uint)firstRoutine.action, firstRoutine.waypoint);
         }
     }
 }

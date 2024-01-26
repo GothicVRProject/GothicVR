@@ -16,7 +16,7 @@ namespace GVR.Npc.Actions.AnimationActions
             Props.isStateTimeActive = true;
             Props.stateTime = 0;
 
-            ai.StartRoutine(Action.Uint0, Action.String0);
+            ai.StartRoutine(Action.Int0, Action.String0);
         }
 
         /// <summary>

@@ -316,11 +316,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skipMainMenu: 0
   useXRDeviceSimulator: 0
+  createWorldMesh: 1
   createWaypoints: 1
   vobItemsDynamicAttach: 1
+  showBarrier: 1
   createWayPointMeshes: 0
   createWaypointEdgeMeshes: 0
   enableDayTime: 1
+  TimeMultiplier: 1
   sunMovementPerformanceValue: 1
   startHour: 8
   startMinute: 0
@@ -339,19 +342,19 @@ MonoBehaviour:
   spawnAtSpecificFreePoint: 
   drawFreePointMeshes: 0
   drawVobCullingGizmos: 0
+  vobTypeToSpawn: 
   createOcNpcs: 0
   enableNpcRoutines: 0
   npcToSpawn: 
-  showPhoenixDebugMessages: 0
-  showZspyLogs: 0
-  showPhoenixVfsFileNotFoundErrors: 0
-  showMusicLogs: 0
   enableSounds: 1
   enableMusic: 1
   enableSoundCulling: 1
   enableVobParticles: 0
-  enableFineGrainedWorldMeshCreation: 0
-  enableWorldCulling: 0
+  zenKitLogLevel: 0
+  showZspyLogs: 0
+  showZenKitVfsFileNotFoundErrors: 0
+  showMusicLogs: 0
+  showBarrierLogs: 0
 --- !u!1 &394991343
 GameObject:
   m_ObjectHideFlags: 0
@@ -984,15 +987,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5af2db35bcd07048bbaf0db2b54d4d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  secondChangeCallback:
-    m_PersistentCalls:
-      m_Calls: []
-  minuteChangeCallback:
-    m_PersistentCalls:
-      m_Calls: []
-  hourChangeCallback:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!4 &936232198
 Transform:
   m_ObjectHideFlags: 0
@@ -1582,7 +1576,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1892061892}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a9bc266eaeba904b874cccfe887cf92, type: 3}
+  m_Script: {fileID: 11500000, guid: ee15f9882c8a2ec438532ce9a36b4ac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   invalidInstallationDirMessage: {fileID: 1623647995}
@@ -1619,9 +1613,10 @@ GameObject:
   - component: {fileID: 1896514221}
   - component: {fileID: 1896514227}
   - component: {fileID: 1896514225}
-  - component: {fileID: 1896514228}
   - component: {fileID: 1896514223}
   - component: {fileID: 1896514226}
+  - component: {fileID: 1896514228}
+  - component: {fileID: 1896514229}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -1791,7 +1786,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 1896514212}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0c4b438ae1b43abb2b46d35adb6e972, type: 3}
+  m_Script: {fileID: 11500000, guid: 46e9095c72bc48bfb33591c93b3dc5f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896514229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896514212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73eb7a86248b445782c0fd172ee7f111, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &2044949334

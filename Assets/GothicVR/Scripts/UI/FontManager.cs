@@ -1,11 +1,11 @@
 using System;
 using System.Reflection;
 using GVR.Caches;
-using GVR.Extensions;
 using GVR.Util;
 using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore;
+using Constants = GVR.Globals.Constants;
 
 namespace GVR.Manager
 {
@@ -23,27 +23,19 @@ namespace GVR.Manager
         {
             if (LookupCache.fontCache.TryGetValue(fontName.ToUpper(), out TMP_SpriteAsset data))
                 return data;
-            var fontData = AssetCache.TryGetFont(fontName.ToUpper());
-
-            var format = fontData.texture.format.AsUnityTextureFormat();
-            var texture = new Texture2D((int)fontData.texture.width, (int)fontData.texture.height, format, (int)fontData.texture.mipmapCount, false);
-            texture.name = fontData.name.ToUpper();
-
-            for (var i = 0u; i < fontData.texture.mipmapCount; i++)
-                texture.SetPixelData(fontData.texture.mipmaps[i].mipmap, (int)i);
-
-            texture.Apply();
+            var font = AssetCache.TryGetFont(fontName.ToUpper());
+            var fontTexture = AssetCache.TryGetTexture(fontName);
 
             TMP_SpriteAsset spriteAsset = ScriptableObject.CreateInstance<TMP_SpriteAsset>();
 
-            for (int i = 0; i < fontData.glyphs.Length; i++)
+            for (int i = 0; i < font.Glyphs.Count; i++)
             {
-                var x = fontData.glyphs[i].upper.X * texture.width;
+                var x = font.Glyphs[i].topLeft.X * fontTexture.width;
                 x = x < 0 ? 0 : x;
-                var y = fontData.glyphs[i].upper.Y * texture.height;
-                var w = fontData.glyphs[i].width;
-                var h = fontData.height;
-                Sprite newSprite = Sprite.Create(texture, new Rect(x, y, w, h), new Vector2(fontData.glyphs[i].upper.X, fontData.glyphs[i].lower.Y));
+                var y = font.Glyphs[i].topLeft.Y * fontTexture.height;
+                var w = font.Glyphs[i].width;
+                var h = font.Height;
+                Sprite newSprite = Sprite.Create(fontTexture, new Rect(x, y, w, h), new Vector2(font.Glyphs[i].topLeft.X, font.Glyphs[i].bottomRight.Y));
 
                 var spriteGlyph = new TMP_SpriteGlyph
                 {
@@ -57,21 +49,22 @@ namespace GVR.Manager
                     metrics = new GlyphMetrics
                     {
                         width = w,
-                        height = h,
-                        horizontalBearingY = h,
+                        height = -h,
+                        horizontalBearingY = 0,
                         horizontalBearingX = 0,
                         horizontalAdvance = w
                     },
                     index = (uint)i,
-                    sprite = newSprite
+                    sprite = newSprite,
+                    scale = -1
                 };
                 spriteAsset.spriteGlyphTable.Add(spriteGlyph);
                 var spriteCharacter = new TMP_SpriteCharacter((uint)i, spriteGlyph);
                 spriteAsset.spriteCharacterTable.Add(spriteCharacter);
             }
             spriteAsset.name = name;
-            spriteAsset.material = GetDefaultSpriteMaterial(texture);
-            spriteAsset.spriteSheet = texture;
+            spriteAsset.material = GetDefaultSpriteMaterial(fontTexture);
+            spriteAsset.spriteSheet = fontTexture;
 
             // Get the Type of the TMP_SpriteAsset
             Type spriteAssetType = spriteAsset.GetType();
@@ -93,8 +86,8 @@ namespace GVR.Manager
             ShaderUtilities.GetShaderPropertyIDs();
 
             // Add a new material
-            Shader shader = Shader.Find("TextMeshPro/Sprite");
-            Material tempMaterial = new Material(shader);
+            var shader = Constants.ShaderTMPSprite;
+            var tempMaterial = new Material(shader);
             tempMaterial.SetTexture(ShaderUtilities.ID_MainTex, spriteSheet);
 
             return tempMaterial;

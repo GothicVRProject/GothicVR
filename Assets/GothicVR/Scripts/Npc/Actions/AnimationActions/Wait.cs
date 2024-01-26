@@ -4,7 +4,6 @@ using UnityEngine;
 namespace GVR.Npc.Actions.AnimationActions
 {
     public class Wait : AbstractAnimationAction
-
     {
         private float waitSeconds;
 
@@ -21,11 +20,6 @@ namespace GVR.Npc.Actions.AnimationActions
             waitSeconds -= Time.deltaTime;
 
             return waitSeconds <= 0f;
-        }
-
-        public override void AnimationEndEventCallback()
-        {
-            throw new NotImplementedException("This method is not needed and shouldn't be called.");
         }
     }
 }

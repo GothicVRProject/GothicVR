@@ -1,7 +1,8 @@
 using System;
 using GVR.Caches;
 using GVR.Creator;
-using GVR.Phoenix.Interface.Vm;
+using GVR.Extensions;
+using GVR.Vm;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -18,6 +19,9 @@ namespace GVR.Npc.Actions.AnimationActions
 
         protected WalkState walkState = WalkState.Initial;
 
+        private float prevWalkVelocityUpAddition;
+
+
         protected AbstractWalkAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
         
@@ -30,7 +34,7 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             base.Tick(transform);
 
-            if (isFinished)
+            if (IsFinishedFlag)
                 return;
 
             switch (walkState)
@@ -94,6 +98,41 @@ namespace GVR.Npc.Actions.AnimationActions
 
             var lookRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * 100);
+        }
+
+        /// <summary>
+        /// As we use legacy animations, we can't use RootMotion. We therefore need to rebuild it.
+        /// </summary>
+        private void HandleRootMotion(Transform transform)
+        {
+            /*
+             * root
+             *  /BIP01/ <- animation root
+             *    /ColliderRootMotion <- Moved with animation as inside BIP01, but physics are applied and merged to root
+             *    /... <- animation bones
+             */
+
+            // Apply physics based position change to root.
+            NpcGo.transform.localPosition += Props.colliderRootMotion.localPosition;
+            // Empty physics based diff. Next frame physics will be recalculated.
+            Props.colliderRootMotion.localPosition = Vector3.zero;
+        }
+
+        /// <summary>
+        /// We need to alter rootNode's position once walk animation is done.
+        /// </summary>
+        public override void AnimationEndEventCallback()
+        {
+            base.AnimationEndEventCallback();
+
+            NpcGo.transform.localPosition = Props.bip01.position;
+            Props.bip01.localPosition = Vector3.zero;
+            Props.colliderRootMotion.localPosition = Vector3.zero;
+
+
+            // root.SetLocalPositionAndRotation(
+            //     root.localPosition + bip01Transform.localPosition,
+            //     root.localRotation * bip01Transform.localRotation);
         }
     }
 }

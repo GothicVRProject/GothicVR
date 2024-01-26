@@ -1,8 +1,7 @@
-using GVR.Demo;
-using GVR.Util;
-using GVR.World;
 using System;
 using GVR.Debugging;
+using GVR.Globals;
+using GVR.World;
 using UnityEngine;
 
 public class SunMover : MonoBehaviour
@@ -19,13 +18,13 @@ public class SunMover : MonoBehaviour
         switch (sunPerformanceSetting)
         {
             case FeatureFlags.SunMovementPerformance.EveryIngameSecond:
-                gameTime.secondChangeCallback.AddListener(RotateSun);
+                GvrEvents.GameTimeSecondChangeCallback.AddListener(RotateSun);
                 break;
             case FeatureFlags.SunMovementPerformance.EveryIngameMinute:
-                gameTime.minuteChangeCallback.AddListener(RotateSun);
+                GvrEvents.GameTimeMinuteChangeCallback.AddListener(RotateSun);
                 break;
             case FeatureFlags.SunMovementPerformance.EveryIngameHour:
-                gameTime.minuteChangeCallback.AddListener(RotateSun);
+                GvrEvents.GameTimeHourChangeCallback.AddListener(RotateSun);
                 break;
             default:
                 Debug.LogError($"{sunPerformanceSetting} isn't handled correctly. Therefore SunMover.cs won't move the sun.");

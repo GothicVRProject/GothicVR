@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using GVR.Manager;
+using GVR.Globals;
 using GVR.Properties;
 using TMPro;
 using UnityEngine;
@@ -14,7 +14,7 @@ namespace GVR.Caches
         /// <summary>
         /// [symbolIndex] = Properties-Component
         /// </summary>
-        public static readonly Dictionary<uint, NpcProperties> NpcCache = new();
+        public static readonly Dictionary<int, NpcProperties> NpcCache = new();
 
         /// <summary>
         /// Already created AnimationData (Clips + RootMotions) can be reused.
@@ -30,14 +30,22 @@ namespace GVR.Caches
         /// VobSounds and VobSoundsDayTime GOs.
         /// </summary>
         public static List<GameObject> vobSoundsAndDayTime = new();
-        
-        
+
         static LookupCache()
         {
-            GvrSceneManager.I.sceneGeneralUnloaded.AddListener(delegate
+            GvrEvents.GeneralSceneUnloaded.AddListener(delegate
             {
+                NpcCache.Clear();
                 vobSoundsAndDayTime.Clear();
             });
+        }
+
+        public static void Dispose()
+        {
+            NpcCache.Clear();
+            AnimationClipCache.Clear();
+            fontCache.Clear();
+            vobSoundsAndDayTime.Clear();
         }
     }
 }

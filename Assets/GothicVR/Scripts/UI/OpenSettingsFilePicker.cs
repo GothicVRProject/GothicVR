@@ -1,7 +1,7 @@
-using UnityEngine;
-using SFB;
+using GVR.Manager;
 using GVR.Manager.Settings;
-using GVR.Bootstrap;
+using SFB;
+using UnityEngine;
 
 namespace GVR
 {
@@ -20,8 +20,8 @@ namespace GVR
             
             if (SettingsManager.CheckIfGothic1InstallationExists())
             {
-                PhoenixBootstrapper.I.invalidInstallationDirMessage.SetActive(false);
-                PhoenixBootstrapper.I.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
+                GvrBootstrapper.I.invalidInstallationDirMessage.SetActive(false);
+                GvrBootstrapper.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
             }
         }
     }

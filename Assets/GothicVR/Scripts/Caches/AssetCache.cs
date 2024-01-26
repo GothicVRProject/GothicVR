@@ -2,37 +2,41 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using GVR.Creator.Sounds;
+using GVR.Data;
 using GVR.Extensions;
-using GVR.Phoenix.Interface;
-using PxCs.Data.Animation;
-using PxCs.Data.Font;
-using PxCs.Data.Mesh;
-using PxCs.Data.Model;
-using PxCs.Data.Sound;
-using PxCs.Data.Vm;
-using PxCs.Interface;
+using GVR.Globals;
+using JetBrains.Annotations;
 using UnityEngine;
+using ZenKit;
+using ZenKit.Daedalus;
+using Font = ZenKit.Font;
+using Mesh = ZenKit.Mesh;
+using Object = UnityEngine.Object;
+using Texture = ZenKit.Texture;
+using TextureFormat = ZenKit.TextureFormat;
 
 namespace GVR.Caches
 {
     public static class AssetCache
     {
-        private static Dictionary<string, Texture2D> textureCache = new();
-        private static Dictionary<string, PxModelScriptData> mdsCache = new();
-        private static Dictionary<string, PxAnimationData> animCache = new();
-        private static Dictionary<string, PxModelHierarchyData> mdhCache = new();
-        private static Dictionary<string, PxModelData> mdlCache = new();
-        private static Dictionary<string, PxModelMeshData> mdmCache = new();
-        private static Dictionary<string, PxMultiResolutionMeshData> mrmCache = new();
-        private static Dictionary<string, PxMorphMeshData> mmbCache = new();
-        private static Dictionary<string, PxVmItemData> itemDataCache = new();
-        private static Dictionary<string, PxVmMusicData> musicDataCache = new();
-        private static Dictionary<string, PxVmSfxData> sfxDataCache = new();
-        private static Dictionary<string, PxVmPfxData> pfxDataCache = new();
-        private static Dictionary<string, PxSoundData<float>> soundCache = new();
-        private static Dictionary<string, PxFontData> fontCache = new();
+        private static readonly Dictionary<string, Texture2D> TextureCache = new();
+        private static readonly Dictionary<string, IMesh> MshCache = new();
+        private static readonly Dictionary<string, IModelScript> MdsCache = new();
+        private static readonly Dictionary<string, IModelAnimation> AnimCache = new();
+        private static readonly Dictionary<string, IModelHierarchy> MdhCache = new();
+        private static readonly Dictionary<string, IModel> MdlCache = new();
+        private static readonly Dictionary<string, IModelMesh> MdmCache = new();
+        private static readonly Dictionary<string, IMultiResolutionMesh> MrmCache = new();
+        private static readonly Dictionary<string, IMorphMesh> MmbCache = new();
+        private static readonly Dictionary<string, ItemInstance> ItemDataCache = new();
+        private static readonly Dictionary<string, MusicThemeInstance> MusiThemeCache = new();
+        private static readonly Dictionary<string, SoundEffectInstance> SfxDataCache = new();
+        private static readonly Dictionary<string, ParticleEffectInstance> PfxDataCache = new();
+        private static readonly Dictionary<string, SoundData> SoundCache = new();
+        private static readonly Dictionary<string, IFont> FontCache = new();
 
-        private static readonly string[] misplacedMdmArmors =
+        private static readonly string[] MisplacedMdmArmors =
         {
             "Hum_GrdS_Armor",
             "Hum_GrdM_Armor",
@@ -45,127 +49,187 @@ namespace GVR.Caches
             "Hum_KdfS_Armor"
         };
 
+        [CanBeNull]
         public static Texture2D TryGetTexture(string key)
         {
             string preparedKey = GetPreparedKey(key);
-            if (textureCache.ContainsKey(preparedKey) && textureCache[preparedKey])
+            if (TextureCache.ContainsKey(preparedKey) && TextureCache[preparedKey])
             {
-                return textureCache[preparedKey];
+                return TextureCache[preparedKey];
             }
 
-            // FIXME - There might be more textures to load compressed. Please check for sake of performance!
-            var pxTexture = PxTexture.GetTextureFromVfs(
-                GameData.VfsPtr,
-                key,
-                PxTexture.Format.tex_dxt1, PxTexture.Format.tex_dxt5
-            );
-
-            // No texture found
-            if (pxTexture == null)
+            Texture zkTexture;
+            try
+            {
+                zkTexture = new Texture(GameData.Vfs, $"{preparedKey}-C.TEX");
+            }
+            catch (Exception)
             {
                 Debug.LogWarning($"Texture {key} couldn't be found.");
                 return null;
             }
 
-            var format = pxTexture.format.AsUnityTextureFormat();
+            Texture2D texture;
 
-            Texture2D texture = null;
-            if (pxTexture.mipmapCount == 1)
+            // Workaround for Unity and DXT1 Mipmaps.
+            if (zkTexture.Format == TextureFormat.Dxt1 && zkTexture.MipmapCount == 1)
             {
-                // Let Unity generate mips if not provided.
-                if (format == TextureFormat.DXT1)
-                {
-                    // Unity doesn't want to create mips for DXT1 textures. Recreate them as RGB24.
-                    Texture2D dxtTexture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, false);
-                    dxtTexture.SetPixelData(pxTexture.mipmaps[0].mipmap, 0);
-                    dxtTexture.Apply(false);
-                    texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, TextureFormat.RGB24, true);
-                    texture.SetPixels(dxtTexture.GetPixels());
-                    texture.Apply(true, true);
-                    GameObject.Destroy(dxtTexture);
-                }
-                else
-                {
-                    texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, true);
-                    texture.SetPixelData(pxTexture.mipmaps[0].mipmap, 0);
-                    texture.Apply(true, true);
-                }
+                texture = GenerateDxt1Mipmaps(zkTexture);
             }
             else
             {
-                // Use Gothic's mips if provided. We could also let Unity generate them here, though.
-                texture = new Texture2D((int)pxTexture.width, (int)pxTexture.height, format, (int)pxTexture.mipmapCount, false);
-                for (int i = 0; i < pxTexture.mipmapCount; i++)
+                var format = zkTexture.Format.AsUnityTextureFormat();
+                var updateMipmaps = zkTexture.MipmapCount == 1; // Let Unity generate Mipmaps if they aren't provided by Gothic texture itself.
+
+                // Use Gothic's mips if provided.
+                texture = new Texture2D(zkTexture.Width, zkTexture.Height, format, zkTexture.MipmapCount, false);
+                for (var i = 0; i < zkTexture.MipmapCount; i++)
                 {
-                    texture.SetPixelData(pxTexture.mipmaps[i].mipmap, i);
+                    if (format == UnityEngine.TextureFormat.RGBA32)
+                        // RGBA is uncompressed format.
+                        texture.SetPixelData(zkTexture.AllMipmapsRgba[i], i);
+                    else
+                        // Raw means "compressed data provided by Gothic texture"
+                        texture.SetPixelData(zkTexture.AllMipmapsRaw[i], i);
                 }
-                texture.Apply(false, true);
+
+                texture.Apply(updateMipmaps, true);
             }
 
             texture.filterMode = FilterMode.Trilinear;
             texture.name = key;
-            textureCache[preparedKey] = texture;
+            TextureCache[preparedKey] = texture;
+
             return texture;
         }
 
-        public static PxModelScriptData TryGetMds(string key)
+        /// <summary>
+        /// Unity doesn't want to create mips for DXT1 textures. Recreate them as RGB24.
+        /// </summary>
+        private static Texture2D GenerateDxt1Mipmaps(Texture zkTexture)
+        {
+            var dxtTexture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, UnityEngine.TextureFormat.DXT1, false);
+            dxtTexture.SetPixelData(zkTexture.AllMipmapsRaw[0], 0);
+            dxtTexture.Apply(false);
+
+            var texture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, UnityEngine.TextureFormat.RGB24, true);
+            texture.SetPixels(dxtTexture.GetPixels());
+            texture.Apply(true, true);
+            Object.Destroy(dxtTexture);
+
+            return texture;
+        }
+
+        public static IModelScript TryGetMds(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (mdsCache.TryGetValue(preparedKey, out var data))
+            if (MdsCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxModelScript.GetModelScriptFromVfs(GameData.VfsPtr, $"{preparedKey}.mds");
-            mdsCache[preparedKey] = newData;
+            var newData = new ModelScript(GameData.Vfs, $"{preparedKey}.mds").Cache();
+            MdsCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public static PxAnimationData TryGetAnimation(string mdsKey, string animKey)
+        public static IModelAnimation TryGetAnimation(string mdsKey, string animKey)
         {
             var preparedMdsKey = GetPreparedKey(mdsKey);
             var preparedAnimKey = GetPreparedKey(animKey);
-            var preparedKey = preparedMdsKey + "-" + preparedAnimKey;
-            if (animCache.TryGetValue(preparedKey, out var data))
+            var preparedKey = $"{preparedMdsKey}-{preparedAnimKey}";
+            if (AnimCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxAnimation.LoadFromVfs(GameData.VfsPtr, $"{preparedKey}.man");
-            animCache[preparedKey] = newData;
+            var newData = new ModelAnimation(GameData.Vfs, $"{preparedKey}.man").Cache();
+            AnimCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public static PxModelHierarchyData TryGetMdh(string key)
+        [CanBeNull]
+        public static IMesh TryGetMsh(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (mdhCache.TryGetValue(preparedKey, out var data))
+            if (MshCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxModelHierarchy.LoadFromVfs(GameData.VfsPtr, $"{preparedKey}.mdh");
-            mdhCache[preparedKey] = newData;
+            IMesh newData = null;
+            try
+            {
+                newData = new Mesh(GameData.Vfs, $"{preparedKey}.msh").Cache();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            MshCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public static PxModelData TryGetMdl(string key)
+        [CanBeNull]
+        public static IModelHierarchy TryGetMdh(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (mdlCache.TryGetValue(preparedKey, out var data))
+            if (MdhCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxModel.LoadModelFromVfs(GameData.VfsPtr, $"{preparedKey}.mdl");
-            mdlCache[preparedKey] = newData;
+            IModelHierarchy newData = null;
+            try
+            {
+                newData = new ModelHierarchy(GameData.Vfs, $"{preparedKey}.mdh").Cache();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            MdhCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public static PxModelMeshData TryGetMdm(string key)
+        [CanBeNull]
+        public static IModel TryGetMdl(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (mdmCache.TryGetValue(preparedKey, out var data))
+            if (MdlCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxModelMesh.LoadModelMeshFromVfs(GameData.VfsPtr, $"{preparedKey}.mdm");
-            mdmCache[preparedKey] = newData;
+            IModel newData = null;
+            try
+            {
+                newData = new Model(GameData.Vfs, $"{preparedKey}.mdl").Cache();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            MdlCache[preparedKey] = newData;
+
+            return newData;
+        }
+
+        [CanBeNull]
+        public static IModelMesh TryGetMdm(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (MdmCache.TryGetValue(preparedKey, out var data))
+                return data;
+
+            IModelMesh newData = null;
+            try
+            {
+                newData = new ModelMesh(GameData.Vfs, $"{preparedKey}.mdm").Cache();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            MdmCache[preparedKey] = newData;
 
             FixArmorTriangles(preparedKey, newData);
 
@@ -175,137 +239,175 @@ namespace GVR.Caches
         /// <summary>
         /// Some armor mdm's have wrong triangles. This function corrects them hard coded until we find a proper solution.
         /// </summary>
-        private static void FixArmorTriangles(string key, PxModelMeshData mdm)
+        private static void FixArmorTriangles(string key, IModelMesh mdm)
         {
-            if (!misplacedMdmArmors.Contains(key, StringComparer.OrdinalIgnoreCase))
+            if (!MisplacedMdmArmors.Contains(key, StringComparer.OrdinalIgnoreCase))
                 return;
 
-            foreach (var mesh in mdm.meshes!)
+            foreach (var mesh in mdm.Meshes)
             {
-                for (var i = 0; i < mesh.mesh!.positions!.Length; i++)
+                for (var i = 0; i < mesh.Mesh.Positions.Count; i++)
                 {
-                    var curPos = mesh.mesh.positions[i];
-                    mesh.mesh.positions[i] = new(curPos.X + 0.5f, curPos.Y - 0.5f, curPos.Z + 13f);
+                    var curPos = mesh.Mesh.Positions[i];
+                    mesh.Mesh.Positions[i] = new(curPos.X + 0.5f, curPos.Y - 0.5f, curPos.Z + 13f);
                 }
             }
         }
 
-        public static PxMultiResolutionMeshData TryGetMrm(string key)
+        public static IMultiResolutionMesh TryGetMrm(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (mrmCache.TryGetValue(preparedKey, out var data))
+            if (MrmCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxMultiResolutionMesh.GetMRMFromVfs(GameData.VfsPtr, $"{preparedKey}.mrm");
-            mrmCache[preparedKey] = newData;
-
-            return newData;
-        }
-
-        public static PxMorphMeshData TryGetMmb(string key)
-        {
-            var preparedKey = GetPreparedKey(key);
-            if (mmbCache.TryGetValue(preparedKey, out var data))
-                return data;
-
-            var newData = PxMorphMesh.LoadMorphMeshFromVfs(GameData.VfsPtr, $"{preparedKey}.mmb");
-            mmbCache[preparedKey] = newData;
-
-            return newData;
-        }
-
-        public static PxVmMusicData TryGetMusic(string key)
-        {
-            var preparedKey = GetPreparedKey(key);
-            if (musicDataCache.TryGetValue(preparedKey, out var data))
-                return data;
-
-            var newData = PxVm.InitializeMusic(GameData.VmMusicPtr, preparedKey);
-            musicDataCache[preparedKey] = newData;
+            var newData = new MultiResolutionMesh(GameData.Vfs, $"{preparedKey}.mrm").Cache();
+            MrmCache[preparedKey] = newData;
 
             return newData;
         }
 
         /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix.
+        /// MMS == MorphMesh
+        /// e.g. face animations during dialogs.
+        /// </summary>
+        public static IMorphMesh TryGetMmb(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (MmbCache.TryGetValue(preparedKey, out var data))
+                return data;
+
+            var newData = new MorphMesh(GameData.Vfs, $"{preparedKey}.mmb").Cache();
+            MmbCache[preparedKey] = newData;
+
+            return newData;
+        }
+
+        public static MusicThemeInstance TryGetMusic(string key)
+        {
+            var preparedKey = GetPreparedKey(key);
+            if (MusiThemeCache.TryGetValue(preparedKey, out var data))
+                return data;
+
+            MusicThemeInstance newData = null;
+            try
+            {
+                newData = GameData.MusicVm.InitInstance<MusicThemeInstance>(preparedKey);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+            MusiThemeCache[preparedKey] = newData;
+
+            return newData;
+        }
+
+        /// <summary>
+        /// Hint: Instances only need to be initialized once in ZenKit.
         /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
         /// </summary>
-        public static PxVmItemData TryGetItemData(uint instanceId)
+        public static ItemInstance TryGetItemData(int instanceId)
         {
-            var symbol = PxDaedalusScript.GetSymbol(GameData.VmGothicPtr, instanceId);
+            var symbol = GameData.GothicVm.GetSymbolByIndex(instanceId);
 
             if (symbol == null)
                 return null;
 
-            return TryGetItemData(symbol.name);
+            return TryGetItemData(symbol.Name);
         }
 
         /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix.
+        /// Hint: Instances only need to be initialized once in ZenKit.
         /// There are two ways of getting Item data. Via INSTANCE name or symbolIndex inside VM.
         /// </summary>
-        public static PxVmItemData TryGetItemData(string key)
+        [CanBeNull]
+        public static ItemInstance TryGetItemData(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (itemDataCache.TryGetValue(preparedKey, out var data))
+            if (ItemDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxVm.InitializeItem(GameData.VmGothicPtr, preparedKey);
-            itemDataCache[preparedKey] = newData;
+            ItemInstance newData = null;
+            try
+            {
+                newData = GameData.GothicVm.InitInstance<ItemInstance>(preparedKey);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+            ItemDataCache[preparedKey] = newData;
 
             return newData;
         }
 
         /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
+        /// Hint: Instances only need to be initialized once in ZenKit and don't need to be deleted during runtime.
         /// </summary>
-        public static PxVmSfxData TryGetSfxData(string key)
+        [CanBeNull]
+        public static SoundEffectInstance TryGetSfxData(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (sfxDataCache.TryGetValue(preparedKey, out var data))
+            if (SfxDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxVm.InitializeSfx(GameData.VmSfxPtr, preparedKey);
-            sfxDataCache[preparedKey] = newData;
+            SoundEffectInstance newData = null;
+            try
+            {
+                newData = GameData.SfxVm.InitInstance<SoundEffectInstance>(preparedKey);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+            SfxDataCache[preparedKey] = newData;
 
             return newData;
         }
 
         /// <summary>
-        /// Hint: Instances only need to be initialized once on phoenix and don't need to be deleted during runtime.
+        /// Hint: Instances only need to be initialized once in ZenKit and don't need to be deleted during runtime.
         /// </summary>
-        public static PxVmPfxData TryGetPfxData(string key)
+        public static ParticleEffectInstance TryGetPfxData(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (pfxDataCache.TryGetValue(preparedKey, out var data))
+            if (PfxDataCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = PxVm.InitializePfx(GameData.VmPfxPtr, preparedKey);
-            pfxDataCache[preparedKey] = newData;
+            ParticleEffectInstance newData = null;
+            try
+            {
+                newData = GameData.PfxVm.InitInstance<ParticleEffectInstance>(preparedKey);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+            PfxDataCache[preparedKey] = newData;
 
             return newData;
         }
 
-        public static PxSoundData<float> TryGetSound(string key)
+        public static SoundData TryGetSound(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (soundCache.TryGetValue(preparedKey, out var data))
+            if (SoundCache.TryGetValue(preparedKey, out var data))
                 return data;
+            
+            var newData = SoundCreator.GetSoundArrayFromVfs($"{preparedKey}.wav");
+            SoundCache[preparedKey] = newData;
 
-            var wavFile = PxSound.GetSoundArrayFromVfs<float>(GameData.VfsPtr, $"{preparedKey}.wav");
-            soundCache[preparedKey] = wavFile;
-
-            return wavFile;
+            return newData;
         }
 
-        public static PxFontData TryGetFont(string key)
+        public static IFont TryGetFont(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (fontCache.TryGetValue(preparedKey, out var data))
+            if (FontCache.TryGetValue(preparedKey, out var data))
                 return data;
-
-            var fontData = PxFont.LoadFont(GameData.VfsPtr, $"{preparedKey}.fnt");
-            fontCache[preparedKey] = fontData;
+            
+            var fontData = new Font(GameData.Vfs, $"{preparedKey}.fnt").Cache();
+            FontCache[preparedKey] = fontData;
 
             return fontData;
         }
@@ -319,6 +421,24 @@ namespace GVR.Caches
                 return lowerKey;
             else
                 return lowerKey.Replace(extension, "");
+        }
+
+        public static void Dispose()
+        {
+            TextureCache.Clear();
+            MdsCache.Clear();
+            AnimCache.Clear();
+            MdhCache.Clear();
+            MdlCache.Clear();
+            MdmCache.Clear();
+            MrmCache.Clear();
+            MmbCache.Clear();
+            ItemDataCache.Clear();
+            MusiThemeCache.Clear();
+            SfxDataCache.Clear();
+            PfxDataCache.Clear();
+            SoundCache.Clear();
+            FontCache.Clear();
         }
     }
 }

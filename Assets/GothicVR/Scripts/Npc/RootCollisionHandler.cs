@@ -4,10 +4,8 @@ using UnityEngine;
 
 namespace GVR.Npc
 {
-    public class RootCollisionHandler : MonoBehaviour
+    public class RootCollisionHandler : BasePlayerBehaviour
     {
-        public NpcProperties properties;
-
         private void OnCollisionEnter(Collision coll)
         {
             properties.currentAction?.OnCollisionEnter(coll);

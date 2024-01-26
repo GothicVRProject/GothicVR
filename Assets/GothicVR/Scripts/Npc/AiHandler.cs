@@ -1,18 +1,16 @@
-﻿using GVR.Extensions;
+﻿using GVR.Globals;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
-using GVR.Phoenix.Interface;
 using GVR.Properties;
-using PxCs.Data.Event;
-using PxCs.Interface;
 using UnityEngine;
+using ZenKit;
 
 namespace GVR.Npc
 {
-    public class AiHandler : MonoBehaviour, IAnimationCallbacks
+    public class AiHandler : BasePlayerBehaviour, IAnimationCallbacks
     {
-        public NpcProperties properties;
-        
+        private static DaedalusVm vm => GameData.GothicVm;
+
         private void Start()
         {
             properties.currentAction = new None(new(AnimationAction.Type.AINone), gameObject);
@@ -45,10 +43,10 @@ namespace GVR.Npc
                         if (properties.stateLoop == 0)
                             return;
                         properties.currentLoopState = NpcProperties.LoopState.Loop;
-                        PxVm.CallFunction(GameData.VmGothicPtr, properties.stateLoop, properties.npcPtr);
+                        GameData.GothicVm.Call((int)properties.stateLoop, properties.npcInstance);
                         break;
                     case NpcProperties.LoopState.Loop:
-                        PxVm.CallFunction(GameData.VmGothicPtr, properties.stateLoop, properties.npcPtr);
+                        GameData.GothicVm.Call((int)properties.stateLoop, properties.npcInstance);
                         break;
                 }
             }
@@ -60,26 +58,24 @@ namespace GVR.Npc
             }
         }
 
-        public void StartRoutine(uint action, string wayPointName)
+        public void StartRoutine(int action, string wayPointName)
         {
             // We need to set WayPoint within Daedalus instance as it calls _self.wp_ during routine loops.
-            PxVm.pxVmInstanceNpcSetWP(properties.npc.instancePtr, wayPointName);
-            properties.npc.wp = wayPointName;
-
+            properties.npcInstance.Wp = wayPointName;
             properties.stateStart = action;
 
-            var routineSymbol = PxDaedalusScript.GetSymbol(GameData.VmGothicPtr, action);
+            var routineSymbol = vm.GetSymbolByIndex(action);
             
-            var symbolLoop = PxDaedalusScript.GetSymbol(GameData.VmGothicPtr, $"{routineSymbol.name}_Loop");
+            var symbolLoop = vm.GetSymbolByName($"{routineSymbol.Name}_Loop");
             if (symbolLoop != null)
-                properties.stateLoop = symbolLoop.id;
+                properties.stateLoop = symbolLoop.Index;
             
-            var symbolEnd = PxDaedalusScript.GetSymbol(GameData.VmGothicPtr, $"{routineSymbol.name}_End");
+            var symbolEnd = vm.GetSymbolByName($"{routineSymbol.Name}_End");
             if (symbolEnd != null)
-                properties.stateEnd = symbolEnd.id;
+                properties.stateEnd = symbolEnd.Index;
             
             properties.currentLoopState = NpcProperties.LoopState.Start;
-            PxVm.CallFunction(GameData.VmGothicPtr, action, GetComponent<NpcProperties>().npcPtr);
+            vm.Call(action, properties.npcInstance);
         }
 
         /// <summary>
@@ -99,7 +95,7 @@ namespace GVR.Npc
                 properties.currentLoopState = NpcProperties.LoopState.End;
                 
                 if (properties.stateEnd != 0)
-                    PxVm.CallFunction(GameData.VmGothicPtr, properties.stateEnd, GetComponent<NpcProperties>().npcPtr);
+                    vm.Call(properties.stateEnd, properties.npcInstance);
             }
         }
         
@@ -111,13 +107,13 @@ namespace GVR.Npc
 
         public void AnimationCallback(string pxEventTagDataParam)
         {
-            var eventData = JsonUtility.FromJson<PxEventTagData>(pxEventTagDataParam);
+            var eventData = JsonUtility.FromJson<IEventTag>(pxEventTagDataParam);
             properties.currentAction.AnimationEventCallback(eventData);
         }
 
         public void AnimationSfxCallback(string pxEventSfxDataParam)
         {
-            var eventData = JsonUtility.FromJson<PxEventSfxData>(pxEventSfxDataParam);
+            var eventData = JsonUtility.FromJson<IEventSoundEffect>(pxEventSfxDataParam);
             properties.currentAction.AnimationSfxEventCallback(eventData);
         }
         

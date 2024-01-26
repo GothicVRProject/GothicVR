@@ -1,11 +1,9 @@
-﻿using GVR.Debugging;
-using GVR.Extensions;
-using GVR.Manager;
-using GVR.Phoenix.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
-using GVR.Phoenix.Interface;
+using GVR.Debugging;
+using GVR.Extensions;
+using GVR.Globals;
 using GVR.World;
 using UnityEngine;
 
@@ -34,22 +32,22 @@ namespace GVR.Creator
         private static void CreateDijkstraWaypointEntries(WorldData world)
         {
             Dictionary<string, DijkstraWaypoint> dijkstraWaypoints = new();
-            var wayEdges = world.waypointEdges;
-            var wayPoints = world.waypoints;
+            var wayEdges = world.WayNet.Edges;
+            var wayPoints = world.WayNet.Points;
 
             // Using LINQ to transform wayEdges into DijkstraWaypoints.
             dijkstraWaypoints = wayEdges.SelectMany(edge => new[]
                 {
                     // For each edge, create two entries: one for each direction of the edge.
                     // 'a' is the source waypoint, 'b' is the destination waypoint.
-                    new { a = wayPoints[(int)edge.a], b = wayPoints[(int)edge.b] },
-                    new { a = wayPoints[(int)edge.b], b = wayPoints[(int)edge.a] }
+                    new { a = wayPoints[(int)edge.A], b = wayPoints[(int)edge.B] },
+                    new { a = wayPoints[(int)edge.B], b = wayPoints[(int)edge.A] }
                 })
-                .GroupBy(x => x.a.name) // Group the entries by the name of the source waypoint.
+                .GroupBy(x => x.a.Name) // Group the entries by the name of the source waypoint.
                 .ToDictionary(g => g.Key, g => new DijkstraWaypoint(g.Key) // Transform each group into a DijkstraWaypoint.
                 {
                     // The neighbors of the DijkstraWaypoint are the names of the destination waypoints in the group.
-                    Neighbors = g.Select(x => x.b.name).ToList()
+                    Neighbors = g.Select(x => x.b.Name).ToList()
                 });
 
             GameData.DijkstraWaypoints = dijkstraWaypoints;
@@ -87,7 +85,7 @@ namespace GVR.Creator
             var waypointsObj = new GameObject(string.Format("Waypoints"));
             waypointsObj.SetParent(parent);
 
-            foreach (var waypoint in world.waypoints)
+            foreach (var waypoint in world.WayNet.Points)
             {
                 var wpObject = PrefabCache.TryGetObject(PrefabCache.PrefabType.WayPoint);
 
@@ -96,9 +94,9 @@ namespace GVR.Creator
                 if (!FeatureFlags.I.createWayPointMeshes)
                     Object.Destroy(wpObject.GetComponent<MeshRenderer>());
 
-                wpObject.tag = ConstantsManager.SpotTag;
-                wpObject.name = waypoint.name;
-                wpObject.transform.position = waypoint.position.ToUnityVector();
+                wpObject.tag = Constants.SpotTag;
+                wpObject.name = waypoint.Name;
+                wpObject.transform.position = waypoint.Position.ToUnityVector();
 
                 wpObject.SetParent(waypointsObj);
             }
@@ -112,22 +110,22 @@ namespace GVR.Creator
             var waypointEdgesObj = new GameObject(string.Format("Edges"));
             waypointEdgesObj.SetParent(parent);
 
-            for (var i = 0; i < world.waypointEdges.Length; i++)
+            for (var i = 0; i < world.WayNet.Edges.Count; i++)
             {
-                var edge = world.waypointEdges[i];
-                var startPos = world.waypoints[(int)edge.a].position.ToUnityVector();
-                var endPos = world.waypoints[(int)edge.b].position.ToUnityVector();
+                var edge = world.WayNet.Edges[i];
+                var startPos = world.WayNet.Points[(int)edge.A].Position.ToUnityVector();
+                var endPos = world.WayNet.Points[(int)edge.B].Position.ToUnityVector();
                 var lineObj = new GameObject();
 
                 lineObj.AddComponent<LineRenderer>();
                 var lr = lineObj.GetComponent<LineRenderer>();
-                lr.material = new Material(Shader.Find("Standard"));
+                lr.material = new Material(Constants.ShaderStandard);
                 lr.startWidth = 0.1f;
                 lr.endWidth = 0.1f;
                 lr.SetPosition(0, startPos);
                 lr.SetPosition(1, endPos);
 
-                lineObj.name = $"{edge.a}->{edge.b}";
+                lineObj.name = $"{edge.A}->{edge.B}";
                 lineObj.transform.position = startPos;
                 lineObj.transform.parent = waypointEdgesObj.transform;
             }

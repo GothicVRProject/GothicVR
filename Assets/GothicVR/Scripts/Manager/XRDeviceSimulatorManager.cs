@@ -1,6 +1,7 @@
 using System.Linq;
 using GVR.Caches;
 using GVR.Debugging;
+using GVR.Globals;
 using GVR.Util;
 using UnityEngine.SceneManagement;
 
@@ -8,8 +9,13 @@ namespace GVR.Manager
 {
     public class XRDeviceSimulatorManager: SingletonBehaviour<XRDeviceSimulatorManager>
     {
+        private void Start()
+        {
+            GvrEvents.GeneralSceneLoaded.AddListener(WorldLoaded);
+            GvrEvents.MainMenuSceneLoaded.AddListener(WorldLoaded);
+        }
 
-        public void PrepareForScene(Scene scene)
+        private void WorldLoaded()
         {
 #if !UNITY_EDITOR // Use this Feature only in Editor mode.
             return;
@@ -19,7 +25,7 @@ namespace GVR.Manager
                 return;
 
             var simulator = PrefabCache.TryGetObject(PrefabCache.PrefabType.XRDeviceSimulator);
-            scene.GetRootGameObjects().Append(simulator);
+            SceneManager.GetActiveScene().GetRootGameObjects().Append(simulator);
         }
         
     }

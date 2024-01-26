@@ -1,20 +1,16 @@
 using System;
 using System.Collections;
 using GVR.Debugging;
+using GVR.Globals;
 using GVR.Util;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace GVR.World
 {
     public class GameTime : SingletonBehaviour<GameTime>
     {
         public static readonly DateTime MIN_TIME = new(1, 1, 1, 0, 0, 0);
-        public static readonly DateTime MAX_TIME = new(1, 1, 1, 23, 59, 59);
-
-        public UnityEvent<DateTime> secondChangeCallback = new();
-        public UnityEvent<DateTime> minuteChangeCallback = new();
-        public UnityEvent<DateTime> hourChangeCallback = new();
+        public static readonly DateTime MAX_TIME = new(9999, 12, 31, 23, 59, 59);
 
         private int secondsInMinute = 0;
         private int minutesInHour = 0;
@@ -26,7 +22,9 @@ namespace GVR.World
         // Reference (ger): https://forum.worldofplayers.de/forum/threads/939357-Wie-lange-dauert-ein-Tag-in-Gothic
         private static readonly float ONE_INGAME_SECOND = 0.06944f;
         private DateTime time = new(1, 1, 1, 15, 0, 0);
-
+        private Coroutine timeTickCoroutineHandler;
+        
+        
         void Start()
         {
             if (!FeatureFlags.I.enableDayTime)
@@ -36,8 +34,20 @@ namespace GVR.World
             time = new DateTime(time.Year, time.Month, time.Day,
                     FeatureFlags.I.startHour, FeatureFlags.I.startMinute, time.Second);
             minutesInHour = FeatureFlags.I.startMinute;
-            
-            StartCoroutine(TimeTick());
+
+            GvrEvents.GeneralSceneLoaded.AddListener(WorldLoaded);
+            GvrEvents.GeneralSceneUnloaded.AddListener(WorldUnloaded);
+        }
+
+        private void WorldLoaded()
+        {
+            timeTickCoroutineHandler = StartCoroutine(TimeTick());
+        }
+
+        private void WorldUnloaded()
+        {
+            // Pause Coroutine until next world is loaded.
+            StopCoroutine(timeTickCoroutineHandler);
         }
 
         public DateTime GetCurrentDateTime()
@@ -54,9 +64,9 @@ namespace GVR.World
                 if (time > MAX_TIME)
                     time = MIN_TIME;
 
-                secondChangeCallback.Invoke(time);
+                GvrEvents.GameTimeSecondChangeCallback.Invoke(time);
                 RaiseMinuteAndHourEvent();
-                yield return new WaitForSeconds(ONE_INGAME_SECOND);
+                yield return new WaitForSeconds(ONE_INGAME_SECOND / FeatureFlags.I.TimeMultiplier);
             }
         }
         private void RaiseMinuteAndHourEvent()
@@ -65,7 +75,7 @@ namespace GVR.World
             if (secondsInMinute%60==0)
             {
                 secondsInMinute = 0;
-                minuteChangeCallback.Invoke(time);
+                GvrEvents.GameTimeMinuteChangeCallback.Invoke(time);
                 RaiseHourEvent();
             }
         }
@@ -75,8 +85,41 @@ namespace GVR.World
             if (minutesInHour % 60 == 0)
             {
                 minutesInHour = 0;
-                hourChangeCallback.Invoke(time);
+                GvrEvents.GameTimeHourChangeCallback.Invoke(time);
             }
+        }
+
+        public bool IsDay()
+        {
+            // 6:30 - 18:30  -  values taken from gothic and regoth - https://github.com/REGoth-project/REGoth/blob/master/src/engine/GameClock.cpp#L126
+            TimeSpan startOfDay = new TimeSpan(6, 30, 0);
+            TimeSpan endOfDay = new TimeSpan(18, 30, 0);
+
+            TimeSpan currentTime = time.TimeOfDay;
+
+            return currentTime >= startOfDay && currentTime <= endOfDay;
+        }
+
+        public float GetSkyTime()
+        {
+            TimeSpan currentTime = time.TimeOfDay;
+
+            double totalSecondsInADay = 24 * 60 * 60;
+
+            double secondsPassedSinceNoon;
+            if (currentTime < TimeSpan.FromHours(12))
+            {
+                secondsPassedSinceNoon = currentTime.TotalSeconds + 12 * 60 * 60;
+            }
+            else
+            {
+                secondsPassedSinceNoon = currentTime.TotalSeconds - 12 * 60 * 60;
+            }
+
+            // Calculate sky time as a float between 0 and 1
+            float skyTime = (float)(secondsPassedSinceNoon / totalSecondsInADay);
+
+            return skyTime;
         }
     }
 }

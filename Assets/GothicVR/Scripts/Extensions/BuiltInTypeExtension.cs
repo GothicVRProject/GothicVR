@@ -1,9 +1,21 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GVR.Extensions
 {
     public static class BuiltInTypeExtension
     {
+        public static bool IsEmpty(this string self)
+        {
+            return !self.Any();
+        }
+
+        public static bool IsEmpty<T>(this IEnumerable<T> self)
+        {
+            return !self.Any();
+        }
+        
         public static bool EqualsIgnoreCase(this string self, string other)
         {
             return self.Equals(other, StringComparison.OrdinalIgnoreCase);
@@ -25,13 +37,16 @@ namespace GVR.Extensions
         }
 
         /// <summary>
-        /// Phoenix delivers values mostly in cm. Convenient method to move to Meter.
+        /// ZenKit delivers values mostly in cm. Convenient method to move to Meter.
         /// </summary>
         public static int ToMeter(this int cmValue)
         {
             return cmValue / 100;
         }
 
+        /// <summary>
+        /// ZenKit delivers values mostly in cm. Convenient method to move to Meter.
+        /// </summary>
         public static float ToMeter(this float cmValue)
         {
             return cmValue / 100;

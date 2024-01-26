@@ -16,12 +16,5 @@ namespace GVR.Npc.Actions.AnimationActions
             // FIXME - We need to handle both mds and mdh options! (base vs overlay)
             AnimationCreator.PlayAnimation(Props.baseMdsName, Action.String0, mdh, NpcGo);
         }
-
-        public override void Tick(Transform transform)
-        {
-            base.Tick(transform);
-
-            HandleRootMotion(transform);
-        }
     }
 }

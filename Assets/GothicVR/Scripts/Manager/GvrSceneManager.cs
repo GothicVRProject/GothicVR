@@ -4,12 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator;
 using GVR.Debugging;
-using GVR.Manager.Culling;
-using GVR.Phoenix.Interface;
+using GVR.Globals;
+using GVR.GothicVR.Scripts.Manager;
 using GVR.Util;
-using PxCs.Interface;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 
@@ -17,8 +15,6 @@ namespace GVR.Manager
 {
     public class GvrSceneManager : SingletonBehaviour<GvrSceneManager>
     {
-        public static UnityEvent StartWorldLoading = new(); // Basically to clear caches etc.
-
         public GameObject interactionManager;
         
         private const string generalSceneName = "General";
@@ -31,13 +27,6 @@ namespace GVR.Manager
 
         private GameObject startPoint;
         private GameObject player;
-
-
-        // Hint: Scene general is always loaded >after< world is fully filled with vobs etc.
-        [NonSerialized]
-        public readonly UnityEvent sceneGeneralLoaded = new();
-        [NonSerialized]
-        public readonly UnityEvent sceneGeneralUnloaded = new();
 
         private bool debugFreshlyDoneLoading;
         
@@ -58,7 +47,7 @@ namespace GVR.Manager
             try
             {
                 if (FeatureFlags.I.skipMainMenu)
-                    await LoadWorld(ConstantsManager.selectedWorld, ConstantsManager.selectedWaypoint, true);
+                    await LoadWorld(Constants.selectedWorld, Constants.selectedWaypoint, true);
                 else
                     await LoadMainMenu();
             }
@@ -76,15 +65,15 @@ namespace GVR.Manager
                 return;
             else
                 debugFreshlyDoneLoading = false;
-            
+
             if (FeatureFlags.I.createOcNpcs)
-                PxVm.CallFunction(GameData.VmGothicPtr, "STARTUP_SUB_OLDCAMP");
+                GameData.GothicVm.Call("STARTUP_SUB_OLDCAMP");
         }
 
         private async Task LoadMainMenu()
         {
             TextureManager.I.LoadLoadingDefaultTextures();
-            await LoadNewWorldScene(ConstantsManager.SceneMainMenu);
+            await LoadNewWorldScene(Constants.SceneMainMenu);
         }
 
         public async Task LoadWorld(string worldName, string startVob, bool newGame = false)
@@ -104,7 +93,6 @@ namespace GVR.Manager
             var watch = Stopwatch.StartNew();
 
             GameData.Reset();
-            StartWorldLoading.Invoke();
             
             await ShowLoadingScene(worldName, newGame);
             var newWorldScene = await LoadNewWorldScene(newWorldName);
@@ -145,19 +133,16 @@ namespace GVR.Manager
             generalScene = SceneManager.GetSceneByName(generalSceneName);
             if (generalScene.isLoaded)
             {
-                SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName(ConstantsManager.SceneBootstrap));
+                SceneManager.MoveGameObjectToScene(interactionManager, SceneManager.GetSceneByName(Constants.SceneBootstrap));
                 SceneManager.UnloadSceneAsync(generalScene);
-                
-                // FIXME - move to event once vobCulling branch is merged
-                WorldCullingManager.I.PreWorldCreate();
-                
-                sceneGeneralUnloaded.Invoke();
+
+                GvrEvents.GeneralSceneUnloaded.Invoke();
                 generalSceneLoaded = false;
             }
 
             SetLoadingTextureForWorld(worldName, newGame);
 
-            SceneManager.LoadScene(ConstantsManager.SceneLoading, new LoadSceneParameters(LoadSceneMode.Additive));
+            SceneManager.LoadScene(Constants.SceneLoading, new LoadSceneParameters(LoadSceneMode.Additive));
 
             // Delay for magic number amount to make sure that bar can be found
             // 1 and 2 caused issues for the 3rd time showing the loading scene in editor
@@ -170,12 +155,12 @@ namespace GVR.Manager
                 return;
 
             string textureString = newGame ? "LOADING.TGA" : $"LOADING_{worldName.Split('.')[0].ToUpper()}.TGA";
-            TextureManager.I.SetTexture(textureString, TextureManager.I.GothicLoadingMenuMaterial);
+            TextureManager.I.SetTexture(textureString, TextureManager.I.gothicLoadingMenuMaterial);
         }
 
         private void HideLoadingScene()
         {
-            SceneManager.UnloadSceneAsync(ConstantsManager.SceneLoading);
+            SceneManager.UnloadSceneAsync(Constants.SceneLoading);
 
             LoadingManager.I.ResetProgress();
         }
@@ -184,42 +169,36 @@ namespace GVR.Manager
         {
             switch (scene.name)
             {
-                case ConstantsManager.SceneBootstrap:
+                case Constants.SceneBootstrap:
                     break;
-                case ConstantsManager.SceneLoading:
+                case Constants.SceneLoading:
                     LoadingManager.I.SetBarFromScene(scene);
                     LoadingManager.I.SetMaterialForLoading(scene);
                     break;
-                case ConstantsManager.SceneGeneral:
+                case Constants.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
                     TeleportPlayerToSpot();
 
-                    sceneGeneralLoaded.Invoke();
-                    
-                    WorldCreator.PostCreate();
-                    // FIXME - Move to UnityEvent once existing
-                    WorldCullingManager.I.PostWorldCreate();
-                    // FIXME - Move to UnityEvent once existing
-                    XRDeviceSimulatorManager.I.PrepareForScene(scene);
+                    GvrEvents.GeneralSceneLoaded.Invoke();
                     break;
-                case ConstantsManager.SceneMainMenu:
+                case Constants.SceneMainMenu:
                     var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
-                    sphere.GetComponent<MeshRenderer>().material = TextureManager.I.LoadingSphereMaterial;
+                    sphere.GetComponent<MeshRenderer>().material = TextureManager.I.loadingSphereMaterial;
                     SceneManager.SetActiveScene(scene);
 
-                    // FIXME - Move to UnityEvent once existing
-                    XRDeviceSimulatorManager.I.PrepareForScene(scene);
+                    GvrEvents.MainMenuSceneLoaded.Invoke();
                     break;
                 // any World
                 default:
                     SceneManager.SetActiveScene(scene);
+                    GvrEvents.WorldSceneLoaded.Invoke();
                     break;
             }
         }
 
         private void OnSceneUnloaded(Scene scene)
         {
-            if (scene.name == ConstantsManager.SceneLoading && !generalSceneLoaded)
+            if (scene.name == Constants.SceneLoading && !generalSceneLoaded)
             {
                 generalScene = SceneManager.LoadScene(generalSceneName, new LoadSceneParameters(LoadSceneMode.Additive));
                 generalSceneLoaded = true;
@@ -228,7 +207,7 @@ namespace GVR.Manager
 
         private void SetSpawnPoint(Scene worldScene)
         {
-            var spots = GameObject.FindGameObjectsWithTag(ConstantsManager.SpotTag);
+            var spots = GameObject.FindGameObjectsWithTag(Constants.SpotTag);
 
             // Spawn at specifically named point.
             if (!string.IsNullOrWhiteSpace(FeatureFlags.I.spawnAtSpecificFreePoint))

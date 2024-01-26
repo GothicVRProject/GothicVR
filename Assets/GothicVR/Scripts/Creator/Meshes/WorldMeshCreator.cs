@@ -1,10 +1,13 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GVR.Extensions;
 using GVR.Manager;
-using GVR.Manager.Culling;
-using GVR.Phoenix.Data;
+using GVR.World;
+using UnityEditor;
 using UnityEngine;
+using ZenKit;
+using Material = UnityEngine.Material;
+using Mesh = UnityEngine.Mesh;
+using TextureFormat = UnityEngine.TextureFormat;
 
 namespace GVR.Creator.Meshes
 {
@@ -24,71 +27,93 @@ namespace GVR.Creator.Meshes
             meshObj.SetParent(parent);
 
             // Track the progress of each sub-mesh creation separately
-            int numSubMeshes = world.subMeshes.Values.Count;
+            int numSubMeshes = world.SubMeshes.Values.Count;
             int meshesCreated = 0;
-            var worldMeshesForCulling = new List<GameObject>();
 
-            foreach (var subMesh in world.subMeshes.Values)
+            foreach (var subMesh in world.SubMeshes.Values)
             {
                 // No texture to add.
                 // For G1 this is: material.name == [KEINE, KEINETEXTUREN, DEFAULT, BRETT2, BRETT1, SUMPFWAASER, S:PSIT01_ABODEN]
-                // Removing these removes tiny slices of walls on the ground. If anyone finds them, I owe them a beer.
-                if (subMesh[0].material.texture == "")
-                {
+                // Removing these removes tiny slices of walls on the ground. If anyone finds them, I owe them a beer. ;-)
+                if (subMesh.Material.Texture.IsEmpty() || subMesh.Triangles.IsEmpty())
                     continue;
-                }
 
                 var subMeshObj = new GameObject()
                 {
-                    name = subMesh[0].material.name!,
+                    name = subMesh.Material.Name,
                     isStatic = true
                 };
 
                 subMeshObj.SetParent(meshObj);
 
-                var i = 0;
-                foreach (var subSubMesh in subMesh)
-                {
-                    var subSubMeshObj = new GameObject()
-                    {
-                        name = i++.ToString(),
-                        isStatic = true
-                    };
+                var meshFilter = subMeshObj.AddComponent<MeshFilter>();
+                var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
-                    var meshFilter = subSubMeshObj.AddComponent<MeshFilter>();
-                    var meshRenderer = subSubMeshObj.AddComponent<MeshRenderer>();
+                Self.PrepareMeshRenderer(meshRenderer, subMesh);
+                Self.PrepareMeshFilter(meshFilter, subMesh);
+                Self.PrepareMeshCollider(subMeshObj, meshFilter.sharedMesh, subMesh.Material);
 
-                    Self.PrepareMeshRenderer(meshRenderer, subSubMesh);
-                    Self.PrepareMeshFilter(meshFilter, subSubMesh);
-                    Self.PrepareMeshCollider(subSubMeshObj, meshFilter.sharedMesh, subSubMesh.material);
-
-#if UNITY_EDITOR
-                    // Don't set alpha clipped as occluders.
-                    if (meshRenderer.sharedMaterial.shader.name == alphaToCoverageShaderName)
-                    {
-                        UnityEditor.GameObjectUtility.SetStaticEditorFlags(subSubMeshObj, (UnityEditor.StaticEditorFlags)(int.MaxValue & ~(int)UnityEditor.StaticEditorFlags.OccluderStatic));
-                    }
+#if UNITY_EDITOR // Only needed for Occlusion Culling baking
+                // Don't set transparent meshes as occluders.
+                if (IsTransparentShader(meshRenderer.sharedMaterial.shader))
+                    GameObjectUtility.SetStaticEditorFlags(subMeshObj, (StaticEditorFlags)(int.MaxValue & ~(int)StaticEditorFlags.OccluderStatic));
 #endif
 
-                    subSubMeshObj.SetParent(subMeshObj);
-                    worldMeshesForCulling.Add(subSubMeshObj);
+                if (LoadingManager.I)
+                    LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
 
-                    if (LoadingManager.I)
-                    {
-                        LoadingManager.I.AddProgress(LoadingManager.LoadingProgressType.WorldMesh, 1f / numSubMeshes);
-                    }
-
-                    if (++meshesCreated % meshesPerFrame == 0)
-                        await Task.Yield(); // Yield to allow other operations to run in the frame  
-                }
+                if (++meshesCreated % meshesPerFrame == 0)
+                    await Task.Yield(); // Yield to allow other operations to run in the frame
             }
+        }
 
-            if (WorldCullingManager.I)
+        protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
+        {
+            var bMaterial = subMesh.Material;
+            var texture = GetTexture(bMaterial.Texture);
+
+            if (null == texture)
             {
-                WorldCullingManager.I.PrepareWorldCulling(worldMeshesForCulling);
+                if (bMaterial.Texture.EndsWithIgnoreCase(".TGA"))
+                    Debug.LogError($"This is supposed to be a decal: ${bMaterial.Texture}");
+                else
+                    Debug.LogError($"Couldn't get texture from name: {bMaterial.Texture}");
             }
 
-            return;
+            Material material;
+            switch (subMesh.Material.Group)
+            {
+                case MaterialGroup.Water:
+                    material = GetWaterMaterial(subMesh.Material);
+                    break;
+                default:
+                    material = GetDefaultMaterial(texture != null && texture.format == TextureFormat.RGBA32);
+                    break;
+            }
+
+            rend.material = material;
+
+            // No texture to add.
+            if (bMaterial.Texture.IsEmpty())
+            {
+                Debug.LogWarning($"No texture was set for: {bMaterial.Name}");
+                return;
+            }
+
+            material.mainTexture = texture;
+        }
+
+        private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)
+        {
+            var mesh = new Mesh();
+            meshFilter.sharedMesh = mesh;
+
+            if (subMesh.Triangles.Count % 3 != 0)
+                Debug.LogError("Triangle count is not a multiple of 3");
+
+            mesh.SetVertices(subMesh.Vertices);
+            mesh.SetTriangles(subMesh.Triangles, 0);
+            mesh.SetUVs(0, subMesh.Uvs);
         }
     }
 }

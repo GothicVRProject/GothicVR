@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.Manager;
-using GVR.Phoenix.Interface;
 using JetBrains.Annotations;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace GVR.Debugging
 {
@@ -35,7 +37,11 @@ namespace GVR.Debugging
                 LightUpWaypoint(debugStart, Color.green);
                 LightUpWaypoint(debugEnd, Color.green);
 
+                var watch = Stopwatch.StartNew();
                 var path = WayNetHelper.FindFastestPath(debugStart, debugEnd);
+                watch.Stop();
+                Debug.Log($"Path found in {watch.Elapsed.Seconds} seconds.");
+
                 var tempGizmoWayPoints = new List<Vector3>();
                 for (var i = 0; i < path.Length - 1; i++)
                 {
