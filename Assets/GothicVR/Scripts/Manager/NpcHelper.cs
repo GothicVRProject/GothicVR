@@ -188,7 +188,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(self);
             props.AnimationQueue.Enqueue(new GoToNpc(
-                new(AnimationAction.Type.AIGoToNpc),
+                new(AnimationAction.Type.AIGoToNpc, int0: other.Id, int1: other.Index),
                 props.gameObject));
         }
         

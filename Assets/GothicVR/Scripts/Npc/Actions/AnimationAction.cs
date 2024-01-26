@@ -61,7 +61,7 @@ namespace GVR.Npc.Actions
                 UnityStartProcessInfos
             }
     
-            public AnimationAction(Type actionType, string string0 = null, int int0 = 0, int int1 = 0, uint uint0 = 0, float float0 = 0f, bool bool0 = false, Vector3 v30 = new Vector3(0,0,0))
+            public AnimationAction(Type actionType, string string0 = null, int int0 = 0, int int1 = 0, uint uint0 = 0, float float0 = 0f, bool bool0 = false)
             {
                 this.ActionType = actionType;
                 this.String0 = string0;
@@ -77,6 +77,5 @@ namespace GVR.Npc.Actions
             public readonly int Int1;
             public readonly float Float0;
             public readonly bool Bool0;
-            public readonly Vector3 V30;
     }
 }

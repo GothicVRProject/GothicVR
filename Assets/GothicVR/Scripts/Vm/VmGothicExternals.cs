@@ -31,7 +31,7 @@ namespace GVR.Vm
             vm.RegisterExternal<NpcInstance>("AI_AlignToWP", AI_AlignToWP);
             vm.RegisterExternal<NpcInstance, string>("AI_GotoFP", AI_GotoFP);
             vm.RegisterExternal<NpcInstance, string>("AI_GotoWP", AI_GotoWP);
-            vm.RegisterExternal<NpcInstance, NpcInstance>("AI_GotoWP", AI_GotoNpc);
+            vm.RegisterExternal<NpcInstance, NpcInstance>("AI_GotoNpc", AI_GotoNpc);
             vm.RegisterExternal<NpcInstance, string>("AI_PlayAni", AI_PlayAni);
             vm.RegisterExternal<NpcInstance, int, int, string>("AI_StartState", AI_StartState);
             vm.RegisterExternal<NpcInstance, int, int>("AI_UseItemToState", AI_UseItemToState);

@@ -97,6 +97,8 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
         CreateAdditionalDialogOptions(dialogOptions.Count);
         ClearDialogOptions();
 
+        // G1 handles DialogOptions added via (Info_AddChoice()) in reverse order.
+        dialogOptions.Reverse();
         for (var i = 0; i < dialogOptions.Count; i++)
         {
             var dialogItem = dialogItems[i];
