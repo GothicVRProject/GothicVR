@@ -25,11 +25,8 @@ namespace GVR.World
         private Coroutine timeTickCoroutineHandler;
         
         
-        void Start()
+        private void Start()
         {
-            if (!FeatureFlags.I.enableDayTime)
-                return;
-
             // Set debug value for current Time.
             time = new DateTime(time.Year, time.Month, time.Day,
                     FeatureFlags.I.startHour, FeatureFlags.I.startMinute, time.Second);

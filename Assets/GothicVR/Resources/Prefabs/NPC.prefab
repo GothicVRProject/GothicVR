@@ -51,6 +51,8 @@ MonoBehaviour:
   npcSound: {fileID: 3405042143443336336}
   bip01: {fileID: 8679908380237941234}
   colliderRootMotion: {fileID: 6115383017936816660}
+  head: {fileID: 0}
+  headMorph: {fileID: 0}
   currentFreePoint:
     Name: 
     Position: {x: 0, y: 0, z: 0}
@@ -85,6 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1843bf3f157d495d89f708f6cba8ed49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  npcRoot: {fileID: 2202926895728732233}
   properties: {fileID: 4778879049934742964}
 --- !u!114 &418615690
 MonoBehaviour:
@@ -256,7 +259,7 @@ GameObject:
   - component: {fileID: 957202922675155714}
   - component: {fileID: 712981900298770246}
   m_Layer: 0
-  m_Name: ColliderRootMotion
+  m_Name: RootMotionCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -339,6 +342,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e31e900fff574068b5e83a20a4f2df42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  npcRoot: {fileID: 2202926895728732233}
   properties: {fileID: 4778879049934742964}
 --- !u!114 &712981900298770246
 MonoBehaviour:
@@ -352,4 +356,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b485183a82257e47a2eea67e7716ef2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  npcRoot: {fileID: 2202926895728732233}
   properties: {fileID: 4778879049934742964}

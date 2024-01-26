@@ -4,6 +4,7 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Data;
 using GVR.Globals;
+using GVR.Npc;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Properties;
@@ -27,12 +28,15 @@ namespace GVR.GothicVR.Scripts.Manager
             // There is at least one important entry, the NPC wants to talk to the hero about.
             else if (TryGetImportant(properties.Dialogs, out var infoInstance))
             {
-                GameData.Dialogs.CurrentDialog.Instance = infoInstance;
+                properties.gameObject.GetComponent<AiHandler>().ClearState(true);
 
+                GameData.Dialogs.CurrentDialog.Instance = infoInstance;
+                
                 CallInformation(properties.npcInstance.Index, infoInstance.Information, true);
             }
             else
             {
+                properties.gameObject.GetComponent<AiHandler>().ClearState(false);
                 var selectableDialogs = new List<InfoInstance>();
 
                 foreach (var dialog in properties.Dialogs)
@@ -141,6 +145,10 @@ namespace GVR.GothicVR.Scripts.Manager
                     .First(d => d.Information == information);
 
             ControllerManager.I.HideDialog();
+
+            // We always need to set "self" before executing any Daedalus function.
+            GameData.GothicVm.GlobalSelf = npcProperties.npcInstance;
+            GameData.GothicVm.GlobalOther = GameData.GothicVm.GlobalHero;
             GameData.GothicVm.Call(information);
 
             // We always want to have a method to get the dialog menu back once all dialog lines are talked.

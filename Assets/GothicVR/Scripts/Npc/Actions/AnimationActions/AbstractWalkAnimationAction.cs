@@ -1,7 +1,6 @@
 using System;
 using GVR.Caches;
 using GVR.Creator;
-using GVR.Extensions;
 using GVR.Vm;
 using UnityEngine;
 
@@ -14,13 +13,11 @@ namespace GVR.Npc.Actions.AnimationActions
             Initial,
             Rotate,
             Walk,
+            WalkAndRotate, // If we're already walking and a new WP is the destination, we walk and rotate together.
             Done
         }
 
         protected WalkState walkState = WalkState.Initial;
-
-        private float prevWalkVelocityUpAddition;
-
 
         protected AbstractWalkAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
@@ -41,13 +38,16 @@ namespace GVR.Npc.Actions.AnimationActions
             {
                 case WalkState.Initial:
                     walkState = WalkState.Rotate;
-                    HandleRotation(transform, GetWalkDestination());
+                    HandleRotation(transform, GetWalkDestination(), false);
                     return;
                 case WalkState.Rotate:
-                    HandleRotation(transform, GetWalkDestination());
+                    HandleRotation(transform, GetWalkDestination(), false);
                     return;
                 case WalkState.Walk:
                     HandleWalk(transform);
+                    return;
+                case WalkState.WalkAndRotate:
+                    HandleRotation(transform, GetWalkDestination(), true);
                     return;
                 case WalkState.Done:
                     return; // NOP
@@ -63,6 +63,8 @@ namespace GVR.Npc.Actions.AnimationActions
             {
                 case VmGothicEnums.WalkMode.Walk:
                     return "S_WALKL";
+                case VmGothicEnums.WalkMode.Run:
+                    return "S_RUNL";
                 default:
                     Debug.LogWarning($"Animation of type {Props.walkMode} not yet implemented.");
                     return "";
@@ -72,50 +74,34 @@ namespace GVR.Npc.Actions.AnimationActions
         private void StartWalk()
         {
             var animName = GetWalkModeAnimationString();
-            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
-            AnimationCreator.PlayAnimation(Props.baseMdsName, animName, mdh, NpcGo, true);
+            AnimationCreator.PlayAnimation(Props.mdsNames, animName, NpcGo, true);
 
             walkState = WalkState.Walk;
         }
 
         private void HandleWalk(Transform transform)
         {
-            HandleRootMotion(transform);
+            // NOP
         }
-        
-        private void HandleRotation(Transform transform, Vector3 destination)
+
+        private void HandleRotation(Transform transform, Vector3 destination, bool includesWalking)
         {
-            var sameHeightDirection = new Vector3(destination.x, transform.position.y, destination.z);
-            var direction = (sameHeightDirection - transform.position).normalized;
+            var pos = transform.position;
+            var sameHeightDirection = new Vector3(destination.x, pos.y, destination.z);
+            var direction = (sameHeightDirection - pos).normalized;
             var dot = Vector3.Dot(direction, transform.forward);
-
-            if (Math.Abs(dot - 1f) < 0.0001f)
-            {
-                StartWalk();
-                walkState = WalkState.Walk;
-                return;
-            }
-
             var lookRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * 100);
-        }
 
-        /// <summary>
-        /// As we use legacy animations, we can't use RootMotion. We therefore need to rebuild it.
-        /// </summary>
-        private void HandleRootMotion(Transform transform)
-        {
-            /*
-             * root
-             *  /BIP01/ <- animation root
-             *    /ColliderRootMotion <- Moved with animation as inside BIP01, but physics are applied and merged to root
-             *    /... <- animation bones
-             */
+            // Stop the rotation and start walking.
+            if (Math.Abs(dot - 1f) < 0.0001f)
+            {
+                walkState = WalkState.Walk;
 
-            // Apply physics based position change to root.
-            NpcGo.transform.localPosition += Props.colliderRootMotion.localPosition;
-            // Empty physics based diff. Next frame physics will be recalculated.
-            Props.colliderRootMotion.localPosition = Vector3.zero;
+                // If we didn't walk so far, we do it now.
+                if (!includesWalking)
+                    StartWalk();
+            }
         }
 
         /// <summary>
@@ -129,7 +115,7 @@ namespace GVR.Npc.Actions.AnimationActions
             Props.bip01.localPosition = Vector3.zero;
             Props.colliderRootMotion.localPosition = Vector3.zero;
 
-
+            // TODO - Needed?
             // root.SetLocalPositionAndRotation(
             //     root.localPosition + bip01Transform.localPosition,
             //     root.localRotation * bip01Transform.localRotation);

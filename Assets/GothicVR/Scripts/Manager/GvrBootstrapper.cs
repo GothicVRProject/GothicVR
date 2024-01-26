@@ -1,16 +1,12 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using AOT;
 using GVR.Caches;
-using GVR.Data;
 using GVR.Debugging;
-using GVR.Extensions;
 using GVR.Globals;
 using GVR.Manager.Settings;
-using GVR.Vm;
 using GVR.Util;
+using GVR.Vm;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;
@@ -97,10 +93,6 @@ namespace GVR.Manager
             switch (level)
             {
                 case LogLevel.Error:
-                    var isVfsMessage = message.ContainsIgnoreCase("failed to find vfs entry");
-                    if (isVfsMessage && !FeatureFlags.I.showZenKitVfsFileNotFoundErrors)
-                        break;
-
                     Debug.LogError(messageString);
                     break;
                 case LogLevel.Warning:

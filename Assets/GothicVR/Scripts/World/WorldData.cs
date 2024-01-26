@@ -15,7 +15,7 @@ namespace GVR.World
         // ReSharper disable once NotAccessedField.Global
         public global::ZenKit.World World;
         public List<IVirtualObject> Vobs;
-        public CachedWayNet WayNet;
+        public IWayNet WayNet;
         
         public Dictionary<int, SubMeshData> SubMeshes;
 

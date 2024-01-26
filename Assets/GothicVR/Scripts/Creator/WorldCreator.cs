@@ -33,8 +33,8 @@ namespace GVR.Creator
         
         public static async Task CreateAsync(string worldName)
         {
-            var world = LoadWorld(worldName);
-            GameData.World = world;
+            LoadWorld(worldName);
+
             worldGo = new GameObject("World");
 
             // Interactable Vobs (item, ladder, ...) have their own collider Components
@@ -45,10 +45,10 @@ namespace GVR.Creator
             nonTeleportGo.SetParent(worldGo);
 
             if (FeatureFlags.I.createWorldMesh)
-                await WorldMeshCreator.CreateAsync(world, teleportGo, Constants.MeshPerFrame);
+                await WorldMeshCreator.CreateAsync(GameData.World, teleportGo, Constants.MeshPerFrame);
     
             if (FeatureFlags.I.createVobs)
-                await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, Constants.VObPerFrame);
+                await VobCreator.CreateAsync(teleportGo, nonTeleportGo, GameData.World, Constants.VObPerFrame);
             
             SkyManager.I.InitSky();
 
@@ -57,13 +57,13 @@ namespace GVR.Creator
                 BarrierManager.I.CreateBarrier();
             }
     
-            WaynetCreator.Create(worldGo, world);
+            WaynetCreator.Create(worldGo, GameData.World);
             
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
         }
 
-        private static WorldData LoadWorld(string worldName)
+        private static void LoadWorld(string worldName)
         {
             var zkWorld = new ZenKit.World(GameData.Vfs, worldName);
             var zkMesh = zkWorld.Mesh.Cache();
@@ -85,7 +85,7 @@ namespace GVR.Creator
             var subMeshes = CreateSubMeshesForUnity(zkMesh, zkBspTree);
             world.SubMeshes = subMeshes;
             
-            return world;
+            GameData.World = world;
         }
 
         /// <summary>
@@ -195,7 +195,7 @@ namespace GVR.Creator
                 return;
             }
 
-            GameData.World = LoadWorld(worldScene.name);
+            LoadWorld(worldScene.name);
 
             await WorldMeshCreator.CreateAsync(GameData.World, new GameObject("World"), Constants.MeshPerFrame);
         }

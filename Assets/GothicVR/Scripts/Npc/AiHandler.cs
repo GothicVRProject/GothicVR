@@ -1,4 +1,6 @@
-﻿using GVR.Globals;
+﻿using GVR.Creator;
+using GVR.Data.ZkEvents;
+using GVR.Globals;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Properties;
@@ -31,29 +33,33 @@ namespace GVR.Npc
             if (properties.isStateTimeActive)
                 properties.stateTime += Time.deltaTime;
 
+            // If we're not yet done, we won't handle further tasks (like dequeuing another Action)
             if (!properties.currentAction.IsFinished())
                 return;
             
             // Queue is empty. Check if we want to start Looping
             if (properties.AnimationQueue.Count == 0)
             {
+                // We always need to set "self" before executing any Daedalus function.
+                vm.GlobalSelf = properties.npcInstance;
+
                 switch (properties.currentLoopState)
                 {
                     case NpcProperties.LoopState.Start:
                         if (properties.stateLoop == 0)
                             return;
                         properties.currentLoopState = NpcProperties.LoopState.Loop;
-                        GameData.GothicVm.Call((int)properties.stateLoop, properties.npcInstance);
+                        vm.Call(properties.stateLoop, properties.npcInstance);
                         break;
                     case NpcProperties.LoopState.Loop:
-                        GameData.GothicVm.Call((int)properties.stateLoop, properties.npcInstance);
+                        vm.Call(properties.stateLoop, properties.npcInstance);
                         break;
                 }
             }
             // Go on
             else
             {
-                Debug.Log($"Start playing {properties.AnimationQueue.Peek().GetType()}");
+                Debug.Log($"Start playing >{properties.AnimationQueue.Peek().GetType()}< on >{properties.gameObject.name}<");
                 PlayNextAnimation(properties.AnimationQueue.Dequeue());
             }
         }
@@ -75,30 +81,45 @@ namespace GVR.Npc
                 properties.stateEnd = symbolEnd.Index;
             
             properties.currentLoopState = NpcProperties.LoopState.Start;
-            vm.Call(action, properties.npcInstance);
+
+            // We need to properly start state time as e.g. ZS_Cook won't call AI_StartState() or Npc_SetStateTime()
+            // But it's required as it checks immediately how long the Cauldron is already been whirled.
+            properties.isStateTimeActive = true;
+            properties.stateTime = 0;
+
+            // We always need to set "self" before executing any Daedalus function.
+            vm.GlobalSelf = properties.npcInstance;
+            vm.Call(action);
         }
 
         /// <summary>
         /// Clear ZS functions. If stopCurrentState=true, then stop current animation and don't execute with ZS_*_End()
         /// </summary>
-        public void ClearState(bool stopCurrentState)
+        public void ClearState(bool stopCurrentStateImmediately)
         {
-            properties.AnimationQueue.Clear();
-
-            if (stopCurrentState)
+            if (stopCurrentStateImmediately)
             {
                 properties.currentLoopState = NpcProperties.LoopState.None;
-                // FIXME - Also stop current animation immediately!
+                AnimationCreator.StopAnimation(properties.gameObject);
             }
             else
             {
                 properties.currentLoopState = NpcProperties.LoopState.End;
                 
                 if (properties.stateEnd != 0)
-                    vm.Call(properties.stateEnd, properties.npcInstance);
+                {
+                    // We always need to set "self" before executing any Daedalus function.
+                    vm.GlobalSelf = properties.npcInstance;
+                    vm.Call(properties.stateEnd);
+                }
             }
+            
+            // Whenever we change routine, we reset some data to "start" from scratch as if the NPC got spawned.
+            properties.AnimationQueue.Clear();
+            properties.currentAction = new None(new(AnimationAction.Type.AINone), gameObject);
+            properties.stateTime = 0.0f;
         }
-        
+
         private void PlayNextAnimation(AbstractAnimationAction action)
         {
             properties.currentAction = action;
@@ -107,13 +128,13 @@ namespace GVR.Npc
 
         public void AnimationCallback(string pxEventTagDataParam)
         {
-            var eventData = JsonUtility.FromJson<IEventTag>(pxEventTagDataParam);
+            var eventData = JsonUtility.FromJson<SerializableEventTag>(pxEventTagDataParam);
             properties.currentAction.AnimationEventCallback(eventData);
         }
 
         public void AnimationSfxCallback(string pxEventSfxDataParam)
         {
-            var eventData = JsonUtility.FromJson<IEventSoundEffect>(pxEventSfxDataParam);
+            var eventData = JsonUtility.FromJson<SerializableEventSoundEffect>(pxEventSfxDataParam);
             properties.currentAction.AnimationSfxEventCallback(eventData);
         }
         

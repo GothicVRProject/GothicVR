@@ -1,9 +1,13 @@
 using System.Linq;
 using GVR.Caches;
+using GVR.Debugging;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
+using GVR.Npc;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
+using GVR.Npc.Routines;
 using GVR.Properties;
 using GVR.Vm;
 using UnityEngine;
@@ -32,7 +36,7 @@ namespace GVR.Manager
             foreach (var fp in freePoints)
             {
                 // Kind of: If we're already standing on a FreePoint, then there is one available.
-                if (props.currentFreePoint == fp)
+                if (props.CurrentFreePoint == fp)
                     return true;
                 // Alternatively, we found a free one within range.
                 if (!fp.IsLocked)
@@ -58,7 +62,7 @@ namespace GVR.Manager
             if (fp == null)
                 return false;
             // Ignore if we're already on this FP.
-            else if (fp == props.currentFreePoint)
+            else if (fp == props.CurrentFreePoint)
                 return false;
             else if (fp.IsLocked)
                 return false;
@@ -76,7 +80,7 @@ namespace GVR.Manager
         
         public static bool ExtIsNpcOnFp(NpcInstance npc, string vobNamePart)
         {
-            var freePoint = GetProperties(npc).currentFreePoint;
+            var freePoint = GetProperties(npc).CurrentFreePoint;
 
             if (freePoint == null)
                 return false;
@@ -156,14 +160,14 @@ namespace GVR.Manager
             GetProperties(npc).walkMode = walkMode;
         }
 
-        public static void ExtAiGotoWP(NpcInstance npc, string wayPointName)
+        public static void ExtAiGoToFp(NpcInstance npc, string freePointName)
         {
             var props = GetProperties(npc);
-            props.AnimationQueue.Enqueue(new GoToWp(
-                new(AnimationAction.Type.AIGoToWP, string0: wayPointName),
+            props.AnimationQueue.Enqueue(new GoToFp(
+                new(AnimationAction.Type.AIGoToFP, string0: freePointName),
                 props.gameObject));
         }
-
+        
         public static void ExtAiGoToNextFp(NpcInstance npc, string fpNamePart)
         {
             var props = GetProperties(npc);
@@ -171,8 +175,32 @@ namespace GVR.Manager
                 new(AnimationAction.Type.AIGoToNextFp, string0: fpNamePart),
                 props.gameObject));
         }
+        
+        public static void ExtAiGoToWp(NpcInstance npc, string wayPointName)
+        {
+            var props = GetProperties(npc);
+            props.AnimationQueue.Enqueue(new GoToWp(
+                new(AnimationAction.Type.AIGoToWP, string0: wayPointName),
+                props.gameObject));
+        }
 
-        public static void ExtAiAlignToWP(NpcInstance npc)
+        public static void ExtAiGoToNpc(NpcInstance self, NpcInstance other)
+        {
+            var props = GetProperties(self);
+            props.AnimationQueue.Enqueue(new GoToNpc(
+                new(AnimationAction.Type.AIGoToNpc, int0: other.Id, int1: other.Index),
+                props.gameObject));
+        }
+        
+        public static void ExtAiAlignToFp(NpcInstance npc)
+        {
+            var props = GetProperties(npc);
+            props.AnimationQueue.Enqueue(new AlignToFp(
+                new(AnimationAction.Type.AIAlignToFp),
+                props.gameObject));
+        }
+
+        public static void ExtAiAlignToWp(NpcInstance npc)
         {
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new AlignToWp(
@@ -196,9 +224,18 @@ namespace GVR.Manager
                 props.gameObject));
         }
 
-        public static float ExtNpcGetStateTime(NpcInstance npc)
+        /// <summary>
+        /// Daedalus needs an int value.
+        /// </summary>
+        public static int ExtNpcGetStateTime(NpcInstance npc)
         {
-            return GetProperties(npc).stateTime;
+            var props = GetProperties(npc);
+
+            // If there is no active running state, we immediately assume the current routine is running since the start of all beings.
+            if (!props.isStateTimeActive)
+                return int.MaxValue;
+            else
+                return (int)props.stateTime;
         }
 
         public static void ExtNpcSetStateTime(NpcInstance npc, int seconds)
@@ -238,6 +275,9 @@ namespace GVR.Manager
         /// </summary>
         public static int ExtNpcGetDistToNpc(NpcInstance npc1, NpcInstance npc2)
         {
+            if (npc1 == null || npc2 == null)
+                return int.MaxValue;
+
             var npc1Pos = LookupCache.NpcCache[npc1.Index].gameObject.transform.position;
 
             Vector3 npc2Pos;
@@ -257,6 +297,43 @@ namespace GVR.Manager
             props.AnimationQueue.Enqueue(new DrawWeapon(
                 new(AnimationAction.Type.AIDrawWeapon),
                 props.gameObject));
+        }
+
+        public static void ExtNpcExchangeRoutine(NpcInstance npcInstance, string routineName)
+        {
+            var formattedRoutineName = $"Rtn_{routineName}_{npcInstance.Id}";
+            var newRoutine = GameData.GothicVm.GetSymbolByName(formattedRoutineName);
+
+            if (newRoutine == null)
+            {
+                Debug.LogError($"Routine {formattedRoutineName} couldn't be found.");
+                return;
+            }
+
+            var npcGo = LookupCache.NpcCache[npcInstance.Index];
+            ExchangeRoutine(npcGo.gameObject, npcInstance, newRoutine.Index);
+        }
+
+        public static void ExchangeRoutine(GameObject go, NpcInstance npcInstance, int routineIndex)
+        {
+            // e.g. Monsters have no routine and therefore no further routine handling needed.
+            if (routineIndex == 0)
+                return;
+
+            var routineComp = go.GetComponent<Routine>();
+            routineComp.Routines.Clear();
+            
+            // We always need to set "self" before executing any Daedalus function.
+            GameData.GothicVm.GlobalSelf = npcInstance;
+            GameData.GothicVm.Call(routineIndex);
+            
+            if (!FeatureFlags.I.enableNpcRoutines)
+                return;
+
+            routineComp.CalculateCurrentRoutine();
+
+            var startRoutine = routineComp.CurrentRoutine;
+            go.GetComponent<AiHandler>().StartRoutine(startRoutine.action, startRoutine.waypoint);
         }
     }
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GVR.Caches;
+using GVR.Data.ZkEvents;
 using GVR.Extensions;
 using GVR.Npc;
 using GVR.Npc.Actions;
@@ -14,20 +15,37 @@ namespace GVR.Creator
 {
     public static class AnimationCreator
     {
-        public static void PlayAnimation(string mdsName, string animationName, IModelHierarchy mdh, GameObject go, bool repeat = false)
+        /// <summary>
+        /// Handling animations for baseMds and overlayMds
+        /// </summary>
+        public static void PlayAnimation(string[] mdsNames, string animationName, GameObject go, bool repeat = false)
         {
+            // We assume, that we get mdsNames in this order: base, overlay. But we should always check for overlay first.
+            foreach (var mdsName in mdsNames.Reverse())
+            {
+                if (TryPlayAnimation(mdsName, animationName, go, repeat))
+                    return;
+            }
+        }
+
+        private static bool TryPlayAnimation(string mdsName, string animationName, GameObject go, bool repeat)
+        {
+            // For animations: mdhName == mdsName
+            var mdhName = mdsName;
+
+            var modelAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
+            if (modelAnimation == null)
+                return false;
+
             var mdsAnimationKeyName = GetCombinedAnimationKey(mdsName, animationName);
             var animationComp = go.GetComponent<Animation>();
-            
+
             var mds = AssetCache.TryGetMds(mdsName);
-            var modelAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
+            var mdh = AssetCache.TryGetMdh(mdhName);
             var anim = mds.Animations.First(i => i.Name.EqualsIgnoreCase(animationName));
 
             if (anim.Direction == AnimationDirection.Backward)
-            {
-                Debug.LogError($"Backwards animations not yet handled. Called for >{animationName}< from >{mdsName}<");
-                return;
-            }
+                Debug.LogWarning($"Backwards animations not yet handled. Called for >{animationName}< from >{mdsName}<. Currently playing Forward.");
 
             // Try to load from cache
             if (!LookupCache.AnimationClipCache.TryGetValue(mdsAnimationKeyName, out var clip))
@@ -45,6 +63,8 @@ namespace GVR.Creator
 
             animationComp.Stop();
             animationComp.Play(mdsAnimationKeyName);
+
+            return true;
         }
 
         public static void StopAnimation(GameObject go)
@@ -192,7 +212,7 @@ namespace GVR.Creator
                 {
                     time = clampedFrame / clip.frameRate,
                     functionName = nameof(IAnimationCallbacks.AnimationCallback),
-                    stringParameter = JsonUtility.ToJson(zkEvent) // As we can't add a custom object, we serialize data.
+                    stringParameter = JsonUtility.ToJson(new SerializableEventTag(zkEvent)) // As we can't add a custom object, we serialize the data object.
                  };
 
                 clip.AddEvent(animEvent);
@@ -205,7 +225,7 @@ namespace GVR.Creator
                 {
                     time = clampedFrame / clip.frameRate,
                     functionName = nameof(IAnimationCallbacks.AnimationSfxCallback),
-                    stringParameter = JsonUtility.ToJson(sfxEvent) // As we can't add a custom object, we serialize data.
+                    stringParameter = JsonUtility.ToJson(new SerializableEventSoundEffect(sfxEvent)) // As we can't add a custom object, we serialize the data object.
                 };
                 
                 clip.AddEvent(animEvent);

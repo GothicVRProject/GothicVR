@@ -114,26 +114,26 @@ namespace GVR.Creator
                     {
                         case VirtualObjectType.oCItem:
                         {
-                            var obj = CreateItem((Item)vob);
-                            _cullingVobObjects.Add(obj);
+                            go = CreateItem((Item)vob);
+                            _cullingVobObjects.Add(go);
                             break;
                         }
                         case VirtualObjectType.oCMobContainer:
                         {
-                            var obj = CreateMobContainer((Container)vob);
-                            _cullingVobObjects.Add(obj);
+                            go = CreateMobContainer((Container)vob);
+                            _cullingVobObjects.Add(go);
                             break;
                         }
                         case VirtualObjectType.zCVobSound:
                         {
-                            var obj = CreateSound((Sound)vob);
-                            LookupCache.vobSoundsAndDayTime.Add(obj);
+                            go = CreateSound((Sound)vob);
+                            LookupCache.vobSoundsAndDayTime.Add(go);
                             break;
                         }
                         case VirtualObjectType.zCVobSoundDaytime:
                         {
-                            var obj = CreateSoundDaytime((SoundDaytime)vob);
-                            LookupCache.vobSoundsAndDayTime.Add(obj);
+                            go = CreateSoundDaytime((SoundDaytime)vob);
+                            LookupCache.vobSoundsAndDayTime.Add(go);
                             break;
                         }
                         case VirtualObjectType.oCZoneMusic:
@@ -150,8 +150,8 @@ namespace GVR.Creator
                         }
                         case VirtualObjectType.oCMobLadder:
                         {
-                            var obj = CreateLadder(vob);
-                            _cullingVobObjects.Add(obj);
+                            go = CreateLadder(vob);
+                            _cullingVobObjects.Add(go);
                             break;
                         }
                         case VirtualObjectType.oCTriggerChangeLevel:
@@ -161,8 +161,6 @@ namespace GVR.Creator
                         }
                         case VirtualObjectType.zCVob:
                         {
-                            GameObject obj;
-
                             if (vob.Visual == null)
                             {
                                 CreateDebugObject(vob);
@@ -172,17 +170,17 @@ namespace GVR.Creator
                             switch (vob.Visual!.Type)
                             {
                                 case VisualType.Decal:
-                                    obj = CreateDecal(vob);
+                                    go = CreateDecal(vob);
                                     break;
                                 case VisualType.ParticleEffect:
-                                    obj = CreatePfx(vob);
+                                    go = CreatePfx(vob);
                                     break;
                                 default:
-                                    obj = CreateDefaultMesh(vob);
+                                    go = CreateDefaultMesh(vob);
                                     break;
                             }
 
-                            _cullingVobObjects.Add(obj);
+                            _cullingVobObjects.Add(go);
                             break;
                         }
                         case VirtualObjectType.oCMobInter:
@@ -194,8 +192,8 @@ namespace GVR.Creator
                         case VirtualObjectType.oCMobBed:
                         case VirtualObjectType.oCMobWheel:
                         {
-                            var obj = CreateDefaultMesh(vob);
-                            _cullingVobObjects.Add(obj);
+                            go = CreateDefaultMesh(vob);
+                            _cullingVobObjects.Add(go);
                             break;
                         }
                         case VirtualObjectType.zCVobScreenFX:
@@ -243,29 +241,12 @@ namespace GVR.Creator
             var nonNullCullingGroupItems = _cullingVobObjects.Where(i => i != null).ToArray();
             VobMeshCullingManager.I.PrepareVobCulling(nonNullCullingGroupItems);
             VobSoundCullingManager.I.PrepareSoundCulling(LookupCache.vobSoundsAndDayTime);
-            
-            // TODO - warnings about "not implemented" - print them once only.
-            foreach (var var in new[]{
-                         VirtualObjectType.zCVobScreenFX,
-                         VirtualObjectType.zCVobAnimate,
-                         VirtualObjectType.zCTriggerWorldStart,
-                         VirtualObjectType.zCTriggerList,
-                         VirtualObjectType.oCCSTrigger,
-                         VirtualObjectType.oCTriggerScript,
-                         VirtualObjectType.zCVobLensFlare,
-                         VirtualObjectType.zCVobLight,
-                         VirtualObjectType.zCMoverController,
-                         VirtualObjectType.zCPFXController
-                     })
-            {
-                Debug.LogWarning($"{var} not yet implemented.");
-            }
         }
 
         private static GameObject GetPrefab(IVirtualObject vob)
         {
             GameObject go;
-            string name = vob.Name;
+            var name = vob.Name;
             
             switch (vob.Type)
             {
@@ -302,8 +283,7 @@ namespace GVR.Creator
             go.name = name;
             
             // Fill Property data into prefab here
-            // Can also be outsourced to a proper method if it becomes a lot.
-            go.GetComponent<VobProperties>().SetVisual(vob.Name);
+            go.GetComponent<VobProperties>().SetData(vob);
             
             return go;
         }
@@ -323,6 +303,11 @@ namespace GVR.Creator
                 case VirtualObjectType.oCMobContainer:
                 case VirtualObjectType.oCMobSwitch:
                 case VirtualObjectType.oCMobWheel:
+                    var propertiesComponent = go.GetComponent<VobProperties>();
+
+                    if (propertiesComponent == null)
+                        Debug.LogError($"VobProperties component missing on {go.name} ({vob.Type})");
+
                     GameData.VobsInteractable.Add(go.GetComponent<VobProperties>());
                     break;
             }
@@ -359,11 +344,18 @@ namespace GVR.Creator
         /// <summary>
         /// Render item inside GameObject
         /// </summary>
-        public static GameObject CreateItem(int itemId, GameObject go)
+        public static void CreateItem(int itemId, GameObject go)
         {
             var item = AssetCache.TryGetItemData(itemId);
 
-            return CreateItemMesh(item, go);
+            CreateItemMesh(item, go);
+        }
+        
+        public static void CreateItem(string itemName, GameObject go)
+        {
+            var item = AssetCache.TryGetItemData(itemName);
+
+            CreateItemMesh(item, go);
         }
         
         [CanBeNull]
@@ -376,18 +368,12 @@ namespace GVR.Creator
             else if (!string.IsNullOrEmpty(vob.Name))
                 itemName = vob.Name;
             else
-                throw new Exception("PxVobItemData -> no usable INSTANCE name found.");
+                throw new Exception("Vob Item -> no usable name found.");
 
             var item = AssetCache.TryGetItemData(itemName);
 
             if (item == null)
                 return null;
-
-            if (item.Visual.EndsWithIgnoreCase(".mms"))
-            {
-                Debug.LogError($"Item {item.Visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
-                return null;
-            }
 
             var prefabInstance = GetPrefab(vob);
             var vobObj = CreateItemMesh(vob, item, prefabInstance);
@@ -563,7 +549,7 @@ namespace GVR.Creator
             // FIXME - change to a Prefab in the future.
             var vobObj = GetPrefab(vob);
 
-            if (!FeatureFlags.I.drawFreePointMeshes)
+            if (!FeatureFlags.I.drawFreePoints)
             {
                 // Quick win: If we don't want to render the spots, we just remove the Renderer.
                 GameObject.Destroy(vobObj.GetComponent<MeshRenderer>());
@@ -573,10 +559,11 @@ namespace GVR.Creator
             vobObj.name = fpName;
             vobObj.SetParent(parentGosTeleport[vob.Type]);
 
-            var freePointData = new FreePoint()
+            var freePointData = new FreePoint
             {
                 Name = fpName,
-                Position = vob.Position.ToUnityVector()
+                Position = vob.Position.ToUnityVector(),
+                Direction = vob.Rotation.ToUnityQuaternion().eulerAngles
             };
             vobObj.GetComponent<VobSpotProperties>().fp = freePointData;
             GameData.FreePoints.Add(fpName, freePointData);
@@ -837,11 +824,12 @@ namespace GVR.Creator
             if (meshName.IsEmpty())
                 return null;
 
+            var go = GetPrefab(vob);
+
             // MDL
             var mdl = AssetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                var go = GetPrefab(vob);
                 var ret = MeshCreatorFacade.CreateVob(meshName, mdl, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), parent, go);
                 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
@@ -856,8 +844,14 @@ namespace GVR.Creator
             var mdm = AssetCache.TryGetMdm(meshName);
             if (mdh != null && mdm != null)
             {
-                return MeshCreatorFacade.CreateVob(meshName, mdm, mdh, vob.Position.ToUnityVector(),
-                    vob.Rotation.ToUnityQuaternion(), parent);
+                var ret = MeshCreatorFacade.CreateVob(meshName, mdm, mdh, vob.Position.ToUnityVector(),
+                    vob.Rotation.ToUnityQuaternion(), parent, go);
+
+                // A few objects are broken and have no meshes. We need to destroy them immediately again.
+                if (ret == null)
+                    GameObject.Destroy(go);
+
+                return ret;
             }
 
             // MRM
@@ -867,7 +861,6 @@ namespace GVR.Creator
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.CdDynamic;
 
-                var go = GetPrefab(vob);
                 var ret = MeshCreatorFacade.CreateVob(meshName, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), withCollider, parent, go);
 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.

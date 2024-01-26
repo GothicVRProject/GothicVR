@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using AOT;
+using GVR.Caches;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Globals;
@@ -26,8 +27,11 @@ namespace GVR.Vm
             // AI
             vm.RegisterExternal<NpcInstance>("AI_StandUp", AI_StandUp);
             vm.RegisterExternal<NpcInstance, int>("AI_SetWalkMode", AI_SetWalkMode);
-            vm.RegisterExternal<NpcInstance, string>("AI_GotoWP", AI_GotoWP);
+            vm.RegisterExternal<NpcInstance>("AI_AlignToFP", AI_AlignToFP);
             vm.RegisterExternal<NpcInstance>("AI_AlignToWP", AI_AlignToWP);
+            vm.RegisterExternal<NpcInstance, string>("AI_GotoFP", AI_GotoFP);
+            vm.RegisterExternal<NpcInstance, string>("AI_GotoWP", AI_GotoWP);
+            vm.RegisterExternal<NpcInstance, NpcInstance>("AI_GotoNpc", AI_GotoNpc);
             vm.RegisterExternal<NpcInstance, string>("AI_PlayAni", AI_PlayAni);
             vm.RegisterExternal<NpcInstance, int, int, string>("AI_StartState", AI_StartState);
             vm.RegisterExternal<NpcInstance, int, int>("AI_UseItemToState", AI_UseItemToState);
@@ -43,7 +47,9 @@ namespace GVR.Vm
             // Helper
             vm.RegisterExternal<int, int>("Hlp_Random", Hlp_Random);
             vm.RegisterExternal<int, string, string>("Hlp_StrCmp", Hlp_StrCmp);
-            // vm.RegisterExternal<int, ItemInstance, int>("Hlp_IsItem", Hlp_IsItem); // Not yet implemented
+            vm.RegisterExternal<int, ItemInstance, int>("Hlp_IsItem", Hlp_IsItem);
+            vm.RegisterExternal<int, ItemInstance>("Hlp_IsValidItem", Hlp_IsValidItem);
+            vm.RegisterExternal<int, NpcInstance>("Hlp_IsValidNpc", Hlp_IsValidNpc);
             vm.RegisterExternal<NpcInstance, int>("Hlp_GetNpc", Hlp_GetNpc);
 
             // Info
@@ -75,7 +81,7 @@ namespace GVR.Vm
             vm.RegisterExternal<int, NpcInstance>("Npc_GetStateTime", Npc_GetStateTime);
             vm.RegisterExternal<NpcInstance, int>("Npc_SetStateTime", Npc_SetStateTime);
             vm.RegisterExternal<ItemInstance, NpcInstance>("Npc_GetEquippedArmor", Npc_GetEquippedArmor);
-            // vm.RegisterExternal<NpcInstance, VmGothicEnums.Talent, int>("Npc_SetTalentSkill", Npc_SetTalentSkill);
+            vm.RegisterExternal<NpcInstance, int, int>("Npc_SetTalentSkill", Npc_SetTalentSkill);
             vm.RegisterExternal<string, NpcInstance>("Npc_GetNearestWP", Npc_GetNearestWP);
             vm.RegisterExternal<int, NpcInstance, string>("Npc_IsOnFP", Npc_IsOnFP);
             vm.RegisterExternal<int, NpcInstance, int>("Npc_WasInState", Npc_WasInState);
@@ -96,11 +102,13 @@ namespace GVR.Vm
 
             // Day Routine
             vm.RegisterExternal<NpcInstance, int, int, int, int, int, string>("TA_MIN", TA_MIN);
+            vm.RegisterExternal<NpcInstance, string>("Npc_ExchangeRoutine", Npc_ExchangeRoutine);
 
             // World
             vm.RegisterExternal<int, string>("Wld_InsertNpc", Wld_InsertNpc);
             vm.RegisterExternal<int, NpcInstance, string>("Wld_IsFPAvailable", Wld_IsFPAvailable);
             vm.RegisterExternal<int, NpcInstance, string>("Wld_IsMobAvailable", Wld_IsMobAvailable);
+            vm.RegisterExternal<int, NpcInstance, int, int, int>("Wld_DetectNpc", Wld_DetectNpc);
             vm.RegisterExternal<int, NpcInstance, int, int, int, int>("Wld_DetectNpcEx", Wld_DetectNpcEx);
             vm.RegisterExternal<int, NpcInstance, string>("Wld_IsNextFPAvailable", Wld_IsNextFPAvailable);
 
@@ -117,61 +125,76 @@ namespace GVR.Vm
         {
             // FIXME: Once GVR is fully released, we can safely throw an exception as it tells us: The game will not work until you implement this missing function.
             //throw new NotImplementedException("External >" + value + "< not registered but required by DaedalusVM.");
-            Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM.");
+            try
+            {
+                var npcName = LookupCache.NpcCache[GameData.GothicVm.GlobalSelf.Index].gameObject.name;
+                Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM (called on >{npcName}<).");
+            }
+            catch (Exception)
+            {
+                Debug.LogError("Bug in getting Npc. Fix or delete.");
+                Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM.");
+            }
         }
 
 
         #region AI
 
-        
         public static void AI_StandUp(NpcInstance npc)
         {
             NpcHelper.ExtAiStandUp(npc);
         }
 
-        
         public static void AI_SetWalkMode(NpcInstance npc, int walkMode)
         {
             NpcHelper.ExtAiSetWalkMode(npc, (VmGothicEnums.WalkMode)walkMode);
         }
 
-        
-        public static void AI_GotoWP(NpcInstance npc, string wayPointName)
+        public static void AI_AlignToFP(NpcInstance npc)
         {
-            NpcHelper.ExtAiGotoWP(npc, wayPointName);
+            NpcHelper.ExtAiAlignToFp(npc);
         }
-
         
         public static void AI_AlignToWP(NpcInstance npc)
         {
-            NpcHelper.ExtAiAlignToWP(npc);
+            NpcHelper.ExtAiAlignToWp(npc);
         }
 
+        public static void AI_GotoFP(NpcInstance npc, string freePointName)
+        {
+            NpcHelper.ExtAiGoToFp(npc, freePointName);
+        }
         
+        public static void AI_GotoWP(NpcInstance npc, string wayPointName)
+        {
+            NpcHelper.ExtAiGoToWp(npc, wayPointName);
+        }
+
+        public static void AI_GotoNpc(NpcInstance self, NpcInstance other)
+        {
+            NpcHelper.ExtAiGoToNpc(self, other);
+        }
+
         public static void AI_PlayAni(NpcInstance npc, string name)
         {
             NpcHelper.ExtAiPlayAni(npc, name);
         }
 
-        
         public static void AI_StartState(NpcInstance npc, int function, int stateBehaviour, string wayPointName)
         {
             NpcHelper.ExtAiStartState(npc, function, Convert.ToBoolean(stateBehaviour), wayPointName);
         }
 
-        
         public static void AI_UseItemToState(NpcInstance npc, int itemId, int expectedInventoryCount)
         {
             NpcHelper.ExtAiUseItemToState(npc, itemId, expectedInventoryCount);
         }
 
-        
         public static void AI_Wait(NpcInstance npc, float seconds)
         {
             NpcHelper.ExtAiWait(npc, seconds);
         }
 
-        
         public static int AI_UseMob(NpcInstance npc, string target, int state)
         {
             NpcHelper.ExtAiUseMob(npc, target, state);
@@ -180,7 +203,6 @@ namespace GVR.Vm
             return 0;
         }
 
-        
         public static void AI_GoToNextFP(NpcInstance npc, string fpNamePart)
         {
             NpcHelper.ExtAiGoToNextFp(npc, fpNamePart);
@@ -230,25 +252,21 @@ namespace GVR.Vm
             return (s1 == s2) ? 1 : 0;
         }
 
-        // 
-        // public static int Hlp_IsItem(ItemInstance item, int instanceName)
-        // {
-        // TODO - Needs to be reimplemented.
-        //     var compareItemSymbol = PxVm.pxVmStackPopInt(vmPtr);
-        //     var itemRef = PxVm.pxVmStackPopInstance(vmPtr);
-        //
-        //     var compareItemRef = AssetCache.TryGetItemData((uint)compareItemSymbol);
-        //
-        //     bool result;
-        //     if (compareItemRef == null)
-        //         result = false;
-        //     else
-        //         result = compareItemRef.instancePtr == itemRef;
-        //
-        //     PxVm.pxVmStackPushInt(vmPtr, Convert.ToInt32(result));
-        // }
+        public static int Hlp_IsItem(ItemInstance item, int itemIndexToCheck)
+        {
+            return Convert.ToInt32(item.Index == itemIndexToCheck);
+        }
 
-        
+        public static int Hlp_IsValidItem(ItemInstance item)
+        {
+            return Convert.ToInt32(item != null);
+        }
+
+        public static int Hlp_IsValidNpc(NpcInstance npc)
+        {
+            return Convert.ToInt32(npc != null);
+        }
+
         public static NpcInstance Hlp_GetNpc(int instanceId)
         {
             return NpcCreator.ExtHlpGetNpc(instanceId);
@@ -456,7 +474,7 @@ namespace GVR.Vm
         public static int Npc_GetStateTime(NpcInstance npc)
         {
             var stateTime = NpcHelper.ExtNpcGetStateTime(npc);
-            return (int)stateTime;
+            return stateTime;
         }
 
         
@@ -472,13 +490,11 @@ namespace GVR.Vm
         }
 
         
-        public static void Npc_SetTalentSkill(NpcInstance npc, VmGothicEnums.Talent talent, int level)
+        public static void Npc_SetTalentSkill(NpcInstance npc, int talent, int level)
         {
-            // FIXME - In OpenGothic it adds MDS overlays based on skill level.
-            // NpcCreator.ExtNpcSetTalentSkill(npcPtr, talent, level);
+            NpcCreator.ExtNpcSetTalentSkill(npc, (VmGothicEnums.Talent)talent, level);
         }
 
-        
         public static string Npc_GetNearestWP(NpcInstance npc)
         {
             return NpcHelper.ExtGetNearestWayPoint(npc);
@@ -545,6 +561,11 @@ namespace GVR.Vm
             NpcCreator.ExtTaMin(npc, startH, startM, stopH, stopM, action, waypoint);
         }
 
+        public static void Npc_ExchangeRoutine(NpcInstance self, string routineName)
+        {
+            NpcHelper.ExtNpcExchangeRoutine(self, routineName);
+        }
+
         #endregion
 
         #region World
@@ -570,7 +591,11 @@ namespace GVR.Vm
             return Convert.ToInt32(res);
         }
 
-        
+        public static int Wld_DetectNpc(NpcInstance npc, int npcInstance, int aiState, int guild)
+        {
+            return Wld_DetectNpcEx(npc, npcInstance, aiState, guild, 1);
+        }
+
         public static int Wld_DetectNpcEx(NpcInstance npc, int npcInstance, int aiState, int guild, int detectPlayer)
         {
             // Logic from Daedalus mentions, that the player will be ignored if 0. Not "detect" if 1.
