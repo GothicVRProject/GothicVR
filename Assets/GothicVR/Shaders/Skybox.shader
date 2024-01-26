@@ -30,7 +30,10 @@ Shader "Unlit/SkyboxWithHorizonFog"
     }
     SubShader
     {
-        Tags { "QUEUE"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
+        Tags
+        {
+            "QUEUE"="Background" "RenderType"="Background" "PreviewType"="Skybox"
+        }
         ZWrite Off
         Pass
         {
@@ -44,6 +47,7 @@ Shader "Unlit/SkyboxWithHorizonFog"
             {
                 float4 vertex : POSITION;
                 float3 uv : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2f
@@ -51,7 +55,7 @@ Shader "Unlit/SkyboxWithHorizonFog"
                 float3 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
                 float3 worldPos : TEXCOORD2;
-
+                UNITY_VERTEX_INPUT_INSTANCE_ID
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
@@ -86,8 +90,10 @@ Shader "Unlit/SkyboxWithHorizonFog"
                 float4 sky3 = tex2D(_Sky3, skyUV3);
                 float4 sky4 = tex2D(_Sky4, skyUV4);
 
-                float3 blendedSkies1 = lerp(lerp(_DomeColor1.rgb, sky1.rgb, _Sky1Opacity * sky1.a), sky2.rgb, _Sky2Opacity * sky2.a);
-                float3 blendedSkies2 = lerp(lerp(_DomeColor2.rgb, sky3.rgb, _Sky3Opacity * sky3.a), sky4.rgb, _Sky4Opacity * sky4.a);
+                float3 blendedSkies1 = lerp(lerp(_DomeColor1.rgb, sky1.rgb, _Sky1Opacity * sky1.a), sky2.rgb,
+                                        _Sky2Opacity * sky2.a);
+                float3 blendedSkies2 = lerp(lerp(_DomeColor2.rgb, sky3.rgb, _Sky3Opacity * sky3.a), sky4.rgb,
+                                                                _Sky4Opacity * sky4.a);
                 float3 blendedSkies = lerp(blendedSkies1, blendedSkies2, _LayerBlend);
 
                 // Calculate the fog color based on the horizon factor
