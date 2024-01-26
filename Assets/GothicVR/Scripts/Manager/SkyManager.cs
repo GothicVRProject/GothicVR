@@ -87,16 +87,28 @@ namespace GVR.GothicVR.Scripts.Manager
                 var currentDay = GameTime.I.GetDay();
                 var day = (currentDay + 1);
 
-                // hacky way to use the proper color for the current day until animTex is implemented
-                var colorValues =
-                    SettingsManager.GameSettings.GothicINISettings["SKY_OUTDOOR"]["zDayColor" + day % 2]
+                float[] colorValues;
+
+                try
+                {
+                    // hacky way to use the proper color for the current day until animTex is implemented
+                    // % 2 is used as there are only 2 textures for the sky, consistent between G1 and G2 
+                    colorValues = SettingsManager.GameSettings.GothicINISettings["SKY_OUTDOOR"]["zDayColor" + day % 2]
                         .Split(' ').Select(float.Parse).ToArray();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                    return;
+                }
 
                 foreach (var state in stateList)
                 {
+                    // all states that contain day sky layer dawn, evening and day 0 to 3
                     if (state.time < 0.35 || state.time > 0.65)
                     {
                         state.layer[0].texName = "SKYDAY_LAYER0_A" + day % 2 + ".TGA";
+                        // day states that contain sky cloud layer day 0 to 3
                         if (state.time < 0.3 || state.time > 0.7)
                         {
                             state.layer[1].texName = "SKYDAY_LAYER1_A" + day % 2 + ".TGA";

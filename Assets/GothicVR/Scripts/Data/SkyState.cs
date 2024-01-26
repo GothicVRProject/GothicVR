@@ -18,6 +18,8 @@ namespace GVR.Data
         public int cloudShadowOn;
         public SkyLayerData[] layer;
 
+        // how long the transition should take
+        // 0.05 = 1 hour and 12 minutes
         public float lerpDuration = 0.05f;
 
         public SkyState()
