@@ -15,6 +15,8 @@ namespace GVR.Globals
 {
     public static class GameData
     {
+        public static bool IsZenKitReady;
+
         public static Vfs Vfs;
         public static DaedalusVm GothicVm;
         public static DaedalusVm SfxVm; // Sound FX
@@ -68,6 +70,7 @@ namespace GVR.Globals
         public static void Dispose()
         {
             // Needs to be reset as Unity won't clear static variables when closing game in EditorMode.
+            IsZenKitReady = false;
             Vfs = null;
             World = null;
             GothicVm = null;

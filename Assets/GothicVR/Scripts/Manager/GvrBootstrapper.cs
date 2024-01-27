@@ -83,6 +83,7 @@ namespace GVR.Manager
             watch.Stop();
             Debug.Log($"Time spent for Bootstrapping ZenKit: {watch.Elapsed}");
 
+            GameData.IsZenKitReady = true;
             GvrEvents.ZenKitBootstrapped.Invoke();
         }
 

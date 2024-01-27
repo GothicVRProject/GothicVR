@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +36,11 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
 
     private void Start()
     {
-        GvrEvents.ZenKitBootstrapped.AddListener(Initialize);
+        // For Lab
+        if (!GameData.IsZenKitReady)
+            GvrEvents.ZenKitBootstrapped.AddListener(Initialize);
+        else
+            Initialize();
     }
 
     private void Initialize()

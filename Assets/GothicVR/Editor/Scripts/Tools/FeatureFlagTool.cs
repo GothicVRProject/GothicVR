@@ -47,7 +47,7 @@ namespace GVR.Editor.Tools
         };
 
 
-        [MenuItem("GothicVR/Tools/FeatureFlags - Set Production ready state", priority = 1)]
+        [MenuItem("GothicVR/Tools/FeatureFlags - Prod state", priority = 1)]
         public static void SetFeatureFlags()
         {
             var scene = SceneManager.GetSceneByName("Bootstrap");
