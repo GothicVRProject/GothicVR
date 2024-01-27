@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GVR.Data;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Util;
 using TMPro;
@@ -34,10 +35,13 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
     AudioSource mapaudio;
     AudioClip scrollsound;
 
-    protected override void Awake()
+    private void Start()
     {
-        base.Awake();
+        GvrEvents.ZenKitBootstrapped.AddListener(Initialize);
+    }
 
+    private void Initialize()
+    {
         maproll = MapObject.gameObject.GetComponent<Animator>();
         mapaudio = MapObject.gameObject.GetComponent<AudioSource>();
         scrollsound = VobHelper.GetSoundClip("SCROLLROLL.WAV");
