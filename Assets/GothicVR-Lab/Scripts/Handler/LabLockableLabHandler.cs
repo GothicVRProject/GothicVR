@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GVR.Lab.Handler
 {
-    public class LockableHandler : MonoBehaviour, IHandler
+    public class LabLockableLabHandler : MonoBehaviour, ILabHandler
     {
         public GameObject chestsGo;
         public GameObject doorsGo;

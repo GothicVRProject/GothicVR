@@ -2172,7 +2172,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7387125324240799344, guid: efebdf03cb1ccd043827e933755e413e, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 122
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7387125324240799344, guid: efebdf03cb1ccd043827e933755e413e, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -3167,7 +3167,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6242851353689079636, guid: f9da24840c60a814295b88e6319d9f9c, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 91
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6242851353689079636, guid: f9da24840c60a814295b88e6319d9f9c, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -3301,6 +3301,7 @@ MonoBehaviour:
   arrowMaterial: {fileID: 2100000, guid: dc6ce4e18c065d34f9037b5b60259872, type: 2}
   fillerMaterial: {fileID: 2100000, guid: 7f15366450c487344a1e66a13b22a847, type: 2}
   skyMaterial: {fileID: 2100000, guid: 39ac659c922b5b1489714aacd9b952e9, type: 2}
+  mapMaterial: {fileID: 0}
   gothicLoadingMenuMaterial: {fileID: 0}
   loadingBarBackgroundMaterial: {fileID: 0}
   loadingBarMaterial: {fileID: 0}
@@ -3320,11 +3321,13 @@ MonoBehaviour:
   skipMainMenu: 0
   useXRDeviceSimulator: 0
   createWorldMesh: 0
-  createWaypoints: 0
   vobItemsDynamicAttach: 0
-  createWayPointMeshes: 0
-  createWaypointEdgeMeshes: 0
-  enableDayTime: 0
+  showBarrier: 0
+  drawWayPoints: 0
+  drawWaypointEdges: 0
+  drawFreePoints: 0
+  spawnAtSpecificWayNetPoint: 
+  TimeMultiplier: 0
   sunMovementPerformanceValue: 0
   startHour: 0
   startMinute: 0
@@ -3340,8 +3343,6 @@ MonoBehaviour:
   vobCullingLarge:
     maxObjectSize: 0
     cullingDistance: 0
-  spawnAtSpecificFreePoint: 
-  drawFreePointMeshes: 0
   drawVobCullingGizmos: 0
   vobTypeToSpawn: 
   createOcNpcs: 0
@@ -3353,8 +3354,8 @@ MonoBehaviour:
   enableVobParticles: 0
   zenKitLogLevel: 3
   showZspyLogs: 1
-  showZenKitVfsFileNotFoundErrors: 0
   showMusicLogs: 0
+  showBarrierLogs: 0
 --- !u!114 &464842616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4652,7 +4653,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 181.14
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_SizeDelta.y
@@ -4660,7 +4661,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 147.05
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -7843,7 +7844,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8107108474233336363, guid: 49e2fbde9521b4341879174df5a51b64, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 262.09998
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8107108474233336363, guid: 49e2fbde9521b4341879174df5a51b64, type: 3}
       propertyPath: m_SizeDelta.y
@@ -7851,7 +7852,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8107108474233336363, guid: 49e2fbde9521b4341879174df5a51b64, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 147.04999
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8107108474233336363, guid: 49e2fbde9521b4341879174df5a51b64, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -8950,7 +8951,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 262.09998
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_SizeDelta.y
@@ -8958,7 +8959,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 147.04999
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -9765,7 +9766,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 262.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_SizeDelta.y
@@ -9773,7 +9774,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 147.05
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -16344,7 +16345,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 178.94
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_SizeDelta.y
@@ -16352,7 +16353,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 147.05
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 781630663273105846, guid: fcac0c3f142ea3742a0565751dec41de, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -17393,9 +17394,9 @@ MonoBehaviour:
   bootNpcHandler: 1
   bootLockableHandler: 0
   bootAttachPointHandler: 0
-  npcHandler: {fileID: 1791413021}
-  lockableHandler: {fileID: 1956714045}
-  vobHandAttachPointsHandler: {fileID: 330949651}
+  npcLabHandler: {fileID: 1791413021}
+  lockableLabHandler: {fileID: 1956714045}
+  vobHandAttachPointsLabHandler: {fileID: 330949651}
 --- !u!1001 &2119216504
 PrefabInstance:
   m_ObjectHideFlags: 0
