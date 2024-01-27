@@ -17,10 +17,6 @@ namespace GVR.Manager
 
         private void WorldLoaded()
         {
-#if !UNITY_EDITOR // Use this Feature only in Editor mode.
-            return;
-#endif
-
             if (!FeatureFlags.I.useXRDeviceSimulator)
                 return;
 

@@ -97,6 +97,11 @@ namespace GVR.World
             return currentTime >= startOfDay && currentTime <= endOfDay;
         }
 
+        public int GetDay()
+        {
+            return time.Day;
+        }
+
         public float GetSkyTime()
         {
             TimeSpan currentTime = time.TimeOfDay;
