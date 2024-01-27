@@ -18,7 +18,7 @@ using ZenKit.Daedalus;
 
 namespace GVR.Lab.Handler
 {
-    public class VobHandAttachPointsHandler: MonoBehaviour, IHandler
+    public class LabVobHandAttachPointsLabHandler: MonoBehaviour, ILabHandler
     {
         public TMP_Dropdown vobCategoryDropdown;
         public TMP_Dropdown vobItemDropdown;

@@ -76,13 +76,14 @@ namespace GVR.Manager
             LoadDialogs();
             LoadSfxVm(g1Dir);
             LoadPfxVm(g1Dir);
-            LoadMusicVv(g1Dir);
+            LoadMusicVm(g1Dir);
             LoadMusic();
             LoadFonts();
             
             watch.Stop();
             Debug.Log($"Time spent for Bootstrapping ZenKit: {watch.Elapsed}");
 
+            GvrEvents.ZenKitBootstrapped.Invoke();
         }
 
         public static void ZenKitLoggerCallback(LogLevel level, string name, string message)
@@ -184,7 +185,7 @@ namespace GVR.Manager
             GameData.PfxVm = new DaedalusVm(fullPath);
         }
 
-        private static void LoadMusicVv(string g1Dir)
+        private static void LoadMusicVm(string g1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
             GameData.MusicVm = new DaedalusVm(fullPath);

@@ -1,6 +1,6 @@
 ﻿namespace GVR.Lab.Handler
 {
-    public interface IHandler
+    public interface ILabHandler
     {
         public void Bootstrap();
     }

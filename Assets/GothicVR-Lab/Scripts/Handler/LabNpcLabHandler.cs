@@ -15,7 +15,7 @@ using Vector3 = UnityEngine.Vector3;
 
 namespace GVR.Lab.Handler
 {
-    public class NpcHandler : MonoBehaviour, IHandler
+    public class LabNpcLabHandler : MonoBehaviour, ILabHandler
     {
         public TMP_Dropdown animationsDropdown;
         public GameObject bloodwynSlotGo;
@@ -62,11 +62,8 @@ namespace GVR.Lab.Handler
             // Hero
             {
                 // Need to be set for later usage (e.g. Bloodwyn checks your inventory if enough nuggets are carried)
-                var heroGo = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
-                heroGo.SetParent(bloodwynSlotGo);
                 var heroInstance = GameData.GothicVm.InitInstance<NpcInstance>("hero");
-                LookupCache.NpcCache[heroInstance.Index] = properties;
-                GameData.GothicVm.GlobalOther = heroInstance;
+                GameData.GothicVm.GlobalHero = heroInstance;
             }
 
             var mdmName = "Hum_GRDM_ARMOR.asc";

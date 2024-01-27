@@ -14,9 +14,9 @@ namespace GVR.GothicVR_Lab.Scripts
         public bool bootLockableHandler;
         public bool bootAttachPointHandler;
         
-        public NpcHandler npcHandler;
-        public LockableHandler lockableHandler;
-        public VobHandAttachPointsHandler vobHandAttachPointsHandler;
+        public LabNpcLabHandler npcLabHandler;
+        public LabLockableLabHandler lockableLabHandler;
+        public LabVobHandAttachPointsLabHandler vobHandAttachPointsLabHandler;
         
         private bool isBooted;
         /// <summary>
@@ -31,11 +31,11 @@ namespace GVR.GothicVR_Lab.Scripts
             GvrBootstrapper.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
 
             if (bootNpcHandler)
-                npcHandler.Bootstrap();
+                npcLabHandler.Bootstrap();
             if (bootLockableHandler)
-                lockableHandler.Bootstrap();
+                lockableLabHandler.Bootstrap();
             if (bootAttachPointHandler)
-                vobHandAttachPointsHandler.Bootstrap();
+                vobHandAttachPointsLabHandler.Bootstrap();
         }
 
         private void OnDestroy()
