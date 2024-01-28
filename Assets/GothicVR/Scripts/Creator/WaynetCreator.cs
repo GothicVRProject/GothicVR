@@ -17,7 +17,7 @@ namespace GVR.Creator
     {
         public static void Create(GameObject root, WorldData world)
         {
-            var waynetObj = new GameObject(string.Format("Waynet"));
+            var waynetObj = new GameObject("Waynet");
             waynetObj.SetParent(root);
 
 
@@ -99,7 +99,7 @@ namespace GVR.Creator
 
         private static void CreateWaypoints(GameObject parent, WorldData world)
         {
-            var waypointsObj = new GameObject(string.Format("Waypoints"));
+            var waypointsObj = new GameObject("Waypoints");
             waypointsObj.SetParent(parent);
 
             foreach (var waypoint in world.WayNet.Points)
@@ -123,14 +123,14 @@ namespace GVR.Creator
             if (!FeatureFlags.I.drawWaypointEdges)
                 return;
 
-            var waypointEdgesObj = new GameObject(string.Format("Edges"));
+            var waypointEdgesObj = new GameObject("Edges");
             waypointEdgesObj.SetParent(parent);
 
             for (var i = 0; i < world.WayNet.Edges.Count; i++)
             {
                 var edge = world.WayNet.Edges[i];
-                var startPos = world.WayNet.Points[(int)edge.A].Position.ToUnityVector();
-                var endPos = world.WayNet.Points[(int)edge.B].Position.ToUnityVector();
+                var startPos = world.WayNet.Points[edge.A].Position.ToUnityVector();
+                var endPos = world.WayNet.Points[edge.B].Position.ToUnityVector();
                 var lineObj = new GameObject();
 
                 lineObj.AddComponent<LineRenderer>();
