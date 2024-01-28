@@ -19,39 +19,78 @@ namespace GVR.Creator.Meshes
 
         public static async Task CreateAsync(WorldData world, GameObject parent, int meshesPerFrame)
         {
-            var meshObj = new GameObject()
+            var meshObj = new GameObject
             {
                 name = "Mesh",
                 isStatic = true
             };
+            var outdoorMeshRoot = new GameObject
+            {
+                name = "Outdoor",
+                isStatic = true
+            };
+            var outdoorNormalRoot = new GameObject
+            {
+                name = "Normal",
+                isStatic = true
+            };
+            var outdoorPortalRoot = new GameObject
+            {
+                name = "Portal",
+                isStatic = true
+            };
+            var indoorMeshRoot = new GameObject
+            {
+                name = "Indoor",
+                isStatic = true
+            };
+            var indoorNormalRoot = new GameObject
+            {
+                name = "Normal",
+                isStatic = true
+            };
+            var indoorPortalRoot = new GameObject
+            {
+                name = "Portal",
+                isStatic = true
+            };
             meshObj.SetParent(parent);
+            outdoorMeshRoot.SetParent(meshObj);
+            outdoorNormalRoot.SetParent(outdoorMeshRoot);
+            outdoorPortalRoot.SetParent(outdoorMeshRoot);
+            indoorMeshRoot.SetParent(meshObj);
+            indoorNormalRoot.SetParent(indoorMeshRoot);
+            indoorPortalRoot.SetParent(indoorMeshRoot);
 
             // Track the progress of each sub-mesh creation separately
             int numSubMeshes = world.SubMeshes.Values.Count;
             int meshesCreated = 0;
 
-            foreach (var subMesh in world.SubMeshes.Values)
+            foreach (var subMesh in world.SubMeshes)
             {
                 // No texture to add.
                 // For G1 this is: material.name == [KEINE, KEINETEXTUREN, DEFAULT, BRETT2, BRETT1, SUMPFWAASER, S:PSIT01_ABODEN]
                 // Removing these removes tiny slices of walls on the ground. If anyone finds them, I owe them a beer. ;-)
-                if (subMesh.Material.Texture.IsEmpty() || subMesh.Triangles.IsEmpty())
+                if (subMesh.Value.Material.Texture.IsEmpty() || subMesh.Value.Triangles.IsEmpty())
                     continue;
 
                 var subMeshObj = new GameObject()
                 {
-                    name = subMesh.Material.Name,
+                    name = subMesh.Value.Material.Name,
                     isStatic = true
                 };
 
-                subMeshObj.SetParent(meshObj);
+                if (subMesh.Key.isOutdoor)
+                    subMeshObj.SetParent(subMesh.Key.isPortal ? outdoorPortalRoot : outdoorNormalRoot);
+                else
+                    subMeshObj.SetParent(subMesh.Key.isPortal ? indoorPortalRoot : indoorNormalRoot);
 
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
-                Self.PrepareMeshRenderer(meshRenderer, subMesh);
-                Self.PrepareMeshFilter(meshFilter, subMesh);
-                Self.PrepareMeshCollider(subMeshObj, meshFilter.sharedMesh, subMesh.Material);
+                Self.PrepareMeshRenderer(meshRenderer, subMesh.Value);
+                Self.PrepareMeshFilter(meshFilter, subMesh.Value);
+                Self.PrepareMeshCollider(subMeshObj, meshFilter.sharedMesh, subMesh.Value.Material);
 
 #if UNITY_EDITOR // Only needed for Occlusion Culling baking
                 // Don't set transparent meshes as occluders.

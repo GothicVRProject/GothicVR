@@ -17,7 +17,7 @@ namespace GVR.World
         public List<IVirtualObject> Vobs;
         public IWayNet WayNet;
         
-        public Dictionary<int, SubMeshData> SubMeshes;
+        public Dictionary<SubMeshKey, SubMeshData> SubMeshes;
 
         public class SubMeshData
         {
@@ -27,6 +27,13 @@ namespace GVR.World
             public readonly List<int> Triangles = new();
             public readonly List<Vector2> Uvs = new() ;
             public readonly List<Vector3> Normals = new();
+        }
+
+        public struct SubMeshKey
+        {
+            public int materialIndex;
+            public bool isOutdoor;
+            public bool isPortal;
         }
 
     }

@@ -99,33 +99,43 @@ namespace GVR.Creator
         /// We also need to put the triangle indices in in Reverse() order to make Unity
         /// draw mesh elements right (instead of upside down)
         /// </summary>
-        private static Dictionary<int, WorldData.SubMeshData> CreateSubMeshesForUnity(IMesh zkMesh, IBspTree zkBspTree)
+        private static Dictionary<WorldData.SubMeshKey, WorldData.SubMeshData> CreateSubMeshesForUnity(IMesh zkMesh, IBspTree zkBspTree)
         {
             var zkMaterials = zkMesh.Materials;
             var zkPolygons = zkMesh.Polygons;
             var zkPositions = zkMesh.Positions;
             var zkFeatures = zkMesh.Features;
 
-            // As we know the exact size of SubMeshes (aka size of Materials), we will prefill them now.
-            Dictionary<int, WorldData.SubMeshData> subMeshes = new(zkMaterials.Count);
-            for (var materialIndex = 0; materialIndex < zkMaterials.Count; materialIndex++)
-            {
-                subMeshes.Add(materialIndex, new()
-                {
-                    Material = zkMaterials[materialIndex]
-                });
-            }
+            Dictionary<WorldData.SubMeshKey, WorldData.SubMeshData> subMeshes = new();
 
             // LeafPolygonIndices aren't distinct. We therefore need to rearrange them this way.
             // Alternatively we could also loop through all Nodes and fetch where Front==Back==-1 (aka Leaf)
             foreach (var leafPolygonIndex in zkBspTree.LeafPolygonIndices.Distinct())
             {
                 var polygon = zkPolygons[leafPolygonIndex];
-                var currentSubMesh = subMeshes[polygon.MaterialIndex];
 
-                if (polygon.IsPortal)
+                // If key doesn't exist yet
+                var key = new WorldData.SubMeshKey
+                {
+                    materialIndex = polygon.MaterialIndex,
+                    isOutdoor = polygon.IsOutdoor,
+                    isPortal = polygon.IsPortal
+                };
+
+                if (!FeatureFlags.I.createPortals && polygon.IsPortal)
                     continue;
-                
+
+                // If key is new.
+                if (!subMeshes.TryGetValue(key, out var currentSubMesh))
+                {
+                    var newSubMesh = new WorldData.SubMeshData()
+                    {
+                        Material = zkMaterials[polygon.MaterialIndex]
+                    };
+                    subMeshes.Add(key, newSubMesh);
+                    currentSubMesh = newSubMesh;
+                }
+
                 // As we always use element 0 and i+1, we skip it in the loop.
                 for (var i=1; i < polygon.PositionIndices.Count - 1; i++)
                 {

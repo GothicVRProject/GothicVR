@@ -347,6 +347,7 @@ MonoBehaviour:
   enableSounds: 1
   enableMusic: 1
   enableSoundCulling: 1
+  createPortals: 0
   enableVobParticles: 0
   zenKitLogLevel: 0
   showZspyLogs: 0

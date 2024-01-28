@@ -67,6 +67,8 @@ namespace GVR.Debugging
         public bool enableSoundCulling;
 
         [Header("__________Experimental / Do not use in Production__________")]
+        [Tooltip("TODO: Needs to be handled by Occlusion culling baking and fading away when close by.")]
+        public bool createPortals;
         [Tooltip("Looks already quite good for leaves.pfy in the forest, but fire is awkward.")]
         public bool enableVobParticles;
 
