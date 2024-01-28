@@ -31,6 +31,7 @@ namespace GVR.World
 
         public struct SubMeshKey
         {
+            public int nodeId;
             public int materialIndex;
             public bool isOutdoor;
             public bool isPortal;

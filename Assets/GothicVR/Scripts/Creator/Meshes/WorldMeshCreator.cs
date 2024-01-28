@@ -74,16 +74,28 @@ namespace GVR.Creator.Meshes
                 if (subMesh.Value.Material.Texture.IsEmpty() || subMesh.Value.Triangles.IsEmpty())
                     continue;
 
-                var subMeshObj = new GameObject()
+                var subMeshObj = new GameObject
                 {
                     name = subMesh.Value.Material.Name,
                     isStatic = true
                 };
 
+                GameObject currentParent;
                 if (subMesh.Key.isOutdoor)
-                    subMeshObj.SetParent(subMesh.Key.isPortal ? outdoorPortalRoot : outdoorNormalRoot);
+                    currentParent = subMesh.Key.isPortal ? outdoorPortalRoot : outdoorNormalRoot;
                 else
-                    subMeshObj.SetParent(subMesh.Key.isPortal ? indoorPortalRoot : indoorNormalRoot);
+                    currentParent = subMesh.Key.isPortal ? indoorPortalRoot : indoorNormalRoot;
+
+                var idRoot = currentParent.FindChildRecursively(subMesh.Key.nodeId.ToString());
+                if (idRoot == null)
+                {
+                    idRoot = new GameObject
+                    {
+                        name = subMesh.Key.nodeId.ToString()
+                    };
+                    idRoot.SetParent(currentParent);
+                }
+                subMeshObj.SetParent(idRoot);
 
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
@@ -104,6 +116,8 @@ namespace GVR.Creator.Meshes
                 if (++meshesCreated % meshesPerFrame == 0)
                     await Task.Yield(); // Yield to allow other operations to run in the frame
             }
+
+            Debug.Log($"Total number of world mesh GOs: {meshesCreated}");
         }
 
         protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)

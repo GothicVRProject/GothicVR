@@ -6,7 +6,6 @@ using GVR.Creator;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
-using GVR.GothicVR.Scripts.Manager;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;

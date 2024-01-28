@@ -110,39 +110,50 @@ namespace GVR.Creator
 
             // LeafPolygonIndices aren't distinct. We therefore need to rearrange them this way.
             // Alternatively we could also loop through all Nodes and fetch where Front==Back==-1 (aka Leaf)
-            foreach (var leafPolygonIndex in zkBspTree.LeafPolygonIndices.Distinct())
+            var nodeId = -1;
+            foreach (var node in zkBspTree.Nodes.Where(n => n.BackIndex == -1 && n.FrontIndex == -1))
             {
-                var polygon = zkPolygons[leafPolygonIndex];
-
-                // If key doesn't exist yet
-                var key = new WorldData.SubMeshKey
+                nodeId++;
+                foreach (var polygonIndex in Enumerable.Range(node.PolygonIndex, node.PolygonCount))
                 {
-                    materialIndex = polygon.MaterialIndex,
-                    isOutdoor = polygon.IsOutdoor,
-                    isPortal = polygon.IsPortal
-                };
+                    if (zkBspTree.PolygonIndices.Count <= polygonIndex)
+                        Debug.Log("");
 
-                if (!FeatureFlags.I.createPortals && polygon.IsPortal)
-                    continue;
+                    var polygon = zkPolygons[zkBspTree.PolygonIndices[polygonIndex]];
 
-                // If key is new.
-                if (!subMeshes.TryGetValue(key, out var currentSubMesh))
-                {
-                    var newSubMesh = new WorldData.SubMeshData()
+                    // If key doesn't exist yet
+                    var key = new WorldData.SubMeshKey
                     {
-                        Material = zkMaterials[polygon.MaterialIndex]
+                        // TODO - If we want to slice the elements on a node (or it's parent) basis, use the line below.
+                        // nodeId = zkBspTree.Nodes[zkBspTree.Nodes[node.ParentIndex].ParentIndex].ParentIndex,
+                        nodeId = -1,
+                        materialIndex = polygon.MaterialIndex,
+                        isOutdoor = polygon.IsOutdoor,
+                        isPortal = polygon.IsPortal,
                     };
-                    subMeshes.Add(key, newSubMesh);
-                    currentSubMesh = newSubMesh;
-                }
 
-                // As we always use element 0 and i+1, we skip it in the loop.
-                for (var i=1; i < polygon.PositionIndices.Count - 1; i++)
-                {
-                    // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
-                    AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, 0);
-                    AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, i);
-                    AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, i+1);
+                    if (!FeatureFlags.I.createPortals && polygon.IsPortal)
+                        continue;
+
+                    // If key is new.
+                    if (!subMeshes.TryGetValue(key, out var currentSubMesh))
+                    {
+                        var newSubMesh = new WorldData.SubMeshData
+                        {
+                            Material = zkMaterials[polygon.MaterialIndex]
+                        };
+                        subMeshes.Add(key, newSubMesh);
+                        currentSubMesh = newSubMesh;
+                    }
+
+                    // As we always use element 0 and i+1, we skip it in the loop.
+                    for (var i = 1; i < polygon.PositionIndices.Count - 1; i++)
+                    {
+                        // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
+                        AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, 0);
+                        AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, i);
+                        AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, i + 1);
+                    }
                 }
             }
 
