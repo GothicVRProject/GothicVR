@@ -155,8 +155,7 @@ namespace GVR.Manager
             
             // If we don't set it early, other calls within VM will fail.
             // TODO - Could be moved to a separate Hero.cs class and set during GvrEvents.GeneralSceneLoaded event.
-            var hero = GameData.GothicVm.InitInstance<NpcInstance>("hero");
-            GameData.GothicVm.GlobalHero = hero;
+            Hero.LoadHeroVM();
 
             VmGothicExternals.RegisterExternals();
         }

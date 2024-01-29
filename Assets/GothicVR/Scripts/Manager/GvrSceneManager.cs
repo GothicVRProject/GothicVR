@@ -247,6 +247,7 @@ namespace GVR.Manager
         private void SetPlayer()
         {
             player = generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController").transform.Find("VRPlayer").gameObject;
+            LookupCache.NpcCache[GameData.GothicVm.GlobalHero.Index].go = player;
         }
 
         public void TeleportPlayerToSpot()
