@@ -21,6 +21,14 @@ private static readonly List<Tuple<string, Type, object>> ProductionFlags = new(
 }
 ```
 
+## Updating Unity or packages
+
+**Updating _XR Interaction Toolkit_**  
+_XRI Default Input Actions.inputactions_ are put from the Samples folder into _Assets/GothicVR/XR Interaction Toolkit/_.
+This ensures (e.g.) velocity handling for Climbing ladders persists after updates. Nevertheless, after an update, it needs to be rechecked.
+
+Update hints from Unity: [Starter Assets](https://docs.unity3d.com/Packages/com.unity.xr.interaction.toolkit@2.5/manual/samples-starter-assets.html)
+
 
 ## XRDeviceSimulator
 You can play the game with [OpenXR's control simulator](https://docs.unity3d.com/Packages/com.unity.xr.interaction.toolkit@2.4/manual/xr-device-simulator-overview.html).

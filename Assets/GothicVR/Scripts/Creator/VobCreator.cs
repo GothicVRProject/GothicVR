@@ -574,15 +574,17 @@ namespace GVR.Creator
 
         private static GameObject CreateLadder(IVirtualObject vob)
         {
-            // FIXME - use Prefab instead. And be cautious of settings!
             var vobObj = CreateDefaultMesh(vob, true);
-            var meshGo = vobObj;
-            var grabComp = meshGo.AddComponent<XRGrabInteractable>();
-            var rigidbodyComp = meshGo.GetComponent<Rigidbody>();
+
+            // We will set some default values for collider and grabbing now.
+            // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
+            // e.g. grabComp's colliders aren't recalculated if we have the XRGrabInteractable set in Prefab.
+            var grabComp = vobObj.AddComponent<XRGrabInteractable>();
+            var rigidbodyComp = vobObj.GetComponent<Rigidbody>();
             var meshColliderComp = vobObj.GetComponentInChildren<MeshCollider>();
 
             meshColliderComp.convex = true; // We need to set it to overcome Physics.ClosestPoint warnings.
-            meshGo.tag = Constants.ClimbableTag;
+            vobObj.tag = Constants.ClimbableTag;
             rigidbodyComp.isKinematic = true;
             grabComp.throwOnDetach = false; // Throws errors and isn't needed as we don't want to move the kinematic ladder when released.
             grabComp.trackPosition = false;
