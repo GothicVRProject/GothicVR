@@ -718,7 +718,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7369722077890996068}
-  - component: {fileID: 1113445482451678875}
   m_Layer: 5
   m_Name: User Interface
   m_TagString: Untagged
@@ -744,32 +743,6 @@ Transform:
   - {fileID: 6359608255794823456}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1113445482451678875
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7339275886835513150}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d06cd27c7d627aa499a0430dd39b8238, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainMenuImageBackgroundMaterial: {fileID: 0}
-  mainMenuBackgroundMaterial: {fileID: 0}
-  mainMenuTextImageMaterial: {fileID: 0}
-  backgroundMaterial: {fileID: 0}
-  buttonMaterial: {fileID: 0}
-  sliderMaterial: {fileID: 0}
-  sliderPositionMaterial: {fileID: 0}
-  arrowMaterial: {fileID: 0}
-  fillerMaterial: {fileID: 0}
-  skyMaterial: {fileID: 0}
-  gothicLoadingMenuMaterial: {fileID: 0}
-  loadingBarBackgroundMaterial: {fileID: 0}
-  loadingBarMaterial: {fileID: 0}
-  loadingSphereMaterial: {fileID: 0}
 --- !u!1001 &7328335570553009904
 PrefabInstance:
   m_ObjectHideFlags: 0
