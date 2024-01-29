@@ -4,31 +4,18 @@ namespace GVR.Properties
 {
     public abstract class AbstractProperties : MonoBehaviour
     {
-        private GameObject _customGameObject = null;
+        private GameObject customGameObject;
 
         public GameObject go
         {
             get
             {
-                if (_customGameObject != null)
-                {
-                    return _customGameObject;
-                }
+                if (customGameObject != null)
+                    return customGameObject;
 
-                try
-                {
-                    if (gameObject != null)
-                    {
-                        return gameObject;
-                    }
-                }
-                catch
-                {
-                }
-
-                return null;
+                return gameObject;
             }
-            set => _customGameObject = value;
+            set => customGameObject = value;
         }
     }
 }

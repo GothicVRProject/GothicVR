@@ -156,13 +156,19 @@ namespace GVR.Vm
             //throw new NotImplementedException("External >" + value + "< not registered but required by DaedalusVM.");
             try
             {
-                var npcName = LookupCache.NpcCache[GameData.GothicVm.GlobalSelf.Index].go.name;
-                Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM (called on >{npcName}<).");
+                if (GameData.GothicVm.GlobalSelf == null)
+                {
+                    Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM.");
+                }
+                else
+                {
+                    var npcName = LookupCache.NpcCache[GameData.GothicVm.GlobalSelf.Index].go.name;
+                    Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM (called on >{npcName}<).");
+                }
             }
             catch (Exception)
             {
                 Debug.LogError("Bug in getting Npc. Fix or delete.");
-                Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM.");
             }
         }
 
