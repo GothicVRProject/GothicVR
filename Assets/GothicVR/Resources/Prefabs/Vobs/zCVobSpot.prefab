@@ -47,12 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13f4f324c4e84a1b8d8427d29f1d2deb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <visual>k__BackingField: 
   <visualScheme>k__BackingField: 
-  fp:
-    Name: 
-    Position: {x: 0, y: 0, z: 0}
-    IsLocked: 0
 --- !u!33 &4250102412515220408
 MeshFilter:
   m_ObjectHideFlags: 0

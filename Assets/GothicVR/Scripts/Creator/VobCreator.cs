@@ -356,9 +356,24 @@ namespace GVR.Creator
 
             CreateItemMesh(item, go);
         }
-        
+
+        /// <summary>
+        /// Render item inside GameObject
+        /// </summary>
+        public static void CreateItem(int itemId, string spawnpoint, GameObject go)
+        {
+            var item = AssetCache.TryGetItemData(itemId);
+
+            var position = WayNetHelper.GetWayNetPoint(spawnpoint).Position;
+
+            CreateItemMesh(item, go, position);
+        }
+
         public static void CreateItem(string itemName, GameObject go)
         {
+            if (itemName == "")
+                return;
+
             var item = AssetCache.TryGetItemData(itemName);
 
             CreateItemMesh(item, go);
@@ -606,10 +621,10 @@ namespace GVR.Creator
             return MeshCreatorFacade.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
         }
         
-        private static GameObject CreateItemMesh(ItemInstance item, GameObject go)
+        private static GameObject CreateItemMesh(ItemInstance item, GameObject go, UnityEngine.Vector3 position = default)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
-            return MeshCreatorFacade.CreateVob(item.Visual, mrm, default, default, false, parent: go);
+            return MeshCreatorFacade.CreateVob(item.Visual, mrm, position, default, false, parent: go);
         }
 
         private static GameObject CreateDecal(IVirtualObject vob)

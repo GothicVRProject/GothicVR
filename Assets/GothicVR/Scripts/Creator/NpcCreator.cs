@@ -222,10 +222,22 @@ namespace GVR.Creator
             return properties.npcInstance;
         }
 
+        public static int ExtHlpGetInstanceId(DaedalusInstance instance)
+        {
+            if (instance == null)
+                return -1;
+            return instance.Index;
+        }
+
         public static void ExtNpcPerceptionEnable(NpcInstance npc, VmGothicEnums.PerceptionType perception, int function)
         {
             var props = GetProperties(npc);
             props.Perceptions[perception] = function;
+        }      
+        public static void ExtNpcPerceptionDisable(NpcInstance npc, VmGothicEnums.PerceptionType perception)
+        {
+            var props = GetProperties(npc);
+            props.Perceptions[perception] = -1;
         }
 
         public static void ExtNpcSetPerceptionTime(NpcInstance npc, float time)

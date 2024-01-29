@@ -7,6 +7,7 @@ using GVR.Debugging;
 using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
+using GVR.World;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;
@@ -41,6 +42,13 @@ namespace GVR.Vm
             vm.RegisterExternal<NpcInstance>("AI_DrawWeapon", AI_DrawWeapon);
             vm.RegisterExternal<NpcInstance, NpcInstance, string>("AI_Output", AI_Output);
             vm.RegisterExternal<NpcInstance>("AI_StopProcessInfos", AI_StopProcessInfos);
+            vm.RegisterExternal<NpcInstance, string>("AI_LookAt", AI_LookAt);
+            vm.RegisterExternal<NpcInstance, NpcInstance>("AI_LookAtNPC", AI_LookAtNPC);
+            vm.RegisterExternal<NpcInstance>("AI_ContinueRoutine", AI_ContinueRoutine);
+            vm.RegisterExternal<NpcInstance, NpcInstance>("AI_TurnToNPC", AI_TurnToNPC);
+            vm.RegisterExternal<NpcInstance, string, int>("AI_PlayAniBS", AI_PlayAniBS);
+            vm.RegisterExternal<NpcInstance>("AI_UnequipArmor", AI_UnequipArmor);
+
 
             // Apply Options
             // Doc
@@ -51,6 +59,7 @@ namespace GVR.Vm
             vm.RegisterExternal<int, ItemInstance>("Hlp_IsValidItem", Hlp_IsValidItem);
             vm.RegisterExternal<int, NpcInstance>("Hlp_IsValidNpc", Hlp_IsValidNpc);
             vm.RegisterExternal<NpcInstance, int>("Hlp_GetNpc", Hlp_GetNpc);
+            vm.RegisterExternal<int, DaedalusInstance>("Hlp_GetInstanceId", Hlp_GetInstanceId);
 
             // Info
             vm.RegisterExternal<int>("Info_ClearChoices", Info_ClearChoices);
@@ -91,6 +100,15 @@ namespace GVR.Vm
             // PxVm.pxVmRegisterExternal(vmPtr, "Npc_RemoveInvItems", Npc_RemoveInvItems);
             vm.RegisterExternal<NpcInstance, int>("EquipItem", EquipItem);
             vm.RegisterExternal<int, NpcInstance, NpcInstance>("Npc_GetDistToNpc", Npc_GetDistToNpc);
+            vm.RegisterExternal<int, NpcInstance>("Npc_HasEquippedArmor", Npc_HasEquippedArmor);
+            vm.RegisterExternal<ItemInstance, NpcInstance>("Npc_GetEquippedMeleeWeapon", Npc_GetEquippedMeleeWeapon);
+            vm.RegisterExternal<int, NpcInstance>("Npc_HasEquippedMeleeWeapon", Npc_HasEquippedMeleeWeapon);
+            vm.RegisterExternal<ItemInstance, NpcInstance>("Npc_GetEquippedRangedWeapon", Npc_GetEquippedRangedWeapon);
+            vm.RegisterExternal<int, NpcInstance>("Npc_HasEquippedRangedWeapon", Npc_HasEquippedRangedWeapon);
+            vm.RegisterExternal<int, NpcInstance, string>("Npc_GetDistToWP", Npc_GetDistToWP);
+            vm.RegisterExternal<NpcInstance, int>("Npc_PercDisable", Npc_PercDisable);
+            vm.RegisterExternal<int, NpcInstance, NpcInstance>("Npc_CanSeeNpc", Npc_CanSeeNpc);
+
 
             // Print
             vm.RegisterExternal<string>("PrintDebug", PrintDebug);
@@ -111,6 +129,11 @@ namespace GVR.Vm
             vm.RegisterExternal<int, NpcInstance, int, int, int>("Wld_DetectNpc", Wld_DetectNpc);
             vm.RegisterExternal<int, NpcInstance, int, int, int, int>("Wld_DetectNpcEx", Wld_DetectNpcEx);
             vm.RegisterExternal<int, NpcInstance, string>("Wld_IsNextFPAvailable", Wld_IsNextFPAvailable);
+            vm.RegisterExternal<int, int>("Wld_SetTime", Wld_SetTime);
+            vm.RegisterExternal("Wld_GetDay", Wld_GetDay);
+            vm.RegisterExternal<int, int, int, int, int>("Wld_IsTime", Wld_IsTime);
+            vm.RegisterExternal<int, NpcInstance, string>("Wld_GetMobState", Wld_GetMobState);
+            vm.RegisterExternal<int, string>("Wld_InsertItem", Wld_InsertItem);
 
             // Misc
             vm.RegisterExternal<string, string, string>("ConcatStrings", ConcatStrings);
@@ -127,7 +150,7 @@ namespace GVR.Vm
             //throw new NotImplementedException("External >" + value + "< not registered but required by DaedalusVM.");
             try
             {
-                var npcName = LookupCache.NpcCache[GameData.GothicVm.GlobalSelf.Index].gameObject.name;
+                var npcName = LookupCache.NpcCache[GameData.GothicVm.GlobalSelf.Index].go.name;
                 Debug.LogWarning($"Method >{sym.Name}< not yet implemented in DaedalusVM (called on >{npcName}<).");
             }
             catch (Exception)
@@ -224,6 +247,36 @@ namespace GVR.Vm
             DialogHelper.ExtAiStopProcessInfos(npc);
         }
 
+        public static void AI_LookAt(NpcInstance npc, string waypoint)
+        {
+            NpcHelper.ExtAiLookAt(npc, waypoint);
+        }
+
+        public static void AI_LookAtNPC(NpcInstance npc, NpcInstance target)
+        {
+            NpcHelper.ExtAiLookAtNpc(npc, target);
+        }
+
+        public static void AI_ContinueRoutine(NpcInstance npc)
+        {
+            NpcHelper.ExtAiContinueRoutine(npc);
+        }
+
+        public static void AI_TurnToNPC(NpcInstance npc, NpcInstance target)
+        {
+            NpcHelper.ExtAiTurnToNpc(npc, target);
+        }
+
+        public static void AI_PlayAniBS(NpcInstance npc, string name, int bodyState)
+        {
+            NpcHelper.ExtAiPlayAniBS(npc, name, bodyState);
+        }
+
+        public static void AI_UnequipArmor(NpcInstance npc)
+        {
+            NpcHelper.ExtAiUnequipArmor(npc);
+        }
+
         #endregion
 
         #region Apply Options
@@ -270,6 +323,11 @@ namespace GVR.Vm
         public static NpcInstance Hlp_GetNpc(int instanceId)
         {
             return NpcCreator.ExtHlpGetNpc(instanceId);
+        }
+
+        public static int Hlp_GetInstanceId(DaedalusInstance instanceId)
+        {
+            return NpcCreator.ExtHlpGetInstanceId(instanceId);
         }
 
         #endregion
@@ -549,6 +607,46 @@ namespace GVR.Vm
         {
             return NpcHelper.ExtNpcGetDistToNpc(npc1, npc2);
         }
+        
+        public static int Npc_HasEquippedArmor(NpcInstance npc)
+        {
+            return NpcHelper.ExtNpcHasEquippedArmor(npc) ? 1 : 0;
+        }
+
+        public static ItemInstance Npc_GetEquippedMeleeWeapon(NpcInstance npc)
+        {
+            return NpcHelper.ExtNpcGetEquippedMeleeWeapon(npc);
+        }
+
+        public static int Npc_HasEquippedMeleeWeapon(NpcInstance npc)
+        {
+            return NpcHelper.ExtNpcHasEquippedMeleeWeapon(npc) ? 1 : 0;
+        }
+
+        public static ItemInstance Npc_GetEquippedRangedWeapon(NpcInstance npc)
+        {
+            return NpcHelper.ExtNpcGetEquippedRangedWeapon(npc);
+        }
+
+        public static int Npc_HasEquippedRangedWeapon(NpcInstance npc)
+        {
+            return NpcHelper.ExtNpcHasEquippedRangedWeapon(npc) ? 1 : 0;
+        }
+
+        public static int Npc_GetDistToWP(NpcInstance npc, string waypoint)
+        {
+            return NpcHelper.ExtNpcGetDistToWp(npc, waypoint);
+        }
+
+        public static void Npc_PercDisable(NpcInstance npc, int perception)
+        {
+            NpcCreator.ExtNpcPerceptionDisable(npc, (VmGothicEnums.PerceptionType)perception);
+        }
+
+        public static int Npc_CanSeeNpc(NpcInstance npc, NpcInstance target)
+        {
+            return NpcHelper.ExtNpcCanSeeNpc(npc, target) ? 1 : 0;
+        }
 
         #endregion
         
@@ -611,6 +709,46 @@ namespace GVR.Vm
         {
             var result = NpcHelper.ExtIsNextFpAvailable(npc, fpNamePart);
             return Convert.ToInt32(result);
+        }
+
+        public static void Wld_SetTime(int hour, int minute)
+        {
+            GameTime.I.SetTime(hour, minute);
+        }
+
+        public static int Wld_GetDay()
+        {
+            return GameTime.I.GetDay();
+        }
+
+        public static int Wld_IsTime(int beginHour, int beginMinute, int endHour, int endMinute)
+        {
+            var begin = new TimeSpan(beginHour, beginMinute, 0);
+            var end = new TimeSpan(endHour, endMinute, 0);
+
+            var now = DateTime.Now.TimeOfDay;
+
+            if (begin <= end && begin <= now && now < end)
+            {
+                return 1;
+            }
+
+            if (begin > end && (begin < now || now <= end)) // begin and end span across midnight
+            {
+                return 1;
+            }
+
+            return 0;
+        }
+
+        public static int Wld_GetMobState(NpcInstance npc, string scheme)
+        {
+            return NpcHelper.ExtWldGetMobState(npc, scheme);
+        }
+
+        public static void Wld_InsertItem(int itemInstance, string spawnpoint)
+        {
+            VobHelper.ExtWldInsertItem(itemInstance, spawnpoint);
         }
 
         #endregion

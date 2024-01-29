@@ -9,6 +9,8 @@ namespace GVR.Npc.Actions.AnimationActions
 
         protected override Vector3 GetRotationDirection()
         {
+            if(Props.CurrentWayPoint == null)
+                return Vector3.zero;
             return Props.CurrentWayPoint.Direction;
         }
     }

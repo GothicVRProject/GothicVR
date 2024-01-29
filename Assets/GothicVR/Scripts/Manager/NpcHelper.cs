@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GVR.Caches;
 using GVR.Debugging;
@@ -70,6 +71,30 @@ namespace GVR.Manager
                 return true;
         }
 
+        public static int ExtWldGetMobState(NpcInstance npcInstance, string scheme)
+        {
+            var npcGo = GetNpc(npcInstance);
+
+            var props = GetProperties(npcInstance);
+
+            VobProperties vob;
+
+            if (props.currentInteractable != null)
+                vob = props.currentInteractable.GetComponent<VobProperties>();
+            else
+                vob = VobHelper.GetFreeInteractableWithin10M(npcGo.transform.position, scheme);
+
+            if (vob == null || vob.visualScheme != scheme)
+                return -1;
+
+            if (vob is InteractiveProperties interactiveVob)
+            {
+                return Math.Max(0, interactiveVob.Properties.State);
+            }
+
+            return -1;
+        }
+
         public static ItemInstance ExtGetEquippedArmor(NpcInstance npc)
         {
             var armor = GetProperties(npc).EquippedItems
@@ -78,6 +103,37 @@ namespace GVR.Manager
             return armor;
         }
         
+        public static bool ExtNpcHasEquippedArmor(NpcInstance npc)
+        {
+            return ExtGetEquippedArmor(npc) != null;
+        }
+
+        public static ItemInstance ExtNpcGetEquippedMeleeWeapon(NpcInstance npc)
+        {
+            var meleeWeapon = GetProperties(npc).EquippedItems
+                .FirstOrDefault(i => i.MainFlag == (int)VmGothicEnums.ItemFlags.ITEM_KAT_NF);
+
+            return meleeWeapon;
+        }
+
+        public static bool ExtNpcHasEquippedMeleeWeapon(NpcInstance npc)
+        {
+            return ExtNpcGetEquippedMeleeWeapon(npc) != null;
+        }
+
+        public static ItemInstance ExtNpcGetEquippedRangedWeapon(NpcInstance npc)
+        {
+            var rangedWeapon = GetProperties(npc).EquippedItems
+                .FirstOrDefault(i => i.MainFlag == (int)VmGothicEnums.ItemFlags.ITEM_KAT_FF);
+
+            return rangedWeapon;
+        }
+
+        public static bool ExtNpcHasEquippedRangedWeapon(NpcInstance npc)
+        {
+            return ExtNpcGetEquippedRangedWeapon(npc) != null;
+        }
+
         public static bool ExtIsNpcOnFp(NpcInstance npc, string vobNamePart)
         {
             var freePoint = GetProperties(npc).CurrentFreePoint;
@@ -88,19 +144,21 @@ namespace GVR.Manager
             return freePoint.Name.ContainsIgnoreCase(vobNamePart);
         }
 
-        public static bool ExtWldDetectNpcEx(NpcInstance npc, int npcInstance, int aiState, int guild, bool ignorePlayer)
+        public static bool ExtWldDetectNpcEx(NpcInstance npc, int npcInstanceIndex, int aiState, int guild,
+            bool ignorePlayer)
         {
             var npcGo = GetNpc(npc);
             var npcPos = npcGo.transform.position;
-            
+
             // FIXME - currently hard coded with 20m, but needs to be imported from ZenKit: daedalus_classes.h::c_npc::senses and senses_range
-            float distance = 20f; // 20m
-            
+            float sensesRange = npc.SensesRange / 100; // cm -> m
+            float distance = sensesRange * sensesRange; // 20m
+
             // FIXME - Add Guild check
             // FIXME - Add Hero check
             // FIXME - Add AiState check
             // FIXME - Add NpcCinstance check (only look for specific NPC)
-            
+
             var foundNpc = LookupCache.NpcCache.Values
                 .Where(i => i.go != null)
                 .Where(i => npcInstanceIndex == -1 || i.npcInstance.Index == npcInstanceIndex)
@@ -123,6 +181,42 @@ namespace GVR.Manager
                 return 0;
         }
         
+        public static int ExtNpcGetDistToWp(NpcInstance npc, string waypointName)
+        {
+            var npcGo = GetNpc(npc);
+            var npcPos = npcGo.transform.position;
+
+            var waypoint = WayNetHelper.GetWayNetPoint(waypointName);
+
+            if (waypoint == null || npcGo)
+                return int.MaxValue;
+
+            return (int)Vector3.Distance(npcPos, waypoint.Position);
+        }
+
+        public static bool ExtNpcCanSeeNpc(NpcInstance npc, NpcInstance other)
+        {
+            var npcGo = GetNpc(npc);
+            var otherGo = GetNpc(other);
+
+            if (npcGo == null || otherGo == null)
+                return false;
+
+            var headBone = npcGo.FindChildRecursively("BIP01 HEAD").transform;
+
+            var inSightRange = Vector3.Distance(npcGo.transform.position, otherGo.transform.position) <=
+                               npc.SensesRange;
+
+            Vector3 directionToTarget = (otherGo.transform.position - headBone.position).normalized;
+            float angleToTarget = Vector3.Angle(headBone.forward, directionToTarget);
+
+            var inFov = angleToTarget <= 50.0f; // OpenGothic assumes 100 fov for NPCs
+
+            var inLineOfSight = Physics.Linecast(headBone.position, directionToTarget);
+
+            return inSightRange && inFov && inLineOfSight;
+        }
+
         private static GameObject GetNpc(NpcInstance npc)
         {
             return GetProperties(npc).go;
@@ -191,6 +285,9 @@ namespace GVR.Manager
 
         public static void ExtAiGoToNpc(NpcInstance self, NpcInstance other)
         {
+            if (other == null)
+                return;
+            
             var props = GetProperties(self);
             props.AnimationQueue.Enqueue(new GoToNpc(
                 new(AnimationAction.Type.AIGoToNpc, int0: other.Id, int1: other.Index),
@@ -237,7 +334,7 @@ namespace GVR.Manager
                 props.go));
         }
 
-        public static void ExtAiLookAtNPC(NpcInstance npc, NpcInstance other)
+        public static void ExtAiLookAtNpc(NpcInstance npc, NpcInstance other)
         {
             if (other == null)
                 return;
@@ -299,7 +396,7 @@ namespace GVR.Manager
         {
             GetProperties(npc).stateTime = seconds;
         }
-        
+
         /// <summary>
         /// State means the final state where the animation shall go to.
         /// example:
@@ -326,7 +423,7 @@ namespace GVR.Manager
         {
             return GetProperties(npc).bodyState;
         }
-        
+
         /// <summary>
         /// Return position distance in cm.
         /// </summary>
