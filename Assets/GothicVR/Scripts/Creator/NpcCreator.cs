@@ -43,7 +43,7 @@ namespace GVR.Creator
 
         private static GameObject GetNpcGo(NpcInstance npcInstance)
         {
-            return GetProperties(npcInstance).gameObject;
+            return GetProperties(npcInstance).go;
         }
 
         /// <summary>

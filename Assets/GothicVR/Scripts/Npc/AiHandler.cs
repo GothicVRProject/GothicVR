@@ -59,7 +59,7 @@ namespace GVR.Npc
             // Go on
             else
             {
-                Debug.Log($"Start playing >{properties.AnimationQueue.Peek().GetType()}< on >{properties.gameObject.name}<");
+                Debug.Log($"Start playing >{properties.AnimationQueue.Peek().GetType()}< on >{properties.go.name}<");
                 PlayNextAnimation(properties.AnimationQueue.Dequeue());
             }
         }
@@ -100,7 +100,7 @@ namespace GVR.Npc
             if (stopCurrentStateImmediately)
             {
                 properties.currentLoopState = NpcProperties.LoopState.None;
-                AnimationCreator.StopAnimation(properties.gameObject);
+                AnimationCreator.StopAnimation(properties.go);
             }
             else
             {
