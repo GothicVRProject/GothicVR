@@ -17,9 +17,6 @@ namespace GVR.Creator.Meshes
     {
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
-        protected const string DefaultShader = "Lit/World"; 
-        protected const string WaterShader = "Shader Graphs/Unlit_Both_ScrollY"; //Vinces moving texture water shader
-        protected const string AlphaToCoverageShaderName = "Lit/AlphaToCoverage";
         protected const float DecalOpacity = 0.75f;
         
         protected GameObject Create(string objectName, IModelMesh mdm, IModelHierarchy mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
@@ -488,7 +485,7 @@ namespace GVR.Creator.Meshes
 
         protected Material GetDefaultMaterial(bool isAlphaTest)
         {
-            var shader = isAlphaTest ? Constants.ShaderUnlitAlphaToCoverage : Constants.ShaderUnlit;
+            var shader = isAlphaTest ? Constants.ShaderLitAlphaToCoverage : Constants.ShaderWorldLit;
             var material = new Material(shader);
 
             if (isAlphaTest)
@@ -535,7 +532,7 @@ namespace GVR.Creator.Meshes
                 return false;
             }
 
-            return shader == Constants.ShaderUnlitAlphaToCoverage || shader == Constants.ShaderWater;
+            return shader == Constants.ShaderLitAlphaToCoverage || shader == Constants.ShaderWater;
         }
     }
 }

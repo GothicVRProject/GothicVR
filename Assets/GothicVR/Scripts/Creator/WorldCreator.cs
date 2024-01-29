@@ -30,7 +30,7 @@ namespace GVR.Creator
         {
             GvrEvents.GeneralSceneLoaded.AddListener(WorldLoaded);
         }
-        
+
         public static async Task CreateAsync(string worldName)
         {
             var world = LoadWorld(worldName);
@@ -46,19 +46,19 @@ namespace GVR.Creator
 
             if (FeatureFlags.I.createWorldMesh)
                 await WorldMeshCreator.CreateAsync(world, teleportGo, Constants.MeshPerFrame);
-    
+
             if (FeatureFlags.I.createVobs)
                 await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, Constants.VObPerFrame);
-            
+
             SkyManager.I.InitSky();
 
             if (FeatureFlags.I.showBarrier)
             {
                 BarrierManager.I.CreateBarrier();
             }
-    
+
             WaynetCreator.Create(worldGo, world);
-            
+
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
         }
@@ -82,10 +82,69 @@ namespace GVR.Creator
                 WayNet = (CachedWayNet)zkWayNet
             };
 
-            var subMeshes = CreateSubMeshesForUnity(zkMesh, zkBspTree);
-            world.SubMeshes = subMeshes;
-            
+            world.SubMeshes = BuildBspTreeForUnity(zkMesh, zkBspTree);
+
             return world;
+        }
+
+        private static List<WorldData.SubMeshData> BuildBspTreeForUnity(IMesh zkMesh, IBspTree zkBspTree)
+        {
+            List<WorldData.SubMeshData> subMeshes = new List<WorldData.SubMeshData>();
+            ExpandTreeIntoMeshes(zkMesh, zkBspTree, zkBspTree.Nodes[0], subMeshes, null);
+
+            // To have easier to read code above, we reverse the arrays now at the end.
+            foreach (WorldData.SubMeshData subMesh in subMeshes)
+            {
+                subMesh.Vertices.Reverse();
+                subMesh.Uvs.Reverse();
+                subMesh.Normals.Reverse();
+                subMesh.Light.Reverse();
+            }
+
+            return subMeshes;
+        }
+
+        private static void ExpandTreeIntoMeshes(IMesh zkMesh, IBspTree bspTree, BspNode node, List<WorldData.SubMeshData> submeshes, WorldData.SubMeshData nodeSubmesh)
+        {
+            if (node.PolygonCount > 0)
+            {
+                if (nodeSubmesh == null)
+                {
+                    nodeSubmesh = new WorldData.SubMeshData();
+                    nodeSubmesh.Material = zkMesh.Materials[1];
+                    submeshes.Add(nodeSubmesh);
+                }
+
+                if (node.FrontIndex == -1 && node.BackIndex == -1)
+                {
+                    for (int i = node.PolygonIndex; i < node.PolygonIndex + node.PolygonCount; i++)
+                    {
+                        IPolygon polygon = zkMesh.Polygons[bspTree.PolygonIndices[i]];
+                        if (polygon.IsPortal)
+                        {
+                            continue;
+                        }
+
+                        // As we always use element 0 and i+1, we skip it in the loop.
+                        for (int p = 1; p < polygon.PositionIndices.Count - 1; p++)
+                        {
+                            // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
+                            AddEntry(zkMesh.Positions, zkMesh.Features, polygon, nodeSubmesh, 0);
+                            AddEntry(zkMesh.Positions, zkMesh.Features, polygon, nodeSubmesh, p);
+                            AddEntry(zkMesh.Positions, zkMesh.Features, polygon, nodeSubmesh, p + 1);
+                        }
+                    }
+                }
+            }
+
+            if (node.FrontIndex != -1)
+            {
+                ExpandTreeIntoMeshes(zkMesh, bspTree, bspTree.Nodes[node.FrontIndex], submeshes, nodeSubmesh);
+            }
+            if (node.BackIndex != -1)
+            {
+                ExpandTreeIntoMeshes(zkMesh, bspTree, bspTree.Nodes[node.BackIndex], submeshes, nodeSubmesh);
+            }
         }
 
         /// <summary>
@@ -125,14 +184,14 @@ namespace GVR.Creator
 
                 if (polygon.IsPortal)
                     continue;
-                
+
                 // As we always use element 0 and i+1, we skip it in the loop.
-                for (var i=1; i < polygon.PositionIndices.Count - 1; i++)
+                for (var i = 1; i < polygon.PositionIndices.Count - 1; i++)
                 {
                     // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
                     AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, 0);
                     AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, i);
-                    AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, i+1);
+                    AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, i + 1);
                 }
             }
 
@@ -168,7 +227,7 @@ namespace GVR.Creator
         {
             // As we already added stored world mesh and waypoints in Unity GOs, we can safely remove them to free MBs.
             GameData.World.SubMeshes = null;
-            
+
             var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
 
             // If we load a new scene, just remove the existing one.
@@ -183,7 +242,7 @@ namespace GVR.Creator
             }
 
         }
-        
+
 #if UNITY_EDITOR
         /// <summary>
         /// Loads the world for occlusion culling.

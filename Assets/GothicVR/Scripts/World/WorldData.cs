@@ -17,7 +17,7 @@ namespace GVR.World
         public List<IVirtualObject> Vobs;
         public CachedWayNet WayNet;
         
-        public Dictionary<int, SubMeshData> SubMeshes;
+        public List<SubMeshData> SubMeshes;
 
         public class SubMeshData
         {

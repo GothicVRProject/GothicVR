@@ -27,10 +27,10 @@ namespace GVR.Creator.Meshes
             meshObj.SetParent(parent);
 
             // Track the progress of each sub-mesh creation separately
-            int numSubMeshes = world.SubMeshes.Values.Count;
+            int numSubMeshes = world.SubMeshes.Count;
             int meshesCreated = 0;
 
-            foreach (var subMesh in world.SubMeshes.Values)
+            foreach (WorldData.SubMeshData subMesh in world.SubMeshes)
             {
                 // No texture to add.
                 // For G1 this is: material.name == [KEINE, KEINETEXTUREN, DEFAULT, BRETT2, BRETT1, SUMPFWAASER, S:PSIT01_ABODEN]

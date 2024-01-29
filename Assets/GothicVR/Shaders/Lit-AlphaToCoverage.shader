@@ -87,7 +87,7 @@ Shader "Lit/AlphaToCoverage"
                 col.a = lerp((col.a - _Cutoff) / max(fwidth(col.a), 0.0001) + 0.5, col.a, saturate(max(i.distance, 0.0001) / _DistanceFade));
 
                 half diffuseDot = saturate(dot(i.normal, -_SunDirection));
-                half3  diffuse = saturate(diffuseDot * _SunColor + _AmbientColor);
+                half3 diffuse = saturate(diffuseDot * _SunColor + _AmbientColor);
 
                 return half4(col.rgb * diffuse, col.a);
             }

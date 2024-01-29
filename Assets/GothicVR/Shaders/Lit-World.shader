@@ -13,7 +13,7 @@ Shader "Lit/World"
         {
             HLSLPROGRAM
             #define MAX_TOTAL_STATIONARY_LIGHTS 512
-            #define MAX_AFFECTING_STATIONARY_LIGHTS 16
+            #define MAX_AFFECTING_STATIONARY_LIGHTS 8
             #pragma vertex vert
             #pragma fragment frag
 
@@ -23,9 +23,9 @@ Shader "Lit/World"
             struct appdata
             {
                 float4 vertex : POSITION;
-                float3 color : COLOR;
-                float3 normal : NORMAL;
-                float2 uv : TEXCOORD0;
+                half3 color : COLOR;
+                half3 normal : NORMAL;
+                half2 uv : TEXCOORD0;
                 
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
@@ -33,11 +33,11 @@ Shader "Lit/World"
             struct v2f
             {
                 float4 vertex : SV_POSITION;
-                float3 normal : NORMAL;
-                float3 vertexLighting : COLOR;
-                float2 uv : TEXCOORD0;
+                half3 normal : NORMAL;
+                half3 vertexLighting : COLOR;
+                half2 uv : TEXCOORD0;
                 float3 worldPos : TEXCOORD1;
-                real3 diffuse : TEXCOORD2;
+                half3 diffuse : TEXCOORD2;
 
                 UNITY_VERTEX_OUTPUT_STEREO
             };
@@ -122,24 +122,24 @@ Shader "Lit/World"
                 half diffuseDot = saturate(dot(i.normal, -_SunDirection));
                 half3  diffuse = saturate(diffuseDot * _SunColor * i.vertexLighting + _AmbientColor);
 
-                //for (int j = 0; j < min(MAX_VISIBLE_LIGHTS, unity_LightData.y); j++)
-                //{
-                //    int lightIndex = GetPerObjectLightIndex(j);
-                //    Light light = CustomGetAdditionalPerObjectLight(lightIndex, i.worldPos);
-                //    diffuse += AdditionalUnityLightDiffuse(light, i.normal);
-                //}
+                for (int j = 0; j < min(MAX_VISIBLE_LIGHTS, unity_LightData.y); j++)
+                {
+                    int lightIndex = GetPerObjectLightIndex(j);
+                    Light light = CustomGetAdditionalPerObjectLight(lightIndex, i.worldPos);
+                    diffuse += AdditionalUnityLightDiffuse(light, i.normal);
+                }
 
-                for (int k = 0; k < min(_StationaryLightCount, MAX_AFFECTING_STATIONARY_LIGHTS); k++)
-                {
-                    diffuse += AdditionalStationaryDiffuse(_StationaryLightIndices[k / 4][k % 4], i.worldPos, i.normal);
-                }
-                if (_StationaryLightCount >= MAX_AFFECTING_STATIONARY_LIGHTS)
-                {
-                    for (int l = 0; l < min(_StationaryLightCount - MAX_AFFECTING_STATIONARY_LIGHTS, MAX_AFFECTING_STATIONARY_LIGHTS); l++)
-                    {
-                        diffuse += AdditionalStationaryDiffuse(_StationaryLightIndices2[l / 4][l % 4], i.worldPos, i.normal);
-                    }
-                }
+                //for (int k = 0; k < min(_StationaryLightCount, MAX_AFFECTING_STATIONARY_LIGHTS); k++)
+                //{
+                //    diffuse += AdditionalStationaryDiffuse(_StationaryLightIndices[k / 4][k % 4], i.worldPos, i.normal);
+                //}
+                //if (_StationaryLightCount >= MAX_AFFECTING_STATIONARY_LIGHTS)
+                //{
+                //    for (int l = 0; l < min(_StationaryLightCount - MAX_AFFECTING_STATIONARY_LIGHTS, MAX_AFFECTING_STATIONARY_LIGHTS); l++)
+                //    {
+                //        diffuse += AdditionalStationaryDiffuse(_StationaryLightIndices2[l / 4][l % 4], i.worldPos, i.normal);
+                //    }
+                //}
 
                 return diffuse;
             }
