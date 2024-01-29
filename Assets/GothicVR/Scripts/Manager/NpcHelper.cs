@@ -217,6 +217,38 @@ namespace GVR.Manager
             return inSightRange && inFov && inLineOfSight;
         }
 
+        public static void ExtNpcClearAiQueue(NpcInstance npc)
+        {
+            var props = GetProperties(npc);
+            props.AnimationQueue.Clear();
+        }
+
+        public static void ExtNpcClearInventory(NpcInstance npc)
+        {
+            var props = GetProperties(npc);
+            props.Items.Clear();
+        }
+
+        public static string ExtNpcGetNextWp(NpcInstance npc)
+        {
+            var pos = GetProperties(npc).transform.position;
+
+            return WayNetHelper.FindSecondNearestWayPoint(pos).Name;
+        }
+
+        public static int ExtNpcGetTalentSkill(NpcInstance npc, int skillId)
+        {
+            var props = GetProperties(npc);
+
+            //TBD
+            return 0;
+        }
+
+        public static int ExtNpcGetTalentValue(NpcInstance npc, int skillId)
+        {
+            return GetProperties(npc).Talents[(VmGothicEnums.Talent)skillId];
+        }
+
         private static GameObject GetNpc(NpcInstance npc)
         {
             return GetProperties(npc).go;

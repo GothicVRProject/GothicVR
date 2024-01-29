@@ -53,6 +53,15 @@ namespace GVR.Manager
             return nearestWayPoint.Value;
         }
 
+        public static WayPoint FindSecondNearestWayPoint(Vector3 lookupPosition)
+        {
+            var nearestWayPoint = GameData.WayPoints
+                .OrderBy(pair => Vector3.Distance(pair.Value.Position, lookupPosition))
+                .Skip(1).First();
+
+            return nearestWayPoint.Value;
+        }
+
         [CanBeNull]
         public static FreePoint FindNearestFreePoint(Vector3 lookupPosition, string fpNamePart)
         {

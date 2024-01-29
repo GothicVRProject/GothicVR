@@ -108,6 +108,11 @@ namespace GVR.Vm
             vm.RegisterExternal<int, NpcInstance, string>("Npc_GetDistToWP", Npc_GetDistToWP);
             vm.RegisterExternal<NpcInstance, int>("Npc_PercDisable", Npc_PercDisable);
             vm.RegisterExternal<int, NpcInstance, NpcInstance>("Npc_CanSeeNpc", Npc_CanSeeNpc);
+            vm.RegisterExternal<NpcInstance>("Npc_ClearAiQueue", Npc_ClearAiQueue);
+            vm.RegisterExternal<NpcInstance>("Npc_ClearInventory", Npc_ClearInventory);
+            vm.RegisterExternal<string, NpcInstance>("Npc_GetNextWp", Npc_GetNextWp);
+            // vm.RegisterExternal<int, NpcInstance, int>("Npc_GetTalentSkill", Npc_GetTalentSkill);
+            vm.RegisterExternal<int, NpcInstance, int>("Npc_GetTalentValue", Npc_GetTalentValue);
 
 
             // Print
@@ -647,6 +652,33 @@ namespace GVR.Vm
         {
             return NpcHelper.ExtNpcCanSeeNpc(npc, target) ? 1 : 0;
         }
+
+        public static void Npc_ClearAiQueue(NpcInstance npc)
+        {
+            NpcHelper.ExtNpcClearAiQueue(npc);
+        }
+
+        public static void Npc_ClearInventory(NpcInstance npc)
+        {
+            NpcHelper.ExtNpcClearInventory(npc);
+        }
+
+        public static string Npc_GetNextWp(NpcInstance npc)
+        {
+            return NpcHelper.ExtNpcGetNextWp(npc);
+        }
+
+        public static int Npc_GetTalentSkill(NpcInstance npc, int skillId)
+        {
+            return NpcHelper.ExtNpcGetTalentSkill(npc, skillId);
+        }
+
+        public static int Npc_GetTalentValue(NpcInstance npc, int skillId)
+        {
+            return NpcHelper.ExtNpcGetTalentValue(npc, skillId);
+        }
+        
+        
 
         #endregion
         
