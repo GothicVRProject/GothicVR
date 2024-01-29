@@ -109,7 +109,7 @@ namespace GVR.Vm
             vm.RegisterExternal<NpcInstance, int>("Npc_PercDisable", Npc_PercDisable);
             vm.RegisterExternal<int, NpcInstance, NpcInstance>("Npc_CanSeeNpc", Npc_CanSeeNpc);
             vm.RegisterExternal<NpcInstance>("Npc_ClearAiQueue", Npc_ClearAiQueue);
-            vm.RegisterExternal<NpcInstance>("Npc_ClearInventory", Npc_ClearInventory);
+            // vm.RegisterExternal<NpcInstance>("Npc_ClearInventory", Npc_ClearInventory);
             vm.RegisterExternal<string, NpcInstance>("Npc_GetNextWp", Npc_GetNextWp);
             // vm.RegisterExternal<int, NpcInstance, int>("Npc_GetTalentSkill", Npc_GetTalentSkill);
             vm.RegisterExternal<int, NpcInstance, int>("Npc_GetTalentValue", Npc_GetTalentValue);
@@ -125,6 +125,7 @@ namespace GVR.Vm
 
             // Day Routine
             vm.RegisterExternal<NpcInstance, int, int, int, int, int, string>("TA_MIN", TA_MIN);
+            vm.RegisterExternal<NpcInstance, int, int, int, string>("TA", TA);
             vm.RegisterExternal<NpcInstance, string>("Npc_ExchangeRoutine", Npc_ExchangeRoutine);
 
             // World
@@ -689,6 +690,12 @@ namespace GVR.Vm
             string waypoint)
         {
             NpcCreator.ExtTaMin(npc, startH, startM, stopH, stopM, action, waypoint);
+        }
+        
+        public static void TA(NpcInstance npc, int startH, int stopH, int action,
+            string waypoint)
+        {
+            NpcCreator.ExtTaMin(npc, startH, 0, stopH, 0, action, waypoint);
         }
 
         public static void Npc_ExchangeRoutine(NpcInstance self, string routineName)
