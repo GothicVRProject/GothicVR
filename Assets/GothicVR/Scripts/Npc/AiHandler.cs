@@ -49,10 +49,13 @@ namespace GVR.Npc
                         if (properties.stateLoop == 0)
                             return;
                         properties.currentLoopState = NpcProperties.LoopState.Loop;
-                        vm.Call(properties.stateLoop, properties.npcInstance);
+                        vm.Call(properties.stateStart);
                         break;
                     case NpcProperties.LoopState.Loop:
-                        vm.Call(properties.stateLoop, properties.npcInstance);
+                        if (vm.GetSymbolByIndex(properties.stateLoop).ReturnType != DaedalusDataType.Int)
+                            break; // check return type as not every loop returns int
+                        if (vm.Call<int>(properties.stateLoop) == 1)
+                            properties.currentLoopState = NpcProperties.LoopState.End;
                         break;
                 }
             }
