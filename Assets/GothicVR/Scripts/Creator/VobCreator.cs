@@ -267,14 +267,20 @@ namespace GVR.Creator
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobMusic);
                     break;
                 case VirtualObjectType.oCMOB:
+                    go = PrefabCache.TryGetObject(PrefabCache.PrefabType.Vob);
+                    break;
                 case VirtualObjectType.oCMobFire:
                 case VirtualObjectType.oCMobInter:
                 case VirtualObjectType.oCMobBed:
-                case VirtualObjectType.oCMobDoor:
-                case VirtualObjectType.oCMobContainer:
-                case VirtualObjectType.oCMobSwitch:
                 case VirtualObjectType.oCMobWheel:
+                case VirtualObjectType.oCMobSwitch:
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobInteractable);
+                    break;
+                case VirtualObjectType.oCMobDoor:
+                    go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobDoor);
+                    break;
+                case VirtualObjectType.oCMobContainer:
+                    go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobContainer);
                     break;
                 default:
                     return new GameObject(name);

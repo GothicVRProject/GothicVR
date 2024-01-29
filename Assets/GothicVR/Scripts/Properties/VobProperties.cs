@@ -15,7 +15,7 @@ namespace GVR.Properties
 
         public IVirtualObject Properties;
 
-        public void SetData(IVirtualObject data)
+        public virtual void SetData(IVirtualObject data)
         {
             Properties = data;
             
