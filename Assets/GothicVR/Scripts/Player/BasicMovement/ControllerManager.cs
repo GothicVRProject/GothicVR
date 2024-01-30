@@ -38,8 +38,6 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
     private void Start()
     {
         GvrEvents.ZenKitBootstrapped.AddListener(Initialize);
-        
-        NpcHelper.SetHeroGameObject(transform.parent.gameObject);
     }
 
     private void Initialize()

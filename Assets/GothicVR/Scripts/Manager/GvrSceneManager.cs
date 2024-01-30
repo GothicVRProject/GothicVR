@@ -251,8 +251,7 @@ namespace GVR.Manager
                 return;
 
             var player = NpcHelper.GetHeroGameObject();
-            player.transform.position = startPoint.transform.position;
-            player.transform.rotation = startPoint.transform.rotation;
+            player.transform.SetPositionAndRotation(startPoint.transform.position, startPoint.transform.rotation);
         }
     }
 }

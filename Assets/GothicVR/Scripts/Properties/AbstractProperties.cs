@@ -17,6 +17,7 @@ namespace GVR.Properties
 
                 return gameObject;
             }
+            // FIXME - Seems this is never called. Let's see if we can remove it later safely.
             set => customGameObject = value;
         }
     }

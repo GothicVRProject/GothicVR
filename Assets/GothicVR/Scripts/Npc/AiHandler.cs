@@ -52,7 +52,7 @@ namespace GVR.Npc
                         vm.Call(properties.stateStart);
                         break;
                     case NpcProperties.LoopState.Loop:
-                        if (vm.GetSymbolByIndex(properties.stateLoop).ReturnType != DaedalusDataType.Int)
+                        if (vm.GetSymbolByIndex(properties.stateLoop)!.ReturnType != DaedalusDataType.Int)
                             break; // check return type as not every loop returns int
                         if (vm.Call<int>(properties.stateLoop) == 1)
                             properties.currentLoopState = NpcProperties.LoopState.End;

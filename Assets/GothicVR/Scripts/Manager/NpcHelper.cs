@@ -527,21 +527,19 @@ namespace GVR.Manager
         {
             var hero = GameData.GothicVm.InitInstance<NpcInstance>("hero");
             GameData.GothicVm.GlobalHero = hero;
-
-            var heroProperties = new NpcProperties();
-            LookupCache.NpcCache[hero.Index] = heroProperties;
         }
 
         public static GameObject GetHeroGameObject()
         {
-            return LookupCache.NpcCache[GameData.GothicVm.GlobalHero.Index].go;
-        }
+            var heroIndex = GameData.GothicVm.GlobalHero!.Index;
 
-        public static void SetHeroGameObject(GameObject hero)
-        {
-            var generalScene = SceneManager.GetSceneByName(Constants.SceneGeneral);
-            if (GameData.GothicVm.GlobalHero != null)
-                LookupCache.NpcCache[GameData.GothicVm.GlobalHero.Index].go = hero;
+            if (!LookupCache.NpcCache.TryGetValue(heroIndex, out var heroProperties))
+            {
+                LookupCache.NpcCache[heroIndex] = GameObject.FindWithTag(Constants.PlayerTag).GetComponent<NpcProperties>();
+                heroProperties = LookupCache.NpcCache[heroIndex];
+            }
+
+            return heroProperties.go;
         }
     }
 }
