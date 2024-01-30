@@ -35,9 +35,10 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
     AudioSource mapaudio;
     AudioClip scrollsound;
 
-    private void Start()
+    protected override void Awake()
     {
-        GvrEvents.ZenKitBootstrapped.AddListener(Initialize);
+        base.Awake();
+        Initialize();
     }
 
     private void Initialize()
