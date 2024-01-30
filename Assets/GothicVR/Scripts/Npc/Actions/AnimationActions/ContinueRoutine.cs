@@ -18,16 +18,8 @@ namespace GVR.Npc.Actions.AnimationActions
             var routine = Props.GetComponent<Routine>().CurrentRoutine;
             
             ai.StartRoutine(routine.action, routine.waypoint);
-        }
 
-        /// <summary>
-        /// This one is actually no animation, but we need to call Start() only.
-        /// FIXME - We need to create an additional inheritance below AbstractAnimationAction if we have more like this class.
-        /// </summary>
-        /// <returns></returns>
-        public override bool IsFinished()
-        {
-            return true;
+            IsFinishedFlag = true;
         }
     }
 }

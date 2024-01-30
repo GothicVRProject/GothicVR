@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -9,9 +10,15 @@ namespace GVR.Npc.Actions.AnimationActions
 
         protected override Vector3 GetRotationDirection()
         {
-            if(Props.CurrentWayPoint == null)
+            try
+            {
+                return Props.CurrentWayPoint.Direction;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
                 return Vector3.zero;
-            return Props.CurrentWayPoint.Direction;
+            }
         }
     }
 }

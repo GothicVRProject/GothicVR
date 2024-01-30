@@ -357,9 +357,6 @@ namespace GVR.Creator
             CreateItemMesh(item, go);
         }
 
-        /// <summary>
-        /// Render item inside GameObject
-        /// </summary>
         public static void CreateItem(int itemId, string spawnpoint, GameObject go)
         {
             var item = AssetCache.TryGetItemData(itemId);

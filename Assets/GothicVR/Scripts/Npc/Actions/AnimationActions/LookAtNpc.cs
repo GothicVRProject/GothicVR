@@ -10,15 +10,12 @@ namespace GVR.Npc.Actions.AnimationActions
         private int otherIndex => Action.Int1;
 
         public LookAtNpc(AnimationAction action, GameObject npcGo) : base(action, npcGo)
-        { }
+        {
+        }
 
         public override void Start()
         {
-            // Hero
-            if (otherId == 0)
-                destinationTransform = Camera.main!.transform;
-            else
-                destinationTransform = LookupCache.NpcCache[otherIndex].transform;
+            destinationTransform = LookupCache.NpcCache[otherIndex].transform;
         }
 
         protected override Vector3 GetRotationDirection()

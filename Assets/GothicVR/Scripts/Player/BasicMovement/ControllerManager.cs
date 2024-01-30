@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +5,7 @@ using GVR.Data;
 using GVR.Extensions;
 using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
+using GVR.Manager;
 using GVR.Util;
 using TMPro;
 using UnityEngine;
@@ -38,6 +38,8 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
     private void Start()
     {
         GvrEvents.ZenKitBootstrapped.AddListener(Initialize);
+        
+        NpcHelper.SetHeroGameObject(transform.parent.gameObject);
     }
 
     private void Initialize()

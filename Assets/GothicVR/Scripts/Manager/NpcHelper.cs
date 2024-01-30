@@ -12,6 +12,7 @@ using GVR.Npc.Routines;
 using GVR.Properties;
 using GVR.Vm;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using ZenKit.Daedalus;
 
 namespace GVR.Manager
@@ -233,7 +234,7 @@ namespace GVR.Manager
         {
             var pos = GetProperties(npc).transform.position;
 
-            return WayNetHelper.FindSecondNearestWayPoint(pos).Name;
+            return WayNetHelper.FindNearestWayPoint(pos, true).Name;
         }
 
         public static int ExtNpcGetTalentSkill(NpcInstance npc, int skillId)
@@ -520,6 +521,27 @@ namespace GVR.Manager
 
             var startRoutine = routineComp.CurrentRoutine;
             go.GetComponent<AiHandler>().StartRoutine(startRoutine.action, startRoutine.waypoint);
+        }
+
+        public static void LoadHero()
+        {
+            var hero = GameData.GothicVm.InitInstance<NpcInstance>("hero");
+            GameData.GothicVm.GlobalHero = hero;
+
+            var heroProperties = new NpcProperties();
+            LookupCache.NpcCache[hero.Index] = heroProperties;
+        }
+
+        public static GameObject GetHeroGameObject()
+        {
+            return LookupCache.NpcCache[GameData.GothicVm.GlobalHero.Index].go;
+        }
+
+        public static void SetHeroGameObject(GameObject hero)
+        {
+            var generalScene = SceneManager.GetSceneByName(Constants.SceneGeneral);
+            if (GameData.GothicVm.GlobalHero != null)
+                LookupCache.NpcCache[GameData.GothicVm.GlobalHero.Index].go = hero;
         }
     }
 }

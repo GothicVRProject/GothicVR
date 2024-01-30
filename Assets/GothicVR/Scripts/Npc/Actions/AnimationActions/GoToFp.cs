@@ -1,8 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using GVR.Manager;
 using GVR.Vob.WayNet;
-using GVR.World;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
