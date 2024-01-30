@@ -69,11 +69,11 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
 
     private void OnDestroy()
     {
-        leftPrimaryButtonAction.Disable();
-        leftSecondaryButtonAction.Disable();
+        leftPrimaryButtonAction?.Disable();
+        leftSecondaryButtonAction?.Disable();
 
-        rightPrimaryButtonAction.Disable();
-        rightSecondaryButtonAction.Disable();
+        rightPrimaryButtonAction?.Disable();
+        rightSecondaryButtonAction?.Disable();
     }
 
     public void ShowRayCasts()
