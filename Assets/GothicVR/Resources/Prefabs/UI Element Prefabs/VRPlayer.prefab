@@ -7221,8 +7221,8 @@ MonoBehaviour:
   m_RaycastMask:
     serializedVersion: 2
     m_Bits: 465
-  m_RaycastTriggerInteraction: 2
-  m_RaycastSnapVolumeInteraction: 1
+  m_RaycastTriggerInteraction: 1
+  m_RaycastSnapVolumeInteraction: 0
   m_HitClosestOnly: 0
   m_HoverToSelect: 0
   m_HoverTimeToSelect: 0.5
