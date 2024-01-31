@@ -558,7 +558,6 @@ namespace GVR.Creator
             var fpName = vob.Name.IsEmpty() ? "START" : vob.Name;
             vobObj.name = fpName;
             vobObj.SetParent(parentGosTeleport[vob.Type]);
-            vobObj.layer = Constants.IgnoreRaycastLayer;
 
             var freePointData = new FreePoint
             {
