@@ -1,4 +1,5 @@
 using GVR.Globals;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -10,7 +11,7 @@ namespace GVR.Player.Climb
     /// </summary>
     public class XRDirectClimbInteractor : XRDirectInteractor
     {
-        public static UnityEvent<string> ClimbHandActivated = new();
+        public static UnityEvent<string, GameObject> ClimbHandActivated = new();
         public static UnityEvent<string> ClimbHandDeactivated = new();
 
         private string controllerName;
@@ -25,8 +26,10 @@ namespace GVR.Player.Climb
         {
             base.OnSelectEntered(args);
 
-            if (args.interactableObject.transform.CompareTag(Constants.ClimbableTag))
-                ClimbHandActivated.Invoke(controllerName);
+            var objTransform = args.interactableObject.transform;
+
+            if (objTransform.transform.CompareTag(Constants.ClimbableTag))
+                ClimbHandActivated.Invoke(controllerName, objTransform.gameObject);
         }
 
         protected override void OnSelectExited(SelectExitEventArgs args)

@@ -12,10 +12,12 @@ namespace GVR.GothicVR_Lab.Scripts
         [Header("Bootstrapping")]
         public bool bootNpcHandler;
         public bool bootLockableHandler;
+        public bool bootLadderHandler;
         public bool bootAttachPointHandler;
         
         public LabNpcLabHandler npcLabHandler;
         public LabLockableLabHandler lockableLabHandler;
+        public LabLadderLabHandler ladderLabHandler;
         public LabVobHandAttachPointsLabHandler vobHandAttachPointsLabHandler;
         
         private bool isBooted;
@@ -34,6 +36,8 @@ namespace GVR.GothicVR_Lab.Scripts
                 npcLabHandler.Bootstrap();
             if (bootLockableHandler)
                 lockableLabHandler.Bootstrap();
+            if (bootLadderHandler)
+                ladderLabHandler.Bootstrap();
             if (bootAttachPointHandler)
                 vobHandAttachPointsLabHandler.Bootstrap();
         }
