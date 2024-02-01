@@ -241,7 +241,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npc);
 
-            //TBD
+            // FIXME - this is related to overlays for the npc's
             return 0;
         }
 
