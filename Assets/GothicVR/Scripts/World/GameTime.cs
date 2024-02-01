@@ -102,6 +102,11 @@ namespace GVR.World
             return time.Day;
         }
 
+        public void SetTime(int hour, int minute)
+        {
+            time = new DateTime(time.Year, time.Month, time.Day, hour, minute, 0);
+        }
+
         public float GetSkyTime()
         {
             TimeSpan currentTime = time.TimeOfDay;

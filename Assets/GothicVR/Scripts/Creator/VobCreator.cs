@@ -267,14 +267,20 @@ namespace GVR.Creator
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobMusic);
                     break;
                 case VirtualObjectType.oCMOB:
+                    go = PrefabCache.TryGetObject(PrefabCache.PrefabType.Vob);
+                    break;
                 case VirtualObjectType.oCMobFire:
                 case VirtualObjectType.oCMobInter:
                 case VirtualObjectType.oCMobBed:
-                case VirtualObjectType.oCMobDoor:
-                case VirtualObjectType.oCMobContainer:
-                case VirtualObjectType.oCMobSwitch:
                 case VirtualObjectType.oCMobWheel:
+                case VirtualObjectType.oCMobSwitch:
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobInteractable);
+                    break;
+                case VirtualObjectType.oCMobDoor:
+                    go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobDoor);
+                    break;
+                case VirtualObjectType.oCMobContainer:
+                    go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobContainer);
                     break;
                 default:
                     return new GameObject(name);
@@ -350,9 +356,21 @@ namespace GVR.Creator
 
             CreateItemMesh(item, go);
         }
-        
+
+        public static void CreateItem(int itemId, string spawnpoint, GameObject go)
+        {
+            var item = AssetCache.TryGetItemData(itemId);
+
+            var position = WayNetHelper.GetWayNetPoint(spawnpoint).Position;
+
+            CreateItemMesh(item, go, position);
+        }
+
         public static void CreateItem(string itemName, GameObject go)
         {
+            if (itemName == "")
+                return;
+
             var item = AssetCache.TryGetItemData(itemName);
 
             CreateItemMesh(item, go);
@@ -600,10 +618,10 @@ namespace GVR.Creator
             return MeshCreatorFacade.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
         }
         
-        private static GameObject CreateItemMesh(ItemInstance item, GameObject go)
+        private static GameObject CreateItemMesh(ItemInstance item, GameObject go, UnityEngine.Vector3 position = default)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
-            return MeshCreatorFacade.CreateVob(item.Visual, mrm, default, default, false, parent: go);
+            return MeshCreatorFacade.CreateVob(item.Visual, mrm, position, default, false, parent: go);
         }
 
         private static GameObject CreateDecal(IVirtualObject vob)

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +5,7 @@ using GVR.Data;
 using GVR.Extensions;
 using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
+using GVR.Manager;
 using GVR.Util;
 using TMPro;
 using UnityEngine;
@@ -35,9 +35,10 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
     AudioSource mapaudio;
     AudioClip scrollsound;
 
-    private void Start()
+    protected override void Awake()
     {
-        GvrEvents.ZenKitBootstrapped.AddListener(Initialize);
+        base.Awake();
+        Initialize();
     }
 
     private void Initialize()
@@ -69,11 +70,11 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
 
     private void OnDestroy()
     {
-        leftPrimaryButtonAction.Disable();
-        leftSecondaryButtonAction.Disable();
+        leftPrimaryButtonAction?.Disable();
+        leftSecondaryButtonAction?.Disable();
 
-        rightPrimaryButtonAction.Disable();
-        rightSecondaryButtonAction.Disable();
+        rightPrimaryButtonAction?.Disable();
+        rightSecondaryButtonAction?.Disable();
     }
 
     public void ShowRayCasts()

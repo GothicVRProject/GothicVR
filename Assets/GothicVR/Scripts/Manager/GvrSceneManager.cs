@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using GVR.Caches;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Extensions;
@@ -27,7 +28,6 @@ namespace GVR.Manager
         private bool generalSceneLoaded;
 
         private GameObject startPoint;
-        private GameObject player;
 
         private bool debugFreshlyDoneLoading;
         
@@ -244,21 +244,14 @@ namespace GVR.Manager
             SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.WorldScene.Value.name));
         }
 
-        private void SetPlayer()
-        {
-            player = generalScene.GetRootGameObjects().FirstOrDefault(go => go.name == "PlayerController").transform.Find("VRPlayer").gameObject;
-        }
 
         public void TeleportPlayerToSpot()
         {
-            if (player == null)
-                SetPlayer();
+            if (startPoint == null)
+                return;
 
-            if (startPoint != null)
-            {
-                player.transform.position = startPoint.transform.position;
-                player.transform.rotation = startPoint.transform.rotation;
-            }
+            var player = NpcHelper.GetHeroGameObject();
+            player.transform.SetPositionAndRotation(startPoint.transform.position, startPoint.transform.rotation);
         }
     }
 }

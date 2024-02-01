@@ -12,6 +12,7 @@ namespace GVR.Npc
     public class AiHandler : BasePlayerBehaviour, IAnimationCallbacks
     {
         private static DaedalusVm vm => GameData.GothicVm;
+        private const int DaedalusLoopContinue = 0;
 
         private void Start()
         {
@@ -48,18 +49,30 @@ namespace GVR.Npc
                     case NpcProperties.LoopState.Start:
                         if (properties.stateLoop == 0)
                             return;
+                        vm.Call(properties.stateStart);
+
                         properties.currentLoopState = NpcProperties.LoopState.Loop;
-                        vm.Call(properties.stateLoop, properties.npcInstance);
                         break;
                     case NpcProperties.LoopState.Loop:
-                        vm.Call(properties.stateLoop, properties.npcInstance);
+                        // Check return type as not every loop returns int.
+                        if (vm.GetSymbolByIndex(properties.stateLoop)!.ReturnType == DaedalusDataType.Int)
+                        {
+                            var loopResponse = vm.Call<int>(properties.stateLoop);
+                            // Some ZS_*_Loop return !=0 when they want to quit.
+                            if (loopResponse != DaedalusLoopContinue)
+                                properties.currentLoopState = NpcProperties.LoopState.End;
+                        }
+                        else
+                        {
+                            vm.Call(properties.stateLoop);
+                        }
                         break;
                 }
             }
             // Go on
             else
             {
-                Debug.Log($"Start playing >{properties.AnimationQueue.Peek().GetType()}< on >{properties.gameObject.name}<");
+                Debug.Log($"Start playing >{properties.AnimationQueue.Peek().GetType()}< on >{properties.go.name}<");
                 PlayNextAnimation(properties.AnimationQueue.Dequeue());
             }
         }
@@ -86,10 +99,6 @@ namespace GVR.Npc
             // But it's required as it checks immediately how long the Cauldron is already been whirled.
             properties.isStateTimeActive = true;
             properties.stateTime = 0;
-
-            // We always need to set "self" before executing any Daedalus function.
-            vm.GlobalSelf = properties.npcInstance;
-            vm.Call(action);
         }
 
         /// <summary>
@@ -100,7 +109,7 @@ namespace GVR.Npc
             if (stopCurrentStateImmediately)
             {
                 properties.currentLoopState = NpcProperties.LoopState.None;
-                AnimationCreator.StopAnimation(properties.gameObject);
+                AnimationCreator.StopAnimation(properties.go);
             }
             else
             {

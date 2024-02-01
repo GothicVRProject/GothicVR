@@ -1,5 +1,6 @@
 using System.Linq;
 using GVR.Caches;
+using GVR.Creator;
 using GVR.Creator.Sounds;
 using GVR.Data;
 using GVR.Extensions;
@@ -22,6 +23,13 @@ namespace GVR.GothicVR.Scripts.Manager
                 .Where(i => i.visualScheme.EqualsIgnoreCase(visualScheme))
                 .OrderBy(i => Vector3.Distance(i.transform.position, position))
                 .FirstOrDefault();
+        }
+
+        public static void ExtWldInsertItem(int itemInstance, string spawnpoint)
+        {
+            if (string.IsNullOrEmpty(spawnpoint) || itemInstance <= 0)
+                return;
+            VobCreator.CreateItem(itemInstance, spawnpoint, null);
         }
 
         [CanBeNull]

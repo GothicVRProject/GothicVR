@@ -28,7 +28,7 @@ namespace GVR.GothicVR.Scripts.Manager
             // There is at least one important entry, the NPC wants to talk to the hero about.
             else if (TryGetImportant(properties.Dialogs, out var infoInstance))
             {
-                properties.gameObject.GetComponent<AiHandler>().ClearState(true);
+                properties.go.GetComponent<AiHandler>().ClearState(true);
 
                 GameData.Dialogs.CurrentDialog.Instance = infoInstance;
                 
@@ -36,7 +36,7 @@ namespace GVR.GothicVR.Scripts.Manager
             }
             else
             {
-                properties.gameObject.GetComponent<AiHandler>().ClearState(false);
+                properties.go.GetComponent<AiHandler>().ClearState(false);
                 var selectableDialogs = new List<InfoInstance>();
 
                 foreach (var dialog in properties.Dialogs)
@@ -76,7 +76,7 @@ namespace GVR.GothicVR.Scripts.Manager
 
             npcProps.AnimationQueue.Enqueue(new Output(
                 new(AnimationAction.Type.AIOutput, int0: speakerId, string0: outputName),
-                npcProps.gameObject));
+                npcProps.go));
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace GVR.GothicVR.Scripts.Manager
 
             props.AnimationQueue.Enqueue(new StopProcessInfos(
                 new(AnimationAction.Type.AIStopProcessInfo),
-                props.gameObject));
+                props.go));
         }
 
         public static void SelectionClicked(int npcInstanceIndex, int dialogId, bool isMainDialog)
@@ -154,12 +154,12 @@ namespace GVR.GothicVR.Scripts.Manager
             // We always want to have a method to get the dialog menu back once all dialog lines are talked.
             npcProperties.AnimationQueue.Enqueue(new StartProcessInfos(
                 new(AnimationAction.Type.UnityStartProcessInfos, int0: information),
-                npcProperties.gameObject));
+                npcProperties.go));
         }
 
         private static GameObject GetNpc(NpcInstance npc)
         {
-            return GetProperties(npc).gameObject;
+            return GetProperties(npc).go;
         }
 
         private static NpcProperties GetProperties(NpcInstance npc)

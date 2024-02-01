@@ -153,10 +153,7 @@ namespace GVR.Manager
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
             GameData.GothicVm = new DaedalusVm(fullPath);
             
-            // If we don't set it early, other calls within VM will fail.
-            // TODO - Could be moved to a separate Hero.cs class and set during GvrEvents.GeneralSceneLoaded event.
-            var hero = GameData.GothicVm.InitInstance<NpcInstance>("hero");
-            GameData.GothicVm.GlobalHero = hero;
+            NpcHelper.LoadHero();
 
             VmGothicExternals.RegisterExternals();
         }

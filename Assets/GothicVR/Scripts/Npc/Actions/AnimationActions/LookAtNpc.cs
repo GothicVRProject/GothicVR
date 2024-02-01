@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
-    public class GoToNpc : AbstractWalkAnimationAction
+    public class LookAtNpc : AbstractRotateAnimationAction
     {
         private Transform destinationTransform;
         private int otherId => Action.Int0;
         private int otherIndex => Action.Int1;
 
-        public GoToNpc(AnimationAction action, GameObject npcGo) : base(action, npcGo)
+        public LookAtNpc(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         {
         }
 
@@ -18,9 +18,9 @@ namespace GVR.Npc.Actions.AnimationActions
             destinationTransform = LookupCache.NpcCache[otherIndex].transform;
         }
 
-        protected override Vector3 GetWalkDestination()
+        protected override Vector3 GetRotationDirection()
         {
-            return destinationTransform.position;
+            return (destinationTransform.position - NpcGo.transform.position).normalized;
         }
 
 

@@ -1,4 +1,3 @@
-using GVR.Manager;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
