@@ -69,16 +69,7 @@ namespace GVR.Manager
         {
             // Get the start and end waypoints from the DijkstraWaypoints dictionary
             var startDijkstraWaypoint = GameData.DijkstraWaypoints[startWaypoint];
-            DijkstraWaypoint endDijkstraWaypoint;
-            try
-            {
-                endDijkstraWaypoint = GameData.DijkstraWaypoints[endWaypoint];
-            }
-            catch
-            {
-                Debug.LogError($"Could not find end waypoint {endWaypoint}");
-                return new[] { startDijkstraWaypoint };
-            }
+            var endDijkstraWaypoint = GameData.DijkstraWaypoints[endWaypoint];
 
             // Initialize the previousNodes dictionary to keep track of the path
             var previousNodes = new Dictionary<string, DijkstraWaypoint>();

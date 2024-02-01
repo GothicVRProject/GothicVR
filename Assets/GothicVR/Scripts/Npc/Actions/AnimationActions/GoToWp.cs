@@ -18,26 +18,23 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
+            var currentWaypoint = Props.CurrentWayPoint ?? WayNetHelper.FindNearestWayPoint(Props.transform.position);
+            var destinationWaypoint = (WayPoint)WayNetHelper.GetWayNetPoint(destination);
+
             /*
              * 1. AI_StartState() can get called multiple times until it won't share the WP. (e.g. ZS_SLEEP -> ZS_StandAround())
              * 2. Happens (e.g.) during spawning. As we spawn NPCs onto their current WayPoints, they don't need to walk there from entrance of OC.
              */
-            if (Props.CurrentWayPoint != null && (destination == "" || Props.CurrentWayPoint.Name == destination))
+            if (destinationWaypoint == null || destinationWaypoint.Name == "" || currentWaypoint.Name == destination)
             {
                 IsFinishedFlag = true;
                 return;
             }
 
-            WayPoint waypoint = Props.CurrentWayPoint != null ? Props.CurrentWayPoint : WayNetHelper.FindNearestWayPoint(Props.transform.position);
-            string finalDestination = destination;
-
-            if (destination == "OCR_OUSIDE_HUT_77_INSERT")
-                finalDestination = "OCR_OUTSIDE_HUT_77_INSERT";
-
-            route = new Stack<DijkstraWaypoint>(WayNetHelper.FindFastestPath(waypoint.Name, finalDestination));
-            
+            route = new Stack<DijkstraWaypoint>(WayNetHelper.FindFastestPath(currentWaypoint.Name,
+                destinationWaypoint.Name));
         }
-        
+
         public override void OnTriggerEnter(Collider coll)
         {
             if (walkState != WalkState.Walk)
