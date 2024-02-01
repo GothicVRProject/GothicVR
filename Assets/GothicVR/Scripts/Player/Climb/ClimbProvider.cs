@@ -1,4 +1,5 @@
 using System;
+using GVR.Extensions;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -17,6 +18,8 @@ namespace GVR.Player.Climb
         private float originalMovementSpeed;
         private float originalTurnSpeed;
 
+        private Vector3 grabbedLadderZsTopPosition;
+
         private void Start()
         {
             XRDirectClimbInteractor.ClimbHandActivated.AddListener(HandActivated);
@@ -31,7 +34,12 @@ namespace GVR.Player.Climb
         /// </summary>
         private void FixedUpdate()
         {
-            if (rightActive || leftActive)
+            if (!rightActive && !leftActive)
+                return;
+
+            if (IsOnTop())
+                SpawnToTop();
+            else
                 Climb();
         }
         
@@ -40,7 +48,25 @@ namespace GVR.Player.Climb
             XRDirectClimbInteractor.ClimbHandActivated.RemoveListener(HandActivated);
             XRDirectClimbInteractor.ClimbHandDeactivated.RemoveListener(HandDeactivated);
         }
-        
+
+        private bool IsOnTop()
+        {
+            // Check if we're at a certain height with our main Camera.
+            // If we are, we can't climb.
+            var mainCamera = Camera.main!;
+            var mainCameraHeight = mainCamera.transform.position.y;
+
+            return mainCameraHeight >= grabbedLadderZsTopPosition.y;
+        }
+
+        private void SpawnToTop()
+        {
+            XRDirectClimbInteractor.ClimbHandDeactivated.Invoke("RightHandBaseController");
+            XRDirectClimbInteractor.ClimbHandDeactivated.Invoke("LeftHandBaseController");
+
+            characterController.transform.position = grabbedLadderZsTopPosition;
+        }
+
         private void Climb()
         {
             var velocity = Vector3.zero;
@@ -53,7 +79,7 @@ namespace GVR.Player.Climb
         /// <summary>
         /// If a hand starts grabbing a Ladder.
         /// </summary>
-        private void HandActivated(string controllerName)
+        private void HandActivated(string controllerName, GameObject ladder)
         {
             switch (controllerName)
             {
@@ -64,8 +90,10 @@ namespace GVR.Player.Climb
                     rightActive = true;
                     break;
                 default:
+                    Debug.LogWarning($"Unknown hand controller used for climbing: >{controllerName}<");
                     return; // Do nothing.
             }
+            grabbedLadderZsTopPosition = ladder.FindChildRecursively("ZS_POS1").transform.position;
             
             DeactivateMovement();
         }
@@ -84,6 +112,7 @@ namespace GVR.Player.Climb
                     rightActive = false;
                     break;
                 default:
+                    Debug.LogWarning($"Unknown hand controller used for climbing: >{controllerName}<");
                     return; // Do nothing.
             }
 
