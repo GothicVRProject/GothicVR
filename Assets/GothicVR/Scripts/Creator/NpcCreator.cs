@@ -184,7 +184,7 @@ namespace GVR.Creator
             if (data.Armor >= 0)
             {
                 var armorData = AssetCache.TryGetItemData(data.Armor);
-                props.EquippedItems.Add(AssetCache.TryGetItemData(data.Armor));
+                props.EquippedItems.Add(armorData);
                 props.mdmName = armorData.VisualChange;
             }
             else

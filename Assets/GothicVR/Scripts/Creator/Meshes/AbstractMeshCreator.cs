@@ -31,12 +31,12 @@ namespace GVR.Creator.Meshes
                 for (var i = 0; i < mdh.Nodes.Count ; i++)
                 {
                     var node = mdh.Nodes[i];
-                    // We attached some Components to root of bones. Therefore reusing it.
+                    // Prefabs might include already existing GOs. We just reuse them now if existing. (basically BIP01)
                     if (node.Name.EqualsIgnoreCase("BIP01"))
                     {
                         var bip01 = rootGo.FindChildRecursively("BIP01");
                         if (bip01 != null)
-                            nodeObjects[i] = rootGo.FindChildRecursively("BIP01");
+                            nodeObjects[i] = bip01;
                         else
                             nodeObjects[i] = new GameObject(mdh.Nodes[i].Name);
                     }
@@ -459,7 +459,7 @@ namespace GVR.Creator.Meshes
         }
 
         /// <summary>
-        /// We basically only set the values from official Unity documentation. No added sugar for the bingPoses.
+        /// We basically only set the values from official Unity documentation. No added sugar for the bindingPoses.
         /// @see https://docs.unity3d.com/ScriptReference/Mesh-bindposes.html
         /// @see https://forum.unity.com/threads/some-explanations-on-bindposes.86185/
         /// </summary>
