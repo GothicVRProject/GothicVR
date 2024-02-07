@@ -116,14 +116,14 @@ namespace GVR.Creator.Meshes
             mesh.SetTriangles(subMesh.Triangles, 0);
             mesh.SetUVs(0, subMesh.Uvs);
             mesh.SetNormals(subMesh.Normals);
-            mesh.SetColors(subMesh.Light);
+            mesh.SetColors(subMesh.Lights);
             if (subMesh.Material.Group == MaterialGroup.Water)
             {
-                mesh.SetUVs(1, subMesh.TextureAnimation);
+                mesh.SetUVs(1, subMesh.TextureAnimations);
             }
         }
 
-        protected static bool IsTransparentShader(WorldData.SubMeshData subMeshData)
+        private static bool IsTransparentShader(WorldData.SubMeshData subMeshData)
         {
             if (subMeshData == null)
             {

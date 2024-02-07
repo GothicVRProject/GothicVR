@@ -561,15 +561,5 @@ namespace GVR.Creator.Meshes
             material.renderQueue = (int)RenderQueue.Transparent;
             return material;
         }
-
-        protected static bool IsTransparentShader(Shader shader)
-        {
-            if (shader == null)
-            {
-                return false;
-            }
-
-            return shader == Constants.ShaderLitAlphaToCoverage || shader == Constants.ShaderWater;
-        }
     }
 }

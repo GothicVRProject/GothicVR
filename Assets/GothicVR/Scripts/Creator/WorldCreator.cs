@@ -22,10 +22,11 @@ namespace GVR.Creator
 {
     public static class WorldCreator
     {
-        private static GameObject worldGo;
-        private static GameObject teleportGo;
-        private static GameObject nonTeleportGo;
-        private static HashSet<IPolygon> _claimedPolygons = new HashSet<IPolygon>();
+        private static GameObject _worldGo;
+        private static GameObject _teleportGo;
+        private static GameObject _nonTeleportGo;
+        private static HashSet<IPolygon> _claimedPolygons;
+
         static WorldCreator()
         {
             GvrEvents.GeneralSceneLoaded.AddListener(WorldLoaded);
@@ -34,24 +35,26 @@ namespace GVR.Creator
         public static async Task CreateAsync(string worldName)
         {
             LoadWorld(worldName);
-            worldGo = new GameObject("World");
+            _worldGo = new GameObject("World");
 
             // Interactable Vobs (item, ladder, ...) have their own collider Components
             // AND we don't want to teleport on top of them. We therefore exclude them from being added to teleport.
-            teleportGo = new GameObject("Teleport");
-            nonTeleportGo = new GameObject("NonTeleport");
-            teleportGo.SetParent(worldGo);
-            nonTeleportGo.SetParent(worldGo);
+            _teleportGo = new GameObject("Teleport");
+            _nonTeleportGo = new GameObject("NonTeleport");
+            _teleportGo.SetParent(_worldGo);
+            _nonTeleportGo.SetParent(_worldGo);
 
             // Build the world and vob meshes, populating the texture arrays.
+            // We need to start creating Vobs as we need to calculate world slicing based on amount of lights at a certain space afterwards.
             if (FeatureFlags.I.createVobs)
             {
-                await VobCreator.CreateAsync(teleportGo, nonTeleportGo, GameData.World, Constants.VObPerFrame);
+                await VobCreator.CreateAsync(_teleportGo, _nonTeleportGo, GameData.World, Constants.VObPerFrame);
             }
+
             if (FeatureFlags.I.createWorldMesh)
             {
                 GameData.World.SubMeshes = await BuildBspTree(GameData.World.World.Mesh.Cache(), GameData.World.World.BspTree.Cache());
-                await WorldMeshCreator.CreateAsync(GameData.World, teleportGo, Constants.MeshPerFrame);
+                await WorldMeshCreator.CreateAsync(GameData.World, _teleportGo, Constants.MeshPerFrame);
             }
 
             // Build the texture arrays.
@@ -75,7 +78,7 @@ namespace GVR.Creator
                 BarrierManager.I.CreateBarrier();
             }
 
-            WaynetCreator.Create(worldGo, GameData.World);
+            WaynetCreator.Create(_worldGo, GameData.World);
 
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
@@ -106,11 +109,14 @@ namespace GVR.Creator
         private static async Task<List<WorldData.SubMeshData>> BuildBspTree(IMesh zkMesh, IBspTree zkBspTree)
         {
             Dictionary<int, List<WorldData.SubMeshData>> subMeshesPerParentNode = new();
+            _claimedPolygons = new();
             System.Diagnostics.Stopwatch stopwatch = new();
             stopwatch.Start();
             ExpandBspTreeIntoMeshes(zkMesh, zkBspTree, 0, subMeshesPerParentNode, null);
             stopwatch.Stop();
             Debug.Log($"Expanding tree: {stopwatch.ElapsedMilliseconds / 1000f} s");
+
+            // Free memory
             _claimedPolygons = null;
 
             stopwatch.Restart();
@@ -143,8 +149,8 @@ namespace GVR.Creator
                     subMesh.Vertices.Reverse();
                     subMesh.Uvs.Reverse();
                     subMesh.Normals.Reverse();
-                    subMesh.Light.Reverse();
-                    subMesh.TextureAnimation.Reverse();
+                    subMesh.Lights.Reverse();
+                    subMesh.TextureAnimations.Reverse();
                 }
             }
 
@@ -284,16 +290,16 @@ namespace GVR.Creator
             Vector2 uv = Vector2.Scale(scaleInTextureArray, feature.Texture.ToUnityVector());
             currentSubMesh.Uvs.Add(new Vector4(uv.x, uv.y, textureArrayIndex, maxMipLevel));
             currentSubMesh.Normals.Add(feature.Normal.ToUnityVector());
-            currentSubMesh.Light.Add(new Color32((byte)(feature.Light >> 16), (byte)(feature.Light >> 8), (byte)feature.Light, (byte)(feature.Light >> 24)));
+            currentSubMesh.Lights.Add(new Color32((byte)(feature.Light >> 16), (byte)(feature.Light >> 8), (byte)feature.Light, (byte)(feature.Light >> 24)));
 
             if (zkMesh.Materials[polygon.MaterialIndex].TextureAnimationMapping == AnimationMapping.Linear)
             {
                 Vector2 uvAnimation = zkMesh.Materials[polygon.MaterialIndex].TextureAnimationMappingDirection.ToUnityVector();
-                currentSubMesh.TextureAnimation.Add(uvAnimation);
+                currentSubMesh.TextureAnimations.Add(uvAnimation);
             }
             else
             {
-                currentSubMesh.TextureAnimation.Add(Vector2.zero);
+                currentSubMesh.TextureAnimations.Add(Vector2.zero);
             }
         }
 
@@ -335,8 +341,8 @@ namespace GVR.Creator
                     groupedMeshes[topParentIndex][0].Triangles.AddRange(groupedMeshes[topParentIndex][i].Triangles.Select(v => v += vertexCount));
                     groupedMeshes[topParentIndex][0].Uvs.AddRange(groupedMeshes[topParentIndex][i].Uvs);
                     groupedMeshes[topParentIndex][0].Normals.AddRange(groupedMeshes[topParentIndex][i].Normals);
-                    groupedMeshes[topParentIndex][0].Light.AddRange(groupedMeshes[topParentIndex][i].Light);
-                    groupedMeshes[topParentIndex][0].TextureAnimation.AddRange(groupedMeshes[topParentIndex][i].TextureAnimation);
+                    groupedMeshes[topParentIndex][0].Lights.AddRange(groupedMeshes[topParentIndex][i].Lights);
+                    groupedMeshes[topParentIndex][0].TextureAnimations.AddRange(groupedMeshes[topParentIndex][i].TextureAnimations);
                 }
 
                 mergedMeshes.Add(topParentIndex, new List<WorldData.SubMeshData>() { groupedMeshes[topParentIndex][0] });
@@ -399,8 +405,8 @@ namespace GVR.Creator
                             meshes.First().Triangles.AddRange(meshes.Last().Triangles.Select(v => v += vertexCount));
                             meshes.First().Uvs.AddRange(meshes.Last().Uvs);
                             meshes.First().Normals.AddRange(meshes.Last().Normals);
-                            meshes.First().Light.AddRange(meshes.Last().Light);
-                            meshes.First().TextureAnimation.AddRange(meshes.Last().TextureAnimation);
+                            meshes.First().Lights.AddRange(meshes.Last().Lights);
+                            meshes.First().TextureAnimations.AddRange(meshes.Last().TextureAnimations);
 
                             lock (mergedChunks)
                             {
@@ -442,11 +448,11 @@ namespace GVR.Creator
             var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
 
             // If we load a new scene, just remove the existing one.
-            if (worldGo.TryGetComponent(out TeleportationArea teleportArea))
+            if (_worldGo.TryGetComponent(out TeleportationArea teleportArea))
                 GameObject.Destroy(teleportArea);
 
             // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
-            var teleportationArea = teleportGo.AddComponent<TeleportationArea>();
+            var teleportationArea = _teleportGo.AddComponent<TeleportationArea>();
             if (interactionManager != null)
             {
                 teleportationArea.interactionManager = interactionManager;
