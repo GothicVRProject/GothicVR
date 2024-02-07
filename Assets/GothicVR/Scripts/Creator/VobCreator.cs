@@ -274,8 +274,8 @@ namespace GVR.Creator
 
             StationaryLight lightComp = lightObject.GetComponent<StationaryLight>();
             lightComp.Type = UnityEngine.LightType.Point;
-            lightComp.Color = FeatureFlags.I.FireLightColor;
-            lightComp.Range = FeatureFlags.I.FireLightRange;
+            lightComp.Color = FeatureFlags.I.fireLightColor;
+            lightComp.Range = FeatureFlags.I.fireLightRange;
             lightComp.Intensity = 1;
         }
 

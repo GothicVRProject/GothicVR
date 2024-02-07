@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GVR.Util;
 using UnityEngine;
+using UnityEngine.Serialization;
 using ZenKit;
 using ZenKit.Vobs;
 
@@ -41,8 +42,8 @@ namespace GVR.Debugging
         [Range(0, 59)] public int startMinute;
 
         [Header("__________Lighting__________")]
-        public Color FireLightColor = new Color(1, .87f, .44f, 1);
-        public float FireLightRange = 10;
+        public Color fireLightColor;
+        public float fireLightRange;
         
         [Header("__________VOB__________")]
         public bool createVobs;

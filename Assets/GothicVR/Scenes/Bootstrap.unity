@@ -327,8 +327,8 @@ MonoBehaviour:
   sunMovementPerformanceValue: 1
   startHour: 8
   startMinute: 0
-  FireLightColor: {r: 1, g: 0.8745099, b: 0.4431373, a: 1}
-  FireLightRange: 10
+  fireLightColor: {r: 1, g: 0.87, b: 0.44, a: 1}
+  fireLightRange: 10
   createVobs: 1
   enableDecals: 0
   vobCulling: 1
