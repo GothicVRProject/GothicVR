@@ -22,7 +22,7 @@ namespace GVR.GothicVR.Scripts.Manager
         public Color SunColor;
         public Color AmbientColor;
         [Range(0, 1)]
-        public float PointLightIntensity = .1f;
+        public float PointLightIntensity = 1f;
         public bool IsRaining;
 
         private float masterTime;

@@ -41,7 +41,7 @@ namespace GVR.Debugging
         [Range(0, 59)] public int startMinute;
 
         [Header("__________Lighting__________")]
-        public Color FireLightColor = new Color(.7f, .7f, .6f, 1);
+        public Color FireLightColor = new Color(1, .87f, .44f, 1);
         public float FireLightRange = 10;
         
         [Header("__________VOB__________")]
