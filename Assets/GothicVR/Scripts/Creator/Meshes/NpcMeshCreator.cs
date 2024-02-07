@@ -144,8 +144,8 @@ namespace GVR.Creator.Meshes
             if (!weaponGo.TryGetComponent<MeshRenderer>(out var meshRenderer))
                 meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
+            PrepareMeshFilter(meshFilter, mrm, false);
             PrepareMeshRenderer(meshRenderer, mrm);
-            PrepareMeshFilter(meshFilter, mrm, false, false);
         }
 
         private void EquipRangeWeapon(GameObject npcGo, ItemInstance itemData)
@@ -170,8 +170,8 @@ namespace GVR.Creator.Meshes
             var meshFilter = weaponGo.AddComponent<MeshFilter>();
             var meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(meshRenderer, mms.Mesh);
             PrepareMeshFilter(meshFilter, mms.Mesh, false, true);
+            PrepareMeshRenderer(meshRenderer, mms.Mesh);
         }
     }
 }
