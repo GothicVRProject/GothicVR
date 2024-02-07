@@ -45,6 +45,11 @@ namespace GVR.Creator
             return VobMeshCreator.CreateVob(objectName, mdl, position, rotation, parent, rootGo);
         }
 
+        public static void AssignTextureArraysToVobMeshes()
+        {
+            VobMeshCreator.PrepareTextureArrayMeshRenderers();
+        }
+
         public static GameObject CreateVob(string objectName, IModelMesh mdm, IModelHierarchy mdh,
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {

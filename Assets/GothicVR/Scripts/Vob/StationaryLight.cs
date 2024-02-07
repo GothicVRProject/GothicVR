@@ -1,3 +1,4 @@
+using GVR.Manager;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -107,22 +108,21 @@ namespace GVR
                 _unityLight.spotAngle = value;
             }
         }
+        public int Index { get; private set; }
 
-        private static List<StationaryLight> _lights = new List<StationaryLight>();
+        public static readonly List<StationaryLight> Lights = new List<StationaryLight>();
 
-        private static readonly int GlobalStationaryLightPositionsAndAttenuationShaderId = Shader.PropertyToID("_GlobalStationaryLightPositionsAndAttenuation");
-        private static readonly int GlobalStationaryLightColorsShaderId = Shader.PropertyToID("_GlobalStationaryLightColors");
-        private static readonly int StationaryLightIndicesShaderId = Shader.PropertyToID("_StationaryLightIndices");
-        private static readonly int StationaryLightIndices2ShaderId = Shader.PropertyToID("_StationaryLightIndices2");
-        private static readonly int StationaryLightCountShaderId = Shader.PropertyToID("_StationaryLightCount");
+        public static readonly int GlobalStationaryLightPositionsAndAttenuationShaderId = Shader.PropertyToID("_GlobalStationaryLightPositionsAndAttenuation");
+        public static readonly int GlobalStationaryLightColorsShaderId = Shader.PropertyToID("_GlobalStationaryLightColors");
+        public static readonly int StationaryLightIndicesShaderId = Shader.PropertyToID("_StationaryLightIndices");
+        public static readonly int StationaryLightIndices2ShaderId = Shader.PropertyToID("_StationaryLightIndices2");
+        public static readonly int StationaryLightCountShaderId = Shader.PropertyToID("_StationaryLightCount");
 
-        private static Dictionary<MeshRenderer, List<StationaryLight>> _lightsPerRenderer = new Dictionary<MeshRenderer, List<StationaryLight>>();
-        private static HashSet<MeshRenderer> _dirtiedMeshes = new HashSet<MeshRenderer>();
+        private static Coroutine _updateDirtiedMeshesRoutine;
 
         private List<MeshRenderer> _affectedRenderers = new List<MeshRenderer>();
         private Light _unityLight;
-        private int _index;
-        private List<Material> _nonAllocMaterials = new List<Material>();
+        private static List<(Vector3 Position, float Range)> _threadsafeLightData = new();
 
         private void OnDrawGizmosSelected()
         {
@@ -131,14 +131,15 @@ namespace GVR
 
         private void Awake()
         {
-            _lights.Add(this);
+            Lights.Add(this);
+            _threadsafeLightData.Add((transform.position, Range));
         }
 
         private void OnDestroy()
         {
             try
             {
-                _lights.Remove(this);
+                Lights.Remove(this);
             }
             catch (Exception)
             {
@@ -148,108 +149,57 @@ namespace GVR
 
         private void OnEnable()
         {
-            return;
             Profiler.BeginSample("Stationary light enabled");
             for (int i = 0; i < _affectedRenderers.Count; i++)
             {
-                if (!_lightsPerRenderer.ContainsKey(_affectedRenderers[i]))
-                {
-                    _lightsPerRenderer.Add(_affectedRenderers[i], new List<StationaryLight>());
-                }
-
-                _lightsPerRenderer[_affectedRenderers[i]].Add(this);
-                _dirtiedMeshes.Add(_affectedRenderers[i]);
+                StationaryLightsManager.AddLightOnRenderer(this, _affectedRenderers[i]);
             }
             Profiler.EndSample();
         }
 
         private void OnDisable()
         {
-            return;
             Profiler.BeginSample("Stationary light disable");
             for (int i = 0; i < _affectedRenderers.Count; i++)
             {
-                if (!_lightsPerRenderer.ContainsKey(_affectedRenderers[i]))
-                {
-                    continue;
-                }
-
-                try
-                {
-                    _lightsPerRenderer[_affectedRenderers[i]].Remove(this);
-                    _dirtiedMeshes.Add(_affectedRenderers[i]);
-                }
-                catch (Exception)
-                {
-                    //Debug.LogError($"[{nameof(StationaryLight)}] Light {name} wasn't part of {_affectedRenderers[i].name}'s lights on disable. This is unexpected.");
-                }
+                StationaryLightsManager.RemoveLightOnRenderer(this, _affectedRenderers[i]);
             }
             Profiler.EndSample();
         }
 
-        //private void LateUpdate()
-        //{
-        //    // Update the renderer once for all updated lights.
-        //    if (_dirtiedMeshes.Count > 0)
-        //    {
-        //        Profiler.BeginSample("Update stationary light renderers");
-        //        foreach (MeshRenderer renderer in _dirtiedMeshes)
-        //        {
-        //            UpdateRenderer(renderer);
-        //        }
-        //        _dirtiedMeshes.Clear();
-        //        Profiler.EndSample();
-        //    }
-        //}
-
         public static void InitStationaryLights()
         {
-            Debug.Log($"[{nameof(StationaryLight)}] Total stationary light count: {_lights.Count}");
-            Vector4[] _lightPositionsAndAttenuation = new Vector4[_lights.Count];
-            Vector4[] _lightColors = new Vector4[_lights.Count];
-            for (int i = 0; i < _lights.Count; i++)
+            Debug.Log($"[{nameof(StationaryLight)}] Total stationary light count: {Lights.Count}");
+            Vector4[] _lightPositionsAndAttenuation = new Vector4[Lights.Count];
+            Vector4[] _lightColors = new Vector4[Lights.Count];
+            for (int i = 0; i < Lights.Count; i++)
             {
-                _lights[i]._index = i;
-                _lights[i].GatherRenderers();
-                _lightPositionsAndAttenuation[i] = new Vector4(_lights[i].transform.position.x, _lights[i].transform.position.y, _lights[i].transform.position.z, 1f / (_lights[i].Range * _lights[i].Range));
-                _lightColors[i] = _lights[i].Color.linear;
-                _lights[i].gameObject.SetActive(true);
+                Lights[i].Index = i;
+                Lights[i].GatherRenderers();
+                _lightPositionsAndAttenuation[i] = new Vector4(Lights[i].transform.position.x, Lights[i].transform.position.y, Lights[i].transform.position.z, 1f / (Lights[i].Range * Lights[i].Range));
+                _lightColors[i] = Lights[i].Color.linear;
+                Lights[i].gameObject.SetActive(false);
+                Lights[i].gameObject.SetActive(true);
             }
 
             Shader.SetGlobalVectorArray(GlobalStationaryLightPositionsAndAttenuationShaderId, _lightPositionsAndAttenuation);
             Shader.SetGlobalVectorArray(GlobalStationaryLightColorsShaderId, _lightColors);
+            _threadsafeLightData = null; // Clear the threadsafe data as it is no longer needed.
         }
 
-        private void UpdateRenderer(MeshRenderer renderer)
+        public static int CountLightsInBounds(Bounds bounds)
         {
-            if (!renderer)
+            int count = 0;
+            for (int i = 0; i < Lights.Count; i++)
             {
-                return;
-            }
-
-            Matrix4x4 indicesMatrix = Matrix4x4.identity;
-            renderer.GetSharedMaterials(_nonAllocMaterials);
-            for (int i = 0; i < Mathf.Min(16, _lightsPerRenderer[renderer].Count); i++)
-            {
-                indicesMatrix[i / 4, i % 4] = _lightsPerRenderer[renderer][i]._index;
-            }
-            for (int i = 0; i < _nonAllocMaterials.Count; i++)
-            {
-                _nonAllocMaterials[i].SetMatrix(StationaryLightIndicesShaderId, indicesMatrix);
-                _nonAllocMaterials[i].SetInt(StationaryLightCountShaderId, _lightsPerRenderer[renderer].Count);
-            }
-
-            if (_lightsPerRenderer[renderer].Count >= 16)
-            {
-                for (int i = 0; i < Mathf.Min(16, _lightsPerRenderer[renderer].Count - 16); i++)
+                Bounds lightBounds = new Bounds(_threadsafeLightData[i].Position, Vector3.one * _threadsafeLightData[i].Range * 2);
+                if (bounds.Intersects(lightBounds))
                 {
-                    indicesMatrix[i / 4, i % 4] = _lightsPerRenderer[renderer][i + 16]._index;
-                }
-                for (int i = 0; i < _nonAllocMaterials.Count; i++)
-                {
-                    _nonAllocMaterials[i].SetMatrix(StationaryLightIndices2ShaderId, indicesMatrix);
+                    count++;
                 }
             }
+
+            return count;
         }
 
         private void GatherRenderers()

@@ -1,16 +1,19 @@
-Shader "Lit/World"
+Shader "Lit/Water"
 {
     Properties
     {
         _MainTex("Texture", 2DArray) = "" {}
-        [HideInInspector]_StationaryLightCount("Stationary light count", Int) = 0
     }
     SubShader
     {
-        Tags {  "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" "RenderQueue" = "Geometry" }
+        Tags {  "RenderType" = "Transparent" "RenderPipeline" = "UniversalPipeline" "RenderQueue" = "Transparent" }
 
         Pass
         {
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite Off
+            Cull Off
+
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -21,9 +24,10 @@ Shader "Lit/World"
             struct appdata
             {
                 float4 vertex : POSITION;
-                half3 color : COLOR;
+                half4 color : COLOR;
                 half3 normal : NORMAL;
                 float4 uv : TEXCOORD0; // uv, array slice, max mip level
+                float2 textureAnimation : TEXCOORD1;
                 
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
@@ -31,6 +35,7 @@ Shader "Lit/World"
             struct v2f
             {
                 float4 vertex : SV_POSITION;
+                half3 normal : NORMAL;
                 float4 uv : TEXCOORD0;
                 float3 worldPos : TEXCOORD1;
                 half3 diffuse : COLOR;
@@ -43,17 +48,13 @@ Shader "Lit/World"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _MainTex_TexelSize;
-                int _StationaryLightCount;
-                float4x4 _StationaryLightIndices;
-                float4x4 _StationaryLightIndices2;
             CBUFFER_END
 
             #include "GothicIncludes.hlsl"
-            #include "StationaryLighting.hlsl"
 
-            half3 DiffuseLighting(half3 normal, float3 worldPos, half3 color)
+            half3 DiffuseLighting(v2f i, appdata v)
             {
-                half3 diffuse = SunAndAmbientDiffuse(normal, color);
+                half3 diffuse = _SunColor + _AmbientColor;
 
                 //for (int j = 0; j < min(MAX_VISIBLE_LIGHTS, unity_LightData.y); j++)
                 //{
@@ -61,18 +62,6 @@ Shader "Lit/World"
                 //    Light light = CustomGetAdditionalPerObjectLight(lightIndex, i.worldPos);
                 //    diffuse += AdditionalUnityLightDiffuse(light, i.normal);
                 //}
-
-                for (int k = 0; k < min(_StationaryLightCount, MAX_AFFECTING_STATIONARY_LIGHTS); k++)
-                {
-                    diffuse += AdditionalStationaryDiffuse(_StationaryLightIndices[k / 4][k % 4], worldPos, normal);
-                }
-                if (_StationaryLightCount >= MAX_AFFECTING_STATIONARY_LIGHTS)
-                {
-                    for (int l = 0; l < min(_StationaryLightCount - MAX_AFFECTING_STATIONARY_LIGHTS, MAX_AFFECTING_STATIONARY_LIGHTS); l++)
-                    {
-                        diffuse += AdditionalStationaryDiffuse(_StationaryLightIndices2[l / 4][l % 4], worldPos, normal);
-                    }
-                }
 
                 return diffuse;
             }
@@ -86,8 +75,10 @@ Shader "Lit/World"
 
                 o.worldPos = TransformObjectToWorld(v.vertex);
                 o.vertex = TransformObjectToHClip(v.vertex);
-                o.uv = float4(v.uv.xy * REFERENCE_TEX_ARRAY_SIZE * _MainTex_TexelSize.xy, v.uv.zw);
-                o.diffuse = DiffuseLighting(TransformObjectToWorldNormal(v.normal), o.worldPos, v.color);
+                float2 movingUv = v.uv.xy * REFERENCE_TEX_ARRAY_SIZE * _MainTex_TexelSize.xy + v.textureAnimation * _Time.y * 1000;
+                o.uv = float4(movingUv, v.uv.zw);
+                o.normal = TransformObjectToWorldNormal(v.normal);
+                o.diffuse = DiffuseLighting(o, v);
                 return o;
             }
 
@@ -98,7 +89,7 @@ Shader "Lit/World"
                 half3 diffuse = albedo * i.diffuse;
                 
                 diffuse = ApplyFog(diffuse, i.worldPos);
-                return half4(diffuse, 1);
+                return half4(diffuse, 0.5 * albedo.a);
             }
             ENDHLSL
         }

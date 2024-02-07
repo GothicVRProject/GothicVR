@@ -5,16 +5,17 @@ namespace GVR.Globals
     public static class Constants
     {
         // Unity shaders
-        public static readonly Shader ShaderUnlit = Shader.Find("Universal Render Pipeline/Unlit"); // "Unlit/Transparent Cutout";
+        public static readonly Shader ShaderUnlit = Shader.Find("Universal Render Pipeline/Unlit");
         public static readonly Shader ShaderUnlitParticles = Shader.Find("Universal Render Pipeline/Particles/Unlit");
         public static readonly Shader ShaderTMPSprite = Shader.Find("TextMeshPro/Sprite");
         public static readonly Shader ShaderDecal = Shader.Find("Shader Graphs/Decal");
         public static readonly Shader ShaderStandard = Shader.Find("Standard");
 
         // Custom GVR shaders
+        public static readonly Shader ShaderSingleMeshLit = Shader.Find("Lit/SingleMesh");
         public static readonly Shader ShaderWorldLit = Shader.Find("Lit/World");
         public static readonly Shader ShaderLitAlphaToCoverage = Shader.Find("Lit/AlphaToCoverage");
-        public static readonly Shader ShaderWater = Shader.Find("Shader Graphs/Unlit_Both_ScrollY"); //Vince's moving texture water shader
+        public static readonly Shader ShaderWater = Shader.Find("Lit/Water");
         public static readonly Shader ShaderBarrier = Shader.Find("Unlit/Barrier");
         public static readonly Shader ShaderThunder = Shader.Find("Unlit/ThunderShader");
 

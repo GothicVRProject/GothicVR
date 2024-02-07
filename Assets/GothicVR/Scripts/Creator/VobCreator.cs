@@ -72,12 +72,15 @@ namespace GVR.Creator
             }
         }
 
-        public static async Task CreateAsync(GameObject rootTeleport, GameObject rootNonTeleport, WorldData world,
-            int vobsPerFrame)
+        public static async Task CreateAsync(GameObject rootTeleport, GameObject rootNonTeleport, WorldData world, int vobsPerFrame)
         {
+            System.Diagnostics.Stopwatch stopwatch = new();
+            stopwatch.Start();
             PreCreateVobs(world, rootTeleport, rootNonTeleport, vobsPerFrame);
             await CreateVobs(world.Vobs);
             PostCreateVobs();
+            stopwatch.Stop();
+            Debug.Log($"Created vobs in {stopwatch.Elapsed.TotalSeconds} s");
         }
 
         private static void PreCreateVobs(WorldData world, GameObject rootTeleport, GameObject rootNonTeleport, int vobsPerFrame)
@@ -120,8 +123,7 @@ namespace GVR.Creator
                             }
                         case VirtualObjectType.zCVobLight:
                             {
-                                GameObject obj = CreateLight((ZenKit.Vobs.Light)vob);
-                                _cullingVobObjects.Add(obj);
+                                CreateLight((ZenKit.Vobs.Light)vob);
                                 break;
                             }
                         case VirtualObjectType.oCMobContainer:
@@ -195,7 +197,6 @@ namespace GVR.Creator
                             {
                                 CreateFire((ZenKit.Vobs.Fire)vob, out GameObject meshObject, out GameObject lightObject);
                                 _cullingVobObjects.Add(meshObject);
-                                _cullingVobObjects.Add(lightObject);
                                 break;
                             }
                         case VirtualObjectType.oCMobInter:
@@ -278,12 +279,6 @@ namespace GVR.Creator
             lightComp.Color = FeatureFlags.I.FireLightColor;
             lightComp.Range = FeatureFlags.I.FireLightRange;
             lightComp.Intensity = 1;
-
-            // Deactivate the light by default. The vob culling manager will enable them when in view.
-            if (FeatureFlags.I.vobCulling)
-            {
-                lightObject.SetActive(false);
-            }
         }
 
         /// <summary>
@@ -293,7 +288,7 @@ namespace GVR.Creator
         {
             if (vob.Name == "OC_FIREPLACE_CAMPFIRE")
             {
-                lightTransform.position+= new UnityEngine.Vector3(0, 1.5f);
+                lightTransform.position += new UnityEngine.Vector3(0, 1.5f);
             }
         }
 
@@ -301,7 +296,6 @@ namespace GVR.Creator
         {
             VobMeshCullingManager.I.PrepareVobCulling(_cullingVobObjects);
             VobSoundCullingManager.I.PrepareSoundCulling(LookupCache.vobSoundsAndDayTime);
-            StationaryLight.InitStationaryLights();
 
             // TODO - warnings about "not implemented" - print them once only.
             foreach (var var in new[]{
@@ -505,11 +499,6 @@ namespace GVR.Creator
             lightComp.SpotAngle = vob.ConeAngle;
             lightComp.Intensity = 1;
 
-            // Deactivate the light by default. The vob culling manager will enable them when in view.
-            if (FeatureFlags.I.vobCulling)
-            {
-                vobObj.SetActive(false);
-            }
             return vobObj;
         }
 
@@ -932,7 +921,7 @@ namespace GVR.Creator
             {
                 var go = GetPrefab(vob);
                 var ret = MeshCreatorFacade.CreateVob(meshName, mdl, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), parent, go);
-                
+
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
                 if (ret == null)
                     GameObject.Destroy(go);

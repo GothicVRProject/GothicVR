@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GVR.Caches;
+using System.Collections.Generic;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Vobs;
@@ -22,12 +23,14 @@ namespace GVR.World
         public class SubMeshData
         {
             public IMaterial Material;
+            public AssetCache.TextureArrayTypes TextureArrayType;
 
             public readonly List<Vector3> Vertices = new();
             public readonly List<int> Triangles = new();
-            public readonly List<Vector2> Uvs = new() ;
+            public readonly List<Vector4> Uvs = new() ;
             public readonly List<Vector3> Normals = new();
             public readonly List<Color32> Light = new();
+            public readonly List<Vector2> TextureAnimation = new(0);
         }
 
     }
