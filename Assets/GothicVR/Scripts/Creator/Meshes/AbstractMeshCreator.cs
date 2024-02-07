@@ -155,7 +155,7 @@ namespace GVR.Creator.Meshes
             if (!_loadingMaterial)
             {
                 _loadingMaterial = new Material(Constants.ShaderWorldLit);
-            }    
+            }
 
             MeshFilter meshFilter = rootGo.AddComponent<MeshFilter>();
             MeshRenderer meshRenderer = rootGo.AddComponent<MeshRenderer>();
@@ -350,7 +350,7 @@ namespace GVR.Creator.Meshes
                         preparedUVs.Add(new Vector4(uv.x, uv.y, textureArrayIndex, maxMipLevel));
                         if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
                         {
-                            MorphMeshCache.AddVertexMappingEntry(morphMeshName, wedges[w].Index, preparedVertices.Count);
+                            MorphMeshCache.AddVertexMappingEntry(morphMeshName, wedges[w].Index, preparedVertices.Count - 1);
                         }
                     }
                 }
@@ -370,7 +370,7 @@ namespace GVR.Creator.Meshes
             }
 
             if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
-            { 
+            {
                 MorphMeshCache.SetUnityVerticesForVertexMapping(morphMeshName, preparedVertices.ToArray());
             }
 
