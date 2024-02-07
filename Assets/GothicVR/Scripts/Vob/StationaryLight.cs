@@ -1,6 +1,7 @@
 using GVR.Manager;
 using System;
 using System.Collections.Generic;
+using GVR.Extensions;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -122,7 +123,7 @@ namespace GVR
 
         private List<MeshRenderer> _affectedRenderers = new List<MeshRenderer>();
         private Light _unityLight;
-        private static List<(Vector3 Position, float Range)> _threadsafeLightData = new();
+        private static readonly List<(Vector3 Position, float Range)> ThreadSafeLightData = new();
 
         private void OnDrawGizmosSelected()
         {
@@ -132,7 +133,7 @@ namespace GVR
         private void Awake()
         {
             Lights.Add(this);
-            _threadsafeLightData.Add((transform.position, Range));
+            ThreadSafeLightData.Add((transform.position, Range));
         }
 
         private void OnDestroy()
@@ -170,6 +171,11 @@ namespace GVR
         public static void InitStationaryLights()
         {
             Debug.Log($"[{nameof(StationaryLight)}] Total stationary light count: {Lights.Count}");
+
+            // e.g. if we disabled Vob loading within FeatureFlags.
+            if (Lights.IsEmpty())
+                return;
+
             Vector4[] _lightPositionsAndAttenuation = new Vector4[Lights.Count];
             Vector4[] _lightColors = new Vector4[Lights.Count];
             for (int i = 0; i < Lights.Count; i++)
@@ -184,7 +190,7 @@ namespace GVR
 
             Shader.SetGlobalVectorArray(GlobalStationaryLightPositionsAndAttenuationShaderId, _lightPositionsAndAttenuation);
             Shader.SetGlobalVectorArray(GlobalStationaryLightColorsShaderId, _lightColors);
-            _threadsafeLightData = null; // Clear the threadsafe data as it is no longer needed.
+            ThreadSafeLightData.Clear(); // Clear the thread safe data as it is no longer needed.
         }
 
         public static int CountLightsInBounds(Bounds bounds)
@@ -192,7 +198,7 @@ namespace GVR
             int count = 0;
             for (int i = 0; i < Lights.Count; i++)
             {
-                Bounds lightBounds = new Bounds(_threadsafeLightData[i].Position, Vector3.one * _threadsafeLightData[i].Range * 2);
+                Bounds lightBounds = new Bounds(ThreadSafeLightData[i].Position, Vector3.one * ThreadSafeLightData[i].Range * 2);
                 if (bounds.Intersects(lightBounds))
                 {
                     count++;

@@ -7,9 +7,9 @@ namespace GVR.Manager
 {
     public class StationaryLightsManager : SingletonBehaviour<StationaryLightsManager>
     {
-        private static readonly HashSet<MeshRenderer> DirtiedMeshes = new ();
-        private static readonly Dictionary<MeshRenderer, List<StationaryLight>> LightsPerRenderer = new ();
-        private static readonly List<Material> NonAllocMaterials = new ();
+        private static readonly HashSet<MeshRenderer> DirtiedMeshes = new();
+        private static readonly Dictionary<MeshRenderer, List<StationaryLight>> LightsPerRenderer = new();
+        private static readonly List<Material> NonAllocMaterials = new();
 
         private void LateUpdate()
         {

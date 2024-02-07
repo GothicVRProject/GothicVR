@@ -25,7 +25,7 @@ namespace GVR.Creator
         private static GameObject _worldGo;
         private static GameObject _teleportGo;
         private static GameObject _nonTeleportGo;
-        private static HashSet<IPolygon> _claimedPolygons;
+        private static readonly HashSet<IPolygon> ClaimedPolygons;
 
         static WorldCreator()
         {
@@ -109,7 +109,6 @@ namespace GVR.Creator
         private static async Task<List<WorldData.SubMeshData>> BuildBspTree(IMesh zkMesh, IBspTree zkBspTree)
         {
             Dictionary<int, List<WorldData.SubMeshData>> subMeshesPerParentNode = new();
-            _claimedPolygons = new();
             System.Diagnostics.Stopwatch stopwatch = new();
             stopwatch.Start();
             ExpandBspTreeIntoMeshes(zkMesh, zkBspTree, 0, subMeshesPerParentNode, null);
@@ -117,7 +116,7 @@ namespace GVR.Creator
             Debug.Log($"Expanding tree: {stopwatch.ElapsedMilliseconds / 1000f} s");
 
             // Free memory
-            _claimedPolygons = null;
+            ClaimedPolygons.Clear();
 
             stopwatch.Restart();
             // Merge the world meshes until they touch the max amount of lights per mesh.
@@ -215,13 +214,13 @@ namespace GVR.Creator
                     for (int i = node.PolygonIndex; i < node.PolygonIndex + node.PolygonCount; i++)
                     {
                         IPolygon polygon = zkMesh.Polygons[bspTree.PolygonIndices[i]];
-                        if (polygon.IsPortal || _claimedPolygons.Contains(polygon))
+                        if (polygon.IsPortal || ClaimedPolygons.Contains(polygon))
                         {
                             continue;
                         }
 
                         // Different leaf nodes reference the same polygons. Manually check if polygons have been used to avoid overlapping geometry.
-                        _claimedPolygons.Add(polygon);
+                        ClaimedPolygons.Add(polygon);
 
                         // As we always use element 0 and i+1, we skip it in the loop.
                         for (int p = 1; p < polygon.PositionIndices.Count - 1; p++)
