@@ -9,6 +9,8 @@ namespace GVR.Globals
     /// </summary>
     public static class GvrEvents
     {
+        public static readonly UnityEvent ZenKitBootstrapped = new();
+
         public static readonly UnityEvent MainMenuSceneLoaded = new();
         public static readonly UnityEvent MainMenuSceneUnloaded = new();
         

@@ -3,11 +3,10 @@ using System.IO;
 using System.Linq;
 using GVR.Caches;
 using GVR.Debugging;
-using GVR.Extensions;
 using GVR.Globals;
 using GVR.Manager.Settings;
-using GVR.Vm;
 using GVR.Util;
+using GVR.Vm;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;
@@ -77,13 +76,14 @@ namespace GVR.Manager
             LoadDialogs();
             LoadSfxVm(g1Dir);
             LoadPfxVm(g1Dir);
-            LoadMusicVv(g1Dir);
+            LoadMusicVm(g1Dir);
             LoadMusic();
             LoadFonts();
             
             watch.Stop();
             Debug.Log($"Time spent for Bootstrapping ZenKit: {watch.Elapsed}");
 
+            GvrEvents.ZenKitBootstrapped.Invoke();
         }
 
         public static void ZenKitLoggerCallback(LogLevel level, string name, string message)
@@ -94,10 +94,6 @@ namespace GVR.Manager
             switch (level)
             {
                 case LogLevel.Error:
-                    var isVfsMessage = message.ContainsIgnoreCase("failed to find vfs entry");
-                    if (isVfsMessage && !FeatureFlags.I.showZenKitVfsFileNotFoundErrors)
-                        break;
-
                     Debug.LogError(messageString);
                     break;
                 case LogLevel.Warning:
@@ -157,10 +153,7 @@ namespace GVR.Manager
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/GOTHIC.DAT"));
             GameData.GothicVm = new DaedalusVm(fullPath);
             
-            // If we don't set it early, other calls within VM will fail.
-            // TODO - Could be moved to a separate Hero.cs class and set during GvrEvents.GeneralSceneLoaded event.
-            var hero = GameData.GothicVm.InitInstance<NpcInstance>("hero");
-            GameData.GothicVm.GlobalHero = hero;
+            NpcHelper.LoadHero();
 
             VmGothicExternals.RegisterExternals();
         }
@@ -189,7 +182,7 @@ namespace GVR.Manager
             GameData.PfxVm = new DaedalusVm(fullPath);
         }
 
-        private static void LoadMusicVv(string g1Dir)
+        private static void LoadMusicVm(string g1Dir)
         {
             var fullPath = Path.GetFullPath(Path.Join(g1Dir, "/_work/DATA/scripts/_compiled/MUSIC.DAT"));
             GameData.MusicVm = new DaedalusVm(fullPath);

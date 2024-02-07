@@ -4,6 +4,7 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Data;
 using GVR.Globals;
+using GVR.Npc;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Properties;
@@ -27,12 +28,15 @@ namespace GVR.GothicVR.Scripts.Manager
             // There is at least one important entry, the NPC wants to talk to the hero about.
             else if (TryGetImportant(properties.Dialogs, out var infoInstance))
             {
-                GameData.Dialogs.CurrentDialog.Instance = infoInstance;
+                properties.go.GetComponent<AiHandler>().ClearState(true);
 
+                GameData.Dialogs.CurrentDialog.Instance = infoInstance;
+                
                 CallInformation(properties.npcInstance.Index, infoInstance.Information, true);
             }
             else
             {
+                properties.go.GetComponent<AiHandler>().ClearState(false);
                 var selectableDialogs = new List<InfoInstance>();
 
                 foreach (var dialog in properties.Dialogs)
@@ -72,7 +76,7 @@ namespace GVR.GothicVR.Scripts.Manager
 
             npcProps.AnimationQueue.Enqueue(new Output(
                 new(AnimationAction.Type.AIOutput, int0: speakerId, string0: outputName),
-                npcProps.gameObject));
+                npcProps.go));
         }
 
         /// <summary>
@@ -114,7 +118,7 @@ namespace GVR.GothicVR.Scripts.Manager
 
             props.AnimationQueue.Enqueue(new StopProcessInfos(
                 new(AnimationAction.Type.AIStopProcessInfo),
-                props.gameObject));
+                props.go));
         }
 
         public static void SelectionClicked(int npcInstanceIndex, int dialogId, bool isMainDialog)
@@ -141,17 +145,21 @@ namespace GVR.GothicVR.Scripts.Manager
                     .First(d => d.Information == information);
 
             ControllerManager.I.HideDialog();
+
+            // We always need to set "self" before executing any Daedalus function.
+            GameData.GothicVm.GlobalSelf = npcProperties.npcInstance;
+            GameData.GothicVm.GlobalOther = GameData.GothicVm.GlobalHero;
             GameData.GothicVm.Call(information);
 
             // We always want to have a method to get the dialog menu back once all dialog lines are talked.
             npcProperties.AnimationQueue.Enqueue(new StartProcessInfos(
                 new(AnimationAction.Type.UnityStartProcessInfos, int0: information),
-                npcProperties.gameObject));
+                npcProperties.go));
         }
 
         private static GameObject GetNpc(NpcInstance npc)
         {
-            return GetProperties(npc).gameObject;
+            return GetProperties(npc).go;
         }
 
         private static NpcProperties GetProperties(NpcInstance npc)

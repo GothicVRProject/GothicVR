@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -317,12 +317,12 @@ MonoBehaviour:
   skipMainMenu: 0
   useXRDeviceSimulator: 0
   createWorldMesh: 1
-  createWaypoints: 1
   vobItemsDynamicAttach: 1
   showBarrier: 1
-  createWayPointMeshes: 0
-  createWaypointEdgeMeshes: 0
-  enableDayTime: 1
+  drawWayPoints: 0
+  drawWaypointEdges: 0
+  drawFreePoints: 0
+  spawnAtSpecificWayNetPoint: 
   TimeMultiplier: 1
   sunMovementPerformanceValue: 1
   startHour: 8
@@ -339,8 +339,6 @@ MonoBehaviour:
   vobCullingLarge:
     maxObjectSize: 100
     cullingDistance: 200
-  spawnAtSpecificFreePoint: 
-  drawFreePointMeshes: 0
   drawVobCullingGizmos: 0
   vobTypeToSpawn: 
   createOcNpcs: 0
@@ -352,7 +350,6 @@ MonoBehaviour:
   enableVobParticles: 0
   zenKitLogLevel: 0
   showZspyLogs: 0
-  showZenKitVfsFileNotFoundErrors: 0
   showMusicLogs: 0
   showBarrierLogs: 0
 --- !u!1 &394991343
@@ -1711,6 +1708,7 @@ MonoBehaviour:
   arrowMaterial: {fileID: 2100000, guid: dc6ce4e18c065d34f9037b5b60259872, type: 2}
   fillerMaterial: {fileID: 2100000, guid: 7f15366450c487344a1e66a13b22a847, type: 2}
   skyMaterial: {fileID: 2100000, guid: 39ac659c922b5b1489714aacd9b952e9, type: 2}
+  mapMaterial: {fileID: 2100000, guid: 6edba26a8e8b5c3488fd2eb615350942, type: 2}
   gothicLoadingMenuMaterial: {fileID: 0}
   loadingBarBackgroundMaterial: {fileID: 0}
   loadingBarMaterial: {fileID: 0}

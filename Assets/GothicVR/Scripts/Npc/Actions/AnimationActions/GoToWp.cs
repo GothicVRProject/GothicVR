@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Manager;
+using GVR.Vob.WayNet;
 using GVR.World;
 using UnityEngine;
 
@@ -17,19 +18,23 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
+            var currentWaypoint = Props.CurrentWayPoint ?? WayNetHelper.FindNearestWayPoint(Props.transform.position);
+            var destinationWaypoint = (WayPoint)WayNetHelper.GetWayNetPoint(destination);
+
             /*
              * 1. AI_StartState() can get called multiple times until it won't share the WP. (e.g. ZS_SLEEP -> ZS_StandAround())
              * 2. Happens (e.g.) during spawning. As we spawn NPCs onto their current WayPoints, they don't need to walk there from entrance of OC.
              */
-            if (destination == "" || Props.currentWayPoint.Name == destination)
+            if (destinationWaypoint == null || destinationWaypoint.Name == "" || currentWaypoint.Name == destination)
             {
                 IsFinishedFlag = true;
                 return;
             }
-            
-            route = new Stack<DijkstraWaypoint>(WayNetHelper.FindFastestPath(Props.currentWayPoint.Name, destination));
+
+            route = new Stack<DijkstraWaypoint>(WayNetHelper.FindFastestPath(currentWaypoint.Name,
+                destinationWaypoint.Name));
         }
-        
+
         public override void OnTriggerEnter(Collider coll)
         {
             if (walkState != WalkState.Walk)
@@ -49,7 +54,10 @@ namespace GVR.Npc.Actions.AnimationActions
                 IsFinishedFlag = true;
             }
             else
-                walkState = WalkState.Initial;
+            {
+                // A new waypoint is destination, we therefore rotate NPC again.
+                walkState = WalkState.WalkAndRotate;
+            }
         }
 
         protected override Vector3 GetWalkDestination()

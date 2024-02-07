@@ -75,7 +75,7 @@ namespace GVR.Creator.Meshes
         }
         
         /// <summary>
-        /// Add ZengineSlot collider. i.e. positions where an NPC can sit on a bench.
+        /// Add ZenginSlot collider. i.e. positions where an NPC can sit on a bench.
         /// </summary>
         private void AddZsCollider([CanBeNull] GameObject go)
         {
@@ -89,6 +89,9 @@ namespace GVR.Creator.Meshes
                 if (!child.name.StartsWithIgnoreCase("ZS"))
                     continue;
                 
+                // ZS need to be "invisible" for the Raycast teleporter.
+                child.gameObject.layer = Constants.IgnoreRaycastLayer;
+
                 // Used for event triggers with NPCs.
                 var coll = child.AddComponent<SphereCollider>();
                 coll.isTrigger = true;

@@ -1,8 +1,7 @@
-using GVR.Caches;
 using GVR.Creator;
+using GVR.Data.ZkEvents;
 using GVR.Extensions;
 using UnityEngine;
-using ZenKit;
 using EventType = ZenKit.EventType;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -14,18 +13,16 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
-
             // FIXME - We need to handle both mds and mdh options! (base vs overlay)
             // "t_1hRun_2_1h" --> undraw animation!
             // "t_Move_2_1hMove" --> drawing
             // "t_1h_2_1hRun"
-            AnimationCreator.PlayAnimation(Props.baseMdsName, "t_Move_2_1hMove", mdh, NpcGo, true);
+            AnimationCreator.PlayAnimation(Props.mdsNames, "t_Move_2_1hMove", NpcGo, true);
         }
 
         // FIXME - 1Hand hardcoded so far. We need to get the information from inventory system itself.
         // FIXME - Sound is hardcoded as well. We need to get material from weapon dynamically of wood or metal.
-        public override void AnimationEventCallback(IEventTag data)
+        public override void AnimationEventCallback(SerializableEventTag data)
         {
             switch (data.Type)
             {
@@ -36,7 +33,7 @@ namespace GVR.Npc.Actions.AnimationActions
                     // FIXME - Handle proper sound effect based on metal or wood weapon
                     // "DRAWSOUND_ME.WAV" --> metal
                     // "DRAWSOUND_WO.WAV" --> wood
-                    AnimationSfxEventCallback(new CachedEventSoundEffect()
+                    AnimationSfxEventCallback(new SerializableEventSoundEffect()
                     {
                         Name = "DRAWSOUND_ME.WAV",
                         Range = 2000f

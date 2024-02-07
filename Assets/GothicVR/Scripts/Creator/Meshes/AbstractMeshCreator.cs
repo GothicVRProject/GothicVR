@@ -278,12 +278,19 @@ namespace GVR.Creator.Meshes
              */
             Mesh mesh = new Mesh();
 
+            bool isMorphMeshMappingAlreadyCached = false;
             if (isMorphMesh)
             {
                 // MorphMeshes will change the vertices. This call optimizes performance.
                 mesh.MarkDynamic();
-                MorphMeshCache.AddVertexMapping(morphMeshName, mrmData.PositionCount);
-                morphMeshName = MorphMeshCache.GetPreparedKey(morphMeshName); // So we don't need to recalculate every Add() call later.
+
+                isMorphMeshMappingAlreadyCached = MorphMeshCache.IsMappingAlreadyCached(morphMeshName);
+
+                if (!isMorphMeshMappingAlreadyCached)
+                {
+                    MorphMeshCache.AddVertexMapping(morphMeshName, mrmData.PositionCount);
+                    morphMeshName = MorphMeshCache.GetPreparedKey(morphMeshName); // So we don't need to recalculate every Add() call later.
+                }
             }
 
             meshFilter.mesh = mesh;
@@ -362,8 +369,7 @@ namespace GVR.Creator.Meshes
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
 
-            if (isMorphMesh)
-            {
+            if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
                 MorphMeshCache.SetUnityVerticesForVertexMapping(morphMeshName, preparedVertices.ToArray());
             }
 

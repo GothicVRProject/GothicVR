@@ -25,11 +25,8 @@ namespace GVR.World
         private Coroutine timeTickCoroutineHandler;
         
         
-        void Start()
+        private void Start()
         {
-            if (!FeatureFlags.I.enableDayTime)
-                return;
-
             // Set debug value for current Time.
             time = new DateTime(time.Year, time.Month, time.Day,
                     FeatureFlags.I.startHour, FeatureFlags.I.startMinute, time.Second);
@@ -103,6 +100,11 @@ namespace GVR.World
         public int GetDay()
         {
             return time.Day;
+        }
+
+        public void SetTime(int hour, int minute)
+        {
+            time = new DateTime(time.Year, time.Month, time.Day, hour, minute, 0);
         }
 
         public float GetSkyTime()

@@ -18,18 +18,20 @@ namespace GVR.Properties
         public Transform head;
         public HeadMorph headMorph;
 
-        public FreePoint currentFreePoint;
-        public WayPoint currentWayPoint;
+        public WayPoint CurrentWayPoint;
+        public FreePoint CurrentFreePoint;
 
         public List<InfoInstance> Dialogs = new();
             
         // Visual
         public string mdmName;
         public string baseMdsName;
-        public string baseMdhName => baseMdsName;
         public string overlayMdsName;
+        public string[] mdsNames => new[]{ baseMdsName, overlayMdsName };
+        public string baseMdhName => baseMdsName;
         public string overlayMdhName => overlayMdsName;
-        
+        public string[] mdhNames => new[]{ baseMdhName, overlayMdhName };
+
         public List<ItemInstance> EquippedItems = new();
         public VmGothicExternals.ExtSetVisualBodyData BodyData;
         
@@ -48,7 +50,10 @@ namespace GVR.Properties
         // HINT: These information aren't set within Daedalus. We need to define them manually.
         // HINT: i.e. every animation might have a BS. E.g. when AI_TakeItem() is called, we set BS.BS_TAKEITEM
         public VmGothicEnums.BodyState bodyState;
-        
+        public GameObject currentInteractable; // e.g. PSI_CAULDRON
+        public GameObject currentInteractableSlot; // e.g. ZS_0
+        public int currentInteractableStateId = -1;
+
         public uint prevStateStart;
         public int stateStart;
         public int stateLoop;

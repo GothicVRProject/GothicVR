@@ -22,7 +22,6 @@ namespace GVR.GothicVR.Scripts.Manager
         private float[] thunderDelay = { 8, 6, 14, 2 }; // https://ataulien.github.io/Inside-Gothic/barrier/#thunder
         private float[] thunderTimer = { 0, 0, 0, 0 };
 
-
         private AudioSource[] thunderSoundSources = new AudioSource[4];
 
         private bool barrierFadeIn;
@@ -48,6 +47,10 @@ namespace GVR.GothicVR.Scripts.Manager
             var barrierMesh = AssetCache.TryGetMsh("MAGICFRONTIER_OUT.MSH");
             barrier = MeshCreatorFacade.CreateBarrier("Barrier", barrierMesh)
                 .GetAllDirectChildren()[0];
+
+            if (!FeatureFlags.I.enableSounds)
+                return;
+            
             for (var i = 0; i < thunderSoundSources.Length; i++)
             {
                 thunderSoundSources[i] = barrier.AddComponent<AudioSource>();
@@ -88,11 +91,11 @@ namespace GVR.GothicVR.Scripts.Manager
 
             UpdateFadeState();
 
-            if (showThunder)
+            if (showThunder && FeatureFlags.I.enableSounds)
             {
                 var sound = VobHelper.GetSoundClip("MFX_BARRIERE_AMBIENT");
-
-                for (int i = 0; i < 4; i++)
+                
+                for (var i = 0; i < 4; i++)
                 {
                     if (!activeThunder[i] && !thunderSoundSources[i].isPlaying &&
                         (Time.time - thunderTimer[i]) > thunderDelay[i])

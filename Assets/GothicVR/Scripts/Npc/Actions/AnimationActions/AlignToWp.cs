@@ -1,27 +1,24 @@
+using System;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
-    public class AlignToWp : AbstractAnimationAction
+    public class AlignToWp : AbstractRotateAnimationAction
     {
         public AlignToWp(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
-        public override void Start()
+        protected override Vector3 GetRotationDirection()
         {
-            // FIXME TODO
+            try
+            {
+                return Props.CurrentWayPoint.Direction;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                return Vector3.zero;
+            }
         }
-
-        public override void AnimationEndEventCallback()
-        {
-            // FIXME TODO
-        }
-
-        public override bool IsFinished()
-        {
-            // FIXME - DEBUG
-            return true;
-        }
-
     }
 }

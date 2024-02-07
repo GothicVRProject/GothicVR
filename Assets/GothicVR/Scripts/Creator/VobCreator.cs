@@ -339,14 +339,20 @@ namespace GVR.Creator
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobMusic);
                     break;
                 case VirtualObjectType.oCMOB:
+                    go = PrefabCache.TryGetObject(PrefabCache.PrefabType.Vob);
+                    break;
                 case VirtualObjectType.oCMobFire:
                 case VirtualObjectType.oCMobInter:
                 case VirtualObjectType.oCMobBed:
-                case VirtualObjectType.oCMobDoor:
-                case VirtualObjectType.oCMobContainer:
-                case VirtualObjectType.oCMobSwitch:
                 case VirtualObjectType.oCMobWheel:
+                case VirtualObjectType.oCMobSwitch:
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobInteractable);
+                    break;
+                case VirtualObjectType.oCMobDoor:
+                    go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobDoor);
+                    break;
+                case VirtualObjectType.oCMobContainer:
+                    go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobContainer);
                     break;
                 default:
                     return new GameObject(name);
@@ -376,6 +382,11 @@ namespace GVR.Creator
                 case VirtualObjectType.oCMobContainer:
                 case VirtualObjectType.oCMobSwitch:
                 case VirtualObjectType.oCMobWheel:
+                    var propertiesComponent = go.GetComponent<VobProperties>();
+
+                    if (propertiesComponent == null)
+                        Debug.LogError($"VobProperties component missing on {go.name} ({vob.Type})");
+
                     GameData.VobsInteractable.Add(go.GetComponent<VobProperties>());
                     break;
             }
@@ -412,11 +423,30 @@ namespace GVR.Creator
         /// <summary>
         /// Render item inside GameObject
         /// </summary>
-        public static GameObject CreateItem(int itemId, GameObject go)
+        public static void CreateItem(int itemId, GameObject go)
         {
             var item = AssetCache.TryGetItemData(itemId);
 
-            return CreateItemMesh(item, go);
+            CreateItemMesh(item, go);
+        }
+
+        public static void CreateItem(int itemId, string spawnpoint, GameObject go)
+        {
+            var item = AssetCache.TryGetItemData(itemId);
+
+            var position = WayNetHelper.GetWayNetPoint(spawnpoint).Position;
+
+            CreateItemMesh(item, go, position);
+        }
+
+        public static void CreateItem(string itemName, GameObject go)
+        {
+            if (itemName == "")
+                return;
+
+            var item = AssetCache.TryGetItemData(itemName);
+
+            CreateItemMesh(item, go);
         }
 
         [CanBeNull]
@@ -429,18 +459,12 @@ namespace GVR.Creator
             else if (!string.IsNullOrEmpty(vob.Name))
                 itemName = vob.Name;
             else
-                throw new Exception("PxVobItemData -> no usable INSTANCE name found.");
+                throw new Exception("Vob Item -> no usable name found.");
 
             var item = AssetCache.TryGetItemData(itemName);
 
             if (item == null)
                 return null;
-
-            if (item.Visual.EndsWithIgnoreCase(".mms"))
-            {
-                Debug.LogError($"Item {item.Visual} is of type mms/mmb and we don't have a mesh creator to handle it properly (for now).");
-                return null;
-            }
 
             var prefabInstance = GetPrefab(vob);
             var vobObj = CreateItemMesh(vob, item, prefabInstance);
@@ -641,7 +665,7 @@ namespace GVR.Creator
             // FIXME - change to a Prefab in the future.
             var vobObj = GetPrefab(vob);
 
-            if (!FeatureFlags.I.drawFreePointMeshes)
+            if (!FeatureFlags.I.drawFreePoints)
             {
                 // Quick win: If we don't want to render the spots, we just remove the Renderer.
                 GameObject.Destroy(vobObj.GetComponent<MeshRenderer>());
@@ -651,10 +675,11 @@ namespace GVR.Creator
             vobObj.name = fpName;
             vobObj.SetParent(parentGosTeleport[vob.Type]);
 
-            var freePointData = new FreePoint()
+            var freePointData = new FreePoint
             {
                 Name = fpName,
-                Position = vob.Position.ToUnityVector()
+                Position = vob.Position.ToUnityVector(),
+                Direction = vob.Rotation.ToUnityQuaternion().eulerAngles
             };
             vobObj.GetComponent<VobSpotProperties>().fp = freePointData;
             GameData.FreePoints.Add(fpName, freePointData);
@@ -665,15 +690,17 @@ namespace GVR.Creator
 
         private static GameObject CreateLadder(IVirtualObject vob)
         {
-            // FIXME - use Prefab instead. And be cautious of settings!
             var vobObj = CreateDefaultMesh(vob, true);
-            var meshGo = vobObj;
-            var grabComp = meshGo.AddComponent<XRGrabInteractable>();
-            var rigidbodyComp = meshGo.GetComponent<Rigidbody>();
+
+            // We will set some default values for collider and grabbing now.
+            // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
+            // e.g. grabComp's colliders aren't recalculated if we have the XRGrabInteractable set in Prefab.
+            var grabComp = vobObj.AddComponent<XRGrabInteractable>();
+            var rigidbodyComp = vobObj.GetComponent<Rigidbody>();
             var meshColliderComp = vobObj.GetComponentInChildren<MeshCollider>();
 
             meshColliderComp.convex = true; // We need to set it to overcome Physics.ClosestPoint warnings.
-            meshGo.tag = Constants.ClimbableTag;
+            vobObj.tag = Constants.ClimbableTag;
             rigidbodyComp.isKinematic = true;
             grabComp.throwOnDetach = false; // Throws errors and isn't needed as we don't want to move the kinematic ladder when released.
             grabComp.trackPosition = false;
@@ -688,11 +715,11 @@ namespace GVR.Creator
             var mrm = AssetCache.TryGetMrm(item.Visual);
             return MeshCreatorFacade.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
         }
-
-        private static GameObject CreateItemMesh(ItemInstance item, GameObject go)
+        
+        private static GameObject CreateItemMesh(ItemInstance item, GameObject go, UnityEngine.Vector3 position = default)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
-            return MeshCreatorFacade.CreateVob(item.Visual, mrm, default, default, false, parent: go);
+            return MeshCreatorFacade.CreateVob(item.Visual, mrm, position, default, false, parent: go);
         }
 
         private static GameObject CreateDecal(IVirtualObject vob)
@@ -915,11 +942,12 @@ namespace GVR.Creator
             if (meshName.IsEmpty())
                 return null;
 
+            var go = GetPrefab(vob);
+
             // MDL
             var mdl = AssetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                var go = GetPrefab(vob);
                 var ret = MeshCreatorFacade.CreateVob(meshName, mdl, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), parent, go);
 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
@@ -934,8 +962,14 @@ namespace GVR.Creator
             var mdm = AssetCache.TryGetMdm(meshName);
             if (mdh != null && mdm != null)
             {
-                return MeshCreatorFacade.CreateVob(meshName, mdm, mdh, vob.Position.ToUnityVector(),
-                    vob.Rotation.ToUnityQuaternion(), parent);
+                var ret = MeshCreatorFacade.CreateVob(meshName, mdm, mdh, vob.Position.ToUnityVector(),
+                    vob.Rotation.ToUnityQuaternion(), parent, go);
+
+                // A few objects are broken and have no meshes. We need to destroy them immediately again.
+                if (ret == null)
+                    GameObject.Destroy(go);
+
+                return ret;
             }
 
             // MRM
@@ -945,7 +979,6 @@ namespace GVR.Creator
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.CdDynamic;
 
-                var go = GetPrefab(vob);
                 var ret = MeshCreatorFacade.CreateVob(meshName, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), withCollider, parent, go);
 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.

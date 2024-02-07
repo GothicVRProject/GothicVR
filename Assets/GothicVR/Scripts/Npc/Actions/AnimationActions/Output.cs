@@ -4,6 +4,7 @@ using GVR.Creator;
 using GVR.Creator.Sounds;
 using GVR.Extensions;
 using GVR.Globals;
+using GVR.Manager;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -28,20 +29,17 @@ namespace GVR.Npc.Actions.AnimationActions
                 // If NPC talked before, we stop it immediately (As some audio samples are shorter than the actual animation)
                 AnimationCreator.StopAnimation(NpcGo);
 
-                // FIXME - Play sound file on Hero's AudioSource - Use global lookup for Hero's AudioSource component
-                GameObject.Find("HeroVoice").GetComponent<AudioSource>().PlayOneShot(audioClip);
+               NpcHelper.GetHeroGameObject().GetComponent<AudioSource>().PlayOneShot(audioClip);
                 // FIXME - Show subtitles somewhere next to Hero (== ourself/main camera)
             }
             // NPC
             else
             {
-                var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
-
                 var gestureCount = GetDialogGestureCount();
                 var randomId = Random.Range(1, gestureCount+1);
 
                 // FIXME - We need to handle both mds and mdh options! (base vs overlay)
-                AnimationCreator.PlayAnimation(Props.baseMdsName, $"T_DIALOGGESTURE_{randomId:00}", mdh, NpcGo);
+                AnimationCreator.PlayAnimation(Props.mdsNames, $"T_DIALOGGESTURE_{randomId:00}", NpcGo);
                 AnimationCreator.PlayHeadMorphAnimation(Props, HeadMorph.HeadMorphType.Viseme);
 
                 Props.npcSound.PlayOneShot(audioClip);

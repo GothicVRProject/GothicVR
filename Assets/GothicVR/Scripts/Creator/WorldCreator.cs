@@ -82,7 +82,7 @@ namespace GVR.Creator
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
         }
 
-        private static WorldData LoadWorld(string worldName)
+        private static void LoadWorld(string worldName)
         {
             var zkWorld = new ZenKit.World(GameData.Vfs, worldName);
             var zkMesh = zkWorld.Mesh.Cache();
@@ -468,7 +468,7 @@ namespace GVR.Creator
                 return;
             }
 
-            GameData.World = LoadWorld(worldScene.name);
+            LoadWorld(worldScene.name);
 
             await WorldMeshCreator.CreateAsync(GameData.World, new GameObject("World"), Constants.MeshPerFrame);
         }

@@ -43,7 +43,7 @@ namespace GVR.Creator
 
         private static GameObject GetNpcGo(NpcInstance npcInstance)
         {
-            return GetProperties(npcInstance).gameObject;
+            return GetProperties(npcInstance).go;
         }
 
         /// <summary>
@@ -88,10 +88,11 @@ namespace GVR.Creator
             if (FeatureFlags.I.npcToSpawn.Any() && !FeatureFlags.I.npcToSpawn.Contains(props.npcInstance.Id))
             {
                 Object.Destroy(newNpc);
+                LookupCache.NpcCache.Remove(props.npcInstance.Index);
                 return;
             }
 
-            newNpc.name = props.npcInstance.GetName(NpcNameSlot.Slot0);
+            newNpc.name = $"{props.npcInstance.GetName(NpcNameSlot.Slot0)} ({props.npcInstance.Id})";
             
             var mdhName = string.IsNullOrEmpty(props.overlayMdhName) ? props.baseMdhName : props.overlayMdhName;
             MeshCreatorFacade.CreateNpc(newNpc.name, props.mdmName, mdhName, props.BodyData, newNpc);
@@ -101,29 +102,17 @@ namespace GVR.Creator
                 MeshCreatorFacade.EquipNpcWeapon(newNpc, equippedItem, (VmGothicEnums.ItemFlags)equippedItem.MainFlag, (VmGothicEnums.ItemFlags)equippedItem.Flags);
             
             var npcRoutine = props.npcInstance.DailyRoutine;
-            vm.GlobalSelf = props.npcInstance;
-            vm.Call(npcRoutine);
-            
-            if (FeatureFlags.I.enableNpcRoutines)
-                StartRoutine(newNpc);
-            
+            NpcHelper.ExchangeRoutine(newNpc, props.npcInstance, npcRoutine);
+
             SetSpawnPoint(newNpc, spawnPoint);
-        }
-
-        private static void StartRoutine(GameObject npc)
-        {
-            var routineComp = npc.GetComponent<Routine>();
-            var firstRoutine = routineComp.routines.First();
-
-            npc.GetComponent<AiHandler>().StartRoutine(firstRoutine.action, firstRoutine.waypoint);
         }
         
         private static void SetSpawnPoint(GameObject npcGo, string spawnPoint)
         {
             WayNetPoint initialSpawnPoint;
-            if (npcGo.GetComponent<Routine>().routines.Any())
+            if (npcGo.GetComponent<Routine>().Routines.Any() && FeatureFlags.I.enableNpcRoutines)
             {
-                var routineSpawnPointName = npcGo.GetComponent<Routine>().routines.First().waypoint;
+                var routineSpawnPointName = npcGo.GetComponent<Routine>().CurrentRoutine.waypoint;
                 initialSpawnPoint = WayNetHelper.GetWayNetPoint(routineSpawnPointName);
             }
             else
@@ -133,39 +122,35 @@ namespace GVR.Creator
 
             if (initialSpawnPoint == null)
             {
-                Debug.LogWarning(string.Format("spawnPoint={0} couldn't be found.", spawnPoint));
+                Debug.LogWarning($"spawnPoint={spawnPoint} couldn't be found.");
                 return;
             }
             
             npcGo.transform.position = initialSpawnPoint.Position;
 
-            if (initialSpawnPoint.GetType() == typeof(WayPoint))
-                npcGo.GetComponent<NpcProperties>().currentWayPoint = (WayPoint)initialSpawnPoint;
+            if (initialSpawnPoint.IsFreePoint())
+                npcGo.GetComponent<NpcProperties>().CurrentFreePoint = (FreePoint)initialSpawnPoint;
             else
-                npcGo.GetComponent<NpcProperties>().currentFreePoint = (FreePoint)initialSpawnPoint;
-            
+                npcGo.GetComponent<NpcProperties>().CurrentWayPoint = (WayPoint)initialSpawnPoint;
         }
         
         public static void ExtTaMin(NpcInstance npcInstance, int startH, int startM, int stopH, int stopM, int action, string waypoint)
         {
             var npc = GetNpcGo(npcInstance);
             
-            // If we put h=24, DateTime will throw an error instead of rolling.
-            var stop_hFormatted = (stopH == 24) ? 0 : stopH;
-
             RoutineData routine = new()
             {
-                start_h = startH,
-                start_m = startM,
-                start = new(1, 1, 1, startH, startM, 0),
-                stop_h = stopH,
-                stop_m = stopM,
-                stop = new(1, 1, 1, stop_hFormatted, stopM, 0),
+                startH = startH,
+                startM = startM,
+                normalizedStart = (startH % 24) * 60 + startM,
+                stopH = stopH,
+                stopM = stopM,
+                normalizedEnd = (stopH % 24) * 60 + stopM,
                 action = action,
                 waypoint = waypoint
             };
 
-            npc.GetComponent<Routine>().routines.Add(routine);
+            npc.GetComponent<Routine>().Routines.Add(routine);
 
             // Add element if key not yet exists.
             GameData.npcRoutines.TryAdd(npcInstance.Index, new());
@@ -182,6 +167,12 @@ namespace GVR.Creator
         {
             var props = GetProperties(npc);
             props.overlayMdsName = overlayName;
+        }
+
+        public static void ExtNpcSetTalentSkill(NpcInstance npc, VmGothicEnums.Talent talent, int level)
+        {
+            // FIXME - TBD.
+            // FIXME - In OpenGothic it adds MDS overlays based on skill level.
         }
 
         public static void ExtSetVisualBody(VmGothicExternals.ExtSetVisualBodyData data)
@@ -231,10 +222,22 @@ namespace GVR.Creator
             return properties.npcInstance;
         }
 
+        public static int ExtHlpGetInstanceId(DaedalusInstance instance)
+        {
+            if (instance == null)
+                return -1;
+            return instance.Index;
+        }
+
         public static void ExtNpcPerceptionEnable(NpcInstance npc, VmGothicEnums.PerceptionType perception, int function)
         {
             var props = GetProperties(npc);
             props.Perceptions[perception] = function;
+        }      
+        public static void ExtNpcPerceptionDisable(NpcInstance npc, VmGothicEnums.PerceptionType perception)
+        {
+            var props = GetProperties(npc);
+            props.Perceptions[perception] = -1;
         }
 
         public static void ExtNpcSetPerceptionTime(NpcInstance npc, float time)

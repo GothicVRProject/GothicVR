@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using GVR.Extensions;
 using GVR.Globals;
@@ -45,13 +44,14 @@ namespace GVR.Manager
             return matchingFreePoints.ToList();
         }
 
-        public static WayPoint FindNearestWayPoint(Vector3 lookupPosition)
+        public static WayPoint FindNearestWayPoint(Vector3 lookupPosition, bool findSecondNearest = false)
         {
-            var nearestWayPoint = GameData.WayPoints
+            var wayPoint = GameData.WayPoints
                 .OrderBy(pair => Vector3.Distance(pair.Value.Position, lookupPosition))
-                .First();
+                .Skip(findSecondNearest ? 1 : 0)
+                .FirstOrDefault();
 
-            return nearestWayPoint.Value;
+            return wayPoint.Value;
         }
 
         [CanBeNull]

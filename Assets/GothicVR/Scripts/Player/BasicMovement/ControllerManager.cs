@@ -1,9 +1,11 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Data;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
+using GVR.Manager;
 using GVR.Util;
 using TMPro;
 using UnityEngine;
@@ -26,9 +28,26 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
     private InputAction rightPrimaryButtonAction;
     private InputAction rightSecondaryButtonAction;
 
+    public GameObject MapObject;
+    public float maprollspeed;
+    public float maprolloffset;
+    private Animator maproll;
+    AudioSource mapaudio;
+    AudioClip scrollsound;
+
     protected override void Awake()
     {
         base.Awake();
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        maproll = MapObject.gameObject.GetComponent<Animator>();
+        mapaudio = MapObject.gameObject.GetComponent<AudioSource>();
+        scrollsound = VobHelper.GetSoundClip("SCROLLROLL.WAV");
+        MapObject.SetActive(false);
+        maproll.enabled = false;
 
         leftPrimaryButtonAction = new InputAction("primaryButton", binding: "<XRController>{LeftHand}/primaryButton");
         leftSecondaryButtonAction = new InputAction("secondaryButton", binding: "<XRController>{LeftHand}/secondaryButton");
@@ -42,7 +61,7 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
         rightPrimaryButtonAction = new InputAction("primaryButton", binding: "<XRController>{RightHand}/primaryButton");
         rightSecondaryButtonAction = new InputAction("secondaryButton", binding: "<XRController>{RightHand}/secondaryButton");
 
-
+        rightPrimaryButtonAction.started += ctx => ShowMap();
         rightSecondaryButtonAction.started += ctx => ShowMainMenu();
 
         rightPrimaryButtonAction.Enable();
@@ -51,11 +70,11 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
 
     private void OnDestroy()
     {
-        leftPrimaryButtonAction.Disable();
-        leftSecondaryButtonAction.Disable();
+        leftPrimaryButtonAction?.Disable();
+        leftSecondaryButtonAction?.Disable();
 
-        rightPrimaryButtonAction.Disable();
-        rightSecondaryButtonAction.Disable();
+        rightPrimaryButtonAction?.Disable();
+        rightSecondaryButtonAction?.Disable();
     }
 
     public void ShowRayCasts()
@@ -82,6 +101,34 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
             MenuGameObject.SetActive(false);
     }
 
+    public void ShowMap()
+    {
+        if (!MapObject.activeSelf)
+            StartCoroutine(UnrollMap());
+        else
+            StartCoroutine(RollupMap());
+    }
+
+    public IEnumerator UnrollMap()
+    {
+        MapObject.SetActive(true);
+        maproll.enabled = true;
+        maproll.speed = maprollspeed;
+        maproll.Play("Unroll", -1, 0.0f);
+        mapaudio.PlayOneShot(scrollsound);
+        yield return new WaitForSeconds((maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length / maprollspeed) * (maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length - maprolloffset) / maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length);
+        maproll.speed = 0f;
+    }
+    public IEnumerator RollupMap()
+    {
+        maproll.speed = maprollspeed;
+        maproll.Play("Roll", -1, (1 - (maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length - maprolloffset) / maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length));
+        mapaudio.PlayOneShot(scrollsound);
+        yield return new WaitForSeconds((maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length / maprollspeed) * (maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length - maprolloffset) / maproll.GetCurrentAnimatorClipInfo(0)[0].clip.length);
+        maproll.speed = 0f;
+        MapObject.SetActive(false);
+    }
+
     public void ShowDialog()
     {
         dialogGameObject.SetActive(true);
@@ -97,6 +144,8 @@ public class ControllerManager : SingletonBehaviour<ControllerManager>
         CreateAdditionalDialogOptions(dialogOptions.Count);
         ClearDialogOptions();
 
+        // G1 handles DialogOptions added via (Info_AddChoice()) in reverse order.
+        dialogOptions.Reverse();
         for (var i = 0; i < dialogOptions.Count; i++)
         {
             var dialogItem = dialogItems[i];

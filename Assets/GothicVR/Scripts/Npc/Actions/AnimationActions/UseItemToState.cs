@@ -1,11 +1,6 @@
-using System;
 using GVR.Caches;
 using GVR.Creator;
-using GVR.Extensions;
 using UnityEngine;
-using ZenKit;
-using EventType = ZenKit.EventType;
-using Object = UnityEngine.Object;
 
 namespace GVR.Npc.Actions.AnimationActions
 {
@@ -39,65 +34,22 @@ namespace GVR.Npc.Actions.AnimationActions
 
         private void StartItemStateAnimation(int itemAnimationState)
         {
-            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
             var item = AssetCache.TryGetItemData(Action.Int0);
 
             // e.g. T_POTION_STAND_2_S0
             var animationName = string.Format(animationStartScheme, item.SchemeName, itemAnimationState);
             
-            AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, mdh, NpcGo);
+            AnimationCreator.PlayAnimation(Props.mdsNames, animationName, NpcGo);
         }
 
         private void EndItemStateAnimation(int itemAnimationState)
         {
-            var mdh = AssetCache.TryGetMdh(Props.overlayMdhName);
             var item = AssetCache.TryGetItemData(Action.Int0);
 
             // e.g. T_POTION_S0_2_STAND
             var animationName = string.Format(animationEndScheme, item.SchemeName, itemAnimationState);
             
-            AnimationCreator.PlayAnimation(Props.baseMdsName, animationName, mdh, NpcGo);
-        }
-
-        public override void AnimationEventCallback(IEventTag data)
-        {
-            switch (data.Type)
-            {
-                case EventType.ItemInsert:
-                    InsertItem(data.Slots);
-                    break;
-                case EventType.ItemDestroy:
-                    DestroyItem();
-                    break;
-                case EventType.TorchInventory:
-                    Debug.Log("PxEventTagType.inventory_torch: I assume this means: if torch is in inventory, then put it out. But not really sure. Need a NPC with real usage of it to predict right.");
-                    break;
-                default:
-                    Debug.LogWarning($"PxEventTagData.type {data.Type} not yet supported.");
-                    break;
-            }
-        }
-        
-        private void InsertItem(Tuple<string, string> slots)
-        {
-            // FIXME - Slots not yet re-implemented.
-            
-            // foreach (var slot in slots)
-            // {
-            //     var slotGo = NpcGo.FindChildRecursively(slot);
-            //     VobCreator.CreateItem(Props.currentItem, slotGo);
-            //
-            //     Props.usedItemSlot = slot;
-            // }
-        }
-
-        private void DestroyItem()
-        {
-            // FIXME - This is called to late. Feels like the animation for T_*_S0_2_Stand is glued with another.
-            // FIXME - So that frame y is more like frame x+y, where y is the frames count from previous call.
-            var slotGo = NpcGo.FindChildRecursively(Props.usedItemSlot);
-            var item = slotGo!.transform.GetChild(0);
-            Object.Destroy(item.gameObject);
+            AnimationCreator.PlayAnimation(Props.mdsNames, animationName, NpcGo);
         }
     }
 }

@@ -7,7 +7,7 @@ using UnityEngine;
 public class TextureManager : SingletonBehaviour<TextureManager>
 {
     public Material mainMenuImageBackgroundMaterial;
-     public Material mainMenuBackgroundMaterial;
+    public Material mainMenuBackgroundMaterial;
     public Material mainMenuTextImageMaterial;
 
     public Material backgroundMaterial;
@@ -17,6 +17,7 @@ public class TextureManager : SingletonBehaviour<TextureManager>
     public Material arrowMaterial;
     public Material fillerMaterial;
     public Material skyMaterial;
+    public Material mapMaterial;
 
     public Material gothicLoadingMenuMaterial;
     public Material loadingBarBackgroundMaterial;
@@ -61,6 +62,7 @@ public class TextureManager : SingletonBehaviour<TextureManager>
         sliderPositionMaterial.mainTexture = AssetCache.TryGetTexture("MENU_SLIDER_POS.TGA");
         fillerMaterial.mainTexture = AssetCache.TryGetTexture("MENU_BUTTONBACK.TGA");
         arrowMaterial.mainTexture = AssetCache.TryGetTexture("U.TGA");
+        mapMaterial.mainTexture = AssetCache.TryGetTexture("MAP_WORLD_ORC.TGA");
     }
 
     public void SetTexture(string texture, Material material)

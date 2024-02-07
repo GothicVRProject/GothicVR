@@ -128,134 +128,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!1 &589842099468929089
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 9113810631379704788}
-  - component: {fileID: 367388854615376469}
-  m_Layer: 7
-  m_Name: HeroVoice
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &9113810631379704788
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 589842099468929089}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3286136463054414638}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!82 &367388854615376469
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 589842099468929089}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &2063933424735589160
 GameObject:
   m_ObjectHideFlags: 0
@@ -5153,7 +5025,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -2024308242397127297, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -2024308242397127297, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_RotationAction:
     m_UseReference: 1
     m_Action:
@@ -5165,7 +5037,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 8248158260566104461, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 8248158260566104461, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_IsTrackedAction:
     m_UseReference: 0
     m_Action:
@@ -5189,7 +5061,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 684395432459739428, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 684395432459739428, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_SelectAction:
     m_UseReference: 1
     m_Action:
@@ -5201,7 +5073,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -6131295136447488360, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -6131295136447488360, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_SelectActionValue:
     m_UseReference: 1
     m_Action:
@@ -5213,7 +5085,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 6558622148059887818, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 6558622148059887818, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ActivateAction:
     m_UseReference: 1
     m_Action:
@@ -5225,7 +5097,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -5982496924579745919, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -5982496924579745919, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ActivateActionValue:
     m_UseReference: 1
     m_Action:
@@ -5237,7 +5109,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -4289430672226363583, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -4289430672226363583, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIPressAction:
     m_UseReference: 1
     m_Action:
@@ -5249,7 +5121,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -6395602842196007441, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -6395602842196007441, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIPressActionValue:
     m_UseReference: 1
     m_Action:
@@ -5261,7 +5133,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 71106601250685021, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 71106601250685021, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIScrollAction:
     m_UseReference: 0
     m_Action:
@@ -5285,7 +5157,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -8785819595477538065, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -8785819595477538065, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_RotateAnchorAction:
     m_UseReference: 1
     m_Action:
@@ -5297,7 +5169,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -7363382999065477798, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -7363382999065477798, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_DirectionalAnchorRotationAction:
     m_UseReference: 0
     m_Action:
@@ -5321,7 +5193,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 7779212132400271959, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 7779212132400271959, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ScaleToggleAction:
     m_UseReference: 0
     m_Action:
@@ -5527,7 +5399,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -3326005586356538449, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -3326005586356538449, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_RotationAction:
     m_UseReference: 1
     m_Action:
@@ -5539,7 +5411,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 5101698808175986029, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 5101698808175986029, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_IsTrackedAction:
     m_UseReference: 0
     m_Action:
@@ -5563,7 +5435,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -1277054153949319361, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -1277054153949319361, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_SelectAction:
     m_UseReference: 1
     m_Action:
@@ -5575,7 +5447,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 187161793506945269, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 187161793506945269, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_SelectActionValue:
     m_UseReference: 1
     m_Action:
@@ -5587,7 +5459,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -1758520528963094988, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -1758520528963094988, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ActivateAction:
     m_UseReference: 1
     m_Action:
@@ -5599,7 +5471,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 83097790271614945, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ActivateActionValue:
     m_UseReference: 1
     m_Action:
@@ -5611,7 +5483,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 7904272356298805229, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 7904272356298805229, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIPressAction:
     m_UseReference: 1
     m_Action:
@@ -5623,7 +5495,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 3279264004350380116, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 3279264004350380116, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIPressActionValue:
     m_UseReference: 1
     m_Action:
@@ -5635,7 +5507,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -5908353012961274365, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -5908353012961274365, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIScrollAction:
     m_UseReference: 0
     m_Action:
@@ -5659,7 +5531,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -8222252007134549311, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -8222252007134549311, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_RotateAnchorAction:
     m_UseReference: 1
     m_Action:
@@ -5671,7 +5543,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -5913262927076077117, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -5913262927076077117, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_DirectionalAnchorRotationAction:
     m_UseReference: 0
     m_Action:
@@ -5695,7 +5567,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 875253871413052681, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 875253871413052681, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ScaleToggleAction:
     m_UseReference: 0
     m_Action:
@@ -6188,6 +6060,7 @@ GameObject:
   - component: {fileID: 3286136461781483593}
   - component: {fileID: 3490461415993468589}
   - component: {fileID: 5331787116829108395}
+  - component: {fileID: 2500770934419847238}
   m_Layer: 7
   m_Name: VRPlayer
   m_TagString: Player
@@ -6245,7 +6118,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ActionAssets:
-  - {fileID: -944628639613478452, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  - {fileID: -944628639613478452, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
 --- !u!143 &3286136461781483592
 CharacterController:
   m_ObjectHideFlags: 0
@@ -6299,7 +6172,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.25
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -6343,7 +6216,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -6406,6 +6279,44 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2500770934419847238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3286136461781483594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da21e4a06ee346319b0a6dc74e0dcc61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  npcSound: {fileID: 0}
+  bip01: {fileID: 0}
+  colliderRootMotion: {fileID: 0}
+  head: {fileID: 0}
+  headMorph: {fileID: 0}
+  mdmName: 
+  baseMdsName: 
+  overlayMdsName: 
+  perceptionTime: 0
+  walkMode: 0
+  bodyState: 0
+  currentInteractable: {fileID: 0}
+  currentInteractableSlot: {fileID: 0}
+  currentInteractableStateId: -1
+  prevStateStart: 0
+  stateStart: 0
+  stateLoop: 0
+  stateEnd: 0
+  isStateTimeActive: 0
+  stateTime: 0
+  currentLoopState: 0
+  hasItemEquipped: 0
+  currentItem: 0
+  usedItemSlot: 
+  itemAnimationState: -1
+  isClonedFromAnother: 0
 --- !u!1 &3286136462172449750
 GameObject:
   m_ObjectHideFlags: 0
@@ -6522,7 +6433,7 @@ MonoBehaviour:
   baseControllerGameObject: {fileID: 3286136463242076545}
   teleportationGameObject: {fileID: 3286136462967229782}
   player: {fileID: 3286136461781483594}
-  teleportActivationReference: {fileID: -8061240218431744966, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  teleportActivationReference: {fileID: -8061240218431744966, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   onTeleportActivate:
     m_PersistentCalls:
       m_Calls:
@@ -6735,7 +6646,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -6493913391331992944, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -6493913391331992944, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
 --- !u!114 &3286136462831979465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6773,7 +6684,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -6493913391331992944, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -6493913391331992944, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
 --- !u!114 &3286136462831979464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6804,7 +6715,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 6972639530819350904, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 6972639530819350904, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_RightHandMoveAction:
     m_UseReference: 0
     m_Action:
@@ -6841,7 +6752,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 0}
+    m_Reference: {fileID: -8265130257064739641, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   velocityLeft:
     m_UseReference: 1
     m_Action:
@@ -6853,7 +6764,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 0}
+    m_Reference: {fileID: -6951532306242082534, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
 --- !u!1 &3286136462967229782
 GameObject:
   m_ObjectHideFlags: 0
@@ -6922,7 +6833,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -3326005586356538449, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -3326005586356538449, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_RotationAction:
     m_UseReference: 1
     m_Action:
@@ -6934,7 +6845,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 5101698808175986029, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 5101698808175986029, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_IsTrackedAction:
     m_UseReference: 0
     m_Action:
@@ -6958,7 +6869,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -1277054153949319361, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -1277054153949319361, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_SelectAction:
     m_UseReference: 1
     m_Action:
@@ -6970,7 +6881,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -8270564778575511633, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -8270564778575511633, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_SelectActionValue:
     m_UseReference: 1
     m_Action:
@@ -6982,7 +6893,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -1758520528963094988, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -1758520528963094988, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ActivateAction:
     m_UseReference: 1
     m_Action:
@@ -6994,7 +6905,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 83097790271614945, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ActivateActionValue:
     m_UseReference: 1
     m_Action:
@@ -7006,7 +6917,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 7904272356298805229, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 7904272356298805229, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIPressAction:
     m_UseReference: 1
     m_Action:
@@ -7018,7 +6929,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 3279264004350380116, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 3279264004350380116, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIPressActionValue:
     m_UseReference: 1
     m_Action:
@@ -7030,7 +6941,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -5908353012961274365, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -5908353012961274365, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIScrollAction:
     m_UseReference: 0
     m_Action:
@@ -7054,7 +6965,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -8222252007134549311, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -8222252007134549311, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_RotateAnchorAction:
     m_UseReference: 1
     m_Action:
@@ -7066,7 +6977,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -5913262927076077117, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -5913262927076077117, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_DirectionalAnchorRotationAction:
     m_UseReference: 0
     m_Action:
@@ -7090,7 +7001,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 875253871413052681, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 875253871413052681, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ScaleToggleAction:
     m_UseReference: 0
     m_Action:
@@ -7220,9 +7131,9 @@ MonoBehaviour:
   m_ConeCastAngle: 6
   m_RaycastMask:
     serializedVersion: 2
-    m_Bits: 2147483647
-  m_RaycastTriggerInteraction: 2
-  m_RaycastSnapVolumeInteraction: 1
+    m_Bits: 465
+  m_RaycastTriggerInteraction: 1
+  m_RaycastSnapVolumeInteraction: 0
   m_HitClosestOnly: 0
   m_HoverToSelect: 0
   m_HoverTimeToSelect: 0.5
@@ -7591,7 +7502,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -2024308242397127297, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -2024308242397127297, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_RotationAction:
     m_UseReference: 1
     m_Action:
@@ -7603,7 +7514,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 8248158260566104461, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 8248158260566104461, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_IsTrackedAction:
     m_UseReference: 0
     m_Action:
@@ -7627,7 +7538,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 684395432459739428, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 684395432459739428, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_SelectAction:
     m_UseReference: 1
     m_Action:
@@ -7639,7 +7550,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -6131295136447488360, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -6131295136447488360, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_SelectActionValue:
     m_UseReference: 1
     m_Action:
@@ -7651,7 +7562,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 6558622148059887818, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 6558622148059887818, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ActivateAction:
     m_UseReference: 1
     m_Action:
@@ -7663,7 +7574,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -5982496924579745919, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -5982496924579745919, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ActivateActionValue:
     m_UseReference: 1
     m_Action:
@@ -7675,7 +7586,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -4289430672226363583, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -4289430672226363583, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIPressAction:
     m_UseReference: 1
     m_Action:
@@ -7687,7 +7598,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -6395602842196007441, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -6395602842196007441, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIPressActionValue:
     m_UseReference: 1
     m_Action:
@@ -7699,7 +7610,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 71106601250685021, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 71106601250685021, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIScrollAction:
     m_UseReference: 0
     m_Action:
@@ -7723,7 +7634,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -8785819595477538065, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -8785819595477538065, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_RotateAnchorAction:
     m_UseReference: 1
     m_Action:
@@ -7735,7 +7646,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -7363382999065477798, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -7363382999065477798, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_DirectionalAnchorRotationAction:
     m_UseReference: 0
     m_Action:
@@ -7759,7 +7670,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 7779212132400271959, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 7779212132400271959, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ScaleToggleAction:
     m_UseReference: 0
     m_Action:
@@ -8253,8 +8164,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 9113810631379704788}
+  m_Children: []
   m_Father: {fileID: 3329884094427662597}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &3286136463054414635
@@ -8527,7 +8437,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -3326005586356538449, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -3326005586356538449, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_RotationAction:
     m_UseReference: 1
     m_Action:
@@ -8539,7 +8449,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 5101698808175986029, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 5101698808175986029, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_IsTrackedAction:
     m_UseReference: 0
     m_Action:
@@ -8563,7 +8473,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -1277054153949319361, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -1277054153949319361, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_SelectAction:
     m_UseReference: 1
     m_Action:
@@ -8575,7 +8485,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 187161793506945269, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 187161793506945269, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_SelectActionValue:
     m_UseReference: 1
     m_Action:
@@ -8587,7 +8497,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -1758520528963094988, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -1758520528963094988, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ActivateAction:
     m_UseReference: 1
     m_Action:
@@ -8599,7 +8509,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 83097790271614945, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ActivateActionValue:
     m_UseReference: 1
     m_Action:
@@ -8611,7 +8521,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 7904272356298805229, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 7904272356298805229, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIPressAction:
     m_UseReference: 1
     m_Action:
@@ -8623,7 +8533,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 3279264004350380116, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 3279264004350380116, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIPressActionValue:
     m_UseReference: 1
     m_Action:
@@ -8635,7 +8545,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -5908353012961274365, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -5908353012961274365, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_UIScrollAction:
     m_UseReference: 0
     m_Action:
@@ -8659,7 +8569,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -8222252007134549311, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -8222252007134549311, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_RotateAnchorAction:
     m_UseReference: 1
     m_Action:
@@ -8671,7 +8581,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -5913262927076077117, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: -5913262927076077117, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_DirectionalAnchorRotationAction:
     m_UseReference: 0
     m_Action:
@@ -8695,7 +8605,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 875253871413052681, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    m_Reference: {fileID: 875253871413052681, guid: 9a7437f3e3bee0145bc5a2d4f573e331, type: 3}
   m_ScaleToggleAction:
     m_UseReference: 0
     m_Action:
@@ -8884,6 +8794,9 @@ MonoBehaviour:
   dialogGameObject: {fileID: 7762858363386810679}
   dialogItems:
   - {fileID: 8387286217587800646}
+  MapObject: {fileID: 6988130571231615501}
+  maprollspeed: 3.6
+  maprolloffset: 0.15
 --- !u!1 &5086955422694840730
 GameObject:
   m_ObjectHideFlags: 0
@@ -9076,6 +8989,18 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 3.7
       objectReference: {fileID: 0}
+    - target: {fileID: 2780009890795622937, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.53
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780009890795622937, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 4.89
+      objectReference: {fileID: 0}
+    - target: {fileID: 3305436417525696675, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3504173973573620308, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
       propertyPath: m_Camera
       value: 
@@ -9143,6 +9068,10 @@ PrefabInstance:
     - target: {fileID: 4945101611003450528, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 5147509481810694248, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5643012489343552596, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
       propertyPath: m_IsActive
@@ -9221,7 +9150,6 @@ PrefabInstance:
       value: CloseButton
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 1113445482451678875, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
     - {fileID: 844863550639310758, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
     m_RemovedGameObjects:
     - {fileID: 5643012489343552596, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
@@ -9234,6 +9162,11 @@ PrefabInstance:
 --- !u!4 &3126365091315283402 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7369722077890996068, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
+  m_PrefabInstance: {fileID: 5559015695381729966}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6988130571231615501 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3305436417525696675, guid: 783884182cf2f8a46a2b872b08eb2aad, type: 3}
   m_PrefabInstance: {fileID: 5559015695381729966}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &7762858363386810679 stripped
