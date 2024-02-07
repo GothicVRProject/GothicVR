@@ -33,8 +33,7 @@ namespace GVR.Creator
 
         public static async Task CreateAsync(string worldName)
         {
-            WorldData world = LoadWorld(worldName);
-            GameData.World = world;
+            LoadWorld(worldName);
             worldGo = new GameObject("World");
 
             // Interactable Vobs (item, ladder, ...) have their own collider Components
@@ -47,12 +46,12 @@ namespace GVR.Creator
             // Build the world and vob meshes, populating the texture arrays.
             if (FeatureFlags.I.createVobs)
             {
-                await VobCreator.CreateAsync(teleportGo, nonTeleportGo, world, Constants.VObPerFrame);
+                await VobCreator.CreateAsync(teleportGo, nonTeleportGo, GameData.World, Constants.VObPerFrame);
             }
             if (FeatureFlags.I.createWorldMesh)
             {
-                world.SubMeshes = await BuildBspTree(world.World.Mesh.Cache(), world.World.BspTree.Cache());
-                await WorldMeshCreator.CreateAsync(world, teleportGo, Constants.MeshPerFrame);
+                GameData.World.SubMeshes = await BuildBspTree(GameData.World.World.Mesh.Cache(), GameData.World.World.BspTree.Cache());
+                await WorldMeshCreator.CreateAsync(GameData.World, teleportGo, Constants.MeshPerFrame);
             }
 
             // Build the texture arrays.
@@ -76,7 +75,7 @@ namespace GVR.Creator
                 BarrierManager.I.CreateBarrier();
             }
 
-            WaynetCreator.Create(worldGo, world);
+            WaynetCreator.Create(worldGo, GameData.World);
 
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
@@ -101,7 +100,7 @@ namespace GVR.Creator
                 WayNet = (CachedWayNet)zkWayNet
             };
 
-            return world;
+            GameData.World = world;
         }
 
         private static async Task<List<WorldData.SubMeshData>> BuildBspTree(IMesh zkMesh, IBspTree zkBspTree)

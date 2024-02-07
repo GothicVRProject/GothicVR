@@ -117,8 +117,8 @@ namespace GVR.Creator
                     {
                         case VirtualObjectType.oCItem:
                             {
-                                var obj = CreateItem((Item)vob);
-                                _cullingVobObjects.Add(obj);
+                                go = CreateItem((Item)vob);
+                                _cullingVobObjects.Add(go);
                                 break;
                             }
                         case VirtualObjectType.zCVobLight:
@@ -128,20 +128,20 @@ namespace GVR.Creator
                             }
                         case VirtualObjectType.oCMobContainer:
                             {
-                                var obj = CreateMobContainer((Container)vob);
-                                _cullingVobObjects.Add(obj);
+                                go = CreateMobContainer((Container)vob);
+                                _cullingVobObjects.Add(go);
                                 break;
                             }
                         case VirtualObjectType.zCVobSound:
                             {
-                                var obj = CreateSound((Sound)vob);
-                                LookupCache.vobSoundsAndDayTime.Add(obj);
+                                go = CreateSound((Sound)vob);
+                                LookupCache.vobSoundsAndDayTime.Add(go);
                                 break;
                             }
                         case VirtualObjectType.zCVobSoundDaytime:
                             {
-                                var obj = CreateSoundDaytime((SoundDaytime)vob);
-                                LookupCache.vobSoundsAndDayTime.Add(obj);
+                                go = CreateSoundDaytime((SoundDaytime)vob);
+                                LookupCache.vobSoundsAndDayTime.Add(go);
                                 break;
                             }
                         case VirtualObjectType.oCZoneMusic:
@@ -158,8 +158,8 @@ namespace GVR.Creator
                             }
                         case VirtualObjectType.oCMobLadder:
                             {
-                                var obj = CreateLadder(vob);
-                                _cullingVobObjects.Add(obj);
+                                go = CreateLadder(vob);
+                                _cullingVobObjects.Add(go);
                                 break;
                             }
                         case VirtualObjectType.oCTriggerChangeLevel:
@@ -169,8 +169,6 @@ namespace GVR.Creator
                             }
                         case VirtualObjectType.zCVob:
                             {
-                                GameObject obj;
-
                                 if (vob.Visual == null)
                                 {
                                     CreateDebugObject(vob);
@@ -180,17 +178,17 @@ namespace GVR.Creator
                                 switch (vob.Visual!.Type)
                                 {
                                     case VisualType.Decal:
-                                        obj = CreateDecal(vob);
+                                        go = CreateDecal(vob);
                                         break;
                                     case VisualType.ParticleEffect:
-                                        obj = CreatePfx(vob);
+                                        go = CreatePfx(vob);
                                         break;
                                     default:
-                                        obj = CreateDefaultMesh(vob);
+                                        go = CreateDefaultMesh(vob);
                                         break;
                                 }
 
-                                _cullingVobObjects.Add(obj);
+                                _cullingVobObjects.Add(go);
                                 break;
                             }
                         case VirtualObjectType.oCMobFire:
@@ -207,8 +205,8 @@ namespace GVR.Creator
                         case VirtualObjectType.oCMobBed:
                         case VirtualObjectType.oCMobWheel:
                             {
-                                var obj = CreateDefaultMesh(vob);
-                                _cullingVobObjects.Add(obj);
+                                go = CreateDefaultMesh(vob);
+                                _cullingVobObjects.Add(go);
                                 break;
                             }
                         case VirtualObjectType.zCVobScreenFX:
@@ -362,7 +360,7 @@ namespace GVR.Creator
 
             // Fill Property data into prefab here
             // Can also be outsourced to a proper method if it becomes a lot.
-            go.GetComponent<VobProperties>().SetVisual(vob.Name);
+            go.GetComponent<VobProperties>().SetData(vob);
 
             return go;
         }
