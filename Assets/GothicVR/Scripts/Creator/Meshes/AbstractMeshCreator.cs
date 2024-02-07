@@ -348,7 +348,7 @@ namespace GVR.Creator.Meshes
                         normals.Add(wedges[w].Normal.ToUnityVector());
                         Vector2 uv = Vector2.Scale(textureScale, wedges[w].Texture.ToUnityVector());
                         preparedUVs.Add(new Vector4(uv.x, uv.y, textureArrayIndex, maxMipLevel));
-                        if (isMorphMesh)
+                        if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
                         {
                             MorphMeshCache.AddVertexMappingEntry(morphMeshName, wedges[w].Index, preparedVertices.Count);
                         }
@@ -370,6 +370,7 @@ namespace GVR.Creator.Meshes
             }
 
             if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
+            { 
                 MorphMeshCache.SetUnityVerticesForVertexMapping(morphMeshName, preparedVertices.ToArray());
             }
 
