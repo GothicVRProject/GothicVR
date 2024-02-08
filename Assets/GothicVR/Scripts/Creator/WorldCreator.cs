@@ -25,7 +25,7 @@ namespace GVR.Creator
         private static GameObject _worldGo;
         private static GameObject _teleportGo;
         private static GameObject _nonTeleportGo;
-        private static readonly HashSet<IPolygon> ClaimedPolygons;
+        private static readonly HashSet<IPolygon> ClaimedPolygons = new();
 
         static WorldCreator()
         {
