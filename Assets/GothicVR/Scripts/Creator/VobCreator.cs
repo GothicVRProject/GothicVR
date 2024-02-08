@@ -513,7 +513,7 @@ namespace GVR.Creator
             SetPosAndRot(vobObj, vob.Position, vob.Rotation);
 
             StationaryLight lightComp = vobObj.AddComponent<StationaryLight>();
-            lightComp.Color = new Color(vob.Color.R * .01f, vob.Color.G * .01f, vob.Color.B * .01f, 1);
+            lightComp.Color = new Color(vob.Color.R / 255f, vob.Color.G / 255f, vob.Color.B / 255f, vob.Color.A / 255f);
             lightComp.Type = vob.LightType == ZenKit.Vobs.LightType.Point
                 ? UnityEngine.LightType.Point
                 : UnityEngine.LightType.Spot;
