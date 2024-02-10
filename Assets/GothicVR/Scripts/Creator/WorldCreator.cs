@@ -25,7 +25,7 @@ namespace GVR.Creator
         private static GameObject _worldGo;
         private static GameObject _teleportGo;
         private static GameObject _nonTeleportGo;
-        private static readonly HashSet<IPolygon> ClaimedPolygons = new();
+        private static HashSet<IPolygon> ClaimedPolygons;
 
         static WorldCreator()
         {
@@ -108,15 +108,17 @@ namespace GVR.Creator
 
         private static async Task<List<WorldData.SubMeshData>> BuildBspTree(IMesh zkMesh, IBspTree zkBspTree)
         {
+            ClaimedPolygons = new();
             Dictionary<int, List<WorldData.SubMeshData>> subMeshesPerParentNode = new();
-            System.Diagnostics.Stopwatch stopwatch = new();
+
+            Stopwatch stopwatch = new();
             stopwatch.Start();
             ExpandBspTreeIntoMeshes(zkMesh, zkBspTree, 0, subMeshesPerParentNode, null);
             stopwatch.Stop();
             Debug.Log($"Expanding tree: {stopwatch.ElapsedMilliseconds / 1000f} s");
 
             // Free memory
-            ClaimedPolygons.Clear();
+            ClaimedPolygons = null;
 
             stopwatch.Restart();
             // Merge the world meshes until they touch the max amount of lights per mesh.
