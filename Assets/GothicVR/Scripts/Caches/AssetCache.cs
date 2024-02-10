@@ -241,27 +241,59 @@ namespace GVR.Caches
 
             MdmCache[preparedKey] = newData;
 
-            FixArmorTriangles(preparedKey, newData);
+            FixArmorMisalignment(preparedKey, newData);
 
             return newData;
         }
 
         /// <summary>
-        /// Some armor mdm's have wrong triangles. This function corrects them hard coded until we find a proper solution.
+        /// Some armor mdm's have misplaced triangles as the meshes aren't centered around bones.
         /// </summary>
-        private static void FixArmorTriangles(string key, IModelMesh mdm)
+        private static void FixArmorMisalignment(string key, IModelMesh mdm)
         {
-            if (!MisplacedMdmArmors.Contains(key, StringComparer.OrdinalIgnoreCase))
+            // Assumption: This is the wanted pivot taken vom Hum_Body_Naked0.asc
+            Vector3 perfectPivot = new(-0.01f, 82.81f, 6.81f);
+
+            float minX = 0;
+            float maxX = 0;
+            float minY = 0;
+            float maxY = 0;
+            float minZ = 0;
+            float maxZ = 0;
+
+            foreach (var mesh in mdm.Meshes)
+            {
+                foreach (var position in mesh.Mesh.Positions)
+                {
+                    minX = Math.Min(minX, position.X);
+                    maxX = Math.Max(maxX, position.X);
+                    minY = Math.Min(minY, position.Y);
+                    maxY = Math.Max(maxY, position.Y);
+                    minZ = Math.Min(minZ, position.Z);
+                    maxZ = Math.Max(maxZ, position.Z);
+                }
+            }
+
+            float centerX = (minX + maxX) / 2;
+            float centerY = (minY + maxY) / 2;
+            float centerZ = (minZ + maxZ) / 2;
+
+            Vector3 currentPivot = new(centerX, centerY, centerZ);
+            Vector3 adjustment = perfectPivot - currentPivot;
+
+            // Some bodies have the right pivot already.
+            if (adjustment.magnitude < 0.001f)
                 return;
 
             foreach (var mesh in mdm.Meshes)
             {
-                for (var i = 0; i < mesh.Mesh.Positions.Count; i++)
+                for (int i = 0; i < mesh.Mesh.Positions.Count; i++)
                 {
-                    var curPos = mesh.Mesh.Positions[i];
-                    mesh.Mesh.Positions[i] = new(curPos.X + 0.5f, curPos.Y - 0.5f, curPos.Z + 13f);
+                    System.Numerics.Vector3 curPos = mesh.Mesh.Positions[i];
+                    mesh.Mesh.Positions[i] = new(curPos.X + adjustment.x, curPos.Y, curPos.Z + adjustment.z);
                 }
             }
+            Debug.Log($"Pivot corrected for {key} by {adjustment}");
         }
 
         public static IMultiResolutionMesh TryGetMrm(string key)
