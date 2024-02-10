@@ -223,7 +223,7 @@ namespace GVR.Caches
         }
 
         [CanBeNull]
-        public static IModelMesh TryGetMdm(string key)
+        public static IModelMesh TryGetMdm(string key, bool isNpcArmor = false)
         {
             var preparedKey = GetPreparedKey(key);
             if (MdmCache.TryGetValue(preparedKey, out var data))
@@ -241,7 +241,9 @@ namespace GVR.Caches
 
             MdmCache[preparedKey] = newData;
 
-            FixArmorMisalignment(preparedKey, newData);
+            // Naked == default armor which is placed correctly based on our testings.
+            if (isNpcArmor && !preparedKey.ContainsIgnoreCase("Naked"))
+                FixArmorMisalignment(preparedKey, newData);
 
             return newData;
         }
