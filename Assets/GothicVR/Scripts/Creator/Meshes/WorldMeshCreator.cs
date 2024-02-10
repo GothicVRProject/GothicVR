@@ -116,7 +116,7 @@ namespace GVR.Creator.Meshes
             mesh.SetTriangles(subMesh.Triangles, 0);
             mesh.SetUVs(0, subMesh.Uvs);
             mesh.SetNormals(subMesh.Normals);
-            mesh.SetColors(subMesh.Lights);
+            mesh.SetColors(subMesh.BakedLightColors);
             if (subMesh.Material.Group == MaterialGroup.Water)
             {
                 mesh.SetUVs(1, subMesh.TextureAnimations);

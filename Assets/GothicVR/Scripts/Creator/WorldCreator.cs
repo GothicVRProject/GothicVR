@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using GVR.Caches;
@@ -15,6 +16,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using ZenKit;
 using System.Linq;
+using Debug = UnityEngine.Debug;
 #if UNITY_EDITOR
 #endif
 
@@ -150,7 +152,7 @@ namespace GVR.Creator
                     subMesh.Vertices.Reverse();
                     subMesh.Uvs.Reverse();
                     subMesh.Normals.Reverse();
-                    subMesh.Lights.Reverse();
+                    subMesh.BakedLightColors.Reverse();
                     subMesh.TextureAnimations.Reverse();
                 }
             }
@@ -291,7 +293,7 @@ namespace GVR.Creator
             Vector2 uv = Vector2.Scale(scaleInTextureArray, feature.Texture.ToUnityVector());
             currentSubMesh.Uvs.Add(new Vector4(uv.x, uv.y, textureArrayIndex, maxMipLevel));
             currentSubMesh.Normals.Add(feature.Normal.ToUnityVector());
-            currentSubMesh.Lights.Add(new Color32((byte)(feature.Light >> 16), (byte)(feature.Light >> 8), (byte)feature.Light, (byte)(feature.Light >> 24)));
+            currentSubMesh.BakedLightColors.Add(new Color32((byte)(feature.Light >> 16), (byte)(feature.Light >> 8), (byte)feature.Light, (byte)(feature.Light >> 24)));
 
             if (zkMesh.Materials[polygon.MaterialIndex].TextureAnimationMapping == AnimationMapping.Linear)
             {
@@ -342,7 +344,7 @@ namespace GVR.Creator
                     groupedMeshes[topParentIndex][0].Triangles.AddRange(groupedMeshes[topParentIndex][i].Triangles.Select(v => v += vertexCount));
                     groupedMeshes[topParentIndex][0].Uvs.AddRange(groupedMeshes[topParentIndex][i].Uvs);
                     groupedMeshes[topParentIndex][0].Normals.AddRange(groupedMeshes[topParentIndex][i].Normals);
-                    groupedMeshes[topParentIndex][0].Lights.AddRange(groupedMeshes[topParentIndex][i].Lights);
+                    groupedMeshes[topParentIndex][0].BakedLightColors.AddRange(groupedMeshes[topParentIndex][i].BakedLightColors);
                     groupedMeshes[topParentIndex][0].TextureAnimations.AddRange(groupedMeshes[topParentIndex][i].TextureAnimations);
                 }
 
@@ -406,7 +408,7 @@ namespace GVR.Creator
                             meshes.First().Triangles.AddRange(meshes.Last().Triangles.Select(v => v += vertexCount));
                             meshes.First().Uvs.AddRange(meshes.Last().Uvs);
                             meshes.First().Normals.AddRange(meshes.Last().Normals);
-                            meshes.First().Lights.AddRange(meshes.Last().Lights);
+                            meshes.First().BakedLightColors.AddRange(meshes.Last().BakedLightColors);
                             meshes.First().TextureAnimations.AddRange(meshes.Last().TextureAnimations);
 
                             lock (mergedChunks)
