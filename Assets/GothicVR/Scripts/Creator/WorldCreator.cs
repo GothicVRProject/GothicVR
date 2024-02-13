@@ -206,7 +206,9 @@ namespace GVR.Creator
             if (node.PolygonCount > 0)
             {
                 // First node containing geometry. Start a new mesh collection. Meshes will be built for each shader in the node.
-                if (nodeSubmeshes == null)
+                // We do not want to create nodeSubmeshes at the root node even if it contains polygons as it would restrict
+                // the leaves of the tree to create chunks with the same shader as the root node.
+                if (nodeSubmeshes == null && node.ParentIndex != -1)
                 {
                     nodeSubmeshes = new Dictionary<Shader, WorldData.SubMeshData>();
                     submeshParentIndex = node.ParentIndex;
