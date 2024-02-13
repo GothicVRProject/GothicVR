@@ -188,7 +188,8 @@ namespace GVR.Caches
             }
 
             // Clear cached texture data.
-            _arrayTexturesList = null;
+            _arrayTexturesList.Clear();
+            _arrayTexturesList.TrimExcess();
 
             stopwatch.Stop();
             Debug.Log($"Built tex array in {stopwatch.ElapsedMilliseconds / 1000f} s");

@@ -49,6 +49,10 @@ namespace GVR.Creator
         {
             VobMeshCreator.PrepareTextureArrayMeshRenderers();
         }
+        public static void RemoveTextureArraysToVobMeshes()
+        {
+            VobMeshCreator.ClearTextureArrayMeshRenderers();
+        }
 
         public static GameObject CreateVob(string objectName, IModelMesh mdm, IModelHierarchy mdh,
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)

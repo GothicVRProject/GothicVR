@@ -90,6 +90,11 @@ namespace GVR.Creator.Meshes
             }
 
             Object.Destroy(_loadingMaterial);
+        }        
+        public static void RemoveTextureArrays()
+        {
+           _renderersInNeedOfTextureArray.Clear();
+           _renderersInNeedOfTextureArray.TrimExcess();
         }
 
         protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)

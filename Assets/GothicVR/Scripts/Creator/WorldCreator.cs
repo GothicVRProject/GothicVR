@@ -275,6 +275,7 @@ namespace GVR.Creator
             {
                 ExpandBspTreeIntoMeshes(zkMesh, bspTree, node.FrontIndex, allSubmeshesPerParentNodeIndex, nodeSubmeshes, submeshParentIndex);
             }
+
             if (node.BackIndex != -1)
             {
                 ExpandBspTreeIntoMeshes(zkMesh, bspTree, node.BackIndex, allSubmeshesPerParentNodeIndex, nodeSubmeshes, submeshParentIndex);
@@ -449,6 +450,11 @@ namespace GVR.Creator
         {
             // As we already added stored world mesh and waypoints in Unity GOs, we can safely remove them to free MBs.
             GameData.World.SubMeshes = null;
+            
+            WorldMeshCreator.RemoveTextureArrays();
+            MeshCreatorFacade.RemoveTextureArraysToVobMeshes();
+            AssetCache.TextureArrays.Clear();
+            AssetCache.TextureArrays.TrimExcess();
 
             var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
 

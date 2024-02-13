@@ -179,6 +179,11 @@ namespace GVR.Creator.Meshes
             }
 
             Object.Destroy(_loadingMaterial);
+        }        
+        public virtual void ClearTextureArrayMeshRenderers()
+        {
+            _renderersInNeedOfTextureArray.Clear();
+            _renderersInNeedOfTextureArray.TrimExcess();
         }
 
         protected void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
