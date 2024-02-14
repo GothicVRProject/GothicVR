@@ -7,7 +7,7 @@ namespace GVR.Npc.Actions.AnimationActions
 {
     public abstract class AbstractRotateAnimationAction : AbstractAnimationAction
     {
-        private const float RotationSpeed = 0.5f;
+        private const float RotationSpeed = 5f;
 
         private Vector3 finalDirection;
         private bool isRotateLeft;
@@ -75,6 +75,12 @@ namespace GVR.Npc.Actions.AnimationActions
                 AnimationCreator.StopAnimation(NpcGo);
                 IsFinishedFlag = true;
             }
+        }
+
+        public override void AnimationEndEventCallback()
+        {
+            base.AnimationEndEventCallback();
+            IsFinishedFlag = false;
         }
     }
 }
