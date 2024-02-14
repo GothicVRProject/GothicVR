@@ -44,9 +44,11 @@ Shader "Unlit/Barrier"
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
-            float _WaveIntensity, _Blend;
+            CBUFFER_START(UnityPerMaterial)
+                sampler2D _MainTex;
+                float4 _MainTex_ST;
+                float _WaveIntensity, _Blend;
+            CBUFFER_END
 
             v2f vert(appdata v)
             {

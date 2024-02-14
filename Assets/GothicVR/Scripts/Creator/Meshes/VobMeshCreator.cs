@@ -17,20 +17,16 @@ namespace GVR.Creator.Meshes
         public GameObject CreateVob(string objectName, IMultiResolutionMesh mrm, Vector3 position,
             Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
-            var go = Create(objectName, mrm, position, rotation, withCollider, parent, rootGo);
-
+            GameObject go = Create(objectName, mrm, position, rotation, withCollider, parent, rootGo);
             AddZsCollider(go);
-
             return go;
         }
 
         public GameObject CreateVob(string objectName, IModel mdl, Vector3 position, Quaternion rotation,
             GameObject parent = null, GameObject rootGo = null)
         {
-            var go = CreateVob(objectName, mdl.Mesh, mdl.Hierarchy, position, rotation, parent, rootGo);
-
+            GameObject go = CreateVob(objectName, mdl.Mesh, mdl.Hierarchy, position, rotation, parent, rootGo);
             AddZsCollider(go);
-
             return go;
         }
 
@@ -39,8 +35,8 @@ namespace GVR.Creator.Meshes
         {
             // Check if there are completely empty elements without any texture.
             // G1: e.g. Harp, Flute, and WASH_SLOT (usage moved to a FreePoint within daedalus functions)
-            var noMeshTextures = mdm.Meshes.All(mesh => mesh.Mesh.SubMeshes.All(subMesh => subMesh.Material.Texture.IsEmpty()));
-            var noAttachmentTextures = mdm.Attachments.All(att => att.Value.Materials.All(mat => mat.Texture.IsEmpty()));
+            bool noMeshTextures = mdm.Meshes.All(mesh => mesh.Mesh.SubMeshes.All(subMesh => subMesh.Material.Texture.IsEmpty()));
+            bool noAttachmentTextures = mdm.Attachments.All(att => att.Value.Materials.All(mat => mat.Texture.IsEmpty()));
 
             if (noMeshTextures && noAttachmentTextures)
                 return null;

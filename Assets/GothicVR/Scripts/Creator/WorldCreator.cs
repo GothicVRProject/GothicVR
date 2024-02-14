@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using GVR.Caches;
 using GVR.Creator.Meshes;
 using GVR.Debugging;
 using GVR.Extensions;
@@ -14,7 +15,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using ZenKit;
-using Vector3 = System.Numerics.Vector3;
+using System.Linq;
+using Debug = UnityEngine.Debug;
 #if UNITY_EDITOR
 #endif
 
@@ -22,43 +24,64 @@ namespace GVR.Creator
 {
     public static class WorldCreator
     {
-        private static GameObject worldGo;
-        private static GameObject teleportGo;
-        private static GameObject nonTeleportGo;
+        private static GameObject _worldGo;
+        private static GameObject _teleportGo;
+        private static GameObject _nonTeleportGo;
+        private static HashSet<IPolygon> ClaimedPolygons;
 
         static WorldCreator()
         {
             GvrEvents.GeneralSceneLoaded.AddListener(WorldLoaded);
         }
-        
+
         public static async Task CreateAsync(string worldName)
         {
             LoadWorld(worldName);
-
-            worldGo = new GameObject("World");
+            _worldGo = new GameObject("World");
 
             // Interactable Vobs (item, ladder, ...) have their own collider Components
             // AND we don't want to teleport on top of them. We therefore exclude them from being added to teleport.
-            teleportGo = new GameObject("Teleport");
-            nonTeleportGo = new GameObject("NonTeleport");
-            teleportGo.SetParent(worldGo);
-            nonTeleportGo.SetParent(worldGo);
+            _teleportGo = new GameObject("Teleport");
+            _nonTeleportGo = new GameObject("NonTeleport");
+            _teleportGo.SetParent(_worldGo);
+            _nonTeleportGo.SetParent(_worldGo);
+
+            // Build the world and vob meshes, populating the texture arrays.
+            // We need to start creating Vobs as we need to calculate world slicing based on amount of lights at a certain space afterwards.
+            if (FeatureFlags.I.createVobs)
+            {
+                await VobCreator.CreateAsync(_teleportGo, _nonTeleportGo, GameData.World, Constants.VObPerFrame);
+            }
 
             if (FeatureFlags.I.createWorldMesh)
-                await WorldMeshCreator.CreateAsync(GameData.World, teleportGo, Constants.MeshPerFrame);
-    
+            {
+                GameData.World.SubMeshes = await BuildBspTree(GameData.World.World.Mesh.Cache(), GameData.World.World.BspTree.Cache());
+                await WorldMeshCreator.CreateAsync(GameData.World, _teleportGo, Constants.MeshPerFrame);
+            }
+
+            // Build the texture arrays.
+            await AssetCache.BuildTextureArrays();
+
+            // Assigns the arrays to the materials.
+            if (FeatureFlags.I.createWorldMesh)
+            {
+                WorldMeshCreator.AssignTextureArrays();
+            }
             if (FeatureFlags.I.createVobs)
-                await VobCreator.CreateAsync(teleportGo, nonTeleportGo, GameData.World, Constants.VObPerFrame);
-            
+            {
+                MeshCreatorFacade.AssignTextureArraysToVobMeshes();
+            }
+
             SkyManager.I.InitSky();
+            StationaryLight.InitStationaryLights();
 
             if (FeatureFlags.I.showBarrier)
             {
                 BarrierManager.I.CreateBarrier();
             }
-    
-            WaynetCreator.Create(worldGo, GameData.World);
-            
+
+            WaynetCreator.Create(_worldGo, GameData.World);
+
             // Set the global variable to the result of the coroutine
             LoadingManager.I.SetProgress(LoadingManager.LoadingProgressType.NPC, 1f);
         }
@@ -82,84 +105,345 @@ namespace GVR.Creator
                 WayNet = (CachedWayNet)zkWayNet
             };
 
-            var subMeshes = CreateSubMeshesForUnity(zkMesh, zkBspTree);
-            world.SubMeshes = subMeshes;
-            
             GameData.World = world;
         }
 
-        /// <summary>
-        /// If we keep Polygons/Vertices like they're provided by Gothic, then we would have hundreds of thousands of small meshes.
-        /// We therefore merge them into blobs grouped by materials.
-        ///
-        /// Gothic provides Polygons as Triangle Fans. As Unity can't handle them out-of-the-box, we just map them
-        /// (every 4th element - aka every new triangle -  is dependent on element 0 (A).
-        /// @see https://en.wikipedia.org/wiki/Triangle_fan
-        ///
-        /// We also need to put the triangle indices in in Reverse() order to make Unity
-        /// draw mesh elements right (instead of upside down)
-        /// </summary>
-        private static Dictionary<int, WorldData.SubMeshData> CreateSubMeshesForUnity(IMesh zkMesh, IBspTree zkBspTree)
+        private static async Task<List<WorldData.SubMeshData>> BuildBspTree(IMesh zkMesh, IBspTree zkBspTree)
         {
-            var zkMaterials = zkMesh.Materials;
-            var zkPolygons = zkMesh.Polygons;
-            var zkPositions = zkMesh.Positions;
-            var zkFeatures = zkMesh.Features;
+            ClaimedPolygons = new();
+            Dictionary<int, List<WorldData.SubMeshData>> subMeshesPerParentNode = new();
 
-            // As we know the exact size of SubMeshes (aka size of Materials), we will prefill them now.
-            Dictionary<int, WorldData.SubMeshData> subMeshes = new(zkMaterials.Count);
-            for (var materialIndex = 0; materialIndex < zkMaterials.Count; materialIndex++)
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+            ExpandBspTreeIntoMeshes(zkMesh, zkBspTree, 0, subMeshesPerParentNode, null);
+            stopwatch.Stop();
+            Debug.Log($"Expanding tree: {stopwatch.ElapsedMilliseconds / 1000f} s");
+
+            // Free memory
+            ClaimedPolygons = null;
+
+            stopwatch.Restart();
+            // Merge the world meshes until they touch the max amount of lights per mesh.
+            Dictionary<int, List<WorldData.SubMeshData>> mergedSubMeshesPerParentNode = subMeshesPerParentNode;
+            while (true)
             {
-                subMeshes.Add(materialIndex, new()
+                mergedSubMeshesPerParentNode = MergeWorldChunksByLightCount(zkBspTree, subMeshesPerParentNode);
+                if (mergedSubMeshesPerParentNode.Count == subMeshesPerParentNode.Count)
                 {
-                    Material = zkMaterials[materialIndex]
-                });
+                    break;
+                }
+                subMeshesPerParentNode = mergedSubMeshesPerParentNode;
+                await Task.Yield();
             }
+            stopwatch.Stop();
+            Debug.Log($"Merging by lights: {stopwatch.ElapsedMilliseconds / 1000f} s");
 
-            // LeafPolygonIndices aren't distinct. We therefore need to rearrange them this way.
-            // Alternatively we could also loop through all Nodes and fetch where Front==Back==-1 (aka Leaf)
-            foreach (var leafPolygonIndex in zkBspTree.LeafPolygonIndices.Distinct())
+            stopwatch.Restart();
+            // Merge the water until a given level in the BSP tree to it a few large chunks.
+            subMeshesPerParentNode = MergeShaderTypeWorldChunksToTreeHeight(AssetCache.TextureArrayTypes.Water, 3, zkBspTree, subMeshesPerParentNode);
+            stopwatch.Stop();
+            Debug.Log($"Merging water: {stopwatch.ElapsedMilliseconds / 1000f} s");
+
+            // To have easier to read code above, we reverse the arrays now at the end.
+            foreach (List<WorldData.SubMeshData> subMeshes in subMeshesPerParentNode.Values)
             {
-                var polygon = zkPolygons[leafPolygonIndex];
-                var currentSubMesh = subMeshes[polygon.MaterialIndex];
-
-                if (polygon.IsPortal)
-                    continue;
-                
-                // As we always use element 0 and i+1, we skip it in the loop.
-                for (var i=1; i < polygon.PositionIndices.Count - 1; i++)
+                foreach (WorldData.SubMeshData subMesh in subMeshes)
                 {
-                    // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
-                    AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, 0);
-                    AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, i);
-                    AddEntry(zkPositions, zkFeatures, polygon, currentSubMesh, i+1);
+                    subMesh.Vertices.Reverse();
+                    subMesh.Uvs.Reverse();
+                    subMesh.Normals.Reverse();
+                    subMesh.BakedLightColors.Reverse();
+                    subMesh.TextureAnimations.Reverse();
                 }
             }
 
-            // To have easier to read code above, we reverse the arrays now at the end.
-            foreach (var subMesh in subMeshes)
-            {
-                subMesh.Value.Vertices.Reverse();
-                subMesh.Value.Uvs.Reverse();
-                subMesh.Value.Normals.Reverse();
-            }
-
-            return subMeshes;
+            return subMeshesPerParentNode.Values.SelectMany(s => s).ToList();
         }
 
-        private static void AddEntry(List<Vector3> zkPositions, List<Vertex> features, IPolygon polygon, WorldData.SubMeshData currentSubMesh, int index)
+        private static void CalculateTreeHeightDescending(IBspTree tree, int nodeIndex, ref int maxHeight)
+        {
+            int height = 1;
+            int parent = tree.Nodes[nodeIndex].ParentIndex;
+            while (parent != -1)
+            {
+                parent = tree.Nodes[parent].ParentIndex;
+                height++;
+            }
+            maxHeight = Mathf.Max(height, maxHeight);
+
+            if (tree.Nodes[nodeIndex].FrontIndex != -1)
+            {
+                CalculateTreeHeightDescending(tree, tree.Nodes[nodeIndex].FrontIndex, ref maxHeight);
+            }
+            if (tree.Nodes[nodeIndex].BackIndex != -1)
+            {
+                CalculateTreeHeightDescending(tree, tree.Nodes[nodeIndex].BackIndex, ref maxHeight);
+            }
+        }
+
+        private static int CalculateTreeHeightAscending(IBspTree tree, int nodeIndex)
+        {
+            int remainingTreeHeight = 0;
+            int parent = tree.GetNode(nodeIndex).ParentIndex;
+            while (parent != -1)
+            {
+                remainingTreeHeight++;
+                parent = tree.GetNode(parent).ParentIndex;
+            }
+
+            return remainingTreeHeight;
+        }
+
+        /// <summary>
+        /// This method recursively walks all the nodes in the bsp tree. It builds a single mesh for each node containing geometry. The bsp tree contains multiple levels of detail and the final geometry under the leaf nodes. 
+        /// The meshes are the leaf geometry combined from the level that contains the first LOD, creating the largest coherent chunks possible. The larger chunks get culled less, but are more performant to render. 
+        /// </summary>
+        /// <returns></returns>
+        private static void ExpandBspTreeIntoMeshes(IMesh zkMesh, IBspTree bspTree, int nodeIndex, Dictionary<int, List<WorldData.SubMeshData>> allSubmeshesPerParentNodeIndex, Dictionary<Shader, WorldData.SubMeshData> nodeSubmeshes, int submeshParentIndex = 0)
+        {
+            BspNode node = bspTree.GetNode(nodeIndex);
+
+            if (node.PolygonCount > 0)
+            {
+                // First node containing geometry. Start a new mesh collection. Meshes will be built for each shader in the node.
+                // We do not want to create nodeSubmeshes at the root node even if it contains polygons as it would restrict
+                // the leaves of the tree to create chunks with the same shader as the root node.
+                if (nodeSubmeshes == null && node.ParentIndex != -1)
+                {
+                    nodeSubmeshes = new Dictionary<Shader, WorldData.SubMeshData>();
+                    submeshParentIndex = node.ParentIndex;
+                }
+
+                if (node.FrontIndex == -1 && node.BackIndex == -1)
+                {
+                    // Add the leaf node geometry.
+                    for (int i = node.PolygonIndex; i < node.PolygonIndex + node.PolygonCount; i++)
+                    {
+                        IPolygon polygon = zkMesh.Polygons[bspTree.PolygonIndices[i]];
+                        if (polygon.IsPortal || ClaimedPolygons.Contains(polygon))
+                        {
+                            continue;
+                        }
+
+                        // Different leaf nodes reference the same polygons. Manually check if polygons have been used to avoid overlapping geometry.
+                        ClaimedPolygons.Add(polygon);
+
+                        // As we always use element 0 and i+1, we skip it in the loop.
+                        for (int p = 1; p < polygon.PositionIndices.Count - 1; p++)
+                        {
+                            // Add the texture to the texture array or retrieve its existing slice.
+                            IMaterial zkMaterial = zkMesh.Materials[polygon.MaterialIndex];
+                            AssetCache.GetTextureArrayIndex(zkMaterial, out AssetCache.TextureArrayTypes textureArrayTpe, out int textureArrayIndex, out Vector2 textureScale, out int maxMipLevel);
+                            if (textureArrayIndex == -1)
+                            {
+                                continue;
+                            }
+
+                            // Build submeshes for each unique shader: Water, opaque, and alpha cutout.
+                            Shader shader = Constants.ShaderWorldLit;
+                            if (textureArrayTpe == AssetCache.TextureArrayTypes.Transparent)
+                            {
+                                shader = Constants.ShaderLitAlphaToCoverage;
+                            }
+                            else if (textureArrayTpe == AssetCache.TextureArrayTypes.Water)
+                            {
+                                shader = Constants.ShaderWater;
+                            }
+
+                            if (!nodeSubmeshes.ContainsKey(shader))
+                            {
+                                nodeSubmeshes.Add(shader, new WorldData.SubMeshData() { Material = zkMaterial, TextureArrayType = textureArrayTpe });
+                                if (!allSubmeshesPerParentNodeIndex.ContainsKey(submeshParentIndex))
+                                {
+                                    allSubmeshesPerParentNodeIndex.Add(submeshParentIndex, new List<WorldData.SubMeshData>());
+                                }
+                                allSubmeshesPerParentNodeIndex[submeshParentIndex].Add(nodeSubmeshes[shader]);
+                            }
+
+                            WorldData.SubMeshData nodeSubmesh = nodeSubmeshes[shader];
+                            // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
+                            AddEntry(zkMesh, polygon, nodeSubmesh, 0, textureArrayIndex, textureScale, maxMipLevel);
+                            AddEntry(zkMesh, polygon, nodeSubmesh, p, textureArrayIndex, textureScale, maxMipLevel);
+                            AddEntry(zkMesh, polygon, nodeSubmesh, p + 1, textureArrayIndex, textureScale, maxMipLevel);
+                        }
+                    }
+                }
+            }
+
+            // Expand the child nodes. Spawn new threads if no geometry is added yet.
+            if (node.FrontIndex != -1)
+            {
+                ExpandBspTreeIntoMeshes(zkMesh, bspTree, node.FrontIndex, allSubmeshesPerParentNodeIndex, nodeSubmeshes, submeshParentIndex);
+            }
+
+            if (node.BackIndex != -1)
+            {
+                ExpandBspTreeIntoMeshes(zkMesh, bspTree, node.BackIndex, allSubmeshesPerParentNodeIndex, nodeSubmeshes, submeshParentIndex);
+            }
+        }
+
+        private static void AddEntry(IMesh zkMesh, IPolygon polygon, WorldData.SubMeshData currentSubMesh, int index, int textureArrayIndex, Vector2 scaleInTextureArray, int maxMipLevel = 16)
         {
             // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
-            var positionIndex = polygon.PositionIndices[index];
-            currentSubMesh.Vertices.Add(zkPositions[(int)positionIndex].ToUnityVector());
+            int positionIndex = polygon.PositionIndices[index];
+            currentSubMesh.Vertices.Add(zkMesh.Positions[positionIndex].ToUnityVector());
 
             // This triangle (index where Vector 3 lies inside vertices, points to the newly added vertex (Vector3) as we don't reuse vertices.
             currentSubMesh.Triangles.Add(currentSubMesh.Vertices.Count - 1);
 
-            var featureIndex = polygon.FeatureIndices[index];
-            var feature = features[(int)featureIndex];
-            currentSubMesh.Uvs.Add(feature.Texture.ToUnityVector());
+            int featureIndex = polygon.FeatureIndices[index];
+            Vertex feature = zkMesh.Features[featureIndex];
+            Vector2 uv = Vector2.Scale(scaleInTextureArray, feature.Texture.ToUnityVector());
+            currentSubMesh.Uvs.Add(new Vector4(uv.x, uv.y, textureArrayIndex, maxMipLevel));
             currentSubMesh.Normals.Add(feature.Normal.ToUnityVector());
+            currentSubMesh.BakedLightColors.Add(new Color32((byte)(feature.Light >> 16), (byte)(feature.Light >> 8), (byte)feature.Light, (byte)(feature.Light >> 24)));
+
+            if (zkMesh.Materials[polygon.MaterialIndex].TextureAnimationMapping == AnimationMapping.Linear)
+            {
+                Vector2 uvAnimation = zkMesh.Materials[polygon.MaterialIndex].TextureAnimationMappingDirection.ToUnityVector();
+                currentSubMesh.TextureAnimations.Add(uvAnimation);
+            }
+            else
+            {
+                currentSubMesh.TextureAnimations.Add(Vector2.zero);
+            }
+        }
+
+        private static Dictionary<int, List<WorldData.SubMeshData>> MergeShaderTypeWorldChunksToTreeHeight(AssetCache.TextureArrayTypes textureArrayType, int treeHeightLimit, IBspTree bspTree, Dictionary<int, List<WorldData.SubMeshData>> submeshesPerParentNode)
+        {
+            // Group the submeshes by parent nodes until max height.
+            Dictionary<int, List<WorldData.SubMeshData>> groupedMeshes = new Dictionary<int, List<WorldData.SubMeshData>>();
+
+            foreach (int parentNodeIndex in submeshesPerParentNode.Keys)
+            {
+                int remainingHeight = CalculateTreeHeightAscending(bspTree, parentNodeIndex);
+                int topParentIndex = parentNodeIndex;
+                for (int i = 0; i < Mathf.Max(0, remainingHeight - treeHeightLimit); i++)
+                {
+                    topParentIndex = bspTree.GetNode(topParentIndex).ParentIndex;
+                }
+
+                if (!groupedMeshes.ContainsKey(topParentIndex))
+                {
+                    groupedMeshes.Add(topParentIndex, new List<WorldData.SubMeshData>());
+                }
+                groupedMeshes[topParentIndex].AddRange(submeshesPerParentNode[parentNodeIndex].Where(s => s.TextureArrayType == textureArrayType));
+            }
+
+            Dictionary<int, List<WorldData.SubMeshData>> mergedMeshes = new Dictionary<int, List<WorldData.SubMeshData>>();
+
+            // Merge the grouped meshes.
+            foreach (int topParentIndex in groupedMeshes.Keys)
+            {
+                if (groupedMeshes[topParentIndex].Count < 2)
+                {
+                    continue;
+                }
+
+                for (int i = 1; i < groupedMeshes[topParentIndex].Count; i++)
+                {
+                    int vertexCount = groupedMeshes[topParentIndex][0].Vertices.Count;
+                    groupedMeshes[topParentIndex][0].Vertices.AddRange(groupedMeshes[topParentIndex][i].Vertices);
+                    groupedMeshes[topParentIndex][0].Triangles.AddRange(groupedMeshes[topParentIndex][i].Triangles.Select(v => v += vertexCount));
+                    groupedMeshes[topParentIndex][0].Uvs.AddRange(groupedMeshes[topParentIndex][i].Uvs);
+                    groupedMeshes[topParentIndex][0].Normals.AddRange(groupedMeshes[topParentIndex][i].Normals);
+                    groupedMeshes[topParentIndex][0].BakedLightColors.AddRange(groupedMeshes[topParentIndex][i].BakedLightColors);
+                    groupedMeshes[topParentIndex][0].TextureAnimations.AddRange(groupedMeshes[topParentIndex][i].TextureAnimations);
+                }
+
+                mergedMeshes.Add(topParentIndex, new List<WorldData.SubMeshData>() { groupedMeshes[topParentIndex][0] });
+            }
+
+            // Add the meshes from the other shader types.
+            foreach (int parentNodeIndex in submeshesPerParentNode.Keys)
+            {
+                if (!mergedMeshes.ContainsKey(parentNodeIndex))
+                {
+                    mergedMeshes.Add(parentNodeIndex, submeshesPerParentNode[parentNodeIndex].Where(s => s.TextureArrayType != textureArrayType).ToList());
+                }
+                else
+                {
+                    mergedMeshes[parentNodeIndex].AddRange(submeshesPerParentNode[parentNodeIndex].Where(s => s.TextureArrayType != textureArrayType));
+                }
+            }
+
+            return mergedMeshes;
+        }
+
+        private static Dictionary<int, List<WorldData.SubMeshData>> MergeWorldChunksByLightCount(IBspTree bspTree, Dictionary<int, List<WorldData.SubMeshData>> submeshesPerParentNode)
+        {
+            const int maxLightsPerChunk = 16;
+            Dictionary<int, List<WorldData.SubMeshData>> mergedChunks = new();
+
+            Parallel.ForEach(submeshesPerParentNode.Keys, (int parentNodeIndex) =>
+            {
+                int grandParentNodeIndex = bspTree.GetNode(parentNodeIndex).ParentIndex;
+                int intersectingLights = StationaryLight.CountLightsInBounds(bspTree.GetNode(parentNodeIndex).BoundingBox.ToUnityBounds());
+                // Merge the two halves of the parent node if the max light count is not exceeded.
+                if (intersectingLights < maxLightsPerChunk && grandParentNodeIndex != -1)
+                {
+                    // Merge all shader types under the parent node.
+                    foreach (AssetCache.TextureArrayTypes textureArrayType in Enum.GetValues(typeof(AssetCache.TextureArrayTypes)))
+                    {
+                        IEnumerable<WorldData.SubMeshData> meshes = submeshesPerParentNode[parentNodeIndex].Where(s => s.TextureArrayType == textureArrayType);
+                        if (meshes.Count() == 0)
+                        {
+                            continue;
+                        }
+                        else if (meshes.Count() == 1)
+                        {
+                            // Only one node under this parent. Carry it over so it can be merged in the next pass.
+                            lock (mergedChunks)
+                            {
+                                if (!mergedChunks.ContainsKey(parentNodeIndex))
+                                {
+                                    mergedChunks.Add(parentNodeIndex, new List<WorldData.SubMeshData>());
+                                }
+
+                                mergedChunks[parentNodeIndex].Add(meshes.First());
+                            }
+                        }
+                        else
+                        {
+                            // Merge the two nodes.
+                            int vertexCount = meshes.First().Vertices.Count;
+                            meshes.First().Vertices.AddRange(meshes.Last().Vertices);
+                            meshes.First().Triangles.AddRange(meshes.Last().Triangles.Select(v => v += vertexCount));
+                            meshes.First().Uvs.AddRange(meshes.Last().Uvs);
+                            meshes.First().Normals.AddRange(meshes.Last().Normals);
+                            meshes.First().BakedLightColors.AddRange(meshes.Last().BakedLightColors);
+                            meshes.First().TextureAnimations.AddRange(meshes.Last().TextureAnimations);
+
+                            lock (mergedChunks)
+                            {
+                                if (!mergedChunks.ContainsKey(grandParentNodeIndex))
+                                {
+                                    mergedChunks.Add(grandParentNodeIndex, new List<WorldData.SubMeshData>());
+                                }
+
+                                mergedChunks[grandParentNodeIndex].Add(meshes.First());
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    lock (mergedChunks)
+                    {
+                        // Max light count would be exceeded. Keep the same nodes.
+                        if (!mergedChunks.ContainsKey(parentNodeIndex))
+                        {
+                            mergedChunks.Add(parentNodeIndex, submeshesPerParentNode[parentNodeIndex]);
+                        }
+                        else
+                        {
+                            mergedChunks[parentNodeIndex].AddRange(submeshesPerParentNode[parentNodeIndex]);
+                        }
+                    }
+                }
+            });
+
+            return mergedChunks;
         }
 
         private static void WorldLoaded()
@@ -167,21 +451,26 @@ namespace GVR.Creator
             // As we already added stored world mesh and waypoints in Unity GOs, we can safely remove them to free MBs.
             GameData.World.SubMeshes = null;
             
+            WorldMeshCreator.RemoveTextureArrays();
+            MeshCreatorFacade.RemoveTextureArraysToVobMeshes();
+            AssetCache.TextureArrays.Clear();
+            AssetCache.TextureArrays.TrimExcess();
+
             var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
 
             // If we load a new scene, just remove the existing one.
-            if (worldGo.TryGetComponent(out TeleportationArea teleportArea))
+            if (_worldGo.TryGetComponent(out TeleportationArea teleportArea))
                 GameObject.Destroy(teleportArea);
 
             // We need to set the Teleportation area after adding mesh to world. Otherwise Awake() method is called too early.
-            var teleportationArea = teleportGo.AddComponent<TeleportationArea>();
+            var teleportationArea = _teleportGo.AddComponent<TeleportationArea>();
             if (interactionManager != null)
             {
                 teleportationArea.interactionManager = interactionManager;
             }
 
         }
-        
+
 #if UNITY_EDITOR
         /// <summary>
         /// Loads the world for occlusion culling.

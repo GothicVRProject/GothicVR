@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GVR.Util;
 using UnityEngine;
+using UnityEngine.Serialization;
 using ZenKit;
 using ZenKit.Vobs;
 
@@ -39,6 +40,10 @@ namespace GVR.Debugging
         public SunMovementPerformance sunMovementPerformanceValue;
         [Range(0, 23)] public int startHour;
         [Range(0, 59)] public int startMinute;
+
+        [Header("__________Lighting__________")]
+        public Color fireLightColor;
+        public float fireLightRange;
         
         [Header("__________VOB__________")]
         public bool createVobs;
