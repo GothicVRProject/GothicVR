@@ -20,11 +20,12 @@ namespace GVR.Npc
         {
             properties.currentAction?.OnCollisionExit(coll);
 
-            // If NPC walks out of a FreePoint, it gets freed.
-            if (!coll.gameObject.name.StartsWithIgnoreCase("FP_"))
-                return;
-
-            coll.gameObject.GetComponent<VobSpotProperties>().fp.IsLocked = false;
+            // FIXME - As we handle FreePoint locking via Colliders, we can't just say "free" whenever collider is left as a rotation can create this state already.
+            // FIXME - Instead we need to handle unlocking via game logic. E.g. whenever a new state starts, clear our NPCs lock setting.
+            // // If NPC walks out of a FreePoint, it gets freed.
+            // if (!coll.gameObject.name.StartsWithIgnoreCase("FP_"))
+            //     return;
+            // coll.gameObject.GetComponent<VobSpotProperties>().fp.IsLocked = false;
         }
 
         /// <summary>
@@ -34,11 +35,12 @@ namespace GVR.Npc
         {
             properties.currentAction?.OnTriggerExit(coll);
 
-            // If NPC walks out of a FreePoint, it gets freed.
-            if (!coll.gameObject.name.StartsWithIgnoreCase("FP_"))
-                return;
-
-            coll.gameObject.GetComponent<VobSpotProperties>().fp.IsLocked = false;
+            // FIXME - As we handle FreePoint locking via Colliders, we can't just say "free" whenever collider is left as a rotation can create this state already.
+            // FIXME - Instead we need to handle unlocking via game logic. E.g. whenever a new state starts, clear our NPCs lock setting.
+            // // If NPC walks out of a FreePoint, it gets freed.
+            // if (!coll.gameObject.name.StartsWithIgnoreCase("FP_"))
+            //     return;
+            // coll.gameObject.GetComponent<VobSpotProperties>().fp.IsLocked = false;
         }
 
         private void Update()
