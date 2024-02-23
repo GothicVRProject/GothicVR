@@ -1,5 +1,6 @@
 using GVR.Manager;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Extensions;
@@ -129,7 +130,7 @@ namespace GVR
         internal int CurrentColorIndex;
         internal float ColorAnimationFps; // change color every 1/ColorAnimationFps seconds
         internal List<Color> ColorAnimationList = new();
-        internal static Vector4[] LightColors;
+        public static Vector4[] LightColors;
 
         private void OnDrawGizmosSelected()
         {
@@ -157,6 +158,7 @@ namespace GVR
         private void OnEnable()
         {
             Profiler.BeginSample("Stationary light enabled");
+            StartCoroutine(ChangeColor(this));
             for (int i = 0; i < _affectedRenderers.Count; i++)
             {
                 StationaryLightsManager.AddLightOnRenderer(this, _affectedRenderers[i]);
@@ -167,6 +169,7 @@ namespace GVR
         private void OnDisable()
         {
             Profiler.BeginSample("Stationary light disable");
+            StopCoroutine(ChangeColor(this));
             for (int i = 0; i < _affectedRenderers.Count; i++)
             {
                 StationaryLightsManager.RemoveLightOnRenderer(this, _affectedRenderers[i]);
@@ -205,6 +208,21 @@ namespace GVR
             Shader.SetGlobalFloatArray(GlobalStationaryLightColorIndicesShaderId, _lightColorIndices);
             Shader.SetGlobalVectorArray(GlobalStationaryLightColorsShaderId, LightColors);
             ThreadSafeLightData.Clear(); // Clear the thread safe data as it is no longer needed.
+        }
+        
+        private static IEnumerator ChangeColor(StationaryLight light)
+        {
+            yield return new WaitForSeconds(1 / light.ColorAnimationFps);
+            while (true)
+            {
+                yield return new WaitForSeconds(1 / light.ColorAnimationFps);
+                if (light.ColorAnimationList.Count == 0) continue;
+                light.CurrentColorIndex++;
+                if (light.CurrentColorIndex >= light.ColorAnimationList.Count)
+                    light.CurrentColorIndex = 0;
+
+                light.Color = light.ColorAnimationList[light.CurrentColorIndex];
+            }
         }
 
         public static int CountLightsInBounds(Bounds bounds)

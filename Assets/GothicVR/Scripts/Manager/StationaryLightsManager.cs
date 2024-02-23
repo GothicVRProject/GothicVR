@@ -23,43 +23,36 @@ namespace GVR.Manager
                 {
                     UpdateRenderer(renderer);
                 }
+
                 DirtiedMeshes.Clear();
                 Profiler.EndSample();
             }
         }
 
-        public void StartCoroutineChangeColors()
+        public void InitLightColorChange()
         {
-            foreach (var light in StationaryLight.Lights)
-            {
-                StartCoroutine(ChangeColor(light));
-            }
+            StartCoroutine(UpdateLightColors());
         }
+        
 
-        private IEnumerator ChangeColor(StationaryLight light)
+        private IEnumerator UpdateLightColors()
         {
-            yield return new WaitForSeconds(1 / light.ColorAnimationFps);
-            while (true)
+            while(true)
             {
-                yield return new WaitForSeconds(1 / light.ColorAnimationFps);
-                if (light.ColorAnimationList.Count == 0) continue;
-                light.CurrentColorIndex++;
-                if (light.CurrentColorIndex >= light.ColorAnimationList.Count)
-                    light.CurrentColorIndex = 0;
+                var colorIndices =
+                    Shader.GetGlobalFloatArray(StationaryLight.GlobalStationaryLightColorIndicesShaderId);
+                var highestTimeInterval = 0f;
+                foreach (var light in StationaryLight.Lights)
+                {
+                    colorIndices[light.Index] = Array.IndexOf(StationaryLight.LightColors,
+                        StationaryLight.Lights[light.Index].Color.linear);
+                    if (highestTimeInterval < light.ColorAnimationFps)
+                        highestTimeInterval = light.ColorAnimationFps;
+                }
 
-                light.Color = light.ColorAnimationList[light.CurrentColorIndex];
-                UpdateShaderArray(light);
+                Shader.SetGlobalFloatArray(StationaryLight.GlobalStationaryLightColorIndicesShaderId, colorIndices);
+                yield return new WaitForSeconds(1 / highestTimeInterval);
             }
-        }
-
-        private void UpdateShaderArray(StationaryLight light)
-        {
-            if (StationaryLight.LightColors == null || StationaryLight.LightColors.Length == 0)
-                return;
-            var colorIndices = Shader.GetGlobalFloatArray(StationaryLight.GlobalStationaryLightColorIndicesShaderId);
-            colorIndices[light.Index] = Array.IndexOf(StationaryLight.LightColors,
-                StationaryLight.Lights[light.Index].Color.linear);
-            Shader.SetGlobalFloatArray(StationaryLight.GlobalStationaryLightColorIndicesShaderId, colorIndices);
         }
 
         public static void AddLightOnRenderer(StationaryLight light, MeshRenderer renderer)
@@ -104,12 +97,14 @@ namespace GVR.Manager
             {
                 indicesMatrix[i / 4, i % 4] = LightsPerRenderer[renderer][i].Index;
             }
+
             for (int i = 0; i < NonAllocMaterials.Count; i++)
             {
                 if (NonAllocMaterials[i])
                 {
                     NonAllocMaterials[i].SetMatrix(StationaryLight.StationaryLightIndicesShaderId, indicesMatrix);
-                    NonAllocMaterials[i].SetInt(StationaryLight.StationaryLightCountShaderId, LightsPerRenderer[renderer].Count);
+                    NonAllocMaterials[i].SetInt(StationaryLight.StationaryLightCountShaderId,
+                        LightsPerRenderer[renderer].Count);
                 }
             }
 
@@ -119,6 +114,7 @@ namespace GVR.Manager
                 {
                     indicesMatrix[i / 4, i % 4] = LightsPerRenderer[renderer][i + 16].Index;
                 }
+
                 for (int i = 0; i < NonAllocMaterials.Count; i++)
                 {
                     if (NonAllocMaterials[i])
