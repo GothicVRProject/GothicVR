@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using GVR.Util;
 using UnityEngine;
@@ -25,6 +27,41 @@ namespace GVR.Manager
                 Profiler.EndSample();
             }
         }
+
+        public void StartCoroutineChangeColors()
+        {
+            foreach (var light in StationaryLight.Lights)
+            {
+                StartCoroutine(ChangeColor(light));
+            }
+        }
+
+        private IEnumerator ChangeColor(StationaryLight light)
+        {
+            yield return new WaitForSeconds(1 / light.ColorAnimationFps);
+            while (true)
+            {
+                yield return new WaitForSeconds(1 / light.ColorAnimationFps);
+                if (light.ColorAnimationList.Count == 0) continue;
+                light.CurrentColorIndex++;
+                if (light.CurrentColorIndex >= light.ColorAnimationList.Count)
+                    light.CurrentColorIndex = 0;
+
+                light.Color = light.ColorAnimationList[light.CurrentColorIndex];
+                UpdateShaderArray(light);
+            }
+        }
+
+        private void UpdateShaderArray(StationaryLight light)
+        {
+            if (StationaryLight.LightColors == null || StationaryLight.LightColors.Length == 0)
+                return;
+            var colorIndices = Shader.GetGlobalFloatArray(StationaryLight.GlobalStationaryLightColorIndicesShaderId);
+            colorIndices[light.Index] = Array.IndexOf(StationaryLight.LightColors,
+                StationaryLight.Lights[light.Index].Color.linear);
+            Shader.SetGlobalFloatArray(StationaryLight.GlobalStationaryLightColorIndicesShaderId, colorIndices);
+        }
+
         public static void AddLightOnRenderer(StationaryLight light, MeshRenderer renderer)
         {
             if (!LightsPerRenderer.ContainsKey(renderer))

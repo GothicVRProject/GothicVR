@@ -74,6 +74,7 @@ namespace GVR.Creator
 
             SkyManager.I.InitSky();
             StationaryLight.InitStationaryLights();
+            StationaryLightsManager.I.StartCoroutineChangeColors();
 
             if (FeatureFlags.I.showBarrier)
             {
