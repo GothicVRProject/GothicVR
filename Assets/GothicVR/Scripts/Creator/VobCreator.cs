@@ -281,7 +281,7 @@ namespace GVR.Creator
                 vobRoot.Position = Vector3.Zero;
             }
 
-            CreateVobs(vobTree.RootObjects, go.FindChildRecursively(vob.Slot), true);
+            CreateVobs(vobTree.RootObjects, go.FindChildRecursively(vob.Slot) ?? go, true);
 
             return go;
         }
