@@ -17,6 +17,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using ZenKit;
 using System.Linq;
 using Debug = UnityEngine.Debug;
+using Vector3 = System.Numerics.Vector3;
 #if UNITY_EDITOR
 #endif
 
@@ -233,6 +234,7 @@ namespace GVR.Creator
                         {
                             // Add the texture to the texture array or retrieve its existing slice.
                             IMaterial zkMaterial = zkMesh.Materials[polygon.MaterialIndex];
+                            List<ILightMap> zkLightMaps = zkMesh.LightMap;
                             AssetCache.GetTextureArrayIndex(zkMaterial, out AssetCache.TextureArrayTypes textureArrayTpe, out int textureArrayIndex, out Vector2 textureScale, out int maxMipLevel);
                             if (textureArrayIndex == -1)
                             {
@@ -262,9 +264,9 @@ namespace GVR.Creator
 
                             WorldData.SubMeshData nodeSubmesh = nodeSubmeshes[shader];
                             // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
-                            AddEntry(zkMesh, polygon, nodeSubmesh, 0, textureArrayIndex, textureScale, maxMipLevel);
-                            AddEntry(zkMesh, polygon, nodeSubmesh, p, textureArrayIndex, textureScale, maxMipLevel);
-                            AddEntry(zkMesh, polygon, nodeSubmesh, p + 1, textureArrayIndex, textureScale, maxMipLevel);
+                            AddEntry(zkMesh, polygon, nodeSubmesh, 0, textureArrayIndex, textureScale, zkLightMaps,maxMipLevel);
+                            AddEntry(zkMesh, polygon, nodeSubmesh, p, textureArrayIndex, textureScale, zkLightMaps,maxMipLevel);
+                            AddEntry(zkMesh, polygon, nodeSubmesh, p + 1, textureArrayIndex, textureScale, zkLightMaps, maxMipLevel);
                         }
                     }
                 }
@@ -282,7 +284,7 @@ namespace GVR.Creator
             }
         }
 
-        private static void AddEntry(IMesh zkMesh, IPolygon polygon, WorldData.SubMeshData currentSubMesh, int index, int textureArrayIndex, Vector2 scaleInTextureArray, int maxMipLevel = 16)
+        private static void AddEntry(IMesh zkMesh, IPolygon polygon, WorldData.SubMeshData currentSubMesh, int index, int textureArrayIndex, Vector2 scaleInTextureArray, List<ILightMap> lightMaps, int maxMipLevel = 16)
         {
             // For every vertexIndex we store a new vertex. (i.e. no reuse of Vector3-vertices for later texture/uv attachment)
             int positionIndex = polygon.PositionIndices[index];
@@ -290,13 +292,23 @@ namespace GVR.Creator
 
             // This triangle (index where Vector 3 lies inside vertices, points to the newly added vertex (Vector3) as we don't reuse vertices.
             currentSubMesh.Triangles.Add(currentSubMesh.Vertices.Count - 1);
+            
 
             int featureIndex = polygon.FeatureIndices[index];
             Vertex feature = zkMesh.Features[featureIndex];
             Vector2 uv = Vector2.Scale(scaleInTextureArray, feature.Texture.ToUnityVector());
             currentSubMesh.Uvs.Add(new Vector4(uv.x, uv.y, textureArrayIndex, maxMipLevel));
             currentSubMesh.Normals.Add(feature.Normal.ToUnityVector());
-            currentSubMesh.BakedLightColors.Add(new Color32((byte)(feature.Light >> 16), (byte)(feature.Light >> 8), (byte)feature.Light, (byte)(feature.Light >> 24)));
+            
+            if(polygon.LightMapIndex != -1)
+            {
+                var currentLightmap = lightMaps[(int)polygon.LightMapIndex];
+                var color = GetLightmapColor(currentLightmap);
+                currentSubMesh.BakedLightColors.Add(color);
+            }
+            else
+                currentSubMesh.BakedLightColors.Add(new Color32((byte)(feature.Light >> 16), (byte)(feature.Light >> 8), (byte)feature.Light, (byte)(feature.Light >> 24)));
+
 
             if (zkMesh.Materials[polygon.MaterialIndex].TextureAnimationMapping == AnimationMapping.Linear)
             {
@@ -308,6 +320,33 @@ namespace GVR.Creator
                 currentSubMesh.TextureAnimations.Add(Vector2.zero);
             }
         }
+
+        private static Color32 GetLightmapColor(ILightMap lightMap)
+        {
+            byte[] texturePixels = lightMap.Image.AllMipmapsRgba[0];
+            
+            //lightmap.Origin needs to have a value subtracted from it to get the correct pixel position
+            //but idk what that value is and it's dependant on some polygon ray intersection
+            
+            float dotProductX = Vector3.Dot(lightMap.Origin, lightMap.Normals.Item1);
+            float dotProductY = Vector3.Dot(lightMap.Origin, lightMap.Normals.Item2);
+            
+            int width = lightMap.Image.Width;
+            int height = lightMap.Image.Height;
+            
+            
+            int x = Mathf.FloorToInt(dotProductX * width);
+            int y = Mathf.FloorToInt(dotProductY * height);
+
+            x = Mathf.Clamp(x, 0, width - 1);
+            y = Mathf.Clamp(y, 0, height - 1);
+
+            int texelIndex = 4*(x + y * (width-1));
+
+            Color32 finalColor = new Color32(texturePixels[texelIndex], texturePixels[texelIndex + 1], texturePixels[texelIndex + 2], texturePixels[texelIndex + 3]);
+            return finalColor;
+        }
+        
 
         private static Dictionary<int, List<WorldData.SubMeshData>> MergeShaderTypeWorldChunksToTreeHeight(AssetCache.TextureArrayTypes textureArrayType, int treeHeightLimit, IBspTree bspTree, Dictionary<int, List<WorldData.SubMeshData>> submeshesPerParentNode)
         {
