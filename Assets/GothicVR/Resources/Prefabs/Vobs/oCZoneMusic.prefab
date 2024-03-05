@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2022050282646122291}
   - component: {fileID: 8028293722520278200}
-  - component: {fileID: 2679884723459066799}
   - component: {fileID: 5953450146727244549}
   m_Layer: 0
   m_Name: oCZoneMusic
@@ -46,21 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a00892b2bbc40d78a264071021c6b20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <visual>k__BackingField: 
-  <visualScheme>k__BackingField: 
---- !u!114 &2679884723459066799
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6503575194566409312}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a00892b2bbc40d78a264071021c6b20, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <visual>k__BackingField: 
   <visualScheme>k__BackingField: 
 --- !u!65 &5953450146727244549
 BoxCollider:
