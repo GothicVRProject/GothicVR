@@ -66,11 +66,13 @@ namespace GVR.Manager
             directmusic = DMDirectMusic.DMusicInitDirectMusic();
 
             // Add paths for G1
+            // FIXME - Read from gothic.ini?
             AddMusicPath(fullPath, "dungeon");
             AddMusicPath(fullPath, "menu_men");
             AddMusicPath(fullPath, "orchestra");
 
             // Add paths for G2
+            // FIXME - Read from gothic.ini?
             AddMusicPath(fullPath, "newworld");
             AddMusicPath(fullPath, "AddonWorld");
 
@@ -199,6 +201,14 @@ namespace GVR.Manager
 
             if (FeatureFlags.I.showMusicLogs)
                 Debug.Log($"Playing music: theme >{musicName}< from file >{theme.File}<");
+        }
+
+        public void SetMusic(string segment, string themeName)
+        {
+            var theme = AssetCache.TryGetMusic(themeName);
+
+            if (FeatureFlags.I.showMusicLogs)
+                Debug.Log($"Playing music: theme >{themeName}< from file >{theme.File}<");
         }
 
         public void SetMusic(string musicName)
