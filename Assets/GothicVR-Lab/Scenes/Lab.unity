@@ -4120,11 +4120,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 464842610}
+  - component: {fileID: 464842615}
   - component: {fileID: 464842609}
   - component: {fileID: 464842612}
   - component: {fileID: 464842613}
   - component: {fileID: 464842614}
-  - component: {fileID: 464842615}
   - component: {fileID: 464842616}
   - component: {fileID: 464842617}
   m_Layer: 0

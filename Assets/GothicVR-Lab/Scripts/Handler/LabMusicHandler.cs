@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Caches;
 using GVR.Debugging;
+using GVR.Globals;
 using GVR.Manager;
 using TMPro;
 using UnityEngine;
+using ZenKit.Daedalus;
 
 namespace GVR.Lab.Handler
 {
@@ -12,17 +16,22 @@ namespace GVR.Lab.Handler
         public TMP_Dropdown fileSelector;
         public TMP_Dropdown themeSelector;
 
-        private Dictionary<string, List<string>> musicMapping = new()
-        {
-            { "ow_day_std.sgt", new(){ "DEF_DAY_STD" } },
-            { "ban_day_std.sgt", new(){ "STA_DAY_STD" } },
-            { "oc_day_std.sgt", new(){ "" } },
-        };
+        private List<MusicThemeInstance> _musicInstances;
 
         public void Bootstrap()
         {
-            fileSelector.options = musicMapping.Select(dict => new TMP_Dropdown.OptionData(dict.Key)).ToList();
-            themeSelector.options = musicMapping.First().Value.Select(i => new TMP_Dropdown.OptionData(i)).ToList();
+            var prototype = GameData.MusicVm.GetSymbolByName("C_MUSICTHEME_DEF");
+
+            _musicInstances = GameData.MusicVm.Symbols
+                .Where(s => s.Parent == prototype.Index)
+                .Select(s => AssetCache.TryGetMusic(s.Name))
+                .GroupBy(instance => instance.File, StringComparer.InvariantCultureIgnoreCase)
+                .Select(group => group.First())
+                .OrderBy(instance => instance.File)
+                .ToList();
+
+            fileSelector.options = _musicInstances.Select(i => new TMP_Dropdown.OptionData(i.File)).ToList();
+            // themeSelector.options = musicMapping.First().Value.Select(i => new TMP_Dropdown.OptionData(i)).ToList();
         }
 
         public void MusicPlayClick()
@@ -31,10 +40,9 @@ namespace GVR.Lab.Handler
             FeatureFlags.I.enableMusic = true;
             FeatureFlags.I.showMusicLogs = true;
 
-            var fileSelect = fileSelector.options[fileSelector.value].text;
-            var themeSelect = fileSelector.options[fileSelector.value].text;
+            var item = _musicInstances[fileSelector.value];
 
-            MusicManager.I.SetMusic(fileSelect, themeSelect);
+            MusicManager.I.SetMusic(item);
         }
     }
 }

@@ -191,9 +191,9 @@ namespace GVR.Manager
             if ((tags & Tags.Thr) != 0)
                 musicTag = "THR";
 
-            var musicName = $"{result}_{(isDay ? "DAY" : "NGT")}_{musicTag}";
+            var musicThemeInstanceName = $"{result}_{(isDay ? "DAY" : "NGT")}_{musicTag}";
 
-            var theme = AssetCache.TryGetMusic(musicName);
+            var theme = AssetCache.TryGetMusic(musicThemeInstanceName);
 
             reloadTheme = pendingTheme.File != theme.File;
             pendingTheme = theme;
@@ -201,30 +201,28 @@ namespace GVR.Manager
             hasPending = true;
 
             if (FeatureFlags.I.showMusicLogs)
-                Debug.Log($"Playing music: theme >{musicName}< from file >{theme.File}<");
+                Debug.Log($"Playing music: MusicThemeInstance >{musicThemeInstanceName}< from file >{theme.File}<");
         }
 
-        public void SetMusic(string segment, string themeName)
+        public void SetMusic(MusicThemeInstance theme)
         {
-            var theme = AssetCache.TryGetMusic(themeName);
-
             reloadTheme = true;
             pendingTheme = theme;
             hasPending = true;
 
             if (FeatureFlags.I.showMusicLogs)
-                Debug.Log($"Playing music: theme >{themeName}< from file >{theme.File}<");
+                Debug.Log($"[Music] Playing music from file >{theme.File}<.");
         }
 
-        public void SetMusic(string musicName)
+        public void SetMusic(string musicThemeInstanceName)
         {
-            var theme = AssetCache.TryGetMusic(musicName);
+            var theme = AssetCache.TryGetMusic(musicThemeInstanceName);
             reloadTheme = true;
             pendingTheme = theme;
             hasPending = true;
 
             if (FeatureFlags.I.showMusicLogs)
-                Debug.Log($"[Music] Playing music: theme >{musicName}< from file >{theme.File}<");
+                Debug.Log($"[Music] Playing music: MusicThemeInstance >{musicThemeInstanceName}< from file >{theme.File}<");
         }
 
         private void StopMusic()
