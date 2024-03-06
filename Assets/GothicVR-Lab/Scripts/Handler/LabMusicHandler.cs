@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Debugging;
 using GVR.Manager;
 using TMPro;
 using UnityEngine;
@@ -26,7 +27,14 @@ namespace GVR.Lab.Handler
 
         public void MusicPlayClick()
         {
-            MusicManager.I.SetMusic(fileSelector.itemText.text, themeSelector.itemText.text);
+            MusicManager.I.SetEnabled(true);
+            FeatureFlags.I.enableMusic = true;
+            FeatureFlags.I.showMusicLogs = true;
+
+            var fileSelect = fileSelector.options[fileSelector.value].text;
+            var themeSelect = fileSelector.options[fileSelector.value].text;
+
+            MusicManager.I.SetMusic(fileSelect, themeSelect);
         }
     }
 }

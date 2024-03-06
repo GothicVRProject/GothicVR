@@ -16,6 +16,7 @@ namespace GVR.Manager
         private IntPtr music;
         private IntPtr directmusic;
 
+        [Flags]
         public enum Tags : byte
         {
             Day = 0,
@@ -49,7 +50,7 @@ namespace GVR.Manager
         private void Start()
         {
             var backgroundMusic = GameObject.Find("BackgroundMusic");
-            backgroundMusic.TryGetComponent<AudioSource>(out musicSource);
+            backgroundMusic.TryGetComponent(out musicSource);
         }
 
 
@@ -206,6 +207,10 @@ namespace GVR.Manager
         public void SetMusic(string segment, string themeName)
         {
             var theme = AssetCache.TryGetMusic(themeName);
+
+            reloadTheme = true;
+            pendingTheme = theme;
+            hasPending = true;
 
             if (FeatureFlags.I.showMusicLogs)
                 Debug.Log($"Playing music: theme >{themeName}< from file >{theme.File}<");
