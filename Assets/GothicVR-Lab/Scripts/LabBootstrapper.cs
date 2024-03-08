@@ -10,11 +10,13 @@ namespace GVR.GothicVR_Lab.Scripts
     public class LabBootstrapper : MonoBehaviour
     {
         [Header("Bootstrapping")]
+        public bool bootLabMusicHandler;
         public bool bootNpcHandler;
         public bool bootLockableHandler;
         public bool bootLadderHandler;
         public bool bootAttachPointHandler;
-        
+
+        public LabMusicHandler labMusicHandler;
         public LabNpcLabHandler npcLabHandler;
         public LabLockableLabHandler lockableLabHandler;
         public LabLadderLabHandler ladderLabHandler;
@@ -32,6 +34,8 @@ namespace GVR.GothicVR_Lab.Scripts
             
             GvrBootstrapper.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
 
+            if (bootLabMusicHandler)
+                labMusicHandler.Bootstrap();
             if (bootNpcHandler)
                 npcLabHandler.Bootstrap();
             if (bootLockableHandler)
