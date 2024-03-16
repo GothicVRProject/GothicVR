@@ -52,7 +52,7 @@ namespace GVR.Creator.Meshes.V2
             var vobBuilder = new VobMeshBuilder();
             vobBuilder.SetRootPosAndRot(position, rotation);
             vobBuilder.SetGameObject(rootGo, objectName);
-            vobBuilder.SetParent(parent);
+            vobBuilder.SetParent(parent, resetRotation: true); // If we don't reset these, all objects will be rotated wrong!
             vobBuilder.SetMdl(mdl);
 
             return vobBuilder.Build();

@@ -7,8 +7,8 @@ namespace GVR.Caches
 {
     public static class NpcArmorPositionCache
     {
-        private static Dictionary<IModelHierarchy, List<Matrix4x4>> bonesInWorldSpace = new();
-        private static Dictionary<ISoftSkinMesh, List<System.Numerics.Vector3>> correctedVertexPositions = new();
+        private static Dictionary<IModelHierarchy, List<Matrix4x4>> _bonesInWorldSpace = new();
+        private static Dictionary<ISoftSkinMesh, List<System.Numerics.Vector3>> _correctedVertexPositions = new();
 
         /// <summary>
         /// Return calculated positions for NPC armor vertices.
@@ -35,12 +35,12 @@ namespace GVR.Caches
         /// <returns></returns>
         public static List<System.Numerics.Vector3> TryGetPositions(ISoftSkinMesh softSkinMesh, IModelHierarchy mdh)
         {
-            if (!bonesInWorldSpace.ContainsKey(mdh))
+            if (!_bonesInWorldSpace.ContainsKey(mdh))
             {
                 CalculateBonesInWorldSpace(mdh);
             }
 
-            if (!correctedVertexPositions.TryGetValue(softSkinMesh, out var currentCorrectedVertexPositions))
+            if (!_correctedVertexPositions.TryGetValue(softSkinMesh, out List<System.Numerics.Vector3> currentCorrectedVertexPositions))
             {
                 currentCorrectedVertexPositions = CalculateCorrectedVertexPositions(softSkinMesh, mdh);
             }
@@ -52,7 +52,7 @@ namespace GVR.Caches
         {
             List<Matrix4x4> retValue = new();
 
-            foreach (var node in mdh.Nodes)
+            foreach (IModelHierarchyNode node in mdh.Nodes)
             {
                 Matrix4x4 newTransform;
 
@@ -70,7 +70,7 @@ namespace GVR.Caches
                 retValue.Add(newTransform);
             }
 
-            bonesInWorldSpace[mdh] = retValue;
+            _bonesInWorldSpace[mdh] = retValue;
         }
 
         /// <summary>
@@ -82,28 +82,28 @@ namespace GVR.Caches
 
             for (int vertexId = 0; vertexId < softSkinMesh.Weights.Count; vertexId++)
             {
-                Vector3 vertexPosition = new(0, 0, 0);
+                Vector3 vertexPosition = new Vector3(0, 0, 0);
 
-                foreach (var weight in softSkinMesh.Weights[vertexId])
+                foreach (SoftSkinWeightEntry weight in softSkinMesh.Weights[vertexId])
                 {
-                    Matrix4x4 mdhBoneMatrix = bonesInWorldSpace[mdh][weight.NodeIndex];
+                    Matrix4x4 mdhBoneMatrix = _bonesInWorldSpace[mdh][weight.NodeIndex];
 
                     Vector3 newPos = mdhBoneMatrix.MultiplyPoint(weight.Position.ToUnityVector(false));
                     vertexPosition += newPos * weight.Weight;
                 }
 
-                retValue.Add(new(vertexPosition.x, vertexPosition.y, vertexPosition.z));
+                retValue.Add(new System.Numerics.Vector3(vertexPosition.x, vertexPosition.y, vertexPosition.z));
             }
 
-            correctedVertexPositions[softSkinMesh] = retValue;
+            _correctedVertexPositions[softSkinMesh] = retValue;
 
             return retValue;
         }
 
         public static void Dispose()
         {
-            bonesInWorldSpace.Clear();
-            correctedVertexPositions.Clear();
+            _bonesInWorldSpace.Clear();
+            _correctedVertexPositions.Clear();
         }
     }
 }

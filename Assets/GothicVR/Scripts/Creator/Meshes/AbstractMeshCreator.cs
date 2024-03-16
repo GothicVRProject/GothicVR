@@ -69,7 +69,7 @@ namespace GVR.Creator.Meshes
                 }
             }
 
-            //// Fill GameObjects with Meshes from "original" Mesh
+            // Fill GameObjects with Meshes from "original" Mesh
             var meshCounter = 0;
             foreach (var softSkinMesh in mdm.Meshes)
             {
@@ -81,7 +81,6 @@ namespace GVR.Creator.Meshes
                 var meshFilter = meshObj.AddComponent<MeshFilter>();
                 var meshRenderer = meshObj.AddComponent<SkinnedMeshRenderer>();
 
-                // FIXME - hard coded as it's the right value for BSFire. Need to be more dynamic by using element which has parent=-1.
                 meshRenderer.rootBone = nodeObjects[0].transform;
 
                 PrepareMeshRenderer(meshRenderer, mesh);

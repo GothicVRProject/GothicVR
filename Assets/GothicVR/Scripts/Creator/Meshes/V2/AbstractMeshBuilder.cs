@@ -78,7 +78,7 @@ namespace GVR.Creator.Meshes.V2
                 }
             }
 
-            //// Fill GameObjects with Meshes from "original" Mesh
+            // Fill GameObjects with Meshes from "original" Mesh
             var meshCounter = 0;
             foreach (var softSkinMesh in Mdm.Meshes)
             {
@@ -90,7 +90,6 @@ namespace GVR.Creator.Meshes.V2
                 var meshFilter = meshObj.AddComponent<MeshFilter>();
                 var meshRenderer = meshObj.AddComponent<SkinnedMeshRenderer>();
 
-                // FIXME - hard coded as it's the right value for BSFire. Need to be more dynamic by using element which has parent=-1.
                 meshRenderer.rootBone = nodeObjects[0].transform;
 
                 PrepareMeshRenderer(meshRenderer, mesh);
@@ -158,14 +157,14 @@ namespace GVR.Creator.Meshes.V2
             }
         }
 
-        public void SetParent([CanBeNull] GameObject parentGo)
+        public void SetParent([CanBeNull] GameObject parentGo, bool resetPosition = false, bool resetRotation = false)
         {
             if (parentGo == null)
             {
                 return;
             }
 
-            RootGo.SetParent(parentGo);
+            RootGo.SetParent(parentGo, resetPosition, resetRotation);
         }
 
         public void SetRootPosAndRot(Vector3 position = default, Quaternion rotation = default)
