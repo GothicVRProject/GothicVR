@@ -1,6 +1,7 @@
 using System.Linq;
 using GVR.Extensions;
 using GVR.Vm;
+using Unity.VisualScripting;
 using UnityEngine;
 using ZenKit;
 
@@ -78,6 +79,24 @@ namespace GVR.Creator.Meshes.V2
             vobBuilder.SetMdm(mdm);
 
             return vobBuilder.Build();
+        }
+
+        public static GameObject CreateBarrier(string objectName, IMesh mesh)
+        {
+            var barrierBuilder = new BarrierMeshBuilder();
+            barrierBuilder.SetGameObject(null, objectName);
+            barrierBuilder.SetBarrierMesh(mesh);
+
+            return barrierBuilder.Build();
+        }
+
+        public static GameObject CreatePolyStrip(GameObject go, int numberOfSegments, Vector3 startPoint, Vector3 endPoint)
+        {
+            var polyStripBuilder = new PolyStripMeshBuilder();
+            polyStripBuilder.SetGameObject(go);
+            polyStripBuilder.SetPolyStripData(numberOfSegments, startPoint, endPoint);
+
+            return polyStripBuilder.Build();
         }
     }
 }

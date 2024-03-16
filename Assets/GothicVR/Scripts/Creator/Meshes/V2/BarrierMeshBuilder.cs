@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GVR.Extensions;
 using GVR.Globals;
 using GVR.World;
@@ -9,37 +8,38 @@ using ZenKit;
 using Material = UnityEngine.Material;
 using Mesh = UnityEngine.Mesh;
 
-namespace GVR.Creator.Meshes
+namespace GVR.Creator.Meshes.V2
 {
-    public class MeshCreator : AbstractMeshCreator
+    public class BarrierMeshBuilder : AbstractMeshBuilder
     {
         private const string BarrierTextureName = "Barriere";
+        private IMesh barrierMesh;
 
-        public GameObject CreateBarrier(string objectName, IMesh msh)
+        public void SetBarrierMesh(IMesh mesh)
         {
-            var rootGo = new GameObject
-            {
-                name = objectName
-            };
+            barrierMesh = mesh;
+        }
 
+        public override GameObject Build()
+        {
             var meshColors = new List<Color>();
 
-            var maxSkyY = msh.BoundingBox.Max.Y; // Assuming AxisAlignedBoundingBox has Min and Max as Vector3
+            var maxSkyY = barrierMesh.BoundingBox.Max.Y; // Assuming AxisAlignedBoundingBox has Min and Max as Vector3
             var minSkyY = maxSkyY * 0.925f;
 
             var subMeshesData = new Dictionary<int, WorldData.SubMeshData>();
-            for (var i = 0; i < msh.MaterialCount; i++)
+            for (var i = 0; i < barrierMesh.MaterialCount; i++)
             {
-                subMeshesData[i] = new WorldData.SubMeshData { Material = msh.Materials[i] };
+                subMeshesData[i] = new WorldData.SubMeshData { Material = barrierMesh.Materials[i] };
             }
 
-            foreach (var polygon in msh.Polygons)
+            foreach (var polygon in barrierMesh.Polygons)
             {
                 var submesh = subMeshesData[polygon.MaterialIndex];
                 // As we always use element 0 and i+1, we skip it in the loop.
                 for (var i = 1; i < polygon.PositionIndices.Count - 1; i++)
                 {
-                    var vertFeature = msh.GetPosition(polygon.PositionIndices[i]);
+                    var vertFeature = barrierMesh.GetPosition(polygon.PositionIndices[i]);
 
                     var vertY = vertFeature.Y;
                     int alpha;
@@ -56,9 +56,9 @@ namespace GVR.Creator.Meshes
                     alpha = Math.Clamp(alpha, 0, 255);
 
                     // Triangle Fan - We need to add element 0 (A) before every triangle 2 elements.
-                    AddEntry(msh.Positions, msh.Features, polygon, meshColors, alpha, submesh, 0);
-                    AddEntry(msh.Positions, msh.Features, polygon, meshColors, alpha, submesh, i);
-                    AddEntry(msh.Positions, msh.Features, polygon, meshColors, alpha, submesh, i + 1);
+                    AddEntry(barrierMesh.Positions, barrierMesh.Features, polygon, meshColors, alpha, submesh, 0);
+                    AddEntry(barrierMesh.Positions, barrierMesh.Features, polygon, meshColors, alpha, submesh, i);
+                    AddEntry(barrierMesh.Positions, barrierMesh.Features, polygon, meshColors, alpha, submesh, i + 1);
                 }
             }
 
@@ -85,7 +85,7 @@ namespace GVR.Creator.Meshes
                     isStatic = true
                 };
 
-                subMeshObj.SetParent(rootGo);
+                subMeshObj.SetParent(RootGo);
 
                 var meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 var meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
@@ -94,7 +94,7 @@ namespace GVR.Creator.Meshes
                 PrepareBarrierMeshFilter(meshFilter, subMesh, meshColors.ToArray());
             }
 
-            return rootGo;
+            return RootGo;
         }
 
         private void PrepareBarrierMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)

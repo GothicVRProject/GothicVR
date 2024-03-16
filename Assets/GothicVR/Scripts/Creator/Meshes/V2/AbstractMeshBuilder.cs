@@ -320,6 +320,34 @@ namespace GVR.Creator.Meshes.V2
             return material;
         }
 
+        protected Material GetWaterMaterial(IMaterial materialData)
+        {
+            var shader = Constants.ShaderWater;
+            var material = new Material(shader);
+
+            // FIXME - Running water speed and direction is hardcoded based on material names
+            // Needs to be improved by a better shader and the implementation of proper water material parameters
+
+            //JaXt0r's suggestion for a not so hardcoded running water implementation
+            //material.SetFloat("_ScrollSpeed", -900000 * materialData.animMapDir.ToUnityVector().SqrMagnitude());
+
+            switch (materialData.Name)
+            {
+                case "OWODSEA2SWAMP": material.SetFloat("_ScrollSpeed", 0f); break;
+                case "NCWASSER": material.SetFloat("_ScrollSpeed", 0f); break;
+                case "OWODWATSTOP": material.SetFloat("_ScrollSpeed", (materialData.TextureAnimationFps / 75f)); break;
+                case "OWODWFALL": material.SetFloat("_ScrollSpeed", -(materialData.TextureAnimationFps / 10f)); break;
+                default: material.SetFloat("_ScrollSpeed", -(materialData.TextureAnimationFps / 75f)); break;
+            }
+
+            material.SetFloat("_Surface", 0);
+            material.SetInt("_ZWrite", 0);
+            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+
+            return material;
+        }
+
         protected virtual void CreateMorphMeshBegin(IMultiResolutionMesh mrm, Mesh mesh)
         {
             // NOP
