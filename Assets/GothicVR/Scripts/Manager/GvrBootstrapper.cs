@@ -36,6 +36,7 @@ namespace GVR.Manager
             LookupCache.Dispose();
             PrefabCache.Dispose();
             MorphMeshCache.Dispose();
+            NpcArmorPositionCache.Dispose();
         }
 
         private void Update()

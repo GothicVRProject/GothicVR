@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Linq;
 using GVR.Extensions;
 using GVR.Globals;
 using Unity.VisualScripting;
 using UnityEngine;
+using ZenKit;
 using Debug = UnityEngine.Debug;
 
 namespace GVR.Creator.Meshes.V2
@@ -28,7 +30,17 @@ namespace GVR.Creator.Meshes.V2
                 return null;
             }
 
+            AddZsCollider();
+
             return RootGo;
+        }
+
+        /// <summary>
+        /// For Vobs we just use the named positions inside mrm files.
+        /// </summary>
+        protected override List<System.Numerics.Vector3> GetPositions(ISoftSkinMesh softSkinMesh)
+        {
+            return softSkinMesh.Mesh.Positions;
         }
 
         /// <summary>

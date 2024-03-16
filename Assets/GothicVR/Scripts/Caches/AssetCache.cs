@@ -37,18 +37,6 @@ namespace GVR.Caches
         private static readonly Dictionary<string, SoundData> SoundCache = new();
         private static readonly Dictionary<string, IFont> FontCache = new();
 
-        private static readonly string[] MisplacedMdmArmors =
-        {
-            "Hum_GrdS_Armor",
-            "Hum_GrdM_Armor",
-            "Hum_GrdL_Armor",
-            "Hum_NovM_Armor",
-            "Hum_TplL_Armor",
-            "Hum_Body_Cooksmith",
-            "Hum_VlkL_Armor",
-            "Hum_VlkM_Armor",
-            "Hum_KdfS_Armor"
-        };
 
         [CanBeNull]
         public static Texture2D TryGetTexture(string key)

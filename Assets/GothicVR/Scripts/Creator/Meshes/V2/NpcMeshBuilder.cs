@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using GVR.Caches;
 using GVR.Vm;
 using UnityEngine;
 using ZenKit;
@@ -45,6 +46,15 @@ namespace GVR.Creator.Meshes.V2
             }
 
             return newAttachments;
+        }
+
+        /// <summary>
+        /// Positions in mdm files for NPC armor isn't what it seems to be. We need to calculate the real data from weights.
+        /// Please check the Cache class for more details.
+        /// </summary>
+        protected override List<System.Numerics.Vector3> GetPositions(ISoftSkinMesh softSkinMesh)
+        {
+            return NpcArmorPositionCache.TryGetPositions(softSkinMesh, Mdh);
         }
     }
 }

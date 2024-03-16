@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
@@ -301,6 +302,11 @@ namespace GVR.Creator.Meshes.V2
             renderer.bones = meshBones;
         }
 
+        protected virtual List<System.Numerics.Vector3> GetPositions(ISoftSkinMesh softSkinMesh)
+        {
+            throw new NotImplementedException();
+        }
+
         protected virtual Texture2D GetTexture(string name)
         {
             return AssetCache.TryGetTexture(name);
@@ -407,9 +413,10 @@ namespace GVR.Creator.Meshes.V2
             // 2-dimensional arrays (as there are segregated by submeshes)
             var preparedTriangles = new List<List<int>>(zkMesh.SubMeshes.Count);
 
+            var vertices = GetPositions(soft);
+
             foreach (var subMesh in zkMesh.SubMeshes)
             {
-                var vertices = zkMesh.Positions;
                 var triangles = subMesh.Triangles;
                 var wedges = subMesh.Wedges;
 
