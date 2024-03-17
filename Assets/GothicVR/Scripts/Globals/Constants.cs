@@ -4,6 +4,8 @@ namespace GVR.Globals
 {
     public static class Constants
     {
+        public static readonly Material LoadingMaterial; // Used for Vobs and World before applying TextureArray.
+
         // Unity shaders
         public static readonly Shader ShaderUnlit = Shader.Find("Universal Render Pipeline/Unlit");
         public static readonly Shader ShaderUnlitParticles = Shader.Find("Universal Render Pipeline/Particles/Unlit");
@@ -53,5 +55,11 @@ namespace GVR.Globals
 
         public static string selectedWorld { get; set; } = "world.zen";
         public static string selectedWaypoint { get; set; } = "START";
+
+
+        static Constants()
+        {
+            LoadingMaterial = new Material(ShaderWorldLit);
+        }
     }
 }

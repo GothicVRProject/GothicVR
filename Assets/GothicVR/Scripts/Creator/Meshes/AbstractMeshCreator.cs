@@ -19,7 +19,6 @@ namespace GVR.Creator.Meshes
         // until we know how to change specifics to the cutout only. (e.g. bushes)
         protected const float DecalOpacity = 0.75f;
         protected List<(MeshRenderer Renderer, (IMultiResolutionMesh Mrm, List<TextureCache.TextureArrayTypes> TextureArrayTypes) Data)> _renderersInNeedOfTextureArray = new();
-        protected static Material _loadingMaterial;
 
         protected GameObject Create(string objectName, IModelMesh mdm, IModelHierarchy mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
@@ -96,18 +95,13 @@ namespace GVR.Creator.Meshes
 
             Dictionary<string, IMultiResolutionMesh> attachments = GetFilteredAttachments(mdm.Attachments);
 
-            if (!_loadingMaterial)
-            {
-                _loadingMaterial = new Material(Constants.ShaderWorldLit);
-            }
-
             // Fill GameObjects with Meshes from attachments
             foreach (KeyValuePair<string, IMultiResolutionMesh> subMesh in attachments)
             {
                 GameObject meshObj = nodeObjects.First(bone => bone.name == subMesh.Key);
                 MeshFilter meshFilter = meshObj.AddComponent<MeshFilter>();
                 MeshRenderer meshRenderer = meshObj.AddComponent<MeshRenderer>();
-                meshRenderer.material = _loadingMaterial;
+                meshRenderer.material = Constants.LoadingMaterial;
 
                 List<TextureCache.TextureArrayTypes> textureFormatsInMesh = PrepareMeshFilter(meshFilter, subMesh.Value, true, false);
                 PrepareMeshCollider(meshObj, meshFilter.sharedMesh, subMesh.Value.Materials);
@@ -152,14 +146,9 @@ namespace GVR.Creator.Meshes
             rootGo.SetParent(parent);
             SetPosAndRot(rootGo, position, rotation);
 
-            if (!_loadingMaterial)
-            {
-                _loadingMaterial = new Material(Constants.ShaderWorldLit);
-            }
-
             MeshFilter meshFilter = rootGo.AddComponent<MeshFilter>();
             MeshRenderer meshRenderer = rootGo.AddComponent<MeshRenderer>();
-            meshRenderer.material = _loadingMaterial;
+            meshRenderer.material = Constants.LoadingMaterial;
             List<TextureCache.TextureArrayTypes> textureArrayTypesInMesh = PrepareMeshFilter(meshFilter, mrm, true);
             _renderersInNeedOfTextureArray.Add((meshRenderer, (mrm, textureArrayTypesInMesh)));
 
@@ -177,9 +166,8 @@ namespace GVR.Creator.Meshes
             {
                 PrepareMeshRenderer(mesh.Renderer, mesh.Data.Mrm, mesh.Data.TextureArrayTypes);
             }
+        }
 
-            Object.Destroy(_loadingMaterial);
-        }        
         public virtual void ClearTextureArrayMeshRenderers()
         {
             _renderersInNeedOfTextureArray.Clear();
