@@ -115,7 +115,7 @@ namespace GVR.Creator.Meshes.V2
             switch (subMesh.Material.Group)
             {
                 case MaterialGroup.Water:
-                    material = GetWaterMaterial(subMesh.Material);
+                    material = GetWaterMaterial();
                     break;
                 default:
                     material = new Material(Constants.ShaderBarrier);

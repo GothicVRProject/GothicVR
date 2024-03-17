@@ -2,26 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using GVR.Creator.Sounds;
 using GVR.Data;
 using GVR.Extensions;
 using GVR.Globals;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Tilemaps;
 using ZenKit;
 using ZenKit.Daedalus;
 using Font = ZenKit.Font;
 using Mesh = ZenKit.Mesh;
 using Object = UnityEngine.Object;
-using Texture = ZenKit.Texture;
-using TextureFormat = ZenKit.TextureFormat;
 
 namespace GVR.Caches
 {
     public static class AssetCache
     {
+        public static Dictionary<TextureArrayTypes, UnityEngine.Texture> TextureArrays { get; private set; } = new();
+        public static int ReferenceTextureSize = 256;
+
         private static readonly Dictionary<string, Texture2D> TextureCache = new();
+        private static readonly Dictionary<string, ZenKit.Texture> TextureDataCache = new();
         private static readonly Dictionary<string, IMesh> MshCache = new();
         private static readonly Dictionary<string, IModelScript> MdsCache = new();
         private static readonly Dictionary<string, IModelAnimation> AnimCache = new();
@@ -37,6 +41,159 @@ namespace GVR.Caches
         private static readonly Dictionary<string, SoundData> SoundCache = new();
         private static readonly Dictionary<string, IFont> FontCache = new();
 
+        private static Dictionary<TextureArrayTypes, List<(string PreparedKey, ZenKit.Texture Texture)>> _arrayTexturesList = new();
+
+        public enum TextureArrayTypes
+        {
+            Opaque,
+            Transparent,
+            Water
+        }
+
+        private static readonly string[] MisplacedMdmArmors =
+        {
+            "Hum_GrdS_Armor",
+            "Hum_GrdM_Armor",
+            "Hum_GrdL_Armor",
+            "Hum_NovM_Armor",
+            "Hum_TplL_Armor",
+            "Hum_Body_Cooksmith",
+            "Hum_VlkL_Armor",
+            "Hum_VlkM_Armor",
+            "Hum_KdfS_Armor"
+        };
+
+        public static void GetTextureArrayIndex(IMaterial materialData, out TextureArrayTypes textureArrayType, out int arrayIndex, out Vector2 textureScale, out int maxMipLevel)
+        {
+            string key = materialData.Texture;
+            ZenKit.Texture zenTextureData = GetZenTextureData(key);
+            if (zenTextureData == null)
+            {
+                textureArrayType = default;
+                arrayIndex = -1;
+                textureScale = Vector2.zero;
+                maxMipLevel = 0;
+                return;
+            }
+
+            maxMipLevel = zenTextureData.MipmapCount - 1;
+            UnityEngine.TextureFormat textureFormat = zenTextureData.Format.AsUnityTextureFormat();
+            if (materialData.Group == MaterialGroup.Water)
+            {
+                textureArrayType = TextureArrayTypes.Water;
+            }
+            else
+            {
+                textureArrayType = textureFormat == UnityEngine.TextureFormat.DXT1 ? TextureArrayTypes.Opaque : TextureArrayTypes.Transparent;
+            }
+            textureScale = new Vector2((float)zenTextureData.Width / ReferenceTextureSize, (float)zenTextureData.Height / ReferenceTextureSize);
+            if (!_arrayTexturesList.ContainsKey(textureArrayType))
+            {
+                _arrayTexturesList.Add(textureArrayType, new List<(string PreparedKey, ZenKit.Texture Texture)>());
+            }
+
+            (string, ZenKit.Texture) cachedTextureData = _arrayTexturesList[textureArrayType].FirstOrDefault(k => k.PreparedKey == key);
+            if (cachedTextureData != default)
+            {
+                arrayIndex = _arrayTexturesList[textureArrayType].IndexOf(cachedTextureData);
+            }
+            else
+            {
+                _arrayTexturesList[textureArrayType].Add((key, zenTextureData));
+                arrayIndex = _arrayTexturesList[textureArrayType].Count - 1;
+            }
+        }
+
+        public static async Task BuildTextureArrays()
+        {
+            System.Diagnostics.Stopwatch stopwatch = new();
+            stopwatch.Start();
+            foreach (TextureArrayTypes textureArrayType in _arrayTexturesList.Keys)
+            {
+                // Create the texture array with the max size of the contained textures.
+                int maxSize = _arrayTexturesList[textureArrayType].Max(p => p.Texture.Width);
+                int index = _arrayTexturesList[textureArrayType].FindIndex(p => p.Texture.Width == maxSize);
+
+                UnityEngine.TextureFormat textureFormat = UnityEngine.TextureFormat.RGBA32;
+                if (textureArrayType == TextureArrayTypes.Opaque)
+                {
+                    textureFormat = UnityEngine.TextureFormat.DXT1;
+                }
+                UnityEngine.Texture texArray = null;
+                if (textureArrayType != TextureArrayTypes.Water)
+                {
+                    texArray = new Texture2DArray(maxSize, maxSize, _arrayTexturesList[textureArrayType].Count, textureFormat, true, false, true)
+                    {
+                        filterMode = FilterMode.Trilinear,
+                        wrapMode = TextureWrapMode.Repeat,
+                    };
+                }
+                else
+                {
+                    texArray = new RenderTexture(maxSize, maxSize, 0, RenderTextureFormat.ARGB32, _arrayTexturesList[textureArrayType].Max(p => p.Texture.MipmapCount))
+                    {
+                        dimension = UnityEngine.Rendering.TextureDimension.Tex2DArray,
+                        autoGenerateMips = false,
+                        filterMode = FilterMode.Trilinear,
+                        useMipMap = true,
+                        volumeDepth = _arrayTexturesList[textureArrayType].Count,
+                        wrapMode = TextureWrapMode.Repeat
+                    };
+                }
+
+                // Copy all the textures and their mips into the array. Textures which are smaller are tiled so bilinear sampling isn't broken - this is why it's not possible to pack different textures together in the same slice.
+                for (int i = 0; i < _arrayTexturesList[textureArrayType].Count; i++)
+                {
+                    Texture2D sourceTex = ImportZenTexture(_arrayTexturesList[textureArrayType][i].PreparedKey);
+                    for (int mip = 0; mip < sourceTex.mipmapCount; mip++)
+                    {
+                        for (int x = 0; x < texArray.width / sourceTex.width; x++)
+                        {
+                            for (int y = 0; y < texArray.height / sourceTex.height; y++)
+                            {
+                                if (texArray is Texture2DArray)
+                                {
+                                    Graphics.CopyTexture(sourceTex, 0, mip, 0, 0, sourceTex.width >> mip, sourceTex.height >> mip, texArray, i, mip, (sourceTex.width >> mip) * x, (sourceTex.height >> mip) * y);
+                                }
+                                else
+                                {
+                                    CommandBuffer cmd = CommandBufferPool.Get();
+                                    RenderTexture rt = (RenderTexture)texArray;
+                                    cmd.SetRenderTarget(new RenderTargetBinding(new RenderTargetSetup(rt.colorBuffer, rt.depthBuffer, mip, CubemapFace.Unknown, i)));
+                                    Vector2 scale = new Vector2((float)sourceTex.width / texArray.width, (float)sourceTex.height / texArray.height);
+                                    Blitter.BlitQuad(cmd, sourceTex, new Vector4(1, 1, 0, 0), new Vector4(scale.x, scale.y, scale.x * x, scale.y * y), mip, false);
+                                    Graphics.ExecuteCommandBuffer(cmd);
+                                    cmd.Clear();
+                                    CommandBufferPool.Release(cmd);
+                                }
+                            }
+                        }
+                    }
+                    if (!Application.isPlaying)
+                    {
+                        Object.DestroyImmediate(sourceTex);
+                    }
+                    else
+                    {
+                        Object.Destroy(sourceTex);
+                    }
+
+                    if (i % 20 == 0)
+                    {
+                        await Task.Yield();
+                    }
+                }
+
+                TextureArrays.Add(textureArrayType, texArray);
+            }
+
+            // Clear cached texture data.
+            _arrayTexturesList.Clear();
+            _arrayTexturesList.TrimExcess();
+
+            stopwatch.Stop();
+            Debug.Log($"Built tex array in {stopwatch.ElapsedMilliseconds / 1000f} s");
+        }
 
         [CanBeNull]
         public static Texture2D TryGetTexture(string key)
@@ -47,21 +204,41 @@ namespace GVR.Caches
                 return TextureCache[preparedKey];
             }
 
-            Texture zkTexture;
+            return ImportZenTexture(key);
+        }
+
+        public static ZenKit.Texture GetZenTextureData(string key)
+        {
+            if (TextureDataCache.ContainsKey(key))
+            {
+                return TextureDataCache[key];
+            }
+
             try
             {
-                zkTexture = new Texture(GameData.Vfs, $"{preparedKey}-C.TEX");
+                string preparedKey = GetPreparedKey(key);
+                TextureDataCache.Add(key, new ZenKit.Texture(GameData.Vfs, $"{preparedKey}-C.TEX"));
+                return TextureDataCache[key];
             }
             catch (Exception)
             {
                 Debug.LogWarning($"Texture {key} couldn't be found.");
                 return null;
             }
+        }
 
+        private static Texture2D ImportZenTexture(string key)
+        {
+            string preparedKey = GetPreparedKey(key);
+            ZenKit.Texture zkTexture = GetZenTextureData(key);
+            if (zkTexture == null)
+            {
+                return null;
+            }
             Texture2D texture;
 
             // Workaround for Unity and DXT1 Mipmaps.
-            if (zkTexture.Format == TextureFormat.Dxt1 && zkTexture.MipmapCount == 1)
+            if (zkTexture.Format == ZenKit.TextureFormat.Dxt1 && zkTexture.MipmapCount == 1)
             {
                 texture = GenerateDxt1Mipmaps(zkTexture);
             }
@@ -75,11 +252,15 @@ namespace GVR.Caches
                 for (var i = 0; i < zkTexture.MipmapCount; i++)
                 {
                     if (format == UnityEngine.TextureFormat.RGBA32)
+                    {
                         // RGBA is uncompressed format.
                         texture.SetPixelData(zkTexture.AllMipmapsRgba[i], i);
+                    }
                     else
+                    {
                         // Raw means "compressed data provided by Gothic texture"
                         texture.SetPixelData(zkTexture.AllMipmapsRaw[i], i);
+                    }
                 }
 
                 texture.Apply(updateMipmaps, true);
@@ -95,7 +276,7 @@ namespace GVR.Caches
         /// <summary>
         /// Unity doesn't want to create mips for DXT1 textures. Recreate them as RGB24.
         /// </summary>
-        private static Texture2D GenerateDxt1Mipmaps(Texture zkTexture)
+        private static Texture2D GenerateDxt1Mipmaps(ZenKit.Texture zkTexture)
         {
             var dxtTexture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, UnityEngine.TextureFormat.DXT1, false);
             dxtTexture.SetPixelData(zkTexture.AllMipmapsRaw[0], 0);
@@ -211,7 +392,7 @@ namespace GVR.Caches
         }
 
         [CanBeNull]
-        public static IModelMesh TryGetMdm(string key, bool isNpcArmor = false)
+        public static IModelMesh TryGetMdm(string key)
         {
             var preparedKey = GetPreparedKey(key);
             if (MdmCache.TryGetValue(preparedKey, out var data))
@@ -229,61 +410,27 @@ namespace GVR.Caches
 
             MdmCache[preparedKey] = newData;
 
-            // Naked == default armor which is placed correctly based on our testings.
-            if (isNpcArmor && !preparedKey.ContainsIgnoreCase("Naked"))
-                FixArmorMisalignment(preparedKey, newData);
+            FixArmorTriangles(preparedKey, newData);
 
             return newData;
         }
 
         /// <summary>
-        /// Some armor mdm's have misplaced triangles as the meshes aren't centered around bones.
+        /// Some armor mdm's have wrong triangles. This function corrects them hard coded until we find a proper solution.
         /// </summary>
-        private static void FixArmorMisalignment(string key, IModelMesh mdm)
+        private static void FixArmorTriangles(string key, IModelMesh mdm)
         {
-            // Assumption: This is the wanted pivot taken vom Hum_Body_Naked0.asc
-            Vector3 perfectPivot = new(-0.01f, 82.81f, 6.81f);
-
-            float minX = 0;
-            float maxX = 0;
-            float minY = 0;
-            float maxY = 0;
-            float minZ = 0;
-            float maxZ = 0;
-
-            foreach (var mesh in mdm.Meshes)
-            {
-                foreach (var position in mesh.Mesh.Positions)
-                {
-                    minX = Math.Min(minX, position.X);
-                    maxX = Math.Max(maxX, position.X);
-                    minY = Math.Min(minY, position.Y);
-                    maxY = Math.Max(maxY, position.Y);
-                    minZ = Math.Min(minZ, position.Z);
-                    maxZ = Math.Max(maxZ, position.Z);
-                }
-            }
-
-            float centerX = (minX + maxX) / 2;
-            float centerY = (minY + maxY) / 2;
-            float centerZ = (minZ + maxZ) / 2;
-
-            Vector3 currentPivot = new(centerX, centerY, centerZ);
-            Vector3 adjustment = perfectPivot - currentPivot;
-
-            // Some bodies have the right pivot already.
-            if (adjustment.magnitude < 0.001f)
+            if (!MisplacedMdmArmors.Contains(key, StringComparer.OrdinalIgnoreCase))
                 return;
 
             foreach (var mesh in mdm.Meshes)
             {
-                for (int i = 0; i < mesh.Mesh.Positions.Count; i++)
+                for (var i = 0; i < mesh.Mesh.Positions.Count; i++)
                 {
-                    System.Numerics.Vector3 curPos = mesh.Mesh.Positions[i];
-                    mesh.Mesh.Positions[i] = new(curPos.X + adjustment.x, curPos.Y, curPos.Z + adjustment.z);
+                    var curPos = mesh.Mesh.Positions[i];
+                    mesh.Mesh.Positions[i] = new(curPos.X + 0.5f, curPos.Y - 0.5f, curPos.Z + 13f);
                 }
             }
-            Debug.Log($"Pivot corrected for {key} by {adjustment}");
         }
 
         public static IMultiResolutionMesh TryGetMrm(string key)
@@ -425,7 +572,7 @@ namespace GVR.Caches
             var preparedKey = GetPreparedKey(key);
             if (SoundCache.TryGetValue(preparedKey, out var data))
                 return data;
-            
+
             var newData = SoundCreator.GetSoundArrayFromVfs($"{preparedKey}.wav");
             SoundCache[preparedKey] = newData;
 
@@ -437,7 +584,7 @@ namespace GVR.Caches
             var preparedKey = GetPreparedKey(key);
             if (FontCache.TryGetValue(preparedKey, out var data))
                 return data;
-            
+
             var fontData = new Font(GameData.Vfs, $"{preparedKey}.fnt").Cache();
             FontCache[preparedKey] = fontData;
 
@@ -458,6 +605,7 @@ namespace GVR.Caches
         public static void Dispose()
         {
             TextureCache.Clear();
+            TextureDataCache.Clear();
             MdsCache.Clear();
             AnimCache.Clear();
             MdhCache.Clear();

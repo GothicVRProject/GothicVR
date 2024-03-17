@@ -154,7 +154,7 @@ namespace GVR.Manager.Culling
         /// <summary>
         /// Fill CullingGroups with GOs based on size (radius), position, and object size (small/medium/large)
         /// </summary>
-        public void PrepareVobCulling(GameObject[] objects)
+        public void PrepareVobCulling(List<GameObject> objects)
         {
             if (!FeatureFlags.I.vobCulling)
                 return;
@@ -167,9 +167,14 @@ namespace GVR.Manager.Culling
 
             foreach (var obj in objects)
             {
+                if (!obj)
+                {
+                    continue;
+                }
+
                 // FIXME - Particles (like leaves in the forest) will be handled like big vobs, but could potentially
                 // FIXME - be handled as small ones as leaves shouldn't be visible from 100 of meters away.
-                var bounds = GetBounds(obj);
+                var bounds = GetLocalBounds(obj);
                 if (!bounds.HasValue)
                 {
                     // Wash slot is placed wrong in G1. Therefore let's skip it.
@@ -231,17 +236,26 @@ namespace GVR.Manager.Culling
         /// TODO If performance allows it, we could also look dynamically for all the existing meshes inside GO
         /// TODO and look for maximum value for largest mesh. But it should be fine for now.
         /// </summary>
-        private Bounds? GetBounds(GameObject go)
+        private Bounds? GetLocalBounds(GameObject go)
         {
-            var transf = go.transform;
-
             try
             {
-                if (transf.TryGetComponent<ParticleSystemRenderer>(out var particleRenderer))
+                if (go.TryGetComponent<ParticleSystemRenderer>(out var particleRenderer))
+                {
                     return particleRenderer.bounds;
+                }
+                else if (go.TryGetComponent(out Light light))
+                {
+                    return new Bounds(Vector3.zero, Vector3.one * light.range * 2);
+                }
+                else if (go.TryGetComponent(out StationaryLight stationaryLight))
+                {
+                    return new Bounds(Vector3.zero, Vector3.one * stationaryLight.Range * 2);
+                }
                 else
-                    // Example lookups: /, /BIP 01, /BIP 01/..., /ZM_0
-                    return transf.GetComponentInChildren<MeshFilter>().mesh.bounds;
+                {
+                    return go.GetComponentInChildren<MeshFilter>().mesh.bounds;
+                }
             }
             catch (Exception e)
             {
@@ -273,18 +287,18 @@ namespace GVR.Manager.Culling
                 return;
 
             // Check Small list
-            var index = Array.IndexOf(vobObjectsSmall.ToArray(), go);
+            int index = vobObjectsSmall.IndexOf(go);
             var vobType = VobList.Small;
             // Check Medium list
             if (index == -1)
             {
-                index = Array.IndexOf(vobObjectsMedium.ToArray(), go);
+                index = vobObjectsMedium.IndexOf(go);
                 vobType = VobList.Medium;
             }
             // Check Large list
             if (index == -1)
             {
-                index = Array.IndexOf(vobObjectsLarge.ToArray(), go);
+                index = vobObjectsLarge.IndexOf(go);
                 vobType = VobList.Large;
             }
 
@@ -296,7 +310,7 @@ namespace GVR.Manager.Culling
             if (pausedVobsToReenable.ContainsKey(go))
                 return;
 
-            pausedVobsToReenableCoroutine.Add(go, StartCoroutine(nameof(StopTrackVobPositionUpdatesDelayed), go));
+            pausedVobsToReenableCoroutine.Add(go, StartCoroutine(StopTrackVobPositionUpdatesDelayed(go)));
         }
 
         /// <summary>
@@ -334,16 +348,17 @@ namespace GVR.Manager.Culling
         {
             while (true)
             {
-                foreach (var obj in pausedVobsToReenable.ToArray()) // Clone to remove elements within foreach
+                for (int i = pausedVobsToReenable.Keys.Count - 1; i >= 0; i--)
                 {
-                    var velocity = obj.Value.velocity;
-                    if (velocity != Vector3.zero)
+                    GameObject key = pausedVobsToReenable.Keys.ElementAt(i);
+                    Rigidbody rigidBody = pausedVobsToReenable[key];
+                    if (rigidBody.velocity != Vector3.zero)
                         continue;
 
-                    UpdateSpherePosition(obj.Key);
+                    UpdateSpherePosition(key);
 
-                    pausedVobs.Remove(obj.Key);
-                    pausedVobsToReenable.Remove(obj.Key);
+                    pausedVobs.Remove(key);
+                    pausedVobsToReenable.Remove(key);
                 }
 
                 yield return null;

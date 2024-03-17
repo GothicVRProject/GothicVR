@@ -18,11 +18,21 @@ namespace GVR.GothicVR.Scripts.Manager
 {
     public class SkyManager : SingletonBehaviour<SkyManager>
     {
+        public Transform SunDirection;
+        public Color SunColor;
+        public Color AmbientColor;
+        [Range(0, 1)]
+        public float PointLightIntensity = 1f;
         public bool IsRaining;
 
         private float masterTime;
         private bool noSky = true;
         private List<SkyState> stateList = new();
+
+        private static readonly int SunDirectionShaderId = Shader.PropertyToID("_SunDirection");
+        private static readonly int SunColorShaderId = Shader.PropertyToID("_SunColor");
+        private static readonly int AmbientShaderId = Shader.PropertyToID("_AmbientColor");
+        private static readonly int PointLightIntensityShaderId = Shader.PropertyToID("_PointLightIntensity");
 
         private SkyStateRain rainState = new();
         private ParticleSystem rainParticleSystem;
@@ -54,6 +64,11 @@ namespace GVR.GothicVR.Scripts.Manager
             GvrEvents.GameTimeSecondChangeCallback.AddListener(Interpolate);
             GvrEvents.GameTimeHourChangeCallback.AddListener(UpdateRainTime);
             GvrEvents.GeneralSceneLoaded.AddListener(InitRainGO);
+        }
+
+        private void OnValidate()
+        {
+            SetShaderProperties();
         }
 
         public void InitSky()
@@ -213,6 +228,7 @@ namespace GVR.GothicVR.Scripts.Manager
             RenderSettings.skybox.SetColor(DomeColor2ShaderId, newDomeColor);
 
             RenderSettings.skybox.SetFloat(LayersBlendShaderId, lerpFraction);
+            SetShaderProperties();
         }
 
         private void InitRainState()
@@ -228,6 +244,17 @@ namespace GVR.GothicVR.Scripts.Manager
             rainState.layer[0].texAlpha = 255.0f;
         }
 
+        private void SetShaderProperties()
+        {
+            if (SunDirection)
+            {
+                Shader.SetGlobalVector(SunDirectionShaderId, SunDirection.forward);
+            }
+            Shader.SetGlobalColor(SunColorShaderId, SunColor);
+            Shader.SetGlobalColor(AmbientShaderId, AmbientColor);
+            Shader.SetGlobalFloat(PointLightIntensityShaderId, PointLightIntensity);
+        }
+
         private void InitRainGO()
         {
             // by default rainPFX is disabled so we need to find the parent and activate it
@@ -241,7 +268,6 @@ namespace GVR.GothicVR.Scripts.Manager
             rainParticleSound.volume = 0;
             rainParticleSound.Stop();
         }
-
 
         private void UpdateRainTime(DateTime _)
         {

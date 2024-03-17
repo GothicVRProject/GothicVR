@@ -37,6 +37,20 @@ namespace GVR.Extensions
             }
         }
 
+        public static UnityEngine.Bounds ToUnityBounds(this ZenKit.AxisAlignedBoundingBox bounds)
+        {
+            UnityEngine.Vector3 max = bounds.Max.ToUnityVector();
+            UnityEngine.Vector3 min = bounds.Min.ToUnityVector();
+
+            UnityEngine.Vector3 boundsChord = max  - min;
+            UnityEngine.Bounds unityBounds = new UnityEngine.Bounds(min + boundsChord.normalized * boundsChord.magnitude * .5f, 
+                new UnityEngine.Vector3(UnityEngine.Mathf.Abs(max.x - min.x),
+                                        UnityEngine.Mathf.Abs(max.y - min.y),
+                                        UnityEngine.Mathf.Abs(max.z - min.z)));
+
+            return unityBounds;
+        }
+
         public static UnityEngine.Color ToUnityColor(this Vector3 vector3, float alpha = 1)
         {
             return new UnityEngine.Color()

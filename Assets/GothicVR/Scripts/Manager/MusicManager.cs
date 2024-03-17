@@ -16,6 +16,7 @@ namespace GVR.Manager
         private IntPtr music;
         private IntPtr directmusic;
 
+        [Flags]
         public enum Tags : byte
         {
             Day = 0,
@@ -49,7 +50,7 @@ namespace GVR.Manager
         private void Start()
         {
             var backgroundMusic = GameObject.Find("BackgroundMusic");
-            backgroundMusic.TryGetComponent<AudioSource>(out musicSource);
+            backgroundMusic.TryGetComponent(out musicSource);
         }
 
 
@@ -66,11 +67,13 @@ namespace GVR.Manager
             directmusic = DMDirectMusic.DMusicInitDirectMusic();
 
             // Add paths for G1
+            // FIXME - Read from gothic.ini?
             AddMusicPath(fullPath, "dungeon");
             AddMusicPath(fullPath, "menu_men");
             AddMusicPath(fullPath, "orchestra");
 
             // Add paths for G2
+            // FIXME - Read from gothic.ini?
             AddMusicPath(fullPath, "newworld");
             AddMusicPath(fullPath, "AddonWorld");
 
@@ -188,9 +191,9 @@ namespace GVR.Manager
             if ((tags & Tags.Thr) != 0)
                 musicTag = "THR";
 
-            var musicName = $"{result}_{(isDay ? "DAY" : "NGT")}_{musicTag}";
+            var musicThemeInstanceName = $"{result}_{(isDay ? "DAY" : "NGT")}_{musicTag}";
 
-            var theme = AssetCache.TryGetMusic(musicName);
+            var theme = AssetCache.TryGetMusic(musicThemeInstanceName);
 
             reloadTheme = pendingTheme.File != theme.File;
             pendingTheme = theme;
@@ -198,18 +201,28 @@ namespace GVR.Manager
             hasPending = true;
 
             if (FeatureFlags.I.showMusicLogs)
-                Debug.Log($"Playing music: theme >{musicName}< from file >{theme.File}<");
+                Debug.Log($"Playing music: MusicThemeInstance >{musicThemeInstanceName}< from file >{theme.File}<");
         }
 
-        public void SetMusic(string musicName)
+        public void SetMusic(MusicThemeInstance theme)
         {
-            var theme = AssetCache.TryGetMusic(musicName);
             reloadTheme = true;
             pendingTheme = theme;
             hasPending = true;
 
             if (FeatureFlags.I.showMusicLogs)
-                Debug.Log($"[Music] Playing music: theme >{musicName}< from file >{theme.File}<");
+                Debug.Log($"[Music] Playing music from file >{theme.File}<.");
+        }
+
+        public void SetMusic(string musicThemeInstanceName)
+        {
+            var theme = AssetCache.TryGetMusic(musicThemeInstanceName);
+            reloadTheme = true;
+            pendingTheme = theme;
+            hasPending = true;
+
+            if (FeatureFlags.I.showMusicLogs)
+                Debug.Log($"[Music] Playing music: MusicThemeInstance >{musicThemeInstanceName}< from file >{theme.File}<");
         }
 
         private void StopMusic()
