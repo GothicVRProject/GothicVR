@@ -17,6 +17,7 @@ namespace GVR.Creator.Meshes.V2
     public abstract class AbstractMeshBuilder
     {
         protected GameObject RootGo;
+        protected GameObject ParentGo;
         protected string ObjectName;
         protected bool HasMeshCollider = true;
 
@@ -24,8 +25,8 @@ namespace GVR.Creator.Meshes.V2
         protected IModelHierarchy Mdh;
         protected IModelMesh Mdm;
 
-        private Vector3 rootPosition;
-        private Quaternion rootRotation;
+        protected Vector3 RootPosition;
+        protected Quaternion RootRotation;
 
 
         public abstract GameObject Build();
@@ -114,7 +115,7 @@ namespace GVR.Creator.Meshes.V2
                 PrepareMeshCollider(meshObj, meshFilter.mesh, subMesh.Value.Materials);
             }
 
-            SetPosAndRot(RootGo, rootPosition, rootRotation);
+            SetPosAndRot(RootGo, RootPosition, RootRotation);
 
             // We need to set the root translation after we add children above. Otherwise the "additive" position/rotation will be broken.
             // We need to reset the rootBones position to zero. Otherwise Vobs won't be placed right.
@@ -142,7 +143,7 @@ namespace GVR.Creator.Meshes.V2
                 PrepareMeshCollider(RootGo, meshFilter.mesh, Mrm.Materials);
             }
 
-            SetPosAndRot(RootGo, rootPosition, rootRotation);
+            SetPosAndRot(RootGo, RootPosition, RootRotation);
 
             return RootGo;
         }
@@ -164,13 +165,14 @@ namespace GVR.Creator.Meshes.V2
                 return;
             }
 
+            ParentGo = parentGo;
             RootGo.SetParent(parentGo, resetPosition, resetRotation);
         }
 
         public void SetRootPosAndRot(Vector3 position = default, Quaternion rotation = default)
         {
-            rootPosition = position;
-            rootRotation = rotation;
+            RootPosition = position;
+            RootRotation = rotation;
         }
 
         public void SetMdl(IModel mdl)

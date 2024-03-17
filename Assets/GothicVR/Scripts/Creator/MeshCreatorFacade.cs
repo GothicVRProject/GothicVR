@@ -25,10 +25,5 @@ namespace GVR.Creator
         {
             NpcMeshCreator.CreateNpcWeapon(npcGo, itemData, mainFlag, flags);
         }
-
-        public static GameObject CreateVobDecal(IVirtualObject vob, VisualDecal decal, GameObject parent)
-        {
-            return VobMeshCreator.CreateVobDecal(vob, decal, parent);
-        }
     }
 }

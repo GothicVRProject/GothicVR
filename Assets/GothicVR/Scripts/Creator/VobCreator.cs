@@ -632,7 +632,7 @@ namespace GVR.Creator
 
             var parent = parentGosTeleport[vob.Type];
 
-            return MeshCreatorFacade.CreateVobDecal(vob, (VisualDecal)vob.Visual, parent);
+            return MeshFactory.CreateVobDecal(vob, (VisualDecal)vob.Visual, parent);
         }
 
         /// <summary>

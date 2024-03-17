@@ -4,6 +4,7 @@ using GVR.Vm;
 using Unity.VisualScripting;
 using UnityEngine;
 using ZenKit;
+using ZenKit.Vobs;
 
 namespace GVR.Creator.Meshes.V2
 {
@@ -79,6 +80,17 @@ namespace GVR.Creator.Meshes.V2
             vobBuilder.SetMdm(mdm);
 
             return vobBuilder.Build();
+        }
+
+        public static GameObject CreateVobDecal(IVirtualObject vob, VisualDecal decal, GameObject parent)
+        {
+            var vobDecalBuilder = new VobDecalMeshBuilder();
+            vobDecalBuilder.SetGameObject(null, vob.Name);
+            vobDecalBuilder.SetParent(parent);
+            vobDecalBuilder.SetRootPosAndRot(vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion());
+            vobDecalBuilder.SetDecalData(vob, decal);
+
+            return vobDecalBuilder.Build();
         }
 
         public static GameObject CreateBarrier(string objectName, IMesh mesh)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
@@ -13,6 +14,7 @@ using TextureFormat = UnityEngine.TextureFormat;
 
 namespace GVR.Creator.Meshes
 {
+    [Obsolete("Use AbstractMeshBuilder instead.")]
     public abstract class AbstractMeshCreator
     {
         // Decals work only on URP shaders. We therefore temporarily change everything to this

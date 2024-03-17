@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
@@ -12,6 +13,7 @@ using Material = UnityEngine.Material;
 
 namespace GVR.Creator.Meshes
 {
+    [Obsolete("Use VobMeshBuilder instead.")]
     public class VobMeshCreator : AbstractMeshCreator
     {
         public GameObject CreateVob(string objectName, IMultiResolutionMesh mrm, Vector3 position,

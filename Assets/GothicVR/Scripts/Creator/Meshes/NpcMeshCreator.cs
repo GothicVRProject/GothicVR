@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using GVR.Caches;
@@ -11,6 +12,7 @@ using ZenKit.Daedalus;
 
 namespace GVR.Creator.Meshes
 {
+    [Obsolete("Use NpcMeshBuilder instead.")]
     public class NpcMeshCreator : AbstractMeshCreator
     {
         private VmGothicExternals.ExtSetVisualBodyData tempBodyData;
