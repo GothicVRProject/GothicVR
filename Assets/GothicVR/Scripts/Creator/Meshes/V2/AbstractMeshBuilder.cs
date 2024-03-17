@@ -24,6 +24,7 @@ namespace GVR.Creator.Meshes.V2
         protected IMultiResolutionMesh Mrm;
         protected IModelHierarchy Mdh;
         protected IModelMesh Mdm;
+        protected IMorphMesh Mmb;
 
         protected Vector3 RootPosition;
         protected Quaternion RootRotation;
@@ -223,6 +224,19 @@ namespace GVR.Creator.Meshes.V2
             if (Mrm == null)
             {
                 Debug.LogError($"MDH from name >{mrmName}< for object >{RootGo.name}< not found.");
+            }
+        }
+
+        /// <summary>
+        /// MorphMesh
+        /// </summary>
+        public void SetMmb(string mmbName)
+        {
+            Mmb = AssetCache.TryGetMmb(mmbName);
+
+            if (Mmb == null)
+            {
+                Debug.LogError($"MDH from name >{mmbName}< for object >{RootGo.name}< not found.");
             }
         }
 
@@ -488,7 +502,7 @@ namespace GVR.Creator.Meshes.V2
              *  triangles = 0, 2, 3 --> (indices for position items); ATTENTION: index 3 would normally be index 2, but! we can never reuse positions. We always need to create new ones. (Reason: uvs demand the same size as vertices.)
              *  uvs = [wedge[0].texture], [wedge[2].texture], [wedge[1].texture]
              */
-            var mesh = new UnityEngine.Mesh();
+            var mesh = new Mesh();
             meshFilter.mesh = mesh;
 
             if (null == mrmData)

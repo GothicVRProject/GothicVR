@@ -4,6 +4,7 @@ using GVR.Vm;
 using Unity.VisualScripting;
 using UnityEngine;
 using ZenKit;
+using ZenKit.Daedalus;
 using ZenKit.Vobs;
 
 namespace GVR.Creator.Meshes.V2
@@ -29,6 +30,26 @@ namespace GVR.Creator.Meshes.V2
             return npcHeadBuilder.Build();
         }
 
+        public static GameObject CreateNpcWeapon(GameObject npcGo, ItemInstance itemData, VmGothicEnums.ItemFlags mainFlag, VmGothicEnums.ItemFlags flags)
+        {
+            var npcWeaponBuilder = new NpcWeaponMeshBuilder();
+            npcWeaponBuilder.SetWeaponData(npcGo, itemData, mainFlag, flags);
+
+            switch (mainFlag)
+            {
+                case VmGothicEnums.ItemFlags.ITEM_KAT_NF:
+                    npcWeaponBuilder.SetMrm(itemData.Visual);
+                    break;
+                case VmGothicEnums.ItemFlags.ITEM_KAT_FF:
+                    npcWeaponBuilder.SetMmb(itemData.Visual);
+                    break;
+                default:
+                    // NOP - e.g. for armor.
+                    return null;
+            }
+
+            return npcWeaponBuilder.Build();
+        }
 
         public static GameObject CreateVob(string objectName, IMultiResolutionMesh mrm, Vector3 position,
             Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)

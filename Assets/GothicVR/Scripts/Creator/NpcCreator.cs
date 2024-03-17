@@ -100,7 +100,7 @@ namespace GVR.Creator
             newNpc.SetParent(GetRootGo());
 
             foreach (var equippedItem in props.EquippedItems)
-                MeshCreatorFacade.EquipNpcWeapon(newNpc, equippedItem, (VmGothicEnums.ItemFlags)equippedItem.MainFlag, (VmGothicEnums.ItemFlags)equippedItem.Flags);
+                MeshFactory.CreateNpcWeapon(newNpc, equippedItem, (VmGothicEnums.ItemFlags)equippedItem.MainFlag, (VmGothicEnums.ItemFlags)equippedItem.Flags);
             
             var npcRoutine = props.npcInstance.DailyRoutine;
             NpcHelper.ExchangeRoutine(newNpc, props.npcInstance, npcRoutine);
