@@ -99,7 +99,7 @@ namespace GVR.Creator.Meshes
 
         protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
         {
-            UnityEngine.Texture texture = AssetCache.TextureArrays[subMesh.TextureArrayType];
+            UnityEngine.Texture texture = TextureCache.TextureArrays[subMesh.TextureArrayType];
             Material material;
             if (subMesh.Material.Group == MaterialGroup.Water)
             {
@@ -107,7 +107,7 @@ namespace GVR.Creator.Meshes
             }
             else
             {
-                material = GetDefaultMaterial(subMesh.TextureArrayType == AssetCache.TextureArrayTypes.Transparent, true);
+                material = GetDefaultMaterial(subMesh.TextureArrayType == TextureCache.TextureArrayTypes.Transparent, true);
             }
             material.mainTexture = texture;
             rend.material = material;
@@ -135,7 +135,7 @@ namespace GVR.Creator.Meshes
                 return false;
             }
 
-            return subMeshData.TextureArrayType != AssetCache.TextureArrayTypes.Opaque;
+            return subMeshData.TextureArrayType != TextureCache.TextureArrayTypes.Opaque;
         }
     }
 }

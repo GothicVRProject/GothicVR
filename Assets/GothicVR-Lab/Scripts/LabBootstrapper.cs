@@ -50,6 +50,7 @@ namespace GVR.GothicVR_Lab.Scripts
         {
             GameData.Dispose();
             AssetCache.Dispose();
+            TextureCache.Dispose();
             LookupCache.Dispose();
             PrefabCache.Dispose();
             MorphMeshCache.Dispose();

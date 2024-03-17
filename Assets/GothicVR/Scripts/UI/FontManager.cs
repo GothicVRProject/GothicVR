@@ -24,7 +24,7 @@ namespace GVR.Manager
             if (LookupCache.fontCache.TryGetValue(fontName.ToUpper(), out TMP_SpriteAsset data))
                 return data;
             var font = AssetCache.TryGetFont(fontName.ToUpper());
-            var fontTexture = AssetCache.TryGetTexture(fontName);
+            var fontTexture = TextureCache.TryGetTexture(fontName);
 
             TMP_SpriteAsset spriteAsset = ScriptableObject.CreateInstance<TMP_SpriteAsset>();
 

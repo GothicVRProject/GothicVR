@@ -13,7 +13,7 @@ public class PolyStripMeshCreator : AbstractMeshCreator
 
         material.ToAdditiveMode();
 
-        var texture = AssetCache.TryGetTexture("THUNDER_A0.TGA");
+        var texture = TextureCache.TryGetTexture("THUNDER_A0.TGA");
 
         if (texture != null)
         {

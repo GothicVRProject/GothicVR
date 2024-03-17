@@ -60,7 +60,7 @@ namespace GVR.Creator
             }
 
             // Build the texture arrays.
-            await AssetCache.BuildTextureArrays();
+            await TextureCache.BuildTextureArrays();
 
             // Assigns the arrays to the materials.
             if (FeatureFlags.I.createWorldMesh)
@@ -140,7 +140,7 @@ namespace GVR.Creator
 
             stopwatch.Restart();
             // Merge the water until a given level in the BSP tree to it a few large chunks.
-            subMeshesPerParentNode = MergeShaderTypeWorldChunksToTreeHeight(AssetCache.TextureArrayTypes.Water, 3, zkBspTree, subMeshesPerParentNode);
+            subMeshesPerParentNode = MergeShaderTypeWorldChunksToTreeHeight(TextureCache.TextureArrayTypes.Water, 3, zkBspTree, subMeshesPerParentNode);
             stopwatch.Stop();
             Debug.Log($"Merging water: {stopwatch.ElapsedMilliseconds / 1000f} s");
 
@@ -233,7 +233,7 @@ namespace GVR.Creator
                         {
                             // Add the texture to the texture array or retrieve its existing slice.
                             IMaterial zkMaterial = zkMesh.Materials[polygon.MaterialIndex];
-                            AssetCache.GetTextureArrayIndex(zkMaterial, out AssetCache.TextureArrayTypes textureArrayTpe, out int textureArrayIndex, out Vector2 textureScale, out int maxMipLevel);
+                            TextureCache.GetTextureArrayIndex(zkMaterial, out TextureCache.TextureArrayTypes textureArrayTpe, out int textureArrayIndex, out Vector2 textureScale, out int maxMipLevel);
                             if (textureArrayIndex == -1)
                             {
                                 continue;
@@ -241,11 +241,11 @@ namespace GVR.Creator
 
                             // Build submeshes for each unique shader: Water, opaque, and alpha cutout.
                             Shader shader = Constants.ShaderWorldLit;
-                            if (textureArrayTpe == AssetCache.TextureArrayTypes.Transparent)
+                            if (textureArrayTpe == TextureCache.TextureArrayTypes.Transparent)
                             {
                                 shader = Constants.ShaderLitAlphaToCoverage;
                             }
-                            else if (textureArrayTpe == AssetCache.TextureArrayTypes.Water)
+                            else if (textureArrayTpe == TextureCache.TextureArrayTypes.Water)
                             {
                                 shader = Constants.ShaderWater;
                             }
@@ -309,7 +309,7 @@ namespace GVR.Creator
             }
         }
 
-        private static Dictionary<int, List<WorldData.SubMeshData>> MergeShaderTypeWorldChunksToTreeHeight(AssetCache.TextureArrayTypes textureArrayType, int treeHeightLimit, IBspTree bspTree, Dictionary<int, List<WorldData.SubMeshData>> submeshesPerParentNode)
+        private static Dictionary<int, List<WorldData.SubMeshData>> MergeShaderTypeWorldChunksToTreeHeight(TextureCache.TextureArrayTypes textureArrayType, int treeHeightLimit, IBspTree bspTree, Dictionary<int, List<WorldData.SubMeshData>> submeshesPerParentNode)
         {
             // Group the submeshes by parent nodes until max height.
             Dictionary<int, List<WorldData.SubMeshData>> groupedMeshes = new Dictionary<int, List<WorldData.SubMeshData>>();
@@ -383,7 +383,7 @@ namespace GVR.Creator
                 if (intersectingLights < maxLightsPerChunk && grandParentNodeIndex != -1)
                 {
                     // Merge all shader types under the parent node.
-                    foreach (AssetCache.TextureArrayTypes textureArrayType in Enum.GetValues(typeof(AssetCache.TextureArrayTypes)))
+                    foreach (TextureCache.TextureArrayTypes textureArrayType in Enum.GetValues(typeof(TextureCache.TextureArrayTypes)))
                     {
                         IEnumerable<WorldData.SubMeshData> meshes = submeshesPerParentNode[parentNodeIndex].Where(s => s.TextureArrayType == textureArrayType);
                         if (meshes.Count() == 0)
@@ -453,8 +453,8 @@ namespace GVR.Creator
             
             WorldMeshCreator.RemoveTextureArrays();
             MeshCreatorFacade.RemoveTextureArraysToVobMeshes();
-            AssetCache.TextureArrays.Clear();
-            AssetCache.TextureArrays.TrimExcess();
+            TextureCache.TextureArrays.Clear();
+            TextureCache.TextureArrays.TrimExcess();
 
             var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
 

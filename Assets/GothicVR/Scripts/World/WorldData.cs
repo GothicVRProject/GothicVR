@@ -23,7 +23,7 @@ namespace GVR.World
         public class SubMeshData
         {
             public IMaterial Material;
-            public AssetCache.TextureArrayTypes TextureArrayType;
+            public TextureCache.TextureArrayTypes TextureArrayType;
 
             public readonly List<Vector3> Vertices = new();
             public readonly List<int> Triangles = new();

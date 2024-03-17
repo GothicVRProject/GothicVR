@@ -52,7 +52,7 @@ namespace GVR.Creator.Meshes
 
             var decalProjectorGo = new GameObject(vob.Name);
             var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
-            var texture = AssetCache.TryGetTexture(vob.Name);
+            var texture = TextureCache.TryGetTexture(vob.Name);
 
             // x/y needs to be made twice the size and transformed from cm in m.
             // z - value is close to what we see in Gothic spacer.

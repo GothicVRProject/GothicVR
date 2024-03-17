@@ -18,7 +18,7 @@ namespace GVR.Creator.Meshes
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
         protected const float DecalOpacity = 0.75f;
-        protected List<(MeshRenderer Renderer, (IMultiResolutionMesh Mrm, List<AssetCache.TextureArrayTypes> TextureArrayTypes) Data)> _renderersInNeedOfTextureArray = new List<(MeshRenderer, (IMultiResolutionMesh, List<AssetCache.TextureArrayTypes>))>();
+        protected List<(MeshRenderer Renderer, (IMultiResolutionMesh Mrm, List<TextureCache.TextureArrayTypes> TextureArrayTypes) Data)> _renderersInNeedOfTextureArray = new();
         protected static Material _loadingMaterial;
 
         protected GameObject Create(string objectName, IModelMesh mdm, IModelHierarchy mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
@@ -109,7 +109,7 @@ namespace GVR.Creator.Meshes
                 MeshRenderer meshRenderer = meshObj.AddComponent<MeshRenderer>();
                 meshRenderer.material = _loadingMaterial;
 
-                List<AssetCache.TextureArrayTypes> textureFormatsInMesh = PrepareMeshFilter(meshFilter, subMesh.Value, true, false);
+                List<TextureCache.TextureArrayTypes> textureFormatsInMesh = PrepareMeshFilter(meshFilter, subMesh.Value, true, false);
                 PrepareMeshCollider(meshObj, meshFilter.sharedMesh, subMesh.Value.Materials);
                 _renderersInNeedOfTextureArray.Add((meshRenderer, (subMesh.Value, textureFormatsInMesh)));
             }
@@ -160,7 +160,7 @@ namespace GVR.Creator.Meshes
             MeshFilter meshFilter = rootGo.AddComponent<MeshFilter>();
             MeshRenderer meshRenderer = rootGo.AddComponent<MeshRenderer>();
             meshRenderer.material = _loadingMaterial;
-            List<AssetCache.TextureArrayTypes> textureArrayTypesInMesh = PrepareMeshFilter(meshFilter, mrm, true);
+            List<TextureCache.TextureArrayTypes> textureArrayTypesInMesh = PrepareMeshFilter(meshFilter, mrm, true);
             _renderersInNeedOfTextureArray.Add((meshRenderer, (mrm, textureArrayTypesInMesh)));
 
             if (withCollider)
@@ -201,7 +201,7 @@ namespace GVR.Creator.Meshes
             obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
-        protected void PrepareMeshRenderer(Renderer rend, IMultiResolutionMesh mrmData, List<AssetCache.TextureArrayTypes> textureArrayTypes = null)
+        protected void PrepareMeshRenderer(Renderer rend, IMultiResolutionMesh mrmData, List<TextureCache.TextureArrayTypes> textureArrayTypes = null)
         {
             if (null == mrmData)
             {
@@ -249,7 +249,7 @@ namespace GVR.Creator.Meshes
                 }
                 else
                 {
-                    texture = AssetCache.TextureArrays[textureArrayTypes[i]];
+                    texture = TextureCache.TextureArrays[textureArrayTypes[i]];
                     material = GetDefaultMaterial(texture && ((Texture2DArray)texture).format == TextureFormat.RGBA32, true);
                 }
 
@@ -261,7 +261,7 @@ namespace GVR.Creator.Meshes
             rend.SetMaterials(finalMaterials);
         }
 
-        protected List<AssetCache.TextureArrayTypes> PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, bool useTextureArray, bool isMorphMesh = false, string morphMeshName = "")
+        protected List<TextureCache.TextureArrayTypes> PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, bool useTextureArray, bool isMorphMesh = false, string morphMeshName = "")
         {
             /*
              * Ok, brace yourself:
@@ -312,17 +312,17 @@ namespace GVR.Creator.Meshes
             List<Vector3> normals = new List<Vector3>(vertexCount);
             List<List<int>> preparedTriangles = new List<List<int>>();
             int index = 0;
-            Dictionary<AssetCache.TextureArrayTypes, int> submeshPerTextureFormat = new Dictionary<AssetCache.TextureArrayTypes, int>();
+            Dictionary<TextureCache.TextureArrayTypes, int> submeshPerTextureFormat = new Dictionary<TextureCache.TextureArrayTypes, int>();
 
             foreach (var subMesh in mrmData.SubMeshes)
             {
                 // When using the texture array, get the index of the array of the matching texture format. Build submeshes for each texture format, i.e. separating opaque and alpha cutout textures.
                 int textureArrayIndex = 0, maxMipLevel = 0;
                 Vector2 textureScale = Vector2.one;
-                AssetCache.TextureArrayTypes textureArrayType = AssetCache.TextureArrayTypes.Opaque;
+                TextureCache.TextureArrayTypes textureArrayType = TextureCache.TextureArrayTypes.Opaque;
                 if (useTextureArray)
                 {
-                    AssetCache.GetTextureArrayIndex(subMesh.Material, out textureArrayType, out textureArrayIndex, out textureScale, out maxMipLevel);
+                    TextureCache.GetTextureArrayIndex(subMesh.Material, out textureArrayType, out textureArrayIndex, out textureScale, out maxMipLevel);
                     if (!submeshPerTextureFormat.ContainsKey(textureArrayType))
                     {
                         submeshPerTextureFormat.Add(textureArrayType, preparedTriangles.Count);
@@ -537,7 +537,7 @@ namespace GVR.Creator.Meshes
 
         protected virtual Texture2D GetTexture(string name)
         {
-            return AssetCache.TryGetTexture(name);
+            return TextureCache.TryGetTexture(name);
         }
 
         protected Material GetDefaultMaterial(bool isAlphaTest, bool useTextureArray)
