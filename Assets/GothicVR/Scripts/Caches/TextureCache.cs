@@ -1,15 +1,17 @@
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GVR.Extensions;
-using GVR.Globals;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Rendering;
 using ZenKit;
+using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
+using Texture = UnityEngine.Texture;
+using TextureFormat = ZenKit.TextureFormat;
 
 namespace GVR.Caches
 {
@@ -17,9 +19,9 @@ namespace GVR.Caches
     {
         public static int ReferenceTextureSize = 256;
 
-        public static Dictionary<TextureArrayTypes, UnityEngine.Texture> TextureArrays { get; private set; } = new();
+        public static Dictionary<TextureArrayTypes, Texture> TextureArrays { get; private set; } = new();
 
-        private static readonly Dictionary<string, Texture2D> TextureDataCache = new();
+        private static readonly Dictionary<string, Texture2D> Texture2DCache = new();
         private static readonly Dictionary<TextureArrayTypes, List<(string PreparedKey, ITexture Texture)>> _arrayTexturesList = new();
 
         public enum TextureArrayTypes
@@ -33,12 +35,53 @@ namespace GVR.Caches
         public static Texture2D TryGetTexture(string key)
         {
             string preparedKey = GetPreparedKey(key);
-            if (TextureDataCache.ContainsKey(preparedKey) && TextureDataCache[preparedKey])
+            if (Texture2DCache.TryGetValue(preparedKey, out var cachedTexture))
             {
-                return TextureDataCache[preparedKey];
+                return cachedTexture;
             }
 
-            return ImportZenTexture(key);
+            ITexture zkTexture = AssetCache.TryGetTexture(key);
+            if (zkTexture == null)
+            {
+                return null;
+            }
+            Texture2D texture;
+
+            // Workaround for Unity and DXT1 Mipmaps.
+            if (zkTexture.Format == TextureFormat.Dxt1 && zkTexture.MipmapCount == 1)
+            {
+                texture = GenerateDxt1Mipmaps(zkTexture);
+            }
+            else
+            {
+                var format = zkTexture.Format.AsUnityTextureFormat();
+                var updateMipmaps = zkTexture.MipmapCount == 1; // Let Unity generate Mipmaps if they aren't provided by Gothic texture itself.
+
+                // Use Gothic's mips if provided.
+                texture = new Texture2D(zkTexture.Width, zkTexture.Height, format, zkTexture.MipmapCount, false);
+                for (var i = 0; i < zkTexture.MipmapCount; i++)
+                {
+                    if (format == UnityEngine.TextureFormat.RGBA32)
+                    {
+                        // RGBA is uncompressed format.
+                        texture.SetPixelData(zkTexture.AllMipmapsRgba[i], i);
+                    }
+                    else
+                    {
+                        // Raw means "compressed data provided by Gothic texture"
+                        texture.SetPixelData(zkTexture.AllMipmapsRaw[i], i);
+                    }
+                }
+
+                texture.Apply(updateMipmaps, true);
+            }
+
+            texture.filterMode = FilterMode.Trilinear;
+            texture.name = key;
+
+            Texture2DCache[preparedKey] = texture;
+
+            return texture;
         }
 
         public static void GetTextureArrayIndex(IMaterial materialData, out TextureArrayTypes textureArrayType, out int arrayIndex, out Vector2 textureScale, out int maxMipLevel)
@@ -87,7 +130,7 @@ namespace GVR.Caches
 
         public static async Task BuildTextureArrays()
         {
-            System.Diagnostics.Stopwatch stopwatch = new();
+            Stopwatch stopwatch = new();
             stopwatch.Start();
             foreach (TextureArrayTypes textureArrayType in _arrayTexturesList.Keys)
             {
@@ -101,7 +144,7 @@ namespace GVR.Caches
                     textureFormat = UnityEngine.TextureFormat.DXT1;
                 }
 
-                UnityEngine.Texture texArray;
+                Texture texArray;
                 if (textureArrayType != TextureArrayTypes.Water)
                 {
                     texArray = new Texture2DArray(maxSize, maxSize, _arrayTexturesList[textureArrayType].Count, textureFormat, true, false, true)
@@ -126,7 +169,7 @@ namespace GVR.Caches
                 // Copy all the textures and their mips into the array. Textures which are smaller are tiled so bilinear sampling isn't broken - this is why it's not possible to pack different textures together in the same slice.
                 for (int i = 0; i < _arrayTexturesList[textureArrayType].Count; i++)
                 {
-                    Texture2D sourceTex = ImportZenTexture(_arrayTexturesList[textureArrayType][i].PreparedKey);
+                    Texture2D sourceTex = TryGetTexture(_arrayTexturesList[textureArrayType][i].PreparedKey);
                     for (int mip = 0; mip < sourceTex.mipmapCount; mip++)
                     {
                         for (int x = 0; x < texArray.width / sourceTex.width; x++)
@@ -151,14 +194,6 @@ namespace GVR.Caches
                             }
                         }
                     }
-                    if (!Application.isPlaying)
-                    {
-                        Object.DestroyImmediate(sourceTex);
-                    }
-                    else
-                    {
-                        Object.Destroy(sourceTex);
-                    }
 
                     if (i % 20 == 0)
                     {
@@ -175,52 +210,6 @@ namespace GVR.Caches
 
             stopwatch.Stop();
             Debug.Log($"Built tex array in {stopwatch.ElapsedMilliseconds / 1000f} s");
-        }
-
-        private static Texture2D ImportZenTexture(string key)
-        {
-            string preparedKey = GetPreparedKey(key);
-            ITexture zkTexture = AssetCache.TryGetTexture(key);
-            if (zkTexture == null)
-            {
-                return null;
-            }
-            Texture2D texture;
-
-            // Workaround for Unity and DXT1 Mipmaps.
-            if (zkTexture.Format == ZenKit.TextureFormat.Dxt1 && zkTexture.MipmapCount == 1)
-            {
-                texture = GenerateDxt1Mipmaps(zkTexture);
-            }
-            else
-            {
-                var format = zkTexture.Format.AsUnityTextureFormat();
-                var updateMipmaps = zkTexture.MipmapCount == 1; // Let Unity generate Mipmaps if they aren't provided by Gothic texture itself.
-
-                // Use Gothic's mips if provided.
-                texture = new Texture2D(zkTexture.Width, zkTexture.Height, format, zkTexture.MipmapCount, false);
-                for (var i = 0; i < zkTexture.MipmapCount; i++)
-                {
-                    if (format == UnityEngine.TextureFormat.RGBA32)
-                    {
-                        // RGBA is uncompressed format.
-                        texture.SetPixelData(zkTexture.AllMipmapsRgba[i], i);
-                    }
-                    else
-                    {
-                        // Raw means "compressed data provided by Gothic texture"
-                        texture.SetPixelData(zkTexture.AllMipmapsRaw[i], i);
-                    }
-                }
-
-                texture.Apply(updateMipmaps, true);
-            }
-
-            texture.filterMode = FilterMode.Trilinear;
-            texture.name = key;
-            TextureDataCache[preparedKey] = texture;
-
-            return texture;
         }
 
         /// <summary>
@@ -254,7 +243,7 @@ namespace GVR.Caches
 
         public static void Dispose()
         {
-            TextureDataCache.Clear();
+            Texture2DCache.Clear();
             TextureArrays.Clear();
             _arrayTexturesList.TrimExcess();
         }
