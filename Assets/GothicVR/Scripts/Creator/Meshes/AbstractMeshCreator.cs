@@ -18,7 +18,6 @@ namespace GVR.Creator.Meshes
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
         protected const float DecalOpacity = 0.75f;
-        protected List<(MeshRenderer Renderer, (IMultiResolutionMesh Mrm, List<TextureCache.TextureArrayTypes> TextureArrayTypes) Data)> _renderersInNeedOfTextureArray = new();
 
         protected GameObject Create(string objectName, IModelMesh mdm, IModelHierarchy mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
@@ -105,7 +104,7 @@ namespace GVR.Creator.Meshes
 
                 List<TextureCache.TextureArrayTypes> textureFormatsInMesh = PrepareMeshFilter(meshFilter, subMesh.Value, true, false);
                 PrepareMeshCollider(meshObj, meshFilter.sharedMesh, subMesh.Value.Materials);
-                _renderersInNeedOfTextureArray.Add((meshRenderer, (subMesh.Value, textureFormatsInMesh)));
+                TextureCache.VobMeshRenderersForTextureArray.Add((meshRenderer, (subMesh.Value, textureFormatsInMesh)));
             }
 
             SetPosAndRot(rootGo, position, rotation);
@@ -150,7 +149,7 @@ namespace GVR.Creator.Meshes
             MeshRenderer meshRenderer = rootGo.AddComponent<MeshRenderer>();
             meshRenderer.material = Constants.LoadingMaterial;
             List<TextureCache.TextureArrayTypes> textureArrayTypesInMesh = PrepareMeshFilter(meshFilter, mrm, true);
-            _renderersInNeedOfTextureArray.Add((meshRenderer, (mrm, textureArrayTypesInMesh)));
+            TextureCache.VobMeshRenderersForTextureArray.Add((meshRenderer, (mrm, textureArrayTypesInMesh)));
 
             if (withCollider)
             {
@@ -158,20 +157,6 @@ namespace GVR.Creator.Meshes
             }
 
             return rootGo;
-        }
-
-        public virtual void PrepareTextureArrayMeshRenderers()
-        {
-            foreach (var mesh in _renderersInNeedOfTextureArray)
-            {
-                PrepareMeshRenderer(mesh.Renderer, mesh.Data.Mrm, mesh.Data.TextureArrayTypes);
-            }
-        }
-
-        public virtual void ClearTextureArrayMeshRenderers()
-        {
-            _renderersInNeedOfTextureArray.Clear();
-            _renderersInNeedOfTextureArray.TrimExcess();
         }
 
         protected void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
@@ -189,7 +174,7 @@ namespace GVR.Creator.Meshes
             obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
 
-        protected void PrepareMeshRenderer(Renderer rend, IMultiResolutionMesh mrmData, List<TextureCache.TextureArrayTypes> textureArrayTypes = null)
+        protected void PrepareMeshRenderer(Renderer rend, IMultiResolutionMesh mrmData)
         {
             if (null == mrmData)
             {
@@ -208,38 +193,27 @@ namespace GVR.Creator.Meshes
 
             for (int i = 0; i < submeshCount; i++)
             {
-                UnityEngine.Texture texture;
-                Material material;
-                if (textureArrayTypes == null)
+                IMaterial materialData = mrmData.SubMeshes[i].Material;
+                if (materialData.Texture.IsEmpty()) // No texture to add.
                 {
-                    IMaterial materialData = mrmData.SubMeshes[i].Material;
-                    // No texture to add.
-                    if (materialData.Texture.IsEmpty())
-                    {
-                        Debug.LogWarning("No texture was set for: " + materialData.Name);
-                        return;
-                    }
-
-                    texture = GetTexture(materialData.Texture);
-                    if (!texture)
-                    {
-                        if (materialData.Texture.EndsWithIgnoreCase(".TGA"))
-                        {
-                            Debug.LogError("This is supposed to be a decal: " + materialData.Texture);
-                        }
-                        else
-                        {
-                            Debug.LogError("Couldn't get texture from name: " + materialData.Texture);
-                        }
-                    }
-
-                    material = GetDefaultMaterial(texture && ((Texture2D)texture).format == TextureFormat.RGBA32, false);
+                    Debug.LogWarning("No texture was set for: " + materialData.Name);
+                    return;
                 }
-                else
+
+                UnityEngine.Texture texture = GetTexture(materialData.Texture);
+                if (!texture)
                 {
-                    texture = TextureCache.TextureArrays[TextureCache.TextureTypes.Vob][textureArrayTypes[i]];
-                    material = GetDefaultMaterial(texture && ((Texture2DArray)texture).format == TextureFormat.RGBA32, true);
+                    if (materialData.Texture.EndsWithIgnoreCase(".TGA"))
+                    {
+                        Debug.LogError("This is supposed to be a decal: " + materialData.Texture);
+                    }
+                    else
+                    {
+                        Debug.LogError("Couldn't get texture from name: " + materialData.Texture);
+                    }
                 }
+
+                Material material = GetDefaultMaterial(texture && ((Texture2D)texture).format == TextureFormat.RGBA32);
 
                 material.mainTexture = texture;
                 rend.material = material;
@@ -529,23 +503,9 @@ namespace GVR.Creator.Meshes
             return TextureCache.TryGetTexture(name);
         }
 
-        protected Material GetDefaultMaterial(bool isAlphaTest, bool useTextureArray)
+        protected virtual Material GetDefaultMaterial(bool isAlphaTest)
         {
-            if (!useTextureArray)
-            {
-                return new Material(Constants.ShaderSingleMeshLit);
-            }
-
-            var shader = isAlphaTest ? Constants.ShaderLitAlphaToCoverage : Constants.ShaderWorldLit;
-            var material = new Material(shader);
-
-            if (isAlphaTest)
-            {
-                // Manually correct the render queue for alpha test, as Unity doesn't want to do it from the shader's render queue tag.
-                material.renderQueue = (int)RenderQueue.AlphaTest;
-            }
-
-            return material;
+            return new Material(Constants.ShaderSingleMeshLit);
         }
 
         protected Material GetWaterMaterial()

@@ -21,7 +21,9 @@ namespace GVR.Creator
         private static readonly VobMeshCreator VobMeshCreator = new();
         private static readonly MeshCreator MeshCreator = new();
         private static readonly PolyStripMeshCreator PolyStripMeshCreator = new();
+        private static readonly VobTextureArrayCreator VobTextureArrayCreator = new();
         private static readonly WorldTextureArrayCreator WorldTextureArrayCreator = new();
+
 
         public static void CreateNpc(string npcName, string mdmName, string mdhName,
             VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
@@ -52,13 +54,9 @@ namespace GVR.Creator
             await WorldTextureArrayCreator.BuildWorldTextureArray();
         }
 
-        public static void AssignTextureArraysToVobMeshes()
+        public static async Task BuildVobTextureArray()
         {
-            VobMeshCreator.PrepareTextureArrayMeshRenderers();
-        }
-        public static void RemoveTextureArraysToVobMeshes()
-        {
-            VobMeshCreator.ClearTextureArrayMeshRenderers();
+            await VobTextureArrayCreator.BuildVobTextureArray();
         }
 
         public static GameObject CreateVob(string objectName, IModelMesh mdm, IModelHierarchy mdh,

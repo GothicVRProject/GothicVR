@@ -28,6 +28,7 @@ namespace GVR.Caches
         };
 
         public static List<(MeshRenderer Renderer, WorldData.SubMeshData SubmeshData)> WorldMeshRenderersForTextureArray = new();
+        public static List<(MeshRenderer Renderer, (IMultiResolutionMesh Mrm, List<TextureArrayTypes> TextureArrayTypes) Data)> VobMeshRenderersForTextureArray = new();
 
         private static readonly Dictionary<string, Texture2D> Texture2DCache = new();
         private static readonly Dictionary<TextureTypes, Dictionary<TextureArrayTypes, List<(string PreparedKey, ITexture Texture)>>> _arrayTexturesList = new()
@@ -255,7 +256,7 @@ namespace GVR.Caches
         }
 
         /// <summary>
-        /// Once TextureArray is build and assigned to renderers, we can safely remove the
+        /// Once a TextureArray is build and assigned to renderers, we can safely remove the
         /// "renderers in need for texture array data" from memory.
         /// </summary>
         public static void RemoveCachedTextureArrayData(TextureTypes type)
@@ -270,9 +271,14 @@ namespace GVR.Caches
                     WorldMeshRenderersForTextureArray.TrimExcess();
                     break;
                 case TextureTypes.Vob:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    TextureArrays[TextureTypes.Vob].Clear();
+                    TextureArrays[TextureTypes.Vob].TrimExcess();
+
+                    VobMeshRenderersForTextureArray.Clear();
+                    VobMeshRenderersForTextureArray.TrimExcess();
+                    break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    throw new NotImplementedException($"Type {type} not yet implemented for cleanup.");
             }
         }
 

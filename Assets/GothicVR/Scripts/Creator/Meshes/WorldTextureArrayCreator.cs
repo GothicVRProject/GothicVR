@@ -1,7 +1,9 @@
 using System.Threading.Tasks;
 using GVR.Caches;
+using GVR.Globals;
 using GVR.World;
 using UnityEngine;
+using UnityEngine.Rendering;
 using ZenKit;
 using Material = UnityEngine.Material;
 
@@ -34,10 +36,24 @@ namespace GVR.Creator.Meshes
             }
             else
             {
-                material = GetDefaultMaterial(subMesh.TextureArrayType == TextureCache.TextureArrayTypes.Transparent, true);
+                material = GetDefaultMaterial(subMesh.TextureArrayType == TextureCache.TextureArrayTypes.Transparent);
             }
             material.mainTexture = texture;
             rend.material = material;
+        }
+
+        protected override Material GetDefaultMaterial(bool isAlphaTest)
+        {
+            var shader = isAlphaTest ? Constants.ShaderLitAlphaToCoverage : Constants.ShaderWorldLit;
+            var material = new Material(shader);
+
+            if (isAlphaTest)
+            {
+                // Manually correct the render queue for alpha test, as Unity doesn't want to do it from the shader's render queue tag.
+                material.renderQueue = (int)RenderQueue.AlphaTest;
+            }
+
+            return material;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace GVR.Globals
         public static readonly Shader ShaderStandard = Shader.Find("Standard");
 
         // Custom GVR shaders
-        public static readonly Shader ShaderSingleMeshLit = Shader.Find("Lit/SingleMesh");
+        public static readonly Shader ShaderSingleMeshLit = Shader.Find("Lit/SingleMesh"); // For textures like NPCs, _not_ the grouped texture array.
         public static readonly Shader ShaderWorldLit = Shader.Find("Lit/World");
         public static readonly Shader ShaderLitAlphaToCoverage = Shader.Find("Lit/AlphaToCoverage");
         public static readonly Shader ShaderWater = Shader.Find("Lit/Water");

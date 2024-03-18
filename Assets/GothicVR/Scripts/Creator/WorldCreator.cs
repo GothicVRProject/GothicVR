@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using GVR.Caches;
 using GVR.Creator.Meshes;
@@ -15,11 +16,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using ZenKit;
-using System.Linq;
 using Debug = UnityEngine.Debug;
-using Texture = ZenKit.Texture;
-#if UNITY_EDITOR
-#endif
 
 namespace GVR.Creator
 {
@@ -52,9 +49,7 @@ namespace GVR.Creator
             if (FeatureFlags.I.createVobs)
             {
                 await VobCreator.CreateAsync(_teleportGo, _nonTeleportGo, GameData.World, Constants.VObPerFrame);
-
-                await TextureCache.BuildTextureArrays(TextureCache.TextureTypes.Vob);
-                MeshCreatorFacade.AssignTextureArraysToVobMeshes();
+                await MeshCreatorFacade.BuildVobTextureArray();
             }
 
             if (FeatureFlags.I.createWorldMesh)
@@ -442,8 +437,6 @@ namespace GVR.Creator
         {
             // As we already added stored world mesh and waypoints in Unity GOs, we can safely remove them to free MBs.
             GameData.World.SubMeshes = null;
-            
-            MeshCreatorFacade.RemoveTextureArraysToVobMeshes();
 
             var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
 
