@@ -19,8 +19,6 @@ namespace GVR.Creator.Meshes
         // As we subclass the main Mesh Creator, we need to have a parent-child inheritance instance.
         // Needed e.g. for overwriting PrepareMeshRenderer() to change specific behaviour.
         private static readonly WorldMeshCreator Self = new();
-        protected new static List<(MeshRenderer Renderer, WorldData.SubMeshData SubmeshData)> _renderersInNeedOfTextureArray = new();
-        protected new static Material _loadingMaterial;
 
         public static async Task CreateAsync(WorldData world, GameObject parent, int meshesPerFrame)
         {
@@ -34,7 +32,6 @@ namespace GVR.Creator.Meshes
             // Track the progress of each sub-mesh creation separately
             int numSubMeshes = world.SubMeshes.Count;
             int meshesCreated = 0;
-            _loadingMaterial = new Material(Constants.ShaderWorldLit);
 
             foreach (WorldData.SubMeshData subMesh in world.SubMeshes)
             {
@@ -57,8 +54,8 @@ namespace GVR.Creator.Meshes
                 MeshFilter meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 MeshRenderer meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
-                meshRenderer.material = _loadingMaterial;
-                _renderersInNeedOfTextureArray.Add((meshRenderer, subMesh));
+                meshRenderer.material = Constants.LoadingMaterial;
+                TextureCache.WorldMeshRenderersForTextureArray.Add((meshRenderer, subMesh));
                 Self.PrepareMeshFilter(meshFilter, subMesh);
                 Self.PrepareMeshCollider(subMeshObj, meshFilter.sharedMesh, subMesh.Material);
 
@@ -80,37 +77,6 @@ namespace GVR.Creator.Meshes
                     await Task.Yield(); // Yield to allow other operations to run in the frame
                 }
             }
-        }
-
-        public static void AssignTextureArrays()
-        {
-            foreach (var rendererData in _renderersInNeedOfTextureArray)
-            {
-                Self.PrepareMeshRenderer(rendererData.Renderer, rendererData.SubmeshData);
-            }
-
-            Object.Destroy(_loadingMaterial);
-        }        
-        public static void RemoveTextureArrays()
-        {
-           _renderersInNeedOfTextureArray.Clear();
-           _renderersInNeedOfTextureArray.TrimExcess();
-        }
-
-        protected void PrepareMeshRenderer(Renderer rend, WorldData.SubMeshData subMesh)
-        {
-            UnityEngine.Texture texture = TextureCache.TextureArrays[subMesh.TextureArrayType];
-            Material material;
-            if (subMesh.Material.Group == MaterialGroup.Water)
-            {
-                material = GetWaterMaterial();
-            }
-            else
-            {
-                material = GetDefaultMaterial(subMesh.TextureArrayType == TextureCache.TextureArrayTypes.Transparent, true);
-            }
-            material.mainTexture = texture;
-            rend.material = material;
         }
 
         private void PrepareMeshFilter(MeshFilter meshFilter, WorldData.SubMeshData subMesh)

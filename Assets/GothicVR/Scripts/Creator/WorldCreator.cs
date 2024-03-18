@@ -17,6 +17,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using ZenKit;
 using System.Linq;
 using Debug = UnityEngine.Debug;
+using Texture = ZenKit.Texture;
 #if UNITY_EDITOR
 #endif
 
@@ -51,25 +52,16 @@ namespace GVR.Creator
             if (FeatureFlags.I.createVobs)
             {
                 await VobCreator.CreateAsync(_teleportGo, _nonTeleportGo, GameData.World, Constants.VObPerFrame);
+
+                await TextureCache.BuildTextureArrays(TextureCache.TextureTypes.Vob);
+                MeshCreatorFacade.AssignTextureArraysToVobMeshes();
             }
 
             if (FeatureFlags.I.createWorldMesh)
             {
                 GameData.World.SubMeshes = await BuildBspTree(GameData.World.World.Mesh.Cache(), GameData.World.World.BspTree.Cache());
                 await WorldMeshCreator.CreateAsync(GameData.World, _teleportGo, Constants.MeshPerFrame);
-            }
-
-            // Build the texture arrays.
-            await TextureCache.BuildTextureArrays();
-
-            // Assigns the arrays to the materials.
-            if (FeatureFlags.I.createWorldMesh)
-            {
-                WorldMeshCreator.AssignTextureArrays();
-            }
-            if (FeatureFlags.I.createVobs)
-            {
-                MeshCreatorFacade.AssignTextureArraysToVobMeshes();
+                await MeshCreatorFacade.BuildWorldTextureArray();
             }
 
             SkyManager.I.InitSky();
@@ -233,7 +225,7 @@ namespace GVR.Creator
                         {
                             // Add the texture to the texture array or retrieve its existing slice.
                             IMaterial zkMaterial = zkMesh.Materials[polygon.MaterialIndex];
-                            TextureCache.GetTextureArrayIndex(zkMaterial, out TextureCache.TextureArrayTypes textureArrayTpe, out int textureArrayIndex, out Vector2 textureScale, out int maxMipLevel);
+                            TextureCache.GetTextureArrayIndex(TextureCache.TextureTypes.World, zkMaterial, out TextureCache.TextureArrayTypes textureArrayTpe, out int textureArrayIndex, out Vector2 textureScale, out int maxMipLevel);
                             if (textureArrayIndex == -1)
                             {
                                 continue;
@@ -451,10 +443,7 @@ namespace GVR.Creator
             // As we already added stored world mesh and waypoints in Unity GOs, we can safely remove them to free MBs.
             GameData.World.SubMeshes = null;
             
-            WorldMeshCreator.RemoveTextureArrays();
             MeshCreatorFacade.RemoveTextureArraysToVobMeshes();
-            TextureCache.TextureArrays.Clear();
-            TextureCache.TextureArrays.TrimExcess();
 
             var interactionManager = GvrSceneManager.I.interactionManager.GetComponent<XRInteractionManager>();
 

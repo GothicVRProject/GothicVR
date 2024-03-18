@@ -1,4 +1,5 @@
-﻿using GVR.Creator.Meshes;
+﻿using System.Threading.Tasks;
+using GVR.Creator.Meshes;
 using GVR.Vm;
 using UnityEngine;
 using ZenKit;
@@ -20,6 +21,7 @@ namespace GVR.Creator
         private static readonly VobMeshCreator VobMeshCreator = new();
         private static readonly MeshCreator MeshCreator = new();
         private static readonly PolyStripMeshCreator PolyStripMeshCreator = new();
+        private static readonly WorldTextureArrayCreator WorldTextureArrayCreator = new();
 
         public static void CreateNpc(string npcName, string mdmName, string mdhName,
             VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
@@ -43,6 +45,11 @@ namespace GVR.Creator
             GameObject parent = null, GameObject rootGo = null)
         {
             return VobMeshCreator.CreateVob(objectName, mdl, position, rotation, parent, rootGo);
+        }
+
+        public static async Task BuildWorldTextureArray()
+        {
+            await WorldTextureArrayCreator.BuildWorldTextureArray();
         }
 
         public static void AssignTextureArraysToVobMeshes()

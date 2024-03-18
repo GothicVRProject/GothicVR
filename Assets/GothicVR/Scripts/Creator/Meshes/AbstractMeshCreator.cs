@@ -237,7 +237,7 @@ namespace GVR.Creator.Meshes
                 }
                 else
                 {
-                    texture = TextureCache.TextureArrays[textureArrayTypes[i]];
+                    texture = TextureCache.TextureArrays[TextureCache.TextureTypes.Vob][textureArrayTypes[i]];
                     material = GetDefaultMaterial(texture && ((Texture2DArray)texture).format == TextureFormat.RGBA32, true);
                 }
 
@@ -310,7 +310,8 @@ namespace GVR.Creator.Meshes
                 TextureCache.TextureArrayTypes textureArrayType = TextureCache.TextureArrayTypes.Opaque;
                 if (useTextureArray)
                 {
-                    TextureCache.GetTextureArrayIndex(subMesh.Material, out textureArrayType, out textureArrayIndex, out textureScale, out maxMipLevel);
+                    // FIXME - NPCs will also be created via this method above. We therefore need to filter it via hook method etc.
+                    TextureCache.GetTextureArrayIndex(TextureCache.TextureTypes.Vob, subMesh.Material, out textureArrayType, out textureArrayIndex, out textureScale, out maxMipLevel);
                     if (!submeshPerTextureFormat.ContainsKey(textureArrayType))
                     {
                         submeshPerTextureFormat.Add(textureArrayType, preparedTriangles.Count);
