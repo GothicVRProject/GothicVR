@@ -108,16 +108,16 @@ namespace GVR.Creator.Meshes.V2
             return vobBuilder.Build();
         }
 
-        // public static GameObject CreateVobDecal(IVirtualObject vob, VisualDecal decal, GameObject parent)
-        // {
-        //     var vobDecalBuilder = new VobDecalMeshBuilder();
-        //     vobDecalBuilder.SetGameObject(null, vob.Name);
-        //     vobDecalBuilder.SetParent(parent);
-        //     vobDecalBuilder.SetRootPosAndRot(vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion());
-        //     vobDecalBuilder.SetDecalData(vob, decal);
-        //
-        //     return vobDecalBuilder.Build();
-        // }
+        public static GameObject CreateVobDecal(IVirtualObject vob, VisualDecal decal, GameObject parent)
+        {
+            var vobDecalBuilder = new VobDecalMeshBuilder();
+            vobDecalBuilder.SetGameObject(null, vob.Name);
+            vobDecalBuilder.SetParent(parent);
+            vobDecalBuilder.SetRootPosAndRot(vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion());
+            vobDecalBuilder.SetDecalData(vob, decal);
+
+            return vobDecalBuilder.Build();
+        }
 
         public static async Task CreateWorldTextureArray()
         {

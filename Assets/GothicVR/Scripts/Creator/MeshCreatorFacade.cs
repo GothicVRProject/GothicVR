@@ -66,7 +66,7 @@ namespace GVR.Creator
 
         public static GameObject CreateVobDecal(IVirtualObject vob, VisualDecal decal, GameObject parent)
         {
-            return VobMeshCreator.CreateVobDecal(vob, decal, parent);
+            return MeshFactory.CreateVobDecal(vob, decal, parent);
         }
         
         public static GameObject CreateBarrier(string objectName, IMesh mesh)
