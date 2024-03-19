@@ -1,4 +1,6 @@
 using System.Linq;
+using System.Threading.Tasks;
+using GVR.Creator.Meshes.V2.Textures;
 using GVR.Extensions;
 using GVR.Vm;
 using Unity.VisualScripting;
@@ -116,6 +118,16 @@ namespace GVR.Creator.Meshes.V2
         //
         //     return vobDecalBuilder.Build();
         // }
+
+        public static async Task CreateWorldTextureArray()
+        {
+            await new WorldTextureArrayBuilder().BuildAsync();
+        }
+
+        public static async Task CreateVobTextureArray()
+        {
+            await new VobTextureArrayBuilder().BuildAsync();
+        }
 
         public static GameObject CreateBarrier(string objectName, IMesh mesh)
         {

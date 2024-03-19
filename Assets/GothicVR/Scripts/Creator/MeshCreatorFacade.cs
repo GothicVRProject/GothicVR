@@ -22,8 +22,6 @@ namespace GVR.Creator
         private static readonly VobMeshCreator VobMeshCreator = new();
         private static readonly MeshCreator MeshCreator = new();
         private static readonly PolyStripMeshCreator PolyStripMeshCreator = new();
-        private static readonly VobTextureArrayCreator VobTextureArrayCreator = new();
-        private static readonly WorldTextureArrayCreator WorldTextureArrayCreator = new();
 
 
         public static void CreateNpc(string npcName, string mdmName, string mdhName,
@@ -52,12 +50,12 @@ namespace GVR.Creator
 
         public static async Task BuildWorldTextureArray()
         {
-            await WorldTextureArrayCreator.BuildWorldTextureArray();
+            await MeshFactory.CreateWorldTextureArray();
         }
 
         public static async Task BuildVobTextureArray()
         {
-            await VobTextureArrayCreator.BuildVobTextureArray();
+            await MeshFactory.CreateVobTextureArray();
         }
 
         public static GameObject CreateVob(string objectName, IModelMesh mdm, IModelHierarchy mdh,

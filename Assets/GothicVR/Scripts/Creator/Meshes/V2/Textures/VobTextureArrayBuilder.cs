@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GVR.Caches;
@@ -9,11 +10,20 @@ using Material = UnityEngine.Material;
 using Texture = UnityEngine.Texture;
 using TextureFormat = UnityEngine.TextureFormat;
 
-namespace GVR.Creator.Meshes
+namespace GVR.Creator.Meshes.V2.Textures
 {
-    public class VobTextureArrayCreator : AbstractMeshCreator
+    /// <summary>
+    /// Create texture array for vob meshes. Basically no MeshBuilder,
+    /// but we inherit the abstract builder to leverage some methods.
+    /// </summary>
+    public class VobTextureArrayBuilder : AbstractMeshBuilder
     {
-        public async Task BuildVobTextureArray()
+        public override GameObject Build()
+        {
+            throw new NotImplementedException("Use BuildAsync instead.");
+        }
+
+        public async Task BuildAsync()
         {
             await TextureCache.BuildTextureArrays(TextureCache.TextureTypes.Vob);
             AssignTextureArrays();
@@ -28,7 +38,7 @@ namespace GVR.Creator.Meshes
             }
         }
 
-        protected void PrepareMeshRenderer(Renderer rend, IMultiResolutionMesh mrmData, List<TextureCache.TextureArrayTypes> textureArrayTypes)
+        private void PrepareMeshRenderer(Renderer rend, IMultiResolutionMesh mrmData, List<TextureCache.TextureArrayTypes> textureArrayTypes)
         {
             if (null == mrmData)
             {

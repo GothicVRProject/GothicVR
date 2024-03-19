@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using GVR.Caches;
 using GVR.Globals;
@@ -7,11 +8,20 @@ using UnityEngine.Rendering;
 using ZenKit;
 using Material = UnityEngine.Material;
 
-namespace GVR.Creator.Meshes
+namespace GVR.Creator.Meshes.V2.Textures
 {
-    public class WorldTextureArrayCreator : AbstractMeshCreator
+    /// <summary>
+    /// Create texture array for world meshes. Basically no MeshBuilder,
+    /// but we inherit the abstract builder to leverage some methods.
+    /// </summary>
+    public class WorldTextureArrayBuilder : AbstractMeshBuilder
     {
-        public async Task BuildWorldTextureArray()
+        public override GameObject Build()
+        {
+            throw new NotImplementedException("Use BuildAsync instead.");
+        }
+
+        public async Task BuildAsync()
         {
             await TextureCache.BuildTextureArrays(TextureCache.TextureTypes.World);
             AssignTextureArrays();
