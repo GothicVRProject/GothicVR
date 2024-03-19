@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using GVR.Creator.Meshes;
+using GVR.Creator.Meshes.V2;
 using GVR.Vm;
 using UnityEngine;
 using ZenKit;
@@ -40,13 +41,13 @@ namespace GVR.Creator
         public static GameObject CreateVob(string objectName, IMultiResolutionMesh mrm, Vector3 position,
             Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
-            return VobMeshCreator.CreateVob(objectName, mrm, position, rotation, withCollider, parent, rootGo);
+            return MeshFactory.CreateVob(objectName, mrm, position, rotation, withCollider, parent, rootGo);
         }
 
         public static GameObject CreateVob(string objectName, IModel mdl, Vector3 position, Quaternion rotation,
             GameObject parent = null, GameObject rootGo = null)
         {
-            return VobMeshCreator.CreateVob(objectName, mdl, position, rotation, parent, rootGo);
+            return MeshFactory.CreateVob(objectName, mdl, position, rotation, parent, rootGo);
         }
 
         public static async Task BuildWorldTextureArray()
@@ -62,7 +63,7 @@ namespace GVR.Creator
         public static GameObject CreateVob(string objectName, IModelMesh mdm, IModelHierarchy mdh,
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            return VobMeshCreator.CreateVob(objectName, mdm, mdh, position, rotation, parent, rootGo);
+            return MeshFactory.CreateVob(objectName, mdm, mdh, position, rotation, parent, rootGo);
         }
 
         public static GameObject CreateVobDecal(IVirtualObject vob, VisualDecal decal, GameObject parent)
