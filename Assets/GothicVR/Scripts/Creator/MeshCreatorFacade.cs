@@ -73,12 +73,12 @@ namespace GVR.Creator
         
         public static GameObject CreateBarrier(string objectName, IMesh mesh)
         {
-            return MeshCreator.CreateBarrier(objectName, mesh);
+            return MeshFactory.CreateBarrier(objectName, mesh);
         }
 
         public static void CreatePolyStrip(GameObject go, int numberOfSegments, Vector3 startPoint, Vector3 endPoint)
         {
-            PolyStripMeshCreator.CreatePolyStrip(go, numberOfSegments, startPoint, endPoint);
+            MeshFactory.CreatePolyStrip(go, numberOfSegments, startPoint, endPoint);
         }
     }
 }

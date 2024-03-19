@@ -353,7 +353,6 @@ namespace GVR.Creator.Meshes.V2
                 TextureCache.TextureArrayTypes textureArrayType = TextureCache.TextureArrayTypes.Opaque;
                 if (UseTextureArray)
                 {
-                    // FIXME - NPCs will also be created via this method above. We therefore need to filter it via hook method etc.
                     TextureCache.GetTextureArrayIndex(TextureCache.TextureTypes.Vob, subMesh.Material, out textureArrayType, out textureArrayIndex, out textureScale, out maxMipLevel);
                     if (!submeshPerTextureFormat.ContainsKey(textureArrayType))
                     {
@@ -581,6 +580,14 @@ namespace GVR.Creator.Meshes.V2
         protected virtual Material GetDefaultMaterial(bool isAlphaTest)
         {
             return new Material(Constants.ShaderSingleMeshLit);
+        }
+
+        protected Material GetWaterMaterial()
+        {
+            Material material = new Material(Constants.ShaderWater);
+            // Manually correct the render queue for alpha test, as Unity doesn't want to do it from the shader's render queue tag.
+            material.renderQueue = (int)RenderQueue.Transparent;
+            return material;
         }
 
         protected void SetPosAndRot(GameObject obj, System.Numerics.Matrix4x4 matrix)

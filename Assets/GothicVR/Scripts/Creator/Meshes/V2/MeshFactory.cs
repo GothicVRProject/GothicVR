@@ -116,23 +116,23 @@ namespace GVR.Creator.Meshes.V2
         //
         //     return vobDecalBuilder.Build();
         // }
-        //
-        // public static GameObject CreateBarrier(string objectName, IMesh mesh)
-        // {
-        //     var barrierBuilder = new BarrierMeshBuilder();
-        //     barrierBuilder.SetGameObject(null, objectName);
-        //     barrierBuilder.SetBarrierMesh(mesh);
-        //
-        //     return barrierBuilder.Build();
-        // }
-        //
-        // public static GameObject CreatePolyStrip(GameObject go, int numberOfSegments, Vector3 startPoint, Vector3 endPoint)
-        // {
-        //     var polyStripBuilder = new PolyStripMeshBuilder();
-        //     polyStripBuilder.SetGameObject(go);
-        //     polyStripBuilder.SetPolyStripData(numberOfSegments, startPoint, endPoint);
-        //
-        //     return polyStripBuilder.Build();
-        // }
+
+        public static GameObject CreateBarrier(string objectName, IMesh mesh)
+        {
+            var barrierBuilder = new BarrierMeshBuilder();
+            barrierBuilder.SetGameObject(null, objectName);
+            barrierBuilder.SetBarrierMesh(mesh);
+
+            return barrierBuilder.Build();
+        }
+
+        public static GameObject CreatePolyStrip(GameObject go, int numberOfSegments, Vector3 startPoint, Vector3 endPoint)
+        {
+            var polyStripBuilder = new PolyStripMeshBuilder();
+            polyStripBuilder.SetGameObject(go);
+            polyStripBuilder.SetPolyStripData(numberOfSegments, startPoint, endPoint);
+
+            return polyStripBuilder.Build();
+        }
     }
 }
