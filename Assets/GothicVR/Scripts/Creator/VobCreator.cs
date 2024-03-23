@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GothicVR.Vob;
 using GVR.Caches;
+using GVR.Creator.Meshes.V2;
 using GVR.Debugging;
 using GVR.Demo;
 using GVR.Extensions;
@@ -711,13 +712,13 @@ namespace GVR.Creator
         private static GameObject CreateItemMesh(Item vob, ItemInstance item, GameObject go)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
-            return MeshCreatorFacade.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
+            return MeshFactory.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
         }
         
         private static GameObject CreateItemMesh(ItemInstance item, GameObject go, UnityEngine.Vector3 position = default)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
-            return MeshCreatorFacade.CreateVob(item.Visual, mrm, position, default, false, parent: go);
+            return MeshFactory.CreateVob(item.Visual, mrm, position, default, false, parent: go);
         }
 
         private static GameObject CreateDecal(IVirtualObject vob)
@@ -727,7 +728,7 @@ namespace GVR.Creator
 
             var parent = parentGosTeleport[vob.Type];
 
-            return MeshCreatorFacade.CreateVobDecal(vob, (VisualDecal)vob.Visual, parent);
+            return MeshFactory.CreateVobDecal(vob, (VisualDecal)vob.Visual, parent);
         }
 
         /// <summary>
@@ -946,7 +947,7 @@ namespace GVR.Creator
             var mdl = AssetCache.TryGetMdl(meshName);
             if (mdl != null)
             {
-                var ret = MeshCreatorFacade.CreateVob(meshName, mdl, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), parent, go);
+                var ret = MeshFactory.CreateVob(meshName, mdl, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), parent, go);
 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
                 if (ret == null)
@@ -960,7 +961,7 @@ namespace GVR.Creator
             var mdm = AssetCache.TryGetMdm(meshName);
             if (mdh != null && mdm != null)
             {
-                var ret = MeshCreatorFacade.CreateVob(meshName, mdm, mdh, vob.Position.ToUnityVector(),
+                var ret = MeshFactory.CreateVob(meshName, mdm, mdh, vob.Position.ToUnityVector(),
                     vob.Rotation.ToUnityQuaternion(), parent, go);
 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
@@ -977,7 +978,7 @@ namespace GVR.Creator
                 // If the object is a dynamic one, it will collide.
                 var withCollider = vob.CdDynamic;
 
-                var ret = MeshCreatorFacade.CreateVob(meshName, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), withCollider, parent, go);
+                var ret = MeshFactory.CreateVob(meshName, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), withCollider, parent, go);
 
                 // A few objects are broken and have no meshes. We need to destroy them immediately again.
                 if (ret == null)

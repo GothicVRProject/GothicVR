@@ -31,19 +31,6 @@ namespace GVR.Caches
         private static readonly Dictionary<string, SoundData> SoundCache = new();
         private static readonly Dictionary<string, IFont> FontCache = new();
 
-        private static readonly string[] MisplacedMdmArmors =
-        {
-            "Hum_GrdS_Armor",
-            "Hum_GrdM_Armor",
-            "Hum_GrdL_Armor",
-            "Hum_NovM_Armor",
-            "Hum_TplL_Armor",
-            "Hum_Body_Cooksmith",
-            "Hum_VlkL_Armor",
-            "Hum_VlkM_Armor",
-            "Hum_KdfS_Armor"
-        };
-
         public static ITexture TryGetTexture(string key)
         {
             var preparedKey = GetPreparedKey(key);
@@ -184,27 +171,7 @@ namespace GVR.Caches
 
             MdmCache[preparedKey] = newData;
 
-            FixArmorTriangles(preparedKey, newData);
-
             return newData;
-        }
-
-        /// <summary>
-        /// Some armor mdm's have wrong triangles. This function corrects them hard coded until we find a proper solution.
-        /// </summary>
-        private static void FixArmorTriangles(string key, IModelMesh mdm)
-        {
-            if (!MisplacedMdmArmors.Contains(key, StringComparer.OrdinalIgnoreCase))
-                return;
-
-            foreach (var mesh in mdm.Meshes)
-            {
-                for (var i = 0; i < mesh.Mesh.Positions.Count; i++)
-                {
-                    var curPos = mesh.Mesh.Positions[i];
-                    mesh.Mesh.Positions[i] = new(curPos.X + 0.5f, curPos.Y - 0.5f, curPos.Z + 13f);
-                }
-            }
         }
 
         public static IMultiResolutionMesh TryGetMrm(string key)

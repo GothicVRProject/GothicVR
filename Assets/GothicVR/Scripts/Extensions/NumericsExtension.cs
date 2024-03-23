@@ -16,18 +16,25 @@ namespace GVR.Extensions
 
         /// <summary>
         /// Transform Vector3 to Unity Vector3.
+        /// cmScale - Gothic positions are in cm, but Unity in m. (factor 100). Most of the time we just transform it directly.
         /// </summary>
-        public static UnityEngine.Vector3 ToUnityVector(this Vector3 vector3)
+        public static UnityEngine.Vector3 ToUnityVector(this Vector3 vector3, bool cmScale = true)
         {
-            var vector = new UnityEngine.Vector3()
+            var vector = new UnityEngine.Vector3
             {
                 x = vector3.X,
                 y = vector3.Y,
                 z = vector3.Z
             };
 
-            // Gothic positions are in cm, but Unity in m. (factor 100)
-            return vector / 100;
+            if (cmScale)
+            {
+                return vector / 100;
+            }
+            else
+            {
+                return vector;
+            }
         }
 
         public static UnityEngine.Bounds ToUnityBounds(this ZenKit.AxisAlignedBoundingBox bounds)

@@ -36,7 +36,7 @@ namespace GVR.Creator.Meshes.V2
 #region Setter
         public void SetGameObject([CanBeNull] GameObject rootGo, string name = null)
         {
-            RootGo = rootGo == null ? new GameObject(name) : rootGo;
+            RootGo = rootGo == null ? new GameObject() : rootGo;
 
             if (name != null)
             {
@@ -313,28 +313,15 @@ namespace GVR.Creator.Meshes.V2
         protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, MeshRenderer meshRenderer, bool isMorphMesh = false, string morphMeshName = "")
         {
             Mesh mesh = new Mesh();
-
-            bool isMorphMeshMappingAlreadyCached = false;
-            if (isMorphMesh)
-            {
-                // MorphMeshes will change the vertices. This call optimizes performance.
-                mesh.MarkDynamic();
-
-                isMorphMeshMappingAlreadyCached = MorphMeshCache.IsMappingAlreadyCached(morphMeshName);
-
-                if (!isMorphMeshMappingAlreadyCached)
-                {
-                    MorphMeshCache.AddVertexMapping(morphMeshName, mrmData.PositionCount);
-                    morphMeshName = MorphMeshCache.GetPreparedKey(morphMeshName); // So we don't need to recalculate every Add() call later.
-                }
-            }
-
             meshFilter.mesh = mesh;
+
             if (null == mrmData)
             {
                 Debug.LogError("No mesh data could be added to filter: " + meshFilter.transform.parent.name);
                 return;
             }
+
+            CreateMorphMeshBegin(mrmData, mesh);
 
             int triangleCount = mrmData.SubMeshes.Sum(i => i.Triangles.Count);
             int vertexCount = triangleCount * 3;
@@ -384,10 +371,8 @@ namespace GVR.Creator.Meshes.V2
                         normals.Add(wedges[w].Normal.ToUnityVector());
                         Vector2 uv = Vector2.Scale(textureScale, wedges[w].Texture.ToUnityVector());
                         preparedUVs.Add(new Vector4(uv.x, uv.y, textureArrayIndex, maxMipLevel));
-                        if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
-                        {
-                            MorphMeshCache.AddVertexMappingEntry(morphMeshName, wedges[w].Index, preparedVertices.Count - 1);
-                        }
+
+                        CreateMorphMeshEntry(wedges[w].Index, preparedVertices.Count);
                     }
                 }
             }
@@ -405,10 +390,7 @@ namespace GVR.Creator.Meshes.V2
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
 
-            if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
-            {
-                MorphMeshCache.SetUnityVerticesForVertexMapping(morphMeshName, preparedVertices.ToArray());
-            }
+            CreateMorphMeshEnd(preparedVertices);
 
             if (UseTextureArray)
             {
@@ -450,10 +432,10 @@ namespace GVR.Creator.Meshes.V2
 
             // 2-dimensional arrays (as there are segregated by submeshes)
             var preparedTriangles = new List<List<int>>(zkMesh.SubMeshes.Count);
+            var vertices = GetSoftSkinMeshPositions(soft);
 
             foreach (var subMesh in zkMesh.SubMeshes)
             {
-                var vertices = zkMesh.Positions;
                 var triangles = subMesh.Triangles;
                 var wedges = subMesh.Wedges;
 
@@ -502,6 +484,11 @@ namespace GVR.Creator.Meshes.V2
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
+        }
+
+        protected virtual List<System.Numerics.Vector3> GetSoftSkinMeshPositions(ISoftSkinMesh softSkinMesh)
+        {
+            return softSkinMesh.Mesh.Positions;
         }
 
         /// <summary>
@@ -562,6 +549,21 @@ namespace GVR.Creator.Meshes.V2
             {
                 PrepareMeshCollider(obj, mesh);
             }
+        }
+
+        protected virtual void CreateMorphMeshBegin(IMultiResolutionMesh mrm, Mesh mesh)
+        {
+            // NOP
+        }
+
+        protected virtual void CreateMorphMeshEntry(int index1, int preparedVerticesCount)
+        {
+            // NOP
+        }
+
+        protected virtual void CreateMorphMeshEnd(List<Vector3> preparedVertices)
+        {
+            // NOP
         }
 
         /// <summary>

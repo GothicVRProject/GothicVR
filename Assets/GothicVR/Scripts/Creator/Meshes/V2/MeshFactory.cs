@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator.Meshes.V2.Textures;
 using GVR.Extensions;
+using GVR.Vm;
 using GVR.World;
 using UnityEngine;
 using ZenKit;
@@ -21,25 +22,25 @@ namespace GVR.Creator.Meshes.V2
             await worldBuilder.BuildAsync();
         }
 
-        // public static GameObject CreateNpc(string npcName, string mdmName, string mdhName,
-        //     VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
-        // {
-        //     var npcBuilder = new NpcMeshBuilder();
-        //     npcBuilder.SetGameObject(root, npcName);
-        //     npcBuilder.SetMdh(mdhName);
-        //     npcBuilder.SetMdm(mdmName);
-        //     npcBuilder.SetBodyData(bodyData);
-        //
-        //     var npcGo = npcBuilder.Build();
-        //
-        //     var npcHeadBuilder = new NpcHeadMeshBuilder();
-        //     npcHeadBuilder.SetGameObject(npcGo);
-        //     npcHeadBuilder.SetBodyData(bodyData);
-        //
-        //     // returns body+head
-        //     return npcHeadBuilder.Build();
-        // }
-        //
+        public static GameObject CreateNpc(string npcName, string mdmName, string mdhName,
+            VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
+        {
+            var npcBuilder = new NpcMeshBuilder();
+            npcBuilder.SetGameObject(root, npcName);
+            npcBuilder.SetMdh(mdhName);
+            npcBuilder.SetMdm(mdmName);
+            npcBuilder.SetBodyData(bodyData);
+
+            var npcGo = npcBuilder.Build();
+
+            var npcHeadBuilder = new NpcHeadMeshBuilder();
+            npcHeadBuilder.SetGameObject(npcGo);
+            npcHeadBuilder.SetBodyData(bodyData);
+
+            // returns body+head
+            return npcHeadBuilder.Build();
+        }
+
         // public static GameObject CreateNpcWeapon(GameObject npcGo, ItemInstance itemData, VmGothicEnums.ItemFlags mainFlag, VmGothicEnums.ItemFlags flags)
         // {
         //     var npcWeaponBuilder = new NpcWeaponMeshBuilder();
