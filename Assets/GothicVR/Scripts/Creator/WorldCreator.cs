@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Caches;
 using GVR.Creator.Meshes;
+using GVR.Creator.Meshes.V2;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
@@ -49,14 +50,15 @@ namespace GVR.Creator
             if (FeatureFlags.I.createVobs)
             {
                 await VobCreator.CreateAsync(_teleportGo, _nonTeleportGo, GameData.World, Constants.VObPerFrame);
-                await MeshCreatorFacade.BuildVobTextureArray();
+                await MeshFactory.CreateVobTextureArray();
             }
 
             if (FeatureFlags.I.createWorldMesh)
             {
                 GameData.World.SubMeshes = await BuildBspTree(GameData.World.World.Mesh.Cache(), GameData.World.World.BspTree.Cache());
-                await WorldMeshCreator.CreateAsync(GameData.World, _teleportGo, Constants.MeshPerFrame);
-                await MeshCreatorFacade.BuildWorldTextureArray();
+
+                await MeshFactory.CreateWorld(GameData.World, _teleportGo, Constants.MeshPerFrame);
+                await MeshFactory.CreateWorldTextureArray();
             }
 
             SkyManager.I.InitSky();

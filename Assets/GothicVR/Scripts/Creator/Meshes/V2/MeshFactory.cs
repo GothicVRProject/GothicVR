@@ -2,17 +2,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using GVR.Creator.Meshes.V2.Textures;
 using GVR.Extensions;
-using GVR.Vm;
-using Unity.VisualScripting;
+using GVR.World;
 using UnityEngine;
 using ZenKit;
-using ZenKit.Daedalus;
 using ZenKit.Vobs;
 
 namespace GVR.Creator.Meshes.V2
 {
     public static class MeshFactory
     {
+        public static async Task CreateWorld(WorldData world, GameObject parent, int meshesPerFrame)
+        {
+            var worldBuilder = new WorldMeshBuilder();
+            worldBuilder.SetGameObject(null, "Mesh");
+            worldBuilder.SetParent(parent);
+            worldBuilder.SetWorldData(world, meshesPerFrame);
+
+            await worldBuilder.BuildAsync();
+        }
+
         // public static GameObject CreateNpc(string npcName, string mdmName, string mdhName,
         //     VmGothicExternals.ExtSetVisualBodyData bodyData, GameObject root)
         // {
