@@ -3,7 +3,7 @@ using GVR.Vm;
 using UnityEngine;
 using ZenKit.Daedalus;
 
-namespace GVR.Creator.Meshes.V2
+namespace GVR.Creator.Meshes.V2.Builder
 {
     public class NpcWeaponMeshBuilder : AbstractMeshBuilder
     {

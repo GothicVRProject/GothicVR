@@ -8,7 +8,7 @@ using ZenKit;
 using Material = UnityEngine.Material;
 using Mesh = UnityEngine.Mesh;
 
-namespace GVR.Creator.Meshes.V2
+namespace GVR.Creator.Meshes.V2.Builder
 {
     public class BarrierMeshBuilder : AbstractMeshBuilder
     {

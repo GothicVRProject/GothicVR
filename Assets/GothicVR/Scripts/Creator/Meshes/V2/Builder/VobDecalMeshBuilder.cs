@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using ZenKit.Vobs;
 
-namespace GVR.Creator.Meshes.V2
+namespace GVR.Creator.Meshes.V2.Builder
 {
     public class VobDecalMeshBuilder : AbstractMeshBuilder
     {

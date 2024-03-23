@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GVR.Extensions;
 using GVR.Globals;
 using GVR.World;
@@ -8,9 +7,11 @@ using UnityEngine;
 using ZenKit;
 using Material = UnityEngine.Material;
 using Mesh = UnityEngine.Mesh;
+using Vector3 = System.Numerics.Vector3;
 
 namespace GVR.Creator.Meshes
 {
+    [Obsolete("Use MeshFactory and *MeshBuilder instead.")]
     public class MeshCreator : AbstractMeshCreator
     {
         private const string BarrierTextureName = "Barriere";
@@ -155,7 +156,7 @@ namespace GVR.Creator.Meshes
             mesh.SetColors(colors);
         }
 
-        private static void AddEntry(List<System.Numerics.Vector3> zkPositions, List<Vertex> features, IPolygon polygon,
+        private static void AddEntry(List<Vector3> zkPositions, List<Vertex> features, IPolygon polygon,
             List<Color> meshColors, float alpha,
             WorldData.SubMeshData currentSubMesh, int index)
         {

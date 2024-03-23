@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
-using GVR.Creator.Meshes.V2.Textures;
+using GVR.Creator.Meshes.V2.Builder;
+using GVR.Creator.Meshes.V2.Builder.Textures;
 using GVR.Extensions;
 using GVR.Vm;
 using GVR.World;

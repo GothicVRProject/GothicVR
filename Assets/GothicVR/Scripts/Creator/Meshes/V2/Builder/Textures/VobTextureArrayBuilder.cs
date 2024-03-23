@@ -10,7 +10,7 @@ using Material = UnityEngine.Material;
 using Texture = UnityEngine.Texture;
 using TextureFormat = UnityEngine.TextureFormat;
 
-namespace GVR.Creator.Meshes.V2.Textures
+namespace GVR.Creator.Meshes.V2.Builder.Textures
 {
     /// <summary>
     /// Create texture array for vob meshes. Basically no MeshBuilder,

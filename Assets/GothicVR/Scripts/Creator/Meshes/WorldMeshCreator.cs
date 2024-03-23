@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 using GVR.Caches;
 using GVR.Extensions;
@@ -8,12 +8,12 @@ using GVR.World;
 using UnityEditor;
 using UnityEngine;
 using ZenKit;
-using Material = UnityEngine.Material;
 using Mesh = UnityEngine.Mesh;
-using TextureFormat = UnityEngine.TextureFormat;
 
 namespace GVR.Creator.Meshes
 {
+
+    [Obsolete("Use MeshFactory and *MeshBuilder instead.")]
     public class WorldMeshCreator : AbstractMeshCreator
     {
         // As we subclass the main Mesh Creator, we need to have a parent-child inheritance instance.

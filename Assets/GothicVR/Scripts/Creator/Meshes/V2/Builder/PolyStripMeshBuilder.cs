@@ -4,7 +4,7 @@ using GVR.Extensions;
 using GVR.Globals;
 using UnityEngine;
 
-namespace GVR.Creator.Meshes.V2
+namespace GVR.Creator.Meshes.V2.Builder
 {
     public class PolyStripMeshBuilder : AbstractMeshBuilder
     {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using GVR.Caches;
@@ -13,6 +14,7 @@ namespace GVR.Creator.Meshes
 {
     public class NpcMeshCreator : AbstractMeshCreator
     {
+        [Obsolete("Use MeshFactory and *MeshBuilder instead.")]
         private VmGothicExternals.ExtSetVisualBodyData tempBodyData;
 
         public void CreateNpc(string npcName, string mdmName, string mdhName,

@@ -11,7 +11,7 @@ using Material = UnityEngine.Material;
 using TextureFormat = UnityEngine.TextureFormat;
 using Mesh = UnityEngine.Mesh;
 
-namespace GVR.Creator.Meshes.V2
+namespace GVR.Creator.Meshes.V2.Builder
 {
     public abstract class AbstractMeshBuilder
     {

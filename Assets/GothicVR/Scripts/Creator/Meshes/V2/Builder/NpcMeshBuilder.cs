@@ -5,7 +5,7 @@ using GVR.Vm;
 using UnityEngine;
 using ZenKit;
 
-namespace GVR.Creator.Meshes.V2
+namespace GVR.Creator.Meshes.V2.Builder
 {
     public class NpcMeshBuilder : AbstractMeshBuilder
     {

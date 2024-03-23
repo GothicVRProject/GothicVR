@@ -8,7 +8,7 @@ using UnityEngine.Rendering;
 using ZenKit;
 using Material = UnityEngine.Material;
 
-namespace GVR.Creator.Meshes.V2.Textures
+namespace GVR.Creator.Meshes.V2.Builder.Textures
 {
     /// <summary>
     /// Create texture array for world meshes. Basically no MeshBuilder,

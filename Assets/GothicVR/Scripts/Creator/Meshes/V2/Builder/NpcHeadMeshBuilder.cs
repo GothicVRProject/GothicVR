@@ -9,7 +9,7 @@ using UnityEngine;
 using ZenKit;
 using Mesh = UnityEngine.Mesh;
 
-namespace GVR.Creator.Meshes.V2
+namespace GVR.Creator.Meshes.V2.Builder
 {
     public class NpcHeadMeshBuilder : NpcMeshBuilder
     {
