@@ -192,7 +192,7 @@ namespace GVR.GothicVR.Scripts.Manager
             // Old sky layer 1.
             if (!string.IsNullOrEmpty(lastState.layer[0].texName))
             {
-                RenderSettings.skybox.SetTexture(SkyTex1ShaderId, AssetCache.TryGetTexture(lastState.layer[0].texName));
+                RenderSettings.skybox.SetTexture(SkyTex1ShaderId, TextureCache.TryGetTexture(lastState.layer[0].texName));
             }
             RenderSettings.skybox.SetVector(SkyMovement1ShaderId, lastState.layer[0].texSpeed);
             RenderSettings.skybox.SetFloat(Sky1OpacityShaderId, lastState.layer[0].texAlpha / 255f);
@@ -200,7 +200,7 @@ namespace GVR.GothicVR.Scripts.Manager
             // Old sky layer 2.
             if (!string.IsNullOrEmpty(lastState.layer[1].texName))
             {
-                RenderSettings.skybox.SetTexture(SkyTex2ShaderId, AssetCache.TryGetTexture(lastState.layer[1].texName));
+                RenderSettings.skybox.SetTexture(SkyTex2ShaderId, TextureCache.TryGetTexture(lastState.layer[1].texName));
             }
             RenderSettings.skybox.SetVector(SkyMovement2ShaderId, lastState.layer[1].texSpeed);
             RenderSettings.skybox.SetFloat(Sky2OpacityShaderId, lastState.layer[1].texAlpha / 255f);
@@ -208,7 +208,7 @@ namespace GVR.GothicVR.Scripts.Manager
             // New sky layer 1.
             if (!string.IsNullOrEmpty(newState.layer[0].texName))
             {
-                RenderSettings.skybox.SetTexture(SkyTex3ShaderId, AssetCache.TryGetTexture(newState.layer[0].texName));
+                RenderSettings.skybox.SetTexture(SkyTex3ShaderId, TextureCache.TryGetTexture(newState.layer[0].texName));
             }
             RenderSettings.skybox.SetVector(SkyMovement3ShaderId, newState.layer[0].texSpeed);
             RenderSettings.skybox.SetFloat(Sky3OpacityShaderId, newState.layer[0].texAlpha / 255f);
@@ -216,7 +216,7 @@ namespace GVR.GothicVR.Scripts.Manager
             // New sky layer 2.
             if (!string.IsNullOrEmpty(newState.layer[1].texName))
             {
-                RenderSettings.skybox.SetTexture(SkyTex4ShaderId, AssetCache.TryGetTexture(newState.layer[1].texName));
+                RenderSettings.skybox.SetTexture(SkyTex4ShaderId, TextureCache.TryGetTexture(newState.layer[1].texName));
             }
             RenderSettings.skybox.SetVector(SkyMovement4ShaderId, newState.layer[1].texSpeed);
             RenderSettings.skybox.SetFloat(Sky4OpacityShaderId, newState.layer[1].texAlpha / 255f);

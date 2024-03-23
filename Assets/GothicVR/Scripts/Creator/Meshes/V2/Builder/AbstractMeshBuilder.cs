@@ -1,84 +1,234 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
 using GVR.Globals;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Rendering;
 using ZenKit;
 using Material = UnityEngine.Material;
-using Matrix4x4 = System.Numerics.Matrix4x4;
-using Mesh = UnityEngine.Mesh;
 using TextureFormat = UnityEngine.TextureFormat;
+using Mesh = UnityEngine.Mesh;
 
-namespace GVR.Creator.Meshes
+namespace GVR.Creator.Meshes.V2.Builder
 {
-    [Obsolete("Use MeshFactory and *MeshBuilder instead.")]
-    public abstract class AbstractMeshCreator
+    public abstract class AbstractMeshBuilder
     {
-        // Decals work only on URP shaders. We therefore temporarily change everything to this
-        // until we know how to change specifics to the cutout only. (e.g. bushes)
-        protected const float DecalOpacity = 0.75f;
+        protected GameObject RootGo;
+        protected GameObject ParentGo;
+        protected string ObjectName;
+        protected bool HasMeshCollider = true;
+        protected bool UseTextureArray;
 
-        protected GameObject Create(string objectName, IModelMesh mdm, IModelHierarchy mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+        protected IMultiResolutionMesh Mrm;
+        protected IModelHierarchy Mdh;
+        protected IModelMesh Mdm;
+        protected IMorphMesh Mmb;
+
+        protected Vector3 RootPosition;
+        protected Quaternion RootRotation;
+
+
+        public abstract GameObject Build();
+
+
+#region Setter
+        public void SetGameObject([CanBeNull] GameObject rootGo, string name = null)
         {
-            rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
-            rootGo.SetParent(parent, true, true);
+            RootGo = rootGo == null ? new GameObject() : rootGo;
 
-            var nodeObjects = new GameObject[mdh.Nodes.Count];
+            if (name != null)
+            {
+                ObjectName = name;
+            }
+        }
+
+        public void SetParent([CanBeNull] GameObject parentGo, bool resetPosition = false, bool resetRotation = false)
+        {
+            if (parentGo == null)
+            {
+                return;
+            }
+
+            ParentGo = parentGo;
+            RootGo.SetParent(parentGo, resetPosition, resetRotation);
+        }
+
+        public void SetRootPosAndRot(Vector3 position = default, Quaternion rotation = default)
+        {
+            RootPosition = position;
+            RootRotation = rotation;
+        }
+
+        public void SetMdl(IModel mdl)
+        {
+            SetMdh(mdl.Hierarchy);
+            SetMdm(mdl.Mesh);
+        }
+
+        public void SetMdh(string mdhName)
+        {
+            Mdh = AssetCache.TryGetMdh(mdhName);
+
+            if (Mdh == null)
+            {
+                Debug.LogError($"MDH from name >{mdhName}< for object >{RootGo.name}< not found.");
+            }
+        }
+
+        public void SetMdh(IModelHierarchy mdh)
+        {
+            this.Mdh = mdh;
+        }
+
+        public void SetMdm(string mdmName)
+        {
+            Mdm = AssetCache.TryGetMdm(mdmName);
+
+            if (Mdm == null)
+            {
+                Debug.LogError($"MDH from name >{mdmName}< for object >{RootGo.name}< not found.");
+            }
+        }
+
+        public void SetMdm(IModelMesh mdm)
+        {
+            this.Mdm = mdm;
+        }
+
+        public void SetMrm(IMultiResolutionMesh mrm)
+        {
+            this.Mrm = mrm;
+        }
+
+        public void SetMrm(string mrmName)
+        {
+            Mrm = AssetCache.TryGetMrm(mrmName);
+
+            if (Mrm == null)
+            {
+                Debug.LogError($"MDH from name >{mrmName}< for object >{RootGo.name}< not found.");
+            }
+        }
+
+        /// <summary>
+        /// MorphMesh
+        /// </summary>
+        public void SetMmb(string mmbName)
+        {
+            Mmb = AssetCache.TryGetMmb(mmbName);
+
+            if (Mmb == null)
+            {
+                Debug.LogError($"MDH from name >{mmbName}< for object >{RootGo.name}< not found.");
+            }
+        }
+
+        /// <summary>
+        /// Only a few objects (vobObjects) have disabled MeshColliders.
+        /// </summary>
+        public void DisableMeshCollider()
+        {
+            HasMeshCollider = false;
+        }
+
+        /// <summary>
+        /// e.g. Vobs and world will use Texture array, but no NPCs or created Vobs after world loading.
+        /// </summary>
+        public void SetUseTextureArray(bool use)
+        {
+            UseTextureArray = use;
+        }
+#endregion
+
+
+        protected GameObject BuildViaMrm()
+        {
+            // If there is no texture for any of the meshes, just skip this item.
+            // G1: Some skull decorations are without texture.
+            if (Mrm.Materials.All(m => m.Texture.IsEmpty()))
+            {
+                return null;
+            }
+
+            MeshFilter meshFilter = RootGo.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = RootGo.AddComponent<MeshRenderer>();
+            meshRenderer.material = Constants.LoadingMaterial;
+            PrepareMeshFilter(meshFilter, Mrm, meshRenderer);
+
+            // If we use TextureArray, we apply textures later.
+            // But if we want to create the mrm based texture now, we do it now. ;-)
+            if (!UseTextureArray)
+            {
+                PrepareMeshRenderer(meshRenderer, Mrm);
+            }
+
+            if (HasMeshCollider)
+            {
+                PrepareMeshCollider(RootGo, meshFilter.sharedMesh, Mrm.Materials);
+            }
+
+            SetPosAndRot(RootGo, RootPosition, RootRotation);
+
+            return RootGo;
+        }
+
+        protected GameObject BuildViaMdmAndMdh()
+        {
+            var nodeObjects = new GameObject[Mdh.Nodes.Count];
 
             // Create empty GameObjects from hierarchy
             {
-                for (var i = 0; i < mdh.Nodes.Count; i++)
+                for (var i = 0; i < Mdh.Nodes.Count; i++)
                 {
-                    var node = mdh.Nodes[i];
+                    var node = Mdh.Nodes[i];
                     // We attached some Components to root of bones. Therefore reusing it.
                     if (node.Name.EqualsIgnoreCase("BIP01"))
                     {
-                        var bip01 = rootGo.FindChildRecursively("BIP01");
+                        var bip01 = RootGo.FindChildRecursively("BIP01");
                         if (bip01 != null)
-                            nodeObjects[i] = rootGo.FindChildRecursively("BIP01");
+                            nodeObjects[i] = RootGo.FindChildRecursively("BIP01");
                         else
-                            nodeObjects[i] = new GameObject(mdh.Nodes[i].Name);
+                            nodeObjects[i] = new GameObject(Mdh.Nodes[i].Name);
                     }
                     else
                     {
-                        nodeObjects[i] = new GameObject(mdh.Nodes[i].Name);
+                        nodeObjects[i] = new GameObject(Mdh.Nodes[i].Name);
                     }
                 }
 
                 // Now set parents
-                for (var i = 0; i < mdh.Nodes.Count; i++)
+                for (var i = 0; i < Mdh.Nodes.Count; i++)
                 {
-                    var node = mdh.Nodes[i];
+                    var node = Mdh.Nodes[i];
                     var nodeObj = nodeObjects[i];
 
                     SetPosAndRot(nodeObj, node.Transform);
 
                     if (node.ParentIndex == -1)
-                        nodeObj.SetParent(rootGo);
+                        nodeObj.SetParent(RootGo);
                     else
                         nodeObj.SetParent(nodeObjects[node.ParentIndex]);
                 }
 
                 for (var i = 0; i < nodeObjects.Length; i++)
                 {
-                    if (mdh.Nodes[i].ParentIndex == -1)
-                        nodeObjects[i].transform.localPosition = mdh.RootTranslation.ToUnityVector();
+                    if (Mdh.Nodes[i].ParentIndex == -1)
+                        nodeObjects[i].transform.localPosition = Mdh.RootTranslation.ToUnityVector();
                     else
-                        SetPosAndRot(nodeObjects[i], mdh.Nodes[i].Transform);
+                        SetPosAndRot(nodeObjects[i], Mdh.Nodes[i].Transform);
                 }
             }
 
             //// Fill GameObjects with Meshes from "original" Mesh
             var meshCounter = 0;
-            foreach (var softSkinMesh in mdm.Meshes)
+            foreach (var softSkinMesh in Mdm.Meshes)
             {
                 var mesh = softSkinMesh.Mesh;
 
                 var meshObj = new GameObject($"ZM_{meshCounter++}");
-                meshObj.SetParent(rootGo);
+                meshObj.SetParent(RootGo);
 
                 var meshFilter = meshObj.AddComponent<MeshFilter>();
                 var meshRenderer = meshObj.AddComponent<SkinnedMeshRenderer>();
@@ -91,10 +241,10 @@ namespace GVR.Creator.Meshes
 
                 meshRenderer.sharedMesh = meshFilter.mesh;
 
-                CreateBonesData(rootGo, nodeObjects, meshRenderer, softSkinMesh);
+                CreateBonesData(RootGo, nodeObjects, meshRenderer, softSkinMesh);
             }
 
-            Dictionary<string, IMultiResolutionMesh> attachments = GetFilteredAttachments(mdm.Attachments);
+            Dictionary<string, IMultiResolutionMesh> attachments = GetFilteredAttachments(Mdm.Attachments);
 
             // Fill GameObjects with Meshes from attachments
             foreach (KeyValuePair<string, IMultiResolutionMesh> subMesh in attachments)
@@ -104,76 +254,18 @@ namespace GVR.Creator.Meshes
                 MeshRenderer meshRenderer = meshObj.AddComponent<MeshRenderer>();
                 meshRenderer.material = Constants.LoadingMaterial;
 
-                List<TextureCache.TextureArrayTypes> textureFormatsInMesh = PrepareMeshFilter(meshFilter, subMesh.Value, true, false);
+                PrepareMeshFilter(meshFilter, subMesh.Value, meshRenderer);
                 PrepareMeshCollider(meshObj, meshFilter.sharedMesh, subMesh.Value.Materials);
-                TextureCache.VobMeshRenderersForTextureArray.Add((meshRenderer, (subMesh.Value, textureFormatsInMesh)));
             }
 
-            SetPosAndRot(rootGo, position, rotation);
+            SetPosAndRot(RootGo, RootPosition, RootRotation);
 
             // We need to set the root translation after we add children above. Otherwise the "additive" position/rotation will be broken.
             // We need to reset the rootBones position to zero. Otherwise Vobs won't be placed right.
             // Due to Unity's parent-child transformation magic, we need to do it at the end. ╰(*°▽°*)╯
             nodeObjects[0].transform.localPosition = Vector3.zero;
 
-            return rootGo;
-        }
-
-        /// <summary>
-        /// There are some objects (e.g. NPCs) where we want to skip specific attachments. This method can be overridden for this feature.
-        /// </summary>
-        protected virtual Dictionary<string, IMultiResolutionMesh> GetFilteredAttachments(Dictionary<string, IMultiResolutionMesh> attachments)
-        {
-            return attachments;
-        }
-
-        protected GameObject Create(string objectName, IMultiResolutionMesh mrm, Vector3 position, Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
-        {
-            if (mrm == null)
-            {
-                Debug.LogError("No mesh data was found for: " + objectName);
-                return null;
-            }
-
-            // If there is no texture for any of the meshes, just skip this item.
-            // G1: Some skull decorations are without texture.
-            if (mrm.Materials.All(m => m.Texture.IsEmpty()))
-            {
-                return null;
-            }
-
-            rootGo ??= new GameObject();
-            rootGo.name = objectName;
-            rootGo.SetParent(parent);
-            SetPosAndRot(rootGo, position, rotation);
-
-            MeshFilter meshFilter = rootGo.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer = rootGo.AddComponent<MeshRenderer>();
-            meshRenderer.material = Constants.LoadingMaterial;
-            List<TextureCache.TextureArrayTypes> textureArrayTypesInMesh = PrepareMeshFilter(meshFilter, mrm, true);
-            TextureCache.VobMeshRenderersForTextureArray.Add((meshRenderer, (mrm, textureArrayTypesInMesh)));
-
-            if (withCollider)
-            {
-                PrepareMeshCollider(rootGo, meshFilter.sharedMesh, mrm.Materials);
-            }
-
-            return rootGo;
-        }
-
-        protected void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
-        {
-            SetPosAndRot(obj, matrix.ToUnityMatrix());
-        }
-
-        protected void SetPosAndRot(GameObject obj, UnityEngine.Matrix4x4 matrix)
-        {
-            SetPosAndRot(obj, matrix.GetPosition() / 100, matrix.rotation);
-        }
-
-        protected void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
-        {
-            obj.transform.SetLocalPositionAndRotation(position, rotation);
+            return RootGo;
         }
 
         protected void PrepareMeshRenderer(Renderer rend, IMultiResolutionMesh mrmData)
@@ -225,49 +317,18 @@ namespace GVR.Creator.Meshes
             rend.SetMaterials(finalMaterials);
         }
 
-        protected List<TextureCache.TextureArrayTypes> PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, bool useTextureArray, bool isMorphMesh = false, string morphMeshName = "")
+        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, MeshRenderer meshRenderer, bool isMorphMesh = false, string morphMeshName = "")
         {
-            /*
-             * Ok, brace yourself:
-             * There are three parameters of interest when it comes to creating meshes for items (etc.).
-             * 1. positions - Unity: vertices (=Vector3)
-             * 2. triangles - contains 3 indices to wedges.
-             * 3. wedges - contains indices (Unity: triangles) to the positions (Unity: vertices) and textures (Unity: uvs (=Vector2)).
-             * 
-             * Data example:
-             *  positions: 0=>[x1,x2,x3], 0=>[x2,y2,z2], 0=>[x3,y3,z3]
-             *  submesh:
-             *    triangles: [0, 2, 1], [1, 2, 3]
-             *    wedges: 0=>[index=0, texture=...], 1=>[index=2, texture=...], 2=>[index=2, texture=...]
-             *  
-             *  If we now take first triangle and prepare it for Unity, we would get the following:
-             *  vertices = 0[x0,...], 2[x2,...], 1[x1,...] --> as triangles point to a wedge and wedge index points to the position-index itself.
-             *  triangles = 0, 2, 3 --> (indices for position items); ATTENTION: index 3 would normally be index 2, but! we can never reuse positions. We always need to create new ones. (Reason: uvs demand the same size as vertices.)
-             *  uvs = [wedge[0].texture], [wedge[2].texture], [wedge[1].texture]
-             */
             Mesh mesh = new Mesh();
-
-            bool isMorphMeshMappingAlreadyCached = false;
-            if (isMorphMesh)
-            {
-                // MorphMeshes will change the vertices. This call optimizes performance.
-                mesh.MarkDynamic();
-
-                isMorphMeshMappingAlreadyCached = MorphMeshCache.IsMappingAlreadyCached(morphMeshName);
-
-                if (!isMorphMeshMappingAlreadyCached)
-                {
-                    MorphMeshCache.AddVertexMapping(morphMeshName, mrmData.PositionCount);
-                    morphMeshName = MorphMeshCache.GetPreparedKey(morphMeshName); // So we don't need to recalculate every Add() call later.
-                }
-            }
-
             meshFilter.mesh = mesh;
+
             if (null == mrmData)
             {
                 Debug.LogError("No mesh data could be added to filter: " + meshFilter.transform.parent.name);
-                return null;
+                return;
             }
+
+            CreateMorphMeshBegin(mrmData, mesh);
 
             int triangleCount = mrmData.SubMeshes.Sum(i => i.Triangles.Count);
             int vertexCount = triangleCount * 3;
@@ -284,9 +345,8 @@ namespace GVR.Creator.Meshes
                 int textureArrayIndex = 0, maxMipLevel = 0;
                 Vector2 textureScale = Vector2.one;
                 TextureCache.TextureArrayTypes textureArrayType = TextureCache.TextureArrayTypes.Opaque;
-                if (useTextureArray)
+                if (UseTextureArray)
                 {
-                    // FIXME - NPCs will also be created via this method above. We therefore need to filter it via hook method etc.
                     TextureCache.GetTextureArrayIndex(TextureCache.TextureTypes.Vob, subMesh.Material, out textureArrayType, out textureArrayIndex, out textureScale, out maxMipLevel);
                     if (!submeshPerTextureFormat.ContainsKey(textureArrayType))
                     {
@@ -302,12 +362,12 @@ namespace GVR.Creator.Meshes
                 for (int i = 0; i < subMesh.Triangles.Count; i++)
                 {
                     // One triangle is made of 3 elements for Unity. We therefore need to prepare 3 elements within one loop.
-                    MeshWedge[] wedges = new MeshWedge[] { subMesh.Wedges[subMesh.Triangles[i].Wedge2], subMesh.Wedges[subMesh.Triangles[i].Wedge1], subMesh.Wedges[subMesh.Triangles[i].Wedge0] };
+                    MeshWedge[] wedges = { subMesh.Wedges[subMesh.Triangles[i].Wedge2], subMesh.Wedges[subMesh.Triangles[i].Wedge1], subMesh.Wedges[subMesh.Triangles[i].Wedge0] };
 
                     for (int w = 0; w < wedges.Length; w++)
                     {
                         preparedVertices.Add(mrmData.Positions[wedges[w].Index].ToUnityVector());
-                        if (useTextureArray)
+                        if (UseTextureArray)
                         {
                             preparedTriangles[submeshPerTextureFormat[textureArrayType]].Add(index++);
                         }
@@ -318,10 +378,8 @@ namespace GVR.Creator.Meshes
                         normals.Add(wedges[w].Normal.ToUnityVector());
                         Vector2 uv = Vector2.Scale(textureScale, wedges[w].Texture.ToUnityVector());
                         preparedUVs.Add(new Vector4(uv.x, uv.y, textureArrayIndex, maxMipLevel));
-                        if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
-                        {
-                            MorphMeshCache.AddVertexMappingEntry(morphMeshName, wedges[w].Index, preparedVertices.Count - 1);
-                        }
+
+                        CreateMorphMeshEntry(wedges[w].Index, preparedVertices.Count);
                     }
                 }
             }
@@ -339,17 +397,12 @@ namespace GVR.Creator.Meshes
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
 
-            if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
-            {
-                MorphMeshCache.SetUnityVerticesForVertexMapping(morphMeshName, preparedVertices.ToArray());
-            }
+            CreateMorphMeshEnd(preparedVertices);
 
-            if (useTextureArray)
+            if (UseTextureArray)
             {
-                return submeshPerTextureFormat.Keys.ToList();
+                TextureCache.VobMeshRenderersForTextureArray.Add((meshRenderer, (mrmData, submeshPerTextureFormat.Keys.ToList())));
             }
-
-            return null;
         }
 
         protected void PrepareMeshFilter(MeshFilter meshFilter, ISoftSkinMesh soft)
@@ -360,13 +413,13 @@ namespace GVR.Creator.Meshes
              * 1. positions - Unity: vertices (=Vector3)
              * 2. triangles - contains 3 indices to wedges.
              * 3. wedges - contains indices (Unity: triangles) to the positions (Unity: vertices) and textures (Unity: uvs (=Vector2)).
-             * 
+             *
              * Data example:
              *  positions: 0=>[x1,x2,x3], 0=>[x2,y2,z2], 0=>[x3,y3,z3]
              *  submesh:
              *    triangles: [0, 2, 1], [1, 2, 3]
              *    wedges: 0=>[index=0, texture=...], 1=>[index=2, texture=...], 2=>[index=2, texture=...]
-             *  
+             *
              *  If we now take first triangle and prepare it for Unity, we would get the following:
              *  vertices = 0[x0,...], 2[x2,...], 1[x1,...] --> as triangles point to a wedge and wedge index points to the position-index itself.
              *  triangles = 0, 2, 3 --> (indices for position items); ATTENTION: index 3 would normally be index 2, but! we can never reuse positions. We always need to create new ones. (Reason: uvs demand the same size as vertices.)
@@ -386,10 +439,10 @@ namespace GVR.Creator.Meshes
 
             // 2-dimensional arrays (as there are segregated by submeshes)
             var preparedTriangles = new List<List<int>>(zkMesh.SubMeshes.Count);
+            var vertices = GetSoftSkinMeshPositions(soft);
 
             foreach (var subMesh in zkMesh.SubMeshes)
             {
-                var vertices = zkMesh.Positions;
                 var triangles = subMesh.Triangles;
                 var wedges = subMesh.Wedges;
 
@@ -440,6 +493,33 @@ namespace GVR.Creator.Meshes
             }
         }
 
+        protected virtual List<System.Numerics.Vector3> GetSoftSkinMeshPositions(ISoftSkinMesh softSkinMesh)
+        {
+            return softSkinMesh.Mesh.Positions;
+        }
+
+        /// <summary>
+        /// We basically only set the values from official Unity documentation. No added sugar for the bingPoses.
+        /// @see https://docs.unity3d.com/ScriptReference/Mesh-bindposes.html
+        /// @see https://forum.unity.com/threads/some-explanations-on-bindposes.86185/
+        /// </summary>
+        private void CreateBonesData(GameObject rootObj, GameObject[] nodeObjects, SkinnedMeshRenderer renderer, ISoftSkinMesh mesh)
+        {
+            var meshBones = new Transform[mesh.Nodes.Count];
+            var bindPoses = new UnityEngine.Matrix4x4[mesh.Nodes.Count];
+
+            for (var i = 0; i < mesh.Nodes.Count; i++)
+            {
+                var nodeIndex = mesh.Nodes[i];
+
+                meshBones[i] = nodeObjects[nodeIndex].transform;
+                bindPoses[i] = meshBones[i].worldToLocalMatrix * rootObj.transform.localToWorldMatrix;
+            }
+
+            renderer.sharedMesh.bindposes = bindPoses;
+            renderer.bones = meshBones;
+        }
+
         protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh)
         {
             var meshCollider = obj.AddComponent<MeshCollider>();
@@ -478,26 +558,27 @@ namespace GVR.Creator.Meshes
             }
         }
 
-        /// <summary>
-        /// We basically only set the values from official Unity documentation. No added sugar for the bingPoses.
-        /// @see https://docs.unity3d.com/ScriptReference/Mesh-bindposes.html
-        /// @see https://forum.unity.com/threads/some-explanations-on-bindposes.86185/
-        /// </summary>
-        private void CreateBonesData(GameObject rootObj, GameObject[] nodeObjects, SkinnedMeshRenderer renderer, ISoftSkinMesh mesh)
+        protected virtual void CreateMorphMeshBegin(IMultiResolutionMesh mrm, Mesh mesh)
         {
-            var meshBones = new Transform[mesh.Nodes.Count];
-            var bindPoses = new UnityEngine.Matrix4x4[mesh.Nodes.Count];
+            // NOP
+        }
 
-            for (var i = 0; i < mesh.Nodes.Count; i++)
-            {
-                var nodeIndex = mesh.Nodes[i];
+        protected virtual void CreateMorphMeshEntry(int index1, int preparedVerticesCount)
+        {
+            // NOP
+        }
 
-                meshBones[i] = nodeObjects[nodeIndex].transform;
-                bindPoses[i] = meshBones[i].worldToLocalMatrix * rootObj.transform.localToWorldMatrix;
-            }
+        protected virtual void CreateMorphMeshEnd(List<Vector3> preparedVertices)
+        {
+            // NOP
+        }
 
-            renderer.sharedMesh.bindposes = bindPoses;
-            renderer.bones = meshBones;
+        /// <summary>
+        /// There are some objects (e.g. NPCs) where we want to skip specific attachments. This method can be overridden for this feature.
+        /// </summary>
+        protected virtual Dictionary<string, IMultiResolutionMesh> GetFilteredAttachments(Dictionary<string, IMultiResolutionMesh> attachments)
+        {
+            return attachments;
         }
 
         protected virtual Texture2D GetTexture(string name)
@@ -516,6 +597,21 @@ namespace GVR.Creator.Meshes
             // Manually correct the render queue for alpha test, as Unity doesn't want to do it from the shader's render queue tag.
             material.renderQueue = (int)RenderQueue.Transparent;
             return material;
+        }
+
+        protected void SetPosAndRot(GameObject obj, System.Numerics.Matrix4x4 matrix)
+        {
+            SetPosAndRot(obj, matrix.ToUnityMatrix());
+        }
+
+        protected void SetPosAndRot(GameObject obj, Matrix4x4 matrix)
+        {
+            SetPosAndRot(obj, matrix.GetPosition() / 100, matrix.rotation);
+        }
+
+        protected void SetPosAndRot(GameObject obj, Vector3 position, Quaternion rotation)
+        {
+            obj.transform.SetLocalPositionAndRotation(position, rotation);
         }
     }
 }

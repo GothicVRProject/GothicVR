@@ -10,24 +10,27 @@ using UnityEngine;
 using ZenKit;
 using Mesh = UnityEngine.Mesh;
 
-namespace GVR.Creator.Meshes
+namespace GVR.Creator.Meshes.V2.Builder
 {
-
-    [Obsolete("Use MeshFactory and *MeshBuilder instead.")]
-    public class WorldMeshCreator : AbstractMeshCreator
+    public class WorldMeshBuilder : AbstractMeshBuilder
     {
-        // As we subclass the main Mesh Creator, we need to have a parent-child inheritance instance.
-        // Needed e.g. for overwriting PrepareMeshRenderer() to change specific behaviour.
-        private static readonly WorldMeshCreator Self = new();
+        private WorldData world;
+        private int meshesPerFrame;
 
-        public static async Task CreateAsync(WorldData world, GameObject parent, int meshesPerFrame)
+        public void SetWorldData(WorldData world, int meshesPerFrame)
         {
-            var meshObj = new GameObject()
-            {
-                name = "Mesh",
-                isStatic = true
-            };
-            meshObj.SetParent(parent);
+            this.world = world;
+            this.meshesPerFrame = meshesPerFrame;
+        }
+
+        public override GameObject Build()
+        {
+            throw new NotImplementedException("Use BuildAsync instead.");
+        }
+
+        public async Task BuildAsync()
+        {
+            RootGo.isStatic = true;
 
             // Track the progress of each sub-mesh creation separately
             int numSubMeshes = world.SubMeshes.Count;
@@ -49,15 +52,15 @@ namespace GVR.Creator.Meshes
                     isStatic = true
                 };
 
-                subMeshObj.SetParent(meshObj);
+                subMeshObj.SetParent(RootGo);
 
                 MeshFilter meshFilter = subMeshObj.AddComponent<MeshFilter>();
                 MeshRenderer meshRenderer = subMeshObj.AddComponent<MeshRenderer>();
 
                 meshRenderer.material = Constants.LoadingMaterial;
                 TextureCache.WorldMeshRenderersForTextureArray.Add((meshRenderer, subMesh));
-                Self.PrepareMeshFilter(meshFilter, subMesh);
-                Self.PrepareMeshCollider(subMeshObj, meshFilter.sharedMesh, subMesh.Material);
+                PrepareMeshFilter(meshFilter, subMesh);
+                PrepareMeshCollider(subMeshObj, meshFilter.sharedMesh, subMesh.Material);
 
 #if UNITY_EDITOR // Only needed for Occlusion Culling baking
                 // Don't set transparent meshes as occluders.

@@ -33,6 +33,7 @@ namespace GVR.Manager
         {
             GameData.Dispose();
             AssetCache.Dispose();
+            TextureCache.Dispose();
             LookupCache.Dispose();
             PrefabCache.Dispose();
             MorphMeshCache.Dispose();

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using GVR.Caches;
 using GVR.Creator.Meshes;
@@ -7,13 +8,15 @@ using UnityEngine;
 
 public class PolyStripMeshCreator : AbstractMeshCreator
 {
+
+    [Obsolete("Use MeshFactory and *MeshBuilder instead.")]
     public void CreatePolyStrip(GameObject go, int numberOfSegments, Vector3 startPoint, Vector3 endPoint)
     {
         var material = new Material(Constants.ShaderThunder);
 
         material.ToAdditiveMode();
 
-        var texture = AssetCache.TryGetTexture("THUNDER_A0.TGA");
+        var texture = TextureCache.TryGetTexture("THUNDER_A0.TGA");
 
         if (texture != null)
         {

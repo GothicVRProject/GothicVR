@@ -2,6 +2,7 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Creator;
 using GVR.Creator.Meshes;
+using GVR.Creator.Meshes.V2;
 using GVR.Extensions;
 using GVR.Globals;
 using GVR.Properties;
@@ -79,7 +80,7 @@ namespace GVR.Lab.Handler
                 TeethTexNr = 1
             };
 
-            MeshCreatorFacade.CreateNpc(newNpc.name, mdmName, mdhName, body, newNpc);
+            MeshFactory.CreateNpc(newNpc.name, mdmName, mdhName, body, newNpc);
         }
 
         public void AnimationStartClick()

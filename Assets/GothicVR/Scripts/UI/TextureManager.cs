@@ -50,24 +50,24 @@ public class TextureManager : SingletonBehaviour<TextureManager>
 
     public void LoadLoadingDefaultTextures()
     {
-        mainMenuImageBackgroundMaterial.mainTexture = AssetCache.TryGetTexture("STARTSCREEN.TGA");
-        mainMenuBackgroundMaterial.mainTexture = AssetCache.TryGetTexture("MENU_INGAME.TGA");
-        mainMenuTextImageMaterial.mainTexture = AssetCache.TryGetTexture("MENU_GOTHIC.TGA");
-        gothicLoadingMenuMaterial.mainTexture = AssetCache.TryGetTexture("LOADING.TGA");
-        loadingBarBackgroundMaterial.mainTexture = AssetCache.TryGetTexture("PROGRESS.TGA");
-        loadingBarMaterial.mainTexture = AssetCache.TryGetTexture("PROGRESS_BAR.TGA");
-        backgroundMaterial.mainTexture = AssetCache.TryGetTexture("LOG_PAPER.TGA");
-        buttonMaterial.mainTexture = AssetCache.TryGetTexture("INV_SLOT.TGA");
-        sliderMaterial.mainTexture = AssetCache.TryGetTexture("MENU_SLIDER_BACK.TGA");
-        sliderPositionMaterial.mainTexture = AssetCache.TryGetTexture("MENU_SLIDER_POS.TGA");
-        fillerMaterial.mainTexture = AssetCache.TryGetTexture("MENU_BUTTONBACK.TGA");
-        arrowMaterial.mainTexture = AssetCache.TryGetTexture("U.TGA");
-        mapMaterial.mainTexture = AssetCache.TryGetTexture("MAP_WORLD_ORC.TGA");
+        mainMenuImageBackgroundMaterial.mainTexture = TextureCache.TryGetTexture("STARTSCREEN.TGA");
+        mainMenuBackgroundMaterial.mainTexture = TextureCache.TryGetTexture("MENU_INGAME.TGA");
+        mainMenuTextImageMaterial.mainTexture = TextureCache.TryGetTexture("MENU_GOTHIC.TGA");
+        gothicLoadingMenuMaterial.mainTexture = TextureCache.TryGetTexture("LOADING.TGA");
+        loadingBarBackgroundMaterial.mainTexture = TextureCache.TryGetTexture("PROGRESS.TGA");
+        loadingBarMaterial.mainTexture = TextureCache.TryGetTexture("PROGRESS_BAR.TGA");
+        backgroundMaterial.mainTexture = TextureCache.TryGetTexture("LOG_PAPER.TGA");
+        buttonMaterial.mainTexture = TextureCache.TryGetTexture("INV_SLOT.TGA");
+        sliderMaterial.mainTexture = TextureCache.TryGetTexture("MENU_SLIDER_BACK.TGA");
+        sliderPositionMaterial.mainTexture = TextureCache.TryGetTexture("MENU_SLIDER_POS.TGA");
+        fillerMaterial.mainTexture = TextureCache.TryGetTexture("MENU_BUTTONBACK.TGA");
+        arrowMaterial.mainTexture = TextureCache.TryGetTexture("U.TGA");
+        mapMaterial.mainTexture = TextureCache.TryGetTexture("MAP_WORLD_ORC.TGA");
     }
 
     public void SetTexture(string texture, Material material)
     {
-        material.mainTexture = AssetCache.TryGetTexture(texture);
+        material.mainTexture = TextureCache.TryGetTexture(texture);
     }
 
     private Material GetEmptyMaterial(MaterialExtension.BlendMode blendMode)

@@ -1,6 +1,7 @@
 using GVR.Caches;
 using GVR.Creator;
 using GVR.Creator.Meshes;
+using GVR.Creator.Meshes.V2;
 using GVR.Globals;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -17,7 +18,7 @@ namespace GVR.Lab.Handler
             var ladderName = "LADDER_3.MDL";
             var mdl = AssetCache.TryGetMdl(ladderName);
 
-            var vobObj = MeshCreatorFacade.CreateVob(ladderName, mdl, Vector3.zero, Quaternion.Euler(0, 180, 0), ladderSlot);
+            var vobObj = MeshFactory.CreateVob(ladderName, mdl, Vector3.zero, Quaternion.Euler(0, 180, 0), ladderSlot);
 
 
             // Data taken from VobCreator.CreateLadder()
