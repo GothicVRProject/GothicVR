@@ -157,6 +157,13 @@ namespace GVR.Creator.Meshes.V2
             meshRenderer.material = Constants.LoadingMaterial;
             PrepareMeshFilter(meshFilter, Mrm, meshRenderer);
 
+            // If we use TextureArray, we apply textures later.
+            // But if we want to create the mrm based texture now, we do it now. ;-)
+            if (!UseTextureArray)
+            {
+                PrepareMeshRenderer(meshRenderer, Mrm);
+            }
+
             if (HasMeshCollider)
             {
                 PrepareMeshCollider(RootGo, meshFilter.sharedMesh, Mrm.Materials);

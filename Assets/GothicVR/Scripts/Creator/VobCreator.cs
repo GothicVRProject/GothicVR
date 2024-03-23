@@ -712,13 +712,14 @@ namespace GVR.Creator
         private static GameObject CreateItemMesh(Item vob, ItemInstance item, GameObject go)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
-            return MeshFactory.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(), true, parentGosNonTeleport[vob.Type], go);
+            return MeshFactory.CreateVob(item.Visual, mrm, vob.Position.ToUnityVector(), vob.Rotation.ToUnityQuaternion(),
+                true, parentGosNonTeleport[vob.Type], go, useTextureArray: false);
         }
         
         private static GameObject CreateItemMesh(ItemInstance item, GameObject go, UnityEngine.Vector3 position = default)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
-            return MeshFactory.CreateVob(item.Visual, mrm, position, default, false, parent: go);
+            return MeshFactory.CreateVob(item.Visual, mrm, position, default, false, parent: go, useTextureArray: false);
         }
 
         private static GameObject CreateDecal(IVirtualObject vob)

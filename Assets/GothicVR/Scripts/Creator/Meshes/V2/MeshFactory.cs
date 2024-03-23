@@ -64,14 +64,15 @@ namespace GVR.Creator.Meshes.V2
         }
 
         public static GameObject CreateVob(string objectName, IMultiResolutionMesh mrm, Vector3 position,
-            Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
+            Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null,
+            bool useTextureArray = true)
         {
             var vobBuilder = new VobMeshBuilder();
             vobBuilder.SetRootPosAndRot(position, rotation);
             vobBuilder.SetGameObject(rootGo, objectName);
             vobBuilder.SetParent(parent);
             vobBuilder.SetMrm(mrm);
-            vobBuilder.SetUseTextureArray(true);
+            vobBuilder.SetUseTextureArray(useTextureArray);
 
             if (!withCollider)
             {
