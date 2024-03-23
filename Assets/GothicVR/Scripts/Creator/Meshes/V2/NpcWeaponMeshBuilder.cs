@@ -61,8 +61,8 @@ namespace GVR.Creator.Meshes.V2
             if (!weaponGo.TryGetComponent<MeshRenderer>(out var meshRenderer))
                 meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(meshRenderer, Mrm);
             PrepareMeshFilter(meshFilter, Mrm, meshRenderer);
+            PrepareMeshRenderer(meshRenderer, Mrm);
 
             return weaponGo;
         }
@@ -87,10 +87,10 @@ namespace GVR.Creator.Meshes.V2
             var meshFilter = weaponGo.AddComponent<MeshFilter>();
             var meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(meshRenderer, Mmb.Mesh);
-
             // FIXME - We don't handle bow morphs as of now. Neet to do once fighting is implemented.
             PrepareMeshFilter(meshFilter, Mmb.Mesh, meshRenderer);
+            PrepareMeshRenderer(meshRenderer, Mmb.Mesh);
+
 
             return weaponGo;
         }
