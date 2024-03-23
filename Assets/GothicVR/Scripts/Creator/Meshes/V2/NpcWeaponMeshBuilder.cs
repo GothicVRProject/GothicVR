@@ -1,5 +1,3 @@
-
-using GVR.Caches;
 using GVR.Extensions;
 using GVR.Vm;
 using UnityEngine;
