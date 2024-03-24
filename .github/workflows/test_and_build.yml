@@ -125,7 +125,7 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
-          buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
+          buildMethod: GVR.Editor.Builds.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
 
       - uses: actions/upload-artifact@v3
         with:
