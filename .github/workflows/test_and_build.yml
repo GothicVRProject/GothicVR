@@ -85,7 +85,7 @@ jobs:
     steps:
       # Checkout without LFS
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           #lfs: true
           fetch-depth: 0
@@ -109,7 +109,7 @@ jobs:
           git reset --hard
 
       # Cache
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: Library
           key: Library-${{ matrix.targetPlatform }}
@@ -117,7 +117,7 @@ jobs:
 
       # Build
       - name: Build project
-        uses: game-ci/unity-builder@v3
+        uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
