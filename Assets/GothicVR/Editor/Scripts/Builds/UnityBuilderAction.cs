@@ -9,7 +9,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.XR.OpenXR;
 using UnityEngine.XR.OpenXR.Features.Interactions;
 using UnityEngine.XR.OpenXR.Features.MetaQuestSupport;
-using UnityEngine.XR.OpenXR.Features.PICOSupport;
+using Pico;
+using Unity.XR.OpenXR.Features.PICOSupport;
 
 namespace GVR.Editor.Builds.UnityBuildTools
 {
@@ -158,7 +159,7 @@ namespace GVR.Editor.Builds.UnityBuildTools
 			PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
 
             //Enable Pico
-			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOTouchControllerProfile>().enabled = true;
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICO4ControllerProfile>().enabled = true;
             OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOFeature>().enabled = true;
 
             //Disable Meta
@@ -186,7 +187,7 @@ namespace GVR.Editor.Builds.UnityBuildTools
 
 			//Disable Pico
 			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOFeature>().enabled = false;
-			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICOTouchControllerProfile>().enabled = false;
+			OpenXRSettings.ActiveBuildTargetInstance.GetFeature<PICO4ControllerProfile>().enabled = false;
 
 			Debug.Log("OpenXR settings set for: Quest");
         
