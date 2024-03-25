@@ -307,7 +307,7 @@ namespace GVR.Manager.Culling
 
         public void StopTrackVobPositionUpdates(GameObject go)
         {
-            if (pausedVobsToReenable.ContainsKey(go))
+            if (pausedVobsToReenableCoroutine.ContainsKey(go))
                 return;
 
             pausedVobsToReenableCoroutine.Add(go, StartCoroutine(StopTrackVobPositionUpdatesDelayed(go)));
@@ -340,8 +340,8 @@ namespace GVR.Manager.Culling
         {
             yield return new WaitForSeconds(1f);
             pausedVobsToReenableCoroutine.Remove(go);
-
-            pausedVobsToReenable.Add(go, go.GetComponent<Rigidbody>());
+            if(!pausedVobsToReenable.ContainsKey(go))
+                pausedVobsToReenable.Add(go, go.GetComponent<Rigidbody>());
         }
 
         private IEnumerator StopVobTrackingBasedOnVelocity()
