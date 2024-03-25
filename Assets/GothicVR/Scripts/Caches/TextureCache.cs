@@ -267,12 +267,18 @@ namespace GVR.Caches
                     TextureArrays[TextureTypes.World].Clear();
                     TextureArrays[TextureTypes.World].TrimExcess();
 
+                    _arrayTexturesList[TextureTypes.World].Clear();
+                    _arrayTexturesList[TextureTypes.World].TrimExcess();
+
                     WorldMeshRenderersForTextureArray.Clear();
                     WorldMeshRenderersForTextureArray.TrimExcess();
                     break;
                 case TextureTypes.Vob:
                     TextureArrays[TextureTypes.Vob].Clear();
                     TextureArrays[TextureTypes.Vob].TrimExcess();
+
+                    _arrayTexturesList[TextureTypes.Vob].Clear();
+                    _arrayTexturesList[TextureTypes.Vob].TrimExcess();
 
                     VobMeshRenderersForTextureArray.Clear();
                     VobMeshRenderersForTextureArray.TrimExcess();
