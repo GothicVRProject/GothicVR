@@ -79,6 +79,13 @@ namespace GVR.Npc
 
         public void StartRoutine(int action, string wayPointName)
         {
+            // End original loop first
+            if (properties.currentLoopState == NpcProperties.LoopState.Loop)
+            {
+                // We reuse this function as it is doing what we need.
+                ClearState(false);
+            }
+
             // We need to set WayPoint within Daedalus instance as it calls _self.wp_ during routine loops.
             properties.npcInstance.Wp = wayPointName;
             properties.stateStart = action;
@@ -106,6 +113,11 @@ namespace GVR.Npc
         /// </summary>
         public void ClearState(bool stopCurrentStateImmediately)
         {
+            // Whenever we change routine, we reset some data to "start" from scratch as if the NPC got spawned.
+            properties.AnimationQueue.Clear();
+            properties.currentAction = new None(new(AnimationAction.Type.AINone), gameObject);
+            properties.stateTime = 0.0f;
+
             if (stopCurrentStateImmediately)
             {
                 properties.currentLoopState = NpcProperties.LoopState.None;
@@ -114,7 +126,7 @@ namespace GVR.Npc
             else
             {
                 properties.currentLoopState = NpcProperties.LoopState.End;
-                
+
                 if (properties.stateEnd != 0)
                 {
                     // We always need to set "self" before executing any Daedalus function.
@@ -122,11 +134,6 @@ namespace GVR.Npc
                     vm.Call(properties.stateEnd);
                 }
             }
-            
-            // Whenever we change routine, we reset some data to "start" from scratch as if the NPC got spawned.
-            properties.AnimationQueue.Clear();
-            properties.currentAction = new None(new(AnimationAction.Type.AINone), gameObject);
-            properties.stateTime = 0.0f;
         }
 
         private void PlayNextAnimation(AbstractAnimationAction action)

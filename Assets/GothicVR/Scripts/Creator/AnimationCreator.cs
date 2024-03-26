@@ -18,14 +18,17 @@ namespace GVR.Creator
         /// <summary>
         /// Handling animations for baseMds and overlayMds
         /// </summary>
-        public static void PlayAnimation(string[] mdsNames, string animationName, GameObject go, bool repeat = false)
+        public static bool PlayAnimation(string[] mdsNames, string animationName, GameObject go, bool repeat = false)
         {
             // We assume, that we get mdsNames in this order: base, overlay. But we should always check for overlay first.
             foreach (var mdsName in mdsNames.Reverse())
             {
                 if (TryPlayAnimation(mdsName, animationName, go, repeat))
-                    return;
+                    return true;
             }
+
+            // No suitable animation found.
+            return false;
         }
 
         private static bool TryPlayAnimation(string mdsName, string animationName, GameObject go, bool repeat)
