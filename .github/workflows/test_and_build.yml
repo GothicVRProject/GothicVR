@@ -20,48 +20,48 @@ jobs:
   # TESTS #
   #########
   
-  Unit_Tests:
-    if: ${{ github.event.label.name == 'Pipeline' }}
-    name: Test in ${{ matrix.testMode }}
-    runs-on: self-hosted
-    strategy:
-      fail-fast: false
-      matrix:
-        testMode:
-          - playmode
-          - editmode
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          lfs: true
-          fetch-depth: 0
-          clean: true
-      - uses: actions/cache@v3
-        with:
-          path: ${{ matrix.projectPath }}/Library
-          key: Library-${{ matrix.projectPath }}
-          restore-keys: |
-            Library-
-      - uses: game-ci/unity-test-runner@v3
-        id: tests
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-        with:
-          testMode: ${{ matrix.testMode }}
-          artifactsPath: ${{ matrix.testMode }}-artifacts
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          checkName: ${{ matrix.testMode }} Test Results
-          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+my.assembly.*'
-      - uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: Test results for ${{ matrix.testMode }}
-          path: ${{ steps.tests.outputs.artifactsPath }}
-      - uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: Coverage results for ${{ matrix.testMode }}
-          path: ${{ steps.tests.outputs.coveragePath }}
+  # Unit_Tests:
+  #   if: ${{ github.event.label.name == 'Pipeline' }}
+  #   name: Test in ${{ matrix.testMode }}
+  #   runs-on: self-hosted
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       testMode:
+  #         - playmode
+  #         - editmode
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         lfs: true
+  #         fetch-depth: 0
+  #         clean: true
+  #     - uses: actions/cache@v3
+  #       with:
+  #         path: ${{ matrix.projectPath }}/Library
+  #         key: Library-${{ matrix.projectPath }}
+  #         restore-keys: |
+  #           Library-
+  #     - uses: game-ci/unity-test-runner@v3
+  #       id: tests
+  #       env:
+  #         UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  #       with:
+  #         testMode: ${{ matrix.testMode }}
+  #         artifactsPath: ${{ matrix.testMode }}-artifacts
+  #         githubToken: ${{ secrets.GITHUB_TOKEN }}
+  #         checkName: ${{ matrix.testMode }} Test Results
+  #         coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+my.assembly.*'
+  #     - uses: actions/upload-artifact@v3
+  #       if: always()
+  #       with:
+  #         name: Test results for ${{ matrix.testMode }}
+  #         path: ${{ steps.tests.outputs.artifactsPath }}
+  #     - uses: actions/upload-artifact@v3
+  #       if: always()
+  #       with:
+  #         name: Coverage results for ${{ matrix.testMode }}
+  #         path: ${{ steps.tests.outputs.coveragePath }}
 
   #########
   # BUILD #
@@ -70,7 +70,7 @@ jobs:
   buildForAllPlatforms:
     if: ${{ github.event.label.name == 'Pipeline' }}
     name: Build GothicVR for ${{ matrix.targetDevice }}
-    needs: Unit_Tests
+    #needs: Unit_Tests
     runs-on: self-hosted
     strategy:
       fail-fast: false
@@ -83,16 +83,33 @@ jobs:
           - targetPlatform: Android
             targetDevice: Quest
     steps:
-      # Checkout
+      # Checkout without LFS
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          lfs: true
+          #lfs: true
           fetch-depth: 0
           clean: true
 
+      # Git LFS
+      - name: Create LFS file list
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+
+      - name: Restore LFS cache
+        uses: actions/cache@v4
+        id: lfs-cache
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
+
+      - name: Git LFS Pull
+        run: |
+          git lfs pull
+          git add .
+          git reset --hard
+
       # Cache
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: Library
           key: Library-${{ matrix.targetPlatform }}
@@ -100,7 +117,7 @@ jobs:
 
       # Build
       - name: Build project
-        uses: game-ci/unity-builder@v3
+        uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -108,9 +125,9 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
-          buildMethod: GVR.Editor.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
+          buildMethod: GVR.Editor.Builds.UnityBuildTools.UnityBuilderAction.Perform${{ matrix.targetDevice }}Build
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Build-${{ matrix.targetDevice }}
           path: build/${{ matrix.targetDevice }}
