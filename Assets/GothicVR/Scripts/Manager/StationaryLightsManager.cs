@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using GVR.Util;
 using UnityEngine;
@@ -21,10 +23,38 @@ namespace GVR.Manager
                 {
                     UpdateRenderer(renderer);
                 }
+
                 DirtiedMeshes.Clear();
                 Profiler.EndSample();
             }
         }
+
+        public void InitLightColorChange()
+        {
+            StartCoroutine(UpdateLightColors());
+        }
+        
+
+        private IEnumerator UpdateLightColors()
+        {
+            while(true)
+            {
+                var colorIndices =
+                    Shader.GetGlobalFloatArray(StationaryLight.GlobalStationaryLightColorIndicesShaderId);
+                var highestTimeInterval = 0f;
+                foreach (var light in StationaryLight.Lights)
+                {
+                    colorIndices[light.Index] = Array.IndexOf(StationaryLight.LightColors,
+                        StationaryLight.Lights[light.Index].Color.linear);
+                    if (highestTimeInterval < light.ColorAnimationFps)
+                        highestTimeInterval = light.ColorAnimationFps;
+                }
+
+                Shader.SetGlobalFloatArray(StationaryLight.GlobalStationaryLightColorIndicesShaderId, colorIndices);
+                yield return new WaitForSeconds(1 / highestTimeInterval);
+            }
+        }
+
         public static void AddLightOnRenderer(StationaryLight light, MeshRenderer renderer)
         {
             if (!LightsPerRenderer.ContainsKey(renderer))
@@ -67,12 +97,14 @@ namespace GVR.Manager
             {
                 indicesMatrix[i / 4, i % 4] = LightsPerRenderer[renderer][i].Index;
             }
+
             for (int i = 0; i < NonAllocMaterials.Count; i++)
             {
                 if (NonAllocMaterials[i])
                 {
                     NonAllocMaterials[i].SetMatrix(StationaryLight.StationaryLightIndicesShaderId, indicesMatrix);
-                    NonAllocMaterials[i].SetInt(StationaryLight.StationaryLightCountShaderId, LightsPerRenderer[renderer].Count);
+                    NonAllocMaterials[i].SetInt(StationaryLight.StationaryLightCountShaderId,
+                        LightsPerRenderer[renderer].Count);
                 }
             }
 
@@ -82,6 +114,7 @@ namespace GVR.Manager
                 {
                     indicesMatrix[i / 4, i % 4] = LightsPerRenderer[renderer][i + 16].Index;
                 }
+
                 for (int i = 0; i < NonAllocMaterials.Count; i++)
                 {
                     if (NonAllocMaterials[i])
