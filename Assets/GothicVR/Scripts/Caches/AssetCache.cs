@@ -196,7 +196,15 @@ namespace GVR.Caches
             if (MmbCache.TryGetValue(preparedKey, out var data))
                 return data;
 
-            var newData = new MorphMesh(GameData.Vfs, $"{preparedKey}.mmb").Cache();
+            IMorphMesh newData = null;
+            try
+            {
+                newData = new MorphMesh(GameData.Vfs, $"{preparedKey}.mmb").Cache();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
             MmbCache[preparedKey] = newData;
 
             return newData;

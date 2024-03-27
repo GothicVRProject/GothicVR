@@ -52,6 +52,14 @@ namespace GVR.Npc
             morphFrameData = MorphMeshCache.TryGetHeadMorphData(headName, animationName);
             
             isAnimationRunning = true;
+        }       
+        public void StartAnimation(string headName)
+        {
+            morphMetadata = AssetCache.TryGetMmb(headName);
+            morphAnimationMetadata = morphMetadata.Animations.First();
+            morphFrameData = MorphMeshCache.TryGetHeadMorphData(headName, morphAnimationMetadata.Name);
+            
+            isAnimationRunning = true;
         }
 
         public void StopAnimation(string headName)
