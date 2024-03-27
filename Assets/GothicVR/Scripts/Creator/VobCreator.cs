@@ -13,6 +13,7 @@ using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Manager.Culling;
+using GVR.Npc;
 using GVR.Properties;
 using GVR.Vob;
 using GVR.Vob.WayNet;
@@ -968,8 +969,8 @@ namespace GVR.Creator
         private static GameObject CreateAnimatedVob(Animate vob, GameObject parent = null)
         {
             var go = CreateDefaultMesh(vob, parent, true);
-            // var headmorph = go.AddComponent<HeadMorph>();
-            // headmorph.StartAnimation(go.name,HeadMorph.HeadMorphType.Viseme);
+            var headmorph = go.AddComponent<HeadMorph>();
+            headmorph.StartAnimation(vob.Visual.Name);
             return go;
         }
 
