@@ -27,6 +27,7 @@ namespace GVR
 
         private void Start()
         {
+            gameObject.layer = LayerMask.NameToLayer("Interactive"); //set layer to interactive so we can interact using XR Ray interactor
             //get snap points
             GetSnapPoints();
             //get interactable
@@ -95,9 +96,9 @@ namespace GVR
             //fade camera out
             cachedCameraFade.Fade(cameraFadeDuration, 1);
             yield return new WaitForSeconds(cameraFadeDuration);
-            //return to previous pos and rot
-            player.transform.position = cachedPos;
-            player.transform.eulerAngles = cachedEulers;
+            //move player forward
+            player.transform.position += player.transform.TransformDirection(new Vector3(0, 0.5f, 1f));
+           // player.transform.eulerAngles = cachedEulers;
             //unlock move an turn input
             cachedLocomotion.SetActive(true);
             //fade camera in

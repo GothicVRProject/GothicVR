@@ -42,7 +42,7 @@ namespace GVR.Creator
             VirtualObjectType.oCZoneMusicDefault,
             VirtualObjectType.zCVobSound,
             VirtualObjectType.zCVobSoundDaytime,
-            VirtualObjectType.oCMobInter
+            //VirtualObjectType.oCMobInter
         };
 
         private static int _totalVObs;
@@ -224,14 +224,20 @@ namespace GVR.Creator
                 }
                 case VirtualObjectType.oCMobInter:
                     {
-                        if(vob.Name.ContainsIgnoreCase("bench") ||
+                        if (vob.Name.ContainsIgnoreCase("bench") ||
                             vob.Name.ContainsIgnoreCase("chair") ||
                             vob.Name.ContainsIgnoreCase("throne"))
                         {
                             go = CreateSeat(vob, parent);
                             _cullingVobObjects.Add(go);
+                            break;
                         }
-                        break;
+                        else
+                        {
+                            go = CreateDefaultMesh(vob);
+                            _cullingVobObjects.Add(go);
+                            break;
+                        }
                     }
                 case VirtualObjectType.oCMobDoor:
                 case VirtualObjectType.oCMobSwitch:
@@ -744,7 +750,7 @@ namespace GVR.Creator
         {
             //to be used for creating chairs, benches etc
             //based on Creating Ladder
-            var vobObj = CreateDefaultMesh(vob, parent, true);
+            var vobObj = CreateDefaultMesh(vob);
             var meshColliderComp = vobObj.GetComponentInChildren<MeshCollider>();
 
             var grabComp = meshColliderComp.gameObject.AddComponent<XRGrabInteractable>();

@@ -5721,7 +5721,7 @@ MonoBehaviour:
   m_ConeCastAngle: 6
   m_RaycastMask:
     serializedVersion: 2
-    m_Bits: 96
+    m_Bits: 608
   m_RaycastTriggerInteraction: 1
   m_RaycastSnapVolumeInteraction: 0
   m_HitClosestOnly: 0
@@ -7131,7 +7131,7 @@ MonoBehaviour:
   m_ConeCastAngle: 6
   m_RaycastMask:
     serializedVersion: 2
-    m_Bits: 465
+    m_Bits: 401
   m_RaycastTriggerInteraction: 1
   m_RaycastSnapVolumeInteraction: 0
   m_HitClosestOnly: 0
@@ -7525,7 +7525,7 @@ MonoBehaviour:
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
-      m_Flags: 1
+      m_Flags: -1
     m_Reference: {fileID: 0}
   m_TrackingStateAction:
     m_UseReference: 1
@@ -7824,7 +7824,7 @@ MonoBehaviour:
   m_ConeCastAngle: 6
   m_RaycastMask:
     serializedVersion: 2
-    m_Bits: 96
+    m_Bits: 608
   m_RaycastTriggerInteraction: 2
   m_RaycastSnapVolumeInteraction: 1
   m_HitClosestOnly: 0
@@ -8386,7 +8386,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraFadeImage: {fileID: 1341512149633278554}
-  cameraFade: 0
 --- !u!1 &3286136463242076545
 GameObject:
   m_ObjectHideFlags: 0
