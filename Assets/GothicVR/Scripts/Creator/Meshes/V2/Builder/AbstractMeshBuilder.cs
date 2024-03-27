@@ -28,6 +28,8 @@ namespace GVR.Creator.Meshes.V2.Builder
 
         protected Vector3 RootPosition;
         protected Quaternion RootRotation;
+        
+        protected bool isMorphMeshMappingAlreadyCached;
 
 
         public abstract GameObject Build();
@@ -346,7 +348,7 @@ namespace GVR.Creator.Meshes.V2.Builder
                 return;
             }
 
-            CreateMorphMeshBegin(mrmData, mesh);
+            CreateMorphMeshBegin(mrmData, mesh, morphMeshName);
 
             int triangleCount = mrmData.SubMeshes.Sum(i => i.Triangles.Count);
             int vertexCount = triangleCount * 3;
@@ -397,7 +399,7 @@ namespace GVR.Creator.Meshes.V2.Builder
                         Vector2 uv = Vector2.Scale(textureScale, wedges[w].Texture.ToUnityVector());
                         preparedUVs.Add(new Vector4(uv.x, uv.y, textureArrayIndex, maxMipLevel));
 
-                        CreateMorphMeshEntry(wedges[w].Index, preparedVertices.Count);
+                        CreateMorphMeshEntry(wedges[w].Index, preparedVertices.Count, morphMeshName);
                     }
                 }
             }
@@ -415,7 +417,7 @@ namespace GVR.Creator.Meshes.V2.Builder
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
 
-            CreateMorphMeshEnd(preparedVertices);
+            CreateMorphMeshEnd(preparedVertices, morphMeshName);
 
             if (UseTextureArray)
             {
@@ -576,19 +578,39 @@ namespace GVR.Creator.Meshes.V2.Builder
             }
         }
 
-        protected virtual void CreateMorphMeshBegin(IMultiResolutionMesh mrm, Mesh mesh)
+        protected void CreateMorphMeshBegin(IMultiResolutionMesh mrm, Mesh mesh, string morphMeshName)
         {
-            // NOP
+            // MorphMeshes will change the vertices. This call optimizes performance.
+            mesh.MarkDynamic();
+
+            isMorphMeshMappingAlreadyCached = MorphMeshCache.IsMappingAlreadyCached(morphMeshName);
+            if (isMorphMeshMappingAlreadyCached)
+            {
+                return;
+            }
+
+            MorphMeshCache.AddVertexMapping(morphMeshName, mrm.PositionCount);
         }
 
-        protected virtual void CreateMorphMeshEntry(int index1, int preparedVerticesCount)
+        protected void CreateMorphMeshEntry(int index1, int preparedVerticesCount, string morphMeshName)
         {
-            // NOP
+            // We add mapping data to later reuse for IMorphAnimation samples
+            if (isMorphMeshMappingAlreadyCached)
+            {
+                return;
+            }
+
+            MorphMeshCache.AddVertexMappingEntry(morphMeshName, index1, preparedVerticesCount - 1);
         }
 
-        protected virtual void CreateMorphMeshEnd(List<Vector3> preparedVertices)
+        protected void CreateMorphMeshEnd(List<Vector3> preparedVertices, string morphMeshName)
         {
-            // NOP
+            if (isMorphMeshMappingAlreadyCached)
+            {
+                return;
+            }
+
+            MorphMeshCache.SetUnityVerticesForVertexMapping(morphMeshName, preparedVertices.ToArray());
         }
 
         /// <summary>

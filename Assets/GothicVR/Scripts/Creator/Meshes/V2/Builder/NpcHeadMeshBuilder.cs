@@ -13,7 +13,6 @@ namespace GVR.Creator.Meshes.V2.Builder
 {
     public class NpcHeadMeshBuilder : NpcMeshBuilder
     {
-        private bool isMorphMeshMappingAlreadyCached;
         private string headName;
 
         public override void SetBodyData(VmGothicExternals.ExtSetVisualBodyData body)
@@ -83,41 +82,6 @@ namespace GVR.Creator.Meshes.V2.Builder
             }
 
             return base.GetTexture(finalTextureName);
-        }
-
-        protected override void CreateMorphMeshBegin(IMultiResolutionMesh mrm, Mesh mesh)
-        {
-            // MorphMeshes will change the vertices. This call optimizes performance.
-            mesh.MarkDynamic();
-
-            isMorphMeshMappingAlreadyCached = MorphMeshCache.IsMappingAlreadyCached(headName);
-            if (isMorphMeshMappingAlreadyCached)
-            {
-                return;
-            }
-
-            MorphMeshCache.AddVertexMapping(headName, mrm.PositionCount);
-        }
-
-        protected override void CreateMorphMeshEntry(int index1, int preparedVerticesCount)
-        {
-            // We add mapping data to later reuse for IMorphAnimation samples
-            if (isMorphMeshMappingAlreadyCached)
-            {
-                return;
-            }
-
-            MorphMeshCache.AddVertexMappingEntry(headName, index1, preparedVerticesCount - 1);
-        }
-
-        protected override void CreateMorphMeshEnd(List<Vector3> preparedVertices)
-        {
-            if (isMorphMeshMappingAlreadyCached)
-            {
-                return;
-            }
-
-            MorphMeshCache.SetUnityVerticesForVertexMapping(headName, preparedVertices.ToArray());
         }
     }
 }
