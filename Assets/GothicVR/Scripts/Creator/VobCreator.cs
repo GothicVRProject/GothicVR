@@ -41,7 +41,8 @@ namespace GVR.Creator
             VirtualObjectType.oCZoneMusic,
             VirtualObjectType.oCZoneMusicDefault,
             VirtualObjectType.zCVobSound,
-            VirtualObjectType.zCVobSoundDaytime
+            VirtualObjectType.zCVobSoundDaytime,
+            //VirtualObjectType.oCMobInter
         };
 
         private static int _totalVObs;
@@ -222,6 +223,22 @@ namespace GVR.Creator
                     break;
                 }
                 case VirtualObjectType.oCMobInter:
+                    {
+                        if (vob.Name.ContainsIgnoreCase("bench") ||
+                            vob.Name.ContainsIgnoreCase("chair") ||
+                            vob.Name.ContainsIgnoreCase("throne"))
+                        {
+                            go = CreateSeat(vob, parent);
+                            _cullingVobObjects.Add(go);
+                            break;
+                        }
+                        else
+                        {
+                            go = CreateDefaultMesh(vob);
+                            _cullingVobObjects.Add(go);
+                            break;
+                        }
+                    }
                 case VirtualObjectType.oCMobDoor:
                 case VirtualObjectType.oCMobSwitch:
                 case VirtualObjectType.oCMOB:
@@ -725,6 +742,28 @@ namespace GVR.Creator
             grabComp.trackPosition = false;
             grabComp.trackRotation = false;
             grabComp.selectMode = InteractableSelectMode.Multiple; // With this, we can grab with both hands!
+
+            return vobObj;
+        }
+
+        private static GameObject CreateSeat(IVirtualObject vob, GameObject parent = null)
+        {
+            //to be used for creating chairs, benches etc
+            //based on Creating Ladder
+            var vobObj = CreateDefaultMesh(vob);
+            var meshColliderComp = vobObj.GetComponentInChildren<MeshCollider>();
+
+            var grabComp = meshColliderComp.gameObject.AddComponent<XRGrabInteractable>();
+            var rigidbodyComp = meshColliderComp.gameObject.GetComponent<Rigidbody>();
+            
+            Seat seat = meshColliderComp.gameObject.AddComponent<Seat>();
+
+            meshColliderComp.convex = true; 
+
+            rigidbodyComp.isKinematic = true;
+            grabComp.throwOnDetach = false; 
+            grabComp.trackPosition = false;
+            grabComp.trackRotation = false;
 
             return vobObj;
         }
