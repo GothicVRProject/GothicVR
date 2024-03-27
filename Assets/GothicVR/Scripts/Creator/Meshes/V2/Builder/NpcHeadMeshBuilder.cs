@@ -54,7 +54,7 @@ namespace GVR.Creator.Meshes.V2.Builder
 
             var headMeshFilter = headGo.AddComponent<MeshFilter>();
             var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
-            PrepareMeshFilter(headMeshFilter, morphMesh.Mesh, headMeshRenderer);
+            PrepareMeshFilter(headMeshFilter, morphMesh.Mesh, headMeshRenderer, true, headName);
             PrepareMeshRenderer(headMeshRenderer, morphMesh.Mesh);
         }
 
