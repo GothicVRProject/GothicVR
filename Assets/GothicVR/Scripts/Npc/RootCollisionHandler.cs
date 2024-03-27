@@ -21,10 +21,10 @@ namespace GVR.Npc
             properties.currentAction?.OnCollisionExit(coll);
 
             // If NPC walks out of a FreePoint, it gets freed.
-            if (!coll.gameObject.name.StartsWithIgnoreCase("FP_"))
-                return;
-
-            coll.gameObject.GetComponent<VobSpotProperties>().fp.IsLocked = false;
+            // Ignore Waypoints from WayNet as there are 4 of them which starts with FP_ but are waypoints not free points.
+            if (coll.gameObject.name.StartsWithIgnoreCase("FP_") &&
+                coll.gameObject.TryGetComponent<VobSpotProperties>(out var vobSpotProperties))
+                vobSpotProperties.fp.IsLocked = false;
         }
 
         /// <summary>
@@ -35,10 +35,10 @@ namespace GVR.Npc
             properties.currentAction?.OnTriggerExit(coll);
 
             // If NPC walks out of a FreePoint, it gets freed.
-            if (!coll.gameObject.name.StartsWithIgnoreCase("FP_"))
-                return;
-
-            coll.gameObject.GetComponent<VobSpotProperties>().fp.IsLocked = false;
+            // Ignore Waypoints from WayNet as there are 4 of them which starts with FP_ but are waypoints not free points.
+            if (coll.gameObject.name.StartsWithIgnoreCase("FP_") &&
+                coll.gameObject.TryGetComponent<VobSpotProperties>(out var vobSpotProperties))
+                vobSpotProperties.fp.IsLocked = false;
         }
 
         private void Update()
@@ -62,6 +62,5 @@ namespace GVR.Npc
             // Empty physics based diff. Next frame physics will be recalculated.
             collisionTransform.localPosition = Vector3.zero;
         }
-
     }
 }
