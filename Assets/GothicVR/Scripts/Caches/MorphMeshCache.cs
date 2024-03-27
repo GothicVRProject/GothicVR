@@ -63,12 +63,16 @@ namespace GVR.Caches
 
         public static void AddVertexMappingEntry(string preparedMorphMeshName, int originalVertexIndex, int additionalUnityVertexIndex)
         {
-            HeadVertexMapping[preparedMorphMeshName][originalVertexIndex].Add(additionalUnityVertexIndex);
+            var preparedKey = GetPreparedKey(preparedMorphMeshName);
+
+            HeadVertexMapping[preparedKey][originalVertexIndex].Add(additionalUnityVertexIndex);
         }
 
         public static void SetUnityVerticesForVertexMapping(string preparedMorphMeshName, Vector3[] unityVertices)
         {
-            UnityVertices.Add(preparedMorphMeshName, unityVertices);
+            var preparedKey = GetPreparedKey(preparedMorphMeshName);
+
+            UnityVertices.Add(preparedKey, unityVertices);
         }
 
         public static Vector3[] GetOriginalUnityVertices(string morphMeshName)
