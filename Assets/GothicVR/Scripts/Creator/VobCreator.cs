@@ -41,7 +41,8 @@ namespace GVR.Creator
             VirtualObjectType.oCZoneMusic,
             VirtualObjectType.oCZoneMusicDefault,
             VirtualObjectType.zCVobSound,
-            VirtualObjectType.zCVobSoundDaytime
+            VirtualObjectType.zCVobSoundDaytime,
+            VirtualObjectType.zCVobAnimate
         };
 
         private static int _totalVObs;
@@ -233,8 +234,13 @@ namespace GVR.Creator
                     _cullingVobObjects.Add(go);
                     break;
                 }
-                case VirtualObjectType.zCVobScreenFX:
                 case VirtualObjectType.zCVobAnimate:
+                {
+                    go = CreateAnimatedVob((Animate)vob, parent);
+                    _cullingVobObjects.Add(go);
+                    break;
+                }
+                case VirtualObjectType.zCVobScreenFX:
                 case VirtualObjectType.zCTriggerWorldStart:
                 case VirtualObjectType.zCTriggerList:
                 case VirtualObjectType.oCCSTrigger:
@@ -958,6 +964,14 @@ namespace GVR.Creator
 
             return pfxGo;
         }
+        
+        private static GameObject CreateAnimatedVob(Animate vob, GameObject parent = null)
+        {
+            var go = CreateDefaultMesh(vob, parent, true);
+            // var headmorph = go.AddComponent<HeadMorph>();
+            // headmorph.StartAnimation(go.name,HeadMorph.HeadMorphType.Viseme);
+            return go;
+        }
 
         private static GameObject CreateDefaultMesh(IVirtualObject vob, GameObject parent = null, bool nonTeleport = false)
         {
@@ -994,6 +1008,22 @@ namespace GVR.Creator
                 if (ret == null)
                     GameObject.Destroy(go);
 
+                return ret;
+            }
+            
+            // MMB
+            var mmb = AssetCache.TryGetMmb(meshName);
+            if (mmb != null)
+            {
+                var ret = MeshFactory.CreateVob(meshName, mmb, vob.Position.ToUnityVector(),
+                    vob.Rotation.ToUnityQuaternion(), parent ?? parentGo, go);
+                
+                // this is a dynamic object 
+
+                // A few objects are broken and have no meshes. We need to destroy them immediately again.
+                if (ret == null)
+                    GameObject.Destroy(go);
+                
                 return ret;
             }
 

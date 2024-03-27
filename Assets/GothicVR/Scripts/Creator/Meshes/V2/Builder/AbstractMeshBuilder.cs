@@ -102,6 +102,11 @@ namespace GVR.Creator.Meshes.V2.Builder
             this.Mrm = mrm;
         }
 
+        public void SetMmb(IMorphMesh mmb)
+        {
+            this.Mmb = mmb;
+        }
+
         public void SetMrm(string mrmName)
         {
             Mrm = AssetCache.TryGetMrm(mrmName);
@@ -265,6 +270,19 @@ namespace GVR.Creator.Meshes.V2.Builder
             // Due to Unity's parent-child transformation magic, we need to do it at the end. ╰(*°▽°*)╯
             nodeObjects[0].transform.localPosition = Vector3.zero;
 
+            return RootGo;
+        }
+
+        protected GameObject BuildViaMmb()
+        {
+            var meshFilter = RootGo.AddComponent<MeshFilter>();
+            var meshRenderer = RootGo.AddComponent<MeshRenderer>();
+            
+            PrepareMeshFilter(meshFilter, Mmb.Mesh, meshRenderer, true, Mmb.Name);
+            PrepareMeshRenderer(meshRenderer, Mmb.Mesh);
+            
+            SetPosAndRot(RootGo, RootPosition, RootRotation);
+            
             return RootGo;
         }
 

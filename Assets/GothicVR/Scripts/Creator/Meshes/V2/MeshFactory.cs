@@ -95,6 +95,19 @@ namespace GVR.Creator.Meshes.V2
 
             return vobBuilder.Build();
         }
+        
+        public static GameObject CreateVob(string objectName, IMorphMesh mmb, Vector3 position, Quaternion rotation,
+            GameObject parent = null, GameObject rootGo = null)
+        {
+            var vobBuilder = new VobMeshBuilder();
+            vobBuilder.SetRootPosAndRot(position, rotation);
+            vobBuilder.SetGameObject(rootGo, objectName);
+            vobBuilder.SetParent(parent);
+            vobBuilder.SetMmb(mmb);
+            vobBuilder.SetUseTextureArray(true);
+
+            return vobBuilder.Build();
+        }
 
         public static GameObject CreateVob(string objectName, IModelMesh mdm, IModelHierarchy mdh,
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
