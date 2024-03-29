@@ -381,6 +381,9 @@ namespace GVR.Creator
                 case VirtualObjectType.oCMobContainer:
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobContainer);
                     break;
+                case VirtualObjectType.zCVobAnimate:
+                    go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobAnimate);
+                    break;
                 default:
                     return new GameObject(name);
             }
