@@ -38,6 +38,7 @@ namespace GVR.Creator.Meshes.V2
             var npcHeadBuilder = new NpcHeadMeshBuilder();
             npcHeadBuilder.SetGameObject(npcGo);
             npcHeadBuilder.SetBodyData(bodyData);
+            npcHeadBuilder.SetMmb(bodyData.Head);
 
             // returns body+head
             return npcHeadBuilder.Build();

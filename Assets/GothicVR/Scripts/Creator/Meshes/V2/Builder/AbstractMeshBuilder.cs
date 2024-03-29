@@ -280,7 +280,7 @@ namespace GVR.Creator.Meshes.V2.Builder
             var meshFilter = RootGo.AddComponent<MeshFilter>();
             var meshRenderer = RootGo.AddComponent<MeshRenderer>();
             
-            PrepareMeshFilter(meshFilter, Mmb.Mesh, meshRenderer, true, Mmb.Name);
+            PrepareMeshFilter(meshFilter, Mmb.Mesh, meshRenderer);
             PrepareMeshRenderer(meshRenderer, Mmb.Mesh);
             
             SetPosAndRot(RootGo, RootPosition, RootRotation);
@@ -337,7 +337,7 @@ namespace GVR.Creator.Meshes.V2.Builder
             rend.SetMaterials(finalMaterials);
         }
 
-        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, MeshRenderer meshRenderer, bool isMorphMesh = false, string morphMeshName = "")
+        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, MeshRenderer meshRenderer)
         {
             Mesh mesh = new Mesh();
             meshFilter.mesh = mesh;
@@ -348,7 +348,7 @@ namespace GVR.Creator.Meshes.V2.Builder
                 return;
             }
 
-            CreateMorphMeshBegin(mrmData, mesh, morphMeshName);
+            CreateMorphMeshBegin(mrmData, mesh);
 
             int triangleCount = mrmData.SubMeshes.Sum(i => i.Triangles.Count);
             int vertexCount = triangleCount * 3;
@@ -399,7 +399,7 @@ namespace GVR.Creator.Meshes.V2.Builder
                         Vector2 uv = Vector2.Scale(textureScale, wedges[w].Texture.ToUnityVector());
                         preparedUVs.Add(new Vector4(uv.x, uv.y, textureArrayIndex, maxMipLevel));
 
-                        CreateMorphMeshEntry(wedges[w].Index, preparedVertices.Count, morphMeshName);
+                        CreateMorphMeshEntry(wedges[w].Index, preparedVertices.Count);
                     }
                 }
             }
@@ -417,7 +417,7 @@ namespace GVR.Creator.Meshes.V2.Builder
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
 
-            CreateMorphMeshEnd(preparedVertices, morphMeshName);
+            CreateMorphMeshEnd(preparedVertices);
 
             if (UseTextureArray)
             {
@@ -578,39 +578,44 @@ namespace GVR.Creator.Meshes.V2.Builder
             }
         }
 
-        protected void CreateMorphMeshBegin(IMultiResolutionMesh mrm, Mesh mesh, string morphMeshName)
+        private void CreateMorphMeshBegin(IMultiResolutionMesh mrm, Mesh mesh)
         {
+            if (Mmb == null)
+            {
+                return;
+            }
+            
             // MorphMeshes will change the vertices. This call optimizes performance.
             mesh.MarkDynamic();
 
-            isMorphMeshMappingAlreadyCached = MorphMeshCache.IsMappingAlreadyCached(morphMeshName);
+            isMorphMeshMappingAlreadyCached = MorphMeshCache.IsMappingAlreadyCached(Mmb.Name);
             if (isMorphMeshMappingAlreadyCached)
             {
                 return;
             }
 
-            MorphMeshCache.AddVertexMapping(morphMeshName, mrm.PositionCount);
+            MorphMeshCache.AddVertexMapping(Mmb.Name, mrm.PositionCount);
         }
 
-        protected void CreateMorphMeshEntry(int index1, int preparedVerticesCount, string morphMeshName)
+        private void CreateMorphMeshEntry(int index1, int preparedVerticesCount)
         {
             // We add mapping data to later reuse for IMorphAnimation samples
-            if (isMorphMeshMappingAlreadyCached)
+            if (Mmb == null || isMorphMeshMappingAlreadyCached)
             {
                 return;
             }
 
-            MorphMeshCache.AddVertexMappingEntry(morphMeshName, index1, preparedVerticesCount - 1);
+            MorphMeshCache.AddVertexMappingEntry(Mmb.Name, index1, preparedVerticesCount - 1);
         }
 
-        protected void CreateMorphMeshEnd(List<Vector3> preparedVertices, string morphMeshName)
+        private void CreateMorphMeshEnd(List<Vector3> preparedVertices)
         {
-            if (isMorphMeshMappingAlreadyCached)
+            if (Mmb == null || isMorphMeshMappingAlreadyCached)
             {
                 return;
             }
 
-            MorphMeshCache.SetUnityVerticesForVertexMapping(morphMeshName, preparedVertices.ToArray());
+            MorphMeshCache.SetUnityVerticesForVertexMapping(Mmb.Name, preparedVertices.ToArray());
         }
 
         /// <summary>
