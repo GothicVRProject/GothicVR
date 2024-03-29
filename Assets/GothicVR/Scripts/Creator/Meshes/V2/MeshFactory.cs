@@ -86,6 +86,11 @@ namespace GVR.Creator.Meshes.V2
         public static GameObject CreateVob(string objectName, IModel mdl, Vector3 position, Quaternion rotation,
             GameObject parent = null, GameObject rootGo = null)
         {
+            if (!HasMeshes(mdl.Mesh))
+            {
+                return null;
+            }
+            
             var vobBuilder = new VobMeshBuilder();
             vobBuilder.SetRootPosAndRot(position, rotation);
             vobBuilder.SetGameObject(rootGo, objectName);
@@ -99,12 +104,7 @@ namespace GVR.Creator.Meshes.V2
         public static GameObject CreateVob(string objectName, IModelMesh mdm, IModelHierarchy mdh,
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            // Check if there are completely empty elements without any texture.
-            // G1: e.g. Harp, Flute, and WASH_SLOT (usage moved to a FreePoint within daedalus functions)
-            var noMeshTextures = mdm.Meshes.All(mesh => mesh.Mesh.SubMeshes.All(subMesh => subMesh.Material.Texture.IsEmpty()));
-            var noAttachmentTextures = mdm.Attachments.All(att => att.Value.Materials.All(mat => mat.Texture.IsEmpty()));
-
-            if (noMeshTextures && noAttachmentTextures)
+            if (!HasMeshes(mdm))
             {
                 return null;
             }
@@ -118,6 +118,16 @@ namespace GVR.Creator.Meshes.V2
             vobBuilder.SetUseTextureArray(true);
 
             return vobBuilder.Build();
+        }
+
+        private static bool HasMeshes(IModelMesh mdm)
+        {
+            // Check if there are completely empty elements without any texture.
+            // G1: e.g. Harp, Flute, and WASH_SLOT (usage moved to a FreePoint within daedalus functions)
+            var noMeshTextures = mdm.Meshes.All(mesh => mesh.Mesh.SubMeshes.All(subMesh => subMesh.Material.Texture.IsEmpty()));
+            var noAttachmentTextures = mdm.Attachments.All(att => att.Value.Materials.All(mat => mat.Texture.IsEmpty()));
+
+            return !(noMeshTextures && noAttachmentTextures);
         }
 
         public static GameObject CreateVobDecal(IVirtualObject vob, VisualDecal decal, GameObject parent)
