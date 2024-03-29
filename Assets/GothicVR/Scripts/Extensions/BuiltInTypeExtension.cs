@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -36,6 +37,30 @@ namespace GVR.Extensions
             return self.EndsWith(other, StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// For huge lists and elements where data is (e.g.) structs, it makes sense to set Capacity=0,
+        /// which releases the elements finally. If you have a smaller Collection with references only, it's not needed.
+        ///
+        /// Please judge for yourself.
+        /// </summary>
+        public static void ClearAndReleaseMemory<TKey>(this List<TKey> self)
+        {
+            self.Clear();
+            self.TrimExcess(); // Sets Capacity=0 and releases the "empty" objects from memory.
+        }
+
+        /// <summary>
+        /// For huge lists and elements where data is (e.g.) structs, it makes sense to set Capacity=0,
+        /// which releases the elements finally. If you have a smaller Collection with references only, it's not needed.
+        ///
+        /// Please judge for yourself.
+        /// </summary>
+        public static void ClearAndReleaseMemory<TKey, TValue>(this Dictionary<TKey, TValue> self)
+        {
+            self.Clear();
+            self.TrimExcess(); // Sets Capacity=0 and releases the "empty" objects from memory.
+        }
+        
         /// <summary>
         /// ZenKit delivers values mostly in cm. Convenient method to move to Meter.
         /// </summary>

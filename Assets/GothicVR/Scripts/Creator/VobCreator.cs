@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,10 +22,14 @@ using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
+using ZenKit;
 using ZenKit.Daedalus;
 using ZenKit.Util;
 using ZenKit.Vobs;
 using Debug = UnityEngine.Debug;
+using Light = ZenKit.Vobs.Light;
+using LightType = ZenKit.Vobs.LightType;
+using Material = UnityEngine.Material;
 using Vector3 = System.Numerics.Vector3;
 
 namespace GVR.Creator
@@ -48,6 +53,7 @@ namespace GVR.Creator
         private static int _vobsPerFrame;
         private static int _createdCount;
         private static List<GameObject> _cullingVobObjects = new();
+        private static Dictionary<string, IWorld> vobTreeCache = new();
 
         static VobCreator()
         {
@@ -75,7 +81,7 @@ namespace GVR.Creator
 
         public static async Task CreateAsync(GameObject rootTeleport, GameObject rootNonTeleport, WorldData world, int vobsPerFrame)
         {
-            System.Diagnostics.Stopwatch stopwatch = new();
+            Stopwatch stopwatch = new();
             stopwatch.Start();
             PreCreateVobs(world, rootTeleport, rootNonTeleport, vobsPerFrame);
             await CreateVobs(world.Vobs);
@@ -147,7 +153,7 @@ namespace GVR.Creator
                 }
                 case VirtualObjectType.zCVobLight:
                 {
-                    go = CreateLight((ZenKit.Vobs.Light)vob, parent);
+                    go = CreateLight((Light)vob, parent);
                     break;
                 }
                 case VirtualObjectType.oCMobContainer:
@@ -217,7 +223,7 @@ namespace GVR.Creator
                 }
                 case VirtualObjectType.oCMobFire:
                 {
-                    go = CreateFire((ZenKit.Vobs.Fire)vob, parent);
+                    go = CreateFire((Fire)vob, parent);
                     _cullingVobObjects.Add(go);
                     break;
                 }
@@ -272,9 +278,12 @@ namespace GVR.Creator
             if (vob.VobTree == "")
                 return go;
 
-            var vobTree = new ZenKit.World(GameData.Vfs, vob.VobTree);
+            if (!vobTreeCache.TryGetValue(vob.VobTree.ToLower(), out IWorld vobTree))
+            {
+                vobTree = new ZenKit.World(GameData.Vfs, vob.VobTree).Cache();
+                vobTreeCache.Add(vob.VobTree.ToLower(), vobTree);
+            }
             
-
             foreach (var vobRoot in vobTree.RootObjects)
             {
                 ResetVobTreePositions(vobRoot.Children, vobRoot.Position, vobRoot.Rotation);
@@ -317,6 +326,8 @@ namespace GVR.Creator
             VobMeshCullingManager.I.PrepareVobCulling(_cullingVobObjects);
             VobSoundCullingManager.I.PrepareSoundCulling(LookupCache.vobSoundsAndDayTime);
 
+            vobTreeCache.ClearAndReleaseMemory();
+            
             // TODO - warnings about "not implemented" - print them once only.
             foreach (var var in new[]
                      {
@@ -522,7 +533,7 @@ namespace GVR.Creator
         }
 
         [CanBeNull]
-        private static GameObject CreateLight(ZenKit.Vobs.Light vob, GameObject parent = null)
+        private static GameObject CreateLight(Light vob, GameObject parent = null)
         {
             if (vob.LightStatic)
             {
@@ -535,7 +546,7 @@ namespace GVR.Creator
 
             StationaryLight lightComp = vobObj.AddComponent<StationaryLight>();
             lightComp.Color = new Color(vob.Color.R / 255f, vob.Color.G / 255f, vob.Color.B / 255f, vob.Color.A / 255f);
-            lightComp.Type = vob.LightType == ZenKit.Vobs.LightType.Point
+            lightComp.Type = vob.LightType == LightType.Point
                 ? UnityEngine.LightType.Point
                 : UnityEngine.LightType.Spot;
             lightComp.Range = vob.Range * .01f;
