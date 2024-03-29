@@ -71,7 +71,7 @@ namespace GVR.Creator.Meshes.V2
             var vobBuilder = new VobMeshBuilder();
             vobBuilder.SetRootPosAndRot(position, rotation);
             vobBuilder.SetGameObject(rootGo, objectName);
-            vobBuilder.SetParent(parent);
+            vobBuilder.SetParent(parent, resetRotation: true);
             vobBuilder.SetMrm(mrm);
             vobBuilder.SetUseTextureArray(useTextureArray);
 
@@ -112,7 +112,7 @@ namespace GVR.Creator.Meshes.V2
             var vobBuilder = new VobMeshBuilder();
             vobBuilder.SetRootPosAndRot(position, rotation);
             vobBuilder.SetGameObject(rootGo, objectName);
-            vobBuilder.SetParent(parent);
+            vobBuilder.SetParent(parent, resetRotation: true);
             vobBuilder.SetMdh(mdh);
             vobBuilder.SetMdm(mdm);
             vobBuilder.SetUseTextureArray(true);
