@@ -19,8 +19,8 @@ namespace GVR.Editor.Tools
         private static readonly List<Tuple<string, Type, object>> ProductionFlags = new()
         {
             // Booleans
-            new(nameof(FeatureFlags.createWorldMesh), typeof(bool), true),
-            new(nameof(FeatureFlags.createVobs), typeof(bool), true),
+            new (nameof(FeatureFlags.createWorldMesh), typeof(bool), true),
+            new (nameof(FeatureFlags.createVobs), typeof(bool), true),
             new (nameof(FeatureFlags.enableSounds), typeof(bool), true),
             new (nameof(FeatureFlags.enableMusic), typeof(bool), true),
             new (nameof(FeatureFlags.vobCulling), typeof(bool), true),
@@ -32,9 +32,11 @@ namespace GVR.Editor.Tools
             new (nameof(FeatureFlags.TimeMultiplier), typeof(float), 1),
             new (nameof(FeatureFlags.startHour), typeof(int), 8), // Official start time of G1 - new game
             new (nameof(FeatureFlags.startMinute), typeof(int), 0), // Official start time of G1 - new game
+            new (nameof(FeatureFlags.fireLightRange), typeof(float), 10),
 
             // Enums (Handled as Int internally)
-            new (nameof(FeatureFlags.sunMovementPerformanceValue), typeof(int), FeatureFlags.SunMovementPerformance.EveryIngameMinute),
+            new (nameof(FeatureFlags.sunMovementPerformanceValue), typeof(int),
+                FeatureFlags.SunMovementPerformance.EveryIngameMinute),
             new (nameof(FeatureFlags.zenKitLogLevel), typeof(int), LogLevel.Error),
             
             // Special types
@@ -43,7 +45,9 @@ namespace GVR.Editor.Tools
             new (nameof(FeatureFlags.vobCullingMedium), typeof(FeatureFlags.VobCullingGroupSetting),
                 new FeatureFlags.VobCullingGroupSetting{ maxObjectSize = 5f, cullingDistance = 100f}),
             new (nameof(FeatureFlags.vobCullingLarge), typeof(FeatureFlags.VobCullingGroupSetting),
-                new FeatureFlags.VobCullingGroupSetting{ maxObjectSize = 100f, cullingDistance = 200f})
+                new FeatureFlags.VobCullingGroupSetting{ maxObjectSize = 100f, cullingDistance = 200f}),
+            new (nameof(FeatureFlags.fireLightColor), typeof(Color),
+                new Color(1, .87f, .44f, 1))
         };
 
 
@@ -92,6 +96,9 @@ namespace GVR.Editor.Tools
                     case "String":
                             field.SetValue(featureFlags, "");
                             break;
+                    case "Color":
+                        field.SetValue(featureFlags, Color.white);
+                        break;
                     case "VobCullingGroupSetting":
                             field.SetValue(featureFlags, new FeatureFlags.VobCullingGroupSetting());
                             break;
@@ -128,6 +135,7 @@ namespace GVR.Editor.Tools
                     case "Boolean":
                     case "Int32":
                     case "Single": // float
+                    case "Color":
                     case "VobCullingGroupSetting":
                         var field = featureFlags.GetType().GetField(flag.Item1);
                         field.SetValue(featureFlags, flag.Item3);

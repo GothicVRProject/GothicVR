@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
@@ -12,25 +13,23 @@ using Material = UnityEngine.Material;
 
 namespace GVR.Creator.Meshes
 {
+
+    [Obsolete("Use MeshFactory and *MeshBuilder instead.")]
     public class VobMeshCreator : AbstractMeshCreator
     {
         public GameObject CreateVob(string objectName, IMultiResolutionMesh mrm, Vector3 position,
             Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null)
         {
-            var go = Create(objectName, mrm, position, rotation, withCollider, parent, rootGo);
-
+            GameObject go = Create(objectName, mrm, position, rotation, withCollider, parent, rootGo);
             AddZsCollider(go);
-
             return go;
         }
 
         public GameObject CreateVob(string objectName, IModel mdl, Vector3 position, Quaternion rotation,
             GameObject parent = null, GameObject rootGo = null)
         {
-            var go = CreateVob(objectName, mdl.Mesh, mdl.Hierarchy, position, rotation, parent, rootGo);
-
+            GameObject go = CreateVob(objectName, mdl.Mesh, mdl.Hierarchy, position, rotation, parent, rootGo);
             AddZsCollider(go);
-
             return go;
         }
 
@@ -39,8 +38,8 @@ namespace GVR.Creator.Meshes
         {
             // Check if there are completely empty elements without any texture.
             // G1: e.g. Harp, Flute, and WASH_SLOT (usage moved to a FreePoint within daedalus functions)
-            var noMeshTextures = mdm.Meshes.All(mesh => mesh.Mesh.SubMeshes.All(subMesh => subMesh.Material.Texture.IsEmpty()));
-            var noAttachmentTextures = mdm.Attachments.All(att => att.Value.Materials.All(mat => mat.Texture.IsEmpty()));
+            bool noMeshTextures = mdm.Meshes.All(mesh => mesh.Mesh.SubMeshes.All(subMesh => subMesh.Material.Texture.IsEmpty()));
+            bool noAttachmentTextures = mdm.Attachments.All(att => att.Value.Materials.All(mat => mat.Texture.IsEmpty()));
 
             if (noMeshTextures && noAttachmentTextures)
                 return null;
@@ -56,7 +55,7 @@ namespace GVR.Creator.Meshes
 
             var decalProjectorGo = new GameObject(vob.Name);
             var decalProj = decalProjectorGo.AddComponent<DecalProjector>();
-            var texture = AssetCache.TryGetTexture(vob.Name);
+            var texture = TextureCache.TryGetTexture(vob.Name);
 
             // x/y needs to be made twice the size and transformed from cm in m.
             // z - value is close to what we see in Gothic spacer.

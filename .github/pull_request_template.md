@@ -14,6 +14,3 @@
 * [ ] Merged _main_ into this branch and tested with the latest features
 * [ ] Tested with PCVR
 * [ ] Tested with Pico / Quest
-
-## Dependencies
-* [ ] If ZenKit.dll is changed, zenkitcapi.dll and libzenkitcapi.so are also changed

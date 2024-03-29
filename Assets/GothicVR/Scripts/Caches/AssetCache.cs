@@ -4,24 +4,18 @@ using System.IO;
 using System.Linq;
 using GVR.Creator.Sounds;
 using GVR.Data;
-using GVR.Extensions;
 using GVR.Globals;
 using JetBrains.Annotations;
-using UnityEngine;
-using UnityEngine.Tilemaps;
 using ZenKit;
 using ZenKit.Daedalus;
 using Font = ZenKit.Font;
 using Mesh = ZenKit.Mesh;
-using Object = UnityEngine.Object;
-using Texture = ZenKit.Texture;
-using TextureFormat = ZenKit.TextureFormat;
 
 namespace GVR.Caches
 {
     public static class AssetCache
     {
-        private static readonly Dictionary<string, Texture2D> TextureCache = new();
+        private static readonly Dictionary<string, ITexture> TextureCache = new();
         private static readonly Dictionary<string, IMesh> MshCache = new();
         private static readonly Dictionary<string, IModelScript> MdsCache = new();
         private static readonly Dictionary<string, IModelAnimation> AnimCache = new();
@@ -37,88 +31,24 @@ namespace GVR.Caches
         private static readonly Dictionary<string, SoundData> SoundCache = new();
         private static readonly Dictionary<string, IFont> FontCache = new();
 
-        private static readonly string[] MisplacedMdmArmors =
+        public static ITexture TryGetTexture(string key)
         {
-            "Hum_GrdS_Armor",
-            "Hum_GrdM_Armor",
-            "Hum_GrdL_Armor",
-            "Hum_NovM_Armor",
-            "Hum_TplL_Armor",
-            "Hum_Body_Cooksmith",
-            "Hum_VlkL_Armor",
-            "Hum_VlkM_Armor",
-            "Hum_KdfS_Armor"
-        };
+            var preparedKey = GetPreparedKey(key);
+            if (TextureCache.TryGetValue(preparedKey, out var data))
+                return data;
 
-        [CanBeNull]
-        public static Texture2D TryGetTexture(string key)
-        {
-            string preparedKey = GetPreparedKey(key);
-            if (TextureCache.ContainsKey(preparedKey) && TextureCache[preparedKey])
-            {
-                return TextureCache[preparedKey];
-            }
-
-            Texture zkTexture;
+            ITexture newData = null;
             try
             {
-                zkTexture = new Texture(GameData.Vfs, $"{preparedKey}-C.TEX");
+                newData = new Texture(GameData.Vfs, $"{preparedKey}-C.TEX").Cache();
+                TextureCache[preparedKey] = newData;
             }
             catch (Exception)
             {
-                Debug.LogWarning($"Texture {key} couldn't be found.");
-                return null;
+                // ignored
             }
 
-            Texture2D texture;
-
-            // Workaround for Unity and DXT1 Mipmaps.
-            if (zkTexture.Format == TextureFormat.Dxt1 && zkTexture.MipmapCount == 1)
-            {
-                texture = GenerateDxt1Mipmaps(zkTexture);
-            }
-            else
-            {
-                var format = zkTexture.Format.AsUnityTextureFormat();
-                var updateMipmaps = zkTexture.MipmapCount == 1; // Let Unity generate Mipmaps if they aren't provided by Gothic texture itself.
-
-                // Use Gothic's mips if provided.
-                texture = new Texture2D(zkTexture.Width, zkTexture.Height, format, zkTexture.MipmapCount, false);
-                for (var i = 0; i < zkTexture.MipmapCount; i++)
-                {
-                    if (format == UnityEngine.TextureFormat.RGBA32)
-                        // RGBA is uncompressed format.
-                        texture.SetPixelData(zkTexture.AllMipmapsRgba[i], i);
-                    else
-                        // Raw means "compressed data provided by Gothic texture"
-                        texture.SetPixelData(zkTexture.AllMipmapsRaw[i], i);
-                }
-
-                texture.Apply(updateMipmaps, true);
-            }
-
-            texture.filterMode = FilterMode.Trilinear;
-            texture.name = key;
-            TextureCache[preparedKey] = texture;
-
-            return texture;
-        }
-
-        /// <summary>
-        /// Unity doesn't want to create mips for DXT1 textures. Recreate them as RGB24.
-        /// </summary>
-        private static Texture2D GenerateDxt1Mipmaps(Texture zkTexture)
-        {
-            var dxtTexture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, UnityEngine.TextureFormat.DXT1, false);
-            dxtTexture.SetPixelData(zkTexture.AllMipmapsRaw[0], 0);
-            dxtTexture.Apply(false);
-
-            var texture = new Texture2D((int)zkTexture.Width, (int)zkTexture.Height, UnityEngine.TextureFormat.RGB24, true);
-            texture.SetPixels(dxtTexture.GetPixels());
-            texture.Apply(true, true);
-            Object.Destroy(dxtTexture);
-
-            return texture;
+            return newData;
         }
 
         public static IModelScript TryGetMds(string key)
@@ -241,27 +171,7 @@ namespace GVR.Caches
 
             MdmCache[preparedKey] = newData;
 
-            FixArmorTriangles(preparedKey, newData);
-
             return newData;
-        }
-
-        /// <summary>
-        /// Some armor mdm's have wrong triangles. This function corrects them hard coded until we find a proper solution.
-        /// </summary>
-        private static void FixArmorTriangles(string key, IModelMesh mdm)
-        {
-            if (!MisplacedMdmArmors.Contains(key, StringComparer.OrdinalIgnoreCase))
-                return;
-
-            foreach (var mesh in mdm.Meshes)
-            {
-                for (var i = 0; i < mesh.Mesh.Positions.Count; i++)
-                {
-                    var curPos = mesh.Mesh.Positions[i];
-                    mesh.Mesh.Positions[i] = new(curPos.X + 0.5f, curPos.Y - 0.5f, curPos.Z + 13f);
-                }
-            }
         }
 
         public static IMultiResolutionMesh TryGetMrm(string key)
@@ -403,7 +313,7 @@ namespace GVR.Caches
             var preparedKey = GetPreparedKey(key);
             if (SoundCache.TryGetValue(preparedKey, out var data))
                 return data;
-            
+
             var newData = SoundCreator.GetSoundArrayFromVfs($"{preparedKey}.wav");
             SoundCache[preparedKey] = newData;
 
@@ -415,7 +325,7 @@ namespace GVR.Caches
             var preparedKey = GetPreparedKey(key);
             if (FontCache.TryGetValue(preparedKey, out var data))
                 return data;
-            
+
             var fontData = new Font(GameData.Vfs, $"{preparedKey}.fnt").Cache();
             FontCache[preparedKey] = fontData;
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using GVR.Caches;
@@ -13,6 +14,7 @@ namespace GVR.Creator.Meshes
 {
     public class NpcMeshCreator : AbstractMeshCreator
     {
+        [Obsolete("Use MeshFactory and *MeshBuilder instead.")]
         private VmGothicExternals.ExtSetVisualBodyData tempBodyData;
 
         public void CreateNpc(string npcName, string mdmName, string mdhName,
@@ -61,8 +63,8 @@ namespace GVR.Creator.Meshes
 
             var headMeshFilter = headGo.AddComponent<MeshFilter>();
             var headMeshRenderer = headGo.AddComponent<MeshRenderer>();
+            PrepareMeshFilter(headMeshFilter, morphMesh.Mesh, false, true, morphMesh.Name);
             PrepareMeshRenderer(headMeshRenderer, morphMesh.Mesh);
-            PrepareMeshFilter(headMeshFilter, morphMesh.Mesh, true, morphMesh.Name);
         }
 
         /// <summary>
@@ -144,8 +146,8 @@ namespace GVR.Creator.Meshes
             if (!weaponGo.TryGetComponent<MeshRenderer>(out var meshRenderer))
                 meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
-            PrepareMeshRenderer(meshRenderer, mrm);
             PrepareMeshFilter(meshFilter, mrm, false);
+            PrepareMeshRenderer(meshRenderer, mrm);
         }
 
         private void EquipRangeWeapon(GameObject npcGo, ItemInstance itemData)
@@ -170,8 +172,8 @@ namespace GVR.Creator.Meshes
             var meshFilter = weaponGo.AddComponent<MeshFilter>();
             var meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
+            PrepareMeshFilter(meshFilter, mms.Mesh, false, true);
             PrepareMeshRenderer(meshRenderer, mms.Mesh);
-            PrepareMeshFilter(meshFilter, mms.Mesh, true);
         }
     }
 }

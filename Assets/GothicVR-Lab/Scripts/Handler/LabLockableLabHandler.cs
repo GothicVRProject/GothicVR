@@ -1,6 +1,7 @@
 using GVR.Caches;
 using GVR.Creator;
 using GVR.Creator.Meshes;
+using GVR.Creator.Meshes.V2;
 using UnityEngine;
 
 namespace GVR.Lab.Handler
@@ -16,13 +17,13 @@ namespace GVR.Lab.Handler
             var mdh = AssetCache.TryGetMdh(chestName);
             var mdm = AssetCache.TryGetMdm(chestName);
 
-            MeshCreatorFacade.CreateVob(chestName, mdm, mdh, Vector3.zero, Quaternion.identity, chestsGo);
+            MeshFactory.CreateVob(chestName, mdm, mdh, Vector3.zero, Quaternion.identity, chestsGo);
 
 
             var doorName = "DOOR_WOODEN";
             var mdlDoor = AssetCache.TryGetMdl(doorName);
 
-            MeshCreatorFacade.CreateVob(doorName, mdlDoor, Vector3.zero, Quaternion.identity, doorsGo);
+            MeshFactory.CreateVob(doorName, mdlDoor, Vector3.zero, Quaternion.identity, doorsGo);
         }
     }
 }

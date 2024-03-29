@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
@@ -13,12 +14,13 @@ using TextureFormat = UnityEngine.TextureFormat;
 
 namespace GVR.Creator.Meshes
 {
+    [Obsolete("Use MeshFactory and *MeshBuilder instead.")]
     public abstract class AbstractMeshCreator
     {
         // Decals work only on URP shaders. We therefore temporarily change everything to this
         // until we know how to change specifics to the cutout only. (e.g. bushes)
         protected const float DecalOpacity = 0.75f;
-        
+
         protected GameObject Create(string objectName, IModelMesh mdm, IModelHierarchy mdh, Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
             rootGo ??= new GameObject(objectName); // Create new object if it is a null-parameter until now.
@@ -28,7 +30,7 @@ namespace GVR.Creator.Meshes
 
             // Create empty GameObjects from hierarchy
             {
-                for (var i = 0; i < mdh.Nodes.Count ; i++)
+                for (var i = 0; i < mdh.Nodes.Count; i++)
                 {
                     var node = mdh.Nodes[i];
                     // We attached some Components to root of bones. Therefore reusing it.
@@ -88,22 +90,23 @@ namespace GVR.Creator.Meshes
                 PrepareMeshFilter(meshFilter, softSkinMesh);
 
                 meshRenderer.sharedMesh = meshFilter.mesh;
-                
+
                 CreateBonesData(rootGo, nodeObjects, meshRenderer, softSkinMesh);
             }
 
-            var attachments = GetFilteredAttachments(mdm.Attachments);
+            Dictionary<string, IMultiResolutionMesh> attachments = GetFilteredAttachments(mdm.Attachments);
 
             // Fill GameObjects with Meshes from attachments
-            foreach (var subMesh in attachments)
+            foreach (KeyValuePair<string, IMultiResolutionMesh> subMesh in attachments)
             {
-                var meshObj = nodeObjects.First(bone => bone.name == subMesh.Key);
-                var meshFilter = meshObj.AddComponent<MeshFilter>();
-                var meshRenderer = meshObj.AddComponent<MeshRenderer>();
+                GameObject meshObj = nodeObjects.First(bone => bone.name == subMesh.Key);
+                MeshFilter meshFilter = meshObj.AddComponent<MeshFilter>();
+                MeshRenderer meshRenderer = meshObj.AddComponent<MeshRenderer>();
+                meshRenderer.material = Constants.LoadingMaterial;
 
-                PrepareMeshRenderer(meshRenderer, subMesh.Value);
-                PrepareMeshFilter(meshFilter, subMesh.Value, false);
-                PrepareMeshCollider(meshObj, meshFilter.mesh, subMesh.Value.Materials);
+                List<TextureCache.TextureArrayTypes> textureFormatsInMesh = PrepareMeshFilter(meshFilter, subMesh.Value, true, false);
+                PrepareMeshCollider(meshObj, meshFilter.sharedMesh, subMesh.Value.Materials);
+                TextureCache.VobMeshRenderersForTextureArray.Add((meshRenderer, (subMesh.Value, textureFormatsInMesh)));
             }
 
             SetPosAndRot(rootGo, position, rotation);
@@ -131,25 +134,29 @@ namespace GVR.Creator.Meshes
                 Debug.LogError("No mesh data was found for: " + objectName);
                 return null;
             }
-            
+
             // If there is no texture for any of the meshes, just skip this item.
             // G1: Some skull decorations are without texture.
             if (mrm.Materials.All(m => m.Texture.IsEmpty()))
+            {
                 return null;
+            }
 
             rootGo ??= new GameObject();
             rootGo.name = objectName;
             rootGo.SetParent(parent);
             SetPosAndRot(rootGo, position, rotation);
 
-            var meshFilter = rootGo.AddComponent<MeshFilter>();
-            var meshRenderer = rootGo.AddComponent<MeshRenderer>();
-
-            PrepareMeshRenderer(meshRenderer, mrm);
-            PrepareMeshFilter(meshFilter, mrm, false);
+            MeshFilter meshFilter = rootGo.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = rootGo.AddComponent<MeshRenderer>();
+            meshRenderer.material = Constants.LoadingMaterial;
+            List<TextureCache.TextureArrayTypes> textureArrayTypesInMesh = PrepareMeshFilter(meshFilter, mrm, true);
+            TextureCache.VobMeshRenderersForTextureArray.Add((meshRenderer, (mrm, textureArrayTypesInMesh)));
 
             if (withCollider)
-                PrepareMeshCollider(rootGo, meshFilter.mesh, mrm.Materials);
+            {
+                PrepareMeshCollider(rootGo, meshFilter.sharedMesh, mrm.Materials);
+            }
 
             return rootGo;
         }
@@ -177,16 +184,27 @@ namespace GVR.Creator.Meshes
                 return;
             }
 
-            var finalMaterials = new List<Material>(mrmData.SubMeshes.Count);
-
-            foreach (var subMesh in mrmData.SubMeshes)
+            if (rend is MeshRenderer && !rend.GetComponent<MeshFilter>().sharedMesh)
             {
-                var materialData = subMesh.Material;
+                Debug.LogError($"Null mesh on {rend.gameObject.name}");
+                return;
+            }
 
-                var texture = GetTexture(materialData.Texture);
-                if (null == texture)
+            List<Material> finalMaterials = new List<Material>(mrmData.SubMeshes.Count);
+            int submeshCount = rend is MeshRenderer ? rend.GetComponent<MeshFilter>().sharedMesh.subMeshCount : mrmData.SubMeshCount;
+
+            for (int i = 0; i < submeshCount; i++)
+            {
+                IMaterial materialData = mrmData.SubMeshes[i].Material;
+                if (materialData.Texture.IsEmpty()) // No texture to add.
                 {
+                    Debug.LogWarning("No texture was set for: " + materialData.Name);
+                    return;
+                }
 
+                UnityEngine.Texture texture = GetTexture(materialData.Texture);
+                if (!texture)
+                {
                     if (materialData.Texture.EndsWithIgnoreCase(".TGA"))
                     {
                         Debug.LogError("This is supposed to be a decal: " + materialData.Texture);
@@ -197,26 +215,17 @@ namespace GVR.Creator.Meshes
                     }
                 }
 
-                var material = GetDefaultMaterial(texture != null && texture.format == TextureFormat.RGBA32);
-
-                rend.material = material;
-
-                // No texture to add.
-                if (materialData.Texture.IsEmpty())
-                {
-                    Debug.LogWarning("No texture was set for: " + materialData.Name);
-                    return;
-                }
+                Material material = GetDefaultMaterial(texture && ((Texture2D)texture).format == TextureFormat.RGBA32);
 
                 material.mainTexture = texture;
-
+                rend.material = material;
                 finalMaterials.Add(material);
             }
 
             rend.SetMaterials(finalMaterials);
         }
 
-        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, bool isMorphMesh = false, string morphMeshName = "")
+        protected List<TextureCache.TextureArrayTypes> PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, bool useTextureArray, bool isMorphMesh = false, string morphMeshName = "")
         {
             /*
              * Ok, brace yourself:
@@ -236,7 +245,7 @@ namespace GVR.Creator.Meshes
              *  triangles = 0, 2, 3 --> (indices for position items); ATTENTION: index 3 would normally be index 2, but! we can never reuse positions. We always need to create new ones. (Reason: uvs demand the same size as vertices.)
              *  uvs = [wedge[0].texture], [wedge[2].texture], [wedge[1].texture]
              */
-            var mesh = new Mesh();
+            Mesh mesh = new Mesh();
 
             bool isMorphMeshMappingAlreadyCached = false;
             if (isMorphMesh)
@@ -257,76 +266,91 @@ namespace GVR.Creator.Meshes
             if (null == mrmData)
             {
                 Debug.LogError("No mesh data could be added to filter: " + meshFilter.transform.parent.name);
-                return;
+                return null;
             }
-            mesh.subMeshCount = mrmData.SubMeshes.Count;
 
-            var verticesAndUvSize = mrmData.SubMeshes.Sum(i => i.Triangles.Count) * 3;
-            var preparedVertices = new List<Vector3>(verticesAndUvSize);
-            var preparedUVs = new List<Vector2>(verticesAndUvSize);
-
-            // 2-dimensional arrays (as there are segregated by submeshes)
-            var preparedTriangles = new List<List<int>>(mrmData.SubMeshes.Count);
-
-            var vertices = mrmData.Positions;
+            int triangleCount = mrmData.SubMeshes.Sum(i => i.Triangles.Count);
+            int vertexCount = triangleCount * 3;
+            List<Vector3> preparedVertices = new List<Vector3>(vertexCount);
+            List<Vector4> preparedUVs = new List<Vector4>(vertexCount);
+            List<Vector3> normals = new List<Vector3>(vertexCount);
+            List<List<int>> preparedTriangles = new List<List<int>>();
+            int index = 0;
+            Dictionary<TextureCache.TextureArrayTypes, int> submeshPerTextureFormat = new Dictionary<TextureCache.TextureArrayTypes, int>();
 
             foreach (var subMesh in mrmData.SubMeshes)
             {
-                var triangles = subMesh.Triangles;
-                var wedges = subMesh.Wedges;
+                // When using the texture array, get the index of the array of the matching texture format. Build submeshes for each texture format, i.e. separating opaque and alpha cutout textures.
+                int textureArrayIndex = 0, maxMipLevel = 0;
+                Vector2 textureScale = Vector2.one;
+                TextureCache.TextureArrayTypes textureArrayType = TextureCache.TextureArrayTypes.Opaque;
+                if (useTextureArray)
+                {
+                    // FIXME - NPCs will also be created via this method above. We therefore need to filter it via hook method etc.
+                    TextureCache.GetTextureArrayIndex(TextureCache.TextureTypes.Vob, subMesh.Material, out textureArrayType, out textureArrayIndex, out textureScale, out maxMipLevel);
+                    if (!submeshPerTextureFormat.ContainsKey(textureArrayType))
+                    {
+                        submeshPerTextureFormat.Add(textureArrayType, preparedTriangles.Count);
+                        preparedTriangles.Add(new List<int>());
+                    }
+                }
+                else
+                {
+                    preparedTriangles.Add(new List<int>());
+                }
 
-                // every triangle is attached to a new vertex.
-                // Therefore new submesh triangles start referencing their vertices with an offset from previous runs.
-                var verticesIndexOffset = preparedVertices.Count;
-
-                var subMeshTriangles = new List<int>(triangles.Count * 3);
-                for (var i = 0; i < triangles.Count; i++)
+                for (int i = 0; i < subMesh.Triangles.Count; i++)
                 {
                     // One triangle is made of 3 elements for Unity. We therefore need to prepare 3 elements within one loop.
-                    var preparedIndex = i * 3 + verticesIndexOffset;
+                    MeshWedge[] wedges = new MeshWedge[] { subMesh.Wedges[subMesh.Triangles[i].Wedge2], subMesh.Wedges[subMesh.Triangles[i].Wedge1], subMesh.Wedges[subMesh.Triangles[i].Wedge0] };
 
-                    var index1 = wedges[triangles[i].Wedge2];
-                    var index2 = wedges[triangles[i].Wedge1];
-                    var index3 = wedges[triangles[i].Wedge0];
-
-                    preparedVertices.Add(vertices[index1.Index].ToUnityVector());
-                    preparedVertices.Add(vertices[index2.Index].ToUnityVector());
-                    preparedVertices.Add(vertices[index3.Index].ToUnityVector());
-
-                    // We add mapping data to later reuse for IMorphAnimation samples
-                    if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
+                    for (int w = 0; w < wedges.Length; w++)
                     {
-                        MorphMeshCache.AddVertexMappingEntry(morphMeshName, index1.Index, preparedVertices.Count - 3);
-                        MorphMeshCache.AddVertexMappingEntry(morphMeshName, index2.Index, preparedVertices.Count - 2);
-                        MorphMeshCache.AddVertexMappingEntry(morphMeshName, index3.Index, preparedVertices.Count - 1);
+                        preparedVertices.Add(mrmData.Positions[wedges[w].Index].ToUnityVector());
+                        if (useTextureArray)
+                        {
+                            preparedTriangles[submeshPerTextureFormat[textureArrayType]].Add(index++);
+                        }
+                        else
+                        {
+                            preparedTriangles[preparedTriangles.Count - 1].Add(index++);
+                        }
+                        normals.Add(wedges[w].Normal.ToUnityVector());
+                        Vector2 uv = Vector2.Scale(textureScale, wedges[w].Texture.ToUnityVector());
+                        preparedUVs.Add(new Vector4(uv.x, uv.y, textureArrayIndex, maxMipLevel));
+                        if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
+                        {
+                            MorphMeshCache.AddVertexMappingEntry(morphMeshName, wedges[w].Index, preparedVertices.Count - 1);
+                        }
                     }
-
-                    subMeshTriangles.Add(preparedIndex);
-                    subMeshTriangles.Add(preparedIndex + 1);
-                    subMeshTriangles.Add(preparedIndex + 2);
-
-                    preparedUVs.Add(index1.Texture.ToUnityVector());
-                    preparedUVs.Add(index2.Texture.ToUnityVector());
-                    preparedUVs.Add(index3.Texture.ToUnityVector());
                 }
-                preparedTriangles.Add(subMeshTriangles);
             }
 
             // Unity 1/ handles vertices on mesh level, but triangles (aka vertex-indices) on submesh level.
             // and 2/ demands vertices to be stored before triangles/uvs.
             // Therefore we prepare the full data once and assign it afterwards.
             // @see: https://answers.unity.com/questions/531968/submesh-vertices.html
+            mesh.subMeshCount = preparedTriangles.Count;
             mesh.SetVertices(preparedVertices);
             mesh.SetUVs(0, preparedUVs);
-            for (var i = 0; i < mrmData.SubMeshes.Count; i++)
+            mesh.SetNormals(normals);
+            for (int i = 0; i < preparedTriangles.Count; i++)
             {
                 mesh.SetTriangles(preparedTriangles[i], i);
             }
 
             if (isMorphMesh && !isMorphMeshMappingAlreadyCached)
+            {
                 MorphMeshCache.SetUnityVerticesForVertexMapping(morphMeshName, preparedVertices.ToArray());
-        }
+            }
 
+            if (useTextureArray)
+            {
+                return submeshPerTextureFormat.Keys.ToList();
+            }
+
+            return null;
+        }
 
         protected void PrepareMeshFilter(MeshFilter meshFilter, ISoftSkinMesh soft)
         {
@@ -445,14 +469,10 @@ namespace GVR.Creator.Meshes
         /// </summary>
         protected void PrepareMeshCollider(GameObject obj, Mesh mesh, List<IMaterial> materialDatas)
         {
-            var anythingDisableCollission = materialDatas.Any(i => i.DisableCollision);
-            var anythingWater = materialDatas.Any(i => i.Group == MaterialGroup.Water);
+            bool anythingDisableCollission = materialDatas.Any(i => i.DisableCollision);
+            bool anythingWater = materialDatas.Any(i => i.Group == MaterialGroup.Water);
 
-            if (anythingDisableCollission || anythingWater)
-            {
-                // Do not add colliders
-            }
-            else
+            if (!anythingDisableCollission && !anythingWater)
             {
                 PrepareMeshCollider(obj, mesh);
             }
@@ -482,59 +502,20 @@ namespace GVR.Creator.Meshes
 
         protected virtual Texture2D GetTexture(string name)
         {
-            return AssetCache.TryGetTexture(name);
+            return TextureCache.TryGetTexture(name);
         }
 
-        protected Material GetDefaultMaterial(bool isAlphaTest)
+        protected virtual Material GetDefaultMaterial(bool isAlphaTest)
         {
-            var shader = isAlphaTest ? Constants.ShaderUnlitAlphaToCoverage : Constants.ShaderUnlit;
-            var material = new Material(shader);
+            return new Material(Constants.ShaderSingleMeshLit);
+        }
 
-            if (isAlphaTest)
-            {
-                // Manually correct the render queue for alpha test, as Unity doesn't want to do it from the shader's render queue tag.
-                material.renderQueue = (int)RenderQueue.AlphaTest;
-            }
-
+        protected Material GetWaterMaterial()
+        {
+            Material material = new Material(Constants.ShaderWater);
+            // Manually correct the render queue for alpha test, as Unity doesn't want to do it from the shader's render queue tag.
+            material.renderQueue = (int)RenderQueue.Transparent;
             return material;
-        }
-
-        protected Material GetWaterMaterial(IMaterial materialData)
-        {
-            var shader = Constants.ShaderWater;
-            var material = new Material(shader);
-
-            // FIXME - Running water speed and direction is hardcoded based on material names
-            // Needs to be improved by a better shader and the implementation of proper water material parameters
-
-            //JaXt0r's suggestion for a not so hardcoded running water implementation
-            //material.SetFloat("_ScrollSpeed", -900000 * materialData.animMapDir.ToUnityVector().SqrMagnitude());
-
-            switch (materialData.Name)
-            {
-                case "OWODSEA2SWAMP": material.SetFloat("_ScrollSpeed", 0f); break;
-                case "NCWASSER": material.SetFloat("_ScrollSpeed", 0f); break;
-                case "OWODWATSTOP": material.SetFloat("_ScrollSpeed", (materialData.TextureAnimationFps / 75f)); break;
-                case "OWODWFALL": material.SetFloat("_ScrollSpeed", -(materialData.TextureAnimationFps / 10f)); break;
-                default: material.SetFloat("_ScrollSpeed", -(materialData.TextureAnimationFps / 75f)); break;
-            }
-
-            material.SetFloat("_Surface", 0);
-            material.SetInt("_ZWrite", 0);
-            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-
-            return material;
-        }
-
-        protected static bool IsTransparentShader(Shader shader)
-        {
-            if (shader == null)
-            {
-                return false;
-            }
-
-            return shader == Constants.ShaderUnlitAlphaToCoverage || shader == Constants.ShaderWater;
         }
     }
 }

@@ -1,5 +1,6 @@
 using GVR.Caches;
 using GVR.Creator;
+using GVR.Creator.Meshes.V2;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Util;
@@ -45,7 +46,7 @@ namespace GVR.GothicVR.Scripts.Manager
         public void CreateBarrier()
         {
             var barrierMesh = AssetCache.TryGetMsh("MAGICFRONTIER_OUT.MSH");
-            barrier = MeshCreatorFacade.CreateBarrier("Barrier", barrierMesh)
+            barrier = MeshFactory.CreateBarrier("Barrier", barrierMesh)
                 .GetAllDirectChildren()[0];
 
             if (!FeatureFlags.I.enableSounds)
@@ -182,7 +183,7 @@ namespace GVR.GothicVR.Scripts.Manager
             thunderStrip.transform.SetParent(barrier.transform);
             thunderStrip.transform.localPosition = new Vector3(-50, 400, -56);
             thunderStrip.transform.localRotation = Quaternion.identity * Quaternion.Euler(0, i * 90, -90);
-            MeshCreatorFacade.CreatePolyStrip(thunderStrip, 11, Vector3.zero, new(0, 320, 100));
+            MeshFactory.CreatePolyStrip(thunderStrip, 11, Vector3.zero, new(0, 320, 100));
         }
     }
 }
