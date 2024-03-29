@@ -143,15 +143,8 @@ namespace GVR.Creator.Meshes.V2.Builder
 #endregion
 
 
-        protected GameObject BuildViaMrm()
+        protected void BuildViaMrm()
         {
-            // If there is no texture for any of the meshes, just skip this item.
-            // G1: Some skull decorations are without texture.
-            if (Mrm.Materials.All(m => m.Texture.IsEmpty()))
-            {
-                return null;
-            }
-
             MeshFilter meshFilter = RootGo.AddComponent<MeshFilter>();
             MeshRenderer meshRenderer = RootGo.AddComponent<MeshRenderer>();
             meshRenderer.material = Constants.LoadingMaterial;
@@ -170,11 +163,9 @@ namespace GVR.Creator.Meshes.V2.Builder
             }
 
             SetPosAndRot(RootGo, RootPosition, RootRotation);
-
-            return RootGo;
         }
 
-        protected GameObject BuildViaMdmAndMdh()
+        protected void BuildViaMdmAndMdh()
         {
             var nodeObjects = new GameObject[Mdh.Nodes.Count];
 
@@ -264,8 +255,6 @@ namespace GVR.Creator.Meshes.V2.Builder
             // We need to reset the rootBones position to zero. Otherwise Vobs won't be placed right.
             // Due to Unity's parent-child transformation magic, we need to do it at the end. ╰(*°▽°*)╯
             nodeObjects[0].transform.localPosition = Vector3.zero;
-
-            return RootGo;
         }
 
         protected void PrepareMeshRenderer(Renderer rend, IMultiResolutionMesh mrmData)

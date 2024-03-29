@@ -16,10 +16,7 @@ namespace GVR.Creator.Meshes.V2.Builder
             }
             else if (Mdm != null && Mdh != null)
             {
-                if (HasMdmTextures())
-                {
-                    BuildViaMdmAndMdh();
-                }
+                BuildViaMdmAndMdh();
             }
             else
             {
@@ -56,19 +53,6 @@ namespace GVR.Creator.Meshes.V2.Builder
                 var coll = child.AddComponent<SphereCollider>();
                 coll.isTrigger = true;
             }
-        }
-
-        /// <summary>
-        /// Check if there are completely empty elements without any texture.
-        /// G1: e.g. Harp, Flute, and WASH_SLOT (usage moved to a FreePoint within daedalus functions)
-        /// </summary>
-        private bool HasMdmTextures()
-        {
-            var noMeshTextures = Mdm.Meshes.All(mesh => mesh.Mesh.SubMeshes.All(subMesh => subMesh.Material.Texture.IsEmpty()));
-            var noAttachmentTextures = Mdm.Attachments.All(att => att.Value.Materials.All(mat => mat.Texture.IsEmpty()));
-
-            return !noMeshTextures || !noAttachmentTextures;
-
         }
     }
 }

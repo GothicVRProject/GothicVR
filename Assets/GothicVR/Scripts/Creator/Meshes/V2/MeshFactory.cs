@@ -68,6 +68,11 @@ namespace GVR.Creator.Meshes.V2
             Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null,
             bool useTextureArray = true)
         {
+            if (!HasTextures(mrm))
+            {
+                return null;
+            }
+            
             var vobBuilder = new VobMeshBuilder();
             vobBuilder.SetRootPosAndRot(position, rotation);
             vobBuilder.SetGameObject(rootGo, objectName);
@@ -120,6 +125,13 @@ namespace GVR.Creator.Meshes.V2
             return vobBuilder.Build();
         }
 
+        private static bool HasTextures(IMultiResolutionMesh mrm)
+        {
+            // If there is no texture for any of the meshes, just skip this item.
+            // G1: Some skull decorations (OC_DECORATE_V4.3DS) are without texture.
+            return !mrm.Materials.All(m => m.Texture.IsEmpty());
+        }
+        
         private static bool HasMeshes(IModelMesh mdm)
         {
             // Check if there are completely empty elements without any texture.

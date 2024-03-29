@@ -18,7 +18,9 @@ namespace GVR.Creator.Meshes.V2.Builder
 
         public override GameObject Build()
         {
-            return BuildViaMdmAndMdh();
+            BuildViaMdmAndMdh();
+
+            return RootGo;
         }
 
         /// <summary>
