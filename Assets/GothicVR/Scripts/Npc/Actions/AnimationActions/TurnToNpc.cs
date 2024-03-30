@@ -23,6 +23,13 @@ namespace GVR.Npc.Actions.AnimationActions
             return (destinationTransform.position - NpcGo.transform.position).normalized;
         }
 
+        public override void Tick(Transform transform)
+        {
+            // As we turn to a movable NPC, we need to recalculate the finalDirection dynamically with each tick.
+            finalDirection = GetRotationDirection();
+            
+            base.Tick(transform);
+        }
 
         public override void AnimationEndEventCallback()
         {

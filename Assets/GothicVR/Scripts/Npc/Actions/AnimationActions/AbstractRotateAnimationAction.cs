@@ -9,7 +9,7 @@ namespace GVR.Npc.Actions.AnimationActions
     {
         private const float RotationSpeed = 5f;
 
-        private Vector3 finalDirection;
+        protected Vector3 finalDirection;
         private bool isRotateLeft;
 
         protected AbstractRotateAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)

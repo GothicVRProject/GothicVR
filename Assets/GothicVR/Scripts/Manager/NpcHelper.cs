@@ -162,7 +162,7 @@ namespace GVR.Manager
                 .Where(i => specificNpcIndex < 0 || specificNpcIndex == i.npcInstance.Index) // Specific NPC is found right now?
                 .Where(i => aiState < 0 || npc.state == i.state)
                 .OrderBy(i => Vector3.Distance(i.transform.position, npcPos)) // get nearest
-                .First();
+                .FirstOrDefault();
 
             // FIXME - Add Hero check
             if (detectPlayer)
