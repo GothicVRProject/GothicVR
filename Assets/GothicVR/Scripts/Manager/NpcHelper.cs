@@ -145,33 +145,40 @@ namespace GVR.Manager
             return freePoint.Name.ContainsIgnoreCase(vobNamePart);
         }
 
-        public static bool ExtWldDetectNpcEx(NpcInstance npc, int npcInstanceIndex, int aiState, int guild,
-            bool ignorePlayer)
+        /// <summary>
+        /// As WldDetectNpc and WldDetectNpc seem to be the same logic except one parameter,
+        /// we implement both in this function.
+        /// </summary>
+        public static bool ExtWldDetectNpcEx(NpcInstance npcInstance, int specificNpcIndex, int aiState, int guild,
+            bool detectPlayer)
         {
-            var npcGo = GetNpc(npc);
-            var npcPos = npcGo.transform.position;
-
-            // FIXME - currently hard coded with 20m, but needs to be imported from ZenKit: daedalus_classes.h::c_npc::senses and senses_range
-            float sensesRange = npc.SensesRange / 100f; // cm -> m
-            float distance = sensesRange * sensesRange; // 20m
-
+            var npc = GetProperties(npcInstance);
+            var npcPos = npc.transform.position;
+            
             // FIXME - Add Guild check
-            // FIXME - Add Hero check
-            // FIXME - Add AiState check
-            // FIXME - Add NpcCinstance check (only look for specific NPC)
-
             var foundNpc = LookupCache.NpcCache.Values
                 .Where(i => i.go != null) // ignore empty (safe check)
-                .Where(i => i.npcInstance.Index != npcInstanceIndex) // ignore self
-                .Where(i => Vector3.Distance(i.go.transform.position, npcPos) <= distance) // only in range
-                .OrderBy(i => Vector3.Distance(i.go.transform.position, npcPos)) // get nearest
-                .FirstOrDefault();
+                .Where(i => i.npcInstance.Index != npcInstance.Index) // ignore self
+                .Where(i => specificNpcIndex < 0 || specificNpcIndex == i.npcInstance.Index) // Specific NPC is found right now?
+                .Where(i => aiState < 0 || npc.state == i.state)
+                .OrderBy(i => Vector3.Distance(i.transform.position, npcPos)) // get nearest
+                .First();
 
-            if (!ignorePlayer)
+            // FIXME - Add Hero check
+            if (detectPlayer)
             {
-                Debug.LogError("We currently don't handle hero check on ExtWldDetectNpcEx(). Please implement once needed.");
+                // FIXME - Currently our hero has no aistate. Is it needed or ignore him when checked here?
+                // var npcDistance = Vector3.Distance(npcPos, foundNpc.transform.position);
+                // var heroDistance = Vector3.Distance(npcPos, Camera.main!.transform.position);
             }
-            
+
+            // We need to set it, as there are calls where we immediately need _other_. e.g.:
+            // if (Wld_DetectNpc(self, ...) && (Npc_GetDistToNpc(self, other)<HAI_DIST_SMALLTALK)
+            if (foundNpc != null)
+            {
+                GameData.GothicVm.GlobalOther = foundNpc.npcInstance;
+            }
+
             return foundNpc != null;
         }
 
