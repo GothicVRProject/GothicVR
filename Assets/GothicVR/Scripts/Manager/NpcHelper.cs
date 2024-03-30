@@ -152,7 +152,7 @@ namespace GVR.Manager
             var npcPos = npcGo.transform.position;
 
             // FIXME - currently hard coded with 20m, but needs to be imported from ZenKit: daedalus_classes.h::c_npc::senses and senses_range
-            float sensesRange = npc.SensesRange / 100; // cm -> m
+            float sensesRange = npc.SensesRange / 100f; // cm -> m
             float distance = sensesRange * sensesRange; // 20m
 
             // FIXME - Add Guild check
@@ -161,17 +161,18 @@ namespace GVR.Manager
             // FIXME - Add NpcCinstance check (only look for specific NPC)
 
             var foundNpc = LookupCache.NpcCache.Values
-                .Where(i => i.go != null)
-                .Where(i => npcInstanceIndex == -1 || i.npcInstance.Index == npcInstanceIndex)
-                // .Where(i => !i.IsDead)
-                // .Where(i => aiState == -1 || i.CurrentAiState == aiState)
-                // .Where(i => guild == -1 || i.GuildId == guild)
-                .Where(i => ignorePlayer)
-                .Where(i => Vector3.Distance(i.go.transform.position, npcPos) <= distance)
-                .OrderBy(i => Vector3.Distance(i.go.transform.position, npcPos))
+                .Where(i => i.go != null) // ignore empty (safe check)
+                .Where(i => i.npcInstance.Index != npcInstanceIndex) // ignore self
+                .Where(i => Vector3.Distance(i.go.transform.position, npcPos) <= distance) // only in range
+                .OrderBy(i => Vector3.Distance(i.go.transform.position, npcPos)) // get nearest
                 .FirstOrDefault();
 
-            return (foundNpc != null);
+            if (!ignorePlayer)
+            {
+                Debug.LogError("We currently don't handle hero check on ExtWldDetectNpcEx(). Please implement once needed.");
+            }
+            
+            return foundNpc != null;
         }
 
         public static int ExtNpcHasItems(NpcInstance npc, uint itemId)
