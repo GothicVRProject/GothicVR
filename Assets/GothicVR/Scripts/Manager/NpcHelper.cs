@@ -11,6 +11,7 @@ using GVR.Npc.Actions.AnimationActions;
 using GVR.Npc.Routines;
 using GVR.Properties;
 using GVR.Vm;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using ZenKit.Daedalus;
@@ -258,14 +259,15 @@ namespace GVR.Manager
             return GetProperties(npc).Talents[(VmGothicEnums.Talent)skillId];
         }
 
-        private static GameObject GetNpc(NpcInstance npc)
+        [CanBeNull]
+        private static GameObject GetNpc([CanBeNull] NpcInstance npc)
         {
-            return GetProperties(npc).go;
+            return GetProperties(npc)?.go;
         }
 
-        private static NpcProperties GetProperties(NpcInstance npc)
+        private static NpcProperties GetProperties([CanBeNull] NpcInstance npc)
         {
-            return LookupCache.NpcCache[npc.Index];
+            return npc == null ? null : LookupCache.NpcCache[npc.Index];
         }
         
         public static void ExtAiWait(NpcInstance npc, float seconds)
