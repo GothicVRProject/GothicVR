@@ -28,6 +28,8 @@ namespace GVR.Creator.Meshes.V2.Builder
 
         protected Vector3 RootPosition;
         protected Quaternion RootRotation;
+        
+        protected bool isMorphMeshMappingAlreadyCached;
 
 
         public abstract GameObject Build();
@@ -100,6 +102,11 @@ namespace GVR.Creator.Meshes.V2.Builder
         public void SetMrm(IMultiResolutionMesh mrm)
         {
             this.Mrm = mrm;
+        }
+
+        public void SetMmb(IMorphMesh mmb)
+        {
+            this.Mmb = mmb;
         }
 
         public void SetMrm(string mrmName)
@@ -268,6 +275,19 @@ namespace GVR.Creator.Meshes.V2.Builder
             return RootGo;
         }
 
+        protected GameObject BuildViaMmb()
+        {
+            var meshFilter = RootGo.AddComponent<MeshFilter>();
+            var meshRenderer = RootGo.AddComponent<MeshRenderer>();
+            
+            PrepareMeshFilter(meshFilter, Mmb.Mesh, meshRenderer);
+            PrepareMeshRenderer(meshRenderer, Mmb.Mesh);
+            
+            SetPosAndRot(RootGo, RootPosition, RootRotation);
+            
+            return RootGo;
+        }
+
         protected void PrepareMeshRenderer(Renderer rend, IMultiResolutionMesh mrmData)
         {
             if (null == mrmData)
@@ -317,7 +337,7 @@ namespace GVR.Creator.Meshes.V2.Builder
             rend.SetMaterials(finalMaterials);
         }
 
-        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, MeshRenderer meshRenderer, bool isMorphMesh = false, string morphMeshName = "")
+        protected void PrepareMeshFilter(MeshFilter meshFilter, IMultiResolutionMesh mrmData, MeshRenderer meshRenderer)
         {
             Mesh mesh = new Mesh();
             meshFilter.mesh = mesh;
@@ -558,19 +578,44 @@ namespace GVR.Creator.Meshes.V2.Builder
             }
         }
 
-        protected virtual void CreateMorphMeshBegin(IMultiResolutionMesh mrm, Mesh mesh)
+        private void CreateMorphMeshBegin(IMultiResolutionMesh mrm, Mesh mesh)
         {
-            // NOP
+            if (Mmb == null)
+            {
+                return;
+            }
+            
+            // MorphMeshes will change the vertices. This call optimizes performance.
+            mesh.MarkDynamic();
+
+            isMorphMeshMappingAlreadyCached = MorphMeshCache.IsMappingAlreadyCached(Mmb.Name);
+            if (isMorphMeshMappingAlreadyCached)
+            {
+                return;
+            }
+
+            MorphMeshCache.AddVertexMapping(Mmb.Name, mrm.PositionCount);
         }
 
-        protected virtual void CreateMorphMeshEntry(int index1, int preparedVerticesCount)
+        private void CreateMorphMeshEntry(int index1, int preparedVerticesCount)
         {
-            // NOP
+            // We add mapping data to later reuse for IMorphAnimation samples
+            if (Mmb == null || isMorphMeshMappingAlreadyCached)
+            {
+                return;
+            }
+
+            MorphMeshCache.AddVertexMappingEntry(Mmb.Name, index1, preparedVerticesCount - 1);
         }
 
-        protected virtual void CreateMorphMeshEnd(List<Vector3> preparedVertices)
+        private void CreateMorphMeshEnd(List<Vector3> preparedVertices)
         {
-            // NOP
+            if (Mmb == null || isMorphMeshMappingAlreadyCached)
+            {
+                return;
+            }
+
+            MorphMeshCache.SetUnityVerticesForVertexMapping(Mmb.Name, preparedVertices.ToArray());
         }
 
         /// <summary>
