@@ -9,7 +9,7 @@ namespace GVR.Npc.Actions.AnimationActions
     {
         private const float RotationSpeed = 5f;
 
-        private Vector3 finalDirection;
+        private Quaternion finalDirection;
         private bool isRotateLeft;
 
         protected AbstractRotateAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
@@ -18,7 +18,7 @@ namespace GVR.Npc.Actions.AnimationActions
         /// <summary>
         /// We need to define the final direction within overriding class.
         /// </summary>
-        protected abstract Vector3 GetRotationDirection();
+        protected abstract Quaternion GetRotationDirection();
 
         public override void Start()
         {
@@ -32,7 +32,7 @@ namespace GVR.Npc.Actions.AnimationActions
             }
 
             // https://discussions.unity.com/t/determining-whether-to-rotate-left-or-right/44021
-            var cross = Vector3.Cross(NpcGo.transform.forward, finalDirection);
+            var cross = Vector3.Cross(NpcGo.transform.forward, finalDirection.eulerAngles);
             isRotateLeft = (cross.y >= 0);
 
             AnimationCreator.PlayAnimation(Props.mdsNames, GetRotateModeAnimationString(), NpcGo, true);
@@ -63,17 +63,17 @@ namespace GVR.Npc.Actions.AnimationActions
         /// </summary>
         private void HandleRotation(Transform npcTransform)
         {
-            // We use y-axis only.
-            if (isRotateLeft)
-                npcTransform.eulerAngles -= new Vector3(0, finalDirection.y * Time.deltaTime * RotationSpeed, 0);
-            else
-                npcTransform.eulerAngles += new Vector3(0, finalDirection.y * Time.deltaTime * RotationSpeed, 0);
-
+            var currentRotation = Quaternion.Slerp(npcTransform.rotation, finalDirection, Time.deltaTime * RotationSpeed);
+            
             // Check if rotation is done.
-            if (Math.Abs(npcTransform.eulerAngles.y - finalDirection.y) < 1f)
+            if (Quaternion.Angle(npcTransform.rotation, currentRotation) < 1f)
             {
                 AnimationCreator.StopAnimation(NpcGo);
                 IsFinishedFlag = true;
+            }
+            else
+            {
+                npcTransform.rotation = currentRotation;
             }
         }
 

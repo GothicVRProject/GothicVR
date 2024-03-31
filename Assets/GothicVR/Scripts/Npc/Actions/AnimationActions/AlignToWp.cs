@@ -8,16 +8,17 @@ namespace GVR.Npc.Actions.AnimationActions
         public AlignToWp(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
-        protected override Vector3 GetRotationDirection()
+        protected override Quaternion GetRotationDirection()
         {
             try
             {
-                return Props.CurrentWayPoint.Direction;
+                var euler = Props.CurrentWayPoint.Direction;
+                return Quaternion.Euler(euler);
             }
             catch (Exception e)
             {
                 Debug.LogError(e);
-                return Vector3.zero;
+                return Quaternion.identity;;
             }
         }
     }

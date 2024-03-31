@@ -5,7 +5,6 @@ namespace GVR.Npc.Actions.AnimationActions
 {
     public class LookAtNpc : AbstractRotateAnimationAction
     {
-        private Transform destinationTransform;
         private int otherId => Action.Int0;
         private int otherIndex => Action.Int1;
 
@@ -13,16 +12,14 @@ namespace GVR.Npc.Actions.AnimationActions
         {
         }
 
-        public override void Start()
+        protected override Quaternion GetRotationDirection()
         {
-            destinationTransform = LookupCache.NpcCache[otherIndex].transform;
+            // FIXME - implement!
+            return default;
+            // var destinationTransform = LookupCache.NpcCache[otherIndex].transform;
+            // var temp = destinationTransform.position - NpcGo.transform.position;
+            // return new Vector3(0, temp.y, 0);
         }
-
-        protected override Vector3 GetRotationDirection()
-        {
-            return (destinationTransform.position - NpcGo.transform.position).normalized;
-        }
-
 
         public override void AnimationEndEventCallback()
         {

@@ -11,9 +11,10 @@ namespace GVR.Npc.Actions.AnimationActions
         public LookAt(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
-        protected override Vector3 GetRotationDirection()
+        protected override Quaternion GetRotationDirection()
         {
-            return WayNetHelper.GetWayNetPoint(waypointName).Direction;
+            var euler = WayNetHelper.GetWayNetPoint(waypointName).Direction;
+            return Quaternion.Euler(euler);
         }
     }
 }

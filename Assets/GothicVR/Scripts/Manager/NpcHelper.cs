@@ -157,6 +157,7 @@ namespace GVR.Manager
             var npcPos = npc.transform.position;
             
             // FIXME - Add Guild check
+            // FIXME - add range check based on perceiveAll's range (npc.sense_range)
             var foundNpc = LookupCache.NpcCache.Values
                 .Where(i => i.go != null) // ignore empty (safe check)
                 .Where(i => i.npcInstance.Index != npcInstance.Index) // ignore self
