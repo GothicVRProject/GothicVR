@@ -14,17 +14,20 @@ namespace GVR.Npc.Actions.AnimationActions
     {
         private float audioPlaySeconds;
 
+        private int speakerId => Action.Int0;
+        protected virtual string outputName => Action.String0;
+        
         public Output(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
         public override void Start()
         {
-            var soundData = AssetCache.TryGetSound(Action.String0);
+            var soundData = AssetCache.TryGetSound(outputName);
             var audioClip = SoundCreator.ToAudioClip(soundData);
             audioPlaySeconds = audioClip.length;
 
             // Hero
-            if (Action.Int0 == 0)
+            if (speakerId == 0)
             {
                 // If NPC talked before, we stop it immediately (As some audio samples are shorter than the actual animation)
                 AnimationCreator.StopAnimation(NpcGo);
@@ -38,7 +41,6 @@ namespace GVR.Npc.Actions.AnimationActions
                 var gestureCount = GetDialogGestureCount();
                 var randomId = Random.Range(1, gestureCount+1);
 
-                // FIXME - We need to handle both mds and mdh options! (base vs overlay)
                 AnimationCreator.PlayAnimation(Props.mdsNames, $"T_DIALOGGESTURE_{randomId:00}", NpcGo);
                 AnimationCreator.PlayHeadMorphAnimation(Props, HeadMorph.HeadMorphType.Viseme);
 

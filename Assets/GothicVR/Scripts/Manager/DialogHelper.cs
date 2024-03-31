@@ -78,6 +78,21 @@ namespace GVR.GothicVR.Scripts.Manager
                 new(AnimationAction.Type.AIOutput, int0: speakerId, string0: outputName),
                 npcProps.go));
         }
+        
+        /// <summary>
+        /// SVM (Standard Voice Module) dialogs are only for NPCs between each other. Not related to Hero dialogs.
+        /// </summary>
+        public static void ExtAiOutputSvm(NpcInstance npc, NpcInstance target, string svmName)
+        {
+            var props = GetProperties(npc);
+            
+            if (target != null)
+                Debug.LogError($"Ai_OutputSvm() - Handling with target not yet implemented!");
+
+            props.AnimationQueue.Enqueue(new OutputSvm(
+                new(AnimationAction.Type.AITurnToNpc, int0: props.npcInstance.Id, string0: svmName),
+                props.go));
+        }
 
         /// <summary>
         /// We update the Unity cached/created elements only.
