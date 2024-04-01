@@ -287,7 +287,7 @@ namespace GVR.Creator
 
             if (!vobTreeCache.TryGetValue(vob.VobTree.ToLower(), out IWorld vobTree))
             {
-                vobTree = new ZenKit.World(GameData.Vfs, vob.VobTree).Cache();
+                vobTree = new ZenKit.World(GameData.Vfs, vob.VobTree, GameVersion.Gothic1);
                 vobTreeCache.Add(vob.VobTree.ToLower(), vobTree);
             }
             
