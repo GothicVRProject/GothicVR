@@ -38,6 +38,7 @@ namespace GVR.Creator.Meshes.V2
             var npcHeadBuilder = new NpcHeadMeshBuilder();
             npcHeadBuilder.SetGameObject(npcGo);
             npcHeadBuilder.SetBodyData(bodyData);
+            npcHeadBuilder.SetMmb(bodyData.Head);
 
             // returns body+head
             return npcHeadBuilder.Build();
@@ -101,6 +102,19 @@ namespace GVR.Creator.Meshes.V2
             vobBuilder.SetGameObject(rootGo, objectName);
             vobBuilder.SetParent(parent, resetRotation: true); // If we don't reset these, all objects will be rotated wrong!
             vobBuilder.SetMdl(mdl);
+            vobBuilder.SetUseTextureArray(true);
+
+            return vobBuilder.Build();
+        }
+        
+        public static GameObject CreateVob(string objectName, IMorphMesh mmb, Vector3 position, Quaternion rotation,
+            GameObject parent = null, GameObject rootGo = null)
+        {
+            var vobBuilder = new VobMeshBuilder();
+            vobBuilder.SetRootPosAndRot(position, rotation);
+            vobBuilder.SetGameObject(rootGo, objectName);
+            vobBuilder.SetParent(parent);
+            vobBuilder.SetMmb(mmb);
             vobBuilder.SetUseTextureArray(true);
 
             return vobBuilder.Build();

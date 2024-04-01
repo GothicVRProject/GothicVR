@@ -18,6 +18,10 @@ namespace GVR.Creator.Meshes.V2.Builder
             {
                 BuildViaMdmAndMdh();
             }
+            else if (Mmb != null)
+            {
+                BuildViaMmb();
+            }
             else
             {
                 Debug.LogError($"No suitable data for Vob to be created found >{RootGo.name}<");

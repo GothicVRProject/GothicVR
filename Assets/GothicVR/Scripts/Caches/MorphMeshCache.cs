@@ -24,7 +24,7 @@ namespace GVR.Caches
         ///                       | Array index is former vertexId
         ///                             | Data is new vertexIds from Unity mesh
         /// </summary>
-        private static readonly Dictionary<string, List<List<int>>> HeadVertexMapping = new();
+        private static readonly Dictionary<string, List<List<int>>> VertexMapping = new();
 
         /// <summary>
         /// We also store the vertices migrated from ZenKit to Unity. They basically differentiate by:
@@ -39,36 +39,40 @@ namespace GVR.Caches
         /// [0] - is frame ID of the Morph Animation
         /// {{x,y,z}, {x,y,z}} - are the morph values of every vertex
         /// </summary>
-        private static readonly Dictionary<string, List<Vector3[]>> HeadAnimationMorphs = new();
+        private static readonly Dictionary<string, List<Vector3[]>> AnimationMorphs = new();
 
 
         public static bool IsMappingAlreadyCached(string morphMeshName)
         {
             var preparedKey = GetPreparedKey(morphMeshName);
 
-            return HeadVertexMapping.ContainsKey(preparedKey);
+            return VertexMapping.ContainsKey(preparedKey);
         }
 
         public static void AddVertexMapping(string morphMeshName, int arraySize)
         {
             var preparedKey = GetPreparedKey(morphMeshName);
 
-            HeadVertexMapping.Add(preparedKey, new(arraySize));
+            VertexMapping.Add(preparedKey, new(arraySize));
 
             // Initialize
             Enumerable.Range(0, arraySize)
                 .ToList()
-                .ForEach(_ => HeadVertexMapping[preparedKey].Add(new List<int>()));
+                .ForEach(_ => VertexMapping[preparedKey].Add(new List<int>()));
         }
 
         public static void AddVertexMappingEntry(string preparedMorphMeshName, int originalVertexIndex, int additionalUnityVertexIndex)
         {
-            HeadVertexMapping[preparedMorphMeshName][originalVertexIndex].Add(additionalUnityVertexIndex);
+            var preparedKey = GetPreparedKey(preparedMorphMeshName);
+
+            VertexMapping[preparedKey][originalVertexIndex].Add(additionalUnityVertexIndex);
         }
 
         public static void SetUnityVerticesForVertexMapping(string preparedMorphMeshName, Vector3[] unityVertices)
         {
-            UnityVertices.Add(preparedMorphMeshName, unityVertices);
+            var preparedKey = GetPreparedKey(preparedMorphMeshName);
+
+            UnityVertices.Add(preparedKey, unityVertices);
         }
 
         public static Vector3[] GetOriginalUnityVertices(string morphMeshName)
@@ -85,20 +89,20 @@ namespace GVR.Caches
         /// | Key is frameId
         ///        | Data is the already processed morph data (morph addition to original triangle data)
         /// </summary>
-        public static List<Vector3[]> TryGetHeadMorphData(string mmbName, string animationName)
+        public static List<Vector3[]> TryGetMorphData(string mmbName, string animationName)
         {
             var preparedMmbKey = GetPreparedKey(mmbName);
             var preparedAnimKey = GetPreparedKey(animationName);
             var preparedKey = $"{preparedMmbKey}-{preparedAnimKey}";
 
-            if (HeadAnimationMorphs.TryGetValue(preparedKey, out var data))
+            if (AnimationMorphs.TryGetValue(preparedKey, out var data))
                 return data;
 
             // Create logic
             var mmb = AssetCache.TryGetMmb(mmbName);
             var anim = mmb.Animations.First(anim => anim.Name.EqualsIgnoreCase(animationName));
 
-            var originalVertexMapping = HeadVertexMapping[preparedMmbKey];
+            var originalVertexMapping = VertexMapping[preparedMmbKey];
             var originalUnityVertexData = UnityVertices[preparedMmbKey];
             // Original vertex count from ZenKit data.
             var vertexCount = anim.Vertices.Count;
@@ -124,7 +128,7 @@ namespace GVR.Caches
                 }
             }
 
-            HeadAnimationMorphs[preparedKey] = newData;
+            AnimationMorphs[preparedKey] = newData;
 
             return newData;
         }
@@ -142,9 +146,9 @@ namespace GVR.Caches
 
         public static void Dispose()
         {
-            HeadVertexMapping.Clear();
+            VertexMapping.Clear();
             UnityVertices.Clear();
-            HeadAnimationMorphs.Clear();
+            AnimationMorphs.Clear();
         }
     }
 }
