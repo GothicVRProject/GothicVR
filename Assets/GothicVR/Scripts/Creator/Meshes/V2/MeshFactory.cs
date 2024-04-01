@@ -69,10 +69,15 @@ namespace GVR.Creator.Meshes.V2
             Quaternion rotation, bool withCollider, GameObject parent = null, GameObject rootGo = null,
             bool useTextureArray = true)
         {
+            if (!HasTextures(mrm))
+            {
+                return null;
+            }
+            
             var vobBuilder = new VobMeshBuilder();
             vobBuilder.SetRootPosAndRot(position, rotation);
             vobBuilder.SetGameObject(rootGo, objectName);
-            vobBuilder.SetParent(parent);
+            vobBuilder.SetParent(parent, resetRotation: true);
             vobBuilder.SetMrm(mrm);
             vobBuilder.SetUseTextureArray(useTextureArray);
 
@@ -87,6 +92,11 @@ namespace GVR.Creator.Meshes.V2
         public static GameObject CreateVob(string objectName, IModel mdl, Vector3 position, Quaternion rotation,
             GameObject parent = null, GameObject rootGo = null)
         {
+            if (!HasMeshes(mdl.Mesh))
+            {
+                return null;
+            }
+            
             var vobBuilder = new VobMeshBuilder();
             vobBuilder.SetRootPosAndRot(position, rotation);
             vobBuilder.SetGameObject(rootGo, objectName);
@@ -113,12 +123,7 @@ namespace GVR.Creator.Meshes.V2
         public static GameObject CreateVob(string objectName, IModelMesh mdm, IModelHierarchy mdh,
             Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
         {
-            // Check if there are completely empty elements without any texture.
-            // G1: e.g. Harp, Flute, and WASH_SLOT (usage moved to a FreePoint within daedalus functions)
-            var noMeshTextures = mdm.Meshes.All(mesh => mesh.Mesh.SubMeshes.All(subMesh => subMesh.Material.Texture.IsEmpty()));
-            var noAttachmentTextures = mdm.Attachments.All(att => att.Value.Materials.All(mat => mat.Texture.IsEmpty()));
-
-            if (noMeshTextures && noAttachmentTextures)
+            if (!HasMeshes(mdm))
             {
                 return null;
             }
@@ -126,12 +131,29 @@ namespace GVR.Creator.Meshes.V2
             var vobBuilder = new VobMeshBuilder();
             vobBuilder.SetRootPosAndRot(position, rotation);
             vobBuilder.SetGameObject(rootGo, objectName);
-            vobBuilder.SetParent(parent);
+            vobBuilder.SetParent(parent, resetRotation: true);
             vobBuilder.SetMdh(mdh);
             vobBuilder.SetMdm(mdm);
             vobBuilder.SetUseTextureArray(true);
 
             return vobBuilder.Build();
+        }
+
+        private static bool HasTextures(IMultiResolutionMesh mrm)
+        {
+            // If there is no texture for any of the meshes, just skip this item.
+            // G1: Some skull decorations (OC_DECORATE_V4.3DS) are without texture.
+            return !mrm.Materials.All(m => m.Texture.IsEmpty());
+        }
+        
+        private static bool HasMeshes(IModelMesh mdm)
+        {
+            // Check if there are completely empty elements without any texture.
+            // G1: e.g. Harp, Flute, and WASH_SLOT (usage moved to a FreePoint within daedalus functions)
+            var noMeshTextures = mdm.Meshes.All(mesh => mesh.Mesh.SubMeshes.All(subMesh => subMesh.Material.Texture.IsEmpty()));
+            var noAttachmentTextures = mdm.Attachments.All(att => att.Value.Materials.All(mat => mat.Texture.IsEmpty()));
+
+            return !(noMeshTextures && noAttachmentTextures);
         }
 
         public static GameObject CreateVobDecal(IVirtualObject vob, VisualDecal decal, GameObject parent)
