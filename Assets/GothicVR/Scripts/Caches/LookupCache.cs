@@ -13,6 +13,7 @@ namespace GVR.Caches
     {
         /// <summary>
         /// [symbolIndex] = Properties-Component
+        /// Hint: Do not add Hero (VrPlayer) to the list as it doesn't contains NpcProperties and other logic from NPCs!
         /// </summary>
         public static readonly Dictionary<int, NpcProperties> NpcCache = new();
 

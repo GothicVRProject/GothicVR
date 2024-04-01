@@ -542,15 +542,7 @@ namespace GVR.Manager
 
         public static GameObject GetHeroGameObject()
         {
-            var heroIndex = GameData.GothicVm.GlobalHero!.Index;
-
-            if (!LookupCache.NpcCache.TryGetValue(heroIndex, out var heroProperties))
-            {
-                LookupCache.NpcCache[heroIndex] = GameObject.FindWithTag(Constants.PlayerTag).GetComponent<NpcProperties>();
-                heroProperties = LookupCache.NpcCache[heroIndex];
-            }
-
-            return heroProperties.go;
+            return GameObject.FindWithTag(Constants.PlayerTag);
         }
     }
 }
