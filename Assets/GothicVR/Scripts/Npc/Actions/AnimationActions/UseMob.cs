@@ -93,6 +93,8 @@ namespace GVR.Npc.Actions.AnimationActions
             // AnimationCreator.StopAnimation(NpcGo);
             NpcGo.transform.SetPositionAndRotation(slotGo.transform.position, slotGo.transform.rotation);
 
+            // We need to disable physics as e.g. Gomez won't sit on his throne otherwise. (Animations are aligned with the objects they use already).
+            // A collider would break it.
             PhysicsHelper.DisablePhysicsForNpc(Props);
 
             PlayTransitionAnimation();

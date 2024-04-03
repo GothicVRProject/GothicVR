@@ -13,7 +13,6 @@ using GVR.Properties;
 using GVR.Vm;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using ZenKit.Daedalus;
 
 namespace GVR.Manager
@@ -21,6 +20,24 @@ namespace GVR.Manager
     public static class NpcHelper
     {
         private const float fpLookupDistance = 20f; // meter
+
+        static NpcHelper()
+        {
+            GvrEvents.GeneralSceneLoaded.AddListener(GeneralSceneLoaded);
+        }
+
+        private static void GeneralSceneLoaded()
+        {
+            var heroIndex = GameData.GothicVm.GlobalHero!.Index;
+            var playerGo = GameObject.FindWithTag(Constants.PlayerTag);
+            var playerProperties = playerGo.GetComponent<NpcProperties>();
+
+            // Set data for NPC.
+            playerProperties.npcInstance = (NpcInstance)GameData.GothicVm.GlobalHero;
+
+            // Cache hero for future lookups.
+            LookupCache.NpcCache[heroIndex] = playerProperties;
+        }
 
         public static bool ExtIsMobAvailable(NpcInstance npcInstance, string vobName)
         {
@@ -161,18 +178,11 @@ namespace GVR.Manager
             var foundNpc = LookupCache.NpcCache.Values
                 .Where(i => i.go != null) // ignore empty (safe check)
                 .Where(i => i.npcInstance.Index != npcInstance.Index) // ignore self
+                .Where(i => detectPlayer || i.npcInstance.Index != GameData.GothicVm.GlobalHero!.Index) // if we don't detect player, then skip it
                 .Where(i => specificNpcIndex < 0 || specificNpcIndex == i.npcInstance.Index) // Specific NPC is found right now?
                 .Where(i => aiState < 0 || npc.state == i.state)
                 .OrderBy(i => Vector3.Distance(i.transform.position, npcPos)) // get nearest
                 .FirstOrDefault();
-
-            // FIXME - Add Hero check
-            if (detectPlayer)
-            {
-                // FIXME - Currently our hero has no aistate. Is it needed or ignore him when checked here?
-                // var npcDistance = Vector3.Distance(npcPos, foundNpc.transform.position);
-                // var heroDistance = Vector3.Distance(npcPos, Camera.main!.transform.position);
-            }
 
             // We need to set it, as there are calls where we immediately need _other_. e.g.:
             // if (Wld_DetectNpc(self, ...) && (Npc_GetDistToNpc(self, other)<HAI_DIST_SMALLTALK)
@@ -542,7 +552,9 @@ namespace GVR.Manager
 
         public static GameObject GetHeroGameObject()
         {
-            return GameObject.FindWithTag(Constants.PlayerTag);
+            var heroIndex = GameData.GothicVm.GlobalHero!.Index;
+
+            return LookupCache.NpcCache[heroIndex].go;
         }
     }
 }
