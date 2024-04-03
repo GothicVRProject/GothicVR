@@ -178,9 +178,10 @@ namespace GVR.Manager
                     break;
                 case Constants.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
-                    TeleportPlayerToSpot();
 
                     GvrEvents.GeneralSceneLoaded.Invoke();
+
+                    TeleportPlayerToSpot();
                     break;
                 case Constants.SceneMainMenu:
                     var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");

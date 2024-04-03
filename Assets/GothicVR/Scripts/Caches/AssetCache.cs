@@ -25,7 +25,8 @@ namespace GVR.Caches
         private static readonly Dictionary<string, IMultiResolutionMesh> MrmCache = new();
         private static readonly Dictionary<string, IMorphMesh> MmbCache = new();
         private static readonly Dictionary<string, ItemInstance> ItemDataCache = new();
-        private static readonly Dictionary<string, MusicThemeInstance> MusiThemeCache = new();
+        private static readonly Dictionary<int, SvmInstance> SvmDataCache = new();
+        private static readonly Dictionary<string, MusicThemeInstance> MusicThemeCache = new();
         private static readonly Dictionary<string, SoundEffectInstance> SfxDataCache = new();
         private static readonly Dictionary<string, ParticleEffectInstance> PfxDataCache = new();
         private static readonly Dictionary<string, SoundData> SoundCache = new();
@@ -213,7 +214,7 @@ namespace GVR.Caches
         public static MusicThemeInstance TryGetMusic(string key)
         {
             var preparedKey = GetPreparedKey(key);
-            if (MusiThemeCache.TryGetValue(preparedKey, out var data))
+            if (MusicThemeCache.TryGetValue(preparedKey, out var data))
                 return data;
 
             MusicThemeInstance newData = null;
@@ -225,7 +226,7 @@ namespace GVR.Caches
             {
                 // ignored
             }
-            MusiThemeCache[preparedKey] = newData;
+            MusicThemeCache[preparedKey] = newData;
 
             return newData;
         }
@@ -265,6 +266,29 @@ namespace GVR.Caches
                 // ignored
             }
             ItemDataCache[preparedKey] = newData;
+
+            return newData;
+        }
+        
+        /// <summary>
+        /// Hint: Instances only need to be initialized once in ZenKit.
+        /// </summary>
+        [CanBeNull]
+        public static SvmInstance TryGetSvmData(int voiceId)
+        {
+            if (SvmDataCache.TryGetValue(voiceId, out var data))
+                return data;
+
+            SvmInstance newData = null;
+            try
+            {
+                newData = GameData.GothicVm.InitInstance<SvmInstance>($"SVM_{voiceId}");
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+            SvmDataCache[voiceId] = newData;
 
             return newData;
         }
@@ -362,7 +386,8 @@ namespace GVR.Caches
             MrmCache.Clear();
             MmbCache.Clear();
             ItemDataCache.Clear();
-            MusiThemeCache.Clear();
+            SvmDataCache.Clear();
+            MusicThemeCache.Clear();
             SfxDataCache.Clear();
             PfxDataCache.Clear();
             SoundCache.Clear();
