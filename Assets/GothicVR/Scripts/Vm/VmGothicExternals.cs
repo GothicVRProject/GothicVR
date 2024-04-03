@@ -741,14 +741,10 @@ namespace GVR.Vm
 
         public static int Wld_DetectNpcEx(NpcInstance npc, int npcInstance, int aiState, int guild, int detectPlayer)
         {
-            // Logic from Daedalus mentions, that the player will be ignored if 0. Not "detect" if 1.
-            var ignorePlayer = !Convert.ToBoolean(detectPlayer);
-
-            var res = NpcHelper.ExtWldDetectNpcEx(npc, npcInstance, aiState, guild, ignorePlayer);
+            var res = NpcHelper.ExtWldDetectNpcEx(npc, npcInstance, aiState, guild, Convert.ToBoolean(detectPlayer));
 
             return Convert.ToInt32(res);
         }
-
         
         public static int Wld_IsNextFPAvailable(NpcInstance npc, string fpNamePart)
         {

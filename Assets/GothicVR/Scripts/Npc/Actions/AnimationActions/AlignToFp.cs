@@ -7,9 +7,11 @@ namespace GVR.Npc.Actions.AnimationActions
         public AlignToFp(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         { }
 
-        protected override Vector3 GetRotationDirection()
+        protected override Quaternion GetRotationDirection()
         {
-            return Props.CurrentFreePoint.Direction;
+            var euler = Props.CurrentFreePoint.Direction;
+
+            return Quaternion.Euler(euler);
         }
     }
 }

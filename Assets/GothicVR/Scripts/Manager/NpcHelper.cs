@@ -11,6 +11,7 @@ using GVR.Npc.Actions.AnimationActions;
 using GVR.Npc.Routines;
 using GVR.Properties;
 using GVR.Vm;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using ZenKit.Daedalus;
@@ -145,33 +146,42 @@ namespace GVR.Manager
             return freePoint.Name.ContainsIgnoreCase(vobNamePart);
         }
 
-        public static bool ExtWldDetectNpcEx(NpcInstance npc, int npcInstanceIndex, int aiState, int guild,
-            bool ignorePlayer)
+        /// <summary>
+        /// As WldDetectNpc and WldDetectNpc seem to be the same logic except one parameter,
+        /// we implement both in this function.
+        /// </summary>
+        public static bool ExtWldDetectNpcEx(NpcInstance npcInstance, int specificNpcIndex, int aiState, int guild,
+            bool detectPlayer)
         {
-            var npcGo = GetNpc(npc);
-            var npcPos = npcGo.transform.position;
-
-            // FIXME - currently hard coded with 20m, but needs to be imported from ZenKit: daedalus_classes.h::c_npc::senses and senses_range
-            float sensesRange = npc.SensesRange / 100; // cm -> m
-            float distance = sensesRange * sensesRange; // 20m
-
+            var npc = GetProperties(npcInstance);
+            var npcPos = npc.transform.position;
+            
             // FIXME - Add Guild check
-            // FIXME - Add Hero check
-            // FIXME - Add AiState check
-            // FIXME - Add NpcCinstance check (only look for specific NPC)
-
+            // FIXME - add range check based on perceiveAll's range (npc.sense_range)
             var foundNpc = LookupCache.NpcCache.Values
-                .Where(i => i.go != null)
-                .Where(i => npcInstanceIndex == -1 || i.npcInstance.Index == npcInstanceIndex)
-                // .Where(i => !i.IsDead)
-                // .Where(i => aiState == -1 || i.CurrentAiState == aiState)
-                // .Where(i => guild == -1 || i.GuildId == guild)
-                .Where(i => ignorePlayer)
-                .Where(i => Vector3.Distance(i.go.transform.position, npcPos) <= distance)
-                .OrderBy(i => Vector3.Distance(i.go.transform.position, npcPos))
+                .Where(i => i.go != null) // ignore empty (safe check)
+                .Where(i => i.npcInstance.Index != npcInstance.Index) // ignore self
+                .Where(i => specificNpcIndex < 0 || specificNpcIndex == i.npcInstance.Index) // Specific NPC is found right now?
+                .Where(i => aiState < 0 || npc.state == i.state)
+                .OrderBy(i => Vector3.Distance(i.transform.position, npcPos)) // get nearest
                 .FirstOrDefault();
 
-            return (foundNpc != null);
+            // FIXME - Add Hero check
+            if (detectPlayer)
+            {
+                // FIXME - Currently our hero has no aistate. Is it needed or ignore him when checked here?
+                // var npcDistance = Vector3.Distance(npcPos, foundNpc.transform.position);
+                // var heroDistance = Vector3.Distance(npcPos, Camera.main!.transform.position);
+            }
+
+            // We need to set it, as there are calls where we immediately need _other_. e.g.:
+            // if (Wld_DetectNpc(self, ...) && (Npc_GetDistToNpc(self, other)<HAI_DIST_SMALLTALK)
+            if (foundNpc != null)
+            {
+                GameData.GothicVm.GlobalOther = foundNpc.npcInstance;
+            }
+
+            return foundNpc != null;
         }
 
         public static int ExtNpcHasItems(NpcInstance npc, uint itemId)
@@ -250,14 +260,15 @@ namespace GVR.Manager
             return GetProperties(npc).Talents[(VmGothicEnums.Talent)skillId];
         }
 
-        private static GameObject GetNpc(NpcInstance npc)
+        [CanBeNull]
+        private static GameObject GetNpc([CanBeNull] NpcInstance npc)
         {
-            return GetProperties(npc).go;
+            return GetProperties(npc)?.go;
         }
 
-        private static NpcProperties GetProperties(NpcInstance npc)
+        private static NpcProperties GetProperties([CanBeNull] NpcInstance npc)
         {
-            return LookupCache.NpcCache[npc.Index];
+            return npc == null ? null : LookupCache.NpcCache[npc.Index];
         }
         
         public static void ExtAiWait(NpcInstance npc, float seconds)

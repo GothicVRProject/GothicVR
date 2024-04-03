@@ -20,11 +20,12 @@ namespace GVR.Npc
         {
             properties.currentAction?.OnCollisionExit(coll);
 
-            // If NPC walks out of a FreePoint, it gets freed.
-            // Ignore Waypoints from WayNet as there are 4 of them which starts with FP_ but are waypoints not free points.
-            if (coll.gameObject.name.StartsWithIgnoreCase("FP_") &&
-                coll.gameObject.TryGetComponent<VobSpotProperties>(out var vobSpotProperties))
-                vobSpotProperties.fp.IsLocked = false;
+            // FIXME - As we handle FreePoint locking via Colliders, we can't just say "free" whenever collider is left as a rotation can create this state already.
+            // FIXME - Instead we need to handle unlocking via game logic. E.g. whenever a new state starts, clear our NPCs lock setting.
+            // // If NPC walks out of a FreePoint, it gets freed.
+            // if (coll.gameObject.name.StartsWithIgnoreCase("FP_") &&
+            //     coll.gameObject.TryGetComponent<VobSpotProperties>(out var vobSpotProperties))
+            //     vobSpotProperties.fp.IsLocked = false;
         }
 
         /// <summary>
@@ -34,11 +35,12 @@ namespace GVR.Npc
         {
             properties.currentAction?.OnTriggerExit(coll);
 
-            // If NPC walks out of a FreePoint, it gets freed.
-            // Ignore Waypoints from WayNet as there are 4 of them which starts with FP_ but are waypoints not free points.
-            if (coll.gameObject.name.StartsWithIgnoreCase("FP_") &&
-                coll.gameObject.TryGetComponent<VobSpotProperties>(out var vobSpotProperties))
-                vobSpotProperties.fp.IsLocked = false;
+            // FIXME - As we handle FreePoint locking via Colliders, we can't just say "free" whenever collider is left as a rotation can create this state already.
+            // FIXME - Instead we need to handle unlocking via game logic. E.g. whenever a new state starts, clear our NPCs lock setting.
+            // // If NPC walks out of a FreePoint, it gets freed.
+            // if (coll.gameObject.name.StartsWithIgnoreCase("FP_") &&
+            //     coll.gameObject.TryGetComponent<VobSpotProperties>(out var vobSpotProperties))
+            //     vobSpotProperties.fp.IsLocked = false;
         }
 
         private void Update()

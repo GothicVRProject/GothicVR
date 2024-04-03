@@ -58,7 +58,7 @@ namespace GVR.Manager
         public static FreePoint FindNearestFreePoint(Vector3 lookupPosition, string fpNamePart)
         {
             return GameData.FreePoints
-                .Where(pair => pair.Value.Name.ContainsIgnoreCase(fpNamePart))
+                .Where(pair => pair.Value.Name.ContainsIgnoreCase(fpNamePart) && !pair.Value.IsLocked)
                 .OrderBy(pair => Vector3.Distance(pair.Value.Position, lookupPosition))
                 .Select(pair => pair.Value)
                 .FirstOrDefault();
