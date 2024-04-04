@@ -4,6 +4,7 @@ using GVR.Lab.Handler;
 using GVR.Manager;
 using GVR.Manager.Settings;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace GVR.GothicVR_Lab.Scripts
 {
@@ -17,11 +18,13 @@ namespace GVR.GothicVR_Lab.Scripts
         public bool bootAttachPointHandler;
 
         public LabMusicHandler labMusicHandler;
-        public LabNpcLabHandler npcLabHandler;
+        public LabNpcDialogHandler npcDialogHandler;
         public LabLockableLabHandler lockableLabHandler;
         public LabLadderLabHandler ladderLabHandler;
         public LabVobHandAttachPointsLabHandler vobHandAttachPointsLabHandler;
-        
+
+        public LabNpcAnimationHandler LabNpcAnimationHandler;
+
         private bool isBooted;
         /// <summary>
         /// It's easiest to wait for Start() to initialize all the MonoBehaviours first.
@@ -37,13 +40,18 @@ namespace GVR.GothicVR_Lab.Scripts
             if (bootLabMusicHandler)
                 labMusicHandler.Bootstrap();
             if (bootNpcHandler)
-                npcLabHandler.Bootstrap();
+                npcDialogHandler.Bootstrap();
             if (bootLockableHandler)
                 lockableLabHandler.Bootstrap();
             if (bootLadderHandler)
                 ladderLabHandler.Bootstrap();
             if (bootAttachPointHandler)
                 vobHandAttachPointsLabHandler.Bootstrap();
+        }
+
+        public void LoadNpcAnimationHandlerClicked()
+        {
+            LabNpcAnimationHandler.Bootstrap();
         }
 
         private void OnDestroy()
