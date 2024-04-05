@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
 using GVR.Creator.Meshes.V2;
@@ -17,9 +18,11 @@ namespace GVR.Lab.Handler
         public TMP_Dropdown animationDropdown;
         public GameObject npcSlotGo;
 
-        private string[] npcNames =
+
+        private Dictionary<string, (string Name, string Mdh, string Mdm, int Armor, string Body, int BodyTexColor, int BodyTexNr, string Head, int HeadTexNr, int TeethTexNr)> npcs = new()
         {
-            "GRD_233_Bloodwyn", "VLK_554_Buddler"
+            {"GRD_233_Bloodwyn", (Name: "Bloodwyn", Mdh: "Humans_Militia.mds", Mdm: "Hum_GRDM_ARMOR", Armor: -1, Body: "hum_body_Naked0", BodyTexColor: 1, BodyTexNr: 0, Head: "Hum_Head_Bald", HeadTexNr: 18, TeethTexNr: 1)},
+            {"VLK_554_Buddler", (Name: "Buddler", Mdh: "Humans_Tired.mds", Mdm: "Hum_VLKL_ARMOR", Armor: -1, Body: "hum_body_Naked0", BodyTexColor: 3, BodyTexNr: 1, Head: "Hum_Head_Pony", HeadTexNr: 0, TeethTexNr: 2)}
         };
 
         private string[] animationNames =
@@ -30,16 +33,19 @@ namespace GVR.Lab.Handler
 
         public void Bootstrap()
         {
-            npcDropdown.options = npcNames.Select(item => new TMP_Dropdown.OptionData(item)).ToList();
+            npcDropdown.options = npcs.Keys.Select(item => new TMP_Dropdown.OptionData(item)).ToList();
             animationDropdown.options = animationNames.Select(item => new TMP_Dropdown.OptionData(item)).ToList();
         }
 
         public void LoadNpcClicked()
         {
+            var npcInstanceName = npcDropdown.options[npcDropdown.value].text;
+            var npcData = npcs[npcInstanceName];
+
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             newNpc.SetParent(npcSlotGo);
+            newNpc.name = npcData.Name;
 
-            var npcInstanceName = npcDropdown.options[npcDropdown.value].text;
             var npcSymbol = GameData.GothicVm.GetSymbolByName(npcInstanceName);
 
             var npcInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol!);
@@ -48,20 +54,18 @@ namespace GVR.Lab.Handler
             npcProps.npcInstance = npcInstance;
             LookupCache.NpcCache[npcInstance.Index] = npcProps;
 
-            var mdmName = "Hum_GRDM_ARMOR.asc";
-            var mdhName = "Humans_Militia.mds";
             var body = new VmGothicExternals.ExtSetVisualBodyData()
             {
-                Armor = 3643,
-                Body = "hum_body_Naked0",
-                BodyTexColor = 1,
-                BodyTexNr = 0,
-                Head = "Hum_Head_Bald",
-                HeadTexNr = 18,
-                TeethTexNr = 1
+                Armor = npcData.Armor,
+                Body = npcData.Body,
+                BodyTexColor = npcData.BodyTexColor,
+                BodyTexNr = npcData.BodyTexNr,
+                Head = npcData.Head,
+                HeadTexNr = npcData.HeadTexNr,
+                TeethTexNr = npcData.TeethTexNr
             };
 
-            MeshFactory.CreateNpc(newNpc.name, mdmName, mdhName, body, newNpc);
+            MeshFactory.CreateNpc(newNpc.name, npcData.Mdm, npcData.Mdh, body, newNpc);
         }
 
         public void LoadAnimationClicked()

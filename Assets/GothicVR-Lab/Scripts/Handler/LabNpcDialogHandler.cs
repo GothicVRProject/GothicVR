@@ -66,7 +66,7 @@ namespace GVR.Lab.Handler
             var mdhName = "Humans_Militia.mds";
             var body = new VmGothicExternals.ExtSetVisualBodyData()
             {
-                Armor = 3643,
+                Armor = -1,
                 Body = "hum_body_Naked0",
                 BodyTexColor = 1,
                 BodyTexNr = 0,
