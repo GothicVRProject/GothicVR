@@ -22,8 +22,7 @@ namespace GVR.GothicVR_Lab.Scripts
         public LabLockableLabHandler lockableLabHandler;
         public LabLadderLabHandler ladderLabHandler;
         public LabVobHandAttachPointsLabHandler vobHandAttachPointsLabHandler;
-
-        public LabNpcAnimationHandler LabNpcAnimationHandler;
+        public LabNpcAnimationHandler labNpcAnimationHandler;
 
         private bool isBooted;
         /// <summary>
@@ -37,21 +36,12 @@ namespace GVR.GothicVR_Lab.Scripts
             
             GvrBootstrapper.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
 
-            if (bootLabMusicHandler)
-                labMusicHandler.Bootstrap();
-            if (bootNpcHandler)
-                npcDialogHandler.Bootstrap();
-            if (bootLockableHandler)
-                lockableLabHandler.Bootstrap();
-            if (bootLadderHandler)
-                ladderLabHandler.Bootstrap();
-            if (bootAttachPointHandler)
-                vobHandAttachPointsLabHandler.Bootstrap();
-        }
-
-        public void LoadNpcAnimationHandlerClicked()
-        {
-            LabNpcAnimationHandler.Bootstrap();
+            labNpcAnimationHandler.Bootstrap();
+            labMusicHandler.Bootstrap();
+            npcDialogHandler.Bootstrap();
+            lockableLabHandler.Bootstrap();
+            ladderLabHandler.Bootstrap();
+            vobHandAttachPointsLabHandler.Bootstrap();
         }
 
         private void OnDestroy()
