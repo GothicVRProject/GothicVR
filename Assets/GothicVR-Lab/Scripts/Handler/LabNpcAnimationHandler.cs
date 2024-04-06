@@ -37,6 +37,9 @@ namespace GVR.Lab.Handler
             animationDropdown.options = animationNames.Select(item => new TMP_Dropdown.OptionData(item)).ToList();
         }
 
+        /// <summary>
+        /// We need to prepare the NPC to load. i.e. set some NpcProperties to work properly.
+        /// </summary>
         public void LoadNpcClicked()
         {
             var npcInstanceName = npcDropdown.options[npcDropdown.value].text;
@@ -52,6 +55,9 @@ namespace GVR.Lab.Handler
             var npcProps = newNpc.GetComponent<NpcProperties>();
 
             npcProps.npcInstance = npcInstance;
+            npcProps.baseMdsName = "Humans.mds";
+            npcProps.overlayMdsName = npcData.Mdh;
+
             LookupCache.NpcCache[npcInstance.Index] = npcProps;
 
             var body = new VmGothicExternals.ExtSetVisualBodyData()
