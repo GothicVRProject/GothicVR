@@ -18,7 +18,8 @@ namespace GVR.Lab.Handler
             var ladderName = "LADDER_3.MDL";
             var mdl = AssetCache.TryGetMdl(ladderName);
 
-            var vobObj = MeshFactory.CreateVob(ladderName, mdl, Vector3.zero, Quaternion.Euler(0, 270, 0), ladderSlot);
+            var vobObj = MeshFactory.CreateVob(ladderName, mdl, Vector3.zero, Quaternion.Euler(0, 270, 0),
+                ladderSlot, useTextureArray: false);
 
 
             // Data taken from VobCreator.CreateLadder()

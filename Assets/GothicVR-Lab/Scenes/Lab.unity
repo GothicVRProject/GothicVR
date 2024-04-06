@@ -2724,11 +2724,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7387125324240799344, guid: efebdf03cb1ccd043827e933755e413e, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7387125324240799344, guid: efebdf03cb1ccd043827e933755e413e, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7387125324240799344, guid: efebdf03cb1ccd043827e933755e413e, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -2736,7 +2736,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7387125324240799344, guid: efebdf03cb1ccd043827e933755e413e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -30
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3990,6 +3990,7 @@ GameObject:
   - component: {fileID: 464842614}
   - component: {fileID: 464842616}
   - component: {fileID: 464842617}
+  - component: {fileID: 464842618}
   m_Layer: 0
   m_Name: GVRSingletons
   m_TagString: Untagged
@@ -4022,6 +4023,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1492632118}
   - {fileID: 393873742}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4154,6 +4156,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff27067532e5fb14d8e963d887bb60cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &464842618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464842608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46e9095c72bc48bfb33591c93b3dc5f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SunDirection: {fileID: 1492632118}
+  SunColor: {r: 0.6901961, g: 0.6901961, b: 0.6901961, a: 1}
+  AmbientColor: {r: 0.10196079, g: 0.10196079, b: 0.10196079, a: 1}
+  PointLightIntensity: 1
+  IsRaining: 0
 --- !u!1001 &468469094
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14503,6 +14522,37 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8969571752666551114, guid: f4c83e540c0057948b19107b827dc236, type: 3}
   m_PrefabInstance: {fileID: 1482640495}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1492632117
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1492632118}
+  m_Layer: 0
+  m_Name: Sun direction
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1492632118
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492632117}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.45451945, y: 0.54167527, z: -0.45451945, w: 0.54167527}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 464842610}
+  m_LocalEulerAnglesHint: {x: 80, y: 90, z: 0}
 --- !u!1001 &1534441155
 PrefabInstance:
   m_ObjectHideFlags: 0
