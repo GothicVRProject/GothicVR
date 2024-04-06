@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
 using GVR.Creator.Meshes.V2;
 using GVR.Extensions;
 using GVR.Globals;
+using GVR.GothicVR_Lab.Scripts.AnimationActionMocks;
+using GVR.Npc.Actions;
+using GVR.Npc.Actions.AnimationActions;
 using GVR.Properties;
 using GVR.Vm;
 using TMPro;
@@ -25,16 +29,26 @@ namespace GVR.Lab.Handler
             {"VLK_554_Buddler", (Name: "Buddler", Mdh: "Humans_Tired.mds", Mdm: "Hum_VLKL_ARMOR", Armor: -1, Body: "hum_body_Naked0", BodyTexColor: 3, BodyTexNr: 1, Head: "Hum_Head_Pony", HeadTexNr: 0, TeethTexNr: 2)}
         };
 
-        private string[] animationNames =
+        private Dictionary<string, List<(Type, AnimationAction)>> animations = new()
         {
-            "T_LGUARD_2_STAND", "T_STAND_2_LGUARD", "T_LGUARD_SCRATCH", "T_LGUARD_STRETCH", "T_LGUARD_CHANGELEG",
-            "T_HGUARD_2_STAND", "T_STAND_2_HGUARD", "T_HGUARD_LOOKAROUND"
+            {"Eat Apple", new()
+            {
+                (typeof(LabCreateInventoryItemAction), new(string0: "ItFoApple") ),
+                (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: 0)), // int0 needs to be calculated live
+                (typeof(Wait), new(float0: 1)),
+                (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
+                (typeof(Wait), new(float0: 1)),
+                (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
+                (typeof(Wait), new(float0: 1)),
+                (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: -1))
+            }},
+
         };
 
         public void Bootstrap()
         {
             npcDropdown.options = npcs.Keys.Select(item => new TMP_Dropdown.OptionData(item)).ToList();
-            animationDropdown.options = animationNames.Select(item => new TMP_Dropdown.OptionData(item)).ToList();
+            animationDropdown.options = animations.Keys.Select(item => new TMP_Dropdown.OptionData(item)).ToList();
         }
 
         /// <summary>
@@ -52,6 +66,8 @@ namespace GVR.Lab.Handler
             var npcSymbol = GameData.GothicVm.GetSymbolByName(npcInstanceName);
 
             var npcInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol!);
+            GameData.GothicVm.InitInstance(npcInstance);
+
             var npcProps = newNpc.GetComponent<NpcProperties>();
 
             npcProps.npcInstance = npcInstance;
@@ -76,8 +92,16 @@ namespace GVR.Lab.Handler
 
         public void LoadAnimationClicked()
         {
-            var npcInstance = npcSlotGo.transform.GetChild(0).GetComponent<NpcProperties>().npcInstance;
-            VmGothicExternals.AI_PlayAni(npcInstance, animationDropdown.options[animationDropdown.value].text);
+            var animationList = animations[animationDropdown.options[animationDropdown.value].text];
+
+            var npcGo = npcSlotGo.transform.GetChild(0).gameObject;
+            var props = npcGo.GetComponent<NpcProperties>();
+
+            foreach (var anim in animationList)
+            {
+                var action = (AbstractAnimationAction)Activator.CreateInstance(anim.Item1, anim.Item2, npcGo);
+                props.AnimationQueue.Enqueue(action);
+            }
         }
     }
 }
