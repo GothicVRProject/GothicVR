@@ -23,26 +23,35 @@ namespace GVR.Lab.Handler
         public GameObject npcSlotGo;
 
 
-        private Dictionary<string, (string Name, string Mdh, string Mdm, int Armor, string Body, int BodyTexColor, int BodyTexNr, string Head, int HeadTexNr, int TeethTexNr)> npcs = new()
+        private Dictionary<string, (string Name, string MdhMds, string Mdm, int BodyTexColor, int BodyTexNr, string Head, int HeadTexNr, int TeethTexNr)> npcs = new()
         {
-            {"GRD_233_Bloodwyn", (Name: "Bloodwyn", Mdh: "Humans_Militia.mds", Mdm: "Hum_GRDM_ARMOR", Armor: -1, Body: "hum_body_Naked0", BodyTexColor: 1, BodyTexNr: 0, Head: "Hum_Head_Bald", HeadTexNr: 18, TeethTexNr: 1)},
-            {"VLK_554_Buddler", (Name: "Buddler", Mdh: "Humans_Tired.mds", Mdm: "Hum_VLKL_ARMOR", Armor: -1, Body: "hum_body_Naked0", BodyTexColor: 3, BodyTexNr: 1, Head: "Hum_Head_Pony", HeadTexNr: 0, TeethTexNr: 2)}
+            {"EBR_110_Seraphia", (Name: "Seraphia", MdhMds: "Babe.mds", Mdm: "Bab_body_Naked0", BodyTexColor: 2, BodyTexNr: 1, Head: "Bab_Head_Hair1", HeadTexNr: 2, TeethTexNr: 0)},
+            {"GRD_233_Bloodwyn", (Name: "Bloodwyn", MdhMds: "Humans_Militia.mds", Mdm: "Hum_GRDM_ARMOR", BodyTexColor: 0, BodyTexNr: 1, Head: "Hum_Head_Bald", HeadTexNr: 18, TeethTexNr: 1)},
+            {"VLK_554_Buddler", (Name: "Buddler", MdhMds: "Humans_Tired.mds", Mdm: "Hum_VLKL_ARMOR", BodyTexColor: 3, BodyTexNr: 1, Head: "Hum_Head_Pony", HeadTexNr: 0, TeethTexNr: 2)}
         };
 
         private Dictionary<string, List<(Type, AnimationAction)>> animations = new()
         {
-            {"Eat Apple", new()
-            {
-                (typeof(LabCreateInventoryItemAction), new(string0: "ItFoApple") ),
-                (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: 0)), // int0 needs to be calculated live
-                (typeof(Wait), new(float0: 1)),
-                (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
-                (typeof(Wait), new(float0: 1)),
-                (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
-                (typeof(Wait), new(float0: 1)),
-                (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: -1))
-            }},
-
+            {"Babe - Sweep", new()
+                {
+                    (typeof(LabCreateInventoryItem), new(string0: "ItMiBrush")), // int0 needs to be calculated live
+                    (typeof(LabUseItemToState), new(string0: "ItMiBrush", int1: 1)),
+                    (typeof(Wait), new(float0: 1)),
+                    (typeof(LabUseItemToState), new(string0: "ItMiBrush", int1: -1))
+                }
+            },
+            {"Human - Eat Apple", new()
+                {
+                    (typeof(LabCreateInventoryItem), new(string0: "ItFoApple") ),
+                    (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: 0)), // int0 needs to be calculated live
+                    (typeof(Wait), new(float0: 1)),
+                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
+                    (typeof(Wait), new(float0: 1)),
+                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
+                    (typeof(Wait), new(float0: 1)),
+                    (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: -1))
+                }
+            }
         };
 
         public void Bootstrap()
@@ -64,30 +73,30 @@ namespace GVR.Lab.Handler
             newNpc.name = npcData.Name;
 
             var npcSymbol = GameData.GothicVm.GetSymbolByName(npcInstanceName);
-
             var npcInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol!);
-            GameData.GothicVm.InitInstance(npcInstance);
-
             var npcProps = newNpc.GetComponent<NpcProperties>();
 
             npcProps.npcInstance = npcInstance;
-            npcProps.baseMdsName = "Humans.mds";
-            npcProps.overlayMdsName = npcData.Mdh;
-
             LookupCache.NpcCache[npcInstance.Index] = npcProps;
+            
+            GameData.GothicVm.InitInstance(npcInstance);
 
+            npcProps.npcInstance = npcInstance;
+            npcProps.overlayMdsName = npcData.MdhMds;
+            
             var body = new VmGothicExternals.ExtSetVisualBodyData()
             {
-                Armor = npcData.Armor,
-                Body = npcData.Body,
                 BodyTexColor = npcData.BodyTexColor,
                 BodyTexNr = npcData.BodyTexNr,
                 Head = npcData.Head,
                 HeadTexNr = npcData.HeadTexNr,
-                TeethTexNr = npcData.TeethTexNr
+                TeethTexNr = npcData.TeethTexNr,
+                
+                Body = "", // We set the armor via Mdm file manually
+                Armor = -1 // We set the armor via Mdm file manually
             };
 
-            MeshFactory.CreateNpc(newNpc.name, npcData.Mdm, npcData.Mdh, body, newNpc);
+            MeshFactory.CreateNpc(newNpc.name, npcData.Mdm, npcData.MdhMds, body, newNpc);
         }
 
         public void LoadAnimationClicked()

@@ -6,9 +6,9 @@ using ZenKit.Daedalus;
 
 namespace GVR.GothicVR_Lab.Scripts.AnimationActionMocks
 {
-    public class LabCreateInventoryItemAction : LabImmediateAnimationAction
+    public class LabCreateInventoryItem : LabImmediateAnimationAction
     {
-        public LabCreateInventoryItemAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
+        public LabCreateInventoryItem(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         {
         }
 
