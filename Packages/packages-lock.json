@@ -264,6 +264,16 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.vrmada.ultimatexr-unity": {
+      "version": "https://github.com/VRMADA/ultimatexr-unity.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.xr.management": "4.2.1",
+        "com.unity.render-pipelines.universal": "12.1.6"
+      },
+      "hash": "b51f924f154416085b1fb4eabff98c4d342a7026"
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
