@@ -88,6 +88,10 @@ ProjectSettings/ShaderGraphSettings.asset
 ProjectSettings/Packages/com.unity.testtools.codecoverage/Settings.json
 Assets/XR/Settings/OpenXR Package Settings.asset
 
+### Sample Assets
+Assets/Samples/UltimateXR
+Assets/Samples/UltimateXR.meta
+
 # Do not commit local development settings
 Assets/StreamingAssets/GameSettings.dev.json
 Assets/StreamingAssets/GameSettings.dev.json.meta
