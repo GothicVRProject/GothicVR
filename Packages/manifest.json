@@ -12,7 +12,7 @@
     "com.unity.xr.interaction.toolkit": "2.5.2",
     "com.unity.xr.management": "4.4.0",
     "com.unity.xr.openxr": "1.8.2",
-    "com.vrmada.ultimatexr-unity": "https://github.com/VRMADA/ultimatexr-unity.git",
+    "com.vrmada.ultimatexr-unity": "https://github.com/VRMADA/ultimatexr-unity.git#release/v1.0.0",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
