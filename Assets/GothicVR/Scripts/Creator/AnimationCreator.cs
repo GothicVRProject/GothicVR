@@ -34,7 +34,7 @@ namespace GVR.Creator
 
         private static bool TryPlayAnimation(string mdsName, string animationName, GameObject go, bool repeat)
         {
-            // For animations: mdhName == mdsName
+            // For animations: mdhName == mdsName (with different file ending of course ;-))
             var mdhName = mdsName;
 
             var modelAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
@@ -47,6 +47,10 @@ namespace GVR.Creator
             var mds = AssetCache.TryGetMds(mdsName);
             var mdh = AssetCache.TryGetMdh(mdhName);
             var anim = mds.Animations.First(i => i.Name.EqualsIgnoreCase(animationName));
+
+            // If we create empty animations with only one frame, Unity will complain. We therefore skip it for now.
+            if (anim.FirstFrame == anim.LastFrame)
+                return false;
 
             if (anim.Direction == AnimationDirection.Backward)
                 Debug.LogWarning($"Backwards animations not yet handled. Called for >{animationName}< from >{mdsName}<. Currently playing Forward.");
@@ -255,7 +259,7 @@ namespace GVR.Creator
         private static float ClampFrame(int expectedFrame, IModelAnimation modelAnimation, IAnimation anim)
         {
             // (2). calculate ration between FpsSource and the animations Fps.
-            var animationRatio = modelAnimation.Fps / modelAnimation.FpsSource; //(float)modelAnimation.FrameCount / (anim.LastFrame - anim.FirstFrame);
+            var animationRatio = modelAnimation.Fps / modelAnimation.FpsSource;
 
             // (1). Norm to start frame of 1
             // (2). Norm to fpsSource (==25 in G1)
