@@ -156,6 +156,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _ImageType: 1
+    - _LayerBlend: 1
     - _Layout: 1
     - _Mapping: 1
     - _Metallic: 0
@@ -166,6 +167,10 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Rotation: 0
+    - _Sky1Opacity: 0.5019608
+    - _Sky2Opacity: 0.5019608
+    - _Sky3Opacity: 1
+    - _Sky4Opacity: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecGlossMapToggle: 0
@@ -182,16 +187,18 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Color2: {r: 1, g: 1, b: 1, a: 1}
+    - _DomeColor1: {r: 0.3137255, g: 0.23529412, b: 0.4117647, a: 1}
+    - _DomeColor2: {r: 0.45490196, g: 0.34901962, b: 0.29411766, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FogColor: {r: 1, g: 1, b: 1, a: 0}
-    - _FogColor2: {r: 1, g: 1, b: 1, a: 0}
+    - _FogColor: {r: 0.3137255, g: 0.23529412, b: 0.4117647, a: 1}
+    - _FogColor2: {r: 0.45490196, g: 0.34901962, b: 0.29411766, a: 1}
     - _GroundColor: {r: 0.36899996, g: 0.34899998, b: 0.34099993, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _Tint: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
     - _Vector1: {r: 0, g: 0, b: 0, a: 0}
     - _Vector2: {r: 0.9, g: 1.1, b: 0, a: 0}
-    - _Vector3: {r: 0, g: 0, b: 0, a: 0}
-    - _Vector4: {r: 0.9, g: 1.1, b: 0, a: 0}
+    - _Vector3: {r: 0.9, g: 1.1, b: 0, a: 0}
+    - _Vector4: {r: 0.17999999, g: 0.22000001, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &2550804037692824493
 MonoBehaviour:
