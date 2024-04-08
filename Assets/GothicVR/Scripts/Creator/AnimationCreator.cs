@@ -62,6 +62,7 @@ namespace GVR.Creator
                 AddClipEvents(clip, modelAnimation, anim);
                 AddClipEndEvent(clip);
                 animationComp.AddClip(clip, mdsAnimationKeyName);
+                animationComp[mdsAnimationKeyName]!.layer = modelAnimation.Layer;
             }
 
             animationComp.Stop();
