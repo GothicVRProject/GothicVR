@@ -75,7 +75,7 @@ namespace GVR.GothicVR.Scripts.Manager
             var speakerId = self.Id;
 
             npcProps.AnimationQueue.Enqueue(new Output(
-                new(AnimationAction.Type.AIOutput, int0: speakerId, string0: outputName),
+                new(int0: speakerId, string0: outputName),
                 npcProps.go));
         }
         
@@ -90,7 +90,7 @@ namespace GVR.GothicVR.Scripts.Manager
                 Debug.LogError($"Ai_OutputSvm() - Handling with target not yet implemented!");
 
             props.AnimationQueue.Enqueue(new OutputSvm(
-                new(AnimationAction.Type.AITurnToNpc, int0: props.npcInstance.Id, string0: svmName),
+                new(int0: props.npcInstance.Id, string0: svmName),
                 props.go));
         }
 
@@ -131,9 +131,7 @@ namespace GVR.GothicVR.Scripts.Manager
         {
             var props = GetProperties(npc);
 
-            props.AnimationQueue.Enqueue(new StopProcessInfos(
-                new(AnimationAction.Type.AIStopProcessInfo),
-                props.go));
+            props.AnimationQueue.Enqueue(new StopProcessInfos(new(), props.go));
         }
 
         public static void SelectionClicked(int npcInstanceIndex, int dialogId, bool isMainDialog)
@@ -168,7 +166,7 @@ namespace GVR.GothicVR.Scripts.Manager
 
             // We always want to have a method to get the dialog menu back once all dialog lines are talked.
             npcProperties.AnimationQueue.Enqueue(new StartProcessInfos(
-                new(AnimationAction.Type.UnityStartProcessInfos, int0: information),
+                new(int0: information),
                 npcProperties.go));
         }
 

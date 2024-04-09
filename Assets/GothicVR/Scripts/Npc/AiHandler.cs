@@ -16,7 +16,7 @@ namespace GVR.Npc
 
         private void Start()
         {
-            properties.currentAction = new None(new(AnimationAction.Type.AINone), gameObject);
+            properties.currentAction = new None(new(), gameObject);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace GVR.Npc
         {
             // Whenever we change routine, we reset some data to "start" from scratch as if the NPC got spawned.
             properties.AnimationQueue.Clear();
-            properties.currentAction = new None(new(AnimationAction.Type.AINone), gameObject);
+            properties.currentAction = new None(new(), gameObject);
             properties.stateTime = 0.0f;
 
             if (stopCurrentStateImmediately)

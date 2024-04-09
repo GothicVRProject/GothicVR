@@ -50,13 +50,14 @@ namespace GVR.Npc.Actions.AnimationActions
                     InsertItem(data.Slot1, data.Slot2);
                     break;
                 case EventType.ItemDestroy:
-                    DestroyItem();
+                case EventType.ItemRemove:
+                    RemoveItem();
                     break;
                 case EventType.TorchInventory:
-                    Debug.Log("PxEventTagType.inventory_torch: I assume this means: if torch is in inventory, then put it out. But not really sure. Need a NPC with real usage of it to predict right.");
+                    Debug.Log("EventType.inventory_torch: I assume this means: if torch is in inventory, then put it out. But not really sure. Need a NPC with real usage of it to predict right.");
                     break;
                 default:
-                    Debug.LogWarning($"PxEventTagData.type {data.Type} not yet supported.");
+                    Debug.LogWarning($"EventType.type {data.Type} not yet supported.");
                     break;
             }
         }
@@ -73,10 +74,8 @@ namespace GVR.Npc.Actions.AnimationActions
             Props.usedItemSlot = slot1;
         }
 
-        private void DestroyItem()
+        private void RemoveItem()
         {
-            // FIXME - This is called to late. Feels like the animation for T_*_S0_2_Stand is glued with another.
-            // FIXME - So that frame y is more like frame x+y, where y is the frames count from previous call.
             var slotGo = NpcGo.FindChildRecursively(Props.usedItemSlot);
             var item = slotGo!.transform.GetChild(0);
             Object.Destroy(item.gameObject);

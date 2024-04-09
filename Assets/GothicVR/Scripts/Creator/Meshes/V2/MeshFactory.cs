@@ -90,7 +90,7 @@ namespace GVR.Creator.Meshes.V2
         }
 
         public static GameObject CreateVob(string objectName, IModel mdl, Vector3 position, Quaternion rotation,
-            GameObject parent = null, GameObject rootGo = null)
+            GameObject parent = null, GameObject rootGo = null, bool useTextureArray = true)
         {
             if (!HasMeshes(mdl.Mesh))
             {
@@ -102,7 +102,7 @@ namespace GVR.Creator.Meshes.V2
             vobBuilder.SetGameObject(rootGo, objectName);
             vobBuilder.SetParent(parent, resetRotation: true); // If we don't reset these, all objects will be rotated wrong!
             vobBuilder.SetMdl(mdl);
-            vobBuilder.SetUseTextureArray(true);
+            vobBuilder.SetUseTextureArray(useTextureArray);
 
             return vobBuilder.Build();
         }
@@ -121,7 +121,7 @@ namespace GVR.Creator.Meshes.V2
         }
 
         public static GameObject CreateVob(string objectName, IModelMesh mdm, IModelHierarchy mdh,
-            Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null)
+            Vector3 position, Quaternion rotation, GameObject parent = null, GameObject rootGo = null, bool useTextureArray = true)
         {
             if (!HasMeshes(mdm))
             {
@@ -134,7 +134,7 @@ namespace GVR.Creator.Meshes.V2
             vobBuilder.SetParent(parent, resetRotation: true);
             vobBuilder.SetMdh(mdh);
             vobBuilder.SetMdm(mdm);
-            vobBuilder.SetUseTextureArray(true);
+            vobBuilder.SetUseTextureArray(useTextureArray);
 
             return vobBuilder.Build();
         }
