@@ -35,6 +35,7 @@ using Vector3 = System.Numerics.Vector3;
 using UltimateXR;
 using UltimateXR.Manipulation;
 using UltimateXR.Core.Components.Composite;
+using Unity.VisualScripting;
 
 namespace GVR.Creator
 {
@@ -522,6 +523,7 @@ namespace GVR.Creator
             // It will set some default values for collider and grabbing now.
             // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
             var grabComp = vobObj.AddComponent<UxrGrabbableObject>();
+            grabComp.RigidBodySource = vobObj.GetComponent<Rigidbody>();
 
             if (FeatureFlags.I.vobItemsDynamicAttach)
             {
@@ -529,7 +531,7 @@ namespace GVR.Creator
                 //grabComp.selectMode = InteractableSelectMode.Multiple;
             }
 
-            var itemGrabComp = vobObj.GetComponent<ItemGrabInteractable>();
+            var itemGrabComp = vobObj.AddComponent<ItemGrabInteractable>();
             var colliderComp = vobObj.GetComponent<MeshCollider>();
 
             //grabComp.attachTransform = itemGrabComp.attachPoint1.transform;

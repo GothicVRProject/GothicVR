@@ -29,8 +29,6 @@ namespace GVR.Vob
 		protected override void OnObjectReleased(UxrManipulationEventArgs e)
 		{
 			Debug.Log($"Object {e.GrabbableObject.name} was released by avatar {e.Grabber.Avatar.name}");
-			if (rb.isKinematic)
-				rb.isKinematic = false;
 			VobMeshCullingManager.I.StopTrackVobPositionUpdates(gameObject);
 		}
 
