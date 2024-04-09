@@ -2,11 +2,10 @@ using GVR.Globals;
 using GVR.Npc.Actions;
 using GVR.Vm;
 using UnityEngine;
-using ZenKit.Daedalus;
 
-namespace GVR.GothicVR_Lab.Scripts.AnimationActionMocks
+namespace GVR.Lab.AnimationActionMocks
 {
-    public class LabCreateInventoryItem : LabImmediateAnimationAction
+    public class LabCreateInventoryItem : AbstractLabAnimationAction
     {
         public LabCreateInventoryItem(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         {

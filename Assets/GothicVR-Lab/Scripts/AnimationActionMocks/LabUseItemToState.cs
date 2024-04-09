@@ -3,7 +3,7 @@ using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using UnityEngine;
 
-namespace GVR.GothicVR_Lab.Scripts.AnimationActionMocks
+namespace GVR.Lab.AnimationActionMocks
 {
     public class LabUseItemToState : UseItemToState
     {
