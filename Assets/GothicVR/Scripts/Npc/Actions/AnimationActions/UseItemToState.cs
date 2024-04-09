@@ -40,7 +40,7 @@ namespace GVR.Npc.Actions.AnimationActions
                 Props.hasItemEquipped = false;
                 Props.currentItem = -1;
                 // e.g. Babe brush doesn't call it automatically. We therefore need to force remove the brush item from hand.
-                AnimationEventCallback(new() { Type = ZenKit.EventType.ItemDestroy });
+                // AnimationEventCallback(new() { Type = ZenKit.EventType.ItemDestroy });
                 newItemAnimationState = --Props.itemAnimationState;
             }
 

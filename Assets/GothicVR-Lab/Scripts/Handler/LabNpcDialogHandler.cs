@@ -1,7 +1,5 @@
 using System.Linq;
 using GVR.Caches;
-using GVR.Creator;
-using GVR.Creator.Meshes;
 using GVR.Creator.Meshes.V2;
 using GVR.Extensions;
 using GVR.Globals;
@@ -9,14 +7,11 @@ using GVR.Properties;
 using GVR.Vm;
 using TMPro;
 using UnityEngine;
-using ZenKit;
 using ZenKit.Daedalus;
-using Mesh = UnityEngine.Mesh;
-using Vector3 = UnityEngine.Vector3;
 
 namespace GVR.Lab.Handler
 {
-    public class LabNpcLabHandler : MonoBehaviour, ILabHandler
+    public class LabNpcDialogHandler : MonoBehaviour, ILabHandler
     {
         public TMP_Dropdown animationsDropdown;
         public GameObject bloodwynSlotGo;
@@ -71,7 +66,7 @@ namespace GVR.Lab.Handler
             var mdhName = "Humans_Militia.mds";
             var body = new VmGothicExternals.ExtSetVisualBodyData()
             {
-                Armor = 3643,
+                Armor = -1,
                 Body = "hum_body_Naked0",
                 BodyTexColor = 1,
                 BodyTexNr = 0,

@@ -285,7 +285,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new Wait(
-                new(AnimationAction.Type.AIWait, float0: seconds),
+                new(float0: seconds),
                 props.go));
         }
 
@@ -293,7 +293,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new UseMob(
-                new(AnimationAction.Type.AIUseMob, string0: target, int0: state),
+                new(string0: target, int0: state),
                 props.go));
         }
         
@@ -303,9 +303,7 @@ namespace GVR.Manager
             // * Ist der Nsc in einem Animatinsstate, wird die passende Rücktransition abgespielt.
             // * Benutzt der NSC gerade ein MOBSI, poppt er ins stehen.
             var props = GetProperties(npc);
-            props.AnimationQueue.Enqueue(new StandUp(
-                new(AnimationAction.Type.AIStandUp),
-                props.go));
+            props.AnimationQueue.Enqueue(new StandUp(new(), props.go));
         }
         
         public static void ExtAiSetWalkMode(NpcInstance npc, VmGothicEnums.WalkMode walkMode)
@@ -317,7 +315,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new GoToFp(
-                new(AnimationAction.Type.AIGoToFP, string0: freePointName),
+                new(string0: freePointName),
                 props.go));
         }
         
@@ -325,7 +323,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new GoToNextFp(
-                new(AnimationAction.Type.AIGoToNextFp, string0: fpNamePart),
+                new(string0: fpNamePart),
                 props.go));
         }
         
@@ -333,7 +331,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new GoToWp(
-                new(AnimationAction.Type.AIGoToWP, string0: wayPointName),
+                new(string0: wayPointName),
                 props.go));
         }
 
@@ -344,48 +342,40 @@ namespace GVR.Manager
             
             var props = GetProperties(self);
             props.AnimationQueue.Enqueue(new GoToNpc(
-                new(AnimationAction.Type.AIGoToNpc, int0: other.Id, int1: other.Index),
+                new(int0: other.Id, int1: other.Index),
                 props.go));
         }
         
         public static void ExtAiAlignToFp(NpcInstance npc)
         {
             var props = GetProperties(npc);
-            props.AnimationQueue.Enqueue(new AlignToFp(
-                new(AnimationAction.Type.AIAlignToFp),
-                props.go));
+            props.AnimationQueue.Enqueue(new AlignToFp(new(), props.go));
         }
 
         public static void ExtAiAlignToWp(NpcInstance npc)
         {
             var props = GetProperties(npc);
-            props.AnimationQueue.Enqueue(new AlignToWp(
-                new(AnimationAction.Type.AIAlignToWp),
-                props.go));
+            props.AnimationQueue.Enqueue(new AlignToWp(new(), props.go));
         }
         
         public static void ExtAiPlayAni(NpcInstance npc, string name)
         {
             var props = GetProperties(npc);
-            props.AnimationQueue.Enqueue(new PlayAni(
-                new(AnimationAction.Type.AIPlayAni, string0: name),
-                props.go));
+            props.AnimationQueue.Enqueue(new PlayAni(new(string0: name), props.go));
         }
 
         public static void ExtAiStartState(NpcInstance npc, int action, bool stopCurrentState, string wayPointName)
         {
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new StartState(
-                new(AnimationAction.Type.AIStartState, int0: action, bool0: stopCurrentState, string0: wayPointName),
+                new(int0: action, bool0: stopCurrentState, string0: wayPointName),
                 props.go));
         }
 
         public static void ExtAiLookAt(NpcInstance npc, string wayPointName)
         {
             var props = GetProperties(npc);
-            props.AnimationQueue.Enqueue(new LookAt(
-                new(AnimationAction.Type.AILookAt, string0: wayPointName),
-                props.go));
+            props.AnimationQueue.Enqueue(new LookAt(new(string0: wayPointName), props.go));
         }
 
         public static void ExtAiLookAtNpc(NpcInstance npc, NpcInstance other)
@@ -395,16 +385,14 @@ namespace GVR.Manager
 
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new LookAtNpc(
-                new(AnimationAction.Type.AILookAtNpc, int0: other.Id, int1: other.Index),
+                new(int0: other.Id, int1: other.Index),
                 props.go));
         }
 
         public static void ExtAiContinueRoutine(NpcInstance npc)
         {
             var props = GetProperties(npc);
-            props.AnimationQueue.Enqueue(new ContinueRoutine(
-                new(AnimationAction.Type.AIContinueRoutine),
-                props.go));
+            props.AnimationQueue.Enqueue(new ContinueRoutine(new(), props.go));
         }
 
         public static void ExtAiTurnToNpc(NpcInstance npc, NpcInstance other)
@@ -414,16 +402,14 @@ namespace GVR.Manager
 
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new TurnToNpc(
-                new(AnimationAction.Type.AITurnToNpc, int0: other.Id, int1: other.Index),
+                new(int0: other.Id, int1: other.Index),
                 props.go));
         }
 
         public static void ExtAiPlayAniBS(NpcInstance npc, string name, int bodyState)
         {
             var props = GetProperties(npc);
-            props.AnimationQueue.Enqueue(new PlayAniBS(
-                new(AnimationAction.Type.AIPlayAnimBs, string0: name, int0: bodyState),
-                props.go));
+            props.AnimationQueue.Enqueue(new PlayAniBS(new(string0: name, int0: bodyState), props.go));
         }
         
         public static void ExtAiUnequipArmor(NpcInstance npc)
@@ -463,7 +449,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npc);
             props.AnimationQueue.Enqueue(new UseItemToState(
-                new(AnimationAction.Type.AIUseItemToState, int0: itemId, int1: animationState),
+                new(int0: itemId, int1: animationState),
                 props.go));
         }
 
@@ -502,9 +488,7 @@ namespace GVR.Manager
         {
             var props = GetProperties(npc);
 
-            props.AnimationQueue.Enqueue(new DrawWeapon(
-                new(AnimationAction.Type.AIDrawWeapon),
-                props.go));
+            props.AnimationQueue.Enqueue(new DrawWeapon(new(), props.go));
         }
 
         public static void ExtNpcExchangeRoutine(NpcInstance npcInstance, string routineName)
