@@ -240,6 +240,19 @@ namespace GVR.Creator
                 clip.AddEvent(animEvent);
             }
 
+            foreach (var morphEvent in anim.MorphAnimations)
+            {
+                var clampedFrame = ClampFrame(morphEvent.Frame, modelAnimation, anim);
+                AnimationEvent animEvent = new()
+                {
+                    time = clampedFrame / clip.frameRate,
+                    functionName = nameof(IAnimationCallbacks.AnimationMorphCallback),
+                    stringParameter = JsonUtility.ToJson(new SerializableEventMorphAnimation(morphEvent)) // As we can't add a custom object, we serialize the data object.
+                };
+
+                clip.AddEvent(animEvent);
+            }
+
             if (anim.ParticleEffects.Any())
                 Debug.LogWarning($"SFX events not yet implemented. Tried to use for {anim.Name}");
         }
