@@ -15,6 +15,7 @@ using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Manager.Culling;
 using GVR.Npc;
+using GVR.Player.Interactive;
 using GVR.Properties;
 using GVR.Vob;
 using GVR.Vob.WayNet;
@@ -232,7 +233,8 @@ namespace GVR.Creator
                     {
                         if (vob.Name.ContainsIgnoreCase("bench") ||
                             vob.Name.ContainsIgnoreCase("chair") ||
-                            vob.Name.ContainsIgnoreCase("throne"))
+                            vob.Name.ContainsIgnoreCase("throne") ||
+                            vob.Name.ContainsIgnoreCase("barrelo"))
                         {
                             go = CreateSeat(vob, parent);
                             _cullingVobObjects.Add(go);

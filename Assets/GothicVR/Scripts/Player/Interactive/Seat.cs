@@ -1,22 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using GVR.Player.Camera;
+using GVR.Globals;
 
-namespace GVR
+namespace GVR.Player.Interactive
 {
     public class Seat : MonoBehaviour
     {
         //this will enable player to sit on benches/chairs etc
         private Vector3 posOffset = new Vector3(0,-0.75f,0.9f);
         private Vector3 eulerOffset = new Vector3(0,180,0);
-        private float cameraFadeDuration = 0.15f;
-        private float sittingCooldown = 0.5f;
+        private const float cameraFadeDuration = 0.15f;
+        private const float sittingCooldown = 0.5f;
 
         private XRGrabInteractable interactable;
-        private bool isPlayerSeated = false;
-        private bool isNpcSeated = false; //when NPC sits down this should be changed to true and when NPC stands up change it back to false
+        private bool isPlayerSeated;
+        private bool isNpcSeated; //when NPC sits down this should be changed to true and when NPC stands up change it back to false
         private List<Transform> snapPoints = new List<Transform>();
         private Transform currentSnapPoint;
 
@@ -27,7 +30,7 @@ namespace GVR
 
         private void Start()
         {
-            gameObject.layer = LayerMask.NameToLayer("Interactive"); //set layer to interactive so we can interact using XR Ray interactor
+            gameObject.layer = Constants.InteractiveLayer;
             //get snap points
             GetSnapPoints();
             //get interactable
@@ -111,19 +114,10 @@ namespace GVR
         }
         private Transform GetNearestSnapPoint(Vector3 pos)
         {
-            //find the closest Snap Point for player to sit
-            Transform nearestSnapPoint = null;
-            float minDistance = float.MaxValue;
-            for (int i = 0; i < snapPoints.Count; i++)
-            {
-                float distance = Vector3.Distance(pos, snapPoints[i].position);
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                    nearestSnapPoint = snapPoints[i];
-                }
-            }
-            return nearestSnapPoint;
+            // Find the closest Snap Point for player to sit.
+            return snapPoints
+                .OrderBy(point => Vector3.Distance(pos, point.position))
+                .First();
         }
     }
 }

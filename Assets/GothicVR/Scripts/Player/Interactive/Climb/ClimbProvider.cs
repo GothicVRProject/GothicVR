@@ -53,7 +53,7 @@ namespace GVR.Player.Climb
         {
             // Check if we're at a certain height with our main Camera.
             // If we are, we can't climb.
-            var mainCamera = Camera.main!;
+            var mainCamera = UnityEngine.Camera.main!;
             var mainCameraHeight = mainCamera.transform.position.y;
 
             return mainCameraHeight >= grabbedLadderZsTopPosition.y;
