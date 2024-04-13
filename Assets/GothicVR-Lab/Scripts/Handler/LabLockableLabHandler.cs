@@ -17,13 +17,13 @@ namespace GVR.Lab.Handler
             var mdh = AssetCache.TryGetMdh(chestName);
             var mdm = AssetCache.TryGetMdm(chestName);
 
-            MeshFactory.CreateVob(chestName, mdm, mdh, Vector3.zero, Quaternion.identity, chestsGo);
+            MeshFactory.CreateVob(chestName, mdm, mdh, Vector3.zero, Quaternion.identity, chestsGo, useTextureArray: false);
 
 
             var doorName = "DOOR_WOODEN";
             var mdlDoor = AssetCache.TryGetMdl(doorName);
 
-            MeshFactory.CreateVob(doorName, mdlDoor, Vector3.zero, Quaternion.identity, doorsGo);
+            MeshFactory.CreateVob(doorName, mdlDoor, Vector3.zero, Quaternion.identity, doorsGo, useTextureArray: false);
         }
     }
 }

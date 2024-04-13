@@ -177,9 +177,7 @@ namespace GVR.Manager.Culling
                 var bounds = GetLocalBounds(obj);
                 if (!bounds.HasValue)
                 {
-                    // Wash slot is placed wrong in G1. Therefore let's skip it.
-                    if (obj.name != "WASHSLOT")
-                        Debug.LogError($"Couldn't find mesh for >{obj}< to be used for CullingGroup. Skipping...");
+                    Debug.LogError($"Couldn't find mesh for >{obj}< to be used for CullingGroup. Skipping...");
 
                     continue;
                 }

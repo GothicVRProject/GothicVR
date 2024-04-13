@@ -48,7 +48,7 @@ namespace GVR.Vm
             vm.RegisterExternal<NpcInstance, NpcInstance>("AI_TurnToNPC", AI_TurnToNPC);
             vm.RegisterExternal<NpcInstance, string, int>("AI_PlayAniBS", AI_PlayAniBS);
             vm.RegisterExternal<NpcInstance>("AI_UnequipArmor", AI_UnequipArmor);
-
+            vm.RegisterExternal<NpcInstance, NpcInstance, string>("AI_OutputSVM", AI_OutputSVM);
 
             // Apply Options
             // Doc
@@ -287,6 +287,11 @@ namespace GVR.Vm
         public static void AI_UnequipArmor(NpcInstance npc)
         {
             NpcHelper.ExtAiUnequipArmor(npc);
+        }
+
+        public static void AI_OutputSVM(NpcInstance npc, NpcInstance target, string svmname)
+        {
+            DialogHelper.ExtAiOutputSvm(npc, target, svmname);
         }
 
         #endregion
@@ -741,14 +746,10 @@ namespace GVR.Vm
 
         public static int Wld_DetectNpcEx(NpcInstance npc, int npcInstance, int aiState, int guild, int detectPlayer)
         {
-            // Logic from Daedalus mentions, that the player will be ignored if 0. Not "detect" if 1.
-            var ignorePlayer = !Convert.ToBoolean(detectPlayer);
-
-            var res = NpcHelper.ExtWldDetectNpcEx(npc, npcInstance, aiState, guild, ignorePlayer);
+            var res = NpcHelper.ExtWldDetectNpcEx(npc, npcInstance, aiState, guild, Convert.ToBoolean(detectPlayer));
 
             return Convert.ToInt32(res);
         }
-
         
         public static int Wld_IsNextFPAvailable(NpcInstance npc, string fpNamePart)
         {

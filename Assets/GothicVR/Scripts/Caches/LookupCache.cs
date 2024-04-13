@@ -13,6 +13,7 @@ namespace GVR.Caches
     {
         /// <summary>
         /// [symbolIndex] = Properties-Component
+        /// Hint: Includes NPCs and Hero (Easier for lookups like "what is nearest enemy in range".)
         /// </summary>
         public static readonly Dictionary<int, NpcProperties> NpcCache = new();
 

@@ -55,6 +55,7 @@ namespace GVR.Properties
         public int currentInteractableStateId = -1;
 
         public uint prevStateStart;
+        public int state => stateStart; // State itself always means start state function. Gothic assumes this when checking for aistate.
         public int stateStart;
         public int stateLoop;
         public int stateEnd;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,19 +19,22 @@ namespace GVR.Creator
         /// <summary>
         /// Handling animations for baseMds and overlayMds
         /// </summary>
-        public static void PlayAnimation(string[] mdsNames, string animationName, GameObject go, bool repeat = false)
+        public static bool PlayAnimation(string[] mdsNames, string animationName, GameObject go, bool repeat = false)
         {
             // We assume, that we get mdsNames in this order: base, overlay. But we should always check for overlay first.
             foreach (var mdsName in mdsNames.Reverse())
             {
                 if (TryPlayAnimation(mdsName, animationName, go, repeat))
-                    return;
+                    return true;
             }
+
+            // No suitable animation found.
+            return false;
         }
 
         private static bool TryPlayAnimation(string mdsName, string animationName, GameObject go, bool repeat)
         {
-            // For animations: mdhName == mdsName
+            // For animations: mdhName == mdsName (with different file ending of course ;-))
             var mdhName = mdsName;
 
             var modelAnimation = AssetCache.TryGetAnimation(mdsName, animationName);
@@ -43,6 +47,10 @@ namespace GVR.Creator
             var mds = AssetCache.TryGetMds(mdsName);
             var mdh = AssetCache.TryGetMdh(mdhName);
             var anim = mds.Animations.First(i => i.Name.EqualsIgnoreCase(animationName));
+
+            // If we create empty animations with only one frame, Unity will complain. We therefore skip it for now.
+            if (anim.FirstFrame == anim.LastFrame)
+                return false;
 
             if (anim.Direction == AnimationDirection.Backward)
                 Debug.LogWarning($"Backwards animations not yet handled. Called for >{animationName}< from >{mdsName}<. Currently playing Forward.");
@@ -59,6 +67,7 @@ namespace GVR.Creator
                 AddClipEvents(clip, modelAnimation, anim);
                 AddClipEndEvent(clip);
                 animationComp.AddClip(clip, mdsAnimationKeyName);
+                animationComp[mdsAnimationKeyName]!.layer = modelAnimation.Layer;
             }
 
             animationComp.Stop();
@@ -206,7 +215,7 @@ namespace GVR.Creator
         {
             foreach (var zkEvent in anim.EventTags)
             {
-                var clampedFrame = ClampFrame(zkEvent.Frame, anim.FirstFrame, modelAnimation.FrameCount, anim.LastFrame);
+                var clampedFrame = ClampFrame(zkEvent.Frame, modelAnimation, anim);
 
                 AnimationEvent animEvent = new()
                 {
@@ -220,7 +229,7 @@ namespace GVR.Creator
 
             foreach (var sfxEvent in anim.SoundEffects)
             {
-                var clampedFrame = ClampFrame(sfxEvent.Frame, anim.FirstFrame, (int)modelAnimation.FrameCount, anim.LastFrame);
+                var clampedFrame = ClampFrame(sfxEvent.Frame, modelAnimation, anim);
                 AnimationEvent animEvent = new()
                 {
                     time = clampedFrame / clip.frameRate,
@@ -236,19 +245,35 @@ namespace GVR.Creator
         }
 
         /// <summary>
-        /// Bugfix: There are events which would happen after the animation is done.
+        /// This method solves multiple circumstances:
+        /// (1). Gothic animations won't always start from frame 0. e.g. t_Potion_Random_1 expects to work from frame 45+.
+        ///      --> This might be, as the animations are "behind" another and could be one single animation in Gothic.
+        ///      --> But in GVR, we create every transition animation separately and therefore normalize to start from frame 0.
+        /// (2). G1 animation key frames are optimized and not always aligned with 25fps (e.g. t_Potion_* leverages 10 frames only).
+        ///      But the animation event frame numbers are matching 25fps.
+        ///      --> In Unity we only store the key frames and fps value provided (e.g. 10fps), as Unity will interpolate on it's own.
+        ///      --> But then we need to calculate the ratio between the fpsSource (G1=25fps) and the actual fps (e.g. 10fps).
+        /// (3). Some animation events seem to be executed before or after the actual animation.
+        ///      --> We take care by checking its boundaries.
         /// </summary>
-        private static float ClampFrame(int expectedFrame, int firstFrame, int frameCount, int lastFrame)
+        private static float ClampFrame(int expectedFrame, IModelAnimation modelAnimation, IAnimation anim)
         {
-            if (expectedFrame < firstFrame)
+            // (2). calculate ration between FpsSource and the animations Fps.
+            var animationRatio = modelAnimation.Fps / modelAnimation.FpsSource;
+
+            // (1). Norm to start frame of 1
+            // (2). Norm to fpsSource (==25 in G1)
+            expectedFrame = (int)Math.Round((expectedFrame - anim.FirstFrame) * animationRatio);
+
+            // (3). check for misaligned animation frame boundaries (if any).
+            if (expectedFrame < 0)
                 return 0;
-            // e.g. beer-in-hand destroy animation would be triggered after animation itself.
-            if (expectedFrame >= (firstFrame + frameCount))
-                return frameCount - 1;
+            else if (expectedFrame >= modelAnimation.FrameCount)
+                return modelAnimation.FrameCount - 1;
             else
-                return expectedFrame - firstFrame;
+                return expectedFrame;
         }
-        
+
         /// <summary>
         /// Adds event at the end of animation.
         /// The event is called on every MonoBehaviour on GameObject where Clip is played.

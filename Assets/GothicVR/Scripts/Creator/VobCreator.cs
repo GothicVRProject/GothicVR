@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Manager.Culling;
+using GVR.Npc;
 using GVR.Properties;
 using GVR.Vob;
 using GVR.Vob.WayNet;
@@ -21,10 +23,14 @@ using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
+using ZenKit;
 using ZenKit.Daedalus;
 using ZenKit.Util;
 using ZenKit.Vobs;
 using Debug = UnityEngine.Debug;
+using Light = ZenKit.Vobs.Light;
+using LightType = ZenKit.Vobs.LightType;
+using Material = UnityEngine.Material;
 using Vector3 = System.Numerics.Vector3;
 
 namespace GVR.Creator
@@ -42,13 +48,14 @@ namespace GVR.Creator
             VirtualObjectType.oCZoneMusicDefault,
             VirtualObjectType.zCVobSound,
             VirtualObjectType.zCVobSoundDaytime,
-            //VirtualObjectType.oCMobInter
+            VirtualObjectType.zCVobAnimate
         };
 
         private static int _totalVObs;
         private static int _vobsPerFrame;
         private static int _createdCount;
         private static List<GameObject> _cullingVobObjects = new();
+        private static Dictionary<string, IWorld> vobTreeCache = new();
 
         static VobCreator()
         {
@@ -76,7 +83,7 @@ namespace GVR.Creator
 
         public static async Task CreateAsync(GameObject rootTeleport, GameObject rootNonTeleport, WorldData world, int vobsPerFrame)
         {
-            System.Diagnostics.Stopwatch stopwatch = new();
+            Stopwatch stopwatch = new();
             stopwatch.Start();
             PreCreateVobs(world, rootTeleport, rootNonTeleport, vobsPerFrame);
             await CreateVobs(world.Vobs);
@@ -87,7 +94,6 @@ namespace GVR.Creator
 
         private static void PreCreateVobs(WorldData world, GameObject rootTeleport, GameObject rootNonTeleport, int vobsPerFrame)
         {
-            // HINT - We assume there is only one nested level. At least works in G1 world.zen
             _totalVObs = GetTotalVobCount(world.Vobs);
 
             _createdCount = 0;
@@ -148,7 +154,7 @@ namespace GVR.Creator
                 }
                 case VirtualObjectType.zCVobLight:
                 {
-                    go = CreateLight((ZenKit.Vobs.Light)vob, parent);
+                    go = CreateLight((Light)vob, parent);
                     break;
                 }
                 case VirtualObjectType.oCMobContainer:
@@ -218,7 +224,7 @@ namespace GVR.Creator
                 }
                 case VirtualObjectType.oCMobFire:
                 {
-                    go = CreateFire((ZenKit.Vobs.Fire)vob, parent);
+                    go = CreateFire((Fire)vob, parent);
                     _cullingVobObjects.Add(go);
                     break;
                 }
@@ -250,8 +256,13 @@ namespace GVR.Creator
                     _cullingVobObjects.Add(go);
                     break;
                 }
-                case VirtualObjectType.zCVobScreenFX:
                 case VirtualObjectType.zCVobAnimate:
+                {
+                    go = CreateAnimatedVob((Animate)vob, parent);
+                    _cullingVobObjects.Add(go);
+                    break;
+                }
+                case VirtualObjectType.zCVobScreenFX:
                 case VirtualObjectType.zCTriggerWorldStart:
                 case VirtualObjectType.zCTriggerList:
                 case VirtualObjectType.oCCSTrigger:
@@ -289,9 +300,12 @@ namespace GVR.Creator
             if (vob.VobTree == "")
                 return go;
 
-            var vobTree = new ZenKit.World(GameData.Vfs, vob.VobTree);
+            if (!vobTreeCache.TryGetValue(vob.VobTree.ToLower(), out IWorld vobTree))
+            {
+                vobTree = new ZenKit.World(GameData.Vfs, vob.VobTree, GameVersion.Gothic1);
+                vobTreeCache.Add(vob.VobTree.ToLower(), vobTree);
+            }
             
-
             foreach (var vobRoot in vobTree.RootObjects)
             {
                 ResetVobTreePositions(vobRoot.Children, vobRoot.Position, vobRoot.Rotation);
@@ -334,6 +348,8 @@ namespace GVR.Creator
             VobMeshCullingManager.I.PrepareVobCulling(_cullingVobObjects);
             VobSoundCullingManager.I.PrepareSoundCulling(LookupCache.vobSoundsAndDayTime);
 
+            vobTreeCache.ClearAndReleaseMemory();
+            
             // TODO - warnings about "not implemented" - print them once only.
             foreach (var var in new[]
                      {
@@ -390,6 +406,9 @@ namespace GVR.Creator
                     break;
                 case VirtualObjectType.oCMobContainer:
                     go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobContainer);
+                    break;
+                case VirtualObjectType.zCVobAnimate:
+                    go = PrefabCache.TryGetObject(PrefabCache.PrefabType.VobAnimate);
                     break;
                 default:
                     return new GameObject(name);
@@ -539,7 +558,7 @@ namespace GVR.Creator
         }
 
         [CanBeNull]
-        private static GameObject CreateLight(ZenKit.Vobs.Light vob, GameObject parent = null)
+        private static GameObject CreateLight(Light vob, GameObject parent = null)
         {
             if (vob.LightStatic)
             {
@@ -552,7 +571,7 @@ namespace GVR.Creator
 
             StationaryLight lightComp = vobObj.AddComponent<StationaryLight>();
             lightComp.Color = new Color(vob.Color.R / 255f, vob.Color.G / 255f, vob.Color.B / 255f, vob.Color.A / 255f);
-            lightComp.Type = vob.LightType == ZenKit.Vobs.LightType.Point
+            lightComp.Type = vob.LightType == LightType.Point
                 ? UnityEngine.LightType.Point
                 : UnityEngine.LightType.Spot;
             lightComp.Range = vob.Range * .01f;
@@ -997,6 +1016,14 @@ namespace GVR.Creator
 
             return pfxGo;
         }
+        
+        private static GameObject CreateAnimatedVob(Animate vob, GameObject parent = null)
+        {
+            var go = CreateDefaultMesh(vob, parent, true);
+            var morph = go.AddComponent<VobAnimateMorph>();
+            morph.StartAnimation(vob.Visual.Name);
+            return go;
+        }
 
         private static GameObject CreateDefaultMesh(IVirtualObject vob, GameObject parent = null, bool nonTeleport = false)
         {
@@ -1033,6 +1060,22 @@ namespace GVR.Creator
                 if (ret == null)
                     GameObject.Destroy(go);
 
+                return ret;
+            }
+            
+            // MMB
+            var mmb = AssetCache.TryGetMmb(meshName);
+            if (mmb != null)
+            {
+                var ret = MeshFactory.CreateVob(meshName, mmb, vob.Position.ToUnityVector(),
+                    vob.Rotation.ToUnityQuaternion(), parent ?? parentGo, go);
+                
+                // this is a dynamic object 
+
+                // A few objects are broken and have no meshes. We need to destroy them immediately again.
+                if (ret == null)
+                    GameObject.Destroy(go);
+                
                 return ret;
             }
 
