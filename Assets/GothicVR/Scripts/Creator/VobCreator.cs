@@ -982,8 +982,8 @@ namespace GVR.Creator
         private static GameObject CreateAnimatedVob(Animate vob, GameObject parent = null)
         {
             var go = CreateDefaultMesh(vob, parent, true);
-            var headmorph = go.AddComponent<HeadMorph>();
-            headmorph.StartAnimation(vob.Visual.Name);
+            var morph = go.AddComponent<VobAnimateMorph>();
+            morph.StartAnimation(vob.Visual.Name);
             return go;
         }
 
