@@ -153,6 +153,12 @@ namespace GVR.Npc
             var eventData = JsonUtility.FromJson<SerializableEventSoundEffect>(pxEventSfxDataParam);
             properties.currentAction.AnimationSfxEventCallback(eventData);
         }
+
+        public void AnimationMorphCallback(string pxEventMorphDataParam)
+        {
+            var eventData = JsonUtility.FromJson<SerializableEventMorphAnimation>(pxEventMorphDataParam);
+            properties.currentAction.AnimationMorphEventCallback(eventData);
+        }
         
         /// <summary>
         /// As all Components on a GameObject get called, we need to feed this information into current AnimationAction instance.

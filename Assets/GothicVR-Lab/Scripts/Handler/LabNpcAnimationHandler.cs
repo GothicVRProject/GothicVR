@@ -32,6 +32,18 @@ namespace GVR.Lab.Handler
 
         private Dictionary<string, List<(Type, AnimationAction)>> animations = new()
         {
+            {"Human - Eat Apple", new()
+                {
+                    (typeof(LabCreateInventoryItem), new(string0: "ItFoApple") ),
+                    (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: 0)), // int0 needs to be calculated live
+                    (typeof(Wait), new(float0: 1)),
+                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
+                    (typeof(Wait), new(float0: 1)),
+                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
+                    (typeof(Wait), new(float0: 1)),
+                    (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: -1))
+                }
+            },
             {"Human - Drink Beer", new()
                 {
                     (typeof(LabCreateInventoryItem), new(string0: "ItFoBeer") ),
@@ -52,18 +64,6 @@ namespace GVR.Lab.Handler
                     (typeof(LabUseItemToState), new(string0: "ItMiBrush", int1: -1))
                 }
             },
-            {"Human - Eat Apple", new()
-                {
-                    (typeof(LabCreateInventoryItem), new(string0: "ItFoApple") ),
-                    (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: 0)), // int0 needs to be calculated live
-                    (typeof(Wait), new(float0: 1)),
-                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
-                    (typeof(Wait), new(float0: 1)),
-                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
-                    (typeof(Wait), new(float0: 1)),
-                    (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: -1))
-                }
-            }
         };
 
         public void Bootstrap()
@@ -113,6 +113,10 @@ namespace GVR.Lab.Handler
 
         public void LoadAnimationClicked()
         {
+            // Shortcut
+            if (npcSlotGo.transform.childCount == 0)
+                LoadNpcClicked();
+
             var animationList = animations[animationDropdown.options[animationDropdown.value].text];
 
             var npcGo = npcSlotGo.transform.GetChild(0).gameObject;

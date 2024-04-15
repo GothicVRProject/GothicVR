@@ -983,7 +983,7 @@ namespace GVR.Creator
         {
             var go = CreateDefaultMesh(vob, parent, true);
             var morph = go.AddComponent<VobAnimateMorph>();
-            morph.StartAnimation(vob.Visual.Name);
+            morph.StartAnimation(vob.Visual!.Name);
             return go;
         }
 
