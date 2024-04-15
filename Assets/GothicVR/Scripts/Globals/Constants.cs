@@ -32,6 +32,7 @@ namespace GVR.Globals
 
         //Layer for all Items, specifically to disable collision physics between player and items
         public static LayerMask ItemLayer { get; set; } = LayerMask.NameToLayer("Item");
+        public static LayerMask InteractiveLayer = LayerMask.NameToLayer("Interactive"); //set layer to interactive so we can interact using XR Ray interactor
 
         // solves some weird interactions between the teleport raycast and collider (musicZone/worldTriggerChange)
         public static LayerMask IgnoreRaycastLayer { get; set; } = LayerMask.NameToLayer("Ignore Raycast");
