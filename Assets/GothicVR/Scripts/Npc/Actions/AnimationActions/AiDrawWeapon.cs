@@ -49,9 +49,15 @@ namespace GVR.Npc.Actions.AnimationActions
         private void SyncZSlots()
         {
             var rightHand = NpcGo.FindChildRecursively("ZS_RIGHTHAND");
-            var weapon1h = NpcGo.FindChildRecursively("ZS_SWORD");
+            var weapon1HSlot = NpcGo.FindChildRecursively("ZS_SWORD");
 
-            weapon1h.SetParent(rightHand, true, true);
+            // No weapon equipped in slot.
+            if (weapon1HSlot.transform.childCount == 0)
+                return;
+
+            var weaponGo = weapon1HSlot.transform.GetChild(0).gameObject;
+
+            weaponGo.SetParent(rightHand, true, true);
         }
     }
 }

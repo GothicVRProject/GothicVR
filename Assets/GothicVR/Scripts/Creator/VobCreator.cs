@@ -796,10 +796,10 @@ namespace GVR.Creator
                 true, parent ?? parentGosNonTeleport[vob.Type], go, useTextureArray: false);
         }
 
-        private static GameObject CreateItemMesh(ItemInstance item, GameObject go, UnityEngine.Vector3 position = default)
+        private static GameObject CreateItemMesh(ItemInstance item, GameObject parentGo, UnityEngine.Vector3 position = default)
         {
             var mrm = AssetCache.TryGetMrm(item.Visual);
-            return MeshFactory.CreateVob(item.Visual, mrm, position, default, false, parent: go, useTextureArray: false);
+            return MeshFactory.CreateVob(item.Visual, mrm, position, default, false, parent: parentGo, useTextureArray: false);
         }
 
         private static GameObject CreateDecal(IVirtualObject vob, GameObject parent = null)

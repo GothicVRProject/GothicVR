@@ -48,9 +48,20 @@ namespace GVR.Creator.Meshes.V2.Builder
                     break;
             }
 
-            var weaponGo = npcGo.FindChildRecursively(slotName);
-            if (weaponGo == null)
+            var weaponSlotGo = npcGo.FindChildRecursively(slotName);
+            if (weaponSlotGo == null)
                 return null;
+
+            GameObject weaponGo;
+            if (weaponSlotGo.transform.childCount == 0)
+            {
+                weaponGo = new GameObject(itemData.Visual);
+                weaponGo.SetParent(weaponSlotGo, true, true);
+            }
+            else
+            {
+                weaponGo = weaponSlotGo.transform.GetChild(0).gameObject;
+            }
 
             // Bugfix: e.g. there's a Buddler who has a NailMace and Club equipped at the same time.
             // Therefore we need to check if the Components are already there.
@@ -78,17 +89,26 @@ namespace GVR.Creator.Meshes.V2.Builder
                     break;
             }
 
-            var weaponGo = npcGo.FindChildRecursively(slotName);
-            if (weaponGo == null)
+            var weaponSlotGo = npcGo.FindChildRecursively(slotName);
+            if (weaponSlotGo == null)
                 return null;
+
+            GameObject weaponGo;
+            if (weaponSlotGo.transform.childCount == 0)
+            {
+                weaponGo = new GameObject(itemData.Visual);
+                weaponGo.SetParent(weaponSlotGo, true, true);
+            }
+            else
+            {
+                weaponGo = weaponSlotGo.transform.GetChild(0).gameObject;
+            }
 
             var meshFilter = weaponGo.AddComponent<MeshFilter>();
             var meshRenderer = weaponGo.AddComponent<MeshRenderer>();
 
-            // FIXME - We don't handle bow morphs as of now. Neet to do once fighting is implemented.
             PrepareMeshFilter(meshFilter, Mmb.Mesh, meshRenderer);
             PrepareMeshRenderer(meshRenderer, Mmb.Mesh);
-
 
             return weaponGo;
         }
