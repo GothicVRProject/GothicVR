@@ -23,11 +23,11 @@ namespace GVR.Lab.Handler
         public GameObject npcSlotGo;
 
 
-        private Dictionary<string, (string Name, string MdhMds, string Mdm, int BodyTexNr, int BodyTexColor, string Head, int HeadTexNr, int TeethTexNr, string sword)> npcs = new()
+        private Dictionary<string, (string Name, string MdhMds, string Mdm, int BodyTexNr, int BodyTexColor, string Head, int HeadTexNr, int TeethTexNr)> npcs = new()
         {
-            {"GRD_233_Bloodwyn", (Name: "Bloodwyn", MdhMds: "Humans_Militia.mds", Mdm: "Hum_GRDM_ARMOR", BodyTexNr: 0, BodyTexColor: 1, Head: "Hum_Head_Bald", HeadTexNr: 18, TeethTexNr: 1, sword: "ItMw_1H_Sword_04")},
-            {"EBR_110_Seraphia", (Name: "Seraphia", MdhMds: "Babe.mds", Mdm: "Bab_body_Naked0", BodyTexNr: 2, BodyTexColor: 1, Head: "Bab_Head_Hair1", HeadTexNr: 2, TeethTexNr: 0, sword: null)},
-            {"VLK_554_Buddler", (Name: "Buddler", MdhMds: "Humans_Tired.mds", Mdm: "Hum_VLKL_ARMOR", BodyTexNr: 3, BodyTexColor: 1, Head: "Hum_Head_Pony", HeadTexNr: 0, TeethTexNr: 2, sword: null)}
+            {"GRD_233_Bloodwyn", (Name: "Bloodwyn", MdhMds: "Humans_Militia.mds", Mdm: "Hum_GRDM_ARMOR", BodyTexNr: 0, BodyTexColor: 1, Head: "Hum_Head_Bald", HeadTexNr: 18, TeethTexNr: 1)},
+            {"EBR_110_Seraphia", (Name: "Seraphia", MdhMds: "Babe.mds", Mdm: "Bab_body_Naked0", BodyTexNr: 2, BodyTexColor: 1, Head: "Bab_Head_Hair1", HeadTexNr: 2, TeethTexNr: 0)},
+            {"VLK_554_Buddler", (Name: "Buddler", MdhMds: "Humans_Tired.mds", Mdm: "Hum_VLKL_ARMOR", BodyTexNr: 3, BodyTexColor: 1, Head: "Hum_Head_Pony", HeadTexNr: 0, TeethTexNr: 2)}
         };
 
         private Dictionary<string, List<(Type, AnimationAction)>> animations = new()
@@ -39,9 +39,21 @@ namespace GVR.Lab.Handler
                     (typeof(PlayAni), new("T_1HSFREE"))
                 }
             },
+            {"Human - Eat Apple", new()
+                {
+                    (typeof(LabCreateInventoryItem), new(string0: "ItFoApple") ),
+                    (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: 0)), // int0 needs to be calculated live
+                    (typeof(Wait), new(float0: 1)),
+                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
+                    (typeof(Wait), new(float0: 1)),
+                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
+                    (typeof(Wait), new(float0: 1)),
+                    (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: -1))
+                }
+            },
             {"Human - Drink Beer", new()
                 {
-                    (typeof(LabCreateInventoryItem), new(string0: "ItFoBeer")),
+                    (typeof(LabCreateInventoryItem), new(string0: "ItFoBeer") ),
                     (typeof(LabUseItemToState), new(string0: "ItFoBeer", int1: 0)), // int0 needs to be calculated live
                     (typeof(Wait), new(float0: 1)),
                     (typeof(PlayAni), new(string0: "T_POTION_RANDOM_1")),
@@ -59,18 +71,6 @@ namespace GVR.Lab.Handler
                     (typeof(LabUseItemToState), new(string0: "ItMiBrush", int1: -1))
                 }
             },
-            {"Human - Eat Apple", new()
-                {
-                    (typeof(LabCreateInventoryItem), new(string0: "ItFoApple")),
-                    (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: 0)), // int0 needs to be calculated live
-                    (typeof(Wait), new(float0: 1)),
-                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
-                    (typeof(Wait), new(float0: 1)),
-                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
-                    (typeof(Wait), new(float0: 1)),
-                    (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: -1))
-                }
-            }
         };
 
         public void Bootstrap()
@@ -116,18 +116,14 @@ namespace GVR.Lab.Handler
             };
 
             MeshFactory.CreateNpc(newNpc.name, npcData.Mdm, npcData.MdhMds, body, newNpc);
-
-            if (npcData.sword != null)
-            {
-                var swordIndex = GameData.GothicVm.GetSymbolByName(npcData.sword)!.Index;
-                var sword = AssetCache.TryGetItemData(swordIndex);
-
-                MeshFactory.CreateNpcWeapon(newNpc, sword, (VmGothicEnums.ItemFlags)sword.MainFlag, (VmGothicEnums.ItemFlags)sword.Flags);
-            }
         }
 
         public void LoadAnimationClicked()
         {
+            // Shortcut
+            if (npcSlotGo.transform.childCount == 0)
+                LoadNpcClicked();
+
             var animationList = animations[animationDropdown.options[animationDropdown.value].text];
 
             var npcGo = npcSlotGo.transform.GetChild(0).gameObject;

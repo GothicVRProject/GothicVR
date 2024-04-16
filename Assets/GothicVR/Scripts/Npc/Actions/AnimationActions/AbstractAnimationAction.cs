@@ -61,6 +61,13 @@ namespace GVR.Npc.Actions.AnimationActions
                     break;
             }
         }
+
+        public virtual void AnimationMorphEventCallback(SerializableEventMorphAnimation data)
+        {
+            var type = Props.headMorph.GetTypeByName(data.Animation);
+
+            Props.headMorph.StartAnimation(Props.BodyData.Head, type, false);
+        }
         
         protected virtual void InsertItem(string slot1, string slot2)
         {

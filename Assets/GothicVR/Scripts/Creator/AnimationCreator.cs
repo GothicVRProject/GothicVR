@@ -91,14 +91,14 @@ namespace GVR.Creator
             animationComp.Stop();
         }
 
-        public static void PlayHeadMorphAnimation(NpcProperties props, HeadMorph.HeadMorphType type)
+        public static void PlayHeadMorphAnimation(NpcProperties props, HeadMorph.HeadMorphType type, bool loop)
         {
-            props.headMorph.StartAnimation(props.BodyData.Head, type);
+            props.headMorph.StartAnimation(props.BodyData.Head, type, loop);
         }
 
         public static void StopHeadMorphAnimation(NpcProperties props)
         {
-            props.headMorph.StopAnimation(props.BodyData.Head);
+            props.headMorph.StopAnimation();
         }
 
         private static AnimationClip LoadAnimationClip(IModelAnimation pxAnimation, IModelHierarchy mdh, GameObject rootBone, bool repeat, string clipName)
@@ -237,6 +237,19 @@ namespace GVR.Creator
                     stringParameter = JsonUtility.ToJson(new SerializableEventSoundEffect(sfxEvent)) // As we can't add a custom object, we serialize the data object.
                 };
                 
+                clip.AddEvent(animEvent);
+            }
+
+            foreach (var morphEvent in anim.MorphAnimations)
+            {
+                var clampedFrame = ClampFrame(morphEvent.Frame, modelAnimation, anim);
+                AnimationEvent animEvent = new()
+                {
+                    time = clampedFrame / clip.frameRate,
+                    functionName = nameof(IAnimationCallbacks.AnimationMorphCallback),
+                    stringParameter = JsonUtility.ToJson(new SerializableEventMorphAnimation(morphEvent)) // As we can't add a custom object, we serialize the data object.
+                };
+
                 clip.AddEvent(animEvent);
             }
 
