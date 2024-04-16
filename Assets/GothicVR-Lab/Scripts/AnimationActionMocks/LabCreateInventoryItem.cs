@@ -14,11 +14,8 @@ namespace GVR.Lab.AnimationActionMocks
         public override void Start()
         {
             var itemSymbol = GameData.GothicVm.GetSymbolByName(Action.String0);
-            // GameData.GothicVm.AllocInstance<ItemInstance>(itemSymbol!);
-            // GameData.GothicVm.InitInstance<ItemInstance>(itemSymbol!);
 
             VmGothicExternals.CreateInvItem(Props.npcInstance, itemSymbol!.Index);
-
 
             base.Start();
         }
