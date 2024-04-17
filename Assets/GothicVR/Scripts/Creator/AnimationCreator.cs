@@ -60,12 +60,13 @@ namespace GVR.Creator
             {
                 clip = LoadAnimationClip(modelAnimation, mdh, go, repeat, mdsAnimationKeyName);
                 LookupCache.AnimationClipCache[mdsAnimationKeyName] = clip;
+
+                AddClipEvents(clip, modelAnimation, anim);
+                AddClipEndEvent(clip);
             }
 
             if (animationComp[mdsAnimationKeyName] == null)
             {
-                AddClipEvents(clip, modelAnimation, anim);
-                AddClipEndEvent(clip);
                 animationComp.AddClip(clip, mdsAnimationKeyName);
                 animationComp[mdsAnimationKeyName]!.layer = modelAnimation.Layer;
             }
