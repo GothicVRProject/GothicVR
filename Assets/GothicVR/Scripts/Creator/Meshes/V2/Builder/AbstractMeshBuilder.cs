@@ -17,7 +17,6 @@ namespace GVR.Creator.Meshes.V2.Builder
     {
         protected GameObject RootGo;
         protected GameObject ParentGo;
-        protected string ObjectName;
         protected bool HasMeshCollider = true;
         protected bool UseTextureArray;
 
@@ -42,7 +41,7 @@ namespace GVR.Creator.Meshes.V2.Builder
 
             if (name != null)
             {
-                ObjectName = name;
+                RootGo.name = name;
             }
         }
 

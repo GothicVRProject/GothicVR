@@ -2,7 +2,7 @@ using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using UnityEngine;
 
-namespace GVR.GothicVR_Lab.Scripts.AnimationActionMocks
+namespace GVR.Lab.AnimationActionMocks
 {
     /// <summary>
     /// Gothic has two types of External calls:
@@ -12,9 +12,9 @@ namespace GVR.GothicVR_Lab.Scripts.AnimationActionMocks
     /// We need to create a mechanism to handle immediate actions as if they would've been called by Daedalus.
     /// These mock classes help implementing it where needed in the Lab.
     /// </summary>
-    public abstract class LabImmediateAnimationAction : AbstractAnimationAction
+    public abstract class AbstractLabAnimationAction : AbstractAnimationAction
     {
-        protected LabImmediateAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
+        protected AbstractLabAnimationAction(AnimationAction action, GameObject npcGo) : base(action, npcGo)
         {
         }
 

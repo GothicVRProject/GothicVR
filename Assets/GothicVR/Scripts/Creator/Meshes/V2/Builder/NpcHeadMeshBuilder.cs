@@ -14,7 +14,7 @@ namespace GVR.Creator.Meshes.V2.Builder
 
             if (headGo == null)
             {
-                Debug.LogWarning($"No NPC head found for {ObjectName}");
+                Debug.LogWarning($"No NPC head found for {RootGo.name}");
                 return RootGo;
             }
 
