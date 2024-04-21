@@ -209,7 +209,7 @@ namespace GVR.Manager
 
             var waypoint = WayNetHelper.GetWayNetPoint(waypointName);
 
-            if (waypoint == null || npcGo)
+            if (waypoint == null || !npcGo)
                 return int.MaxValue;
 
             return (int)Vector3.Distance(npcPos, waypoint.Position);
