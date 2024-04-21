@@ -33,10 +33,18 @@ namespace GVR.Lab.Handler
         private Dictionary<string, List<(Type, AnimationAction)>> animations = new()
         {
             {
+                "Human - Wash self", new()
+                {
+                    (typeof(PlayAni), new(string0: "T_STAND_2_WASH")),
+                    (typeof(Wait), new(float0: 5)),
+                    (typeof(PlayAni), new(string0: "T_WASH_2_STAND")),
+                }
+            },
+            {
                 "Human - Sword training", new()
                 {
                     (typeof(DrawWeapon), new()),
-                    (typeof(PlayAni), new("T_1HSFREE"))
+                    (typeof(PlayAni), new(string0: "T_1HSFREE"))
                 }
             },
             {"Human - Eat Apple", new()

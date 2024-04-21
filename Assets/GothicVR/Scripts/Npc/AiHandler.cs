@@ -1,5 +1,6 @@
 ﻿using GVR.Creator;
 using GVR.Data.ZkEvents;
+using GVR.Extensions;
 using GVR.Globals;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
@@ -12,7 +13,7 @@ namespace GVR.Npc
     public class AiHandler : BasePlayerBehaviour, IAnimationCallbacks
     {
         private static DaedalusVm vm => GameData.GothicVm;
-        private const int DaedalusLoopContinue = 0;
+        private const int DaedalusLoopContinue = 0; // Id taken from a Daedalus constant.
 
         private void Start()
         {
@@ -142,29 +143,38 @@ namespace GVR.Npc
             action.Start();
         }
 
-        public void AnimationCallback(string pxEventTagDataParam)
+        public void AnimationCallback(string eventTagDataParam)
         {
-            var eventData = JsonUtility.FromJson<SerializableEventTag>(pxEventTagDataParam);
+            var eventData = JsonUtility.FromJson<SerializableEventTag>(eventTagDataParam);
             properties.currentAction.AnimationEventCallback(eventData);
         }
 
-        public void AnimationSfxCallback(string pxEventSfxDataParam)
+        public void AnimationSfxCallback(string eventSfxDataParam)
         {
-            var eventData = JsonUtility.FromJson<SerializableEventSoundEffect>(pxEventSfxDataParam);
+            var eventData = JsonUtility.FromJson<SerializableEventSoundEffect>(eventSfxDataParam);
             properties.currentAction.AnimationSfxEventCallback(eventData);
         }
 
-        public void AnimationMorphCallback(string pxEventMorphDataParam)
+        public void AnimationMorphCallback(string eventMorphDataParam)
         {
-            var eventData = JsonUtility.FromJson<SerializableEventMorphAnimation>(pxEventMorphDataParam);
+            var eventData = JsonUtility.FromJson<SerializableEventMorphAnimation>(eventMorphDataParam);
             properties.currentAction.AnimationMorphEventCallback(eventData);
         }
         
         /// <summary>
         /// As all Components on a GameObject get called, we need to feed this information into current AnimationAction instance.
         /// </summary>
-        public void AnimationEndCallback()
+        public void AnimationEndCallback(string eventEndSignalParam)
         {
+            var eventData = JsonUtility.FromJson<SerializableEventEndSignal>(eventEndSignalParam);
+
+            // We offload this call to not interfere with the actual implementations. They can always overwrite the next animation if needed.
+            // Assumption: If there is a nextAnimation, it needs to be played automatically in a loop.
+            // e.g. T_STAND_2_WASH -> S_WASH -> S_WASH ... -> T_WASH_2_STAND
+            // Inside daedalus there is no information about S_WASH, but we need this animation automatically being played.
+            if (!eventData.NextAnimation.IsEmpty())
+                AnimationCreator.PlayAnimation(properties.mdsNames, eventData.NextAnimation, properties.go);
+
             properties.currentAction.AnimationEndEventCallback();
         }
     }
