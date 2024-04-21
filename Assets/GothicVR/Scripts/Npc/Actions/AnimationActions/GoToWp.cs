@@ -18,6 +18,8 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
+            base.Start();
+
             var currentWaypoint = Props.CurrentWayPoint ?? WayNetHelper.FindNearestWayPoint(Props.transform.position);
             var destinationWaypoint = (WayPoint)WayNetHelper.GetWayNetPoint(destination);
 

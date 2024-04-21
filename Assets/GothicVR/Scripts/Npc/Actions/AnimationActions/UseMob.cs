@@ -3,6 +3,7 @@ using System.Linq;
 using GVR.Creator;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
+using GVR.Manager;
 using GVR.Properties;
 using GVR.Vm;
 using JetBrains.Annotations;
@@ -27,6 +28,8 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
+            base.Start();
+
             // NPC is already interacting with a Mob, we therefore assume it's a change of state (e.g. -1 to stop Mob usage)
             if (Props.bodyState == VmGothicEnums.BodyState.BS_MOBINTERACT)
             {
@@ -89,13 +92,10 @@ namespace GVR.Npc.Actions.AnimationActions
         private void StartMobUseAnimation()
         {
             walkState = WalkState.Done;
+            PhysicsHelper.DisablePhysicsForNpc(Props);
 
             // AnimationCreator.StopAnimation(NpcGo);
             NpcGo.transform.SetPositionAndRotation(slotGo.transform.position, slotGo.transform.rotation);
-
-            // We need to disable physics as e.g. Gomez won't sit on his throne otherwise. (Animations are aligned with the objects they use already).
-            // A collider would break it.
-            PhysicsHelper.DisablePhysicsForNpc(Props);
 
             PlayTransitionAnimation();
         }

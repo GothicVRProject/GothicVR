@@ -15,6 +15,8 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
+            base.Start();
+
             destinationTransform = LookupCache.NpcCache[otherIndex].transform;
         }
 

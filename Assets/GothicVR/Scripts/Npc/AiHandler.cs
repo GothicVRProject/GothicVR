@@ -2,6 +2,7 @@
 using GVR.Data.ZkEvents;
 using GVR.Extensions;
 using GVR.Globals;
+using GVR.Manager;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Properties;
@@ -172,6 +173,7 @@ namespace GVR.Npc
             // Assumption: If there is a nextAnimation, it needs to be played automatically in a loop.
             // e.g. T_STAND_2_WASH -> S_WASH -> S_WASH ... -> T_WASH_2_STAND
             // Inside daedalus there is no information about S_WASH, but we need this animation automatically being played.
+            // TODO - We could/should migrate it inside the actual Actions so that we don't clutter TODOs outside them.
             if (!eventData.NextAnimation.IsEmpty())
                 AnimationCreator.PlayAnimation(properties.mdsNames, eventData.NextAnimation, properties.go);
 

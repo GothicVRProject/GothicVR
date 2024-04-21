@@ -1,5 +1,6 @@
 using System;
 using GVR.Creator;
+using GVR.Manager;
 using GVR.Vm;
 using UnityEngine;
 
@@ -25,7 +26,14 @@ namespace GVR.Npc.Actions.AnimationActions
         /// We need to define the final destination spot within overriding class.
         /// </summary>
         protected abstract Vector3 GetWalkDestination();
-        
+
+        public override void Start()
+        {
+            base.Start();
+
+            PhysicsHelper.EnablePhysicsForNpc(Props);
+        }
+
         public override void Tick(Transform transform)
         {
             base.Tick(transform);

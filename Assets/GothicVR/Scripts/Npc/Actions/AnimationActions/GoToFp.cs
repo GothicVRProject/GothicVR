@@ -1,3 +1,4 @@
+using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Vob.WayNet;
 using UnityEngine;
@@ -17,11 +18,12 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            var pos = NpcGo.transform.position;
+            base.Start();
 
+            var pos = NpcGo.transform.position;
             fp = WayNetHelper.FindNearestFreePoint(pos, destination);
         }
-        
+
         public override void OnTriggerEnter(Collider coll)
         {
             if (walkState != WalkState.Walk)

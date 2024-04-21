@@ -1,6 +1,6 @@
 using GVR.Caches;
 using GVR.Creator;
-using GVR.GothicVR.Scripts.Manager;
+using GVR.Manager;
 using UnityEngine;
 using ZenKit.Daedalus;
 
@@ -21,7 +21,6 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            PhysicsHelper.DisablePhysicsForNpc(Props);
             PlayTransitionAnimation();
         }
 
