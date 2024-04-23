@@ -81,7 +81,7 @@ namespace GVR.Editor.Tools
         {
             SetFeatureFlagsProduction();
 
-            SetFlags(new()
+            SetFlags(new List<(string, Type, object)>
             {
                 new (nameof(FeatureFlags.createOcNpcs), typeof(bool), true),
                 new (nameof(FeatureFlags.enableNpcRoutines), typeof(bool), true),
