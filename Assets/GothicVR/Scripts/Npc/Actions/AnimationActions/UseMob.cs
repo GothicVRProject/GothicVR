@@ -43,21 +43,25 @@ namespace GVR.Npc.Actions.AnimationActions
 
             // Else: We have a new animation where we seek the Mob before walking towards and executing action.
             var mob = GetNearestMob();
-            var slotPos = GetNearestMobSlot(mob);
+            var slot = GetNearestMobSlot(mob);
 
-            if (slotPos == null)
+            if (slot == null)
             {
                 IsFinishedFlag = true;
                 return;
             }
 
             mobGo = mob;
-            slotGo = slotPos;
+            slotGo = slot;
             destination = slotGo.transform.position;
 
             Props.currentInteractable = mobGo;
             Props.currentInteractableSlot = slotGo;
             Props.bodyState = VmGothicEnums.BodyState.BS_MOBINTERACT;
+
+            // Fix - If NPC is spawned directly in front of the Mob, we start transition immediately (otherwise trigger/collider won't be called).
+            if (Vector3.Distance(NpcGo.transform.position, slotGo.transform.position) < 0.5f)
+                StartMobUseAnimation();
         }
 
         [CanBeNull]
@@ -74,9 +78,9 @@ namespace GVR.Npc.Actions.AnimationActions
                 return null;
             
             var pos = NpcGo.transform.position;
-            var slotPos = VobHelper.GetNearestSlot(mob.gameObject, pos);
+            var slot = VobHelper.GetNearestSlot(mob.gameObject, pos);
 
-            return slotPos;
+            return slot;
         }
 
         public override void OnTriggerEnter(Collider coll)
@@ -122,6 +126,7 @@ namespace GVR.Npc.Actions.AnimationActions
         public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
             base.AnimationEndEventCallback(eventData);
+            IsFinishedFlag = false;
 
             if (walkState != WalkState.Done)
                 return;
@@ -138,10 +143,6 @@ namespace GVR.Npc.Actions.AnimationActions
             // Mobsi isn't in use any longer
             if (Props.currentInteractableStateId == -1)
             {
-                // FIXME - Needed?
-                // e.g. Cauldron cooking doesn't call it automatically. We therefore need to force remove the whirling item from hand.
-                // AnimationEventCallback(new() { Type = EventType.ItemDestroy });
-
                 Props.currentInteractable = null;
                 Props.currentInteractableSlot = null;
                 Props.bodyState = VmGothicEnums.BodyState.BS_STAND;
