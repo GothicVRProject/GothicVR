@@ -1,5 +1,6 @@
 using GVR.Caches;
 using GVR.Creator;
+using GVR.Data.ZkEvents;
 using GVR.Manager;
 using UnityEngine;
 using ZenKit.Daedalus;
@@ -67,8 +68,10 @@ namespace GVR.Npc.Actions.AnimationActions
             AnimationCreator.PlayAnimation(Props.mdsNames, animName, NpcGo, true);
         }
 
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
+            base.AnimationEndEventCallback(eventData);
+
             if (Props.itemAnimationState == desiredState)
             {
                 PhysicsHelper.EnablePhysicsForNpc(Props);

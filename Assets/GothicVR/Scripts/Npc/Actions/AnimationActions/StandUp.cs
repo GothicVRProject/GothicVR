@@ -1,3 +1,4 @@
+using GVR.Data.ZkEvents;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -12,7 +13,7 @@ namespace GVR.Npc.Actions.AnimationActions
             // FIXME - TODO
         }
 
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
             // FIXME - TODO
         }

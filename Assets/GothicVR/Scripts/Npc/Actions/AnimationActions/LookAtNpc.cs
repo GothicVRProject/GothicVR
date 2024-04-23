@@ -1,4 +1,5 @@
 using GVR.Caches;
+using GVR.Data.ZkEvents;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -21,9 +22,9 @@ namespace GVR.Npc.Actions.AnimationActions
             // return new Vector3(0, temp.y, 0);
         }
 
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
-            base.AnimationEndEventCallback();
+            base.AnimationEndEventCallback(eventData);
 
             IsFinishedFlag = false;
         }

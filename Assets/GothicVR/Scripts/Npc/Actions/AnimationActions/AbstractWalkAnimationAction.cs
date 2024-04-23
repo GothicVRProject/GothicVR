@@ -1,5 +1,6 @@
 using System;
 using GVR.Creator;
+using GVR.Data.ZkEvents;
 using GVR.Manager;
 using GVR.Vm;
 using UnityEngine;
@@ -114,9 +115,13 @@ namespace GVR.Npc.Actions.AnimationActions
         /// <summary>
         /// We need to alter rootNode's position once walk animation is done.
         /// </summary>
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
-            base.AnimationEndEventCallback();
+            base.AnimationEndEventCallback(eventData);
+
+            // We need to ensure, that physics still apply when an animation is looped.
+            if (walkState != WalkState.Done)
+                PhysicsHelper.EnablePhysicsForNpc(Props);
 
             NpcGo.transform.localPosition = Props.bip01.position;
             Props.bip01.localPosition = Vector3.zero;

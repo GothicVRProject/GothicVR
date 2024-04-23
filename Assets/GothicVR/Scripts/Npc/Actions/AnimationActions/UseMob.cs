@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using GVR.Creator;
+using GVR.Data.ZkEvents;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
@@ -118,8 +119,10 @@ namespace GVR.Npc.Actions.AnimationActions
         /// <summary>
         /// Only after the Mob is reached and final transition animation is done, we will finalize this Action.
         /// </summary>
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
+            base.AnimationEndEventCallback(eventData);
+
             if (walkState != WalkState.Done)
                 return;
 
@@ -135,8 +138,9 @@ namespace GVR.Npc.Actions.AnimationActions
             // Mobsi isn't in use any longer
             if (Props.currentInteractableStateId == -1)
             {
+                // FIXME - Needed?
                 // e.g. Cauldron cooking doesn't call it automatically. We therefore need to force remove the whirling item from hand.
-                AnimationEventCallback(new() { Type = EventType.ItemDestroy });
+                // AnimationEventCallback(new() { Type = EventType.ItemDestroy });
 
                 Props.currentInteractable = null;
                 Props.currentInteractableSlot = null;

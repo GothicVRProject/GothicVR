@@ -1,4 +1,5 @@
 using System;
+using GVR.Data.ZkEvents;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -13,7 +14,7 @@ namespace GVR.Npc.Actions.AnimationActions
             // NOP
         }
 
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
             throw new NotImplementedException("This method is not needed and shouldn't be called.");
         }

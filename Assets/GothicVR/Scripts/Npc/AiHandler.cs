@@ -169,15 +169,8 @@ namespace GVR.Npc
         {
             var eventData = JsonUtility.FromJson<SerializableEventEndSignal>(eventEndSignalParam);
 
-            // We offload this call to not interfere with the actual implementations. They can always overwrite the next animation if needed.
-            // Assumption: If there is a nextAnimation, it needs to be played automatically in a loop.
-            // e.g. T_STAND_2_WASH -> S_WASH -> S_WASH ... -> T_WASH_2_STAND
-            // Inside daedalus there is no information about S_WASH, but we need this animation automatically being played.
-            // TODO - We could/should migrate it inside the actual Actions so that we don't clutter TODOs outside them.
-            if (!eventData.NextAnimation.IsEmpty())
-                AnimationCreator.PlayAnimation(properties.mdsNames, eventData.NextAnimation, properties.go);
-
-            properties.currentAction.AnimationEndEventCallback();
+            // FIXME ! We need to re-add physics when e.g. looping walk animation!
+            properties.currentAction.AnimationEndEventCallback(eventData);
         }
     }
 }

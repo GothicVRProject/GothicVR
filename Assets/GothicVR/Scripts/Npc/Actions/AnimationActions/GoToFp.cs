@@ -1,3 +1,4 @@
+using GVR.Data.ZkEvents;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Vob.WayNet;
@@ -35,15 +36,15 @@ namespace GVR.Npc.Actions.AnimationActions
             Props.CurrentFreePoint = fp;
             fp.IsLocked = true;
 
-            AnimationEndEventCallback();
+            AnimationEndEventCallback(new SerializableEventEndSignal(nextAnimation: ""));
 
             walkState = WalkState.Done;
             IsFinishedFlag = true;
         }
 
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
-            base.AnimationEndEventCallback();
+            base.AnimationEndEventCallback(eventData);
 
             IsFinishedFlag = false;
         }

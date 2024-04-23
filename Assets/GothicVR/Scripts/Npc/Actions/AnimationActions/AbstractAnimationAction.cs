@@ -88,16 +88,31 @@ namespace GVR.Npc.Actions.AnimationActions
 
         private void RemoveItem()
         {
+            // Some animations need to force remove items, some not.
+            if (Props.usedItemSlot == "")
+                return;
+
             var slotGo = NpcGo.FindChildRecursively(Props.usedItemSlot);
             var item = slotGo!.transform.GetChild(0);
+
             Object.Destroy(item.gameObject);
         }
         
         /// <summary>
         /// Most of our animations are fine if we just set this flag and return it via IsFinished()
+        /// If an animation has also a next animation set, we will call it automatically.
+        /// If this is not intended, the overwriting class can always reset the animation being played at the same frame.
         /// </summary>
-        public virtual void AnimationEndEventCallback()
+        public virtual void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
+            // e.g. T_STAND_2_WASH -> S_WASH -> S_WASH ... -> T_WASH_2_STAND
+            // Inside daedalus there is no information about S_WASH, but we need this animation automatically being played.
+            if (!eventData.NextAnimation.IsEmpty())
+            {
+                PhysicsHelper.DisablePhysicsForNpc(Props);
+                AnimationCreator.PlayAnimation(Props.mdsNames, eventData.NextAnimation, Props.go);
+            }
+
             IsFinishedFlag = true;
         }
 
