@@ -16,7 +16,7 @@ namespace GVR.Editor.Tools
         /// <summary>
         /// FieldName, FieldType, Value
         /// </summary>
-        private static readonly List<Tuple<string, Type, object>> ProductionFlags = new()
+        private static readonly List<(string name, Type type, object value)> ProductionFlags = new()
         {
             // Booleans
             new (nameof(FeatureFlags.createWorldMesh), typeof(bool), true),
@@ -50,66 +50,85 @@ namespace GVR.Editor.Tools
                 new Color(1, .87f, .44f, 1))
         };
 
-
-        [MenuItem("GothicVR/Tools/FeatureFlags - Set Production ready state", priority = 1)]
-        public static void SetFeatureFlags()
+        private static Scene _bootstrapScene
         {
-            var scene = SceneManager.GetSceneByName("Bootstrap");
-
-            if (scene == default)
+            get
             {
-                Debug.LogError(">Bootstrap< scene needs to be loaded.");
-                return;
+                var scene = SceneManager.GetSceneByName("Bootstrap");
+                if (scene == default)
+                    Debug.LogError(">Bootstrap< scene needs to be loaded.");
+                return scene;
             }
+        }
+        private static FeatureFlags _featureFlags => GameObject.Find("FeatureFlags").GetComponent<FeatureFlags>();
 
-            var featureFlags = GameObject.Find("FeatureFlags").GetComponent<FeatureFlags>();
-            var fields = featureFlags.GetType().GetFields();
 
-            ResetFlags(featureFlags, fields);
-            SetProductionFlags(featureFlags);
+        [MenuItem("GothicVR/Tools/FeatureFlags - Production", priority = 1)]
+        public static void SetFeatureFlagsProduction()
+        {
+            var fields = _featureFlags.GetType().GetFields();
 
-            EditorSceneManager.MarkSceneDirty(scene);
+            ResetFlags(fields);
+            SetProductionFlags();
 
-            Debug.Log("FeatureFlags successfully set to production values.");
+            EditorSceneManager.MarkSceneDirty(_bootstrapScene);
+
+            Debug.Log("FeatureFlags successfully set to >production<.");
+        }
+
+        [MenuItem("GothicVR/Tools/FeatureFlags - NpcTest", priority = 2)]
+        public static void SetFeatureFlagsNpcTest()
+        {
+            SetFeatureFlagsProduction();
+
+            SetFlags(new()
+            {
+                new (nameof(FeatureFlags.createOcNpcs), typeof(bool), true),
+                new (nameof(FeatureFlags.enableNpcRoutines), typeof(bool), true),
+                // 1 - Diego, 100 - Gomez, 233 - Blodwyn
+                new (nameof(FeatureFlags.npcToSpawn), typeof(List<int>), new List<int>{1, 100, 233})
+            });
+
+            Debug.Log("FeatureFlags successfully set to >NpcTest<.");
         }
 
         /// <summary>
         /// We reset all flags to a default value. It's expected, that e.g. a bool=false is default.
         /// </summary>
-        private static void ResetFlags(FeatureFlags featureFlags, FieldInfo[] fields)
+        private static void ResetFlags(FieldInfo[] fields)
         {
             foreach (var field in fields)
             {
                 switch (field.FieldType.Name)
                 {
                     case "Boolean":
-                        field.SetValue(featureFlags, false);
+                        field.SetValue(_featureFlags, false);
                         break;
                     case "Int32":
                     case "Single": // float
                     case "SunMovementPerformance":
-                        field.SetValue(featureFlags, 0);
+                        field.SetValue(_featureFlags, 0);
                         break;
                     case "LogLevel":
-                        field.SetValue(featureFlags, LogLevel.Error);
+                        field.SetValue(_featureFlags, LogLevel.Error);
                         break;
                     case "String":
-                            field.SetValue(featureFlags, "");
+                            field.SetValue(_featureFlags, "");
                             break;
                     case "Color":
-                        field.SetValue(featureFlags, Color.white);
+                        field.SetValue(_featureFlags, Color.white);
                         break;
                     case "VobCullingGroupSetting":
-                            field.SetValue(featureFlags, new FeatureFlags.VobCullingGroupSetting());
+                            field.SetValue(_featureFlags, new FeatureFlags.VobCullingGroupSetting());
                             break;
                     case "List`1":
                         switch (field.FieldType.GenericTypeArguments[0].Name)
                         {
                             case "Int32":
-                                ((List<int>)field.GetValue(featureFlags)).Clear();
+                                ((List<int>)field.GetValue(_featureFlags)).Clear();
                                 break;
                             case nameof(VirtualObjectType):
-                                ((List<VirtualObjectType>)field.GetValue(featureFlags)).Clear();
+                                ((List<VirtualObjectType>)field.GetValue(_featureFlags)).Clear();
                                 break;
                             default:
                                 Debug.LogError($"Unsupported field type >{field.FieldType.GenericTypeArguments[0].Name}<");
@@ -126,22 +145,41 @@ namespace GVR.Editor.Tools
         /// <summary>
         /// Pick the ProductionFlags and set values to demanded values.
         /// </summary>
-        private static void SetProductionFlags(FeatureFlags featureFlags)
+        private static void SetProductionFlags()
         {
-            foreach (var flag in ProductionFlags)
+            SetFlags(ProductionFlags);
+        }
+
+        /// <summary>
+        /// Set whatever flags we want.
+        /// </summary>
+        private static void SetFlags(List<(string name, Type type, object value)> flags)
+        {
+            foreach (var flag in flags)
             {
-                switch (flag.Item2.Name)
+                var field = _featureFlags.GetType().GetField(flag.name);
+                switch (flag.type.Name)
                 {
                     case "Boolean":
                     case "Int32":
                     case "Single": // float
                     case "Color":
                     case "VobCullingGroupSetting":
-                        var field = featureFlags.GetType().GetField(flag.Item1);
-                        field.SetValue(featureFlags, flag.Item3);
+                        field.SetValue(_featureFlags, flag.value);
+                        break;
+                    case "List`1":
+                        switch (field.FieldType.GenericTypeArguments[0].Name)
+                        {
+                            case "Int32":
+                                field.SetValue(_featureFlags, flag.value);
+                                break;
+                            default:
+                                Debug.LogError($"Unsupported field type >{field.FieldType.GenericTypeArguments[0].Name}<");
+                                break;
+                        }
                         break;
                     default:
-                        Debug.LogError($"Unsupported/Untested field type >{flag.Item2.Name}< for >{flag.Item1}<");
+                        Debug.LogError($"Unsupported/Untested field type >{flag.type.Name}< for >{flag.name}<");
                         break;
                 }
             }
