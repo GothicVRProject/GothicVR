@@ -63,7 +63,7 @@ namespace GVR.GothicVR.Scripts.Manager
         {
             GvrEvents.GameTimeSecondChangeCallback.AddListener(Interpolate);
             GvrEvents.GameTimeHourChangeCallback.AddListener(UpdateRainTime);
-            GvrEvents.GeneralSceneLoaded.AddListener(InitRainGO);
+            GvrEvents.GeneralSceneLoaded.AddListener(GeneralSceneLoaded);
         }
 
         public void InitSky()
@@ -247,6 +247,13 @@ namespace GVR.GothicVR.Scripts.Manager
             Shader.SetGlobalColor(SunColorShaderId, SunColor);
             Shader.SetGlobalColor(AmbientShaderId, AmbientColor);
             Shader.SetGlobalFloat(PointLightIntensityShaderId, PointLightIntensity);
+        }
+
+        private void GeneralSceneLoaded()
+        {
+            RenderSettings.skybox = Instantiate(TextureManager.I.skyMaterial);
+
+            InitRainGO();
         }
 
         private void InitRainGO()
