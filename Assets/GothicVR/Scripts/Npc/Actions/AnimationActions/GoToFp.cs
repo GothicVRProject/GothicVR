@@ -21,8 +21,12 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             base.Start();
 
-            var pos = NpcGo.transform.position;
-            fp = WayNetHelper.FindNearestFreePoint(pos, destination);
+            var npcPos = NpcGo.transform.position;
+            fp = WayNetHelper.FindNearestFreePoint(npcPos, destination);
+
+            // Fix - If NPC is spawned directly in front of the FP, we start transition immediately (otherwise trigger/collider won't be called).
+            if (Vector3.Distance(npcPos, fp!.Position) < 1f)
+                FreePointReached();
         }
 
         public override void OnTriggerEnter(Collider coll)
@@ -33,13 +37,7 @@ namespace GVR.Npc.Actions.AnimationActions
             if (coll.gameObject.name != fp.Name)
                 return;
 
-            Props.CurrentFreePoint = fp;
-            fp.IsLocked = true;
-
-            AnimationEndEventCallback(new SerializableEventEndSignal(nextAnimation: ""));
-
-            walkState = WalkState.Done;
-            IsFinishedFlag = true;
+            FreePointReached();
         }
 
         public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
@@ -52,6 +50,17 @@ namespace GVR.Npc.Actions.AnimationActions
         protected override Vector3 GetWalkDestination()
         {
             return fp.Position;
+        }
+
+        private void FreePointReached()
+        {
+            Props.CurrentFreePoint = fp;
+            fp.IsLocked = true;
+
+            AnimationEndEventCallback(new SerializableEventEndSignal(nextAnimation: ""));
+
+            walkState = WalkState.Done;
+            IsFinishedFlag = true;
         }
     }
 }
