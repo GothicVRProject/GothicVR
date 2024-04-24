@@ -66,11 +66,6 @@ namespace GVR.GothicVR.Scripts.Manager
             GvrEvents.GeneralSceneLoaded.AddListener(InitRainGO);
         }
 
-        private void OnValidate()
-        {
-            SetShaderProperties();
-        }
-
         public void InitSky()
         {
             stateList.AddRange(new[]
@@ -173,7 +168,6 @@ namespace GVR.GothicVR.Scripts.Manager
 
             if (lerpFraction >= 1 && noSky == false)
             {
-                noSky = false;
                 return; // finished blending
             }
 
