@@ -26,7 +26,6 @@ public class TextureManager : SingletonBehaviour<TextureManager>
 
     private void Start()
     {
-
         mainMenuImageBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
         mainMenuBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
         mainMenuTextImageMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
@@ -34,15 +33,6 @@ public class TextureManager : SingletonBehaviour<TextureManager>
         gothicLoadingMenuMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
         loadingBarBackgroundMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
         loadingBarMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
-
-        // These elements get their material assigned in Editor already.
-        // TODO: remove the middleman materials and use these for settings menu
-        // backgroundmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
-        // buttonmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
-        // slidermaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
-        // sliderpositionmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
-        // arrowmaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
-        // fillermaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Transparent);
 
         loadingSphereMaterial = GetEmptyMaterial(MaterialExtension.BlendMode.Opaque);
         loadingSphereMaterial.color = new Color(.25f, .25f, .25f, 1f); // dark gray
