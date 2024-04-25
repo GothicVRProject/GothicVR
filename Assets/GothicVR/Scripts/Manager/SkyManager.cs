@@ -19,8 +19,11 @@ namespace GVR.GothicVR.Scripts.Manager
     public class SkyManager : SingletonBehaviour<SkyManager>
     {
         public Transform SunDirection;
+        [Tooltip("Changes will be reflected in Editor Runtime mode for testing purposes.")]
         public Color SunColor;
+        [Tooltip("Changes will be reflected in Editor Runtime mode for testing purposes.")]
         public Color AmbientColor;
+        [Tooltip("Changes will be reflected in Editor Runtime mode for testing purposes.")]
         [Range(0, 1)]
         public float PointLightIntensity = 1f;
         public bool IsRaining;
@@ -64,6 +67,11 @@ namespace GVR.GothicVR.Scripts.Manager
             GvrEvents.GameTimeSecondChangeCallback.AddListener(Interpolate);
             GvrEvents.GameTimeHourChangeCallback.AddListener(UpdateRainTime);
             GvrEvents.GeneralSceneLoaded.AddListener(GeneralSceneLoaded);
+        }
+
+        private void OnValidate()
+        {
+            SetShaderProperties();
         }
 
         public void InitSky()
