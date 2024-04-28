@@ -74,7 +74,9 @@ namespace GVR.Npc.Actions.AnimationActions
 
             if (audioPlaySeconds <= 0f)
             {
-                AnimationCreator.StopHeadMorphAnimation(Props);
+                // NPC
+                if (speakerId != 0)
+                    AnimationCreator.StopHeadMorphAnimation(Props);
 
                 return true;
             }
