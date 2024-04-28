@@ -18,6 +18,9 @@ namespace GVR.Creator.Sounds
         [CanBeNull]
         public static SoundData GetSoundArrayFromVfs(string name)
         {
+            if (GameData.Vfs == null)
+                return null;
+
             var node = GameData.Vfs.Find(name);
             if (node == null)
                 return null;

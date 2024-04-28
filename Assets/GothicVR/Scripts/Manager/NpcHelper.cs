@@ -28,6 +28,11 @@ namespace GVR.Manager
 
         private static void GeneralSceneLoaded()
         {
+            CacheHero();
+        }
+
+        public static void CacheHero()
+        {
             var heroIndex = GameData.GothicVm.GlobalHero!.Index;
             var playerGo = GameObject.FindWithTag(Constants.PlayerTag);
             var playerProperties = playerGo.GetComponent<NpcProperties>();

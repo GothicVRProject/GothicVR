@@ -4,19 +4,11 @@ using GVR.Lab.Handler;
 using GVR.Manager;
 using GVR.Manager.Settings;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace GVR.GothicVR_Lab.Scripts
 {
     public class LabBootstrapper : MonoBehaviour
     {
-        [Header("Bootstrapping")]
-        public bool bootLabMusicHandler;
-        public bool bootNpcHandler;
-        public bool bootLockableHandler;
-        public bool bootLadderHandler;
-        public bool bootAttachPointHandler;
-
         public LabMusicHandler labMusicHandler;
         public LabNpcDialogHandler npcDialogHandler;
         public LabLockableLabHandler lockableLabHandler;
@@ -24,17 +16,19 @@ namespace GVR.GothicVR_Lab.Scripts
         public LabVobHandAttachPointsLabHandler vobHandAttachPointsLabHandler;
         public LabNpcAnimationHandler labNpcAnimationHandler;
 
-        private bool isBooted;
+        private bool _isBooted;
         /// <summary>
         /// It's easiest to wait for Start() to initialize all the MonoBehaviours first.
         /// </summary>
         private void Update()
         {
-            if (isBooted)
+            if (_isBooted)
                 return;
-            isBooted = true;
+            _isBooted = true;
             
             GvrBootstrapper.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
+
+            BootLab();
 
             labNpcAnimationHandler.Bootstrap();
             labMusicHandler.Bootstrap();
@@ -42,6 +36,11 @@ namespace GVR.GothicVR_Lab.Scripts
             lockableLabHandler.Bootstrap();
             ladderLabHandler.Bootstrap();
             vobHandAttachPointsLabHandler.Bootstrap();
+        }
+
+        private void BootLab()
+        {
+            NpcHelper.CacheHero();
         }
 
         private void OnDestroy()
