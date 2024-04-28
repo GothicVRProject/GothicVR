@@ -15,12 +15,8 @@ namespace GVR.Lab.Handler
     {
         public TMP_Dropdown animationsDropdown;
         public GameObject bloodwynSlotGo;
-        public BloodwynInstanceId bloodwynInstanceId;
+        private string bloodwynInstanceId = "GRD_233_Bloodwyn";
         
-        public enum BloodwynInstanceId
-        {
-            Deu = 6596
-        }
 
         private NpcInstance bloodwynInstance;
         private string[] animations = {
@@ -34,13 +30,14 @@ namespace GVR.Lab.Handler
 
             BootstrapBloodwyn();
         }
+        
 
         private void BootstrapBloodwyn()
         {
             var newNpc = PrefabCache.TryGetObject(PrefabCache.PrefabType.Npc);
             newNpc.SetParent(bloodwynSlotGo);
 
-            var npcSymbol = GameData.GothicVm.GetSymbolByIndex((int)bloodwynInstanceId);
+            var npcSymbol = GameData.GothicVm.GetSymbolByName(bloodwynInstanceId);
             bloodwynInstance = GameData.GothicVm.AllocInstance<NpcInstance>(npcSymbol!);
             var properties = newNpc.GetComponent<NpcProperties>();
             LookupCache.NpcCache[bloodwynInstance.Index] = properties;
