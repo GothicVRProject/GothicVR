@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
 using GVR.Creator;
+using GVR.Data.ZkEvents;
 using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
+using GVR.Manager;
 using GVR.Properties;
 using GVR.Vm;
 using JetBrains.Annotations;
@@ -27,6 +29,8 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
+            base.Start();
+
             // NPC is already interacting with a Mob, we therefore assume it's a change of state (e.g. -1 to stop Mob usage)
             if (Props.bodyState == VmGothicEnums.BodyState.BS_MOBINTERACT)
             {
@@ -39,21 +43,25 @@ namespace GVR.Npc.Actions.AnimationActions
 
             // Else: We have a new animation where we seek the Mob before walking towards and executing action.
             var mob = GetNearestMob();
-            var slotPos = GetNearestMobSlot(mob);
+            var slot = GetNearestMobSlot(mob);
 
-            if (slotPos == null)
+            if (slot == null)
             {
                 IsFinishedFlag = true;
                 return;
             }
 
             mobGo = mob;
-            slotGo = slotPos;
+            slotGo = slot;
             destination = slotGo.transform.position;
 
             Props.currentInteractable = mobGo;
             Props.currentInteractableSlot = slotGo;
             Props.bodyState = VmGothicEnums.BodyState.BS_MOBINTERACT;
+
+            // Fix - If NPC is spawned directly in front of the Mob, we start transition immediately (otherwise trigger/collider won't be called).
+            if (Vector3.Distance(NpcGo.transform.position, slotGo.transform.position) < 0.5f)
+                StartMobUseAnimation();
         }
 
         [CanBeNull]
@@ -70,9 +78,9 @@ namespace GVR.Npc.Actions.AnimationActions
                 return null;
             
             var pos = NpcGo.transform.position;
-            var slotPos = VobHelper.GetNearestSlot(mob.gameObject, pos);
+            var slot = VobHelper.GetNearestSlot(mob.gameObject, pos);
 
-            return slotPos;
+            return slot;
         }
 
         public override void OnTriggerEnter(Collider coll)
@@ -89,13 +97,10 @@ namespace GVR.Npc.Actions.AnimationActions
         private void StartMobUseAnimation()
         {
             walkState = WalkState.Done;
+            PhysicsHelper.DisablePhysicsForNpc(Props);
 
             // AnimationCreator.StopAnimation(NpcGo);
             NpcGo.transform.SetPositionAndRotation(slotGo.transform.position, slotGo.transform.rotation);
-
-            // We need to disable physics as e.g. Gomez won't sit on his throne otherwise. (Animations are aligned with the objects they use already).
-            // A collider would break it.
-            PhysicsHelper.DisablePhysicsForNpc(Props);
 
             PlayTransitionAnimation();
         }
@@ -118,8 +123,11 @@ namespace GVR.Npc.Actions.AnimationActions
         /// <summary>
         /// Only after the Mob is reached and final transition animation is done, we will finalize this Action.
         /// </summary>
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
+            base.AnimationEndEventCallback(eventData);
+            IsFinishedFlag = false;
+
             if (walkState != WalkState.Done)
                 return;
 
@@ -135,9 +143,6 @@ namespace GVR.Npc.Actions.AnimationActions
             // Mobsi isn't in use any longer
             if (Props.currentInteractableStateId == -1)
             {
-                // e.g. Cauldron cooking doesn't call it automatically. We therefore need to force remove the whirling item from hand.
-                AnimationEventCallback(new() { Type = EventType.ItemDestroy });
-
                 Props.currentInteractable = null;
                 Props.currentInteractableSlot = null;
                 Props.bodyState = VmGothicEnums.BodyState.BS_STAND;

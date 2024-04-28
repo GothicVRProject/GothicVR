@@ -1,5 +1,6 @@
 using System;
 using GVR.Creator;
+using GVR.Data.ZkEvents;
 using GVR.Vm;
 using UnityEngine;
 
@@ -77,9 +78,9 @@ namespace GVR.Npc.Actions.AnimationActions
             }
         }
 
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
-            base.AnimationEndEventCallback();
+            base.AnimationEndEventCallback(eventData);
             IsFinishedFlag = false;
         }
     }

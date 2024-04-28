@@ -62,7 +62,7 @@ namespace GVR.Creator
                 LookupCache.AnimationClipCache[mdsAnimationKeyName] = clip;
 
                 AddClipEvents(clip, modelAnimation, anim);
-                AddClipEndEvent(clip);
+                AddClipEndEvent(anim, clip);
             }
 
             if (animationComp[mdsAnimationKeyName] == null)
@@ -294,12 +294,13 @@ namespace GVR.Creator
         /// @see: https://docs.unity3d.com/ScriptReference/AnimationEvent.html
         /// @see: https://docs.unity3d.com/ScriptReference/GameObject.SendMessage.html
         /// </summary>
-        private static void AddClipEndEvent(AnimationClip clip)
+        private static void AddClipEndEvent(IAnimation anim, AnimationClip clip)
         {
             AnimationEvent finalEvent = new()
             {
                 time = clip.length,
                 functionName = nameof(IAnimationCallbacks.AnimationEndCallback),
+                stringParameter = JsonUtility.ToJson(new SerializableEventEndSignal(anim.Next))
             };
             
             clip.AddEvent(finalEvent);

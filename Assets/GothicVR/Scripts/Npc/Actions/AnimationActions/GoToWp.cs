@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GVR.Data.ZkEvents;
 using GVR.Manager;
 using GVR.Vob.WayNet;
 using GVR.World;
@@ -18,6 +19,8 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
+            base.Start();
+
             var currentWaypoint = Props.CurrentWayPoint ?? WayNetHelper.FindNearestWayPoint(Props.transform.position);
             var destinationWaypoint = (WayPoint)WayNetHelper.GetWayNetPoint(destination);
 
@@ -65,9 +68,9 @@ namespace GVR.Npc.Actions.AnimationActions
             return route.Peek().Position;
         }
 
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
-            base.AnimationEndEventCallback();
+            base.AnimationEndEventCallback(eventData);
 
             IsFinishedFlag = false;
         }

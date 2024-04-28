@@ -1,3 +1,5 @@
+using GVR.Data.ZkEvents;
+using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Vob.WayNet;
 using UnityEngine;
@@ -17,11 +19,16 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            var pos = NpcGo.transform.position;
+            base.Start();
 
-            fp = WayNetHelper.FindNearestFreePoint(pos, destination);
+            var npcPos = NpcGo.transform.position;
+            fp = WayNetHelper.FindNearestFreePoint(npcPos, destination);
+
+            // Fix - If NPC is spawned directly in front of the FP, we start transition immediately (otherwise trigger/collider won't be called).
+            if (Vector3.Distance(npcPos, fp!.Position) < 1f)
+                FreePointReached();
         }
-        
+
         public override void OnTriggerEnter(Collider coll)
         {
             if (walkState != WalkState.Walk)
@@ -30,18 +37,12 @@ namespace GVR.Npc.Actions.AnimationActions
             if (coll.gameObject.name != fp.Name)
                 return;
 
-            Props.CurrentFreePoint = fp;
-            fp.IsLocked = true;
-
-            AnimationEndEventCallback();
-
-            walkState = WalkState.Done;
-            IsFinishedFlag = true;
+            FreePointReached();
         }
 
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
-            base.AnimationEndEventCallback();
+            base.AnimationEndEventCallback(eventData);
 
             IsFinishedFlag = false;
         }
@@ -49,6 +50,17 @@ namespace GVR.Npc.Actions.AnimationActions
         protected override Vector3 GetWalkDestination()
         {
             return fp.Position;
+        }
+
+        private void FreePointReached()
+        {
+            Props.CurrentFreePoint = fp;
+            fp.IsLocked = true;
+
+            AnimationEndEventCallback(new SerializableEventEndSignal(nextAnimation: ""));
+
+            walkState = WalkState.Done;
+            IsFinishedFlag = true;
         }
     }
 }

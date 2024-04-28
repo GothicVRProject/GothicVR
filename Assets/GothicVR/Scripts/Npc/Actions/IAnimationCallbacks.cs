@@ -2,9 +2,9 @@
 {
     public interface IAnimationCallbacks
     {
-        public void AnimationCallback(string pxEventTagDataParam);
-        public void AnimationSfxCallback(string pxEventSfxDataParam);
-        public void AnimationMorphCallback(string pxEventMorphDataParam);
-        public void AnimationEndCallback();
+        public void AnimationCallback(string eventTagDataParam);
+        public void AnimationSfxCallback(string eventSfxDataParam);
+        public void AnimationMorphCallback(string eventMorphDataParam);
+        public void AnimationEndCallback(string eventEndSignalParam);
     }
 }

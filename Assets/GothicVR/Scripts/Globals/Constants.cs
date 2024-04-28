@@ -21,10 +21,6 @@ namespace GVR.Globals
         public static readonly Shader ShaderBarrier = Shader.Find("Unlit/Barrier");
         public static readonly Shader ShaderThunder = Shader.Find("Unlit/ThunderShader");
 
-
-        public const float NpcWalkingSpeed = 1f;
-        public const float NpcRotationSpeed = 3f;
-        
         public const string SceneBootstrap = "Bootstrap";
         public const string SceneGeneral = "General";
         public const string SceneMainMenu = "MainMenu";
@@ -37,9 +33,7 @@ namespace GVR.Globals
         // solves some weird interactions between the teleport raycast and collider (musicZone/worldTriggerChange)
         public static LayerMask IgnoreRaycastLayer { get; set; } = LayerMask.NameToLayer("Ignore Raycast");
 
-        //Tags for components to exchange the default font with custom Gothic title and subtitle / ingame fonts
-        public const string MenuFontTag = "Title";
-        public const string SubtitleFontTag = "IngameText";
+        // Tags
         public const string ClimbableTag = "Climbable";
         public const string SpotTag = "PxVob_zCVobSpot";
         public const string PlayerTag = "Player";
@@ -57,6 +51,8 @@ namespace GVR.Globals
         public static string selectedWorld { get; set; } = "world.zen";
         public static string selectedWaypoint { get; set; } = "START";
 
+        // We need to set the scale so that collision and NPC animation is starting at the right spot.
+        public static Vector3 VobZSScale = new(0.1f, 0.1f, 0.1f);
 
         static Constants()
         {

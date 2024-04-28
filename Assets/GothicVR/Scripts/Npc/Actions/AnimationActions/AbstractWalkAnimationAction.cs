@@ -1,5 +1,7 @@
 using System;
 using GVR.Creator;
+using GVR.Data.ZkEvents;
+using GVR.Manager;
 using GVR.Vm;
 using UnityEngine;
 
@@ -25,7 +27,14 @@ namespace GVR.Npc.Actions.AnimationActions
         /// We need to define the final destination spot within overriding class.
         /// </summary>
         protected abstract Vector3 GetWalkDestination();
-        
+
+        public override void Start()
+        {
+            base.Start();
+
+            PhysicsHelper.EnablePhysicsForNpc(Props);
+        }
+
         public override void Tick(Transform transform)
         {
             base.Tick(transform);
@@ -106,9 +115,13 @@ namespace GVR.Npc.Actions.AnimationActions
         /// <summary>
         /// We need to alter rootNode's position once walk animation is done.
         /// </summary>
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
-            base.AnimationEndEventCallback();
+            base.AnimationEndEventCallback(eventData);
+
+            // We need to ensure, that physics still apply when an animation is looped.
+            if (walkState != WalkState.Done)
+                PhysicsHelper.EnablePhysicsForNpc(Props);
 
             NpcGo.transform.localPosition = Props.bip01.position;
             Props.bip01.localPosition = Vector3.zero;

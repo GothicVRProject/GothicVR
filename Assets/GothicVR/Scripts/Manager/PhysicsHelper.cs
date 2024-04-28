@@ -1,7 +1,7 @@
 using GVR.Properties;
 using UnityEngine;
 
-namespace GVR.GothicVR.Scripts.Manager
+namespace GVR.Manager
 {
     public static class PhysicsHelper
     {

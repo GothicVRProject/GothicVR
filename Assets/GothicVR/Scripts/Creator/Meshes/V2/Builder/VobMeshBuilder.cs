@@ -47,12 +47,12 @@ namespace GVR.Creator.Meshes.V2.Builder
             for (var i = 0; i < zm.childCount; i++)
             {
                 var child = zm.GetChild(i);
-                if (!child.name.StartsWithIgnoreCase("ZS"))
+                if (!child.name.StartsWithIgnoreCase("ZS_"))
                     continue;
 
                 // ZS need to be "invisible" for the Raycast teleporter.
                 child.gameObject.layer = Constants.IgnoreRaycastLayer;
-
+                child.localScale = Constants.VobZSScale;
                 // Used for event triggers with NPCs.
                 var coll = child.AddComponent<SphereCollider>();
                 coll.isTrigger = true;

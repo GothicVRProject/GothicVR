@@ -1,4 +1,5 @@
 using GVR.Caches;
+using GVR.Data.ZkEvents;
 using UnityEngine;
 
 namespace GVR.Npc.Actions.AnimationActions
@@ -19,9 +20,9 @@ namespace GVR.Npc.Actions.AnimationActions
             return Quaternion.LookRotation(temp, Vector3.up);
         }
 
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
-            base.AnimationEndEventCallback();
+            base.AnimationEndEventCallback(eventData);
 
             IsFinishedFlag = false;
         }

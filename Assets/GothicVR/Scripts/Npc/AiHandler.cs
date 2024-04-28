@@ -1,6 +1,8 @@
 ﻿using GVR.Creator;
 using GVR.Data.ZkEvents;
+using GVR.Extensions;
 using GVR.Globals;
+using GVR.Manager;
 using GVR.Npc.Actions;
 using GVR.Npc.Actions.AnimationActions;
 using GVR.Properties;
@@ -12,7 +14,7 @@ namespace GVR.Npc
     public class AiHandler : BasePlayerBehaviour, IAnimationCallbacks
     {
         private static DaedalusVm vm => GameData.GothicVm;
-        private const int DaedalusLoopContinue = 0;
+        private const int DaedalusLoopContinue = 0; // Id taken from a Daedalus constant.
 
         private void Start()
         {
@@ -142,30 +144,33 @@ namespace GVR.Npc
             action.Start();
         }
 
-        public void AnimationCallback(string pxEventTagDataParam)
+        public void AnimationCallback(string eventTagDataParam)
         {
-            var eventData = JsonUtility.FromJson<SerializableEventTag>(pxEventTagDataParam);
+            var eventData = JsonUtility.FromJson<SerializableEventTag>(eventTagDataParam);
             properties.currentAction.AnimationEventCallback(eventData);
         }
 
-        public void AnimationSfxCallback(string pxEventSfxDataParam)
+        public void AnimationSfxCallback(string eventSfxDataParam)
         {
-            var eventData = JsonUtility.FromJson<SerializableEventSoundEffect>(pxEventSfxDataParam);
+            var eventData = JsonUtility.FromJson<SerializableEventSoundEffect>(eventSfxDataParam);
             properties.currentAction.AnimationSfxEventCallback(eventData);
         }
 
-        public void AnimationMorphCallback(string pxEventMorphDataParam)
+        public void AnimationMorphCallback(string eventMorphDataParam)
         {
-            var eventData = JsonUtility.FromJson<SerializableEventMorphAnimation>(pxEventMorphDataParam);
+            var eventData = JsonUtility.FromJson<SerializableEventMorphAnimation>(eventMorphDataParam);
             properties.currentAction.AnimationMorphEventCallback(eventData);
         }
         
         /// <summary>
         /// As all Components on a GameObject get called, we need to feed this information into current AnimationAction instance.
         /// </summary>
-        public void AnimationEndCallback()
+        public void AnimationEndCallback(string eventEndSignalParam)
         {
-            properties.currentAction.AnimationEndEventCallback();
+            var eventData = JsonUtility.FromJson<SerializableEventEndSignal>(eventEndSignalParam);
+
+            // FIXME ! We need to re-add physics when e.g. looping walk animation!
+            properties.currentAction.AnimationEndEventCallback(eventData);
         }
     }
 }

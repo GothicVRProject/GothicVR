@@ -1,6 +1,7 @@
 using GVR.Caches;
 using GVR.Creator;
-using GVR.GothicVR.Scripts.Manager;
+using GVR.Data.ZkEvents;
+using GVR.Manager;
 using UnityEngine;
 using ZenKit.Daedalus;
 
@@ -21,7 +22,6 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public override void Start()
         {
-            PhysicsHelper.DisablePhysicsForNpc(Props);
             PlayTransitionAnimation();
         }
 
@@ -68,8 +68,10 @@ namespace GVR.Npc.Actions.AnimationActions
             AnimationCreator.PlayAnimation(Props.mdsNames, animName, NpcGo, true);
         }
 
-        public override void AnimationEndEventCallback()
+        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
+            base.AnimationEndEventCallback(eventData);
+
             if (Props.itemAnimationState == desiredState)
             {
                 PhysicsHelper.EnablePhysicsForNpc(Props);
