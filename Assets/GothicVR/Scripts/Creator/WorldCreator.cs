@@ -470,7 +470,7 @@ namespace GVR.Creator
 
             LoadWorld(worldScene.name);
 
-            await WorldMeshCreator.CreateAsync(GameData.World, new GameObject("World"), Constants.MeshPerFrame);
+            await MeshFactory.CreateWorld(GameData.World, new GameObject("World"), Constants.MeshPerFrame);
         }
 #endif
     }
