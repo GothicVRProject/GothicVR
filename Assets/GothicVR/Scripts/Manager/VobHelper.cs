@@ -77,7 +77,6 @@ namespace GVR.GothicVR.Scripts.Manager
 
             if (soundData == null)
             {
-                Debug.LogError($"No .wav data returned for {soundName}");
                 return null;
             }
             
