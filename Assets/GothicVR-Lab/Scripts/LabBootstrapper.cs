@@ -4,7 +4,6 @@ using GVR.Lab.Handler;
 using GVR.Manager;
 using GVR.Manager.Settings;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace GVR.GothicVR_Lab.Scripts
 {
@@ -29,12 +28,19 @@ namespace GVR.GothicVR_Lab.Scripts
             
             GvrBootstrapper.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
 
+            BootLab();
+
             labNpcAnimationHandler.Bootstrap();
             labMusicHandler.Bootstrap();
             npcDialogHandler.Bootstrap();
             lockableLabHandler.Bootstrap();
             ladderLabHandler.Bootstrap();
             vobHandAttachPointsLabHandler.Bootstrap();
+        }
+
+        private void BootLab()
+        {
+            NpcHelper.CacheHero();
         }
 
         private void OnDestroy()
