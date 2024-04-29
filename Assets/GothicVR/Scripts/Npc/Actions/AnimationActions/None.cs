@@ -14,11 +14,6 @@ namespace GVR.Npc.Actions.AnimationActions
             // NOP
         }
 
-        public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
-        {
-            throw new NotImplementedException("This method is not needed and shouldn't be called.");
-        }
-
         public override bool IsFinished()
         {
             return true;

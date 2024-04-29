@@ -61,24 +61,12 @@ namespace GVR.Npc.Actions.AnimationActions
             }
         }
 
-        private void PlayLoopAnimation()
-        {
-            ItemInstance item = AssetCache.TryGetItemData(itemToUse);
-            string animName = string.Format(LoopAnimationScheme, item.SchemeName, desiredState);
-            AnimationCreator.PlayAnimation(Props.mdsNames, animName, NpcGo, true);
-        }
-
         public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
         {
             base.AnimationEndEventCallback(eventData);
 
             if (Props.itemAnimationState == desiredState)
             {
-                PhysicsHelper.EnablePhysicsForNpc(Props);
-
-                PlayLoopAnimation();
-
-                IsFinishedFlag = true;
                 return;
             }
 
