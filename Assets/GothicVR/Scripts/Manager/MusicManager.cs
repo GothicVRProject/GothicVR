@@ -1,23 +1,22 @@
 using System;
 using System.IO;
-using DMCs.Interface;
+using DirectMusic;
 using GVR.Caches;
 using GVR.Debugging;
+using GVR.Globals;
 using GVR.Manager.Settings;
-using GVR.Util;
 using UnityEngine;
+using ZenKit;
 using ZenKit.Daedalus;
+using Logger = DirectMusic.Logger;
+using LogLevel = DirectMusic.LogLevel;
 
 namespace GVR.Manager
 {
-    public class MusicManager : SingletonBehaviour<MusicManager>
+    public static class MusicManager
     {
-        private IntPtr mixer;
-        private IntPtr music;
-        private IntPtr directmusic;
-
         [Flags]
-        public enum Tags : byte
+        public enum SegmentTags : byte
         {
             Day = 0,
             Ngt = 1 << 0,
@@ -27,237 +26,159 @@ namespace GVR.Manager
             Thr = 1 << 2
         }
 
-        private Tags pendingTags = Tags.Day;
-        private Tags currentTags = Tags.Day;
+        private static Performance _dxPerformance;
+        private static Loader _dxLoader;
+        private static AudioSource _audioSourceComp;
+        private static AudioReverbFilter _reverbFilterComp;
 
-        private bool hasPending;
-        private bool reloadTheme;
-
-        private MusicThemeInstance pendingTheme;
-
-        private int bufferSize = 2048;
-        private short[] shortBuffer;
-
-        private static AudioSource musicSource;
+        // Depending on speed of track, 2048 == around less than a second
+        // If we cache each call to dxMusic synthesizer, we would skip a lot of transition options as the synthesizer assumes we're already ahead.
+        // This is due to the fact, that whenever we ask for data from dxMusic, the handler "moves" forward as it assumes we play to the end until asking for more data.
+        // But if we ask for numerous seconds and therefore "cache" music way too long, the transition will take place very late which can be heard by gamers.
+        private const int BUFFER_SIZE = 2048;
 
 
-        // This multiplier is used to increase the buffer size and reduce the number times PrepareData is called
-        // also affects the delay of the music, it doesn't sound so harsh when switching
-        // It also controls how fast/slow the music is updated 
-        // (since we are updating music when we don't have any more music data to parse)
-        private int bufferSizeMultiplier = 16;
+        public static void Initialize()
+        {
+            if (!FeatureFlags.I.enableMusic)
+                return;
 
-        private void Start()
+            _dxPerformance = Performance.Create();
+
+            InitializeUnity();
+            InitializeZenKit();
+            InitializeDxMusic();
+        }
+
+        private static void InitializeUnity()
         {
             var backgroundMusic = GameObject.Find("BackgroundMusic");
-            backgroundMusic.TryGetComponent(out musicSource);
+            _audioSourceComp = backgroundMusic.GetComponent<AudioSource>();
+            _reverbFilterComp = backgroundMusic.GetComponent<AudioReverbFilter>();
+
+            var audioClip = AudioClip.Create("Music", BUFFER_SIZE * 2, 2, 44100, true, PCMReaderCallback);
+
+            _audioSourceComp.priority = 0;
+            _audioSourceComp.clip = audioClip;
+            _audioSourceComp.loop = true;
+
+            _audioSourceComp.Play();
         }
 
-
-        public void Create()
+        private static void InitializeZenKit()
         {
-            var g1Dir = SettingsManager.GameSettings.GothicIPath;
-
-            // Combine paths using Path.Combine instead of Path.Join
-            var fullPath = Path.Combine(g1Dir, "_work", "DATA", "Music");
-
-            // Initialize DirectMusic components
-            mixer = DMMixer.DMusicInitMixer();
-            music = DMMusic.DMusicInitMusic();
-            directmusic = DMDirectMusic.DMusicInitDirectMusic();
-
-            // Add paths for G1
-            // FIXME - Read from gothic.ini?
-            AddMusicPath(fullPath, "dungeon");
-            AddMusicPath(fullPath, "menu_men");
-            AddMusicPath(fullPath, "orchestra");
-
-            // Add paths for G2
-            // FIXME - Read from gothic.ini?
-            AddMusicPath(fullPath, "newworld");
-            AddMusicPath(fullPath, "AddonWorld");
-
-            // Create audio clip with, 4 times the bufferSize so we have enough room, 2 channels and 44100Hz
-            var audioClip = AudioClip.Create("Music", bufferSize * 4 * bufferSizeMultiplier, 2, 44100, true, PrepareData);
-
-            musicSource.priority = 0;
-            musicSource.clip = audioClip;
-            musicSource.loop = true;
+            // Load all music files into vfs.
+            GameData.Vfs.Mount(Path.Combine(SettingsManager.GameSettings.GothicIPath, "_work"), "/", VfsOverwriteBehavior.All);
         }
 
-        private void AddMusicPath(string fullPath, string path)
+        private static void InitializeDxMusic()
         {
-            fullPath = Path.Combine(fullPath, path);
-            DMDirectMusic.DMusicAddPath(directmusic, fullPath);
-        }
+            Logger.Set(FeatureFlags.I.dxMusicLogLevel, LoggerCallback);
 
-        private void PrepareData(float[] data)
-        {
-            shortBuffer = new short[bufferSize * 2 * bufferSizeMultiplier];
-
-            DMMixer.DMusicMix(mixer, shortBuffer, (uint)data.Length / 2);
-
-            byte[] byteArray = new byte[data.Length * 2];
-            Buffer.BlockCopy(shortBuffer, 0, byteArray, 0, byteArray.Length);
-
-            float[] floatArray = Convert16BitByteArrayToFloatArray(byteArray, 0, byteArray.Length);
-            Array.Copy(floatArray, data, floatArray.Length);
-
-            UpdateMusic();
-        }
-
-        private void UpdateMusic()
-        {
-            if (!hasPending)
-                return;
-
-            hasPending = false;
-            var theme = pendingTheme;
-            var tags = pendingTags;
-
-            DMMixer.DMusicSetMusicVolume(mixer, pendingTheme.Vol);
-
-            if (!reloadTheme)
-                return;
-
-            var pattern = DMDirectMusic.DMusicLoadFile(directmusic, theme.File, theme.File.Length);
-
-            DMMusic.DMusicAddPattern(music, pattern);
-
-            Tags cur = currentTags & (Tags.Std | Tags.Fgt | Tags.Thr);
-            Tags next = tags & (Tags.Std | Tags.Fgt | Tags.Thr);
-
-            int em = 8; // end
-
-            if (next == Tags.Std)
+            _dxLoader = Loader.Create(LoaderOptions.Download);
+            _dxLoader.AddResolver(name =>
             {
-                if (cur != Tags.Std)
+                try
                 {
-                    em = 2; // break
-                    Debug.Log("break");
+                    return GameData.Vfs.Find(name).Buffer.Bytes;
                 }
-            }
-            else if (next == Tags.Fgt)
-            {
-                if (cur == Tags.Thr)
+                catch (Exception e)
                 {
-                    em = 1; // fill
-                    Debug.Log("fill");
+                    // No audio file found. Return null for now as it seems sufficient.
+                    return null;
                 }
-            }
-            else if (next == Tags.Thr)
-            {
-                if (cur == Tags.Fgt)
-                {
-                    em = 0; // normal
-                    Debug.Log("normal");
-                }
-            }
-            DMMixer.DMusicSetMusic(mixer, music, em);
-            currentTags = tags;
+            });
+            return;
         }
 
-        private static float[] Convert16BitByteArrayToFloatArray(byte[] source, int headerOffset, int dataSize)
+        private static void LoggerCallback(LogLevel level, string message)
         {
-            int bytesPerSample = sizeof(short); // block size = 2
-            int sampleCount = source.Length / bytesPerSample;
-
-            float[] data = new float[sampleCount];
-
-            short maxValue = short.MaxValue;
-
-            for (int i = 0; i < sampleCount; i++)
+            switch (level)
             {
-                int offset = i * bytesPerSample;
-                short sample = BitConverter.ToInt16(source, offset);
-                float floatSample = (float)sample / maxValue;
-                data[i] = floatSample;
+                case LogLevel.Fatal:
+                case LogLevel.Error:
+                    Debug.LogError(message);
+                    break;
+                case LogLevel.Warning:
+                    Debug.LogWarning(message);
+                    break;
+                case LogLevel.Info:
+                case LogLevel.Debug:
+                case LogLevel.Trace:
+                    Debug.Log(message);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(level), level, null);
             }
-
-            return data;
         }
 
-        public void SetMusic(string zone, Tags tags)
+        private static void PCMReaderCallback(float[] data)
         {
-            bool isDay = (tags & Tags.Ngt) == 0;
+            _dxPerformance.RenderPcm(data, true);
+        }
 
-            string result = zone.Substring(zone.IndexOf("_") + 1);
-
+        public static void Play(string zoneName, SegmentTags tags)
+        {
+            bool isDay = (tags & SegmentTags.Ngt) == 0;
+            string result = zoneName.Substring(zoneName.IndexOf("_") + 1);
             var musicTag = "STD";
 
-            if ((tags & Tags.Fgt) != 0)
+            if ((tags & SegmentTags.Fgt) != 0)
                 musicTag = "FGT";
 
-            if ((tags & Tags.Thr) != 0)
+            if ((tags & SegmentTags.Thr) != 0)
                 musicTag = "THR";
 
             var musicThemeInstanceName = $"{result}_{(isDay ? "DAY" : "NGT")}_{musicTag}";
 
-            var theme = AssetCache.TryGetMusic(musicThemeInstanceName);
-
-            reloadTheme = pendingTheme.File != theme.File;
-            pendingTheme = theme;
-            pendingTags = tags;
-            hasPending = true;
-
-            if (FeatureFlags.I.showMusicLogs)
-                Debug.Log($"Playing music: MusicThemeInstance >{musicThemeInstanceName}< from file >{theme.File}<");
+            Play(musicThemeInstanceName);
         }
 
-        public void SetMusic(MusicThemeInstance theme)
+        public static void Play(string musicInstanceName)
         {
-            reloadTheme = true;
-            pendingTheme = theme;
-            hasPending = true;
-
-            if (FeatureFlags.I.showMusicLogs)
-                Debug.Log($"[Music] Playing music from file >{theme.File}<.");
+            var music = AssetCache.TryGetMusic(musicInstanceName);
+            Play(music);
         }
 
-        public void SetMusic(string musicThemeInstanceName)
+        public static void Play(MusicThemeInstance theme)
         {
-            var theme = AssetCache.TryGetMusic(musicThemeInstanceName);
-            reloadTheme = true;
-            pendingTheme = theme;
-            hasPending = true;
+            var segment = _dxLoader.GetSegment(theme.File);
 
-            if (FeatureFlags.I.showMusicLogs)
-                Debug.Log($"[Music] Playing music: MusicThemeInstance >{musicThemeInstanceName}< from file >{theme.File}<");
+            var timing = ToTiming(theme.TransSubType);
+            var embellishment = ToEmbellishment(theme.TransType);
+
+            _dxPerformance.PlayTransition(segment, embellishment, timing);
+
+            // Tests sounded feasible like when you stop the music you get somme afterglow hall.
+            // TODO - But I have no clue if decayTime is the right timer to set here. Alter if you have better ears than I have. ;-)
+            _reverbFilterComp.decayTime = theme.ReverbTime / 1000; // ms in seconds
         }
 
-        private void StopMusic()
+        private static Timing ToTiming(MusicTransitionType type)
         {
-            if (musicSource.isPlaying)
-                musicSource.Pause();
-
-            // reinitialize music
-            DMMusic.DMusicFreeMusic(music);
-            music = DMMusic.DMusicInitMusic();
-
-            DMMixer.DMusicSetMusic(mixer, music);
-        }
-
-        private void RestartMusic()
-        {
-            hasPending = true;
-            reloadTheme = true;
-        }
-
-        public void SetEnabled(bool enable)
-        {
-            var isPlaying = musicSource.isPlaying;
-            if (isPlaying == enable)
-                return;
-
-            if (enable)
+            return type switch
             {
-                RestartMusic();
-                musicSource.Play();
-            }
-            else
+                MusicTransitionType.Measure or MusicTransitionType.Unknown => Timing.Measure,
+                MusicTransitionType.Immediate => Timing.Instant,
+                MusicTransitionType.Beat => Timing.Beat,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
+
+        private static Embellishment ToEmbellishment(MusicTransitionEffect effect)
+        {
+            return effect switch
             {
-                StopMusic();
-            }
+                // None or Unknown needs to be set to End - otherwise normal transitions won't happen in G1 music.
+                MusicTransitionEffect.Unknown or MusicTransitionEffect.None => Embellishment.End,
+                MusicTransitionEffect.Groove => Embellishment.Groove,
+                MusicTransitionEffect.Fill => Embellishment.Fill,
+                MusicTransitionEffect.Break => Embellishment.Break,
+                MusicTransitionEffect.Intro => Embellishment.Intro,
+                MusicTransitionEffect.End => Embellishment.End,
+                MusicTransitionEffect.EndAndInto => Embellishment.EndAndIntro,
+                _ => throw new ArgumentOutOfRangeException(nameof(effect), effect, null)
+            };
         }
     }
 }

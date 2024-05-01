@@ -4,6 +4,7 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Debugging;
 using GVR.Globals;
+using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager.Settings;
 using GVR.Util;
 using GVR.Vm;
@@ -191,10 +192,7 @@ namespace GVR.Manager
 
         private static void LoadMusic()
         {
-            var music = MusicManager.I;
-            music.Create();
-            music.SetEnabled(FeatureFlags.I.enableMusic);
-            music.SetMusic("SYS_MENU");
+            MusicManager.Initialize();
         }
 
         private static void LoadFonts()

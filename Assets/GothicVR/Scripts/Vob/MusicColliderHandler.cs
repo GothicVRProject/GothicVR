@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GVR.Debugging;
+using GVR.Extensions;
 using GVR.Globals;
 using GVR.Manager;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace GVR.Vob
 {
     public class MusicCollisionHandler : MonoBehaviour
     {
-        private static List<string> musicZones = new();
+        private static Stack<string> musicZones = new();
 
         private void OnTriggerEnter(Collider other)
         {
@@ -18,9 +19,13 @@ namespace GVR.Vob
             if (!other.CompareTag(Constants.PlayerTag))
                 return;
 
-            musicZones.Add(gameObject.name);
+            // We are already playing this segment.
+            if (!musicZones.IsEmpty() && musicZones.Peek() == gameObject.name)
+                return;
 
-            MusicManager.I.SetMusic(gameObject.name, MusicManager.Tags.Std);
+            musicZones.Push(gameObject.name);
+
+            MusicManager.Play(gameObject.name, MusicManager.SegmentTags.Std);
         }
 
         private void OnTriggerExit(Collider other)
@@ -31,14 +36,20 @@ namespace GVR.Vob
             if (!other.CompareTag(Constants.PlayerTag))
                 return;
 
-            musicZones.Remove(gameObject.name);
-
-            // Other music will play now.
-            if (musicZones.Count > 0)
+            if (musicZones.IsEmpty() || musicZones.Peek() != gameObject.name)
                 return;
 
-            // Play default music.
-            MusicManager.I.SetMusic("MUSICZONE_DEF", MusicManager.Tags.Std);
+            musicZones.Pop();
+
+            // Play default music
+            if (musicZones.IsEmpty())
+            {
+                MusicManager.Play("MUSICZONE_DEF", MusicManager.SegmentTags.Std);
+            }
+            else
+            {
+                MusicManager.Play(musicZones.Peek(), MusicManager.SegmentTags.Std);
+            }
         }
     }
 }

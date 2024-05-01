@@ -77,8 +77,8 @@ namespace GVR.Debugging
 
         [Header("__________Debug messages__________")]
         public LogLevel zenKitLogLevel;
+        public DirectMusic.LogLevel dxMusicLogLevel;
         public bool showZspyLogs;
-        public bool showMusicLogs;
         public bool showBarrierLogs;
 
 

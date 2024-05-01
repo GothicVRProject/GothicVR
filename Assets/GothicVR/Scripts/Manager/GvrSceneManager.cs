@@ -2,12 +2,10 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using GVR.Caches;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Globals;
-using GVR.GothicVR.Scripts.Manager;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -90,7 +88,8 @@ namespace GVR.Manager
             }
             
             newWorldName = worldName;
-            MusicManager.I.SetMusic("SYS_LOADING");
+            MusicManager.Play("SYS_LOADING");
+
             var watch = Stopwatch.StartNew();
 
             GameData.Reset();

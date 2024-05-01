@@ -38,7 +38,8 @@ namespace GVR.Editor.Tools
             new (nameof(FeatureFlags.sunMovementPerformanceValue), typeof(int),
                 FeatureFlags.SunMovementPerformance.EveryIngameMinute),
             new (nameof(FeatureFlags.zenKitLogLevel), typeof(int), LogLevel.Error),
-            
+            new (nameof(FeatureFlags.dxMusicLogLevel), typeof(int), DirectMusic.LogLevel.Error),
+
             // Special types
             new (nameof(FeatureFlags.vobCullingSmall), typeof(FeatureFlags.VobCullingGroupSetting),
                 new FeatureFlags.VobCullingGroupSetting{ maxObjectSize = 1.2f, cullingDistance = 50f}),
@@ -91,7 +92,12 @@ namespace GVR.Editor.Tools
                         field.SetValue(featureFlags, 0);
                         break;
                     case "LogLevel":
-                        field.SetValue(featureFlags, LogLevel.Error);
+                        if (field.FieldType == typeof(LogLevel))
+                            field.SetValue(featureFlags, LogLevel.Error);
+                        else if (field.FieldType == typeof(DirectMusic.LogLevel))
+                            field.SetValue(featureFlags, DirectMusic.LogLevel.Error);
+                        else
+                            Debug.LogError($"Unsupported field type >{field.FieldType.Name}< for >{field.Name}<");
                         break;
                     case "String":
                             field.SetValue(featureFlags, "");
