@@ -37,13 +37,14 @@ namespace GVR.Manager
         // But if we ask for numerous seconds and therefore "cache" music way too long, the transition will take place very late which can be heard by gamers.
         private const int BUFFER_SIZE = 2048;
 
+        private static readonly int FREQUENCY_RATE = 44100;
 
         public static void Initialize()
         {
             if (!FeatureFlags.I.enableMusic)
                 return;
 
-            _dxPerformance = Performance.Create();
+            _dxPerformance = Performance.Create(FREQUENCY_RATE);
 
             InitializeUnity();
             InitializeZenKit();
@@ -56,7 +57,7 @@ namespace GVR.Manager
             _audioSourceComp = backgroundMusic.GetComponent<AudioSource>();
             _reverbFilterComp = backgroundMusic.GetComponent<AudioReverbFilter>();
 
-            var audioClip = AudioClip.Create("Music", BUFFER_SIZE * 2, 2, 44100, true, PCMReaderCallback);
+            var audioClip = AudioClip.Create("Music", BUFFER_SIZE * 2, 2, FREQUENCY_RATE, true, PCMReaderCallback);
 
             _audioSourceComp.priority = 0;
             _audioSourceComp.clip = audioClip;
@@ -146,6 +147,9 @@ namespace GVR.Manager
 
             var timing = ToTiming(theme.TransSubType);
             var embellishment = ToEmbellishment(theme.TransType);
+
+            if (FeatureFlags.I.dxMusicLogLevel >= LogLevel.Info)
+                Debug.Log($"Switching music to: {theme.File}");
 
             _dxPerformance.PlayTransition(segment, embellishment, timing);
 
