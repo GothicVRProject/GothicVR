@@ -143,6 +143,9 @@ namespace GVR.Manager
 
         public static void Play(MusicThemeInstance theme)
         {
+            if (!FeatureFlags.I.enableMusic)
+                return;
+            
             var segment = _dxLoader.GetSegment(theme.File);
 
             var timing = ToTiming(theme.TransSubType);
