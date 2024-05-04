@@ -178,9 +178,9 @@ namespace GVR.Manager
                 case Constants.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
 
+                    TeleportPlayerToSpot();
                     GvrEvents.GeneralSceneLoaded.Invoke();
 
-                    TeleportPlayerToSpot();
                     break;
                 case Constants.SceneMainMenu:
                     var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
@@ -238,19 +238,12 @@ namespace GVR.Manager
             startPoint = startPoint2;
         }
 
-        public void MoveToWorldScene(GameObject go)
-        {
-            GameData.WorldScene!.Value.GetRootGameObjects().Append(go);
-            SceneManager.MoveGameObjectToScene(go, SceneManager.GetSceneByName(GameData.WorldScene.Value.name));
-        }
-
-
         public void TeleportPlayerToSpot()
         {
             if (startPoint == null)
                 return;
 
-            var player = NpcHelper.GetHeroGameObject();
+            var player = GameObject.FindWithTag(Constants.PlayerTag);
             player.transform.SetPositionAndRotation(startPoint.transform.position, startPoint.transform.rotation);
         }
     }

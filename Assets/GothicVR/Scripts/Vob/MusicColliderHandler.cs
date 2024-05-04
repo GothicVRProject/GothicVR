@@ -16,7 +16,7 @@ namespace GVR.Vob
                 return;
             
             // FIXME - We need to load the currently active music when spawned. Currently we need to walk 1cm to trigger collider.
-            MusicManager.MusicZones.Add(gameObject);
+            MusicManager.AddMusicZone(gameObject);
             MusicManager.Play(MusicManager.SegmentTags.Std);
         }
 
@@ -28,7 +28,7 @@ namespace GVR.Vob
             if (!other.CompareTag(Constants.PlayerTag))
                 return;
 
-            MusicManager.MusicZones.Remove(gameObject);
+            MusicManager.RemoveMusicZone(gameObject);
             MusicManager.Play(MusicManager.SegmentTags.Std);
         }
     }

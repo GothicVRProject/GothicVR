@@ -14,6 +14,7 @@ using ZenKit.Daedalus;
 using ZenKit.Vobs;
 using Logger = DirectMusic.Logger;
 using LogLevel = DirectMusic.LogLevel;
+using Object = UnityEngine.Object;
 
 namespace GVR.Manager
 {
@@ -39,14 +40,15 @@ namespace GVR.Manager
         /// <summary>
         /// Whenever we collide with a musicZoneVobGO, it's entry will be added to the list and the most important theme will be played.
         /// </summary>
-        public static List<GameObject> MusicZones;
+        private static readonly List<GameObject> _musicZones = new();
 
         // Depending on speed of track, 2048 == around less than a second
         // If we cache each call to dxMusic synthesizer, we would skip a lot of transition options as the synthesizer assumes we're already ahead.
         // This is due to the fact, that whenever we ask for data from dxMusic, the handler "moves" forward as it assumes we play to the end until asking for more data.
         // But if we ask for numerous seconds and therefore "cache" music way too long, the transition will take place very late which can be heard by gamers.
         private const int BUFFER_SIZE = 2048;
-        private static readonly int FREQUENCY_RATE = 44100;
+        private const int FREQUENCY_RATE = 44100;
+        private const float AVERAGE_HUMAN_SIZE = 1.65f;
 
         public static void Initialize()
         {
@@ -78,17 +80,46 @@ namespace GVR.Manager
 
         private static void WorldLoaded()
         {
-            MusicZones = new List<GameObject>();
-            var musicZoneDefaultParentGO = GameObject.Find(VirtualObjectType.oCZoneMusicDefault.ToString());
+            _musicZones.Clear();
 
-            if (musicZoneDefaultParentGO == null || musicZoneDefaultParentGO.transform.childCount != 1)
+            var zones = Object.FindObjectsOfType<VobMusicProperties>();
+            var playerPosition = GameObject.FindWithTag(Constants.PlayerTag).transform.position;
+
+            // In my tests with XrDeviceSimulator as well as my VR glasses, I was spawned close to the ground. But START_STA in G1 expects a normal human standing.
+            // TODO - Is it only my behaviour or are other players when spawning on start of G1 also 30cm tall?
+            playerPosition = new Vector3(playerPosition.x, playerPosition.y + AVERAGE_HUMAN_SIZE, playerPosition.z);
+
+            foreach (var zone in zones)
             {
-                Debug.LogError(
-                    "There's no/too many defaultMusic entries on this map. Won't use any of these right now.");
-                return;
+                // We always set default music as fallback.
+                if (zone.musicData.GetType() == typeof(ZoneMusicDefault))
+                {
+                    AddMusicZone(zone.gameObject);
+                    continue;
+                }
+
+                // If it's a normal music, we check if we're standing inside.
+                if (zone.GetComponent<BoxCollider>().bounds.Contains(playerPosition))
+                {
+                    AddMusicZone(zone.gameObject);
+                }
             }
 
-            MusicZones.Add(musicZoneDefaultParentGO.transform.GetChild(0).gameObject);
+            Play(SegmentTags.Std);
+        }
+
+        public static void AddMusicZone(GameObject newMusicZoneGo)
+        {
+            // If a collider triggers multiple times or we added the zone manually: Skip as duplicate
+            if (_musicZones.Contains(newMusicZoneGo))
+                return;
+
+            _musicZones.Add(newMusicZoneGo);
+        }
+
+        public static void RemoveMusicZone(GameObject newMusicZoneGo)
+        {
+            _musicZones.Remove(newMusicZoneGo);
         }
 
         private static void InitializeZenKit()
@@ -108,7 +139,7 @@ namespace GVR.Manager
                 {
                     return GameData.Vfs.Find(name).Buffer.Bytes;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // No audio file found. Return null for now as it seems sufficient.
                     return null;
@@ -144,7 +175,7 @@ namespace GVR.Manager
 
         public static void Play(SegmentTags tags)
         {
-            var zoneName = MusicZones
+            var zoneName = _musicZones
                 .OrderBy(i => i.GetComponent<VobMusicProperties>().musicData.Priority)
                 .Last()
                 .GetComponent<VobMusicProperties>().musicData.Name;
