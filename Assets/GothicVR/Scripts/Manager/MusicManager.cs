@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using DirectMusic;
+using GothicVR.Vob;
 using GVR.Caches;
 using GVR.Debugging;
 using GVR.Globals;
@@ -8,6 +11,7 @@ using GVR.Manager.Settings;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;
+using ZenKit.Vobs;
 using Logger = DirectMusic.Logger;
 using LogLevel = DirectMusic.LogLevel;
 
@@ -31,12 +35,17 @@ namespace GVR.Manager
         private static AudioSource _audioSourceComp;
         private static AudioReverbFilter _reverbFilterComp;
 
+        private static MusicThemeInstance _currentTheme;
+        /// <summary>
+        /// Whenever we collide with a musicZoneVobGO, it's entry will be added to the list and the most important theme will be played.
+        /// </summary>
+        public static SortedSet<GameObject> MusicZones;
+
         // Depending on speed of track, 2048 == around less than a second
         // If we cache each call to dxMusic synthesizer, we would skip a lot of transition options as the synthesizer assumes we're already ahead.
         // This is due to the fact, that whenever we ask for data from dxMusic, the handler "moves" forward as it assumes we play to the end until asking for more data.
         // But if we ask for numerous seconds and therefore "cache" music way too long, the transition will take place very late which can be heard by gamers.
         private const int BUFFER_SIZE = 2048;
-
         private static readonly int FREQUENCY_RATE = 44100;
 
         public static void Initialize()
@@ -49,6 +58,8 @@ namespace GVR.Manager
             InitializeUnity();
             InitializeZenKit();
             InitializeDxMusic();
+
+            GvrEvents.GeneralSceneLoaded.AddListener(WorldLoaded);
         }
 
         private static void InitializeUnity()
@@ -62,8 +73,37 @@ namespace GVR.Manager
             _audioSourceComp.priority = 0;
             _audioSourceComp.clip = audioClip;
             _audioSourceComp.loop = true;
-
             _audioSourceComp.Play();
+        }
+
+        private static void WorldLoaded()
+        {
+            MusicZones = new SortedSet<GameObject>(new MusicZonesComparer());
+            var musicZoneDefaultParentGO = GameObject.Find(VirtualObjectType.oCZoneMusicDefault.ToString());
+
+            if (musicZoneDefaultParentGO == null || musicZoneDefaultParentGO.transform.childCount != 1)
+            {
+                Debug.LogError(
+                    "There's no/too many defaultMusic entries on this map. Won't use any of these right now.");
+                return;
+            }
+
+            MusicZones.Add(musicZoneDefaultParentGO.transform.GetChild(0).gameObject);
+        }
+
+        /// <summary>
+        /// We compare the order of MusicZones when added to the list.
+        /// It ensures we don't need to calculate it every time an entry is added.
+        /// </summary>
+        private class MusicZonesComparer : IComparer<GameObject>
+        {
+            public int Compare(GameObject x, GameObject y)
+            {
+                var prio1 = x.GetComponent<VobMusicProperties>().musicData.Priority;
+                var prio2 = y.GetComponent<VobMusicProperties>().musicData.Priority;
+
+                return prio1.CompareTo(prio2);
+            }
         }
 
         private static void InitializeZenKit()
@@ -89,7 +129,6 @@ namespace GVR.Manager
                     return null;
                 }
             });
-            return;
         }
 
         private static void LoggerCallback(LogLevel level, string message)
@@ -118,8 +157,10 @@ namespace GVR.Manager
             _dxPerformance.RenderPcm(data, true);
         }
 
-        public static void Play(string zoneName, SegmentTags tags)
+        public static void Play(SegmentTags tags)
         {
+            var zoneName = MusicZones.Last().GetComponent<VobMusicProperties>().musicData.Name;
+
             bool isDay = (tags & SegmentTags.Ngt) == 0;
             string result = zoneName.Substring(zoneName.IndexOf("_") + 1);
             var musicTag = "STD";
@@ -145,20 +186,27 @@ namespace GVR.Manager
         {
             if (!FeatureFlags.I.enableMusic)
                 return;
-            
+
+            // Do not restart the current theme if already playing.
+            // Multiple MusicThemeInstances can reference the same audio. Therefore checking actual files only.
+            if (_currentTheme != null && theme.File == _currentTheme.File)
+                return;
+
             var segment = _dxLoader.GetSegment(theme.File);
 
             var timing = ToTiming(theme.TransSubType);
             var embellishment = ToEmbellishment(theme.TransType);
 
             if (FeatureFlags.I.dxMusicLogLevel >= LogLevel.Info)
-                Debug.Log($"Switching music to: {theme.File}");
+                Debug.Log($"Changing music theme to: {theme.File}");
 
             _dxPerformance.PlayTransition(segment, embellishment, timing);
 
             // Tests sounded feasible like when you stop the music you get somme afterglow hall.
             // TODO - But I have no clue if decayTime is the right timer to set here. Alter if you have better ears than I have. ;-)
             _reverbFilterComp.decayTime = theme.ReverbTime / 1000; // ms in seconds
+
+            _currentTheme = theme;
         }
 
         private static Timing ToTiming(MusicTransitionType type)

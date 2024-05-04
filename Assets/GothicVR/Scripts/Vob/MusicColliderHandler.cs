@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using GVR.Debugging;
-using GVR.Extensions;
 using GVR.Globals;
 using GVR.Manager;
 using UnityEngine;
@@ -9,8 +7,6 @@ namespace GVR.Vob
 {
     public class MusicCollisionHandler : MonoBehaviour
     {
-        private static Stack<string> musicZones = new();
-
         private void OnTriggerEnter(Collider other)
         {
             if (!FeatureFlags.I.enableMusic)
@@ -19,13 +15,13 @@ namespace GVR.Vob
             if (!other.CompareTag(Constants.PlayerTag))
                 return;
 
-            // We are already playing this segment.
-            if (!musicZones.IsEmpty() && musicZones.Peek() == gameObject.name)
-                return;
+            Debug.Log("Changing - Add " + gameObject.name);
 
-            musicZones.Push(gameObject.name);
+            // FIXME - Seems different GOs with same name aren't added to the Set. Fix it.
+            // FIXME - We need to load the currently active music when spawned. Currently we need to walk 1cm to trigger collider.
+            MusicManager.MusicZones.Add(gameObject);
 
-            MusicManager.Play(gameObject.name, MusicManager.SegmentTags.Std);
+            MusicManager.Play(MusicManager.SegmentTags.Std);
         }
 
         private void OnTriggerExit(Collider other)
@@ -36,20 +32,11 @@ namespace GVR.Vob
             if (!other.CompareTag(Constants.PlayerTag))
                 return;
 
-            if (musicZones.IsEmpty() || musicZones.Peek() != gameObject.name)
-                return;
+            Debug.Log("Changing - Remove " + gameObject.name);
 
-            musicZones.Pop();
+            MusicManager.MusicZones.Remove(gameObject);
 
-            // Play default music
-            if (musicZones.IsEmpty())
-            {
-                MusicManager.Play("MUSICZONE_DEF", MusicManager.SegmentTags.Std);
-            }
-            else
-            {
-                MusicManager.Play(musicZones.Peek(), MusicManager.SegmentTags.Std);
-            }
+            MusicManager.Play(MusicManager.SegmentTags.Std);
         }
     }
 }

@@ -57,7 +57,7 @@ namespace GVR.Manager
         }
 
         // Outsourced after async Task LoadStartupScenes() as async makes Debugging way harder
-        // (Breakpoints won't be catched during exceptions)
+        // (Breakpoints won't be caught during exceptions)
         private void Update()
         {
             if (!debugFreshlyDoneLoading)
