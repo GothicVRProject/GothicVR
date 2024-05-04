@@ -39,7 +39,7 @@ namespace GVR.Manager
         /// <summary>
         /// Whenever we collide with a musicZoneVobGO, it's entry will be added to the list and the most important theme will be played.
         /// </summary>
-        public static SortedSet<GameObject> MusicZones;
+        public static List<GameObject> MusicZones;
 
         // Depending on speed of track, 2048 == around less than a second
         // If we cache each call to dxMusic synthesizer, we would skip a lot of transition options as the synthesizer assumes we're already ahead.
@@ -78,7 +78,7 @@ namespace GVR.Manager
 
         private static void WorldLoaded()
         {
-            MusicZones = new SortedSet<GameObject>(new MusicZonesComparer());
+            MusicZones = new List<GameObject>();
             var musicZoneDefaultParentGO = GameObject.Find(VirtualObjectType.oCZoneMusicDefault.ToString());
 
             if (musicZoneDefaultParentGO == null || musicZoneDefaultParentGO.transform.childCount != 1)
@@ -89,21 +89,6 @@ namespace GVR.Manager
             }
 
             MusicZones.Add(musicZoneDefaultParentGO.transform.GetChild(0).gameObject);
-        }
-
-        /// <summary>
-        /// We compare the order of MusicZones when added to the list.
-        /// It ensures we don't need to calculate it every time an entry is added.
-        /// </summary>
-        private class MusicZonesComparer : IComparer<GameObject>
-        {
-            public int Compare(GameObject x, GameObject y)
-            {
-                var prio1 = x.GetComponent<VobMusicProperties>().musicData.Priority;
-                var prio2 = y.GetComponent<VobMusicProperties>().musicData.Priority;
-
-                return prio1.CompareTo(prio2);
-            }
         }
 
         private static void InitializeZenKit()
@@ -159,7 +144,10 @@ namespace GVR.Manager
 
         public static void Play(SegmentTags tags)
         {
-            var zoneName = MusicZones.Last().GetComponent<VobMusicProperties>().musicData.Name;
+            var zoneName = MusicZones
+                .OrderBy(i => i.GetComponent<VobMusicProperties>().musicData.Priority)
+                .Last()
+                .GetComponent<VobMusicProperties>().musicData.Name;
 
             bool isDay = (tags & SegmentTags.Ngt) == 0;
             string result = zoneName.Substring(zoneName.IndexOf("_") + 1);
