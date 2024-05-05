@@ -48,7 +48,6 @@ namespace GVR.Manager
         // But if we ask for numerous seconds and therefore "cache" music way too long, the transition will take place very late which can be heard by gamers.
         private const int BUFFER_SIZE = 2048;
         private const int FREQUENCY_RATE = 44100;
-        private const float AVERAGE_HUMAN_SIZE = 1.65f;
 
         public static void Initialize()
         {
@@ -84,10 +83,6 @@ namespace GVR.Manager
 
             var zones = Object.FindObjectsOfType<VobMusicProperties>();
             var playerPosition = GameObject.FindWithTag(Constants.PlayerTag).transform.position;
-
-            // In my tests with XrDeviceSimulator as well as my VR glasses, I was spawned close to the ground. But START_STA in G1 expects a normal human standing.
-            // TODO - Is it only my behaviour or are other players when spawning on start of G1 also 30cm tall?
-            playerPosition = new Vector3(playerPosition.x, playerPosition.y + AVERAGE_HUMAN_SIZE, playerPosition.z);
 
             foreach (var zone in zones)
             {
