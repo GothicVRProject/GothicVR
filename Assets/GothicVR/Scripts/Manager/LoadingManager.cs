@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GVR.Extensions;
+using GVR.Globals;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -27,6 +28,8 @@ namespace GVR.Manager
 
         private void Start()
         {
+            GvrEvents.LoadingSceneLoaded.AddListener(OnLoadingSceneLoaded);
+
             // Initializing the Dictionary with the default progress (which is 0) for each type
             foreach (LoadingProgressType progressType in Enum.GetValues(typeof(LoadingProgressType)))
             {
@@ -45,10 +48,26 @@ namespace GVR.Manager
             }
         }
 
-        public void SetBarFromScene(Scene scene)
+        private void OnLoadingSceneLoaded()
         {
+            SetBarFromScene();
+            SetMaterialForLoading();
+        }
+
+        private void SetBarFromScene()
+        {
+            var sphere = GameObject.Find("LoadingSphere");
+            bar = sphere.FindChildRecursively("ProgressBar");
+        }
+
+        private void SetMaterialForLoading()
+        {
+            var scene = SceneManager.GetSceneByName(Constants.SceneLoading);
             var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
-            this.bar = sphere.FindChildRecursively("ProgressBar");
+            sphere.GetComponent<MeshRenderer>().material = TextureManager.I.loadingSphereMaterial;
+            sphere.FindChildRecursively("LoadingImage").GetComponent<Image>().material = TextureManager.I.gothicLoadingMenuMaterial;
+            sphere.FindChildRecursively("ProgressBackground").gameObject.GetComponent<Image>().material = TextureManager.I.loadingBarBackgroundMaterial;
+            sphere.FindChildRecursively("ProgressBar").gameObject.GetComponent<Image>().material = TextureManager.I.loadingBarMaterial;
         }
 
         private float CalculateOverallProgress()
@@ -86,15 +105,6 @@ namespace GVR.Manager
             progressByType[progressType] = newProgress;
             if (bar != null)
                 UpdateLoadingBar();
-        }
-
-        public void SetMaterialForLoading(Scene scene)
-        {
-            var sphere = scene.GetRootGameObjects().FirstOrDefault(go => go.name == "LoadingSphere");
-            sphere.GetComponent<MeshRenderer>().material = TextureManager.I.loadingSphereMaterial;
-            sphere.FindChildRecursively("LoadingImage").GetComponent<Image>().material = TextureManager.I.gothicLoadingMenuMaterial;
-            sphere.FindChildRecursively("ProgressBackground").gameObject.GetComponent<Image>().material = TextureManager.I.loadingBarBackgroundMaterial;
-            sphere.FindChildRecursively("ProgressBar").gameObject.GetComponent<Image>().material = TextureManager.I.loadingBarMaterial;
         }
     }
 }

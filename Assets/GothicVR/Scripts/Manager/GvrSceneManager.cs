@@ -88,7 +88,6 @@ namespace GVR.Manager
             }
             
             newWorldName = worldName;
-            MusicManager.Play("SYS_LOADING");
 
             var watch = Stopwatch.StartNew();
 
@@ -172,8 +171,7 @@ namespace GVR.Manager
                 case Constants.SceneBootstrap:
                     break;
                 case Constants.SceneLoading:
-                    LoadingManager.I.SetBarFromScene(scene);
-                    LoadingManager.I.SetMaterialForLoading(scene);
+                    GvrEvents.LoadingSceneLoaded.Invoke();
                     break;
                 case Constants.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);

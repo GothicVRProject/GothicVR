@@ -60,7 +60,9 @@ namespace GVR.Manager
             InitializeZenKit();
             InitializeDxMusic();
 
-            GvrEvents.GeneralSceneLoaded.AddListener(WorldLoaded);
+            GvrEvents.MainMenuSceneLoaded.AddListener(OnMainMenuLoaded);
+            GvrEvents.LoadingSceneLoaded.AddListener(OnLoadingSceneLoaded);
+            GvrEvents.GeneralSceneLoaded.AddListener(OnWorldLoaded);
         }
 
         private static void InitializeUnity()
@@ -77,7 +79,17 @@ namespace GVR.Manager
             _audioSourceComp.Play();
         }
 
-        private static void WorldLoaded()
+        private static void OnMainMenuLoaded()
+        {
+            Play("SYS_MENU");
+        }
+
+        private static void OnLoadingSceneLoaded()
+        {
+            Play("SYS_LOADING");
+        }
+
+        private static void OnWorldLoaded()
         {
             _musicZones.Clear();
 
