@@ -17,6 +17,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using ZenKit;
+using ZenKit.Vobs;
 using Debug = UnityEngine.Debug;
 
 namespace GVR.Creator
@@ -361,7 +362,15 @@ namespace GVR.Creator
 
         private static Dictionary<int, List<WorldData.SubMeshData>> MergeWorldChunksByLightCount(IBspTree bspTree, Dictionary<int, List<WorldData.SubMeshData>> submeshesPerParentNode)
         {
-            const int maxLightsPerChunk = 16;
+            int maxLightsPerChunk = 16;
+
+            // Workaround - if we have no lights spawned, then the merging algorithm has some issues.
+            // But as this will only happen with Developer settings, we fix it here.
+            if (!FeatureFlags.I.IsVobTypeSpawned(VirtualObjectType.zCVobLight))
+            {
+                maxLightsPerChunk = 0;
+            }
+
             Dictionary<int, List<WorldData.SubMeshData>> mergedChunks = new();
 
             Parallel.ForEach(submeshesPerParentNode.Keys, (int parentNodeIndex) =>

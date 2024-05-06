@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GVR.Extensions;
 using GVR.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -87,6 +88,19 @@ namespace GVR.Debugging
         {
             [Range(1f, 100f)] public float maxObjectSize;
             [Range(1f, 1000f)] public float cullingDistance;
+        }
+
+        /// <summary>
+        /// Short hand method to check for Vob settings.
+        /// </summary>
+        public bool IsVobTypeSpawned(VirtualObjectType type)
+        {
+            if (!createVobs)
+                return false;
+            else if (vobTypeToSpawn.IsEmpty())
+                return true;
+            else
+                return vobTypeToSpawn.Contains(type);
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using GVR.Caches;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using GVR.Caches;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Vobs;
@@ -13,8 +13,7 @@ namespace GVR.World
     public class WorldData
     {
         // We need to store it as we need the pointer to it for load+save of un-cached vobs.
-        // ReSharper disable once NotAccessedField.Global
-        public global::ZenKit.World World;
+        public IWorld World;
         public List<IVirtualObject> Vobs;
         public IWayNet WayNet;
         
