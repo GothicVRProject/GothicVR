@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using GVR.Extensions;
 using GVR.Misc;
 using UnityEngine;
@@ -34,14 +35,28 @@ namespace GVR.Npc
         
         public void StartAnimation(string headName, HeadMorphType type)
         {
-            var animationName = type switch
+            StartAnimation(headName, GetAnimationNameByType(type));
+        }
+
+        /// <summary>
+        /// We need to wrap StopAnimation by fetching string name of animation based on HeadMorphType
+        /// </summary>
+        public void StopAnimation(HeadMorphType type)
+        {
+            var animationName = GetAnimationNameByType(type);
+            var animationData = MorphMetadata.Animations.First(anim => anim.Name.EqualsIgnoreCase(animationName));
+
+            StopAnimation(animationData.Name);
+        }
+
+        private string GetAnimationNameByType(HeadMorphType type)
+        {
+            return type switch
             {
                 HeadMorphType.Viseme => "VISEME",
                 HeadMorphType.Eat => "T_EAT",
                 _ => throw new Exception($"AnimationType >{type}< not yet handled for head morphing.")
             };
-
-            StartAnimation(headName, animationName);
         }
     }
 }
