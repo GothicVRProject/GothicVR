@@ -1,7 +1,6 @@
 using System;
-using System.Linq;
 using GVR.Extensions;
-using GVR.Misc;
+using GVR.Morph;
 using UnityEngine;
 
 namespace GVR.Npc
@@ -44,9 +43,7 @@ namespace GVR.Npc
         public void StopAnimation(HeadMorphType type)
         {
             var animationName = GetAnimationNameByType(type);
-            var animationData = MorphMetadata.Animations.First(anim => anim.Name.EqualsIgnoreCase(animationName));
-
-            StopAnimation(animationData.Name);
+            StopAnimation(animationName);
         }
 
         private string GetAnimationNameByType(HeadMorphType type)
