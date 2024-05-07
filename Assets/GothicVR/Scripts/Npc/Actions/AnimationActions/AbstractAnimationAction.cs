@@ -72,7 +72,7 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             var type = Props.headMorph.GetTypeByName(data.Animation);
 
-            Props.headMorph.StartAnimation(Props.BodyData.Head, type, false);
+            Props.headMorph.StartAnimation(Props.BodyData.Head, type);
         }
         
         protected virtual void InsertItem(string slot1, string slot2)

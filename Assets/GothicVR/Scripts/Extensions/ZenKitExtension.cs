@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using GVR.Vm;
 using UnityEngine;
 using ZenKit;
 using ZenKit.Daedalus;
@@ -111,6 +112,11 @@ namespace GVR.Extensions
             }
 
             return data;
+        }
+
+        public static VmGothicEnums.MorphAnimationFlags ToMorphAnimationFlags(this byte flags)
+        {
+            return (VmGothicEnums.MorphAnimationFlags)flags;
         }
 
         /// <summary>

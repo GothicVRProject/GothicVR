@@ -1,6 +1,4 @@
 using System;
-using System.Linq;
-using GVR.Caches;
 using GVR.Extensions;
 using GVR.Misc;
 using UnityEngine;
@@ -15,7 +13,7 @@ namespace GVR.Npc
             Friendly,
             Angry,
             Hostile,
-            Firghtened,
+            Frightened,
             Eyesclosed,
             Eyesblink,
             Eat,
@@ -34,7 +32,7 @@ namespace GVR.Npc
             return HeadMorphType.Hurt;
         }
         
-        public void StartAnimation(string headName, HeadMorphType type, bool loop)
+        public void StartAnimation(string headName, HeadMorphType type)
         {
             var animationName = type switch
             {
@@ -43,7 +41,7 @@ namespace GVR.Npc
                 _ => throw new Exception($"AnimationType >{type}< not yet handled for head morphing.")
             };
 
-            StartAnimation(headName, animationName, loop);
+            StartAnimation(headName, animationName);
         }
     }
 }

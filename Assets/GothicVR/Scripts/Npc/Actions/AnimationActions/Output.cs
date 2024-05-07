@@ -42,7 +42,7 @@ namespace GVR.Npc.Actions.AnimationActions
                 var randomId = Random.Range(1, gestureCount+1);
 
                 AnimationCreator.PlayAnimation(Props.mdsNames, $"T_DIALOGGESTURE_{randomId:00}", NpcGo);
-                AnimationCreator.PlayHeadMorphAnimation(Props, HeadMorph.HeadMorphType.Viseme, true);
+                AnimationCreator.PlayHeadMorphAnimation(Props, HeadMorph.HeadMorphType.Viseme);
 
                 Props.npcSound.PlayOneShot(audioClip);
 

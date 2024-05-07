@@ -171,5 +171,14 @@ namespace GVR.Vm
             ITEM_AMULET   = 1 << 22, // use like amulet
             ITEM_RING     = 1 << 11  // use like ring
         };
+
+        [Flags]
+        public enum MorphAnimationFlags
+        {
+            DISTRIBUTE_FRAMES_RANDOMLY = 1 << 0,
+            LOOP_INFINITELY = 1 << 1,
+            SHIFT_VERTEX_POSITION = 1 << 2,
+            REFERENCE_ANIMATION = 1 << 3,
+        }
     }
 }

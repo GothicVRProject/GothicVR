@@ -92,9 +92,9 @@ namespace GVR.Creator
             animationComp.Stop();
         }
 
-        public static void PlayHeadMorphAnimation(NpcProperties props, HeadMorph.HeadMorphType type, bool loop)
+        public static void PlayHeadMorphAnimation(NpcProperties props, HeadMorph.HeadMorphType type)
         {
-            props.headMorph.StartAnimation(props.BodyData.Head, type, loop);
+            props.headMorph.StartAnimation(props.BodyData.Head, type);
         }
 
         public static void StopHeadMorphAnimation(NpcProperties props)
@@ -111,7 +111,7 @@ namespace GVR.Creator
                 wrapMode = repeat ? WrapMode.Loop : WrapMode.Once
             };
 
-            var curves = new Dictionary<string, List<AnimationCurve>>((int)pxAnimation.NodeCount);
+            var curves = new Dictionary<string, List<AnimationCurve>>(pxAnimation.NodeCount);
             var boneNames = pxAnimation.NodeIndices.Select(nodeIndex => mdh.Nodes[nodeIndex].Name).ToArray();
 
             // Initialize array

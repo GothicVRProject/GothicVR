@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
+using GVR.Vm;
 using JetBrains.Annotations;
 using UnityEngine;
 using ZenKit;
@@ -37,7 +38,7 @@ namespace GVR.Misc
                 _mesh = GetComponent<MeshFilter>().mesh;
         }
         
-        protected void StartAnimation(string morphMeshName, [CanBeNull] string animationName, bool loop)
+        protected void StartAnimation(string morphMeshName, [CanBeNull] string animationName)
         {
             // Reset
             if (_isAnimationRunning)
@@ -49,7 +50,7 @@ namespace GVR.Misc
                 : _morphMetadata.Animations.First(anim => anim.Name.EqualsIgnoreCase(animationName));
             _morphFrameData = MorphMeshCache.TryGetMorphData(morphMeshName, _morphAnimationMetadata.Name);
 
-            if (loop)
+            if (_morphAnimationMetadata.Flags.ToMorphAnimationFlags().HasFlag(VmGothicEnums.MorphAnimationFlags.LOOP_INFINITELY))
                 _isLooping = true;
             else
                 _animationDuration = (float)_morphAnimationMetadata.Duration.TotalMilliseconds / 1000; // /1k to normalize to seconds.
