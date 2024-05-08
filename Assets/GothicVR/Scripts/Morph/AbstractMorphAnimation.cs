@@ -6,6 +6,7 @@ using GVR.Extensions;
 using GVR.Vm;
 using JetBrains.Annotations;
 using UnityEngine;
+using ZenKit;
 using Mesh = UnityEngine.Mesh;
 
 namespace GVR.Morph
@@ -19,11 +20,7 @@ namespace GVR.Morph
         /// Multiple morphs can run at the same time. e.g. viseme and eyesblink.
         /// We therefore add animations to a list to calculate their positions together.
         /// </summary>
-        protected List<MorphAnimationData> RunningMorphs = new();
-
-        // Time and looping information
-        private bool _isAnimationRunning;
-
+        private readonly List<MorphAnimationData> _runningMorphs = new();
         private Mesh _mesh;
 
         protected virtual void Start()
@@ -44,31 +41,31 @@ namespace GVR.Morph
             newMorph.AnimationFrameData = MorphMeshCache.TryGetMorphData(morphMeshName, newMorph.AnimationMetadata.Name);
 
             // Reset if already added and playing
-            if (RunningMorphs.Any(i => i.MeshName == newMorph.MeshName))
+            if (_runningMorphs.Any(i => i.MeshName == newMorph.MeshName))
                 StopAnimation(newMorph.AnimationMetadata.Name);
 
-            var animationFlags = newMorph.AnimationMetadata.Flags.ToMorphAnimationFlags();
+            var animationFlags = newMorph.AnimationMetadata.Flags;
 
             // Not yet implemented warning.
-            if (animationFlags.HasFlag(VmGothicEnums.MorphAnimationFlags.DISTRIBUTE_FRAMES_RANDOMLY)
-                || animationFlags.HasFlag(VmGothicEnums.MorphAnimationFlags.SHIFT_VERTEX_POSITION)
-                || animationFlags.HasFlag(VmGothicEnums.MorphAnimationFlags.REFERENCE_ANIMATION)
+            if (animationFlags.HasFlag(MorphAnimationFlags.Random)
+                || animationFlags.HasFlag(MorphAnimationFlags.Shape)
+                || animationFlags.HasFlag(MorphAnimationFlags.ShapeReference)
                )
             {
                 Debug.LogWarning($"MorphMesh animation with flags {animationFlags} not yet supported!");
             }
 
-            if (animationFlags.HasFlag(VmGothicEnums.MorphAnimationFlags.LOOP_INFINITELY))
+            if (animationFlags.HasFlag(MorphAnimationFlags.Loop))
                 newMorph.IsLooping = true;
             else
                 newMorph.AnimationDuration = (float)newMorph.AnimationMetadata.Duration.TotalMilliseconds / 1000; // /1k to normalize to seconds.
 
-            RunningMorphs.Add(newMorph);
+            _runningMorphs.Add(newMorph);
         }
 
         public void StopAnimation(string animationName)
         {
-            var morphToStop = RunningMorphs.FirstOrDefault(i => i.AnimationName.EqualsIgnoreCase(animationName));
+            var morphToStop = _runningMorphs.FirstOrDefault(i => i.AnimationName.EqualsIgnoreCase(animationName));
 
             if (morphToStop == null)
             {
@@ -79,15 +76,15 @@ namespace GVR.Morph
             // Reset to a stable value.
             _mesh.vertices = MorphMeshCache.GetOriginalUnityVertices(morphToStop.MeshName);
 
-            RunningMorphs.Remove(morphToStop);
+            _runningMorphs.Remove(morphToStop);
         }
         
         private void Update()
         {
-            if (RunningMorphs.IsEmpty())
+            if (_runningMorphs.IsEmpty())
                 return;
 
-            foreach (var morph in RunningMorphs)
+            foreach (var morph in _runningMorphs)
             {
 
                 morph.Time += Time.deltaTime;

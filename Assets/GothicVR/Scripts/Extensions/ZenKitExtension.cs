@@ -114,11 +114,6 @@ namespace GVR.Extensions
             return data;
         }
 
-        public static VmGothicEnums.MorphAnimationFlags ToMorphAnimationFlags(this byte flags)
-        {
-            return (VmGothicEnums.MorphAnimationFlags)flags;
-        }
-
         /// <summary>
         /// Leveraging switch statements with string => member mapping as it's faster than reflection.
         /// https://www.jacksondunstan.com/articles/2972
