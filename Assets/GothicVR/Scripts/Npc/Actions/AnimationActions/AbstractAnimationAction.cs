@@ -70,7 +70,7 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public virtual void AnimationMorphEventCallback(SerializableEventMorphAnimation data)
         {
-            var type = Props.headMorph.GetTypeByName(data.Animation);
+            var type = Props.headMorph.GetAnimationTypeByName(data.Animation);
 
             Props.headMorph.StartAnimation(Props.BodyData.Head, type);
         }

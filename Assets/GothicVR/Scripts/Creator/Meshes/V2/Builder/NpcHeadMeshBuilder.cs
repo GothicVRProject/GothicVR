@@ -23,6 +23,7 @@ namespace GVR.Creator.Meshes.V2.Builder
             // Cache it for faster use during runtime
             props.head = headGo.transform;
             props.headMorph = headGo.AddComponent<HeadMorph>();
+            props.headMorph.HeadName = props.BodyData.Head;
 
             var headMeshFilter = headGo.AddComponent<MeshFilter>();
             var headMeshRenderer = headGo.AddComponent<MeshRenderer>();

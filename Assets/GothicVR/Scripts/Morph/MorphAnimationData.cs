@@ -8,7 +8,6 @@ namespace GVR.Morph
     {
         // Time data
         public float Time;
-        public float AnimationDuration;
         public bool IsLooping;
 
         // Mesh data
@@ -19,5 +18,6 @@ namespace GVR.Morph
         public IMorphAnimation AnimationMetadata;
         public List<Vector3[]> AnimationFrameData;
         public string AnimationName => AnimationMetadata.Name;
+        public int AnimationFrameCount => AnimationMetadata.FrameCount;
     }
 }

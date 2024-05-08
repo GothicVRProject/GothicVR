@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GVR.Caches;
 using GVR.Extensions;
-using GVR.Vm;
 using JetBrains.Annotations;
 using UnityEngine;
 using ZenKit;
@@ -55,10 +54,9 @@ namespace GVR.Morph
                 Debug.LogWarning($"MorphMesh animation with flags {animationFlags} not yet supported!");
             }
 
+            // TODO/HINT - Is also handled via -1 second duration value of morphAnimation.Duration
             if (animationFlags.HasFlag(MorphAnimationFlags.Loop))
                 newMorph.IsLooping = true;
-            else
-                newMorph.AnimationDuration = (float)newMorph.AnimationMetadata.Duration.TotalMilliseconds / 1000; // /1k to normalize to seconds.
 
             _runningMorphs.Add(newMorph);
         }
@@ -78,43 +76,70 @@ namespace GVR.Morph
 
             _runningMorphs.Remove(morphToStop);
         }
-        
+
+        // FIXME - We currently calculate morphs every frame but could lower it's value with 60, 30, 15 frames in mind (e.g. for each distance culling).
+        // FIXME - Means less CPU cycles to calculate morphs.
         private void Update()
         {
             if (_runningMorphs.IsEmpty())
                 return;
 
-            foreach (var morph in _runningMorphs)
+            // ToList() -> As we might call .Remove() during looping, we need to clone the list to allow it (otherwise we get a CompilerIssue).
+            foreach (var morph in _runningMorphs.ToList())
             {
-
                 morph.Time += Time.deltaTime;
-
-                if (!morph.IsLooping && morph.Time > morph.AnimationDuration)
-                {
-                    StopAnimation(morph.AnimationMetadata.Name);
-                    return;
-                }
 
                 CalculateMorphWeights();
 
                 // IMorphAnimation.Speed is in milliseconds. We therefore multiply current time by 1000.
-                var newFrame = (morph.Time * 1000 * morph.AnimationMetadata.Speed % morph.AnimationMetadata.FrameCount);
+                var newFrameFloat = (morph.Time * 1000 * morph.AnimationMetadata.Speed);
+                var newFrameInt = (int)newFrameFloat;
 
-                var currentMorph = morph.AnimationFrameData[(int)newFrame];
-                var nextMorph =
-                    morph.AnimationFrameData[(int)newFrame == morph.AnimationMetadata.FrameCount - 1 ? 0 : (int)newFrame + 1];
-
-                // FIXME - We currently calculate this morph interpolation every time the morph is played. We could also cache it.
-                // FIXME - e.g. cache it with 60, 30, 15 frames in mind (for each distance culling).
-                // FIXME - This would mean more memory is needed, but less CPU cycles.
-                var interpolatedMorph = new Vector3[currentMorph.Length];
-                for (var i = 0; i < currentMorph.Length; i++)
+                // We can't use animationtime as (e.g.) for R_EYESBLINK we have only one frame which is a time of 0.0f,
+                // but instead we need to say frame 0 is 0...0.999 of first frame.
+                if (newFrameInt >= morph.AnimationFrameCount)
                 {
-                    interpolatedMorph[i] =
-                        Vector3.Lerp(currentMorph[i], nextMorph[i], newFrame - MathF.Truncate(newFrame));
+                    // We just assume we're exactly at point 0.0f when we reached the end. Not 100% perfect but we're in milliseconds area of error.
+                    if (morph.IsLooping)
+                    {
+                        morph.Time = 0;
+                        newFrameFloat = 0.0f;
+                        newFrameInt = 0;
+                    }
+                    else
+                    {
+                        StopAnimation(morph.AnimationName);
+                        continue;
+                    }
                 }
 
-                _mesh.vertices = interpolatedMorph;
+                var currentMorph = morph.AnimationFrameData[newFrameInt];
+
+                // e.g. R_EYESBLINK
+                if (morph.AnimationFrameCount == 1)
+                {
+                    // FIXME - We need blendin/blendout otherwise this will be a on-off only.
+                    var calculatedMorph = new Vector3[currentMorph.Length];
+                    for (var i = 0; i < currentMorph.Length; i++)
+                    {
+                        calculatedMorph[i] = currentMorph[i];
+                    }
+                    _mesh.vertices = calculatedMorph;
+                }
+                else
+                {
+                    var nextMorph =
+                        morph.AnimationFrameData[newFrameInt == morph.AnimationMetadata.FrameCount - 1 ? 0 : newFrameInt + 1];
+
+                    var interpolatedMorph = new Vector3[currentMorph.Length];
+                    for (var i = 0; i < currentMorph.Length; i++)
+                    {
+                        interpolatedMorph[i] =
+                            Vector3.Lerp(currentMorph[i], nextMorph[i], newFrameFloat - MathF.Truncate(newFrameFloat));
+                    }
+                    _mesh.vertices = interpolatedMorph;
+                }
+
             }
         }
 
