@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using GVR.Debugging;
 using GVR.Globals;
 using GVR.Manager;
@@ -8,8 +7,6 @@ namespace GVR.Vob
 {
     public class MusicCollisionHandler : MonoBehaviour
     {
-        private static List<string> musicZones = new();
-
         private void OnTriggerEnter(Collider other)
         {
             if (!FeatureFlags.I.enableMusic)
@@ -17,10 +14,10 @@ namespace GVR.Vob
 
             if (!other.CompareTag(Constants.PlayerTag))
                 return;
-
-            musicZones.Add(gameObject.name);
-
-            MusicManager.I.SetMusic(gameObject.name, MusicManager.Tags.Std);
+            
+            // FIXME - We need to load the currently active music when spawned. Currently we need to walk 1cm to trigger collider.
+            MusicManager.AddMusicZone(gameObject);
+            MusicManager.Play(MusicManager.SegmentTags.Std);
         }
 
         private void OnTriggerExit(Collider other)
@@ -31,14 +28,8 @@ namespace GVR.Vob
             if (!other.CompareTag(Constants.PlayerTag))
                 return;
 
-            musicZones.Remove(gameObject.name);
-
-            // Other music will play now.
-            if (musicZones.Count > 0)
-                return;
-
-            // Play default music.
-            MusicManager.I.SetMusic("MUSICZONE_DEF", MusicManager.Tags.Std);
+            MusicManager.RemoveMusicZone(gameObject);
+            MusicManager.Play(MusicManager.SegmentTags.Std);
         }
     }
 }
