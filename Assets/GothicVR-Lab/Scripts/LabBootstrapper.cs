@@ -3,7 +3,10 @@ using GVR.Globals;
 using GVR.Lab.Handler;
 using GVR.Manager;
 using GVR.Manager.Settings;
+using GVR.ZenjectTest;
+using GVR.ZenjectTest.Main;
 using UnityEngine;
+using Zenject;
 
 namespace GVR.GothicVR_Lab.Scripts
 {
@@ -15,6 +18,9 @@ namespace GVR.GothicVR_Lab.Scripts
         public LabLadderLabHandler ladderLabHandler;
         public LabVobHandAttachPointsLabHandler vobHandAttachPointsLabHandler;
         public LabNpcAnimationHandler labNpcAnimationHandler;
+
+        [Inject]
+        IInjectable injector;
 
         private bool _isBooted;
         /// <summary>
