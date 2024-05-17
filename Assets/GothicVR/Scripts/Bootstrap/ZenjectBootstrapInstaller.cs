@@ -5,12 +5,11 @@ using Zenject;
 
 namespace GVR.ZenjectTest
 {
-    public class BootstrapInstaller : MonoBehaviour
+    public class ZenjectBootstrapInstaller : MonoBehaviour
     {
         private static readonly List<string> INSTALLERS = new() {
-            "GVR.ZenjectTest.Main.MainInstaller",
-            "GVR.ZenjectTest.VRMock.VRMockInstaller",
-            "GVR.ZenjectTest.HVR.HVRInstaller"
+            "GVR.HVR.HVRInstaller",
+            "GVR.Flat.FlatInstaller"
         };
 
         private void Awake()

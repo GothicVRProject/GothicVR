@@ -4,7 +4,7 @@ using System.Linq;
 using GVR.Caches;
 using GVR.Debugging;
 using GVR.Globals;
-using GVR.GothicVR.Scripts.Manager;
+using GVR.Manager;
 using GVR.Manager.Settings;
 using GVR.Util;
 using GVR.Vm;
@@ -14,7 +14,7 @@ using ZenKit.Daedalus;
 using Debug = UnityEngine.Debug;
 using Logger = ZenKit.Logger;
 
-namespace GVR.Manager
+namespace GVR.Bootstrap
 {
     public class GvrBootstrapper : SingletonBehaviour<GvrBootstrapper>
     {

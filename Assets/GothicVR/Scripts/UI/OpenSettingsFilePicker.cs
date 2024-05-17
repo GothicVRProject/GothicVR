@@ -1,4 +1,4 @@
-using GVR.Manager;
+using GVR.Bootstrap;
 using GVR.Manager.Settings;
 using SFB;
 using UnityEngine;
