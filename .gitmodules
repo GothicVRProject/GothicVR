@@ -1,3 +1,4 @@
 [submodule "Assets/GothicVR-HVR-Adapter"]
 	path = Assets/GothicVR-HVR-Adapter
 	url = https://github.com/GothicVRProject/GothicVR-HVR-Adapter.git
+	branch = main
