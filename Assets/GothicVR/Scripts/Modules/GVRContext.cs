@@ -1,12 +1,13 @@
 using System;
 using GVR.Context.Controls;
 using GVR.Flat;
-using GVR.OXR;
 using UnityEngine;
-
 #if GVR_HVR_INSTALLED
-
+using GVR.HVR;
+#else
+using GVR.OXR;
 #endif
+
 
 namespace GVR.Context
 {
@@ -40,7 +41,8 @@ namespace GVR.Context
         {
 #if GVR_HVR_INSTALLED
             Debug.Log("Selecting Context: VR - HurricaneVR");
-
+            PlayerControllerAdapter = new HVRPlayerControllerAdapter();
+            ClimbingAdapter = new HVRClimbingAdapter();
 #else
             Debug.Log("Selecting Context: VR - OpenXR (legacy)");
             PlayerControllerAdapter = new OXRPlayerControllerAdapter();
