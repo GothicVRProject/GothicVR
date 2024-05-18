@@ -16,9 +16,19 @@ namespace GVR.Manager
 {
     public class GvrSceneManager : SingletonBehaviour<GvrSceneManager>
     {
+        /// <summary>
+        /// IMPORTANT: Names are exact the same in Scenes/ e.g. DefaultSceneNames.General => Scenes/General.unity
+        /// </summary>
+        public enum DefaultSceneNames
+        {
+            MainMenu,
+            Loading,
+            General
+        }
+
         public GameObject interactionManager;
-        
-        private const string generalSceneName = "General";
+
+        private static readonly string generalSceneName = DefaultSceneNames.General.ToString();
         private const int ensureLoadingBarDelayMilliseconds = 5;
 
         private string newWorldName;

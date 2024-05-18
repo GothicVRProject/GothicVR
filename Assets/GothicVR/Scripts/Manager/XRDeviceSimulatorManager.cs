@@ -23,6 +23,5 @@ namespace GVR.Manager
             var simulator = PrefabCache.TryGetObject(PrefabCache.PrefabType.XRDeviceSimulator);
             SceneManager.GetActiveScene().GetRootGameObjects().Append(simulator);
         }
-        
     }
 }
