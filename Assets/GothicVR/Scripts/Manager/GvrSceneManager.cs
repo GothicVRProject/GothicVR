@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using GVR.Context;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Extensions;
@@ -175,8 +176,10 @@ namespace GVR.Manager
                     break;
                 case Constants.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
+                    GVRContext.PlayerControllerAdapter.CreatePlayerController(scene);
 
                     TeleportPlayerToSpot();
+
                     GvrEvents.GeneralSceneLoaded.Invoke();
 
                     break;

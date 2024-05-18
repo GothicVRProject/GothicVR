@@ -12,6 +12,7 @@ namespace GVR.Context
 {
     public static class GVRContext
     {
+        public static IPlayerControllerAdapter PlayerControllerAdapter { get; private set; }
         public static IClimbingAdapter ClimbingAdapter { get; private set; }
 
         public enum Controls
@@ -33,15 +34,16 @@ namespace GVR.Context
                 default:
                     throw new ArgumentOutOfRangeException(nameof(controls), controls, null);
             }
-
         }
 
         private static void SetVRContext()
         {
 #if GVR_HVR_INSTALLED
             Debug.Log("Selecting Context: VR - HurricaneVR");
+
 #else
             Debug.Log("Selecting Context: VR - OpenXR (legacy)");
+            PlayerControllerAdapter = new OXRPlayerControllerAdapter();
             ClimbingAdapter = new OXRClimbingAdapter();
 #endif
         }
@@ -49,7 +51,7 @@ namespace GVR.Context
         private static void SetFlatContext()
         {
             Debug.Log("Selecting Context: Flat");
-
+            PlayerControllerAdapter = new FlatPlayerControllerAdapter();
             ClimbingAdapter = new FlatClimbingAdapter();
         }
     }
