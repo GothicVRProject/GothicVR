@@ -1,8 +1,11 @@
 using System;
 using GVR.Context.Controls;
 using GVR.Flat;
+using GVR.OXR;
+using UnityEngine;
+
 #if GVR_HVR_INSTALLED
-// using Foo.Bar;
+
 #endif
 
 namespace GVR.Context
@@ -36,14 +39,17 @@ namespace GVR.Context
         private static void SetVRContext()
         {
 #if GVR_HVR_INSTALLED
-
+            Debug.Log("Selecting Context: VR - HurricaneVR");
 #else
-            throw new Exception("HVR isn't activated in Compiler flags. Please ensure your PlayerSettings have ScriptCompilation flag called >GVR_HVR_INSTALLED<.");
+            Debug.Log("Selecting Context: VR - OpenXR (legacy)");
+            ClimbingAdapter = new OXRClimbingAdapter();
 #endif
         }
 
         private static void SetFlatContext()
         {
+            Debug.Log("Selecting Context: Flat");
+
             ClimbingAdapter = new FlatClimbingAdapter();
         }
     }

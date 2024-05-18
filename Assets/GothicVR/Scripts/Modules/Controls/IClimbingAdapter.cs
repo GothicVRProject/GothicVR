@@ -4,6 +4,6 @@ namespace GVR.Context.Controls
 {
     public interface IClimbingAdapter
     {
-        Component GetClimbingComponent();
+        void AddClimbingComponent(GameObject go);
     }
 }

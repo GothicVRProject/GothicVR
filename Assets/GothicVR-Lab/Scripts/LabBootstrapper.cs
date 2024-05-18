@@ -1,5 +1,4 @@
 using GVR.Caches;
-using GVR.Context;
 using GVR.Globals;
 using GVR.Lab.Handler;
 using GVR.Manager;
@@ -26,10 +25,6 @@ namespace GVR.GothicVR_Lab.Scripts
             if (_isBooted)
                 return;
             _isBooted = true;
-
-            GVRContext.SetContext(GVRContext.Controls.Flat);
-
-            var x = GVRContext.ClimbingAdapter;
 
             GvrBootstrapper.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
 
