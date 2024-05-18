@@ -1,9 +1,10 @@
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace GVR.Context.Controls
 {
     public interface IPlayerControllerAdapter
     {
-        void CreatePlayerController(Scene scene);
+        GameObject CreatePlayerController(Scene scene);
     }
 }

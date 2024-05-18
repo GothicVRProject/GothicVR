@@ -7,7 +7,7 @@ namespace GVR.HVR
 {
     public class HVRPlayerControllerAdapter : IPlayerControllerAdapter
     {
-        public void CreatePlayerController(Scene scene)
+        public GameObject CreatePlayerController(Scene scene)
         {
             var newPrefab = Resources.Load<GameObject>("HVR/Prefabs/VRPlayer");
             var go = Object.Instantiate(newPrefab);
@@ -16,6 +16,8 @@ namespace GVR.HVR
             // During normal gameplay, we need to move the VRPlayer to General scene. Otherwise, it will be created inside
             // world scene and removed whenever we change the world.
             SceneManager.MoveGameObjectToScene(go, scene);
+
+            return go;
         }
     }
 }

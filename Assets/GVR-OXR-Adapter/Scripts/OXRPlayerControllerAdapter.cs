@@ -7,7 +7,7 @@ namespace GVR.OXR
 {
     public class OXRPlayerControllerAdapter : IPlayerControllerAdapter
     {
-        public void CreatePlayerController(Scene scene)
+        public GameObject CreatePlayerController(Scene scene)
         {
             string prefabName;
             string goName;
@@ -30,6 +30,8 @@ namespace GVR.OXR
             // During normal gameplay, we need to move the VRPlayer to General scene. Otherwise, it will be created inside
             // world scene and removed whenever we change the world.
             SceneManager.MoveGameObjectToScene(go, scene);
+
+            return go;
         }
     }
 }

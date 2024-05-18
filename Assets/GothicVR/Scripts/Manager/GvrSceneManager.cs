@@ -94,7 +94,6 @@ namespace GVR.Manager
             if (worldName == newWorldName)
             {
                 SetSpawnPoint(SceneManager.GetSceneByName(newWorldName));
-                TeleportPlayerToSpot();
                 return;
             }
             
@@ -186,9 +185,9 @@ namespace GVR.Manager
                     break;
                 case Constants.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
-                    GVRContext.PlayerControllerAdapter.CreatePlayerController(scene);
+                    var playerGo = GVRContext.PlayerControllerAdapter.CreatePlayerController(scene);
 
-                    TeleportPlayerToSpot();
+                    TeleportPlayerToSpot(playerGo);
 
                     GvrEvents.GeneralSceneLoaded.Invoke();
 
@@ -249,13 +248,14 @@ namespace GVR.Manager
             startPoint = startPoint2;
         }
 
-        public void TeleportPlayerToSpot()
+        public void TeleportPlayerToSpot(GameObject playerGo)
         {
             if (startPoint == null)
                 return;
 
-            var player = GameObject.FindWithTag(Constants.PlayerTag);
-            player.transform.SetPositionAndRotation(startPoint.transform.position, startPoint.transform.rotation);
+            playerGo.transform.SetPositionAndRotation(startPoint.transform.position, startPoint.transform.rotation);
+
+            var p2 = playerGo.FindChildRecursively("PlayerController");
         }
     }
 }

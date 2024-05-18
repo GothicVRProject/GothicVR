@@ -1,11 +1,12 @@
 using GVR.Context.Controls;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace GVR.Flat
 {
     public class FlatPlayerControllerAdapter : IPlayerControllerAdapter
     {
-        public void CreatePlayerController(Scene scene)
+        public GameObject CreatePlayerController(Scene scene)
         {
             throw new System.NotImplementedException();
         }
