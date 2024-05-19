@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 using ZenKit;
 using Mesh = UnityEngine.Mesh;
+using Random = UnityEngine.Random;
 
 namespace GVR.Morph
 {
@@ -22,13 +23,20 @@ namespace GVR.Morph
         private readonly List<MorphAnimationData> _runningMorphs = new();
         private Mesh _mesh;
 
+        /// <summary>
+        /// RandomMorphs are blinking eyes in G1.
+        /// The settings for it contains two options of blinking firstTime and secondTime.
+        /// </summary>
+        protected List<(string morphMeshName, string animationName, float firstTimeAverage, float firstTimeVariable, float secondTimeAverage, float secondTimeVariable, float probabilityOfFirst, float timer)> randomAnimations = new ();
+        protected List<float> randomAnimationTimers = new(); // It's faster to alter a list entry than rewriting the whole Tuple struct above.
+
         protected virtual void Start()
         {
             // As we don't set component inside Prefab, we need to assign mesh later at runtime.
             if (_mesh == null)
                 _mesh = GetComponent<MeshFilter>().mesh;
         }
-        
+
         protected void StartAnimation(string morphMeshName, [CanBeNull] string animationName)
         {
             var newMorph = new MorphAnimationData();
@@ -77,13 +85,16 @@ namespace GVR.Morph
             _runningMorphs.Remove(morphToStop);
         }
 
-        // FIXME - We currently calculate morphs every frame but could lower it's value with 60, 30, 15 frames in mind (e.g. for each distance culling).
-        // FIXME - Means less CPU cycles to calculate morphs.
         private void Update()
         {
-            if (_runningMorphs.IsEmpty())
-                return;
+            UpdateRunningMorphs();
+            CheckIfRandomAnimationShouldBePlayed();
+        }
 
+        // FIXME - We currently calculate morphs every frame but could lower it's value with 60, 30, 15 frames in mind (e.g. for each distance culling).
+        // FIXME - Means less CPU cycles to calculate morphs.
+        private void UpdateRunningMorphs()
+        {
             // ToList() -> As we might call .Remove() during looping, we need to clone the list to allow it (otherwise we get a CompilerIssue).
             foreach (var morph in _runningMorphs.ToList())
             {
@@ -139,13 +150,34 @@ namespace GVR.Morph
                     }
                     _mesh.vertices = interpolatedMorph;
                 }
-
             }
         }
 
         private void CalculateMorphWeights()
         {
             // FIXME - Not yet implemented. But will provide smoother animations for e.g. viseme. Keep in mind there are blendIn and blendOut parameters.
+        }
+
+        private void CheckIfRandomAnimationShouldBePlayed()
+        {
+            for (var i = 0; i < randomAnimations.Count; i++)
+            {
+                randomAnimationTimers[i] -= Time.deltaTime;
+
+                if (randomAnimationTimers[i] > 0)
+                    continue;
+
+                var anim = randomAnimations[i];
+
+                // FIXME - Set maxWeight for animation based on random value.
+                // FIXME - var weight = Random.value * 0.4f + 0.6f
+                StartAnimation(anim.morphMeshName, anim.animationName);
+
+                if (Random.value < anim.probabilityOfFirst)
+                    randomAnimationTimers[i] = (Random.value * 2 - 1) * anim.firstTimeVariable + anim.firstTimeAverage;
+                else
+                    randomAnimationTimers[i] = (Random.value * 2 - 1) * anim.secondTimeVariable + anim.secondTimeAverage;
+            }
         }
     }
 }

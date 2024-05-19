@@ -29,7 +29,18 @@ namespace GVR.Npc
         {
             base.Start();
 
-            StartAnimation(HeadName, HeadMorphType.Eyesblink);
+            randomAnimations.Add(new()
+            {
+                morphMeshName = HeadName,
+                animationName = GetAnimationNameByType(HeadMorphType.Eyesblink),
+                firstTimeAverage = 0.15f,
+                firstTimeVariable = 0.1f,
+                secondTimeAverage = 3.8f,
+                secondTimeVariable = 1.0f,
+                probabilityOfFirst = 0.2f
+            });
+
+            randomAnimationTimers.Add(3.8f * 2); // secondTimeAverage * 2 seconds);
         }
 
         public void StartAnimation(string headName, HeadMorphType type)
