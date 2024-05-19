@@ -31,10 +31,14 @@ namespace GVR.Manager
             CacheHero();
         }
 
-        public static void CacheHero()
+        public static void CacheHero(GameObject playerGo = null)
         {
             var heroIndex = GameData.GothicVm.GlobalHero!.Index;
-            var playerGo = GameObject.FindWithTag(Constants.PlayerTag);
+
+            // In lab we can't fetch it, as it's spawned at the same time. In normal game it works.
+            if (playerGo == null)
+                playerGo = GameObject.FindWithTag(Constants.PlayerTag);
+
             var playerProperties = playerGo.GetComponent<NpcProperties>();
 
             // Set data for NPC.

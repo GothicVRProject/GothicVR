@@ -42,8 +42,8 @@ namespace GVR.GothicVR_Lab.Scripts
 
         private void BootLab()
         {
-            GVRContext.PlayerControllerAdapter.CreatePlayerController(SceneManager.GetActiveScene());
-            NpcHelper.CacheHero();
+            var playerGo = GVRContext.PlayerControllerAdapter.CreatePlayerController(SceneManager.GetActiveScene());
+            NpcHelper.CacheHero(playerGo);
         }
 
         private void OnDestroy()
