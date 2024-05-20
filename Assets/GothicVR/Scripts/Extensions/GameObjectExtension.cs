@@ -20,7 +20,16 @@ namespace GVR.Extensions
 
         public static GameObject FindChildRecursively(this GameObject go, string name)
         {
-            var result = go.transform.Find(name);
+            Transform result;
+            try
+            {
+                result = go.transform.Find(name);
+            }
+            catch (System.Exception)
+            {
+                Debug.LogError($"Couldn't find GameObject with name >{name}< in parent >{go.name}<");
+                return null;
+            }
 
             // The child object was found and isn't ourself
             if (result != null && result != go.transform)
