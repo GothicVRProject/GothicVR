@@ -252,6 +252,12 @@ namespace GVR.Creator.Meshes.V2.Builder
                 meshRenderer.material = Constants.LoadingMaterial;
 
                 PrepareMeshFilter(meshFilter, subMesh.Value, meshRenderer);
+
+                if (!UseTextureArray)
+                {
+                    PrepareMeshRenderer(meshRenderer, subMesh.Value);
+                }
+                
                 PrepareMeshCollider(meshObj, meshFilter.sharedMesh, subMesh.Value.Materials);
             }
 
