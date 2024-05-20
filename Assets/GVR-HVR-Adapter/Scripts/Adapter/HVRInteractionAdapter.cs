@@ -1,11 +1,13 @@
 #if GVR_HVR_INSTALLED
 using GVR.Context.Controls;
+using HurricaneVR.Framework.Components;
+using HurricaneVR.Framework.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace GVR.HVR
+namespace GVR.HVR.Adapter
 {
-    public class HVRPlayerControllerAdapter : IPlayerControllerAdapter
+    public class HVRInteractionAdapter : IInteractionAdapter
     {
         public GameObject CreatePlayerController(Scene scene)
         {
@@ -18,6 +20,13 @@ namespace GVR.HVR
             SceneManager.MoveGameObjectToScene(go, scene);
 
             return go;
+        }
+
+        public void AddClimbingComponent(GameObject go)
+        {
+            go.AddComponent<HVRClimbable>();
+            HVRGrabbable grabbable = go.AddComponent<HVRGrabbable>();
+            grabbable.PoseType = HurricaneVR.Framework.Shared.PoseType.PhysicPoser;
         }
     }
 }

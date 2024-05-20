@@ -16,19 +16,9 @@ namespace GVR.Manager
 {
     public class GvrSceneManager : SingletonBehaviour<GvrSceneManager>
     {
-        /// <summary>
-        /// IMPORTANT: Names are exact the same in Scenes/ e.g. DefaultSceneNames.General => Scenes/General.unity
-        /// </summary>
-        public enum DefaultSceneNames
-        {
-            MainMenu,
-            Loading,
-            General
-        }
-
         public GameObject interactionManager;
 
-        private static readonly string generalSceneName = DefaultSceneNames.General.ToString();
+        private static readonly string generalSceneName = Constants.SceneGeneral;
         private const int ensureLoadingBarDelayMilliseconds = 5;
 
         private string newWorldName;
@@ -185,7 +175,7 @@ namespace GVR.Manager
                     break;
                 case Constants.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
-                    var playerGo = GVRContext.PlayerControllerAdapter.CreatePlayerController(scene);
+                    var playerGo = GVRContext.InteractionAdapter.CreatePlayerController(scene);
 
                     TeleportPlayerToSpot(playerGo);
 

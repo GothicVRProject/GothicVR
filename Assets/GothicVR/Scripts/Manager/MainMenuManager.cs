@@ -15,7 +15,7 @@ namespace GVR.Manager
         {
             GvrEvents.MainMenuSceneLoaded.AddListener(delegate
             {
-                GVRContext.PlayerControllerAdapter.CreatePlayerController(SceneManager.GetActiveScene());
+                GVRContext.InteractionAdapter.CreatePlayerController(SceneManager.GetActiveScene());
             });
         }
     }

@@ -18,7 +18,7 @@ namespace GVR.Lab.Handler
                 ladderSlot, useTextureArray: false);
 
             GameObject climbableObj = vobObj.GetComponentInChildren<MeshCollider>().gameObject;
-            GVRContext.ClimbingAdapter.AddClimbingComponent(climbableObj);
+            GVRContext.InteractionAdapter.AddClimbingComponent(climbableObj);
         }
     }
 }

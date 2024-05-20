@@ -1,3 +1,4 @@
+#if GVR_HVR_INSTALLED
 using HurricaneVR.Framework.Core.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,3 +18,4 @@ namespace GVR
         }
     }
 }
+#endif

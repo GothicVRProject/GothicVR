@@ -3,9 +3,9 @@ using GVR.Context.Controls;
 using GVR.Flat;
 using UnityEngine;
 #if GVR_HVR_INSTALLED
-using GVR.HVR;
+using GVR.HVR.Adapter;
 #else
-using GVR.OXR;
+using GVR.OXR.Adapter;
 #endif
 
 
@@ -13,8 +13,7 @@ namespace GVR.Context
 {
     public static class GVRContext
     {
-        public static IPlayerControllerAdapter PlayerControllerAdapter { get; private set; }
-        public static IClimbingAdapter ClimbingAdapter { get; private set; }
+        public static IInteractionAdapter InteractionAdapter { get; private set; }
 
         public enum Controls
         {
@@ -41,20 +40,17 @@ namespace GVR.Context
         {
 #if GVR_HVR_INSTALLED
             Debug.Log("Selecting Context: VR - HurricaneVR");
-            PlayerControllerAdapter = new HVRPlayerControllerAdapter();
-            ClimbingAdapter = new HVRClimbingAdapter();
+            InteractionAdapter = new HVRInteractionAdapter();
 #else
             Debug.Log("Selecting Context: VR - OpenXR (legacy)");
-            PlayerControllerAdapter = new OXRPlayerControllerAdapter();
-            ClimbingAdapter = new OXRClimbingAdapter();
+            InteractionAdapter = new OXRInteractionAdapter();
 #endif
         }
 
         private static void SetFlatContext()
         {
             Debug.Log("Selecting Context: Flat");
-            PlayerControllerAdapter = new FlatPlayerControllerAdapter();
-            ClimbingAdapter = new FlatClimbingAdapter();
+            InteractionAdapter = new FlatInteractionAdapter();
         }
     }
 }

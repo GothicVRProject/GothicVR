@@ -750,7 +750,7 @@ namespace GVR.Creator
         {
             var vobObj = CreateDefaultMesh(vob, parent, true);
 
-            GVRContext.ClimbingAdapter.AddClimbingComponent(vobObj);
+            GVRContext.InteractionAdapter.AddClimbingComponent(vobObj);
 
             return vobObj;
         }
