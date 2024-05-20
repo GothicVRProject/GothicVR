@@ -4,6 +4,7 @@ using HurricaneVR.Framework.Components;
 using HurricaneVR.Framework.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using HurricaneVR.Framework.Shared;
 
 namespace GVR.HVR.Adapter
 {
@@ -24,9 +25,9 @@ namespace GVR.HVR.Adapter
 
         public void AddClimbingComponent(GameObject go)
         {
-            go.AddComponent<HVRClimbable>();
-            HVRGrabbable grabbable = go.AddComponent<HVRGrabbable>();
-            grabbable.PoseType = HurricaneVR.Framework.Shared.PoseType.PhysicPoser;
+            HVRGrabbable grabbable = go.GetComponentInChildren<MeshCollider>().gameObject.AddComponent<HVRGrabbable>();
+            grabbable.gameObject.AddComponent<HVRClimbable>();
+            grabbable.PoseType = PoseType.PhysicPoser;
         }
 
         public void AddItemComponent(GameObject go, bool isLab = false)
@@ -35,7 +36,7 @@ namespace GVR.HVR.Adapter
             colliderComp.convex = true;
 
             HVRGrabbable grabbable = go.AddComponent<HVRGrabbable>();
-            grabbable.PoseType = HurricaneVR.Framework.Shared.PoseType.PhysicPoser;
+            grabbable.PoseType = PoseType.PhysicPoser;
             Rigidbody rb = go.GetComponent<Rigidbody>();
             rb.isKinematic = false;
 
