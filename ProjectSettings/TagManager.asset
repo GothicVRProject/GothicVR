@@ -9,6 +9,7 @@ TagManager:
   - Title
   - IngameText
   - Subtitle
+  - projectile
   layers:
   - Default
   - TransparentFX
@@ -20,6 +21,7 @@ TagManager:
   - Player
   - Hands
   - Interactive
+  - DynamicPose
   - 
   - 
   - 
@@ -29,9 +31,8 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
+  - Grabbable
+  - Hand
   - 
   - 
   - 

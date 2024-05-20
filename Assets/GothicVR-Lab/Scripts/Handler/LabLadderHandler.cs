@@ -17,7 +17,8 @@ namespace GVR.Lab.Handler
             var vobObj = MeshFactory.CreateVob(ladderName, mdl, Vector3.zero, Quaternion.Euler(0, 270, 0),
                 ladderSlot, useTextureArray: false);
 
-            GVRContext.ClimbingAdapter.AddClimbingComponent(vobObj);
+            GameObject climbableObj = vobObj.GetComponentInChildren<MeshCollider>().gameObject;
+            GVRContext.ClimbingAdapter.AddClimbingComponent(climbableObj);
         }
     }
 }

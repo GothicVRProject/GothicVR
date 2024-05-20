@@ -11,6 +11,9 @@ using GVR.Extensions;
 using GVR.Globals;
 using GVR.Vm;
 using GVR.Vob;
+#if GVR_HVR_INSTALLED
+using HurricaneVR.Framework.Core;
+#endif
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -91,11 +94,12 @@ namespace GVR.Lab.Handler
 
             currentItemName = vobItemDropdown.options[vobItemDropdown.value].text;
             var item = CreateItem(currentItemName);
-
+#if !GVR_HVR_INSTALLED
             attachPoint1 = item.FindChildRecursively("AttachPoint1").transform;
             attachPoint2 = item.FindChildRecursively("AttachPoint2").transform;
 
             SetInitialItemValue();
+#endif
         }
 
         private GameObject CreateItem(string itemName)
@@ -104,9 +108,15 @@ namespace GVR.Lab.Handler
             var item = AssetCache.TryGetItemData(itemName);
             var mrm = AssetCache.TryGetMrm(item.Visual);
             var itemGo = MeshFactory.CreateVob(item.Visual, mrm, default, default, true, rootGo: itemPrefab, parent: itemSpawnSlot);
-
-            var itemGrabComp = itemGo.GetComponent<ItemGrabInteractable>();
             var colliderComp = itemGo.GetComponent<MeshCollider>();
+#if GVR_HVR_INSTALLED
+            HVRGrabbable grabbable = itemGo.AddComponent<HVRGrabbable>();
+            grabbable.PoseType = HurricaneVR.Framework.Shared.PoseType.PhysicPoser;
+            Rigidbody rb = itemGo.GetComponent<Rigidbody>();
+            rb.isKinematic = false;
+#else
+var itemGrabComp = itemGo.GetComponent<ItemGrabInteractable>();
+            
 
             // Adding it now will set some default values for collider and grabbing now.
             // Easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
@@ -114,6 +124,8 @@ namespace GVR.Lab.Handler
 
             xrGrabComp.attachTransform = itemGrabComp.attachPoint1.transform;
             xrGrabComp.secondaryAttachTransform = itemGrabComp.attachPoint2.transform;
+
+#endif
 
             colliderComp.convex = true;
 
