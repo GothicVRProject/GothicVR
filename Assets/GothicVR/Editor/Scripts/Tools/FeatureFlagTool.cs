@@ -25,7 +25,6 @@ namespace GVR.Editor.Tools
             new (nameof(FeatureFlags.enableMusic), typeof(bool), true),
             new (nameof(FeatureFlags.vobCulling), typeof(bool), true),
             new (nameof(FeatureFlags.enableSoundCulling), typeof(bool), true),
-            new (nameof(FeatureFlags.vobItemsDynamicAttach), typeof(bool), true),
             new (nameof(FeatureFlags.showBarrier), typeof(bool), true),
 
             // Ints / Floats

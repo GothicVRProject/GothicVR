@@ -17,5 +17,10 @@ namespace GVR.Flat
         {
             throw new NotImplementedException();
         }
+
+        public void AddItemComponent(GameObject go, bool isLab = false)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

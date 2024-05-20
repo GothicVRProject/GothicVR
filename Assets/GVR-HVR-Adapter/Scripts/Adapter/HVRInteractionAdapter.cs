@@ -28,6 +28,19 @@ namespace GVR.HVR.Adapter
             HVRGrabbable grabbable = go.AddComponent<HVRGrabbable>();
             grabbable.PoseType = HurricaneVR.Framework.Shared.PoseType.PhysicPoser;
         }
+
+        public void AddItemComponent(GameObject go, bool isLab = false)
+        {
+            var colliderComp = go.GetComponent<MeshCollider>();
+            colliderComp.convex = true;
+
+            HVRGrabbable grabbable = go.AddComponent<HVRGrabbable>();
+            grabbable.PoseType = HurricaneVR.Framework.Shared.PoseType.PhysicPoser;
+            Rigidbody rb = go.GetComponent<Rigidbody>();
+            rb.isKinematic = false;
+
+            // FIXME - activate/deactivate culling when dragged around
+        }
     }
 }
 #endif

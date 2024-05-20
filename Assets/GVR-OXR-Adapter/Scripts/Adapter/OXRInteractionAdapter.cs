@@ -1,5 +1,7 @@
 using GVR.Context.Controls;
 using GVR.Globals;
+using GVR.OXR.Components.Vobs;
+using GVR.Vob;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -51,6 +53,26 @@ namespace GVR.OXR.Adapter
             grabComp.trackPosition = false;
             grabComp.trackRotation = false;
             grabComp.selectMode = InteractableSelectMode.Multiple; // With this, we can grab with both hands!
+        }
+
+        public void AddItemComponent(GameObject go, bool isLab = false)
+        {
+            // This will set some default values for collider and grabbing now.
+            // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
+            var grabComp = go.AddComponent<XRGrabInteractable>();
+
+            var colliderComp = go.GetComponent<MeshCollider>();
+            colliderComp.convex = true;
+
+            var itemGrabComp = go.AddComponent<OXRItemGrabInteractable>();
+            itemGrabComp.rb = go.GetComponent<Rigidbody>();
+
+            // There is no culling in Lab
+            if (!isLab)
+            {
+                grabComp.selectEntered.AddListener(itemGrabComp.SelectEntered);
+                grabComp.selectExited.AddListener(itemGrabComp.SelectExited);
+            }
         }
     }
 }

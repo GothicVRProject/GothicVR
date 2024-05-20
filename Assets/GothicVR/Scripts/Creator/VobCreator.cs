@@ -535,27 +535,7 @@ namespace GVR.Creator
                 return null;
             }
 
-            // It will set some default values for collider and grabbing now.
-            // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
-            var grabComp = vobObj.AddComponent<XRGrabInteractable>();
-
-            if (FeatureFlags.I.vobItemsDynamicAttach)
-            {
-                grabComp.useDynamicAttach = true;
-                grabComp.selectMode = InteractableSelectMode.Multiple;
-            }
-
-            var itemGrabComp = vobObj.GetComponent<ItemGrabInteractable>();
-            var colliderComp = vobObj.GetComponent<MeshCollider>();
-
-            grabComp.attachTransform = itemGrabComp.attachPoint1.transform;
-            grabComp.secondaryAttachTransform = itemGrabComp.attachPoint2.transform;
-
-            vobObj.layer = Constants.ItemLayer;
-
-            colliderComp.convex = true;
-            grabComp.selectEntered.AddListener(itemGrabComp.SelectEntered);
-            grabComp.selectExited.AddListener(itemGrabComp.SelectExited);
+            GVRContext.InteractionAdapter.AddItemComponent(vobObj);
 
             return vobObj;
         }

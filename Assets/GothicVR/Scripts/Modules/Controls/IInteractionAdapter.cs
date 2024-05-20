@@ -7,5 +7,6 @@ namespace GVR.Context.Controls
     {
         GameObject CreatePlayerController(Scene scene);
         void AddClimbingComponent(GameObject go);
+        void AddItemComponent(GameObject go, bool isLab = false);
     }
 }
