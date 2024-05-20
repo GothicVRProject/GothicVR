@@ -3,6 +3,7 @@ using GVR.Caches;
 using GVR.Debugging;
 using GVR.Globals;
 using GVR.Util;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace GVR.Manager
@@ -11,7 +12,10 @@ namespace GVR.Manager
     {
         private void Start()
         {
-            GvrEvents.GeneralSceneLoaded.AddListener(WorldLoaded);
+            GvrEvents.GeneralSceneLoaded.AddListener(delegate(GameObject playerGo)
+            {
+                WorldLoaded();
+            });
             GvrEvents.MainMenuSceneLoaded.AddListener(WorldLoaded);
         }
 

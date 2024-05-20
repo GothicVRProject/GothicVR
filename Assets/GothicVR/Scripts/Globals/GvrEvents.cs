@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace GVR.Globals
@@ -18,7 +19,11 @@ namespace GVR.Globals
         public static readonly UnityEvent LoadingSceneUnloaded = new();
 
         // Hint: Scene general is always loaded >after< world is fully filled with vobs etc.
-        public static readonly UnityEvent GeneralSceneLoaded = new();
+        /// <summary>
+        /// GameObject playerGo - as we spawn it the same frame, we call this event. But Unity can Find() it one frame later earliest.
+        /// We therefore provide it to the event.
+        /// </summary>
+        public static readonly UnityEvent<GameObject> GeneralSceneLoaded = new();
         public static readonly UnityEvent GeneralSceneUnloaded = new();
         
         public static readonly UnityEvent WorldSceneLoaded = new();

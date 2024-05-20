@@ -64,7 +64,7 @@ namespace GVR.Creator
             GvrEvents.GeneralSceneLoaded.AddListener(PostWorldLoaded);
         }
 
-        private static void PostWorldLoaded()
+        private static void PostWorldLoaded(GameObject playerGo)
         {
             // We need to check for all Sounds once, if they need to be activated as they're next to player.
             // As CullingGroup only triggers deactivation once player spawns, but not activation.

@@ -23,21 +23,15 @@ namespace GVR.Manager
 
         static NpcHelper()
         {
-            GvrEvents.GeneralSceneLoaded.AddListener(GeneralSceneLoaded);
+            GvrEvents.GeneralSceneLoaded.AddListener((GameObject playerGo) =>
+            {
+                CacheHero(playerGo);
+            });
         }
 
-        private static void GeneralSceneLoaded()
-        {
-            CacheHero();
-        }
-
-        public static void CacheHero(GameObject playerGo = null)
+        public static void CacheHero(GameObject playerGo)
         {
             var heroIndex = GameData.GothicVm.GlobalHero!.Index;
-
-            // In lab we can't fetch it, as it's spawned at the same time. In normal game it works.
-            if (playerGo == null)
-                playerGo = GameObject.FindWithTag(Constants.PlayerTag);
 
             var playerProperties = playerGo.GetComponent<NpcProperties>();
 

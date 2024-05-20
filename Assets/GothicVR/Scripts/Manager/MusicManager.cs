@@ -89,7 +89,7 @@ namespace GVR.Manager
             Play("SYS_LOADING");
         }
 
-        private static void OnWorldLoaded()
+        private static void OnWorldLoaded(GameObject playerGo)
         {
             _musicZones.Clear();
 

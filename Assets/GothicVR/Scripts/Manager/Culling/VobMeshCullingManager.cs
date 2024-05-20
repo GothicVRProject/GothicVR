@@ -266,7 +266,7 @@ namespace GVR.Manager.Culling
         /// Set main camera once world is loaded fully.
         /// Doesn't work at loading time as we change scenes etc.
         /// </summary>
-        private void PostWorldCreate()
+        private void PostWorldCreate(GameObject playerGo)
         {
             foreach (var group in new[] { vobCullingGroupSmall, vobCullingGroupMedium, vobCullingGroupLarge })
             {

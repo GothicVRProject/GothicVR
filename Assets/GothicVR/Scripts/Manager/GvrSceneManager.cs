@@ -179,7 +179,7 @@ namespace GVR.Manager
 
                     TeleportPlayerToSpot(playerGo);
 
-                    GvrEvents.GeneralSceneLoaded.Invoke();
+                    GvrEvents.GeneralSceneLoaded.Invoke(playerGo);
 
                     break;
                 case Constants.SceneMainMenu:

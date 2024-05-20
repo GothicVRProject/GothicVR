@@ -34,7 +34,7 @@ namespace GVR.Manager
             GvrEvents.GeneralSceneLoaded.AddListener(WorldLoadedEvent);
         }
 
-        private void WorldLoadedEvent()
+        private void WorldLoadedEvent(GameObject playerGo)
         {
             var time = new DateTime(1, 1, 1,
                 FeatureFlags.I.startHour, FeatureFlags.I.startMinute, 0);

@@ -257,7 +257,7 @@ namespace GVR.GothicVR.Scripts.Manager
             Shader.SetGlobalFloat(PointLightIntensityShaderId, PointLightIntensity);
         }
 
-        private void GeneralSceneLoaded()
+        private void GeneralSceneLoaded(GameObject playerGo)
         {
             RenderSettings.skybox = Instantiate(TextureManager.I.skyMaterial);
 
