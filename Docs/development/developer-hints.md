@@ -138,9 +138,42 @@ public static class GVRContext
     }
 ```
 
+**Example implementation**  
+```c#
+// Compile time exclusion of everything HVR related at runtime. If HVR isn't installed/in use.
+#if GVR_HVR_INSTALLED
+
+using HurricaneVR.Framework.Components;
+using HurricaneVR.Framework.Core;
+
+public class HVRInteractionAdapter : IInteractionAdapter
+{
+    public void CreatePlayerController(Scene scene)
+    {
+        var newPrefab = Resources.Load<GameObject>("HVR/Prefabs/VRPlayer");
+        var go = Object.Instantiate(newPrefab);
+        go.name = "VRPlayer - HVR";
+    }
+    
+    public void AddClimbingComponent(GameObject go)
+    {
+        go.AddComponent<HVRClimbable>();
+        HVRGrabbable grabbable = go.AddComponent<HVRGrabbable>();
+        grabbable.PoseType = HurricaneVR.Framework.Shared.PoseType.PhysicPoser;
+    }
+}
+#endif
+```
+
 **Example Usage**
 ```c#
-
+public class GVRSceneManager
+{
+    private void OnSceneLoaded(Scene scene)
+    {
+        var playerGo = GVRContext.InteractionAdapter.CreatePlayerController();
+    }
+}
 ```
 
 ### VR Controls modules
@@ -159,13 +192,9 @@ Use cases:
 
 #### How to ensure HVR is not referenced in code if not bought
 
-The image above shows, that there are two major elements required, when using Hurricane VR:
+HVR usage requires two major elements when used:
 1. Hurricane VR Plugin is installed on local Unity project
-2. Hurricane VR adapter module is installed on local Unity project
-
-To ensure we have no code reference towards an HurricaneVR namespace, we will:
-1. The adapter plugin is a separate GitHub repository, which we reference as a .gitmodule
-2. Hurricane VR will be .gitignore'd and never committed to the main repository
+2. Hurricane VR adapter module implementation is used
 
 **Workflow for Hurricane VR developers:**
 1. Checkout GothicVR repository
@@ -178,11 +207,15 @@ To ensure we have no code reference towards an HurricaneVR namespace, we will:
 2. Deactivate the #if PRAGMAs via Player symbols or via GVR Context menu
 3. Build and play, then you will use (legacy) OpenXR controls for developers
 
+To ensure we have no code reference towards an HurricaneVR namespace, we will:
+1. The adapter plugin is separated from non-HVR build via #if PRAGMAs
+2. Hurricane VR will be .gitignore'd and never committed to the main repository
+
 **How to enable/disable HVR**
 1. Edit -> Project Settings --> Player -> Scripting Define Symbols --> GVR_HVR_INSTALLED  
-   [XR Framework symbol settings](./images/XR-Controls-Symbol-Setting.png)
+   ![XR Framework symbol settings](./images/XR-Controls-Symbol-Setting.png)
 2. Via Context menu in Unity  
-   [XR Framework menu selector](./images/XR-Controls-Menu.png)
+   ![XR Framework menu selector](./images/XR-Controls-Menu.png)
 
 ### Gothic asset modules (TBD)
 
