@@ -84,3 +84,145 @@ We work with async-await for scene loading. It provides us a way to skip frames 
 Hint: async is _*not!*_ async as another thread. The way we use it, it's nearly the same as Coroutine. i.e. we just define synchronously when to skip to the next frame.
 
 ![SceneLoading](./diagrams/SceneLoading.drawio.png)
+
+## Modularization concept
+
+As our solution grows, we need a way to properly modularize it and ensure different flavors of solutions (OXR vs HVr, G1 vs G2) can be used at runtime.
+
+![Module concept](./diagrams/module-logic.drawio.png)
+
+GothicVR features the following modules:
+* Core module:
+    * GothicVR (namespace: GVR) - Core module handling main game logic
+* VR control modules
+    * OpenXR (namespace: OXR) - Handling legacy OpenXR implementation of VR controls
+    * Hurricane VR (namespace: HVR) - Handling Hurricane VR logic for VR controls
+* Gothic asset modules (used at a future state)
+    * Gothic1 (namespace: G1) - Handling logic specifically designed to work with Gothic1 only
+    * Gothic2 (namespace: G2) - Handling logic specifically designed to work with Gothic2 only
+
+Our module concept is featured by [Strategy](https://refactoring.guru/design-patterns/strategy) and [Adapter](https://refactoring.guru/design-patterns/adapter) pattern.
+
+An abbreviation of this logic looks like this:
+
+**Set context at runtime**
+```c#
+public class GVRBootstrapper
+{
+    public static void BootGothicVR(string g1Dir)
+    {
+        GVRContext.SetContext(GVRContext.Controls.VR);
+    }
+}
+```
+
+**Register Adapter via context**  
+```c#
+public static class GVRContext
+{
+        public static IInteractionAdapter InteractionAdapter { get; private set; }
+    
+        private static void SetContext(Controls context)
+        {
+            if (context == GVRContext.Controls.VR)
+            {
+#if GVR_HVR_INSTALLED
+                Debug.Log("Selecting Context: VR - HurricaneVR");
+                InteractionAdapter = new HVRInteractionAdapter();
+#else
+                Debug.Log("Selecting Context: VR - OpenXR (legacy)");
+                InteractionAdapter = new OXRInteractionAdapter();
+#endif
+            }
+        }
+    }
+```
+
+**Example implementation**  
+```c#
+// Compile time exclusion of everything HVR related at runtime. If HVR isn't installed/in use.
+#if GVR_HVR_INSTALLED
+
+using HurricaneVR.Framework.Components;
+using HurricaneVR.Framework.Core;
+
+public class HVRInteractionAdapter : IInteractionAdapter
+{
+    public void CreatePlayerController(Scene scene)
+    {
+        var newPrefab = Resources.Load<GameObject>("HVR/Prefabs/VRPlayer");
+        var go = Object.Instantiate(newPrefab);
+        go.name = "VRPlayer - HVR";
+    }
+    
+    public void AddClimbingComponent(GameObject go)
+    {
+        go.AddComponent<HVRClimbable>();
+        HVRGrabbable grabbable = go.AddComponent<HVRGrabbable>();
+        grabbable.PoseType = HurricaneVR.Framework.Shared.PoseType.PhysicPoser;
+    }
+}
+#endif
+```
+
+**Example Usage**
+```c#
+public class GVRSceneManager
+{
+    private void OnSceneLoaded(Scene scene)
+    {
+        var playerGo = GVRContext.InteractionAdapter.CreatePlayerController();
+    }
+}
+```
+
+### VR Controls modules
+
+Initially we leveraged OpenXR directly to implement VR controls. After research, we decided to go with Hurricane VR as
+it offers feature rich out-of-the-box capabilities for VR controls. Nevertheless, the module is paid, and we need to ensure,
+that developers who want to work on the project, but don't owning the asset, are able to develop the game. Therefore, we
+offer the multi-module approach.
+
+At runtime, our game decides whether to load the legacy OXR implementation to ensure developers can start the game.
+
+Use cases:
+* A developer doesn't own Hurricane VR and wants to import ZenKit data - Uses OpenXR module
+* A developer owns Hurricane VR and wants to work on VR controls - Uses Hurricane VR module
+* A developer owns Hurricane VR but doesn't want to change VR controls (e.g. importing new ZenKit assets) - Also uses Hurricane VR for running the game
+
+#### How to ensure HVR is not referenced in code if not bought
+
+HVR usage requires two major elements when used:
+1. Hurricane VR Plugin is installed on local Unity project
+2. Hurricane VR adapter module implementation is used
+
+**Workflow for Hurricane VR developers:**
+1. Checkout GothicVR repository
+2. Install Hurricane VR at Assets/HurricaneVR
+3. Activate it via Player Symbol or GVR Context menu
+4. When you hit play, you will now work with Hurricane VR controls
+
+**Workflow for non-Hurricane VR developers:**
+1. Checkout GothicVR repository
+2. Deactivate the #if PRAGMAs via Player symbols or via GVR Context menu
+3. Build and play, then you will use (legacy) OpenXR controls for developers
+
+To ensure we have no code reference towards an HurricaneVR namespace, we will:
+1. The adapter plugin is separated from non-HVR build via #if PRAGMAs
+2. Hurricane VR will be .gitignore'd and never committed to the main repository
+
+**How to enable/disable HVR**
+1. Edit -> Project Settings --> Player -> Scripting Define Symbols --> GVR_HVR_INSTALLED  
+   ![XR Framework symbol settings](./images/XR-Controls-Symbol-Setting.png)
+2. Via Context menu in Unity  
+   ![XR Framework menu selector](./images/XR-Controls-Menu.png)
+
+### Gothic asset modules (TBD)
+
+Once we finished developing GothicVR for Gothic1, we will move on implementing Gothic2 specifics. The modularization concept
+can help clearly separating code used by either of these games.
+
+### Future modules (TBD)
+
+Depending on our development progress, we might decide to go on with supporting mods which are using DLL exploits (Ninja etc.) or
+other implementing other features like Multiplayer, then we can reuse the module l
