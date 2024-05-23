@@ -344,6 +344,7 @@ MonoBehaviour:
   vobTypeToSpawn: 
   createOcNpcs: 0
   enableNpcRoutines: 0
+  enableNpcEyeBlinking: 0
   npcToSpawn: 
   enableSounds: 1
   enableMusic: 1

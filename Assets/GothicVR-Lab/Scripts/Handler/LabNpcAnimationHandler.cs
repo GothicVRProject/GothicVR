@@ -54,7 +54,7 @@ namespace GVR.Lab.Handler
                     (typeof(Wait), new(float0: 1)),
                     (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
                     (typeof(Wait), new(float0: 1)),
-                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_1")),
+                    (typeof(PlayAni), new(string0: "T_FOOD_RANDOM_2")),
                     (typeof(Wait), new(float0: 1)),
                     (typeof(LabUseItemToState), new(string0: "ItFoApple", int1: -1))
                 }
@@ -66,7 +66,7 @@ namespace GVR.Lab.Handler
                     (typeof(Wait), new(float0: 1)),
                     (typeof(PlayAni), new(string0: "T_POTION_RANDOM_1")),
                     (typeof(Wait), new(float0: 1)),
-                    (typeof(PlayAni), new(string0: "T_POTION_RANDOM_1")),
+                    (typeof(PlayAni), new(string0: "T_POTION_RANDOM_3")),
                     (typeof(Wait), new(float0: 1)),
                     (typeof(LabUseItemToState), new(string0: "ItFoBeer", int1: -1))
                 }
