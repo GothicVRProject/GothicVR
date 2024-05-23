@@ -62,6 +62,8 @@ namespace GVR.Debugging
         [Header("__________NPCs__________")]
         public bool createOcNpcs;
         public bool enableNpcRoutines;
+        [Tooltip("NPCs blink way too long until now. ;-)")]
+        public bool enableNpcEyeBlinking;
 
         [Header("__________NPCs - Developer__________")]
         [Tooltip("Add the Daedalus ids for NPCs to spawn. Take them from C_NPC instances. (Ignored if empty; No monsters to be named as they always have id=0)")]

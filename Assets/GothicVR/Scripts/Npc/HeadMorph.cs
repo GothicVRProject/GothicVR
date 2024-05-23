@@ -1,4 +1,5 @@
 using System;
+using GVR.Debugging;
 using GVR.Extensions;
 using GVR.Morph;
 using UnityEngine;
@@ -29,6 +30,9 @@ namespace GVR.Npc
         {
             base.Start();
 
+            if (!FeatureFlags.I.enableNpcEyeBlinking)
+                return;
+
             randomAnimations.Add(new()
             {
                 morphMeshName = HeadName,
@@ -39,7 +43,6 @@ namespace GVR.Npc
                 secondTimeVariable = 1.0f,
                 probabilityOfFirst = 0.2f
             });
-
             randomAnimationTimers.Add(3.8f * 2); // secondTimeAverage * 2 seconds);
         }
 

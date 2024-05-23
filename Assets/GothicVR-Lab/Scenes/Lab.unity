@@ -4122,6 +4122,7 @@ MonoBehaviour:
   vobTypeToSpawn: 
   createOcNpcs: 0
   enableNpcRoutines: 0
+  enableNpcEyeBlinking: 1
   npcToSpawn: 
   enableSounds: 0
   enableMusic: 0
@@ -17643,7 +17644,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animationsDropdown: {fileID: 999036247}
   bloodwynSlotGo: {fileID: 576832278}
-  bloodwynInstanceId: 6596
 --- !u!1 &1820935222
 GameObject:
   m_ObjectHideFlags: 0
@@ -19877,11 +19877,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5216bb91c14ec494f0c03b3f00ae47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bootLabMusicHandler: 0
-  bootNpcHandler: 0
-  bootLockableHandler: 0
-  bootLadderHandler: 0
-  bootAttachPointHandler: 0
   labMusicHandler: {fileID: 408181898}
   npcDialogHandler: {fileID: 1791413021}
   lockableLabHandler: {fileID: 1956714045}
