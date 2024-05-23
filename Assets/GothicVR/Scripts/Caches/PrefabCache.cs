@@ -38,7 +38,7 @@ namespace GVR.Caches
                 PrefabType.Vob => "Prefabs/Vobs/Vob",
                 PrefabType.VobAnimate => "Prefabs/Vobs/zCVobAnimate",
                 PrefabType.VobItem => "Prefabs/Vobs/oCItem",
-                PrefabType.VobContainer => "HVR/Prefabs/Vobs/oCMobContainer", // FIXME - Need to implement a lookup logic for real adapter instead of hard coding it.
+                PrefabType.VobContainer => "Prefabs/Vobs/oCMobContainer",
                 PrefabType.VobDoor => "Prefabs/Vobs/oCMobDoor",
                 PrefabType.VobInteractable => "Prefabs/Vobs/oCMobInter",
                 PrefabType.VobMovable => "Prefabs/Vobs/oCMobMovable",
