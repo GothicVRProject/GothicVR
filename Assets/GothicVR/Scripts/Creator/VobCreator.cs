@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GothicVR.Vob;
 using GVR.Caches;
+using GVR.Context;
 using GVR.Creator.Meshes.V2;
 using GVR.Debugging;
 using GVR.Demo;
@@ -63,7 +64,7 @@ namespace GVR.Creator
             GvrEvents.GeneralSceneLoaded.AddListener(PostWorldLoaded);
         }
 
-        private static void PostWorldLoaded()
+        private static void PostWorldLoaded(GameObject playerGo)
         {
             // We need to check for all Sounds once, if they need to be activated as they're next to player.
             // As CullingGroup only triggers deactivation once player spawns, but not activation.
@@ -534,27 +535,7 @@ namespace GVR.Creator
                 return null;
             }
 
-            // It will set some default values for collider and grabbing now.
-            // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
-            var grabComp = vobObj.AddComponent<XRGrabInteractable>();
-
-            if (FeatureFlags.I.vobItemsDynamicAttach)
-            {
-                grabComp.useDynamicAttach = true;
-                grabComp.selectMode = InteractableSelectMode.Multiple;
-            }
-
-            var itemGrabComp = vobObj.GetComponent<ItemGrabInteractable>();
-            var colliderComp = vobObj.GetComponent<MeshCollider>();
-
-            grabComp.attachTransform = itemGrabComp.attachPoint1.transform;
-            grabComp.secondaryAttachTransform = itemGrabComp.attachPoint2.transform;
-
-            vobObj.layer = Constants.ItemLayer;
-
-            colliderComp.convex = true;
-            grabComp.selectEntered.AddListener(itemGrabComp.SelectEntered);
-            grabComp.selectExited.AddListener(itemGrabComp.SelectExited);
+            GVRContext.InteractionAdapter.AddItemComponent(vobObj);
 
             return vobObj;
         }
@@ -749,20 +730,7 @@ namespace GVR.Creator
         {
             var vobObj = CreateDefaultMesh(vob, parent, true);
 
-            // We will set some default values for collider and grabbing now.
-            // Adding it now is easier than putting it on a prefab and updating it at runtime (as grabbing didn't work this way out-of-the-box).
-            // e.g. grabComp's colliders aren't recalculated if we have the XRGrabInteractable set in Prefab.
-            var grabComp = vobObj.AddComponent<XRGrabInteractable>();
-            var rigidbodyComp = vobObj.GetComponent<Rigidbody>();
-            var meshColliderComp = vobObj.GetComponentInChildren<MeshCollider>();
-
-            meshColliderComp.convex = true; // We need to set it to overcome Physics.ClosestPoint warnings.
-            vobObj.tag = Constants.ClimbableTag;
-            rigidbodyComp.isKinematic = true;
-            grabComp.throwOnDetach = false; // Throws errors and isn't needed as we don't want to move the kinematic ladder when released.
-            grabComp.trackPosition = false;
-            grabComp.trackRotation = false;
-            grabComp.selectMode = InteractableSelectMode.Multiple; // With this, we can grab with both hands!
+            GVRContext.InteractionAdapter.AddClimbingComponent(vobObj);
 
             return vobObj;
         }

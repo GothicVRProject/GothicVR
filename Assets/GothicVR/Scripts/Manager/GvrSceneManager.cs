@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using GVR.Context;
 using GVR.Creator;
 using GVR.Debugging;
 using GVR.Extensions;
@@ -16,8 +17,8 @@ namespace GVR.Manager
     public class GvrSceneManager : SingletonBehaviour<GvrSceneManager>
     {
         public GameObject interactionManager;
-        
-        private const string generalSceneName = "General";
+
+        private static readonly string generalSceneName = Constants.SceneGeneral;
         private const int ensureLoadingBarDelayMilliseconds = 5;
 
         private string newWorldName;
@@ -83,7 +84,6 @@ namespace GVR.Manager
             if (worldName == newWorldName)
             {
                 SetSpawnPoint(SceneManager.GetSceneByName(newWorldName));
-                TeleportPlayerToSpot();
                 return;
             }
             
@@ -175,9 +175,11 @@ namespace GVR.Manager
                     break;
                 case Constants.SceneGeneral:
                     SceneManager.MoveGameObjectToScene(interactionManager, generalScene);
+                    var playerGo = GVRContext.InteractionAdapter.CreatePlayerController(scene);
 
-                    TeleportPlayerToSpot();
-                    GvrEvents.GeneralSceneLoaded.Invoke();
+                    TeleportPlayerToSpot(playerGo);
+
+                    GvrEvents.GeneralSceneLoaded.Invoke(playerGo);
 
                     break;
                 case Constants.SceneMainMenu:
@@ -236,13 +238,14 @@ namespace GVR.Manager
             startPoint = startPoint2;
         }
 
-        public void TeleportPlayerToSpot()
+        public void TeleportPlayerToSpot(GameObject playerGo)
         {
             if (startPoint == null)
                 return;
 
-            var player = GameObject.FindWithTag(Constants.PlayerTag);
-            player.transform.SetPositionAndRotation(startPoint.transform.position, startPoint.transform.rotation);
+            playerGo.transform.SetPositionAndRotation(startPoint.transform.position, startPoint.transform.rotation);
+
+            var p2 = playerGo.FindChildRecursively("PlayerController");
         }
     }
 }

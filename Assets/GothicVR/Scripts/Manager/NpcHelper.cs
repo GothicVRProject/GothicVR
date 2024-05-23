@@ -23,18 +23,16 @@ namespace GVR.Manager
 
         static NpcHelper()
         {
-            GvrEvents.GeneralSceneLoaded.AddListener(GeneralSceneLoaded);
+            GvrEvents.GeneralSceneLoaded.AddListener((GameObject playerGo) =>
+            {
+                CacheHero(playerGo);
+            });
         }
 
-        private static void GeneralSceneLoaded()
-        {
-            CacheHero();
-        }
-
-        public static void CacheHero()
+        public static void CacheHero(GameObject playerGo)
         {
             var heroIndex = GameData.GothicVm.GlobalHero!.Index;
-            var playerGo = GameObject.FindWithTag(Constants.PlayerTag);
+
             var playerProperties = playerGo.GetComponent<NpcProperties>();
 
             // Set data for NPC.

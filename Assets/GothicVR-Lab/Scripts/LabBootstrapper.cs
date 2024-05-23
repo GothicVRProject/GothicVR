@@ -1,9 +1,11 @@
 using GVR.Caches;
+using GVR.Context;
 using GVR.Globals;
 using GVR.Lab.Handler;
 using GVR.Manager;
 using GVR.Manager.Settings;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace GVR.GothicVR_Lab.Scripts
 {
@@ -25,7 +27,7 @@ namespace GVR.GothicVR_Lab.Scripts
             if (_isBooted)
                 return;
             _isBooted = true;
-            
+
             GvrBootstrapper.BootGothicVR(SettingsManager.GameSettings.GothicIPath);
 
             BootLab();
@@ -40,7 +42,8 @@ namespace GVR.GothicVR_Lab.Scripts
 
         private void BootLab()
         {
-            NpcHelper.CacheHero();
+            var playerGo = GVRContext.InteractionAdapter.CreatePlayerController(SceneManager.GetActiveScene());
+            NpcHelper.CacheHero(playerGo);
         }
 
         private void OnDestroy()

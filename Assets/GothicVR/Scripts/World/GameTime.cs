@@ -36,7 +36,7 @@ namespace GVR.World
             GvrEvents.GeneralSceneUnloaded.AddListener(WorldUnloaded);
         }
 
-        private void WorldLoaded()
+        private void WorldLoaded(GameObject playerGo)
         {
             timeTickCoroutineHandler = StartCoroutine(TimeTick());
         }

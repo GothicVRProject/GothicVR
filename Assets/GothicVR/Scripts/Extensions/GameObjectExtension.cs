@@ -20,7 +20,16 @@ namespace GVR.Extensions
 
         public static GameObject FindChildRecursively(this GameObject go, string name)
         {
-            var result = go.transform.Find(name);
+            Transform result;
+            try
+            {
+                result = go.transform.Find(name);
+            }
+            catch (System.Exception)
+            {
+                Debug.LogError($"Couldn't find GameObject with name >{name}< in parent >{go.name}<");
+                return null;
+            }
 
             // The child object was found and isn't ourself
             if (result != null && result != go.transform)
@@ -50,6 +59,16 @@ namespace GVR.Extensions
                 .Select(i => go.transform.GetChild(i).gameObject)
                 .ToArray();
         }
-        
+
+        /// <summary>
+        /// Either add or get existing component on GameObject.
+        /// </summary>
+        public static T TryAddComponent<T>(this GameObject go) where T : Component
+        {
+            if (go.TryGetComponent<T>(out var component))
+                return component;
+            else
+                return go.AddComponent<T>();
+        }
     }
 }

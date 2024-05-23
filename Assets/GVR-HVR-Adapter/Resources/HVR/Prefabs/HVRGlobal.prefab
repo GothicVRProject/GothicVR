@@ -1,0 +1,989 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &346970544491195575
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1528484417705360207}
+  - component: {fileID: 4364203075296450839}
+  m_Layer: 0
+  m_Name: AudioSourceTemplate
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1528484417705360207
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346970544491195575}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6318791619840882940}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &4364203075296450839
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346970544491195575}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!1 &3543920068253889181
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3543920068253889183}
+  - component: {fileID: 3543920068253889180}
+  - component: {fileID: 8473502037100388311}
+  - component: {fileID: 3527063488932284254}
+  - component: {fileID: 2568252713329606950}
+  - component: {fileID: 6541524538752578671}
+  m_Layer: 0
+  m_Name: HVRGlobal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3543920068253889183
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3543920068253889181}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6318791619840882940}
+  - {fileID: 5968507739840764660}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3543920068253889180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3543920068253889181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 923ec526580e484ca0d4716c43ccccc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GrabberManager: {fileID: 0}
+  PlayerController: {fileID: 0}
+  Camera: {fileID: 0}
+--- !u!114 &8473502037100388311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3543920068253889181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94e2703aa70f47be808cc7d516fced77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OpenVRLoader: Open VR Loader
+  OculusLoader: Oculus Loader
+  OpenXRLoader: Open XR Loader
+  WMRLoader: Windows MR Loader
+  UseOVRInputs: 0
+  OVRHaptics: 0
+  ForceOVRInputUpdate: 0
+  InitializeSteamVR: 1
+  InitializeSteamVRActions: 1
+  UseNewInputSystem: 0
+  TrackingSpace: 2
+  FingerSettings: {fileID: 11400000, guid: 09c84620c15a89048b2784a87bec8194, type: 2}
+  ControllerOffsets: {fileID: 11400000, guid: 59fc82dc1cb718745ac93844b67b3644, type: 2}
+  GrabHaptics: {fileID: 11400000, guid: 4253c613ebc69fa439e509571ef54d42, type: 2}
+  WMRInputMap: {fileID: 11400000, guid: 124009afce8494b46b50a7b8e468ed5b, type: 2}
+  ReverbG2InputMap: {fileID: 11400000, guid: 5b2559fbaa8c2904186757782b3c8fce, type: 2}
+  OculusInputMap: {fileID: 11400000, guid: dcf21fbd7ffd7f947b782b608806c6c4, type: 2}
+  ViveInputMap: {fileID: 11400000, guid: fe1ab9350dfac0141ae1397f20750127, type: 2}
+  KnucklesInputMap: {fileID: 11400000, guid: c916ec0ed5099a6488a2c81fae5ef2f3, type: 2}
+  CosmosInputMap: {fileID: 11400000, guid: 94eb4525b569d404b84cd4f580f7ffae, type: 2}
+  WMRDeadzone: {x: 0.15, y: 0.15}
+  OculusDeadzone: {x: 0.15, y: 0.15}
+  ViveDeadzone: {x: 0, y: 0}
+  KnucklesDeadzone: {x: 0, y: 0}
+  CosmosDeadzone: {x: 0, y: 0}
+  DeadzoneOverride: {x: 0, y: 0}
+  OverrideDeadzone: 0
+  CurrentSDK: 4
+  _xrPlugin: 
+  LegacyActive: 0
+  XRPluginActive: 0
+  VRPlugin: 0
+  HMDManufacturer: 
+  HMDName: 
+  LeftManufacturer: 
+  LeftControllerName: 
+  RightManufacturer: 
+  RightControllerName: 
+  LeftControllerType: 0
+  RightControllerType: 0
+  LeftFeatures: []
+  RightFeatures: []
+  HMDFeatures: []
+  LeftController: {fileID: 0}
+  RightController: {fileID: 0}
+  LeftXRInputController: {fileID: 0}
+  RightXRInputController: {fileID: 0}
+  LeftOculusController: {fileID: 0}
+  RightOculusController: {fileID: 0}
+  LeftSteamController: {fileID: 0}
+  RightSteamController: {fileID: 0}
+  LeftInputSystemController: {fileID: 0}
+  RightInputSystemController: {fileID: 0}
+  HMDFirstActivation:
+    m_PersistentCalls:
+      m_Calls: []
+  HMDActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  HMDDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  HMDRecentered:
+    m_PersistentCalls:
+      m_Calls: []
+  UserSensed:
+    m_PersistentCalls:
+      m_Calls: []
+  UserNotSensed:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftControllerConnected:
+    m_PersistentCalls:
+      m_Calls: []
+  RightControllerConnected:
+    m_PersistentCalls:
+      m_Calls: []
+  hmdpos: {x: 0, y: 0, z: 0}
+--- !u!114 &3527063488932284254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3543920068253889181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1d69d34a47b3314cbdbe937d90d2cf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TimedSlowed:
+    m_PersistentCalls:
+      m_Calls: []
+  TimeResumed:
+    m_PersistentCalls:
+      m_Calls: []
+  SmoothFixedTimeStep: 1
+  FrameSamples: 30
+  MinTimeStep: 72
+  MaxTimeStep: 144
+  TimeScale: 0.5
+  SlowImmediately: 0
+  ResumeImmediately: 0
+  TimeToSlow: 0.25
+  TimeToResume: 0.25
+  Debug: 0
+  DebugRefreshRate: 0
+  DebugTimeScale: 0
+  SlowDown: 0
+--- !u!114 &2568252713329606950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3543920068253889181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cbdb3f5a90abf442b512b58ce932e71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LeftTrigger: 0
+  LeftGrip: 0
+  RightTrigger: 0
+  RightGrip: 0
+  LeftJoystickAxis: {x: 0, y: 0}
+  LeftTrackpadAxis: {x: 0, y: 0}
+  RightJoystickAxis: {x: 0, y: 0}
+  RightTrackpadAxis: {x: 0, y: 0}
+  LeftGripButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftTriggerButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftPrimaryButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftSecondaryButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftMenuButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftPrimaryTouchButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftSecondaryTouchButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftJoystickButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftTrackpadButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftJoystickTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftTrackPadTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftTriggerTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftThumbTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftTriggerNearTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftThumbNearTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftTrackPadUp:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftTrackPadLeft:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftTrackPadRight:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  LeftTrackPadDown:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightGripButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightTriggerButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightPrimaryButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightSecondaryButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightMenuButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightPrimaryTouchButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightSecondaryTouchButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightJoystickButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightTrackpadButtonState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightJoystickTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightTrackPadTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightTriggerTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightThumbTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightTriggerNearTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightThumbNearTouchState:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightTrackPadUp:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightTrackPadLeft:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightTrackPadRight:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+  RightTrackPadDown:
+    Active: 0
+    JustActivated: 0
+    JustDeactivated: 0
+    Value: 0
+--- !u!114 &6541524538752578671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3543920068253889181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd07f8606d5a2184ca2bab0e57b64ef7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LeftGripActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftGripDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightGripActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightGripDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTriggerActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTriggerDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTriggerActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTriggerDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftPrimaryActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftPrimaryDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightPrimaryActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightPrimaryDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftSecondaryActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftSecondaryDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightSecondaryActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightSecondaryDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftMenuActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftMenuDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightMenuActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightMenuDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftPrimaryTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftPrimaryTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightPrimaryTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightPrimaryTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftSecondaryTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftSecondaryTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightSecondaryTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightSecondaryTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftJoystickActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftJoystickDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightJoystickActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightJoystickDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackpadActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackpadDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackpadActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackpadDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftJoystickTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftJoystickTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightJoystickTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightJoystickTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackPadTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackPadTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackPadTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackPadTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTriggerTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTriggerTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTriggerTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTriggerTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftThumbTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftThumbTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightThumbTouchActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightThumbTouchDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackPadUpActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackPadUpDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackPadUpActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackPadUpDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackPadLeftActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackPadLeftDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackPadLeftActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackPadLeftDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackPadRightActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackPadRightDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackPadRightActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackPadRightDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackPadDownActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  LeftTrackPadDownDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackPadDownActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  RightTrackPadDownDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!1 &3839573455227007413
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6318791619840882940}
+  - component: {fileID: 3787930450428918629}
+  m_Layer: 0
+  m_Name: SFXPlayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6318791619840882940
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3839573455227007413}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1528484417705360207}
+  m_Father: {fileID: 3543920068253889183}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3787930450428918629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3839573455227007413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36afb7cdd1462a84cb54c017be4ef91b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SFXReferenceSource: {fileID: 4364203075296450839}
+  SFXSourceCount: 100
+  SetClipName: 0
+--- !u!1001 &7282443911582554055
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3543920068253889183}
+    m_Modifications:
+    - target: {fileID: 2877709639154543785, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485226741830556, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485226745961024, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485226821168774, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485227092484991, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485227092484991, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485227092484991, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485227374402222, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485227374402222, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485227829497912, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485228308958691, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485228358529809, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485228358529809, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485228396452629, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485228611107004, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485228705090541, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485228765608965, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485228765608965, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485228765608965, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497485228795086524, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361015780881185, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361015780881187, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.0028536152
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361015780881187, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.003059646
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361015780881187, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.0028536152
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361015780881187, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7.96
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361015780881187, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.000001758337
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361015780881187, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361015780881187, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -10.896
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361015780881187, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -2.644
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361015780881187, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016183768576, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982190, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_Name
+      value: UIManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982193, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: UICanvases.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982195, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.988
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982195, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.761
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982195, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.924
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982195, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.70710653
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982195, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982195, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.70710707
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982195, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982195, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982195, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90.00001
+      objectReference: {fileID: 0}
+    - target: {fileID: 4018361016754982195, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5756381093363089672, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 6033743375347685497, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 6514669149575339086, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 7099341483417607613, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 8741537233370662430, guid: c884123088440284692e484efd2c360f, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.data[0]
+      value: 1801810542
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects:
+    - {fileID: 4018361015780881373, guid: c884123088440284692e484efd2c360f, type: 3}
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c884123088440284692e484efd2c360f, type: 3}
+--- !u!4 &5968507739840764660 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4018361016754982195, guid: c884123088440284692e484efd2c360f, type: 3}
+  m_PrefabInstance: {fileID: 7282443911582554055}
+  m_PrefabAsset: {fileID: 0}

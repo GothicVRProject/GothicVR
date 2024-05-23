@@ -2,14 +2,11 @@ using GVR.Manager.Culling;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace GVR.Vob
+namespace GVR.OXR.Components.Vobs
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class ItemGrabInteractable : MonoBehaviour
+    public class OXRItemGrabInteractable : MonoBehaviour
     {
-        public GameObject attachPoint1;
-        public GameObject attachPoint2;
-
         public Rigidbody rb;
 
         private void Start()

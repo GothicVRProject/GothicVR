@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GVR.Context;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -51,16 +52,31 @@ namespace GVR.Caches
             };
         }
 
+        /// <summary>
+        /// Lookup is done in following places:
+        /// 1. CONTEXT_NAME/Prefabs/... - overwrites lookup path below, used for specific prefabs, for current context (HVR, Flat, ...)
+        /// 2. Prefabs/... - Located inside core module (GVR), if we don't need special handling.
+        /// </summary>
         public static GameObject TryGetObject(PrefabType type)
         {
             if (Cache.TryGetValue(type, out var prefab))
                 return Object.Instantiate(prefab);
-            
-            var path = GetPath(type);
-            var newPrefab = Resources.Load<GameObject>(path);
 
-            Cache[type] = newPrefab;
-            return Object.Instantiate(newPrefab);
+            var defaultPath = GetPath(type);
+            var contextPath = $"{GVRContext.InteractionAdapter.GetContextName()}/{defaultPath}";
+
+            foreach (var path in new[]{contextPath, defaultPath})
+            {
+                var newPrefab = Resources.Load<GameObject>(path);
+
+                if (newPrefab == null)
+                    continue;
+
+                Cache[type] = newPrefab;
+                return Object.Instantiate(newPrefab);
+            }
+
+            throw new ArgumentException($"No suitable prefab found for >{type}<");
         }
 
         public static void Dispose()

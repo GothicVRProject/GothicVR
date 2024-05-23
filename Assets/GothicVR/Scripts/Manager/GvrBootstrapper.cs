@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using GVR.Caches;
+using GVR.Context;
 using GVR.Debugging;
 using GVR.Globals;
 using GVR.GothicVR.Scripts.Manager;
@@ -71,7 +72,9 @@ namespace GVR.Manager
         public static void BootGothicVR(string g1Dir)
         {
             var watch = Stopwatch.StartNew();
-            
+
+            GVRContext.SetContext(GVRContext.Controls.VR);
+
             MountVfs(g1Dir);
             SetLanguage();
             LoadGothicVm(g1Dir);
