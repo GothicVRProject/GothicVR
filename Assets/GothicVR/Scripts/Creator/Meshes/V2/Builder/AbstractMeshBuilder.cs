@@ -153,8 +153,8 @@ namespace GVR.Creator.Meshes.V2.Builder
 
         protected void BuildViaMrm()
         {
-            MeshFilter meshFilter = RootGo.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer = RootGo.AddComponent<MeshRenderer>();
+            MeshFilter meshFilter = RootGo.TryAddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = RootGo.TryAddComponent<MeshRenderer>();
             meshRenderer.material = Constants.LoadingMaterial;
             PrepareMeshFilter(meshFilter, Mrm, meshRenderer);
 
@@ -230,8 +230,8 @@ namespace GVR.Creator.Meshes.V2.Builder
                 var meshObj = new GameObject($"ZM_{meshCounter++}");
                 meshObj.SetParent(RootGo);
 
-                var meshFilter = meshObj.AddComponent<MeshFilter>();
-                var meshRenderer = meshObj.AddComponent<SkinnedMeshRenderer>();
+                var meshFilter = meshObj.TryAddComponent<MeshFilter>();
+                var meshRenderer = meshObj.TryAddComponent<SkinnedMeshRenderer>();
 
                 // FIXME - hard coded as it's the right value for BSFire. Need to be more dynamic by using element which has parent=-1.
                 meshRenderer.rootBone = nodeObjects[0].transform;
@@ -250,8 +250,8 @@ namespace GVR.Creator.Meshes.V2.Builder
             foreach (KeyValuePair<string, IMultiResolutionMesh> subMesh in attachments)
             {
                 GameObject meshObj = nodeObjects.First(bone => bone.name == subMesh.Key);
-                MeshFilter meshFilter = meshObj.AddComponent<MeshFilter>();
-                MeshRenderer meshRenderer = meshObj.AddComponent<MeshRenderer>();
+                MeshFilter meshFilter = meshObj.TryAddComponent<MeshFilter>();
+                MeshRenderer meshRenderer = meshObj.TryAddComponent<MeshRenderer>();
                 meshRenderer.material = Constants.LoadingMaterial;
 
                 PrepareMeshFilter(meshFilter, subMesh.Value, meshRenderer);
@@ -354,8 +354,8 @@ namespace GVR.Creator.Meshes.V2.Builder
 
         protected GameObject BuildViaMmb()
         {
-            var meshFilter = RootGo.AddComponent<MeshFilter>();
-            var meshRenderer = RootGo.AddComponent<MeshRenderer>();
+            var meshFilter = RootGo.TryAddComponent<MeshFilter>();
+            var meshRenderer = RootGo.TryAddComponent<MeshRenderer>();
             
             PrepareMeshFilter(meshFilter, Mmb.Mesh, meshRenderer);
             PrepareMeshRenderer(meshRenderer, Mmb.Mesh);
@@ -619,7 +619,7 @@ namespace GVR.Creator.Meshes.V2.Builder
 
         protected Collider PrepareMeshCollider(GameObject obj, Mesh mesh)
         {
-            var meshCollider = obj.AddComponent<MeshCollider>();
+            var meshCollider = obj.TryAddComponent<MeshCollider>();
             meshCollider.sharedMesh = mesh;
             return meshCollider;
         }

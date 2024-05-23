@@ -59,6 +59,16 @@ namespace GVR.Extensions
                 .Select(i => go.transform.GetChild(i).gameObject)
                 .ToArray();
         }
-        
+
+        /// <summary>
+        /// Either add or get existing component on GameObject.
+        /// </summary>
+        public static T TryAddComponent<T>(this GameObject go) where T : Component
+        {
+            if (go.TryGetComponent<T>(out var component))
+                return component;
+            else
+                return go.AddComponent<T>();
+        }
     }
 }
