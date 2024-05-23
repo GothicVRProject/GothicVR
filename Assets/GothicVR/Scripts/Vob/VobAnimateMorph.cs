@@ -1,4 +1,4 @@
-﻿using GVR.Misc;
+﻿using GVR.Morph;
 
 namespace GVR.Vob
 {
@@ -7,7 +7,7 @@ namespace GVR.Vob
     {
         public void StartAnimation(string morphMeshName)
         {
-            StartAnimation(morphMeshName, null, true);
+            StartAnimation(morphMeshName, null);
         }
     }
 }

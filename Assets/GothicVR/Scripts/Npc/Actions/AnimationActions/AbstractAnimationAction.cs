@@ -6,6 +6,7 @@ using GVR.Extensions;
 using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Properties;
+using GVR.Vm;
 using UnityEngine;
 using EventType = ZenKit.EventType;
 using Object = UnityEngine.Object;
@@ -69,9 +70,9 @@ namespace GVR.Npc.Actions.AnimationActions
 
         public virtual void AnimationMorphEventCallback(SerializableEventMorphAnimation data)
         {
-            var type = Props.headMorph.GetTypeByName(data.Animation);
+            var type = Props.headMorph.GetAnimationTypeByName(data.Animation);
 
-            Props.headMorph.StartAnimation(Props.BodyData.Head, type, false);
+            Props.headMorph.StartAnimation(Props.BodyData.Head, type);
         }
         
         protected virtual void InsertItem(string slot1, string slot2)
@@ -107,10 +108,26 @@ namespace GVR.Npc.Actions.AnimationActions
         {
             // e.g. T_STAND_2_WASH -> S_WASH -> S_WASH ... -> T_WASH_2_STAND
             // Inside daedalus there is no information about S_WASH, but we need this animation automatically being played.
-            if (!eventData.NextAnimation.IsEmpty())
+            if (eventData.NextAnimation.Any())
             {
                 PhysicsHelper.DisablePhysicsForNpc(Props);
                 AnimationCreator.PlayAnimation(Props.mdsNames, eventData.NextAnimation, Props.go);
+            }
+            // Play Idle animation
+            // But only if NPC isn't using an item right now. Otherwise breathing will spawn hand to hips which looks wrong when (e.g.) drinking beer.
+            else if (Props.currentItem < 0)
+            {
+                var animName = Props.walkMode switch
+                {
+                    VmGothicEnums.WalkMode.Walk => "S_WALK",
+                    VmGothicEnums.WalkMode.Sneak => "S_SNEAK",
+                    VmGothicEnums.WalkMode.Swim => "S_SWIM",
+                    VmGothicEnums.WalkMode.Dive => "S_DIVE",
+                    _ => "S_RUN"
+                };
+                var idleAnimPlaying = AnimationCreator.PlayAnimation(Props.mdsNames, animName, Props.go, true);
+                if (!idleAnimPlaying)
+                    Debug.LogError($"Animation {animName} not found for {NpcGo.name} on {this}.");
             }
 
             IsFinishedFlag = true;
