@@ -9,6 +9,13 @@ namespace GVR.HVR.Adapter
 {
     public class HVRInteractionAdapter : IInteractionAdapter
     {
+        private const string CONTEXT_NAME = "HVR";
+
+        public string GetContextName()
+        {
+            return CONTEXT_NAME;
+        }
+
         public GameObject CreatePlayerController(Scene scene)
         {
             var newPrefab = Resources.Load<GameObject>("HVR/Prefabs/VRPlayer");

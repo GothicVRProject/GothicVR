@@ -1,7 +1,6 @@
 using GVR.Context.Controls;
 using GVR.Globals;
 using GVR.OXR.Components.Vobs;
-using GVR.Vob;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -10,6 +9,13 @@ namespace GVR.OXR.Adapter
 {
     public class OXRInteractionAdapter : IInteractionAdapter
     {
+        private const string CONTEXT_NAME = "OXR";
+
+        public string GetContextName()
+        {
+            return CONTEXT_NAME;
+        }
+
         public GameObject CreatePlayerController(Scene scene)
         {
             string prefabName;
