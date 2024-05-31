@@ -22,10 +22,6 @@ namespace GVR.Npc.Actions.AnimationActions
 
             var npcPos = NpcGo.transform.position;
             fp = WayNetHelper.FindNearestFreePoint(npcPos, destination);
-
-            // Fix - If NPC is spawned directly in front of the FP, we start transition immediately (otherwise trigger/collider won't be called).
-            if (Vector3.Distance(npcPos, fp!.Position) < 1f)
-                OnDestinationReached();
         }
 
         public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
