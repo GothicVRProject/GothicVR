@@ -19,7 +19,7 @@ namespace GVR.Manager
 {
     public static class NpcHelper
     {
-        private const float fpLookupDistance = 20f; // meter
+        private const float fpLookupDistance = 7f; // meter
 
         static NpcHelper()
         {

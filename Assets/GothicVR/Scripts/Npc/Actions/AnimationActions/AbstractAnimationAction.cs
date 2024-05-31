@@ -132,22 +132,12 @@ namespace GVR.Npc.Actions.AnimationActions
 
             IsFinishedFlag = true;
         }
-
-        public virtual void OnCollisionEnter(Collision coll)
-        { }
-        public virtual void OnTriggerEnter(Collider coll)
-        { }
-
-        public virtual void OnCollisionExit(Collision coll)
-        { }
-        public virtual void OnTriggerExit(Collider coll)
-        { }
         
         /// <summary>
         /// Called every update cycle.
         /// Can be used to handle frequent things internally.
         /// </summary>
-        public virtual void Tick(Transform transform)
+        public virtual void Tick()
         { }
 
         /// <summary>

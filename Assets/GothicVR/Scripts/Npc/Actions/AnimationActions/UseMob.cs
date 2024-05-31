@@ -83,14 +83,8 @@ namespace GVR.Npc.Actions.AnimationActions
             return slot;
         }
 
-        public override void OnTriggerEnter(Collider coll)
+        protected override void OnDestinationReached()
         {
-            if (walkState != WalkState.Walk)
-                return;
-
-            if (coll.gameObject != slotGo)
-                return;
-
             StartMobUseAnimation();
         }
 

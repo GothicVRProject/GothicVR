@@ -33,5 +33,13 @@ namespace GVR.Npc.Actions.AnimationActions
 
             IsFinishedFlag = false;
         }
+
+        protected override void OnDestinationReached()
+        {
+            AnimationEndEventCallback(new SerializableEventEndSignal(nextAnimation: ""));
+
+            walkState = WalkState.Done;
+            IsFinishedFlag = true;
+        }
     }
 }
