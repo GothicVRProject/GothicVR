@@ -51,11 +51,11 @@ namespace GVR.Npc.Actions.AnimationActions
             }
         }
 
-        public override void Tick(Transform transform)
+        public override void Tick()
         {
-            base.Tick(transform);
+            base.Tick();
 
-            HandleRotation(transform);
+            HandleRotation(NpcGo.transform);
         }
 
         /// <summary>

@@ -55,6 +55,9 @@ namespace GVR.Globals
         // We need to set the scale so that collision and NPC animation is starting at the right spot.
         public static Vector3 VobZSScale = new(0.1f, 0.1f, 0.1f);
 
+        // e.g. for NPCs to check if they reached a FreePoint already. Value is based on best guess/testing.
+        public const float CloseToThreshold = 0.6f;
+
         static Constants()
         {
             LoadingMaterial = new Material(ShaderWorldLit);
