@@ -1,6 +1,8 @@
 using GVR.Manager;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using GVR.Extensions;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -114,6 +116,7 @@ namespace GVR
         public static readonly List<StationaryLight> Lights = new List<StationaryLight>();
 
         public static readonly int GlobalStationaryLightPositionsAndAttenuationShaderId = Shader.PropertyToID("_GlobalStationaryLightPositionsAndAttenuation");
+        public static readonly int GlobalStationaryLightColorIndicesShaderId = Shader.PropertyToID("_GlobalStationaryLightColorIndices");
         public static readonly int GlobalStationaryLightColorsShaderId = Shader.PropertyToID("_GlobalStationaryLightColors");
         public static readonly int StationaryLightIndicesShaderId = Shader.PropertyToID("_StationaryLightIndices");
         public static readonly int StationaryLightIndices2ShaderId = Shader.PropertyToID("_StationaryLightIndices2");
@@ -124,6 +127,10 @@ namespace GVR
         private List<MeshRenderer> _affectedRenderers = new List<MeshRenderer>();
         private Light _unityLight;
         private static readonly List<(Vector3 Position, float Range)> ThreadSafeLightData = new();
+        internal int CurrentColorIndex;
+        internal float ColorAnimationFps; // change color every 1/ColorAnimationFps seconds
+        internal List<Color> ColorAnimationList = new();
+        public static Vector4[] LightColors;
 
         private void OnDrawGizmosSelected()
         {
@@ -151,6 +158,7 @@ namespace GVR
         private void OnEnable()
         {
             Profiler.BeginSample("Stationary light enabled");
+            StartCoroutine(ChangeColor(this));
             for (int i = 0; i < _affectedRenderers.Count; i++)
             {
                 StationaryLightsManager.AddLightOnRenderer(this, _affectedRenderers[i]);
@@ -161,6 +169,7 @@ namespace GVR
         private void OnDisable()
         {
             Profiler.BeginSample("Stationary light disable");
+            StopCoroutine(ChangeColor(this));
             for (int i = 0; i < _affectedRenderers.Count; i++)
             {
                 StationaryLightsManager.RemoveLightOnRenderer(this, _affectedRenderers[i]);
@@ -175,22 +184,45 @@ namespace GVR
             // e.g. if we disabled Vob loading within FeatureFlags.
             if (Lights.IsEmpty())
                 return;
-
+            List<Vector4> _lightColorsList = new List<Vector4>();
+            foreach (var light in Lights)
+            {
+                _lightColorsList.Add(light.Color.linear);
+                _lightColorsList.AddRange(light.ColorAnimationList.Select(t => t.linear).Select(dummy => (Vector4)dummy));
+            }
             Vector4[] _lightPositionsAndAttenuation = new Vector4[Lights.Count];
-            Vector4[] _lightColors = new Vector4[Lights.Count];
+            float[] _lightColorIndices = new float[Lights.Count];
+            LightColors = _lightColorsList.Distinct().ToArray();
             for (int i = 0; i < Lights.Count; i++)
             {
                 Lights[i].Index = i;
                 Lights[i].GatherRenderers();
                 _lightPositionsAndAttenuation[i] = new Vector4(Lights[i].transform.position.x, Lights[i].transform.position.y, Lights[i].transform.position.z, 1f / (Lights[i].Range * Lights[i].Range));
-                _lightColors[i] = Lights[i].Color.linear;
+                int index = Array.IndexOf(LightColors, Lights[i].Color.linear);
+                _lightColorIndices[i] = index;
                 Lights[i].gameObject.SetActive(false);
                 Lights[i].gameObject.SetActive(true);
             }
 
             Shader.SetGlobalVectorArray(GlobalStationaryLightPositionsAndAttenuationShaderId, _lightPositionsAndAttenuation);
-            Shader.SetGlobalVectorArray(GlobalStationaryLightColorsShaderId, _lightColors);
+            Shader.SetGlobalFloatArray(GlobalStationaryLightColorIndicesShaderId, _lightColorIndices);
+            Shader.SetGlobalVectorArray(GlobalStationaryLightColorsShaderId, LightColors);
             ThreadSafeLightData.Clear(); // Clear the thread safe data as it is no longer needed.
+        }
+        
+        private static IEnumerator ChangeColor(StationaryLight light)
+        {
+            yield return new WaitForSeconds(1 / light.ColorAnimationFps);
+            while (true)
+            {
+                yield return new WaitForSeconds(1 / light.ColorAnimationFps);
+                if (light.ColorAnimationList.Count == 0) continue;
+                light.CurrentColorIndex++;
+                if (light.CurrentColorIndex >= light.ColorAnimationList.Count)
+                    light.CurrentColorIndex = 0;
+
+                light.Color = light.ColorAnimationList[light.CurrentColorIndex];
+            }
         }
 
         public static int CountLightsInBounds(Bounds bounds)
