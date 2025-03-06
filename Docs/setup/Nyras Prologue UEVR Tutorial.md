@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/b25fbc1f-8b44-435d-9167-76bbb400b74e)# Step 1 - Install the Nyras Prologue and UEVR 
+# Step 1 - Install the Nyras Prologue and UEVR 
 * Install the Nyras Prologue from Steam
 * Download UEVR from https://uevr.io/
 * Follow the installation documentation: https://praydog.github.io/uevr-docs/index.htm
@@ -9,13 +9,13 @@
 * Start the Nyras Prologue and start a new game untill you are in the game
 * Optional: Set the Nyras Prologue to windowed mode for easier configuration
   
-![image](https://github.com/user-attachments/assets/f97ae881-51ca-486d-b1e3-deb5496c7f76)
+  ![image](https://github.com/user-attachments/assets/f97ae881-51ca-486d-b1e3-deb5496c7f76)
 
 *  Change back to UEVR
 *  Select the Gothic Remake Nyras Prologue application
 *  Press "Inject"
   
-![image](https://github.com/user-attachments/assets/ca7b6d00-3691-4e81-bbe0-d1624d30d399)
+  ![image](https://github.com/user-attachments/assets/ca7b6d00-3691-4e81-bbe0-d1624d30d399)
 
 *  You should change to the game automatically with VR mode active (in 3rd person)
 
@@ -24,7 +24,7 @@
 *  You can move the camera with the right controller joystick
 *  Access the UEVR ingame menue with the "insert" button on your keyboard
 
-![image](https://github.com/user-attachments/assets/29aa35f3-4eac-4181-b0ec-b8baec07d354)
+  ![image](https://github.com/user-attachments/assets/29aa35f3-4eac-4181-b0ec-b8baec07d354)
 
 *  Activate "Advanced Settings"
 *  Go to "UObjectHook"
@@ -71,4 +71,18 @@
    ![image](https://github.com/user-attachments/assets/72b83952-30e8-412d-8745-0e8b94ff300c)
 
  *  Expand "Children"
- *  
+ *  Go to the object you want to attach to your hand (eg a sword or torch)
+ *  Expand "Components"
+ *  Go to the StaticMeshComponent of the object
+ *  Press "Attach to" right or left hand
+
+   ![image](https://github.com/user-attachments/assets/e9f5b09b-8cff-4385-afb4-f4f6d8d021be)
+
+ *  Adjust it to your needs
+ *  Check "Permanent change"
+ *  Press "Save state"
+
+  ![image](https://github.com/user-attachments/assets/55dbf1d0-08c4-4258-9fef-212a18526d95)
+
+ *  The sword will now be in your according hand
+ *  This change is mostly visually and not necessarily connected with real physics like damage dealing
