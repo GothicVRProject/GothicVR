@@ -13,6 +13,7 @@
 
 *  Change back to UEVR
 *  Select the Gothic Remake Nyras Prologue application
+*  Select "OpenXR"
 *  Press "Inject"
   
   ![image](https://github.com/user-attachments/assets/ca7b6d00-3691-4e81-bbe0-d1624d30d399)
