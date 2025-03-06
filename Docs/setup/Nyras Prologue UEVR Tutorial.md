@@ -21,18 +21,18 @@
 *  You should change to the game automatically with VR mode active (in 3rd person)
 
  # Step 3 - Configure a virtual reality first person view
-*  You will look the main character now over the shoould in 3rd person view
+*  You will now look the main character over the shoould (3rd person view)
 *  You can move the camera with the right controller joystick
 *  Access the UEVR ingame menue with the "insert" button on your keyboard
 
   ![image](https://github.com/user-attachments/assets/29aa35f3-4eac-4181-b0ec-b8baec07d354)
 
-*  Activate "Advanced Settings"
+*  Select "Show Advanced Settings"
 *  Go to "UObjectHook"
+*  Go to Main
 
   ![image](https://github.com/user-attachments/assets/0fab4fdb-61b7-4bc2-8ca6-02275f2614b7)
 
-*  Go to Main
 *  Expand the Common Objects
 *  Expand the "Acknowledged Pawn"
 *  Press "Attach camera to (relative)"
@@ -41,7 +41,7 @@
 
 *  Adjust the camera offset so that the camera is in the main character's head a little in front of his eyes
 *  Press "Save state"
-*  You have know configured a first person view
+*  You now have configured a first person VR view
 
  # Step 4 - Hide the main character's body for a more immersive experience
  *  Go to Common Objects and the "Acknowledged Pawn"
@@ -61,7 +61,7 @@
  # Step 5 - Adjust the user interface to your needs
  *  Go to "Runtime"
  *  Change the UI offset, size and distance to your needs
- *  All UI like hud, dialogs, chest interaction etc will be affacted at the same time
+ *  All UI elements like hud, dialogs, chest interaction etc will be affacted at the same time
 
    ![image](https://github.com/user-attachments/assets/2174e2f3-bc04-4382-b079-4005573357b7)
 
@@ -86,4 +86,4 @@
   ![image](https://github.com/user-attachments/assets/55dbf1d0-08c4-4258-9fef-212a18526d95)
 
  *  The sword will now be in your according hand
- *  This change is mostly visually and not necessarily connected with real physics like damage dealing
+ *  This change is mostly visual and not necessarily connected with real physics like damage dealing
