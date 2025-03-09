@@ -81,5 +81,11 @@ namespace GVR.Npc.Routines
 
             return changed;
         }
+
+        public RoutineData GetPreviousRoutine()
+        {
+            var currentRoutineIndex = Routines.IndexOf(CurrentRoutine);
+            return currentRoutineIndex == 0 ? Routines.Last() : Routines[currentRoutineIndex - 1];
+        }
     }
 }

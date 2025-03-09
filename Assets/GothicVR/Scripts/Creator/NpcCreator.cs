@@ -115,6 +115,13 @@ namespace GVR.Creator
             {
                 var routineSpawnPointName = npcGo.GetComponent<Routine>().CurrentRoutine.waypoint;
                 initialSpawnPoint = WayNetHelper.GetWayNetPoint(routineSpawnPointName);
+
+                // Fallback: No WP found? Try one more time with the previous (most likely "earlier") routine waypoint.
+                if (initialSpawnPoint == null)
+                {
+                    routineSpawnPointName = npcGo.GetComponent<Routine>().GetPreviousRoutine().waypoint;
+                    initialSpawnPoint = WayNetHelper.GetWayNetPoint(routineSpawnPointName);
+                }
             }
             else
             {
