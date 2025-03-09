@@ -5,6 +5,7 @@
 #define MAX_AFFECTING_STATIONARY_LIGHTS 16
 
 float4 _GlobalStationaryLightPositionsAndAttenuation[MAX_TOTAL_STATIONARY_LIGHTS];
+float _GlobalStationaryLightColorIndices[MAX_TOTAL_STATIONARY_LIGHTS];
 real3 _GlobalStationaryLightColors[MAX_TOTAL_STATIONARY_LIGHTS];
 
 half3 AdditionalStationaryDiffuse(uint lightIndex, real3 worldPos, real3 normal)
@@ -15,7 +16,7 @@ half3 AdditionalStationaryDiffuse(uint lightIndex, real3 worldPos, real3 normal)
 	half3 lightDirection = half3(lightVector * rsqrt(distanceSqr));
 	float diffuseDot = saturate(dot(lightDirection, normal));
 
-	return _GlobalStationaryLightColors[lightIndex] * CustomDistanceAttenuation(distanceSqr, lightPosAndAttenuation.w) * diffuseDot * _PointLightIntensity;
+	return _GlobalStationaryLightColors[_GlobalStationaryLightColorIndices[lightIndex]] * CustomDistanceAttenuation(distanceSqr, lightPosAndAttenuation.w) * diffuseDot * _PointLightIntensity;
 }
 
 #endif
