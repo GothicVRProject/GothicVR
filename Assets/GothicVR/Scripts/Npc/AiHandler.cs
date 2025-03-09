@@ -30,7 +30,7 @@ namespace GVR.Npc
         /// </summary>
         private void Update()
         {
-            properties.currentAction.Tick(transform);
+            properties.currentAction.Tick();
           
             // Add new milliseconds when stateTime shall be measured.
             if (properties.isStateTimeActive)

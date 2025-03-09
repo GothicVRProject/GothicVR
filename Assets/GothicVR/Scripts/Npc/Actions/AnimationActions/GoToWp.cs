@@ -38,31 +38,6 @@ namespace GVR.Npc.Actions.AnimationActions
                 destinationWaypoint.Name));
         }
 
-        public override void OnTriggerEnter(Collider coll)
-        {
-            if (walkState != WalkState.Walk)
-                return;
-
-            if (coll.gameObject.name != route.First().Name)
-                return;
-
-            // FIXME - get current waypoint object
-            // props.currentWayPoint = coll.gameObject.
-
-            route.Pop();
-
-            if (route.Count == 0)
-            {
-                walkState = WalkState.Done;
-                IsFinishedFlag = true;
-            }
-            else
-            {
-                // A new waypoint is destination, we therefore rotate NPC again.
-                walkState = WalkState.WalkAndRotate;
-            }
-        }
-
         protected override Vector3 GetWalkDestination()
         {
             return route.Peek().Position;
@@ -73,6 +48,24 @@ namespace GVR.Npc.Actions.AnimationActions
             base.AnimationEndEventCallback(eventData);
 
             IsFinishedFlag = false;
+        }
+
+        protected override void OnDestinationReached()
+        {
+            route.Pop();
+
+            if (route.Count == 0)
+            {
+                AnimationEndEventCallback(new SerializableEventEndSignal(nextAnimation: ""));
+
+                walkState = WalkState.Done;
+                IsFinishedFlag = true;
+            }
+            else
+            {
+                // A new waypoint is destination, we therefore rotate NPC again.
+                walkState = WalkState.WalkAndRotate;
+            }
         }
     }
 }

@@ -1,5 +1,4 @@
 using GVR.Data.ZkEvents;
-using GVR.GothicVR.Scripts.Manager;
 using GVR.Manager;
 using GVR.Vob.WayNet;
 using UnityEngine;
@@ -23,21 +22,6 @@ namespace GVR.Npc.Actions.AnimationActions
 
             var npcPos = NpcGo.transform.position;
             fp = WayNetHelper.FindNearestFreePoint(npcPos, destination);
-
-            // Fix - If NPC is spawned directly in front of the FP, we start transition immediately (otherwise trigger/collider won't be called).
-            if (Vector3.Distance(npcPos, fp!.Position) < 1f)
-                FreePointReached();
-        }
-
-        public override void OnTriggerEnter(Collider coll)
-        {
-            if (walkState != WalkState.Walk)
-                return;
-
-            if (coll.gameObject.name != fp.Name)
-                return;
-
-            FreePointReached();
         }
 
         public override void AnimationEndEventCallback(SerializableEventEndSignal eventData)
@@ -52,7 +36,7 @@ namespace GVR.Npc.Actions.AnimationActions
             return fp.Position;
         }
 
-        private void FreePointReached()
+        protected override void OnDestinationReached()
         {
             Props.CurrentFreePoint = fp;
             fp.IsLocked = true;
